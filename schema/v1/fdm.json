@@ -1,13 +1,13 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/schema/v1/fdm.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm.json",
     "title": "Farm Data Model",
     "description": "A data model to describe farm activities and assets",
     "type": "object",
     "properties": {
         "farm": {
             "description": "Properties of a farm",
-            "$ref": "https://github.com/AgroCares/farm-data-model/schema/v1/fdm_farm.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farm.json"
         }
     }
 }
