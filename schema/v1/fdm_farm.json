@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://github.com/AgroCares/farm-data-model/schema/v1/fdm.json",
+    "title": "Farm object of Farm Data Model",
+    "description": "The data model to describe the asset farm",
+    "type": "object",
+    "properties": {
+        "b_id": {
+            "description": "ID of the farm",
+            "type": "string"
+        },
+        "b_name_farm": {
+            "description": "Name of the farm",
+            "type": "string"
+        },
+        "b_sector": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": ["arable", "diary", "bulb", "tree_nursery"]
+            }
+        }
+    }
+}
