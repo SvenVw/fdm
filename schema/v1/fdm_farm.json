@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/schema/v1/fdm.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/schema/v1/fdm_farm.json",
     "title": "Farm object of Farm Data Model",
     "description": "The data model to describe the asset farm",
     "type": "object",
