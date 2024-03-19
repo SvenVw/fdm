@@ -18,5 +18,6 @@
             "type": "string",
             "pattern": "^POLYGON"
         }
-    }
+    },
+    "required": ["b_id"]
 }

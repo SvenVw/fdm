@@ -6,11 +6,11 @@
     "type": "object",
     "properties": {
         "b_id_cultivation": {
-            "description": "ID of the sowing event",
+            "description": "ID of the cultivation",
             "type": "string"
         },
         "b_id_sowing": {
-            "description": "ID of the field",
+            "description": "ID of the sowing event",
             "type": "string"
         }
     },

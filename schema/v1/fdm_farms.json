@@ -20,5 +20,6 @@
                 "enum": ["arable", "diary", "bulb", "tree_nursery"]
             }
         }
-    }
+    },
+    "required": ["b_id_farm"]
 }
