@@ -8,6 +8,14 @@
         "farm": {
             "description": "Properties of a farm",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farm.json"
+        },
+        "field": {
+            "description": "Properties of a farm",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_field.json"
+        },
+        "aquire_field": {
+            "description": "Properties of a farm",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquire_field.json"
         }
     }
 }
