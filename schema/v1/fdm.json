@@ -24,6 +24,18 @@
         "cultivations": {
             "description": "Properties of sowing fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_cultivations.json"
-        }
+        },
+        "harvesting": {
+            "description": "Properties of sowing fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_harvesting.json"
+        },
+        "terminating": {
+            "description": "Properties of sowing fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_terminating.json"
+        },
+        "analyses_harvestables": {
+            "description": "Properties of sowing fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_analyses_harvestables.json"
+        },
     }
 }

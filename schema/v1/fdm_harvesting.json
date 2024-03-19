@@ -13,8 +13,8 @@
             "description": "ID of the cultivation",
             "type": "string"
         },
-        "b_id_harvestables": {
-            "description": "ID of the harvestables",
+        "b_id_harvestable": {
+            "description": "ID of the harvestable",
             "type": "string"
         },
         "b_lu_end": {
