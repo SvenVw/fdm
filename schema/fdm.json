@@ -48,6 +48,10 @@
         "fertilizing": {
             "description": "Properties of fertilizing",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fertilizing.json"
+        },
+        "analyses_fertilizer": {
+            "description": "Properties of fertilizing",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_fertilizer.json"
         }
     }
 }

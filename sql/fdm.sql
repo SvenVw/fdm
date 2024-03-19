@@ -130,6 +130,28 @@ CREATE TABLE fertilizing (
 );
 
 
+-- fdm.analyses_fertilizer definition
+
+-- Drop table
+
+-- DROP TABLE analyses_fertilizer;
+
+CREATE TABLE analyses_fertilizer (
+	p_id_analysis text NOT NULL,
+	p_id text NOT NULL,
+	p_date_sampling date NULL,
+	p_n_rt numeric NULL,
+	p_n_if numeric NULL,
+	p_n_of numeric NULL,
+	p_p_rt numeric NULL,
+	p_k_rt numeric NULL,
+	p_dm numeric NULL,
+	p_om numeric NULL,
+	CONSTRAINT analyses_fertilizer_pk PRIMARY KEY (p_id_analysis),
+	CONSTRAINT analyses_fertilizer_fertilizers_fk FOREIGN KEY (p_id) REFERENCES fertilizers(p_id)
+);
+
+
 -- fdm.cultivations definition
 
 -- Drop table
