@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquire_field.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquiring_fields.json",
     "title": "Aquire event of field for a farm in Farm Data Model",
     "description": "The data model to describe the aquire of field event and connect farm and field",
     "type": "object",

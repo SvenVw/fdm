@@ -5,20 +5,20 @@
     "description": "A data model to describe farm activities and assets",
     "type": "object",
     "properties": {
-        "farm": {
-            "description": "Properties of a farm",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farm.json"
+        "farms": {
+            "description": "Properties of farms",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farms.json"
         },
-        "field": {
-            "description": "Properties of a field",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_field.json"
+        "fields": {
+            "description": "Properties of fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_fields.json"
         },
-        "aquire_field": {
-            "description": "Properties of a aquiring a field",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquire_field.json"
+        "aquiring_fields": {
+            "description": "Properties of a aquiring fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquiring_fields.json"
         },
         "sowing": {
-            "description": "Properties of a sowing a field",
+            "description": "Properties of sowing fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_sowing.json"
         }
     }
