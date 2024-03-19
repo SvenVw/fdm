@@ -13,7 +13,7 @@
             "description": "Properties of fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_fields.json"
         },
-        "aquiring_fields": {
+        "aquiring": {
             "description": "Properties of a aquiring fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquiring_fields.json"
         },
