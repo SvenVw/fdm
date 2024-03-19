@@ -96,6 +96,21 @@ CREATE TABLE sowing (
 );
 
 
+-- fdm.fertilizers definition
+
+-- Drop table
+
+-- DROP TABLE fertilizers;
+
+CREATE TABLE fertilizers (
+	p_id text NOT NULL,
+	b_id_farm text NOT NULL,
+	p_id_name text NULL,
+	CONSTRAINT fertilizers_pk PRIMARY KEY (p_id),
+	CONSTRAINT fertilizers_farms_fk FOREIGN KEY (b_id_farm) REFERENCES farms(b_id_farm)
+);
+
+
 -- fdm.cultivations definition
 
 -- Drop table

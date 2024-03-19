@@ -41,5 +41,9 @@
             "description": "Properties of analyis of harvestable",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_harvestable.json"
         },
+        "fertilizers": {
+            "description": "Properties of fertilizer",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fertilizers.json"
+        }
     }
 }
