@@ -52,6 +52,10 @@
         "analyses_fertilizer": {
             "description": "Properties of fertilizing",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_fertilizer.json"
+        },
+        "sampling_soil": {
+            "description": "Properties of fertilizing",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_sampling soil.json"
         }
     }
 }

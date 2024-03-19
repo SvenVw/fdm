@@ -152,6 +152,23 @@ CREATE TABLE analyses_fertilizer (
 );
 
 
+-- fdm.sampling_soil definition
+
+-- Drop table
+
+-- DROP TABLE sampling_soil;
+
+CREATE TABLE sampling_soil (
+	a_id_sampling text NOT NULL,
+	b_id text NULL,
+	a_date_sampling date NULL,
+	a_depth numeric NULL,
+	a_geometry_sampling public.geometry NULL,
+	CONSTRAINT sampling_soil_pk PRIMARY KEY (a_id_sampling),
+	CONSTRAINT sampling_soil_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+);
+
+
 -- fdm.cultivations definition
 
 -- Drop table
