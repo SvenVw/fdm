@@ -7,39 +7,39 @@
     "properties": {
         "farms": {
             "description": "Properties of farms",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farms.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_farms.json"
         },
         "fields": {
             "description": "Properties of fields",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_fields.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fields.json"
         },
         "aquiring": {
             "description": "Properties of a aquiring fields",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquiring_fields.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_aquiring_fields.json"
         },
         "sowing": {
             "description": "Properties of sowing fields",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_sowing.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_sowing.json"
         },
         "cultivations": {
             "description": "Properties of sowing fields",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_cultivations.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_cultivations.json"
         },
         "harvesting": {
             "description": "Properties of havesting cultivations",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_harvesting.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_harvesting.json"
         },
         "terminating": {
             "description": "Properties of terminating cultivations",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_terminating.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_terminating.json"
         },
         "harvestable": {
             "description": "Properties of harvestable",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_harvestable.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_harvestable.json"
         },
         "analyses_harvestable": {
             "description": "Properties of analyis of harvestable",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_analyses_harvestable.json"
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_harvestable.json"
         },
     }
 }

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_sowing.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_sowing.json",
     "title": "Sowing event in Farm Data Model",
     "description": "The data model to describe sowing event and connect field with cultivation",
     "type": "object",

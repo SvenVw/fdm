@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_cultivations.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_cultivations.json",
     "title": "Cultivation assets in Farm Data Model",
     "description": "The data model to describe cultivations and connect sowing with harvesting or terminating",
     "type": "object",

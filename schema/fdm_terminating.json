@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_terminating.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_terminating.json",
     "title": "Terminating event in Farm Data Model",
     "description": "The data model to describe terminating event of a cultivation",
     "type": "object",
