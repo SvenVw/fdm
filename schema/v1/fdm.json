@@ -10,12 +10,16 @@
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farm.json"
         },
         "field": {
-            "description": "Properties of a farm",
+            "description": "Properties of a field",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_field.json"
         },
         "aquire_field": {
-            "description": "Properties of a farm",
+            "description": "Properties of a aquiring a field",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_aquire_field.json"
+        },
+        "sowing": {
+            "description": "Properties of a sowing a field",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_sowing.json"
         }
     }
 }
