@@ -111,6 +111,25 @@ CREATE TABLE fertilizers (
 );
 
 
+-- fdm.fertilizing definition
+
+-- Drop table
+
+-- DROP TABLE fertilizing;
+
+CREATE TABLE fertilizing (
+	b_id_fertilizing text NOT NULL,
+	p_id text NOT NULL,
+	b_id text NOT NULL,
+	p_dose numeric NULL,
+	b_date_fertilizing date NULL,
+	p_app_method text NULL,
+	CONSTRAINT fertilizing_pk PRIMARY KEY (b_id_fertilizing),
+	CONSTRAINT fertilizing_fertilizers_fk FOREIGN KEY (p_id) REFERENCES fertilizers(p_id),
+	CONSTRAINT fertilizing_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+);
+
+
 -- fdm.cultivations definition
 
 -- Drop table
