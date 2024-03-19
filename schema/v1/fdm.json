@@ -20,6 +20,10 @@
         "sowing": {
             "description": "Properties of sowing fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_sowing.json"
+        },
+        "cultivations": {
+            "description": "Properties of sowing fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_cultivations.json"
         }
     }
 }
