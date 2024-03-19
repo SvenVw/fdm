@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_cultivations.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_harvestable.json",
     "title": "Harvestable assets in Farm Data Model",
     "description": "The data model to describe analyses of harvestables",
     "type": "object",
