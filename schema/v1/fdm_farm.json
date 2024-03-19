@@ -1,11 +1,11 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/v1/fdm_farm.json",
-    "title": "Farm object of Farm Data Model",
-    "description": "The data model to describe the asset farm",
+    "title": "Farm asset in Farm Data Model",
+    "description": "The data model to describe the asset: farm",
     "type": "object",
     "properties": {
-        "b_id": {
+        "b_id_farm": {
             "description": "ID of the farm",
             "type": "string"
         },
