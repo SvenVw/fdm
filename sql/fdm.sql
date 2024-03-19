@@ -169,6 +169,27 @@ CREATE TABLE sampling_soil (
 );
 
 
+-- fdm.analyses_soil definition
+
+-- Drop table
+
+-- DROP TABLE analyses_soil;
+
+CREATE TABLE analyses_soil (
+	a_id_analysis text NOT NULL,
+	a_id_sampling text NOT NULL,
+	a_source text NULL,
+	a_som_loi numeric NULL,
+	a_clay_mi numeric NULL,
+	a_c_of numeric NULL,
+	a_n_rt numeric NULL,
+	a_nmin_cc numeric NULL,
+	a_ph_cc numeric NULL,
+	CONSTRAINT analyses_soil_pk PRIMARY KEY (a_id_analysis),
+	CONSTRAINT analyses_soil_sampling_soil_fk FOREIGN KEY (a_id_sampling) REFERENCES sampling_soil(a_id_sampling)
+);
+
+
 -- fdm.cultivations definition
 
 -- Drop table

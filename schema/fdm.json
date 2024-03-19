@@ -50,12 +50,16 @@
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fertilizing.json"
         },
         "analyses_fertilizer": {
-            "description": "Properties of fertilizing",
+            "description": "Properties of fertilzer analysis",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_fertilizer.json"
         },
         "sampling_soil": {
-            "description": "Properties of fertilizing",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_sampling soil.json"
+            "description": "Properties of soil sampling",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_sampling_soil.json"
+        },
+        "analyses_soil": {
+            "description": "Properties of soil analysis",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_soil.json"
         }
     }
 }
