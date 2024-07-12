@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fertilizing.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_field_fertilizing.json",
     "title": "Fertilizing event in Farm Data Model",
     "description": "The data model to describe fertilizing event of a field",
     "type": "object",
@@ -10,7 +10,7 @@
             "type": "string"
         },
         "p_id": {
-            "description": "ID of the cultivation",
+            "description": "ID of the fertilizer",
             "type": "string"
         },
         "b_id": {

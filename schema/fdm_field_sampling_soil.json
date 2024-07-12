@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_sampling_soil.json",
-    "title": "Sampling of soil event in Farm Data Model",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_field_sampling_soil.json",
+    "title": "Sampling of soil of a field in Farm Data Model",
     "description": "The data model to describe sampling of soil",
     "type": "object",
     "properties": {

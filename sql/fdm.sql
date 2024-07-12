@@ -77,6 +77,24 @@ CREATE TABLE analyses_harvestable (
 );
 
 
+-- fdm.farm_managing definition
+
+-- Drop table
+
+-- DROP TABLE farm_managing;
+
+CREATE TABLE farm_managing (
+	b_id text NOT NULL,
+	b_id_farm text NOT NULL,
+	b_manage_start date NULL,
+	b_manage_end date NULL,
+	b_manage_type text NULL,
+	CONSTRAINT acquiring_unique UNIQUE (b_id, b_id_farm, b_manage_start, b_manage_end),
+	CONSTRAINT acquiring_farms_fk FOREIGN KEY (b_id_farm) REFERENCES farms(b_id_farm),
+	CONSTRAINT acquiring_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+);
+
+
 -- fdm.fertilizers definition
 
 -- Drop table
@@ -92,13 +110,13 @@ CREATE TABLE fertilizers (
 );
 
 
--- fdm.fertilizing definition
+-- fdm.field_fertilizing definition
 
 -- Drop table
 
--- DROP TABLE fertilizing;
+-- DROP TABLE field_fertilizing;
 
-CREATE TABLE fertilizing (
+CREATE TABLE field_fertilizing (
 	b_id_fertilizing text NOT NULL,
 	p_id text NOT NULL,
 	b_id text NOT NULL,
@@ -126,6 +144,38 @@ CREATE TABLE field_reconfigure (
 );
 
 
+-- fdm.field_sampling_soil definition
+
+-- Drop table
+
+-- DROP TABLE field_sampling_soil;
+
+CREATE TABLE field_sampling_soil (
+	a_id_sampling text NOT NULL,
+	b_id text NULL,
+	a_date_sampling date NULL,
+	a_depth numeric NULL,
+	a_geometry_sampling public.geometry NULL,
+	CONSTRAINT sampling_soil_pk PRIMARY KEY (a_id_sampling),
+	CONSTRAINT sampling_soil_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+);
+
+
+-- fdm.field_sowing definition
+
+-- Drop table
+
+-- DROP TABLE field_sowing;
+
+CREATE TABLE field_sowing (
+	b_id_sowing text NOT NULL,
+	b_id text NOT NULL,
+	b_lu text NOT NULL,
+	CONSTRAINT sowing_pk PRIMARY KEY (b_id_sowing),
+	CONSTRAINT sowing_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+);
+
+
 -- fdm.field_zoning definition
 
 -- Drop table
@@ -141,56 +191,6 @@ CREATE TABLE field_zoning (
 );
 
 
--- fdm.managing definition
-
--- Drop table
-
--- DROP TABLE managing;
-
-CREATE TABLE managing (
-	b_id text NOT NULL,
-	b_id_farm text NOT NULL,
-	b_manage_start date NULL,
-	b_manage_end date NULL,
-	b_manage_type text NULL,
-	CONSTRAINT acquiring_unique UNIQUE (b_id, b_id_farm, b_manage_start, b_manage_end),
-	CONSTRAINT acquiring_farms_fk FOREIGN KEY (b_id_farm) REFERENCES farms(b_id_farm),
-	CONSTRAINT acquiring_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
-);
-
-
--- fdm.sampling_soil definition
-
--- Drop table
-
--- DROP TABLE sampling_soil;
-
-CREATE TABLE sampling_soil (
-	a_id_sampling text NOT NULL,
-	b_id text NULL,
-	a_date_sampling date NULL,
-	a_depth numeric NULL,
-	a_geometry_sampling public.geometry NULL,
-	CONSTRAINT sampling_soil_pk PRIMARY KEY (a_id_sampling),
-	CONSTRAINT sampling_soil_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
-);
-
-
--- fdm.sowing definition
-
--- Drop table
-
--- DROP TABLE sowing;
-
-CREATE TABLE sowing (
-	b_id_sowing text NOT NULL,
-	b_id text NOT NULL,
-	b_lu text NOT NULL,
-	CONSTRAINT sowing_pk PRIMARY KEY (b_id_sowing),
-	CONSTRAINT sowing_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
-);
-
-
 -- fdm.zone_fertilizing definition
 
 -- Drop table
@@ -202,7 +202,7 @@ CREATE TABLE zone_fertilizing (
 	b_id_fertilizing text NOT NULL,
 	p_dose_rate numeric NOT NULL,
 	CONSTRAINT zone_fertilizing_unique UNIQUE (b_id_fertilizing, b_id_zone),
-	CONSTRAINT zone_fertilizing_fertilizing_fk FOREIGN KEY (b_id_fertilizing) REFERENCES fertilizing(b_id_fertilizing),
+	CONSTRAINT zone_fertilizing_fertilizing_fk FOREIGN KEY (b_id_fertilizing) REFERENCES field_fertilizing(b_id_fertilizing),
 	CONSTRAINT zone_fertilizing_zones_fk FOREIGN KEY (b_id_zone) REFERENCES zones(b_id_zone)
 );
 
@@ -246,7 +246,7 @@ CREATE TABLE analyses_soil (
 	a_nmin_cc numeric NULL,
 	a_ph_cc numeric NULL,
 	CONSTRAINT analyses_soil_pk PRIMARY KEY (a_id_analysis),
-	CONSTRAINT analyses_soil_sampling_soil_fk FOREIGN KEY (a_id_sampling) REFERENCES sampling_soil(a_id_sampling)
+	CONSTRAINT analyses_soil_sampling_soil_fk FOREIGN KEY (a_id_sampling) REFERENCES field_sampling_soil(a_id_sampling)
 );
 
 
@@ -261,17 +261,17 @@ CREATE TABLE cultivations (
 	b_id_sowing text NOT NULL,
 	CONSTRAINT cultivations_pk PRIMARY KEY (b_id_cultivation),
 	CONSTRAINT cultivations_unique UNIQUE (b_id_sowing),
-	CONSTRAINT cultivations_sowing_fk FOREIGN KEY (b_id_sowing) REFERENCES sowing(b_id_sowing)
+	CONSTRAINT cultivations_sowing_fk FOREIGN KEY (b_id_sowing) REFERENCES field_sowing(b_id_sowing)
 );
 
 
--- fdm.harvesting definition
+-- fdm.cultivation_harvesting definition
 
 -- Drop table
 
--- DROP TABLE harvesting;
+-- DROP TABLE cultivation_harvesting;
 
-CREATE TABLE harvesting (
+CREATE TABLE cultivation_harvesting (
 	b_id_harvesting text NOT NULL,
 	b_id_cultivation text NOT NULL,
 	b_id_harvestable text NULL,
@@ -283,13 +283,13 @@ CREATE TABLE harvesting (
 );
 
 
--- fdm.terminating definition
+-- fdm.cultivation_terminating definition
 
 -- Drop table
 
--- DROP TABLE terminating;
+-- DROP TABLE cultivation_terminating;
 
-CREATE TABLE terminating (
+CREATE TABLE cultivation_terminating (
 	b_id_terminating text NOT NULL,
 	b_id_cultivation text NOT NULL,
 	b_lu_end date NULL,

@@ -1,7 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_field_zoning.json",
-    "title": "Field asset in Farm Data Model",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_zone_fertilizing.json",
+    "title": "Zone fertilizing event in Farm Data Model",
     "description": "The data model to describe the event of zoning a field",
     "type": "object",
     "properties": {

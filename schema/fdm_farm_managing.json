@@ -1,16 +1,16 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_managing.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_farm_managing.json",
     "title": "Managing event of field for a farm in Farm Data Model",
     "description": "The data model to describe the management of field event and connect farm and field",
     "type": "object",
     "properties": {
-        "b_id": {
-            "description": "ID of the field",
-            "type": "string"
-        },
         "b_id_farm": {
             "description": "ID of the farm",
+            "type": "string"
+        },
+        "b_id": {
+            "description": "ID of the field",
             "type": "string"
         },
         "b_manage_start": {

@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_harvesting.json",
+    "$id": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_cultivation_harvesting.json",
     "title": "harvesting event in Farm Data Model",
     "description": "The data model to describe harvesting event of a cultivation",
     "type": "object",
