@@ -42,21 +42,17 @@ CREATE TABLE harvestables (
 );
 
 
--- fdm.managing definition
+-- fdm.zones definition
 
 -- Drop table
 
--- DROP TABLE managing;
+-- DROP TABLE zones;
 
-CREATE TABLE managing (
-	b_id text NOT NULL,
-	b_id_farm text NOT NULL,
-	b_manage_start date NULL,
-	b_manage_end date NULL,
-	b_manage_type text NULL,
-	CONSTRAINT acquiring_unique UNIQUE (b_id, b_id_farm, b_manage_start, b_manage_end),
-	CONSTRAINT acquiring_farms_fk FOREIGN KEY (b_id_farm) REFERENCES farms(b_id_farm),
-	CONSTRAINT acquiring_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+CREATE TABLE zones (
+	b_id_zone text NOT NULL,
+	b_geometry_zone public.geometry NULL,
+	b_name_zone text NULL,
+	CONSTRAINT zones_pk PRIMARY KEY (b_id_zone)
 );
 
 
@@ -115,6 +111,54 @@ CREATE TABLE fertilizing (
 );
 
 
+-- fdm.field_reconfigure definition
+
+-- Drop table
+
+-- DROP TABLE field_reconfigure;
+
+CREATE TABLE field_reconfigure (
+	b_id_primary text NOT NULL,
+	b_id_secondary text NOT NULL,
+	CONSTRAINT field_reconfigure_unique UNIQUE (b_id_primary, b_id_secondary),
+	CONSTRAINT field_reconfigure_fields_fk FOREIGN KEY (b_id_primary) REFERENCES fields(b_id),
+	CONSTRAINT field_reconfigure_fields_fk_1 FOREIGN KEY (b_id_secondary) REFERENCES fields(b_id)
+);
+
+
+-- fdm.field_zoning definition
+
+-- Drop table
+
+-- DROP TABLE field_zoning;
+
+CREATE TABLE field_zoning (
+	b_id_zoning text NOT NULL,
+	b_id text NOT NULL,
+	CONSTRAINT field_zoning_unique UNIQUE (b_id_zoning, b_id),
+	CONSTRAINT field_zoning_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id),
+	CONSTRAINT field_zoning_zones_fk FOREIGN KEY (b_id_zoning) REFERENCES zones(b_id_zone)
+);
+
+
+-- fdm.managing definition
+
+-- Drop table
+
+-- DROP TABLE managing;
+
+CREATE TABLE managing (
+	b_id text NOT NULL,
+	b_id_farm text NOT NULL,
+	b_manage_start date NULL,
+	b_manage_end date NULL,
+	b_manage_type text NULL,
+	CONSTRAINT acquiring_unique UNIQUE (b_id, b_id_farm, b_manage_start, b_manage_end),
+	CONSTRAINT acquiring_farms_fk FOREIGN KEY (b_id_farm) REFERENCES farms(b_id_farm),
+	CONSTRAINT acquiring_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
+);
+
+
 -- fdm.sampling_soil definition
 
 -- Drop table
@@ -147,18 +191,19 @@ CREATE TABLE sowing (
 );
 
 
--- fdm.field_reconfigure definition
+-- fdm.zone_fertilizing definition
 
 -- Drop table
 
--- DROP TABLE field_reconfigure;
+-- DROP TABLE zone_fertilizing;
 
-CREATE TABLE field_reconfigure (
-	b_id_primary text NOT NULL,
-	b_id_secondary text NOT NULL,
-	CONSTRAINT field_reconfigure_unique UNIQUE (b_id_primary, b_id_secondary),
-	CONSTRAINT field_reconfigure_fields_fk FOREIGN KEY (b_id_primary) REFERENCES fields(b_id),
-	CONSTRAINT field_reconfigure_fields_fk_1 FOREIGN KEY (b_id_secondary) REFERENCES fields(b_id)
+CREATE TABLE zone_fertilizing (
+	b_id_zone text NOT NULL,
+	b_id_fertilizing text NOT NULL,
+	p_dose_rate numeric NOT NULL,
+	CONSTRAINT zone_fertilizing_unique UNIQUE (b_id_fertilizing, b_id_zone),
+	CONSTRAINT zone_fertilizing_fertilizing_fk FOREIGN KEY (b_id_fertilizing) REFERENCES fertilizing(b_id_fertilizing),
+	CONSTRAINT zone_fertilizing_zones_fk FOREIGN KEY (b_id_zone) REFERENCES zones(b_id_zone)
 );
 
 

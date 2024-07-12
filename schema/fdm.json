@@ -64,6 +64,18 @@
         "analyses_soil": {
             "description": "Properties of soil analysis",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_analyses_soil.json"
+        },
+        "zones": {
+            "description": "Properties of zones",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_zones.json"
+        },
+        "field_zoning": {
+            "description": "Properties of zoning a field",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_field_zoning.json"
+        },
+        "zone_fertilizing": {
+            "description": "Properties of fertilizing a zone",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_zone_fertilizing.json"
         }
     }
 }
