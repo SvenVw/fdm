@@ -20,7 +20,7 @@
         "m_cropresidue": {
             "description": "Are crop residue left on the field",
             "type": "boolean"
-        },
+        }
     },
     "required": ["b_id_harvesting", "b_id_cultivation"]
 }

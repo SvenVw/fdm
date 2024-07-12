@@ -13,9 +13,9 @@
             "description": "Properties of fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fields.json"
         },
-        "aquiring": {
-            "description": "Properties of a aquiring fields",
-            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_aquiring_fields.json"
+        "managing": {
+            "description": "Properties of a managing fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_managing.json"
         },
         "sowing": {
             "description": "Properties of sowing fields",
