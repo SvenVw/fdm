@@ -13,6 +13,10 @@
             "description": "Properties of fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_fields.json"
         },
+        "field_reconfigure": {
+            "description": "Properties of reconfiguring fields",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_field_reconfiguring.json"
+        },
         "managing": {
             "description": "Properties of a managing fields",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_managing.json"

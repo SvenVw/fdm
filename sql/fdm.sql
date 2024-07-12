@@ -147,6 +147,21 @@ CREATE TABLE sowing (
 );
 
 
+-- fdm.field_reconfigure definition
+
+-- Drop table
+
+-- DROP TABLE field_reconfigure;
+
+CREATE TABLE field_reconfigure (
+	b_id_primary text NOT NULL,
+	b_id_secondary text NOT NULL,
+	CONSTRAINT field_reconfigure_unique UNIQUE (b_id_primary, b_id_secondary),
+	CONSTRAINT field_reconfigure_fields_fk FOREIGN KEY (b_id_primary) REFERENCES fields(b_id),
+	CONSTRAINT field_reconfigure_fields_fk_1 FOREIGN KEY (b_id_secondary) REFERENCES fields(b_id)
+);
+
+
 -- fdm.analyses_fertilizer definition
 
 -- Drop table
