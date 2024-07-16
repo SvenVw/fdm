@@ -5,7 +5,7 @@
     "description": "The data model to describe sampling of soil",
     "type": "object",
     "properties": {
-        "a_id_sampling": {
+        "a_id_sampling_soil": {
             "description": "ID of the sampling of soil",
             "type": "string"
         },
@@ -25,7 +25,11 @@
             "description": "Geometry of soil sampling",
             "type": "string",
             "pattern": "^POINT|^MULTIPOINT"
+        },
+        "b_id_samplingdesign": {
+            "description": "ID of sampling design",
+            "type": "string"
         }
     },
-    "required": ["a_id_sampling"]
+    "required": ["a_id_sampling", "b_id"]
 }

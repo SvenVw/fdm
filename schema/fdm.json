@@ -76,6 +76,10 @@
         "zone_fertilizing": {
             "description": "Properties of fertilizing a zone",
             "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_zone_fertilizing.json"
+        },
+        "samplingdesign_soil": {
+            "description": "Properties of a soils sampling design",
+            "$ref": "https://github.com/AgroCares/farm-data-model/blob/main/schema/fdm_samplingdesign_soil.json"
         }
     }
 }

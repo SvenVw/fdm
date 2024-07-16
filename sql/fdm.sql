@@ -56,6 +56,20 @@ CREATE TABLE zones (
 );
 
 
+-- fdm.samplingdesign_soil definition
+
+-- Drop table
+
+-- DROP TABLE samplingdesign_soil;
+
+CREATE TABLE samplingdesign_soil (
+	b_id_samplingdesign text NOT NULL,
+	b_geometry_sampling public.geometry NULL,
+	a_depth numeric NULL,
+	CONSTRAINT samplingdesign_pk PRIMARY KEY (b_id_samplingdesign)
+);
+
+
 -- fdm.analyses_harvestable definition
 
 -- Drop table
@@ -151,12 +165,14 @@ CREATE TABLE field_reconfigure (
 -- DROP TABLE field_sampling_soil;
 
 CREATE TABLE field_sampling_soil (
-	a_id_sampling text NOT NULL,
-	b_id text NULL,
+	a_id_sampling_soil text NOT NULL,
+	b_id text NOT NULL,
 	a_date_sampling date NULL,
 	a_depth numeric NULL,
 	a_geometry_sampling public.geometry NULL,
-	CONSTRAINT sampling_soil_pk PRIMARY KEY (a_id_sampling),
+	b_id_samplingdesign text NULL,
+	CONSTRAINT sampling_soil_pk PRIMARY KEY (a_id_sampling_soil),
+	CONSTRAINT field_sampling_soil_samplingdesign_soil_fk FOREIGN KEY (b_id_samplingdesign) REFERENCES samplingdesign_soil(b_id_samplingdesign),
 	CONSTRAINT sampling_soil_fields_fk FOREIGN KEY (b_id) REFERENCES fields(b_id)
 );
 
@@ -237,7 +253,6 @@ CREATE TABLE analyses_fertilizer (
 
 CREATE TABLE analyses_soil (
 	a_id_analysis text NOT NULL,
-	a_id_sampling text NOT NULL,
 	a_source text NULL,
 	a_som_loi numeric NULL,
 	a_clay_mi numeric NULL,
@@ -245,8 +260,9 @@ CREATE TABLE analyses_soil (
 	a_n_rt numeric NULL,
 	a_nmin_cc numeric NULL,
 	a_ph_cc numeric NULL,
+	a_id_sampling_soil text NOT NULL,
 	CONSTRAINT analyses_soil_pk PRIMARY KEY (a_id_analysis),
-	CONSTRAINT analyses_soil_sampling_soil_fk FOREIGN KEY (a_id_sampling) REFERENCES field_sampling_soil(a_id_sampling)
+	CONSTRAINT analyses_soil_field_sampling_soil_fk FOREIGN KEY (a_id_sampling_soil) REFERENCES field_sampling_soil(a_id_sampling_soil)
 );
 
 
