@@ -1,4 +1,5 @@
 import { access, constants } from 'node:fs';
+import { execSync } from 'child_process';
 import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 
@@ -11,7 +12,7 @@ export class fdm {
   * @public
   */
 
-    db: any // Unknown type yet
+    db
 
     constructor(isPersisted: boolean, filePath: string) {
 
@@ -32,4 +33,17 @@ export class fdm {
         this.db = drizzle(client)
 
     }
+
+    setupDatabase() {
+        try {
+          console.log('Generating migrations...');
+          execSync('npx drizzle-kit generate --config drizzle.config.ts');
+          console.log('Running migrations...');
+          execSync('npx drizzle-kit migrate --config drizzle.config.ts');
+          console.log('Database setup complete.');
+        } catch (error) {
+          console.error('Error setting up the database:', error);
+        }
+      }
+    
 }
