@@ -1,51 +1,53 @@
 import { fdm } from './fdm';
-import { describe, expect, test, afterEach, vi } from 'vitest';
-import { access } from 'node:fs';
-import { execSync } from 'child_process';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { migrate } from 'drizzle-orm/pglite/migrator';
+import { drizzle } from 'drizzle-orm/pglite';
+import { PGlite } from '@electric-sql/pglite';
 
-vi.mock('child_process');
-vi.mock('node:fs');
+vi.mock('drizzle-orm/pglite/migrator');
+vi.mock('drizzle-orm/pglite');
+vi.mock('@electric-sql/pglite');
 
 describe('fdm', () => {
-  const dbFilePath = 'test.db';
+  let dbMock: any;
+  let migrateMock: any;
+
+  beforeEach(() => {
+    // Create mock instances before each test
+    dbMock = {
+      farms: {
+        create: vi.fn(),
+        delete: vi.fn(),
+        update: vi.fn(),
+        select: vi.fn(),
+      },
+    };
+    (drizzle as any).mockReturnValue(dbMock);
+
+    migrateMock = vi.fn();
+    (migrate as any).mockReturnValue(migrateMock);
+  });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    // Reset mocks after each test
+    vi.clearAllMocks();
   });
 
-  test('should initialize with in-memory database', () => {
-    const farmDataModel = new fdm(false, '');
-    expect(farmDataModel.db).toBeDefined();
+  it('should create an in-memory instance', () => {
+    new fdm(false, '');
+    expect(PGlite).toHaveBeenCalledWith('memory://');
   });
 
-  test('should initialize with persistent database', () => {
-    // Mock access to return successfully
-    vi.mocked(access).mockImplementation((path, mode, callback) => callback(null));
-
-    const farmDataModel = new fdm(true, dbFilePath);
-    expect(farmDataModel.db).toBeDefined();
+  it('should create a persistent instance', () => {
+    const filePath = '/some/path/to/db';
+    new fdm(true, filePath);
+    expect(PGlite).toHaveBeenCalledWith(filePath);
   });
 
-  test('should throw error if persistent database file is not accessible', () => {
-    // Mock access to return an error
-    const mockedAccess = vi.mocked(access);
-    mockedAccess.mockImplementation((path, mode, callback) => callback(new Error('File not accessible')));
-
-    // Assert that the console.error method is called with the correct error message
-    const consoleSpy = vi.spyOn(console, 'error');
-    new fdm(true, dbFilePath);
-    expect(consoleSpy).toHaveBeenCalledWith(`${dbFilePath} is not readable and writable`);
-  });
-
-  test('should setup database successfully', () => {
-    const mockedExecSync = vi.mocked(execSync);
-    mockedExecSync.mockImplementation(() => { return undefined; });
-
-    const farmDataModel = new fdm(false, '');
-    farmDataModel.setupDatabase();
-    expect(mockedExecSync).toHaveBeenCalledTimes(2);
-    expect(mockedExecSync).toHaveBeenNthCalledWith(1, 'npx drizzle-kit generate --config drizzle.config.ts');
-    expect(mockedExecSync).toHaveBeenNthCalledWith(2, 'npx drizzle-kit migrate --config drizzle.config.ts');
-  });
-
+  // No migrations yet, thus not functional
+  // it('should migrate the database on creation', async () => {
+  //   const fdmInstance = new fdm(false, '');
+  //   expect(migrateMock).toHaveBeenCalledWith(fdmInstance.db, { migrationsFolder: '/schema/migrations' });
+  // });
 });
+
