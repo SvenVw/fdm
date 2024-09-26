@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import * as schema from './db/schema';
+import { farms } from './db/schema';
 
 export class fdmServer {
   /**
@@ -42,7 +43,17 @@ export class fdmServer {
   private migrateDatabase() {
 
     // This will run migrations on the database, skipping the ones already applied
-    migrate(this.db, { migrationsFolder: '/schema/migrations', migrationsSchema: 'fdm-migrations' });
+    migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' });
 
+  }
+
+   /**
+   * Adds a new farm to the 'farms' table.
+   * 
+   * @param farmData - An object containing the data for the new farm.
+   * @returns A Promise that resolves when the farm has been added.
+   */
+   public async addFarm(farmData: schema.farmsTypeInsert): Promise<void> {
+    await this.db.insert(farms).values(farmData);
   }
 }
