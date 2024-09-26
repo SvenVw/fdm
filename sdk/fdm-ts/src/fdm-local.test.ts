@@ -1,4 +1,4 @@
-import { fdm } from './fdm';
+import { fdmLocal } from './fdm-local';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { migrate } from 'drizzle-orm/pglite/migrator';
 import { drizzle } from 'drizzle-orm/pglite';
@@ -8,7 +8,7 @@ vi.mock('drizzle-orm/pglite/migrator');
 vi.mock('drizzle-orm/pglite');
 vi.mock('@electric-sql/pglite');
 
-describe('fdm', () => {
+describe('fdmLocal', () => {
   let dbMock: any;
   let migrateMock: any;
 
@@ -34,20 +34,20 @@ describe('fdm', () => {
   });
 
   it('should create an in-memory instance', () => {
-    new fdm(false, '');
+    new fdmLocal(false, '');
     expect(PGlite).toHaveBeenCalledWith('memory://');
   });
 
   it('should create a persistent instance', () => {
     const filePath = '/some/path/to/db';
-    new fdm(true, filePath);
+    new fdmLocal(true, filePath);
     expect(PGlite).toHaveBeenCalledWith(filePath);
   });
 
   // No migrations yet, thus not functional
   // it('should migrate the database on creation', async () => {
-  //   const fdmInstance = new fdm(false, '');
-  //   expect(migrateMock).toHaveBeenCalledWith(fdmInstance.db, { migrationsFolder: '/schema/migrations' });
+  //   const fdmLocalInstance = new fdmLocal(false, '');
+  //   expect(migrateMock).toHaveBeenCalledWith(fdmLocalInstance.db, { migrationsFolder: '/schema/migrations' });
   // });
 });
 

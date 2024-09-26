@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/pglite';
 import { migrate } from 'drizzle-orm/pglite/migrator'
 import * as schema from './db/schema';
 
-export class fdm {
+export class fdmLocal {
   /**
 * Class of fdm to interact with the Farm Data Model
 * @param isPersisted  - Whether to store the data persistent on the local file system. Requires {@link filePath} to be included
