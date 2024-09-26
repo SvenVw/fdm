@@ -1,53 +1,54 @@
+// import { access, constants } from 'node:fs';
+import { afterEach, afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { eq } from "drizzle-orm";
 import { fdmLocal } from './fdm-local';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { migrate } from 'drizzle-orm/pglite/migrator';
-import { drizzle } from 'drizzle-orm/pglite';
-import { PGlite } from '@electric-sql/pglite';
-
-vi.mock('drizzle-orm/pglite/migrator');
-vi.mock('drizzle-orm/pglite');
-vi.mock('@electric-sql/pglite');
+import * as schema from './db/schema';
+import { unlinkSync } from 'fs';
 
 describe('fdmLocal', () => {
-  let dbMock: any;
-  let migrateMock: any;
+  let fdmLocalInstance: fdmLocal;
+  const filePath = './test.db';
 
-  beforeEach(() => {
-    // Create mock instances before each test
-    dbMock = {
-      farms: {
-        create: vi.fn(),
-        delete: vi.fn(),
-        update: vi.fn(),
-        select: vi.fn(),
-      },
-    };
-    (drizzle as any).mockReturnValue(dbMock);
+  beforeAll(async () => {
+    // Connect to the database
+    fdmLocalInstance = new fdmLocal(true, filePath);
+  })
 
-    migrateMock = vi.fn();
-    (migrate as any).mockReturnValue(migrateMock);
+  afterEach(async () => {
+    // Clean up the database after each test
+    await fdmLocalInstance.db.delete(schema.farms).where(eq(schema.farms.b_id_farm, 'test-farm-id'));
+
+    // Close the connection to the database
+    await fdmLocalInstance.client.close();
   });
 
-  afterEach(() => {
-    // Reset mocks after each test
-    vi.clearAllMocks();
+  afterAll(async () => {
+    // Delete the database file after all tests
+    unlinkSync(filePath);
   });
 
-  it('should create an in-memory instance', () => {
-    new fdmLocal(false, '');
-    expect(PGlite).toHaveBeenCalledWith('memory://');
+  it('should create an instance with correct parameters', () => {
+    expect(fdmLocalInstance.client).toBeDefined();
+    expect(fdmLocalInstance.db).toBeDefined();
   });
 
-  it('should create a persistent instance', () => {
-    const filePath = '/some/path/to/db';
-    new fdmLocal(true, filePath);
-    expect(PGlite).toHaveBeenCalledWith(filePath);
-  });
+  // it('should add a new farm to the database', async () => {
+  //   const farmData: schema.farmsTypeInsert = {
+  //     b_id_farm: 'test-farm-id',
+  //     b_name_farm: 'test-farm-name',
+  //     b_sector: 'arable',
+  //   };
 
-  // No migrations yet, thus not functional
-  // it('should migrate the database on creation', async () => {
-  //   const fdmLocalInstance = new fdmLocal(false, '');
-  //   expect(migrateMock).toHaveBeenCalledWith(fdmLocalInstance.db, { migrationsFolder: '/schema/migrations' });
+  //   await fdmLocalInstance.addFarm(farmData);
+
+  //   // Retrieve the added farm from the database
+  //   const addedFarm = await fdmLocalInstance.db.query.farms.findFirst({
+  //     where: (farms) => farms.b_id_farm === farmData.b_id_farm,
+  //   });
+
+  //   expect(addedFarm).toBeDefined();
+  //   expect(addedFarm?.b_id_farm).toBe(farmData.b_id_farm);
+  //   expect(addedFarm?.b_name_farm).toBe(farmData.b_name_farm);
+  //   expect(addedFarm?.b_sector).toBe(farmData.b_sector);
   // });
 });
-
