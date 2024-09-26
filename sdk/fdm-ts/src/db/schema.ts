@@ -1,7 +1,7 @@
 import { pgSchema, text, date } from "drizzle-orm/pg-core";
 
 // Define postgres schema
-export const fdmSchema = pgSchema("fdm")
+export const fdmSchema = pgSchema("fdm-dev")
 export type fdmSchemaTypeSelect = typeof fdmSchema
 
 // Define farms table

@@ -1,0 +1,158 @@
+{
+  "id": "e5ea0479-c871-44b2-bb1b-45f15e02cb25",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "fdm-dev.farm_managing": {
+      "name": "farm_managing",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_id_farm": {
+          "name": "b_id_farm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_manage_start": {
+          "name": "b_manage_start",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_manage_end": {
+          "name": "b_manage_end",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_manage_type": {
+          "name": "b_manage_type",
+          "type": "b_manage_type",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "farm_managing_b_id_fields_b_id_fk": {
+          "name": "farm_managing_b_id_fields_b_id_fk",
+          "tableFrom": "farm_managing",
+          "tableTo": "fields",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "b_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "farm_managing_b_id_farm_farms_b_id_farm_fk": {
+          "name": "farm_managing_b_id_farm_farms_b_id_farm_fk",
+          "tableFrom": "farm_managing",
+          "tableTo": "farms",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id_farm"
+          ],
+          "columnsTo": [
+            "b_id_farm"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.farms": {
+      "name": "farms",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id_farm": {
+          "name": "b_id_farm",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_name_farm": {
+          "name": "b_name_farm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_sector": {
+          "name": "b_sector",
+          "type": "sector",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.fields": {
+      "name": "fields",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_name_field": {
+          "name": "b_name_field",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {
+    "fdm-dev.b_manage_type": {
+      "name": "b_manage_type",
+      "schema": "fdm-dev",
+      "values": [
+        "owner",
+        "lease"
+      ]
+    },
+    "fdm-dev.sector": {
+      "name": "sector",
+      "schema": "fdm-dev",
+      "values": [
+        "diary",
+        "arable",
+        "tree_nursery",
+        "bulbs"
+      ]
+    }
+  },
+  "schemas": {
+    "fdm-dev": "fdm-dev"
+  },
+  "sequences": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
