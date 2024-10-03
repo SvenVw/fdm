@@ -33,6 +33,12 @@ describe('fdmServer', () => {
     expect(fdmServerInstance.db).toBeDefined();
   });
 
+  it('should return a GraphQL schema', () => {
+    const schemaGraphQl = fdmServerInstance.getGraphQlSchema()
+    console.log(schemaGraphQl)
+    expect(schemaGraphQl).toBeDefined()
+  });
+
   it('should add a new farm to the database', async () => {
     const farmData: schema.farmsTypeInsert = {
       b_id_farm: 'test-farm-id',

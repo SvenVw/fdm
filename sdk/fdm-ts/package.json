@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.7",
+    "drizzle-graphql": "^0.8.5",
     "drizzle-orm": "^0.33.0",
     "postgres": "^3.4.4"
   }

@@ -1,6 +1,7 @@
 // import { access, constants } from 'node:fs';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
+import { buildSchema } from 'drizzle-graphql';
 import postgres from 'postgres';
 import * as schema from './db/schema';
 import { farms } from './db/schema';
@@ -43,6 +44,18 @@ export class fdmServer {
     // This will run migrations on the database, skipping the ones already applied
     await migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' });
 
+  }
+
+  /**
+   * Returns the GraphQL schema for the Farm Data Model
+   * 
+   * @param farmData - An object containing the data for the new farm.
+   * @returns A Promise that resolves when the farm has been added.
+   */
+  public getGraphQlSchema() {
+    const { schema } = buildSchema(this.db)
+
+    return schema
   }
 
    /**
