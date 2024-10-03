@@ -3,6 +3,7 @@ import { PGlite } from '@electric-sql/pglite';
 import { drizzle } from 'drizzle-orm/pglite';
 import { migrate } from 'drizzle-orm/pglite/migrator'
 import * as schema from './db/schema';
+import { farms } from './db/schema';
 
 export class fdmLocal {
   /**
@@ -19,7 +20,7 @@ export class fdmLocal {
   constructor(isPersisted: boolean, filePath: string) {
 
     let dataDir = 'memory://'
-    if (isPersisted) {
+    if (isPersisted == true) {
 
       // Check if file is accessible
       // access(filePath, constants.R_OK | constants.W_OK, (err) => {
@@ -34,15 +35,23 @@ export class fdmLocal {
     this.client = new PGlite(dataDir)
     this.db = drizzle(this.client, { schema })
 
-    // Migrate the db to the latest version, if needed
-    this.migrateDatabase()
   }
 
   // Migrate the databe to the latest version
-  private async migrateDatabase() {
+  async migrateDatabase() {
 
     // This will run migrations on the database, skipping the ones already applied
-    await migrate(this.db, { migrationsFolder: '/schema/migrations' });
+    await migrate(this.db, { migrationsFolder: 'src/db/migrations' });
 
+  }
+
+  /**
+* Adds a new farm to the 'farms' table.
+* 
+* @param farmData - An object containing the data for the new farm.
+* @returns A Promise that resolves when the farm has been added.
+*/
+  public async addFarm(farmData: schema.farmsTypeInsert): Promise<void> {
+    await this.db.insert(farms).values(farmData);
   }
 }

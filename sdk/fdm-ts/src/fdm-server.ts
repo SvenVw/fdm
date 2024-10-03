@@ -20,7 +20,7 @@ export class fdmServer {
   client: ReturnType<typeof postgres>
   db: ReturnType<typeof drizzle>
 
-  constructor(host: string, port: number | undefined, user: string, password: string, database:string) {
+  constructor(host: string, port: number, user: string, password: string, database:string) {
 
     // Create a client
     this.client = postgres({
@@ -35,15 +35,13 @@ export class fdmServer {
     // Create the db instance
     this.db = drizzle(this.client, { schema })
 
-    // Migrate the db to the latest version, if needed
-    this.migrateDatabase()
   }
 
   // Migrate the databe to the latest version
-  private migrateDatabase() {
+  async migrateDatabase() {
 
     // This will run migrations on the database, skipping the ones already applied
-    migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' });
+    await migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' });
 
   }
 
