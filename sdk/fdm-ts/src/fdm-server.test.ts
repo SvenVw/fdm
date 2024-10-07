@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { eq } from "drizzle-orm";
+import fastify from 'fastify'
+import { createYoga } from 'graphql-yoga'
 import { fdmServer } from './fdm-server';
 import * as schema from './db/schema';
 
@@ -35,8 +37,18 @@ describe('fdmServer', () => {
 
   it('should return a GraphQL schema', () => {
     const schemaGraphQl = fdmServerInstance.getGraphQlSchema()
-    console.log(schemaGraphQl)
     expect(schemaGraphQl).toBeDefined()
+  });
+
+  it('should create a GraphQL server', async () => {
+    const logger = false;
+    const app = fdmServerInstance.createGraphQlServer(logger);    
+
+    const response = await app.inject({
+      method: 'GET',
+      url: '/graphql',
+    });
+    expect(response.statusCode).toBe(200);
   });
 
   it('should add a new farm to the database', async () => {
