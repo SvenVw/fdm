@@ -15,11 +15,11 @@ describe('fdmServer', () => {
     const port = Number(process.env.POSTGRES_PORT)
     const user = String(process.env.POSTGRES_USER)
     const password = String(process.env.POSTGRES_PASSWORD)
-    const db  = String(process.env.POSTGRES_DB)
+    const db = String(process.env.POSTGRES_DB)
     if (!host) {
       host = '127.0.0.1'
     }
-    
+
     // Connect to the database
     fdmServerInstance = new fdmServer(host, port, user, password, db);
     await fdmServerInstance.migrateDatabase()
@@ -42,7 +42,7 @@ describe('fdmServer', () => {
 
   it('should create a GraphQL server', async () => {
     const logger = false;
-    const app = fdmServerInstance.createGraphQlServer(logger);    
+    const app = fdmServerInstance.createGraphQlServer(logger);
 
     const response = await app.inject({
       method: 'GET',
@@ -67,4 +67,21 @@ describe('fdmServer', () => {
     expect(addedFarm[0].b_name_farm).toBe(farmData.b_name_farm);
     expect(addedFarm[0].b_sector).toBe(farmData.b_sector);
   });
-});
+
+  it('should get the details of a farm', async () => {
+    const farmData: schema.farmsTypeInsert = {
+      b_id_farm: 'test-farm-id',
+      b_name_farm: 'test-farm-name',
+      b_sector: 'arable',
+    };
+
+    await fdmServerInstance.addFarm(farmData);
+
+    const farm = await fdmServerInstance.getFarm('test-farm-id');
+
+    expect(farm).toBeDefined();
+    expect(farm.b_id_farm).toBe(farmData.b_id_farm);
+    expect(farm.b_name_farm).toBe(farmData.b_name_farm);
+    expect(farm.b_sector).toBe(farmData.b_sector);
+  })
+})

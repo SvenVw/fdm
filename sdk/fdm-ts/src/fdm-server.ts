@@ -1,4 +1,5 @@
 // import { access, constants } from 'node:fs';
+import { eq } from "drizzle-orm";
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { buildSchema } from 'drizzle-graphql';
@@ -103,7 +104,7 @@ export class fdmServer {
         return reply
       }
     })
-    
+
     // This will allow Fastify to forward multipart requests to GraphQL Yoga
     app.addContentTypeParser('multipart/form-data', {}, (_req, _payload, done) => done(null))
 
@@ -118,5 +119,16 @@ export class fdmServer {
   */
   public async addFarm(farmData: schema.farmsTypeInsert): Promise<void> {
     await this.db.insert(farms).values(farmData);
+  }
+
+  /**
+  * Get the details of a farm.
+  * 
+  * @param b_id_farm - The id of the farm to be requested
+  * @returns A Promise that resolves with an object that contains the details of a farm
+  */
+  public async getFarm(b_id_farm: string): Promise<schema.farmsTypeSelect> {
+    const farm = await this.db.select().from(schema.farms).where(eq(schema.farms.b_id_farm, b_id_farm)).limit(1);
+    return farm[0]
   }
 }
