@@ -22,22 +22,22 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const manageTypeEnum = fdmSchema.enum('b_manage_type', ['owner', 'lease'])
 
 export const farmManaging = fdmSchema.table('farm_managing', {
-  b_id: text('b_id').notNull().references(() => fields.b_id),
-  b_id_farm: text('b_id_farm').notNull().references(() => farms.b_id_farm),
-  b_manage_start: date('b_manage_start'),
-  b_manage_end: date('b_manage_end'),
-  b_manage_type: manageTypeEnum('b_manage_type'),
+  b_id: text().notNull().references(() => fields.b_id),
+  b_id_farm: text().notNull().references(() => farms.b_id_farm),
+  b_manage_start: date({mode: 'date'}),
+  b_manage_end: date({mode: 'date'}),
+  b_manage_type: manageTypeEnum(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })
 
-export type farmManagingTypeSelect = typeof farms.$inferSelect
-export type farmManagingTypeInsert = typeof farms.$inferInsert
+export type farmManagingTypeSelect = typeof farmManaging.$inferSelect
+export type farmManagingTypeInsert = typeof farmManaging.$inferInsert
 
 // Define fields table
 export const fields = fdmSchema.table('fields', {
-  b_id: text('b_id').primaryKey(),
-  b_name_field: text('b_name_field'),
+  b_id: text().primaryKey(),
+  b_name: text(),
   // b_geometry
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })

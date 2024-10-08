@@ -23,15 +23,13 @@ describe('FdmServer', () => {
   })
 
   beforeEach(async () => {
-    // Create a new instance for each test
-    // FdmServerInstance = new FdmServer(false, filePath);
-    // await FdmServerInstance.migrateDatabase()
+    // Clean up the database before each test
+    await FdmServerInstance.db.delete(schema.farms).where(eq(schema.farms.b_id_farm, 'test-farm-id'))
+    await FdmServerInstance.db.delete(schema.fields).where(eq(schema.fields.b_id, 'test-field-id'))
+    await FdmServerInstance.db.delete(schema.farmManaging).where(eq(schema.farmManaging.b_id, 'test-field-id'))
   })
 
   afterEach(async () => {
-    // Clean up the database after each test
-    await FdmServerInstance.db.delete(schema.farms).where(eq(schema.farms.b_id_farm, 'test-farm-id'))
-
     // Close the connection to the database
     // await FdmServerInstance.client.close();
   })
@@ -72,5 +70,26 @@ describe('FdmServer', () => {
     expect(farm.b_id_farm).toBe(b_id_farm)
     expect(farm.b_name_farm).toBe('test-farm-name-updated')
     expect(farm.b_sector).toBe('diary')
+  })
+
+  it('should add a new field to the database', async () => {
+    const b_id_farm = await FdmServerInstance.addFarm('test-farm-name', 'arable')
+    const b_id = await FdmServerInstance.addField(b_id_farm, 'test-field-name', new Date(), new Date(), 'owner')
+
+    // Retrieve the added field from the database
+    const addedField = await FdmServerInstance.db.select().from(schema.fields).where(eq(schema.fields.b_id, b_id))
+    expect(addedField).toBeDefined()
+    expect(addedField[0].b_id).toBe(b_id)
+    expect(addedField[0].b_name).toBe('test-field-name')
+
+    // Retrieve the added farm managing relation from the database
+    const addedFarmManaging = await FdmServerInstance.db.select().from(schema.farmManaging).where(eq(schema.farmManaging.b_id, b_id))
+    expect(addedFarmManaging).toBeDefined()
+    expect(addedFarmManaging[0].b_id).toBe(b_id)
+    expect(addedFarmManaging[0].b_id_farm).toBe(b_id_farm)
+  })
+
+  it('should throw an error when adding a field without a farm id', async () => {
+    await expect(FdmServerInstance.addField(null, 'test-field-name', new Date(), new Date(), 'owner')).rejects.toThrowError('b_id_farm must be defined')
   })
 })

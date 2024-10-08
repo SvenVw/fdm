@@ -5,7 +5,6 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import { buildSchema } from 'drizzle-graphql'
 import postgres from 'postgres'
 import * as schema from './db/schema'
-import { farms } from './db/schema'
 
 import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { createYoga } from 'graphql-yoga'
@@ -27,7 +26,7 @@ export class FdmServer {
   client: ReturnType<typeof postgres>
   db: ReturnType<typeof drizzle>
 
-  constructor (host: string, port: number, user: string, password: string, database: string) {
+  constructor(host: string, port: number, user: string, password: string, database: string) {
     // Create a client
     this.client = postgres({
       host,
@@ -43,7 +42,7 @@ export class FdmServer {
   }
 
   // Migrate the databe to the latest version
-  async migrateDatabase (): Promise<void> {
+  async migrateDatabase(): Promise<void> {
     // This will run migrations on the database, skipping the ones already applied
     await migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' })
   }
@@ -54,13 +53,13 @@ export class FdmServer {
    * @param farmData - An object containing the data for the new farm.
    * @returns A Promise that resolves when the farm has been added.
    */
-  public getGraphQlSchema (): GraphQLSchema {
+  public getGraphQlSchema(): GraphQLSchema {
     const { schema } = buildSchema(this.db)
 
     return schema
   }
 
-  public createGraphQlServer (logger: boolean): FastifyInstance {
+  public createGraphQlServer(logger: boolean): FastifyInstance {
     // Collect the schema
     const schema = this.getGraphQlSchema()
 
@@ -115,7 +114,7 @@ export class FdmServer {
   * @param b_sector - Sector(s) for which the farm is active
   * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
   */
-  public async addFarm (b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
+  public async addFarm(b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
     // Generate an ID for the farm
     const b_id_farm = nanoid()
 
@@ -126,7 +125,7 @@ export class FdmServer {
       b_sector
     }
     await this.db
-      .insert(farms)
+      .insert(schema.farms)
       .values(farmData)
 
     return b_id_farm
@@ -138,7 +137,7 @@ export class FdmServer {
   * @param b_id_farm - The id of the farm to be requested
   * @returns A Promise that resolves with an object that contains the details of a farm
   */
-  public async getFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
+  public async getFarm(b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
     const farm = await this.db
       .select()
       .from(schema.farms)
@@ -156,7 +155,7 @@ export class FdmServer {
   * @param b_sector - The new list of sectors for which this farm is active
   * @returns A Promise that resolves with an object that contains the details of a farm
   */
-  public async updateFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
+  public async updateFarm(b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
     const updatedFarm = await this.db
       .update(schema.farms)
       .set({
@@ -174,5 +173,49 @@ export class FdmServer {
       })
 
     return updatedFarm[0]
+  }
+
+  /**
+   * Adds a new field to the database.
+   *
+   * @param b_id_farm - ID of the farm
+   * @param b_name - Name of the field
+   * @param b_manage_start - Start date of managing field
+   * @param b_manage_end - End date of managing field
+   * @param b_manage_type - Type of managing field
+   * @returns A Promise that resolves when the field has been added and returns the value for b_id
+   */
+  public async addField(b_id_farm: schema.farmManagingTypeInsert['b_manage_start'],
+    b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
+
+    if (b_id_farm == null) {
+      throw new Error('b_id_farm must be defined')
+    }
+
+    // Generate an ID for the field
+    const b_id = nanoid()
+
+    // Insert field
+    const fieldData = {
+      b_id,
+      b_name
+    }
+    await this.db
+      .insert(schema.fields)
+      .values(fieldData)
+
+    // Insert relation between farm and fiel
+    const farmManagingData = {
+      b_id,
+      b_id_farm,
+      b_manage_start,
+      b_manage_end,
+      b_manage_type
+    }
+    await this.db
+      .insert(schema.farmManaging)
+      .values(farmManagingData)
+
+    return b_id
   }
 }

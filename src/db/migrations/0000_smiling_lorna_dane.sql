@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
-	"b_name_field" text,
+	"b_name" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
