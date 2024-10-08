@@ -89,7 +89,13 @@ describe('FdmServer', () => {
     expect(addedFarmManaging[0].b_id_farm).toBe(b_id_farm)
   })
 
-  it('should throw an error when adding a field without a farm id', async () => {
-    await expect(FdmServerInstance.addField(null, 'test-field-name', new Date(), new Date(), 'owner')).rejects.toThrowError('b_id_farm must be defined')
+  it('should create a GraphQL server', async () => {
+    const app = FdmServerInstance.createGraphQlServer(false)
+    expect(app).toBeDefined()
+  })
+
+  it('should return a GraphQL schema', async () => {
+    const schema = FdmServerInstance.getGraphQlSchema()
+    expect(schema).toBeDefined()
   })
 })

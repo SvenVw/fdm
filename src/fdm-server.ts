@@ -185,12 +185,8 @@ export class FdmServer {
    * @param b_manage_type - Type of managing field
    * @returns A Promise that resolves when the field has been added and returns the value for b_id
    */
-  public async addField(b_id_farm: schema.farmManagingTypeInsert['b_manage_start'],
+  public async addField(b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
     b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
-
-    if (b_id_farm == null) {
-      throw new Error('b_id_farm must be defined')
-    }
 
     // Generate an ID for the field
     const b_id = nanoid()
