@@ -17,18 +17,24 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farm_managing" (
 	"b_id_farm" text NOT NULL,
 	"b_manage_start" date,
 	"b_manage_end" date,
-	"b_manage_type" "fdm-dev"."b_manage_type"
+	"b_manage_type" "fdm-dev"."b_manage_type",
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
 	"b_id_farm" text PRIMARY KEY NOT NULL,
 	"b_name_farm" text,
-	"b_sector" "fdm-dev"."sector"
+	"b_sector" "fdm-dev"."sector",
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
-	"b_name_field" text
+	"b_name_field" text,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
 );
 --> statement-breakpoint
 DO $$ BEGIN

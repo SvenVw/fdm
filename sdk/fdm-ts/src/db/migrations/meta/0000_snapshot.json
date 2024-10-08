@@ -1,5 +1,5 @@
 {
-  "id": "f14c1b7d-c70f-4a63-8fb1-80d4c645950b",
+  "id": "273c2086-135c-4ced-822c-2a94660787d4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -36,6 +36,19 @@
           "name": "b_manage_type",
           "type": "b_manage_type",
           "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         }
@@ -96,6 +109,19 @@
           "typeSchema": "fdm-dev",
           "primaryKey": false,
           "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -116,6 +142,19 @@
         "b_name_field": {
           "name": "b_name_field",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         }

@@ -167,13 +167,16 @@ export class fdmServer {
       .update(schema.farms)
       .set({
         b_name_farm: b_name_farm,
-        b_sector: b_sector
+        b_sector: b_sector,
+        updated: new Date()
       })
       .where(eq(schema.farms.b_id_farm, b_id_farm))
       .returning({
         b_id_farm: schema.farms.b_id_farm,
         b_name_farm: schema.farms.b_name_farm,
-        b_sector: schema.farms.b_sector
+        b_sector: schema.farms.b_sector,
+        created: schema.farms.created,
+        updated: schema.farms.updated
       })
 
       return updatedFarm[0]
