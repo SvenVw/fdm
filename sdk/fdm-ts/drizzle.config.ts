@@ -6,7 +6,8 @@ export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./src/db/migrations",
   migrations: {
-    schema: "fdm-migrations"
+    table: "migrations", 
+    schema: "fdm-migration"
   },
   dbCredentials: {
     host: process.env.POSTGRES_HOST,
