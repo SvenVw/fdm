@@ -10,9 +10,9 @@ export default defineConfig({
     schema: "fdm-migration"
   },
   dbCredentials: {
-    host: process.env.POSTGRES_HOST,
+    host: String(process.env.POSTGRES_HOST),
     port: Number(process.env.POSTGRES_PORT),
-    database: process.env.POSTGRES_DB,
+    database: String(process.env.POSTGRES_DB),
     user: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
   },

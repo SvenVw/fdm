@@ -1,24 +1,25 @@
 // import { access, constants } from 'node:fs';
-import { eq } from "drizzle-orm";
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { buildSchema } from 'drizzle-graphql';
-import postgres from 'postgres';
-import * as schema from './db/schema';
-import { farms } from './db/schema';
+import { eq } from 'drizzle-orm'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
+import { buildSchema } from 'drizzle-graphql'
+import postgres from 'postgres'
+import * as schema from './db/schema'
+import { farms } from './db/schema'
 
-import fastify, { FastifyReply, FastifyRequest } from 'fastify'
+import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import { createYoga } from 'graphql-yoga'
 import { nanoid } from 'nanoid'
+import { GraphQLSchema } from 'graphql'
 
-export class fdmServer {
+export class FdmServer {
   /**
-* Class of fdmServer to interact with the Farm Data Model
-* @param host  -
-* @param port - 
-* @param user - 
-* @param password - 
-* @param database - 
+* Class of FdmServer to interact with the Farm Data Model
+* @param host  - host of the postgres server
+* @param port - port of the postgres server
+* @param user - username to connect to the postgres database
+* @param password - password to connect to the postgres database
+* @param database - database to connect to the postgres database
 * @returns A fdm class with the functions to interact with the data
 * @public
 */
@@ -26,50 +27,45 @@ export class fdmServer {
   client: ReturnType<typeof postgres>
   db: ReturnType<typeof drizzle>
 
-  constructor(host: string, port: number, user: string, password: string, database: string) {
-
+  constructor (host: string, port: number, user: string, password: string, database: string) {
     // Create a client
     this.client = postgres({
-      host: host,
-      port: port,
-      user: user,
-      password: password,
-      database: database,
-      max: 1,
+      host,
+      port,
+      user,
+      password,
+      database,
+      max: 1
     })
 
     // Create the db instance
     this.db = drizzle(this.client, { schema })
-
   }
 
   // Migrate the databe to the latest version
-  async migrateDatabase() {
-
+  async migrateDatabase (): Promise<void> {
     // This will run migrations on the database, skipping the ones already applied
-    await migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' });
-
+    await migrate(this.db, { migrationsFolder: 'src/db/migrations', migrationsSchema: 'fdm-migrations' })
   }
 
   /**
    * Returns the GraphQL schema for the Farm Data Model
-   * 
+   *
    * @param farmData - An object containing the data for the new farm.
    * @returns A Promise that resolves when the farm has been added.
    */
-  public getGraphQlSchema() {
+  public getGraphQlSchema (): GraphQLSchema {
     const { schema } = buildSchema(this.db)
 
     return schema
   }
 
-  public createGraphQlServer(logger: boolean) {
-
+  public createGraphQlServer (logger: boolean): FastifyInstance {
     // Collect the schema
     const schema = this.getGraphQlSchema()
 
     // Start a fastify instance
-    const app = fastify({ logger: logger })
+    const app = fastify({ logger })
     const yoga = createYoga<{
       req: FastifyRequest
       reply: FastifyReply
@@ -81,7 +77,7 @@ export class fdmServer {
         warn: (...args) => args.forEach(arg => app.log.warn(arg)),
         error: (...args) => args.forEach(arg => app.log.error(arg))
       },
-      schema: schema,
+      schema
     })
 
     app.route({
@@ -94,13 +90,13 @@ export class fdmServer {
           req,
           reply
         })
-        response.headers.forEach((value, key) => {
-          reply.header(key, value)
+        response.headers.forEach(async (value, key) => {
+          await reply.header(key, value)
         })
 
-        reply.status(response.status)
+        await reply.status(response.status)
 
-        reply.send(response.body)
+        await reply.send(response.body)
 
         return reply
       }
@@ -114,21 +110,20 @@ export class fdmServer {
 
   /**
   * Adds a new farm to the 'farms' table.
-  * 
+  *
   * @param b_name_farm - Name of the farm
   * @param b_sector - Sector(s) for which the farm is active
   * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
   */
-  public async addFarm(b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
-
+  public async addFarm (b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
     // Generate an ID for the farm
     const b_id_farm = nanoid()
 
     // Insert the farm in the dab
     const farmData = {
-      b_id_farm: b_id_farm,
-      b_name_farm: b_name_farm,
-      b_sector: b_sector
+      b_id_farm,
+      b_name_farm,
+      b_sector
     }
     await this.db
       .insert(farms)
@@ -139,11 +134,11 @@ export class fdmServer {
 
   /**
   * Get the details of a farm.
-  * 
+  *
   * @param b_id_farm - The id of the farm to be requested
   * @returns A Promise that resolves with an object that contains the details of a farm
   */
-  public async getFarm(b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
+  public async getFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
     const farm = await this.db
       .select()
       .from(schema.farms)
@@ -155,19 +150,18 @@ export class fdmServer {
 
   /**
   * Update the details of a farm
-  * 
+  *
   * @param b_id_farm - The id of the farm to be updated
   * @param b_name_farm - The new value for the name of the farm
   * @param b_sector - The new list of sectors for which this farm is active
   * @returns A Promise that resolves with an object that contains the details of a farm
   */
-  public async updateFarm(b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
-    
+  public async updateFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
     const updatedFarm = await this.db
       .update(schema.farms)
       .set({
-        b_name_farm: b_name_farm,
-        b_sector: b_sector,
+        b_name_farm,
+        b_sector,
         updated: new Date()
       })
       .where(eq(schema.farms.b_id_farm, b_id_farm))
@@ -179,6 +173,6 @@ export class fdmServer {
         updated: schema.farms.updated
       })
 
-      return updatedFarm[0]
+    return updatedFarm[0]
   }
 }

@@ -11,8 +11,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: '@nmi/fdm-ts',
-      fileName: 'fdm-ts',
+      name: '@nmi/fdm',
+      fileName: 'fdm',
     },
   },
   plugins: [dts()],
