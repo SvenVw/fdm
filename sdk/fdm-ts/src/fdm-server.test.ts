@@ -13,7 +13,7 @@ describe('FdmServer', () => {
     const user = String(process.env.POSTGRES_USER)
     const password = String(process.env.POSTGRES_PASSWORD)
     const db = String(process.env.POSTGRES_DB)
-    if (host != null) {
+    if (host == null) {
       host = '127.0.0.1'
     }
 
