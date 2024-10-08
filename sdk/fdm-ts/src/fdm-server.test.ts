@@ -1,8 +1,6 @@
 import 'dotenv/config'
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { eq } from "drizzle-orm";
-import fastify from 'fastify'
-import { createYoga } from 'graphql-yoga'
 import { fdmServer } from './fdm-server';
 import * as schema from './db/schema';
 
@@ -22,12 +20,21 @@ describe('fdmServer', () => {
 
     // Connect to the database
     fdmServerInstance = new fdmServer(host, port, user, password, db);
-    await fdmServerInstance.migrateDatabase()
+    await fdmServerInstance.migrateDatabase() 
   })
+
+  beforeEach(async () => {
+    // Create a new instance for each test
+    // fdmServerInstance = new fdmServer(false, filePath);
+    // await fdmServerInstance.migrateDatabase()
+  });
 
   afterEach(async () => {
     // Clean up the database after each test
     await fdmServerInstance.db.delete(schema.farms).where(eq(schema.farms.b_id_farm, 'test-farm-id'));
+
+    // Close the connection to the database
+    // await fdmServerInstance.client.close();
   });
 
   it('should create an instance with correct parameters', () => {
@@ -35,53 +42,36 @@ describe('fdmServer', () => {
     expect(fdmServerInstance.db).toBeDefined();
   });
 
-  it('should return a GraphQL schema', () => {
-    const schemaGraphQl = fdmServerInstance.getGraphQlSchema()
-    expect(schemaGraphQl).toBeDefined()
-  });
-
-  it('should create a GraphQL server', async () => {
-    const logger = false;
-    const app = fdmServerInstance.createGraphQlServer(logger);
-
-    const response = await app.inject({
-      method: 'GET',
-      url: '/graphql',
-    });
-    expect(response.statusCode).toBe(200);
-  });
-
   it('should add a new farm to the database', async () => {
-    const farmData: schema.farmsTypeInsert = {
-      b_id_farm: 'test-farm-id',
-      b_name_farm: 'test-farm-name',
-      b_sector: 'arable',
-    };
-
-    await fdmServerInstance.addFarm(farmData);
+    const b_id_farm = await fdmServerInstance.addFarm('test-farm-name', 'arable')
 
     // Retrieve the added farm from the database
-    const addedFarm = await fdmServerInstance.db.select().from(schema.farms)
+    const addedFarm = await fdmServerInstance.db.select().from(schema.farms).where(eq(schema.farms.b_id_farm, b_id_farm))
     expect(addedFarm).toBeDefined();
-    expect(addedFarm[0].b_id_farm).toBe(farmData.b_id_farm);
-    expect(addedFarm[0].b_name_farm).toBe(farmData.b_name_farm);
-    expect(addedFarm[0].b_sector).toBe(farmData.b_sector);
+    expect(addedFarm[0].b_id_farm).toBe(b_id_farm);
+    expect(addedFarm[0].b_name_farm).toBe('test-farm-name');
+    expect(addedFarm[0].b_sector).toBe('arable');
   });
 
   it('should get the details of a farm', async () => {
-    const farmData: schema.farmsTypeInsert = {
-      b_id_farm: 'test-farm-id',
-      b_name_farm: 'test-farm-name',
-      b_sector: 'arable',
-    };
+    const b_id_farm = await fdmServerInstance.addFarm('test-farm-name', 'arable')
 
-    await fdmServerInstance.addFarm(farmData);
-
-    const farm = await fdmServerInstance.getFarm('test-farm-id');
+    const farm = await fdmServerInstance.getFarm(b_id_farm);
 
     expect(farm).toBeDefined();
-    expect(farm.b_id_farm).toBe(farmData.b_id_farm);
-    expect(farm.b_name_farm).toBe(farmData.b_name_farm);
-    expect(farm.b_sector).toBe(farmData.b_sector);
+    expect(farm.b_id_farm).toBe(b_id_farm);
+    expect(farm.b_name_farm).toBe('test-farm-name');
+    expect(farm.b_sector).toBe('arable');
   })
-})
+
+  it('should update the details of a farm', async () => {
+    const b_id_farm = await fdmServerInstance.addFarm('test-farm-name', 'arable')
+
+    const farm = await fdmServerInstance.updateFarm(b_id_farm, 'test-farm-name-updated', 'diary');
+
+    expect(farm).toBeDefined();
+    expect(farm.b_id_farm).toBe(b_id_farm);
+    expect(farm.b_name_farm).toBe('test-farm-name-updated');
+    expect(farm.b_sector).toBe('diary');
+  })
+});
