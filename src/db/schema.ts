@@ -38,7 +38,7 @@ export type farmManagingTypeInsert = typeof farmManaging.$inferInsert
 export const fields = fdmSchema.table('fields', {
   b_id: text().primaryKey(),
   b_name: text(),
-  // b_geometry
+  // b_geometry: PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })
