@@ -89,6 +89,17 @@ describe('FdmServer', () => {
     expect(addedFarmManaging[0].b_id_farm).toBe(b_id_farm)
   })
 
+  it('should get the details of a field', async () => {
+    const b_id_farm = await FdmServerInstance.addFarm('test-farm-name', 'arable')
+    const b_id = await FdmServerInstance.addField(b_id_farm, 'test-field-name', new Date(), new Date(), 'owner')
+
+    const field = await FdmServerInstance.getField(b_id)
+
+    expect(field).toBeDefined()
+    expect(field.b_id).toBe(b_id)
+    expect(field.b_name).toBe('test-field-name')
+  })
+
   it('should create a GraphQL server', async () => {
     const app = FdmServerInstance.createGraphQlServer(false)
     expect(app).toBeDefined()

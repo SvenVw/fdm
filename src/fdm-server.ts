@@ -11,6 +11,8 @@ import { createYoga } from 'graphql-yoga'
 import { nanoid } from 'nanoid'
 import { GraphQLSchema } from 'graphql'
 
+import { getFieldType } from './fdm-server.d'
+
 export class FdmServer {
   /**
 * Class of FdmServer to interact with the Farm Data Model.
@@ -222,5 +224,25 @@ export class FdmServer {
       .values(farmManagingData)
 
     return b_id
+  }
+
+  public async getField (b_id: schema.fieldsTypeSelect['b_id']): Promise<getFieldType> {
+    // Get properties of the requested field
+    const field = await this.db
+      .select({
+        b_id: schema.fields.b_id,
+        b_name: schema.fields.b_name,
+        b_manage_start: schema.farmManaging.b_manage_start,
+        b_manage_end: schema.farmManaging.b_manage_end,
+        b_manage_type: schema.farmManaging.b_manage_type,
+        created: schema.fields.created,
+        updated: schema.fields.updated
+      })
+      .from(schema.fields)
+      .leftJoin(schema.farmManaging, eq(schema.fields.b_id, schema.farmManaging.b_id))
+      .where(eq(schema.fields.b_id, b_id))
+      .limit(1)
+
+    return field[0]
   }
 }
