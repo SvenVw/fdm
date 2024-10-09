@@ -13,14 +13,14 @@ import { GraphQLSchema } from 'graphql'
 
 export class FdmServer {
   /**
-* Class of FdmServer to interact with the Farm Data Model
-* @param host  - host of the postgres server
-* @param port - port of the postgres server
-* @param user - username to connect to the postgres database
-* @param password - password to connect to the postgres database
-* @param database - database to connect to the postgres database
-* @returns A fdm class with the functions to interact with the data
-* @public
+* Class of FdmServer to interact with the Farm Data Model.
+* @param host  - host of the postgres server.
+* @param port - port of the postgres server.
+* @param user - username to connect to the postgres database.
+* @param password - password to connect to the postgres database.
+* @param database - database to connect to the postgres database.
+* @returns A FdmServer class with functions to interact with the Farm Data Model.
+* @alpha
 */
 
   client: ReturnType<typeof postgres>
@@ -48,10 +48,10 @@ export class FdmServer {
   }
 
   /**
-   * Returns the GraphQL schema for the Farm Data Model
+   * Get the GraphQL schema for the Farm Data Model
    *
-   * @param farmData - An object containing the data for the new farm.
-   * @returns A Promise that resolves when the farm has been added.
+   * @returns A GraphQL schema for the Farm Data Model
+   * @experimental
    */
   public getGraphQlSchema(): GraphQLSchema {
     const { schema } = buildSchema(this.db)
@@ -59,6 +59,12 @@ export class FdmServer {
     return schema
   }
 
+  /**
+   * Create a FastifyInstance with GraphQL endpoint.
+   *
+   * @returns A FastifyInstance with GraphQL endpoint. Use .listen(PORT) to start the instance.
+   * @experimental
+   */
   public createGraphQlServer(logger: boolean): FastifyInstance {
     // Collect the schema
     const schema = this.getGraphQlSchema()
@@ -108,11 +114,12 @@ export class FdmServer {
   }
 
   /**
-  * Adds a new farm to the 'farms' table.
+  * Add a new farm.
   *
   * @param b_name_farm - Name of the farm
   * @param b_sector - Sector(s) for which the farm is active
   * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
+  * @alpha
   */
   public async addFarm(b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
     // Generate an ID for the farm
@@ -132,10 +139,11 @@ export class FdmServer {
   }
 
   /**
-  * Get the details of a farm.
+  * Get the details of a specific farm.
   *
-  * @param b_id_farm - The id of the farm to be requested
-  * @returns A Promise that resolves with an object that contains the details of a farm
+  * @param b_id_farm - The id of the farm to be requested.
+  * @returns A Promise that resolves with an object that contains the details of a farm.
+  * @alpha
   */
   public async getFarm(b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
     const farm = await this.db
@@ -148,12 +156,13 @@ export class FdmServer {
   }
 
   /**
-  * Update the details of a farm
+  * Update the details of a farm.
   *
-  * @param b_id_farm - The id of the farm to be updated
-  * @param b_name_farm - The new value for the name of the farm
-  * @param b_sector - The new list of sectors for which this farm is active
-  * @returns A Promise that resolves with an object that contains the details of a farm
+  * @param b_id_farm - The id of the farm to be updated.
+  * @param b_name_farm - The new value for the name of the farm.
+  * @param b_sector - The new list of sectors for which this farm is active.
+  * @returns A Promise that resolves with an object that contains the details of a farm.
+  * @alpha
   */
   public async updateFarm(b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
     const updatedFarm = await this.db
@@ -176,14 +185,15 @@ export class FdmServer {
   }
 
   /**
-   * Adds a new field to the database.
+   * Add a new field
    *
-   * @param b_id_farm - ID of the farm
-   * @param b_name - Name of the field
-   * @param b_manage_start - Start date of managing field
-   * @param b_manage_end - End date of managing field
-   * @param b_manage_type - Type of managing field
-   * @returns A Promise that resolves when the field has been added and returns the value for b_id
+   * @param b_id_farm - ID of the farm.
+   * @param b_name - Name of the field.
+   * @param b_manage_start - Start date of managing field.
+   * @param b_manage_end - End date of managing field.
+   * @param b_manage_type - Type of managing field.
+   * @returns A Promise that resolves when the field has been added and returns the value for b_id.
+   * @alpha
    */
   public async addField(b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
     b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {

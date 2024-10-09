@@ -39,21 +39,4 @@ describe('FdmLocal', () => {
     expect(FdmLocalInstance.client).toBeDefined()
     expect(FdmLocalInstance.db).toBeDefined()
   })
-
-  it('should add a new farm to the database', async () => {
-    const farmData: schema.farmsTypeInsert = {
-      b_id_farm: 'test-farm-id',
-      b_name_farm: 'test-farm-name',
-      b_sector: 'arable'
-    }
-
-    await FdmLocalInstance.addFarm(farmData)
-
-    // Retrieve the added farm from the database
-    const addedFarm = await FdmLocalInstance.db.select().from(schema.farms)
-    expect(addedFarm).toBeDefined()
-    expect(addedFarm[0].b_id_farm).toBe(farmData.b_id_farm)
-    expect(addedFarm[0].b_name_farm).toBe(farmData.b_name_farm)
-    expect(addedFarm[0].b_sector).toBe(farmData.b_sector)
-  })
 })
