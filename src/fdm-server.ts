@@ -239,6 +239,7 @@ export class FdmServer {
       .select({
         b_id: schema.fields.b_id,
         b_name: schema.fields.b_name,
+        b_id_farm: schema.farmManaging.b_id_farm,
         b_manage_start: schema.farmManaging.b_manage_start,
         b_manage_end: schema.farmManaging.b_manage_end,
         b_manage_type: schema.farmManaging.b_manage_type,
@@ -246,7 +247,7 @@ export class FdmServer {
         updated: schema.fields.updated
       })
       .from(schema.fields)
-      .leftJoin(schema.farmManaging, eq(schema.fields.b_id, schema.farmManaging.b_id))
+      .innerJoin(schema.farmManaging, eq(schema.fields.b_id, schema.farmManaging.b_id))
       .where(eq(schema.fields.b_id, b_id))
       .limit(1)
 
