@@ -1,4 +1,4 @@
-import { pgSchema, text, date, timestamp } from 'drizzle-orm/pg-core'
+import { pgSchema, text, date, timestamp, primaryKey, uniqueIndex } from 'drizzle-orm/pg-core'
 
 // Define postgres schema
 export const fdmSchema = pgSchema('fdm-dev')
@@ -13,6 +13,10 @@ export const farms = fdmSchema.table('farms', {
   b_sector: sectorEnum(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    b_id_farm_idx: uniqueIndex('b_id_farm_idx').on(table.b_id_farm)
+  }
 })
 
 export type farmsTypeSelect = typeof farms.$inferSelect
@@ -29,6 +33,11 @@ export const farmManaging = fdmSchema.table('farm_managing', {
   b_manage_type: manageTypeEnum(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.b_id, table.b_id_farm] }),
+    b_id_b_id_farm_idx: uniqueIndex('b_id_b_id_farm_idx').on(table.b_id, table.b_id_farm)
+  }
 })
 
 export type farmManagingTypeSelect = typeof farmManaging.$inferSelect
@@ -41,6 +50,10 @@ export const fields = fdmSchema.table('fields', {
   // b_geometry: PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    b_id_idx: uniqueIndex('b_id_idx').on(table.b_id)
+  }
 })
 
 export type fieldsTypeSelect = typeof fields.$inferSelect

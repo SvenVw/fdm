@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farm_managing" (
 	"b_manage_end" date,
 	"b_manage_type" "fdm-dev"."b_manage_type",
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated" timestamp with time zone
+	"updated" timestamp with time zone,
+	CONSTRAINT "farm_managing_b_id_b_id_farm_pk" PRIMARY KEY("b_id","b_id_farm")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
@@ -48,3 +49,7 @@ DO $$ BEGIN
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
+--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "b_id_b_id_farm_idx" ON "fdm-dev"."farm_managing" USING btree ("b_id","b_id_farm");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "b_id_farm_idx" ON "fdm-dev"."farms" USING btree ("b_id_farm");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "b_id_idx" ON "fdm-dev"."fields" USING btree ("b_id");

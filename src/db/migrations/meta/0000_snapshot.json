@@ -1,5 +1,5 @@
 {
-  "id": "a567f85a-6b41-4797-8da6-b416fe8dcdfc",
+  "id": "3cb7522b-7573-4182-bbf2-630a864430cc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -53,7 +53,29 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "b_id_b_id_farm_idx": {
+          "name": "b_id_b_id_farm_idx",
+          "columns": [
+            {
+              "expression": "b_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "b_id_farm",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "farm_managing_b_id_fields_b_id_fk": {
           "name": "farm_managing_b_id_fields_b_id_fk",
@@ -84,7 +106,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "farm_managing_b_id_b_id_farm_pk": {
+          "name": "farm_managing_b_id_b_id_farm_pk",
+          "columns": [
+            "b_id",
+            "b_id_farm"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "fdm-dev.farms": {
@@ -124,7 +154,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "b_id_farm_idx": {
+          "name": "b_id_farm_idx",
+          "columns": [
+            {
+              "expression": "b_id_farm",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
@@ -159,7 +205,23 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "b_id_idx": {
+          "name": "b_id_idx",
+          "columns": [
+            {
+              "expression": "b_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
