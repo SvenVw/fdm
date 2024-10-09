@@ -226,6 +226,13 @@ export class FdmServer {
     return b_id
   }
 
+  /**
+  * Get the details of a specific field.
+  *
+  * @param b_id - The id of the field to be requested.
+  * @returns A Promise that resolves with an object that contains the details of a field.
+  * @alpha
+  */
   public async getField (b_id: schema.fieldsTypeSelect['b_id']): Promise<getFieldType> {
     // Get properties of the requested field
     const field = await this.db
