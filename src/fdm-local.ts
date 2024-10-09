@@ -38,5 +38,4 @@ export class FdmLocal {
     // This will run migrations on the database, skipping the ones already applied
     await migrate(this.db, { migrationsFolder: 'src/db/migrations' })
   }
-
 }
