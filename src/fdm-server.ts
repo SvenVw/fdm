@@ -200,7 +200,7 @@ export class FdmServer {
       .insert(schema.fields)
       .values(fieldData)
 
-    // Insert relation between farm and fiel
+    // Insert relation between farm and field
     const farmManagingData = {
       b_id,
       b_id_farm,
