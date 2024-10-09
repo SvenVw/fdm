@@ -5,7 +5,7 @@ export const fdmSchema = pgSchema('fdm-dev')
 export type fdmSchemaTypeSelect = typeof fdmSchema
 
 // Define farms table
-export const sectorEnum = fdmSchema.enum('sector', ['diary', 'arable', 'tree_nursery', 'bulbs'])
+export const sectorEnum = fdmSchema.enum('b_sector', ['diary', 'arable', 'tree_nursery', 'bulbs'])
 
 export const farms = fdmSchema.table('farms', {
   b_id_farm: text().primaryKey(),

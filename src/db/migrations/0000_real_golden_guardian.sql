@@ -7,7 +7,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "fdm-dev"."sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');
+ CREATE TYPE "fdm-dev"."b_sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farm_managing" (
 CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
 	"b_id_farm" text PRIMARY KEY NOT NULL,
 	"b_name_farm" text,
-	"b_sector" "fdm-dev"."sector",
+	"b_sector" "fdm-dev"."b_sector",
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );

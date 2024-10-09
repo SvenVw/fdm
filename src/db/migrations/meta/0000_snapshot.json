@@ -1,5 +1,5 @@
 {
-  "id": "3cb7522b-7573-4182-bbf2-630a864430cc",
+  "id": "6bb93a45-3782-4b1c-a0a8-f6eee11b62c8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -135,7 +135,7 @@
         },
         "b_sector": {
           "name": "b_sector",
-          "type": "sector",
+          "type": "b_sector",
           "typeSchema": "fdm-dev",
           "primaryKey": false,
           "notNull": false
@@ -236,8 +236,8 @@
         "lease"
       ]
     },
-    "fdm-dev.sector": {
-      "name": "sector",
+    "fdm-dev.b_sector": {
+      "name": "b_sector",
       "schema": "fdm-dev",
       "values": [
         "diary",
