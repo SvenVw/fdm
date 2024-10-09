@@ -100,6 +100,20 @@ describe('FdmServer', () => {
     expect(field.b_name).toBe('test-field-name')
   })
 
+  it('should update the details of a field', async () => {
+    const b_id_farm = await FdmServerInstance.addFarm('test-farm-name', 'arable')
+    const b_id = await FdmServerInstance.addField(b_id_farm, 'test-field-name', new Date(), new Date(), 'owner')
+
+    const updatedField = await FdmServerInstance.updateField(b_id, 'updated-test-field-name', new Date('2024-03-10'), new Date('2025-03-10'), 'lease')
+
+    expect(updatedField).toBeDefined()
+    expect(updatedField.b_id).toBe(b_id)
+    expect(updatedField.b_name).toBe('updated-test-field-name')
+    expect(updatedField.b_manage_start).toEqual(new Date('2024-03-10'))
+    expect(updatedField.b_manage_end).toEqual(new Date('2025-03-10'))
+    expect(updatedField.b_manage_type).toBe('lease')
+  })
+
   it('should create a GraphQL server', async () => {
     const app = FdmServerInstance.createGraphQlServer(false)
     expect(app).toBeDefined()
