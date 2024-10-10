@@ -7,6 +7,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import dts from 'vite-plugin-dts';
+import { copy } from 'fs-extra';
 // https://vitejs.dev/guide/build.html#library-mode
 export default defineConfig({
   build: {
@@ -39,7 +40,21 @@ export default defineConfig({
       },
     },
   },
-  plugins: [dts(), nodePolyfills(),],
+  plugins: [dts(), nodePolyfills(),
+    // Add a custom plugin to copy migration folder
+    {
+      name: 'copy-migrations-folder',
+      closeBundle: () => {
+        copy('src/db/migrations', 'dist/db/migrations')
+          .then(() => {
+            console.log('Copied migrations folder to dist/db/migrations');
+          })
+          .catch(err => {
+            console.error('Error copying migrations folder:', err);
+          });
+      }
+    }
+  ],
   test: {
     // ...
   },

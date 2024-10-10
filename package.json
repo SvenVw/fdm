@@ -31,6 +31,7 @@
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.25.0",
     "eslint": "^9.9.0",
+    "fs-extra": "^11.2.0",
     "globals": "^15.9.0",
     "typedoc": "^0.26.5",
     "typedoc-plugin-missing-exports": "^3.0.0",
