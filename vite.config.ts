@@ -5,6 +5,7 @@
 
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import dts from 'vite-plugin-dts';
 // https://vitejs.dev/guide/build.html#library-mode
 export default defineConfig({
@@ -14,8 +15,19 @@ export default defineConfig({
       name: '@nmi/fdm',
       fileName: 'fdm',
     },
+    rollupOptions: {
+      external: [
+        "perf_hooks",
+      ],
+      output: {
+        globals: {
+          perf_hooks: "perf_hooks",
+        },
+        inlineDynamicImports: true,
+      },
+    },
   },
-  plugins: [dts()],
+  plugins: [dts(), nodePolyfills(),],
   test: {
     // ...
   },
