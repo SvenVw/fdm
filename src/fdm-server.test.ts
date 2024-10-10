@@ -114,10 +114,10 @@ describe('FdmServer', () => {
     expect(updatedField.b_manage_type).toBe('lease')
   })
 
-  it('should create a GraphQL server', async () => {
-    const app = FdmServerInstance.createGraphQlServer(false)
-    expect(app).toBeDefined()
-  })
+  // it('should create a GraphQL server', async () => {
+  //   const app = FdmServerInstance.createGraphQlServer(false)
+  //   expect(app).toBeDefined()
+  // })
 
   it('should return a GraphQL schema', async () => {
     const schema = FdmServerInstance.getGraphQlSchema()

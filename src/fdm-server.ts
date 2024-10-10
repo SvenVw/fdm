@@ -6,8 +6,8 @@ import { buildSchema } from 'drizzle-graphql'
 import postgres from 'postgres'
 import * as schema from './db/schema'
 
-import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import { createYoga } from 'graphql-yoga'
+// import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+// import { createYoga } from 'graphql-yoga'
 import { nanoid } from 'nanoid'
 import { GraphQLSchema } from 'graphql'
 
@@ -61,59 +61,59 @@ export class FdmServer {
     return schema
   }
 
-  /**
-   * Create a FastifyInstance with GraphQL endpoint.
-   *
-   * @returns A FastifyInstance with GraphQL endpoint. Use .listen(PORT) to start the instance.
-   * @experimental
-   */
-  public createGraphQlServer (logger: boolean): FastifyInstance {
-    // Collect the schema
-    const schema = this.getGraphQlSchema()
+  // /**
+  //  * Create a FastifyInstance with GraphQL endpoint.
+  //  *
+  //  * @returns A FastifyInstance with GraphQL endpoint. Use .listen(PORT) to start the instance.
+  //  * @experimental
+  //  */
+  // public createGraphQlServer (logger: boolean): FastifyInstance {
+  //   // Collect the schema
+  //   const schema = this.getGraphQlSchema()
 
-    // Start a fastify instance
-    const app = fastify({ logger })
-    const yoga = createYoga<{
-      req: FastifyRequest
-      reply: FastifyReply
-    }>({
-      // Integrate Fastify logger
-      logging: {
-        debug: (...args) => args.forEach(arg => app.log.debug(arg)),
-        info: (...args) => args.forEach(arg => app.log.info(arg)),
-        warn: (...args) => args.forEach(arg => app.log.warn(arg)),
-        error: (...args) => args.forEach(arg => app.log.error(arg))
-      },
-      schema
-    })
+  //   // Start a fastify instance
+  //   const app = fastify({ logger })
+  //   const yoga = createYoga<{
+  //     req: FastifyRequest
+  //     reply: FastifyReply
+  //   }>({
+  //     // Integrate Fastify logger
+  //     logging: {
+  //       debug: (...args) => args.forEach(arg => app.log.debug(arg)),
+  //       info: (...args) => args.forEach(arg => app.log.info(arg)),
+  //       warn: (...args) => args.forEach(arg => app.log.warn(arg)),
+  //       error: (...args) => args.forEach(arg => app.log.error(arg))
+  //     },
+  //     schema
+  //   })
 
-    app.route({
-      // Bind to the Yoga's endpoint to avoid rendering on any path
-      url: '/graphql',
-      method: ['GET', 'POST', 'OPTIONS'],
-      handler: async (req, reply) => {
-        // Second parameter adds Fastify's `req` and `reply` to the GraphQL Context
-        const response = await yoga.handleNodeRequestAndResponse(req, reply, {
-          req,
-          reply
-        })
-        response.headers.forEach(async (value, key) => {
-          await reply.header(key, value)
-        })
+  //   app.route({
+  //     // Bind to the Yoga's endpoint to avoid rendering on any path
+  //     url: '/graphql',
+  //     method: ['GET', 'POST', 'OPTIONS'],
+  //     handler: async (req, reply) => {
+  //       // Second parameter adds Fastify's `req` and `reply` to the GraphQL Context
+  //       const response = await yoga.handleNodeRequestAndResponse(req, reply, {
+  //         req,
+  //         reply
+  //       })
+  //       response.headers.forEach(async (value, key) => {
+  //         await reply.header(key, value)
+  //       })
 
-        await reply.status(response.status)
+  //       await reply.status(response.status)
 
-        await reply.send(response.body)
+  //       await reply.send(response.body)
 
-        return await reply
-      }
-    })
+  //       return await reply
+  //     }
+  //   })
 
-    // This will allow Fastify to forward multipart requests to GraphQL Yoga
-    app.addContentTypeParser('multipart/form-data', {}, (_req, _payload, done) => done(null))
+  //   // This will allow Fastify to forward multipart requests to GraphQL Yoga
+  //   app.addContentTypeParser('multipart/form-data', {}, (_req, _payload, done) => done(null))
 
-    return app
-  }
+  //   return app
+  // }
 
   /**
   * Add a new farm.
