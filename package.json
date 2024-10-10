@@ -19,6 +19,7 @@
     "dev": "vite",
     "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
     "build": "tsc && vite build",
+    "prepare": "npm run build",
     "preview": "vite preview",
     "test": "vitest run",
     "watch": "vitest",
