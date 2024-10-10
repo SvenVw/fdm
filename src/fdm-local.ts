@@ -34,8 +34,8 @@ export class FdmLocal {
   }
 
   // Migrate the databe to the latest version
-  async migrateDatabase (): Promise<void> {
+  async migrateDatabase (migrationsFolderPath: string = './node_modules/@nmi/fdm/dist/db/migrations'): Promise<void> {
     // This will run migrations on the database, skipping the ones already applied
-    await migrate(this.db, { migrationsFolder: 'src/db/migrations' })
+    await migrate(this.db, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
   }
 }

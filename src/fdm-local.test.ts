@@ -8,17 +8,19 @@ import * as schema from './db/schema'
 describe('FdmLocal', () => {
   let FdmLocalInstance: FdmLocal
   const filePath = './test.db'
+  const migrationsFolderPath = 'src/db/migrations'
 
   beforeAll(async () => {
     // Connect to the database
     FdmLocalInstance = new FdmLocal(false, filePath)
-    await FdmLocalInstance.migrateDatabase()
+
+    await FdmLocalInstance.migrateDatabase(migrationsFolderPath)
   })
 
   beforeEach(async () => {
     // Create a new instance for each test
     FdmLocalInstance = new FdmLocal(false, filePath)
-    await FdmLocalInstance.migrateDatabase()
+    await FdmLocalInstance.migrateDatabase(migrationsFolderPath)
   })
 
   afterEach(async () => {

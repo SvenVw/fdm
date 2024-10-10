@@ -16,10 +16,11 @@ describe('FdmServer', () => {
     if (host == null) {
       host = '127.0.0.1'
     }
+    const migrationsFolderPath = 'src/db/migrations'
 
     // Connect to the database
     FdmServerInstance = new FdmServer(host, port, user, password, db)
-    await FdmServerInstance.migrateDatabase()
+    await FdmServerInstance.migrateDatabase(migrationsFolderPath)
   })
 
   beforeEach(async () => {
