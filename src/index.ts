@@ -14,3 +14,4 @@
 
 /** {@inheritDoc fdmServer} */
 export { FdmServer } from './fdm-server'
+export { FdmLocal } from './fdm-local'
