@@ -15,3 +15,5 @@
 /** {@inheritDoc fdmServer} */
 export { FdmServer } from './fdm-server'
 export { FdmLocal } from './fdm-local'
+export { fdmSchema } from './db/schema'
+export {} from'./fdm-crud'
