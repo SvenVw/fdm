@@ -8,8 +8,14 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/fdm.js",
-      "require": "./dist/fdm.umd.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/fdm.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/fdm.umd.cjs"
+      }
     }
   },
   "files": [
