@@ -5,7 +5,6 @@
 
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
 import dts from 'vite-plugin-dts';
 import { copy } from 'fs-extra';
 // https://vitejs.dev/guide/build.html#library-mode
@@ -34,13 +33,15 @@ export default defineConfig({
           "node:util": "util",
           "node:net": "net",
           "node:url": "url",
+          "node:fs": "fs",
+          "node:path": "path",
           perf_hooks: "perf_hooks",
         },
         inlineDynamicImports: true,
       },
     },
   },
-  plugins: [dts(), nodePolyfills(),
+  plugins: [dts(),
     // Add a custom plugin to copy migration folder
     {
       name: 'copy-migrations-folder',
@@ -55,7 +56,10 @@ export default defineConfig({
       }
     }
   ],
+  optimizeDeps: {
+    exclude: ['@electric-sql/pglite'],
+  },
   test: {
     // ...
-  },
+  } 
 });

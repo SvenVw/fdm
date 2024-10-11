@@ -39,11 +39,10 @@
     "typescript-eslint": "^8.1.0",
     "vite": "^5.4.0",
     "vite-plugin-dts": "^4.0.2",
-    "vite-plugin-node-polyfills": "^0.22.0",
     "vitest": "^2.0.5"
   },
   "dependencies": {
-    "@electric-sql/pglite": "^0.2.7",
+    "@electric-sql/pglite": "^0.2.11",
     "drizzle-graphql": "^0.8.5",
     "drizzle-orm": "^0.34.1",
     "graphql": "^16.9.0",
