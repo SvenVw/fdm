@@ -50,7 +50,7 @@ export class FdmLocal {
   * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
   * @alpha
   */
-  public async addFarm (b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
+  async addFarm (b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
     // Generate an ID for the farm
     const b_id_farm = nanoid()
 
@@ -74,7 +74,7 @@ export class FdmLocal {
   * @returns A Promise that resolves with an object that contains the details of a farm.
   * @alpha
   */
-  public async getFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
+  async getFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
     const farm = await this.db
       .select()
       .from(schema.farms)
@@ -93,7 +93,7 @@ export class FdmLocal {
   * @returns A Promise that resolves with an object that contains the details of a farm.
   * @alpha
   */
-  public async updateFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
+  async updateFarm (b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
     const updatedFarm = await this.db
       .update(schema.farms)
       .set({
@@ -124,7 +124,7 @@ export class FdmLocal {
    * @returns A Promise that resolves when the field has been added and returns the value for b_id.
    * @alpha
    */
-  public async addField (b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
+  async addField (b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
     b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
     // Generate an ID for the field
     const b_id = nanoid()
@@ -160,7 +160,7 @@ export class FdmLocal {
   * @returns A Promise that resolves with an object that contains the details of a field.
   * @alpha
   */
-  public async getField (b_id: schema.fieldsTypeSelect['b_id']): Promise<getFieldType> {
+  async getField (b_id: schema.fieldsTypeSelect['b_id']): Promise<getFieldType> {
     // Get properties of the requested field
     const field = await this.db
       .select({
@@ -192,7 +192,7 @@ export class FdmLocal {
    * @returns A Promise that resolves when the field has been added and returns the value for b_id.
    * @alpha
    */
-  public async updateField (b_id: schema.fieldsTypeInsert['b_id'],
+  async updateField (b_id: schema.fieldsTypeInsert['b_id'],
     b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<getFieldType> {
     const updatedField = await this.db.transaction(async (tx) => {
       try {
