@@ -1,10 +1,11 @@
 import 'dotenv/config'
 import { describe, expect, it, beforeEach} from 'vitest'
-import { createFdmServer } from './fdm-server'
+import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { addFarm, getFarm, updateFarm, addField, getField, updateField } from './fdm-crud'
+import { type FdmServerType } from './fdm-server.d'
 
 describe('Farm Data Model', () => {
-  let fdm: ReturnType<typeof createFdmServer>
+  let fdm: FdmServerType
 
   beforeEach(async () => {
     let host = process.env.POSTGRES_HOST
@@ -22,9 +23,10 @@ describe('Farm Data Model', () => {
       port,
       user,
       password,
-      db,
-      migrationsFolderPath
+      db
     )
+
+    await migrateFdmServer(fdm, migrationsFolderPath)
   })
 
   describe('Farm CRUD', () => {

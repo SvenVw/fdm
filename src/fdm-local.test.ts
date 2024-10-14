@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach} from 'vitest'
-import { createFdmLocal } from './fdm-local'
+import { createFdmLocal, migrateFdmLocal } from './fdm-local'
 import { addFarm, getFarm, updateFarm, addField, getField, updateField } from './fdm-crud'
 
 describe('Farm Data Model', () => {
@@ -9,9 +9,9 @@ describe('Farm Data Model', () => {
     const backend = 'memory://'
     const migrationsFolderPath = 'src/db/migrations'
     fdm = await createFdmLocal(
-      backend,
-      migrationsFolderPath
+      backend
     )
+    await migrateFdmLocal(fdm, migrationsFolderPath)
   })
 
   describe('Farm CRUD', () => {
