@@ -13,7 +13,7 @@
  */
 
 /** {@inheritDoc fdmServer} */
-export { FdmServer } from './fdm-server'
-export { FdmLocal } from './fdm-local'
+export { createFdmServer } from './fdm-server'
+export { createFdmLocal } from './fdm-local'
 export { fdmSchema } from './db/schema'
 export {addFarm, getFarm, updateFarm, addField, getField, updateField} from'./fdm-crud'

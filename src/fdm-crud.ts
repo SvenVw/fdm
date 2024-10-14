@@ -1,13 +1,8 @@
-// import { access, constants } from 'node:fs';
 import { eq } from 'drizzle-orm'
-import { drizzle } from 'drizzle-orm/postgres-js'
-import * as schema from './db/schema'
-
 import { nanoid } from 'nanoid'
 
-import { getFieldType } from './fdm-server.d'
-
-type dbType = ReturnType<typeof drizzle>
+import * as schema from './db/schema'
+import { type getFieldType, type FdmType } from './fdm-crud.d'
 
 /**
 * Add a new farm.
@@ -17,7 +12,7 @@ type dbType = ReturnType<typeof drizzle>
 * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
 * @alpha
 */
-export async function addFarm(db: dbType, b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
+export async function addFarm(fdm: FdmType, b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
     // Generate an ID for the farm
     const b_id_farm = nanoid()
 
@@ -27,7 +22,7 @@ export async function addFarm(db: dbType, b_name_farm: schema.farmsTypeInsert['b
         b_name_farm,
         b_sector
     }
-    await db
+    await fdm
         .insert(schema.farms)
         .values(farmData)
 
@@ -41,8 +36,8 @@ export async function addFarm(db: dbType, b_name_farm: schema.farmsTypeInsert['b
 * @returns A Promise that resolves with an object that contains the details of a farm.
 * @alpha
 */
-export async function getFarm(db: dbType, b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
-    const farm = await db
+export async function getFarm(fdm: FdmType, b_id_farm: schema.farmsTypeInsert['b_id_farm']): Promise<schema.farmsTypeSelect> {
+    const farm = await fdm
         .select()
         .from(schema.farms)
         .where(eq(schema.farms.b_id_farm, b_id_farm))
@@ -60,8 +55,8 @@ export async function getFarm(db: dbType, b_id_farm: schema.farmsTypeInsert['b_i
 * @returns A Promise that resolves with an object that contains the details of a farm.
 * @alpha
 */
-export async function updateFarm(db: dbType, b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
-    const updatedFarm = await db
+export async function updateFarm(fdm: FdmType, b_id_farm: schema.farmsTypeInsert['b_id_farm'], b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeSelect> {
+    const updatedFarm = await fdm
         .update(schema.farms)
         .set({
             b_name_farm,
@@ -91,7 +86,7 @@ export async function updateFarm(db: dbType, b_id_farm: schema.farmsTypeInsert['
  * @returns A Promise that resolves when the field has been added and returns the value for b_id.
  * @alpha
  */
-export async function addField(db: dbType, b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
+export async function addField(fdm: FdmType, b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
     b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
     // Generate an ID for the field
     const b_id = nanoid()
@@ -101,7 +96,7 @@ export async function addField(db: dbType, b_id_farm: schema.farmManagingTypeIns
         b_id,
         b_name
     }
-    await db
+    await fdm
         .insert(schema.fields)
         .values(fieldData)
 
@@ -113,7 +108,7 @@ export async function addField(db: dbType, b_id_farm: schema.farmManagingTypeIns
         b_manage_end,
         b_manage_type
     }
-    await db
+    await fdm
         .insert(schema.farmManaging)
         .values(farmManagingData)
 
@@ -127,9 +122,9 @@ export async function addField(db: dbType, b_id_farm: schema.farmManagingTypeIns
 * @returns A Promise that resolves with an object that contains the details of a field.
 * @alpha
 */
-export async function getField(db: dbType, b_id: schema.fieldsTypeSelect['b_id']): Promise<getFieldType> {
+export async function getField(fdm: FdmType, b_id: schema.fieldsTypeSelect['b_id']): Promise<getFieldType> {
     // Get properties of the requested field
-    const field = await db
+    const field = await fdm
         .select({
             b_id: schema.fields.b_id,
             b_name: schema.fields.b_name,
@@ -159,9 +154,9 @@ export async function getField(db: dbType, b_id: schema.fieldsTypeSelect['b_id']
  * @returns A Promise that resolves when the field has been added and returns the value for b_id.
  * @alpha
  */
-export async function updateField(db: dbType, b_id: schema.fieldsTypeInsert['b_id'],
+export async function updateField(fdm: FdmType, b_id: schema.fieldsTypeInsert['b_id'],
     b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<getFieldType> {
-    const updatedField = await db.transaction(async (tx) => {
+    const updatedField = await fdm.transaction(async (tx: FdmType) => {
         try {
             await tx.update(schema.fields)
                 .set({
