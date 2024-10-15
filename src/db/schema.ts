@@ -62,7 +62,6 @@ export type fieldsTypeInsert = typeof fields.$inferInsert
 // Define fertilizers table
 export const fertilizers = fdmSchema.table('fertilizers', {
   p_id: text().primaryKey(),
-
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => {
@@ -87,9 +86,9 @@ export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
 export type fertilizerAcquiringTypeSelect = typeof fertilizerAcquiring.$inferSelect
 export type fertilzierAcquiringTypeInsert = typeof fertilizerAcquiring.$inferInsert
 
-// Define fertilizers properties table
-export const fertilizerProperties = fdmSchema.table('fertilizer_properties', {
-  p_id_properties: text().primaryKey(),
+// Define fertilizers_catalogue table
+export const fertilizersCatalogue = fdmSchema.table('fertilizers_catalogue', {
+  p_id_catalogue: text().primaryKey(),
   p_source: text().notNull(),
   p_name_nl: text(),
   p_name_en: text(),
@@ -137,19 +136,21 @@ export const fertilizerProperties = fdmSchema.table('fertilizer_properties', {
   updated: timestamp({ withTimezone: true })
 }, (table) => {
   return {
-    p_id_properties_idx: uniqueIndex('p_id_properties_idx').on(table.p_id_properties)
+    p_id_catalogue_idx: uniqueIndex('p_id_catalogue_idx').on(table.p_id_catalogue)
   }
 })
 
-export type fertilizerPropertiesTypeSelect = typeof fertilizerProperties.$inferSelect
-export type fertilzierPropertiesTypeInsert = typeof fertilizerProperties.$inferInsert
+export type fertilizersCatalogueTypeSelect = typeof fertilizersCatalogue.$inferSelect
+export type fertilizersCatalogueTypeInsert = typeof fertilizersCatalogue.$inferInsert
 
-// Define fertilizers inspecting table
-export const fertilizerInspecting = fdmSchema.table('fertilizer_inspecting', {
+// Define fertilizer_picking table
+export const fertilizerPicking = fdmSchema.table('fertilizer_picking', {
   p_id: text().notNull().references(() => fertilizers.p_id),
-  p_id_properties: text().notNull().references(() => fertilizerProperties.p_id_properties),
-  p_inspecting_date: timestamp({ withTimezone: true }),
+  p_id_catalogue: text().notNull().references(() => fertilizersCatalogue.p_id_catalogue),
+  p_picking_date: timestamp({ withTimezone: true }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })
 
+export type fertilizerPickingTypeSelect = typeof fertilizerPicking.$inferSelect
+export type fertilizerPickingTypeInsert = typeof fertilizerPicking.$inferInsert

@@ -1,5 +1,5 @@
 {
-  "id": "fe519fa9-fae3-483f-9b4e-ddb380223860",
+  "id": "e14d1e37-705f-4d8a-a0ed-a0c82bc38e3b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -251,8 +251,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "fdm-dev.fertilizer_inspecting": {
-      "name": "fertilizer_inspecting",
+    "fdm-dev.fertilizer_picking": {
+      "name": "fertilizer_picking",
       "schema": "fdm-dev",
       "columns": {
         "p_id": {
@@ -261,14 +261,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "p_id_properties": {
-          "name": "p_id_properties",
+        "p_id_catalogue": {
+          "name": "p_id_catalogue",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "p_inspecting_date": {
-          "name": "p_inspecting_date",
+        "p_picking_date": {
+          "name": "p_picking_date",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
@@ -289,9 +289,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "fertilizer_inspecting_p_id_fertilizers_p_id_fk": {
-          "name": "fertilizer_inspecting_p_id_fertilizers_p_id_fk",
-          "tableFrom": "fertilizer_inspecting",
+        "fertilizer_picking_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_picking_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_picking",
           "tableTo": "fertilizers",
           "schemaTo": "fdm-dev",
           "columnsFrom": [
@@ -303,16 +303,16 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "fertilizer_inspecting_p_id_properties_fertilizer_properties_p_id_properties_fk": {
-          "name": "fertilizer_inspecting_p_id_properties_fertilizer_properties_p_id_properties_fk",
-          "tableFrom": "fertilizer_inspecting",
-          "tableTo": "fertilizer_properties",
+        "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk": {
+          "name": "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk",
+          "tableFrom": "fertilizer_picking",
+          "tableTo": "fertilizers_catalogue",
           "schemaTo": "fdm-dev",
           "columnsFrom": [
-            "p_id_properties"
+            "p_id_catalogue"
           ],
           "columnsTo": [
-            "p_id_properties"
+            "p_id_catalogue"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -321,12 +321,57 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "fdm-dev.fertilizer_properties": {
-      "name": "fertilizer_properties",
+    "fdm-dev.fertilizers": {
+      "name": "fertilizers",
       "schema": "fdm-dev",
       "columns": {
-        "p_id_properties": {
-          "name": "p_id_properties",
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_id_idx": {
+          "name": "p_id_idx",
+          "columns": [
+            {
+              "expression": "p_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.fertilizers_catalogue": {
+      "name": "fertilizers_catalogue",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id_catalogue": {
+          "name": "p_id_catalogue",
           "type": "text",
           "primaryKey": true,
           "notNull": true
@@ -604,56 +649,11 @@
         }
       },
       "indexes": {
-        "p_id_properties_idx": {
-          "name": "p_id_properties_idx",
+        "p_id_catalogue_idx": {
+          "name": "p_id_catalogue_idx",
           "columns": [
             {
-              "expression": "p_id_properties",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "fdm-dev.fertilizers": {
-      "name": "fertilizers",
-      "schema": "fdm-dev",
-      "columns": {
-        "p_id": {
-          "name": "p_id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "created": {
-          "name": "created",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated": {
-          "name": "updated",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "p_id_idx": {
-          "name": "p_id_idx",
-          "columns": [
-            {
-              "expression": "p_id",
+              "expression": "p_id_catalogue",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

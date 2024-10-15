@@ -40,16 +40,22 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_aquiring" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_inspecting" (
+CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_picking" (
 	"p_id" text NOT NULL,
-	"p_id_properties" text NOT NULL,
-	"p_inspecting_date" timestamp with time zone,
+	"p_id_catalogue" text NOT NULL,
+	"p_picking_date" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_properties" (
-	"p_id_properties" text PRIMARY KEY NOT NULL,
+CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers" (
+	"p_id" text PRIMARY KEY NOT NULL,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers_catalogue" (
+	"p_id_catalogue" text PRIMARY KEY NOT NULL,
 	"p_source" text NOT NULL,
 	"p_name_nl" text,
 	"p_name_en" text,
@@ -97,12 +103,6 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_properties" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers" (
-	"p_id" text PRIMARY KEY NOT NULL,
-	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated" timestamp with time zone
-);
---> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
 	"b_name" text,
@@ -135,19 +135,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "fdm-dev"."fertilizer_inspecting" ADD CONSTRAINT "fertilizer_inspecting_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "fdm-dev"."fertilizer_picking" ADD CONSTRAINT "fertilizer_picking_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "fdm-dev"."fertilizer_inspecting" ADD CONSTRAINT "fertilizer_inspecting_p_id_properties_fertilizer_properties_p_id_properties_fk" FOREIGN KEY ("p_id_properties") REFERENCES "fdm-dev"."fertilizer_properties"("p_id_properties") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "fdm-dev"."fertilizer_picking" ADD CONSTRAINT "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk" FOREIGN KEY ("p_id_catalogue") REFERENCES "fdm-dev"."fertilizers_catalogue"("p_id_catalogue") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_id_b_id_farm_idx" ON "fdm-dev"."farm_managing" USING btree ("b_id","b_id_farm");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_id_farm_idx" ON "fdm-dev"."farms" USING btree ("b_id_farm");--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "p_id_properties_idx" ON "fdm-dev"."fertilizer_properties" USING btree ("p_id_properties");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "p_id_idx" ON "fdm-dev"."fertilizers" USING btree ("p_id");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "p_id_catalogue_idx" ON "fdm-dev"."fertilizers_catalogue" USING btree ("p_id_catalogue");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_id_idx" ON "fdm-dev"."fields" USING btree ("b_id");
