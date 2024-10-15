@@ -291,13 +291,24 @@ export async function addFertilizerToCatalogue(
 
 }
 
+/**
+ * Add fertilizer to farm
+ *
+ * @param fdm - 
+ * @param p_id_catalogue - Catalogue id of the fertilizer
+ * @param b_id_farm - ID of the farm
+ * @param p_amount - Amount of product that is acquired for this field
+ * @param p_date_acquiring - Date on which the fertilizer is acquired
+ * @returns A Promise that resolves with the if of the fertilizer
+ * @alpha
+ */
 export async function addFertilizer(
     fdm: FdmType,
     p_id_catalogue: schema.fertilizersCatalogueTypeInsert['p_id_catalogue'],
     b_id_farm: schema.fertilizerAcquiringTypeInsert['b_id_farm'],
     p_amount: schema.fertilizerAcquiringTypeInsert['p_amount'],
     p_date_acquiring: schema.fertilizerAcquiringTypeInsert['p_date_acquiring']
-) {
+): Promise<schema.fertilizerAcquiringTypeInsert['p_id']> {
 
     // Generate an ID for the fertilizer
     const p_id = nanoid()
@@ -315,7 +326,6 @@ export async function addFertilizer(
         p_id_catalogue: p_id_catalogue,
         p_picking_date: new Date()
     }
-
 
     await fdm.transaction(async (tx: FdmType) => {
         try {
@@ -341,4 +351,38 @@ export async function addFertilizer(
     })
 
     return p_id
+}
+
+/**
+ * Remove fertilizer from farm
+ *
+ * @param fdm - 
+ * @param p_id - ID of the fertilizer to be remove
+ * @returns A Promise that resolves when the fertilizer is removed from the farm
+ * @alpha
+ */
+export async function removeFertilizer(
+    fdm: FdmType,
+    p_id: schema.fertilizerAcquiringTypeInsert['p_id']
+): Promise<void> {
+
+    await fdm.transaction(async (tx: FdmType) => {
+        try {
+            await tx
+                .delete(schema.fertilizerAcquiring)
+                .where(eq(schema.fertilizerAcquiring.p_id, p_id))
+
+            await tx
+                .delete(schema.fertilizerPicking)
+                .where(eq(schema.fertilizerPicking.p_id, p_id))
+
+            await tx
+                .delete(schema.fertilizers)
+                .where(eq(schema.fertilizers.p_id, p_id))
+        }
+        catch (error) {
+            tx.rollback()
+            throw new Error('Remove fertilizer failed with error ' + error)
+        }
+    })
 }
