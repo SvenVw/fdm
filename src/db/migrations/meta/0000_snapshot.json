@@ -1,5 +1,5 @@
 {
-  "id": "6bb93a45-3782-4b1c-a0a8-f6eee11b62c8",
+  "id": "fe519fa9-fae3-483f-9b4e-ddb380223860",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -160,6 +160,500 @@
           "columns": [
             {
               "expression": "b_id_farm",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.fertilizer_aquiring": {
+      "name": "fertilizer_aquiring",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id_farm": {
+          "name": "b_id_farm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_amount": {
+          "name": "p_amount",
+          "type": "numeric(7, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_date_acquiring": {
+          "name": "p_date_acquiring",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fertilizer_aquiring_b_id_farm_farms_b_id_farm_fk": {
+          "name": "fertilizer_aquiring_b_id_farm_farms_b_id_farm_fk",
+          "tableFrom": "fertilizer_aquiring",
+          "tableTo": "farms",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id_farm"
+          ],
+          "columnsTo": [
+            "b_id_farm"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fertilizer_aquiring_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_aquiring_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_aquiring",
+          "tableTo": "fertilizers",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id"
+          ],
+          "columnsTo": [
+            "p_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.fertilizer_inspecting": {
+      "name": "fertilizer_inspecting",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_id_properties": {
+          "name": "p_id_properties",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_inspecting_date": {
+          "name": "p_inspecting_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fertilizer_inspecting_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_inspecting_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_inspecting",
+          "tableTo": "fertilizers",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id"
+          ],
+          "columnsTo": [
+            "p_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fertilizer_inspecting_p_id_properties_fertilizer_properties_p_id_properties_fk": {
+          "name": "fertilizer_inspecting_p_id_properties_fertilizer_properties_p_id_properties_fk",
+          "tableFrom": "fertilizer_inspecting",
+          "tableTo": "fertilizer_properties",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id_properties"
+          ],
+          "columnsTo": [
+            "p_id_properties"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.fertilizer_properties": {
+      "name": "fertilizer_properties",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id_properties": {
+          "name": "p_id_properties",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "p_source": {
+          "name": "p_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_name_nl": {
+          "name": "p_name_nl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_name_en": {
+          "name": "p_name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_description": {
+          "name": "p_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_dm": {
+          "name": "p_dm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_om": {
+          "name": "p_om",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_a": {
+          "name": "p_a",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_hc": {
+          "name": "p_hc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_eom": {
+          "name": "p_eom",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_eoc": {
+          "name": "p_eoc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_rt": {
+          "name": "p_c_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_of": {
+          "name": "p_c_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_if": {
+          "name": "p_c_if",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_fr": {
+          "name": "p_c_fr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cn_of": {
+          "name": "p_cn_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_rt": {
+          "name": "p_n_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_if": {
+          "name": "p_n_if",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_of": {
+          "name": "p_n_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_wc": {
+          "name": "p_n_wc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_p_rt": {
+          "name": "p_p_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_k_rt": {
+          "name": "p_k_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_mg_rt": {
+          "name": "p_mg_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ca_rt": {
+          "name": "p_ca_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ne": {
+          "name": "p_ne",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_s_rt": {
+          "name": "p_s_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_s_wc": {
+          "name": "p_s_wc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cu_rt": {
+          "name": "p_cu_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_zn_rt": {
+          "name": "p_zn_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_na_rt": {
+          "name": "p_na_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_si_rt": {
+          "name": "p_si_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_b_rt": {
+          "name": "p_b_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_mn_rt": {
+          "name": "p_mn_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ni_rt": {
+          "name": "p_ni_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_fe_rt": {
+          "name": "p_fe_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_mo_rt": {
+          "name": "p_mo_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_co_rt": {
+          "name": "p_co_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_as_rt": {
+          "name": "p_as_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cd_rt": {
+          "name": "p_cd_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cr_rt": {
+          "name": "p_cr_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cr_vi": {
+          "name": "p_cr_vi",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_pb_rt": {
+          "name": "p_pb_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_hg_rt": {
+          "name": "p_hg_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cl_cr": {
+          "name": "p_cl_cr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_id_properties_idx": {
+          "name": "p_id_properties_idx",
+          "columns": [
+            {
+              "expression": "p_id_properties",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "fdm-dev.fertilizers": {
+      "name": "fertilizers",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_id_idx": {
+          "name": "p_id_idx",
+          "columns": [
+            {
+              "expression": "p_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
