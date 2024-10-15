@@ -198,3 +198,19 @@ export async function updateField(fdm: FdmType, b_id: schema.fieldsTypeInsert['b
 
     return updatedField
 }
+
+/**
+ * Get fertilizers available in catalogue
+ *
+ * @param fdm - 
+ * @returns A Promise that resolves with an array of fertilizers and the details.
+ * @alpha
+ */
+export async function getFertilizersFromCatalogue(fdm: FdmType): Promise<schema.fertilizersCatalogueTypeSelect[]> {
+
+    const fertilizersCatalogue = await fdm
+        .select()
+        .from(schema.fertilizersCatalogue)
+
+    return fertilizersCatalogue
+}

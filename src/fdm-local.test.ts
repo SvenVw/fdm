@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach} from 'vitest'
 import { createFdmLocal, migrateFdmLocal } from './fdm-local'
-import { addFarm, getFarm, updateFarm, addField, getField, updateField } from './fdm-crud'
+import { addFarm, getFarm, updateFarm, addField, getField, updateField, getFertilizersFromCatalogue } from './fdm-crud'
 
 describe('Farm Data Model', () => {
   let fdm: ReturnType<typeof createFdmLocal>
@@ -109,6 +109,13 @@ describe('Farm Data Model', () => {
       expect(updatedField.b_manage_start).toEqual(updatedManageStart)
       expect(updatedField.b_manage_end).toEqual(updatedManageEnd)
       expect(updatedField.b_manage_type).toBe(updatedManageType)
+    })
+  })
+
+  describe('Fertilizers CRUD', () => {
+    it('should get fertilizers from catalogue', async () => {
+      const fertilizers = await getFertilizersFromCatalogue(fdm)
+      expect(fertilizers).toBeDefined()
     })
   })
 })

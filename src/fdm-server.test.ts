@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { describe, expect, it, beforeEach} from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
-import { addFarm, getFarm, updateFarm, addField, getField, updateField } from './fdm-crud'
+import { addFarm, getFarm, updateFarm, addField, getField, updateField, getFertilizersFromCatalogue } from './fdm-crud'
 import { type FdmServerType } from './fdm-server.d'
 
 describe('Farm Data Model', () => {
@@ -124,6 +124,13 @@ describe('Farm Data Model', () => {
       expect(updatedField.b_manage_start).toEqual(updatedManageStart)
       expect(updatedField.b_manage_end).toEqual(updatedManageEnd)
       expect(updatedField.b_manage_type).toBe(updatedManageType)
+    })
+  })
+
+  describe('Fertilizers CRUD', () => {
+    it('should get fertilizers from catalogue', async () => {
+      const fertilizers = await getFertilizersFromCatalogue(fdm)
+      expect(fertilizers).toBeDefined()
     })
   })
 })
