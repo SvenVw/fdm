@@ -71,20 +71,20 @@ export const fertilizers = fdmSchema.table('fertilizers', {
 })
 
 export type fertilizersTypeSelect = typeof fertilizers.$inferSelect
-export type fertilziersTypeInsert = typeof fertilizers.$inferInsert
+export type fertilizersTypeInsert = typeof fertilizers.$inferInsert
 
 // Define fertilizers acquiring table
 export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
-  p_amount: numeric({precision: 7,scale: 3}), // kg
+  p_amount: numeric({precision: 7,scale: 3}).$type<number>(),//kg // Workaround for bug: https://github.com/drizzle-team/drizzle-orm/issues/2681
   p_date_acquiring: timestamp({ withTimezone: true }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })
 
 export type fertilizerAcquiringTypeSelect = typeof fertilizerAcquiring.$inferSelect
-export type fertilzierAcquiringTypeInsert = typeof fertilizerAcquiring.$inferInsert
+export type fertilizerAcquiringTypeInsert = typeof fertilizerAcquiring.$inferInsert
 
 // Define fertilizers_catalogue table
 export const fertilizersCatalogue = fdmSchema.table('fertilizers_catalogue', {

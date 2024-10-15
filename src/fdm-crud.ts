@@ -270,7 +270,7 @@ export async function addFertilizerToCatalogue(
         p_cl_rt: schema.fertilizersCatalogueTypeInsert['p_cl_cr']
     }): Promise<schema.fertilizersCatalogueTypeInsert['p_id_catalogue']> {
 
-    // Generate an ID for the farm
+    // Generate an ID for the fertilizer catalogue item
     const p_id_catalogue = nanoid()
 
     // Insert the farm in the db
@@ -289,4 +289,56 @@ export async function addFertilizerToCatalogue(
 
     return p_id_catalogue
 
+}
+
+export async function addFertilizer(
+    fdm: FdmType,
+    p_id_catalogue: schema.fertilizersCatalogueTypeInsert['p_id_catalogue'],
+    b_id_farm: schema.fertilizerAcquiringTypeInsert['b_id_farm'],
+    p_amount: schema.fertilizerAcquiringTypeInsert['p_amount'],
+    p_date_acquiring: schema.fertilizerAcquiringTypeInsert['p_date_acquiring']
+) {
+
+    // Generate an ID for the fertilizer
+    const p_id = nanoid()
+
+    // Insert the fertilizer in the db
+    const fertilizerAcquiringData = {
+        b_id_farm: b_id_farm,
+        p_id: p_id,
+        p_amount: p_amount,
+        p_date_acquiring: p_date_acquiring
+    }
+
+    const fertilizerPickingData = {
+        p_id: p_id,
+        p_id_catalogue: p_id_catalogue,
+        p_picking_date: new Date()
+    }
+
+
+    await fdm.transaction(async (tx: FdmType) => {
+        try {
+
+            await tx
+                .insert(schema.fertilizers)
+                .values({
+                    p_id: p_id
+                })
+
+            await tx
+                .insert(schema.fertilizerAcquiring)
+                .values(fertilizerAcquiringData)
+
+            await tx
+                .insert(schema.fertilizerPicking)
+                .values(fertilizerPickingData)
+
+        } catch (error) {
+            tx.rollback()
+            throw new Error('Add fertilizer failed with error ' + error)
+        }
+    })
+
+    return p_id
 }
