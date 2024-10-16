@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_aquiring" (
 	"b_id_farm" text NOT NULL,
 	"p_id" text NOT NULL,
-	"p_amount" numeric(7, 3),
+	"p_amount" numeric,
 	"p_date_acquiring" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone

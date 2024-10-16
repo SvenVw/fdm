@@ -17,4 +17,6 @@ import * as fdmSchema from './db/schema'
 export { fdmSchema }
 export { createFdmServer, migrateFdmServer } from './fdm-server'
 export { createFdmLocal, migrateFdmLocal } from './fdm-local'
-export {addFarm, getFarm, updateFarm, addField, getField, updateField} from'./fdm-crud'
+export { addFarm, getFarm, updateFarm, } from './farm'
+export { addField, getField, updateField } from './field'
+export { addFertilizerToCatalogue, getFertilizersFromCatalogue, addFertilizer, removeFertilizer } from './fertilizer'
