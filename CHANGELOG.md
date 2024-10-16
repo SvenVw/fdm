@@ -1,4 +1,4 @@
-# Changelog fdm
+# Changelog fdm-core
 
 ## v0.2.0 
 ### Added

@@ -1,20 +1,20 @@
 {
-  "name": "@nmi/fdm",
+  "name": "fdm-core",
   "private": true,
   "version": "0.2.0",
   "type": "module",
-  "main": "./dist/fdm.umd.cjs",
-  "module": "./dist/fdm.js",
+  "main": "./dist/fdm-core.umd.cjs",
+  "module": "./dist/fdm-core.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/fdm.js"
+        "default": "./dist/fdm-core.js"
       },
       "require": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/fdm.umd.cjs"
+        "default": "./dist/fdm-core.umd.cjs"
       }
     }
   },

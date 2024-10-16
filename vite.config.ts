@@ -12,8 +12,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: '@nmi/fdm',
-      fileName: 'fdm',
+      name: 'fdm-core',
+      fileName: 'fdm-core',
     },
     rollupOptions: {
       external: [
