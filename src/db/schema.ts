@@ -1,4 +1,4 @@
-import { pgSchema, text, date, timestamp, primaryKey, uniqueIndex, numeric } from 'drizzle-orm/pg-core'
+import { pgSchema, text, date, timestamp, primaryKey, uniqueIndex} from 'drizzle-orm/pg-core'
 import { numericCasted } from './schema-custom-types'
 
 // Define postgres schema

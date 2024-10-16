@@ -1,18 +1,30 @@
+import 'dotenv/config'
 import { describe, expect, it, beforeEach } from 'vitest'
-import { createFdmLocal, migrateFdmLocal } from './fdm-local'
+import { createFdmServer, migrateFdmServer } from './fdm-server'
+import { type FdmServerType } from './fdm-server.d'
 import { addFarm } from './farm'
 import { addField, getField, updateField } from './field'
 
 describe('Farm Data Model', () => {
-  let fdm: ReturnType<typeof createFdmLocal>
+  let fdm: FdmServerType
 
   beforeEach(async () => {
-    const backend = 'memory://'
+    const host = process.env.POSTGRES_HOST
+    const port = Number(process.env.POSTGRES_PORT)
+    const user = process.env.POSTGRES_USER
+    const password = process.env.POSTGRES_PASSWORD
+    const database = process.env.POSTGRES_DB
     const migrationsFolderPath = 'src/db/migrations'
-    fdm = await createFdmLocal(
-      backend
+
+    fdm = await createFdmServer(
+      host,
+      port,
+      user,
+      password,
+      database
     )
-    await migrateFdmLocal(fdm, migrationsFolderPath)
+
+    await migrateFdmServer(fdm, migrationsFolderPath)
   })
 
   describe('Field CRUD', () => {

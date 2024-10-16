@@ -28,16 +28,13 @@ describe('Farm Data Model', () => {
 
       // Add assertion to check if migration was successful
       // For example, check if a specific table exists
-      interface Row {
-        table_name: string
-      }
       const statement = sql`
         SELECT table_name
         FROM information_schema.tables
         WHERE table_schema = 'fdm-dev'
       `
       const tables = await fdm.execute(statement)
-      const tableNames = tables.map((row: Row) => row.table_name)
+      const tableNames = tables.rows.map((row) => row.table_name)
       expect(tableNames).toContain('farms')
     })
   })

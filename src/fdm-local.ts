@@ -1,4 +1,3 @@
-import { PGlite } from '@electric-sql/pglite'
 import { drizzle } from 'drizzle-orm/pglite'
 import { migrate } from 'drizzle-orm/pglite/migrator'
 import * as schema from './db/schema'
@@ -6,11 +5,14 @@ import { type FdmLocalType } from './fdm-local.d'
 
 export function createFdmLocal(backend: 'memory://' = 'memory://'): FdmLocalType {
 
-  // Create client
-  const client = new PGlite(backend)
-
   // Create drizzle instance
-  const db = drizzle(client, { schema })
+  const db = drizzle({
+    connection: {
+      dataDir: backend
+    },
+    logger: false,
+    schema: schema
+  })
 
   return db
 }

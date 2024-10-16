@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { describe, expect, it, beforeEach } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
@@ -22,7 +23,7 @@ describe('Farm Data Model', () => {
       database
     )
   })
-
+ 
   describe('Database Connection', () => {
     it('should connect to the database', async () => {
       const statement = sql`SELECT 1 + 1`;

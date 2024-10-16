@@ -36,7 +36,7 @@
     "@eslint/js": "^9.9.0",
     "@types/node": "^22.7.2",
     "dotenv": "^16.4.5",
-    "drizzle-kit": "^0.25.0",
+    "drizzle-kit": "^0.26.2",
     "eslint": "^9.9.0",
     "fs-extra": "^11.2.0",
     "globals": "^15.9.0",
@@ -51,7 +51,7 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.2.11",
     "drizzle-graphql": "^0.8.5",
-    "drizzle-orm": "^0.34.1",
+    "drizzle-orm": "^0.35.1",
     "graphql": "^16.9.0",
     "nanoid": "^5.0.7",
     "postgres": "^3.4.4"
