@@ -6,6 +6,11 @@
   "license": "MIT",
   "homepage": "https://github.com/SvenVw/fdm",
   "bugs": "https://github.com/SvenVw/fdm/issues/new",
+  "author": {
+    "name": "Sven Verweij",
+    "email": "37927107+SvenVw@users.noreply.github.com",
+    "url": "https://github.com/SvenVw"
+  },
   "type": "module",
   "main": "./dist/fdm-core.umd.cjs",
   "module": "./dist/fdm-core.js",
