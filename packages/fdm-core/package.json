@@ -25,7 +25,8 @@
     "dev": "vite",
     "db:generate": "npx drizzle-kit generate",
     "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
-    "build": "tsc && vite build",
+    "build": "vite build",
+    "check-types": "tsc --noEmit",
     "preinstall": "npx only-allow pnpm",
     "prepare": "pnpm build",
     "preview": "vite preview",
@@ -56,5 +57,6 @@
     "graphql": "^16.9.0",
     "nanoid": "^5.0.7",
     "postgres": "^3.4.4"
-  }
+  },
+  "packageManager": "pnpm@9.12.2"
 }
