@@ -1,7 +1,9 @@
 {
   "name": "fdm-source",
   "version": "0.0.0",
-  "description": "",
+  "description": "Monorepo for fdm",
+  "homepage": "https://github.com/SvenVw/fdm",
+  "bugs": "https://github.com/SvenVw/fdm/issues/new",
   "type": "module",
   "private": true,
   "scripts": {
