@@ -5,8 +5,8 @@
  * The `fdm` defines the {@link fdmLocal} and {@link fdmServer} class to store, retrieve and update the Farm Data Model
  *
  * Created by Nutriënten Management Instituut (www.nmi-agro.nl)
- * Source code available at https://github.com/AgroCares/Farm-Data-Model
- * In case you find a bug, please report at https://github.com/AgroCares/Farm-Data-Model/issues
+ * Source code available at https://github.com/SvenVw/fdm
+ * In case you find a bug, please report at https://github.com/SvenVw/fdm/issues
  *
  * @public
  * @packageDocumentation
