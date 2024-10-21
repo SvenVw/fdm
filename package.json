@@ -2,14 +2,14 @@
   "name": "fdm-source",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "private": true,
   "scripts": {
     "test": "turbo run test",
+    "build": "turbo run build",
+    "watch": "turbo run watch",
     "publih-packages": "turbo run build test && changeset version && changeset publish"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "turbo": "^2.2.1",
     "@changesets/cli": "^2.27.9"
