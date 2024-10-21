@@ -2,6 +2,8 @@
   "name": "fdm-core",
   "private": true,
   "version": "0.2.0",
+  "description": "Interface for the Farm Data Model",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/fdm-core.umd.cjs",
   "module": "./dist/fdm-core.js",
