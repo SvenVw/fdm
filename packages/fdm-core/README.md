@@ -3,7 +3,7 @@
 > [!WARNING]  
 > Until version v1.0.0 no schema migrations are provided and the database schema will be broken between updates
 
-This repository contains the `fdm``  JavaScript/TypeScript package that enables to interact with Farm Data Model  (FDM) schema specification of the Farm Data Model (FDM). The goal of the FDM is to include the information about agronomic relevant activities, assets and insights. 
+This repository contains the `fdm-core`  JavaScript/TypeScript package that enables to interact with Farm Data Model  (FDM) schema specification of the Farm Data Model (FDM). The goal of the FDM is to include the information about agronomic relevant activities, assets and insights. 
 
 ## Principles
 The FDM is based on the following principles:
