@@ -5,9 +5,11 @@
 * Maintainer: @SvenVw
 
 ## Made possible by
-The package `fdm` is developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe project: [NutriBudget](https://www.nutribudget.eu/)
+The packages of `fdm` are developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe project: [NutriBudget](https://www.nutribudget.eu/) and [PPS BAAT](https://www.handboekbodemenbemesting.nl/nl/handboekbodemenbemesting/pps-baat.htm)
 
 ![Logo of NutriBudget](https://www.nutribudget.eu/wp-content/themes/nutribudget/images/logo-nutribudget.png)
+
+![Logo of PPS BAAT](https://www.beterbodembeheer.nl/wp-content/uploads/2024/01/pps-baat-projectlogo.png)
 
 ![Logo of EU](https://ec.europa.eu/regional_policy/images/information-sources/logo-download-center/eu_funded_en.jpg)
 
