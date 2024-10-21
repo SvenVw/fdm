@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "turbo run test",
+    "publih-packages": "turbo run build test && changeset version && changeset publish"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "turbo": "^2.2.1"
+    "turbo": "^2.2.1",
+    "@changesets/cli": "^2.27.9"
   },
   "packageManager": "pnpm@9.12.2"
 }
