@@ -45,8 +45,11 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.20.0",
     "typescript": "^5.5.3",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "vite-plugin-dts": "^4.0.2",
+    "vitest": "^2.0.5"
   },
   "dependencies": {
     "fdm-core": "workspace:*"
