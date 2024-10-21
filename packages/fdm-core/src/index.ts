@@ -15,6 +15,7 @@
 /** {@inheritDoc fdmServer} */
 import * as fdmSchema from './db/schema'
 export { fdmSchema }
+export {type FdmType } from './fdm.d'
 export { createFdmServer, migrateFdmServer } from './fdm-server'
 export { createFdmLocal, migrateFdmLocal } from './fdm-local'
 export { addFarm, getFarm, updateFarm, } from './farm'
