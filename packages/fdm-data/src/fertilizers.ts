@@ -1,13 +1,14 @@
-import { addFertilizerToCatalogue, type FdmType } from "fdm-core";
+import { addFertilizerToCatalogue, type FdmType, fdmSchema } from "fdm-core";
 
 export async function extendFertilizersCatalogue(fdm: FdmType, datasetName: string): Promise<void> {
     
-    let dataset = [{}]
+    let dataset: fdmSchema.fertilizersCatalogueTypeInsert[] = []
     if (datasetName == 'test') {
         dataset = [
             {
-                p_source: "test",
-                p_name_nl: "KAS",
+                p_id_catalogue: '001',
+                p_source: 'test',
+                p_name_nl: 'KAS',
                 p_description: 'A test product for KAS',
                 p_n_rt: 27
             }
