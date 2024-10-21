@@ -22,19 +22,21 @@
     "dist"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "dotenvx run -- vite",
     "db:generate": "npx drizzle-kit generate",
     "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
+    "dotenvx": "dotenvx",
     "build": "vite build",
     "check-types": "tsc --noEmit",
     "preinstall": "npx only-allow pnpm",
     "prepare": "pnpm build",
     "preview": "vite preview",
-    "test": "vitest run",
-    "watch": "vitest",
+    "test": "dotenvx run -- vitest run",
+    "watch": "dotenvx run -- vitest",
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.20.0",
     "@eslint/js": "^9.9.0",
     "@types/node": "^22.7.2",
     "dotenv": "^16.4.5",

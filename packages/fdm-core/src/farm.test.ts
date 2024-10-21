@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { describe, expect, it, beforeEach } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { addFarm, getFarm, updateFarm } from './farm'
