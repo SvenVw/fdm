@@ -15,6 +15,15 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
 
+  packages/fdm-calculator:
+    devDependencies:
+      typescript:
+        specifier: ^5.5.3
+        version: 5.6.3
+      vite:
+        specifier: ^5.4.8
+        version: 5.4.9(@types/node@22.7.7)
+
   packages/fdm-core:
     dependencies:
       '@electric-sql/pglite':
