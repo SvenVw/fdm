@@ -1,15 +1,45 @@
 {
     "$schema": "https://turbo.build/schema.json",
     "tasks": {
-      "build": {
-        "outputs": ["dist/**"]
-      },
-      "check-types": {
-        "dependsOn": ["^check-types"]
-      },
-      "dev": {
-        "persistent": true,
-        "cache": false
-      }
+        "build": {
+            "outputs": [
+                "dist/**"
+            ],
+            "dependsOn": [
+                "^build"
+            ]
+        },
+        "check-types": {
+            "dependsOn": [
+                "^check-types"
+            ]
+        },
+        "test": {
+            "outputs": [],
+            "persistent": false,
+            "cache": true,
+            "env": [
+                "POSTGRES_HOST",
+                "POSTGRES_PORT",
+                "POSTGRES_DB",
+                "POSTGRES_USER",
+                "POSTGRES_PASSWORD"
+            ]
+        },
+        "watch": {
+            "persistent": true,
+            "cache": false,
+            "env": [
+                "POSTGRES_HOST",
+                "POSTGRES_PORT",
+                "POSTGRES_DB",
+                "POSTGRES_USER",
+                "POSTGRES_PASSWORD"
+            ]
+        },
+        "dev": {
+            "persistent": true,
+            "cache": false
+        }
     }
-  }
+}
