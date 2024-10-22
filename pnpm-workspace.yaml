@@ -2,3 +2,4 @@ packages:
   - 'fdm-core'
   - 'fdm-data'
   - 'fdm-calculator'
+  - 'fdm-docs'

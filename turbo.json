@@ -40,6 +40,10 @@
         "dev": {
             "persistent": true,
             "cache": false
+        },
+        "watch-docs": {
+            "persistent": true,
+            "cache": false
         }
     }
 }
