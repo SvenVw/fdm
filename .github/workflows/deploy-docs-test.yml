@@ -15,19 +15,21 @@ jobs:
   build:
     name: Build Docusaurus
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
-      - uses: pnpm/action-setup@v2.4.0
+          version: 9.12.2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          version: 9
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-
+          
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build website
