@@ -64,12 +64,12 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/docusaurus-social-card.jpg',
+    image: 'img/fdm-high-resolution-logo.png',
     navbar: {
       title: 'FDM',
       logo: {
         alt: 'logo of FDM',
-        src: 'img/logo.svg',
+        src: 'img/fdm-high-resolution-logo-transparent-no-text.png',
       },
       items: [
         {
@@ -124,7 +124,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/SvenVw/fdms',
+              href: 'https://github.com/SvenVw/fdm',
             },
           ],
         },
