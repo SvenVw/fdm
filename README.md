@@ -1,6 +1,6 @@
 # FDM: Transforming Farm Data into Actionable Insights
 
-[Logo of FDM](/fdm-docs/static/img/fdm-high-resolution-logo.png)
+![Logo of FDM](/fdm-docs/static/img/fdm-high-resolution-logo.png)
 
 ## Contact
 * Maintainer: @SvenVw
