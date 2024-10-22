@@ -15,7 +15,7 @@ importers:
         specifier: ^2.2.1
         version: 2.2.1
 
-  packages/fdm-calculator:
+  fdm-calculator:
     dependencies:
       fdm-core:
         specifier: workspace:*
@@ -34,7 +34,7 @@ importers:
         specifier: ^2.0.5
         version: 2.1.3(@types/node@22.7.7)
 
-  packages/fdm-core:
+  fdm-core:
     dependencies:
       '@electric-sql/pglite':
         specifier: ^0.2.11
@@ -101,7 +101,7 @@ importers:
         specifier: ^2.0.5
         version: 2.1.3(@types/node@22.7.7)
 
-  packages/fdm-data:
+  fdm-data:
     dependencies:
       fdm-core:
         specifier: workspace:*

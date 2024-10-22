@@ -1,2 +1,4 @@
 packages:
-  - 'packages/*'
+  - 'fdm-core'
+  - 'fdm-data'
+  - 'fdm-calculator'
