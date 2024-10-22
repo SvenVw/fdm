@@ -1,5 +1,6 @@
-# fdm: Analyze farm data in a structured way
+# FDM: Transforming Farm Data into Actionable Insights
 
+[Logo of FDM](/fdm-docs/static/img/fdm-high-resolution-logo.png)
 
 ## Contact
 * Maintainer: @SvenVw
