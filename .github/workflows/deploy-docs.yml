@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Build website
-        run: pnpm build
+        run: pnpm build-docs
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3

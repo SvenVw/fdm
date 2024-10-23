@@ -7,6 +7,7 @@
     "start": "docusaurus start",
     "watch-docs": "pnpm start",
     "build": "docusaurus build",
+    "build-docs": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",
