@@ -59,6 +59,29 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages # Checkout the gh-pages branch
+
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact #
+
+      - name: Prepare gh-pages
+        run: |
+          rm -rf * # Remove existing content on gh-pages
+          mv build-artifact/* ./ # Move built files to root
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Deploy Docusaurus site to gh-pages"
+          branch: gh-pages # Push to the gh-pages branch
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          folder: .
