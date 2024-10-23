@@ -31,14 +31,14 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --filter fdm-docs
       - name: Build website
-        run: pnpm build
+        run: pnpm build-docs
 
       - name: Upload Build Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build
+          path: ./fdm-docs/build
 
   deploy:
     name: Deploy to GitHub Pages

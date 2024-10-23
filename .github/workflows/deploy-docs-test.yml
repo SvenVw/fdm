@@ -29,8 +29,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-          
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --filter fdm-docs
       - name: Build website
-        run: pnpm build
+        run: pnpm build-docs

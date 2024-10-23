@@ -9,12 +9,13 @@
   "scripts": {
     "test": "turbo run test",
     "build": "turbo run build",
+    "build-docs": "turbo run build-docs",
     "watch": "turbo run watch",
-    "publih-packages": "turbo run build test && changeset version && changeset publish"
+    "publish-packages": "turbo run build test && changeset version && changeset publish"
   },
   "devDependencies": {
-    "turbo": "^2.2.1",
-    "@changesets/cli": "^2.27.9"
+    "@changesets/cli": "^2.27.9",
+    "turbo": "^2.2.3"
   },
   "packageManager": "pnpm@9.12.2"
 }

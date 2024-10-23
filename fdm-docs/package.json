@@ -1,12 +1,13 @@
 {
   "name": "fdm-docs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "watch-docs": "pnpm start",
     "build": "docusaurus build",
+    "build-docs": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

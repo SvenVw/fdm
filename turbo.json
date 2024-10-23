@@ -3,10 +3,18 @@
     "tasks": {
         "build": {
             "outputs": [
-                "dist/**"
+                "dist/**", "build/**"
             ],
             "dependsOn": [
                 "^build"
+            ]
+        },
+        "build-docs": {
+            "outputs": [
+                "build/**"
+            ],
+            "dependsOn": [
+                "^build-docs"
             ]
         },
         "check-types": {
