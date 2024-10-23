@@ -5,6 +5,9 @@ defaults:
     working-directory: ./fdm-docs
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
