@@ -1,10 +1,14 @@
 {
   "name": "fdm-core",
-  "private": true,
+  "private": false,
   "version": "0.3.0",
   "description": "Interface for the Farm Data Model",
   "license": "MIT",
-  "homepage": "https://github.com/SvenVw/fdm",
+  "homepage": "https://svenvw.github.io/fdm/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SvenVw/fdm.git"
+  },
   "bugs": "https://github.com/SvenVw/fdm/issues/new",
   "author": {
     "name": "Sven Verweij",
@@ -70,6 +74,9 @@
     "postgres": "^3.4.4"
   },
   "packageManager": "pnpm@9.12.2",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "pnpm": {
     "packageExtensions": {
       "vite-plugin-dts": {
