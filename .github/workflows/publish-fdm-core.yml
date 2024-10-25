@@ -1,5 +1,9 @@
 name: Publish fdm-core (dev) to GitHub Packages
 
+defaults:
+  run:
+    working-directory: ./fdm-core
+
 on:
   pull_request:
     paths:
