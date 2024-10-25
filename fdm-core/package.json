@@ -69,5 +69,22 @@
     "nanoid": "^5.0.7",
     "postgres": "^3.4.4"
   },
-  "packageManager": "pnpm@9.12.2"
+  "packageManager": "pnpm@9.12.2",
+  "pnpm": {
+    "packageExtensions": {
+      "vite-plugin-dts": {
+        "dependenciesMeta": {
+          "@volar/typescript": {
+            "optional": true
+          },
+          "vue-tsc": {
+            "optional": true
+          },
+          "@vue/language-core": {
+            "optional": true
+          }
+        }
+      }
+    }
+  }
 }
