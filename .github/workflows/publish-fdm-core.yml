@@ -37,6 +37,6 @@ jobs:
       # - name: Run tests
       #   run: pnpm test
       - name: Publish the package
-        run: pnpm publish --tag ${{ GITHUB_HEAD_REF }}:${{ GITHUB_SHA }}
+        run: pnpm publish --tag ${{ github.head.ref }}:${{ github.sha }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
