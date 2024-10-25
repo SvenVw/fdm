@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.1.2
+
+### Patch Changes
+
+- b357b4c: Trigger test and publish for fdm-docs only if change is made in fdm-docs
+
 ## 0.1.1
 
 ### Patch Changes

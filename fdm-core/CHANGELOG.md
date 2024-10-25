@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.3.1
+
+### Patch Changes
+
+- 6f6b1c4: Fix building by updating `vite-plugin-dts`
+- 1750661: Add GitHub Action to publish dev version of fdm-core to GitHub Packages
+
 ## 0.3.0
 
 ### Minor Changes
