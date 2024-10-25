@@ -33,6 +33,6 @@ jobs:
       # - name: Run tests
       #   run: pnpm test
       - name: Publish the package
-        run: pnpm publish fdm-core --tag ${{ github.head_ref }}:${{ github.sha }} --no-git-checks
+        run: pnpm publish fdm-core --tag ${{ github.head_ref }} --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
