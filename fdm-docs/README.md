@@ -4,11 +4,11 @@ This folder contains the source code of the website for fdm. This website is bui
 
 ## Development
 
-As part of the the `fdm` monorepu you can use turbo tasks for development:
+As part of the the `fdm` monorepo you can use turbo tasks for development:
 
 ```
 # Install the packages required
-$ pnpm install
+$ npm install
 
 # Start local development
 $ turbo run watch-docs
