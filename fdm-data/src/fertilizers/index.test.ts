@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { createFdmLocal, migrateFdmLocal, type FdmType } from 'fdm-core'
-import { extendFertilizersCatalogue } from './fertilizers'
+import { extendFertilizersCatalogue } from '.'
 
 describe('Fertilizers Data', () => {
     let fdm: FdmType
