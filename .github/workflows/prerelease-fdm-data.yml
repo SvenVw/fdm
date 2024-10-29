@@ -1,0 +1,65 @@
+name: Prerelease fdm-data to GitHub Packages
+
+defaults:
+  run:
+    working-directory: ./fdm-data
+
+on:
+  pull_request:
+    paths:
+      - 'fdm-data/**'
+    branches:
+      - main
+  push:
+    paths:
+      - 'fdm-data/**'
+    branches:
+      - main
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with: 
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://npm.pkg.github.com'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter fdm-data
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: fdm-data
+      - name: Create a prerelease version from PR
+        if: ${{ github.ref != 'refs/heads/main' }}
+        run: pnpm version ${{ steps.package-version.outputs.current-version}}-${{ github.head_ref }}.${{ github.sha }} --no-git-tag-version
+      - name: Create a prerelease version from main
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: pnpm version ${{ steps.package-version.outputs.current-version}}.${{ github.sha }} --no-git-tag-version
+      # - name: Run tests
+      #   run: pnpm test
+      - name: Publish the package
+        run: pnpm publish --tag ${{ github.head_ref }} --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
