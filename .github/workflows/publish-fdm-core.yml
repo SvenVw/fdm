@@ -41,10 +41,11 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter fdm-core
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
       - name: Create a development version
-        uses: adobe/update-prerelease-npm-version@v1.0.0
-        with: 
-          pre-release-tag: ${{ github.head_ref }}
+        run: pnpm version ${{ steps.package-version.outputs.current-version}}.${{ github.head_ref }}.${{ github.sha }} --no-git-tag-version
       # - name: Run tests
       #   run: pnpm test
       - name: Publish the package
