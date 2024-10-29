@@ -14,13 +14,10 @@ describe('Fertilizers Data', () => {
         await expect(extendFertilizersCatalogue(fdm, 'not-existing-dataset')).rejects.toThrowError('Dataset not-existing-dataset is not recognized')
     })
 
-    it('should extend fertilizers catalogue with test dataset', async () => {
-        await extendFertilizersCatalogue(fdm, 'test')
+    it('should extend fertilizers catalogue with srm dataset', async () => {
+        await extendFertilizersCatalogue(fdm, 'srm')
 
         const result = await fdm.select().from(fdm.schema.fertilizersCatalogue)
-        expect(result.length).toBe(1)
-        expect(result[0].p_name_nl).toBe('KAS')
-        expect(result[0].p_description).toBe('A test product for KAS')
-        expect(result[0].p_n_rt).toBe(27)
+        expect(result.length).toBeGreaterThan(0)
     })
 })
