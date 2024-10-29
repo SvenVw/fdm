@@ -1,4 +1,4 @@
-name: Publish fdm-core (dev) to GitHub Packages
+name: Prerelease fdm-core to GitHub Packages
 
 defaults:
   run:
