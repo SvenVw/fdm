@@ -76,22 +76,5 @@
   "packageManager": "pnpm@9.12.2",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
-  },
-  "pnpm": {
-    "packageExtensions": {
-      "vite-plugin-dts": {
-        "dependenciesMeta": {
-          "@volar/typescript": {
-            "optional": true
-          },
-          "vue-tsc": {
-            "optional": true
-          },
-          "@vue/language-core": {
-            "optional": true
-          }
-        }
-      }
-    }
   }
 }
