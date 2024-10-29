@@ -11,7 +11,7 @@ describe('Fertilizers Data', () => {
     })
 
     it('should throw error if dataset is not recognized', async () => {
-        await expect(extendFertilizersCatalogue(fdm, 'not-existing-dataset')).rejects.toThrowError('Dataset not-existing-dataset is not recognized')
+        await expect(extendFertilizersCatalogue(fdm, 'not-existing-dataset')).rejects.toThrowError('catalogue not-existing-dataset is not recognized')
     })
 
     it('should extend fertilizers catalogue with srm dataset', async () => {

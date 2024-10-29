@@ -1,67 +1,78 @@
-import { addFertilizerToCatalogue, type FdmType, fdmSchema } from "fdm-core";
-import { getDatasetSrm } from "./datasets/srm";
+import { addFertilizerToCatalogue, getFertilizersFromCatalogue, type FdmType, fdmSchema } from "fdm-core";
+import { getCatalogueSrm } from "./catalogues/srm";
 
-export async function extendFertilizersCatalogue(fdm: FdmType, datasetName: string): Promise<void> {
+export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: string): Promise<void> {
 
-    let dataset: fdmSchema.fertilizersCatalogueTypeInsert[] = []
-    if (datasetName == 'srm') {
-        dataset = getDatasetSrm()
+    // Get the specified catalogue
+    let catalogue: fdmSchema.fertilizersCatalogueTypeInsert[] = []
+    if (catalogueName == 'srm') {
+        catalogue = getCatalogueSrm()
     }
 
-    if (dataset.length === 0) {
-        throw new Error(`Dataset ${datasetName} is not recognized`)
+    // Check if specified catalogue exist
+    if (catalogue.length === 0) {
+        throw new Error(`catalogue ${catalogueName} is not recognized`)
     }
+
+    // Get list of fertilizers from catalogue
+    const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
 
     // Add fertilizers to catalogue
-    dataset.map(async product => {
+    catalogue.map(async fertilizer => {
 
-        await addFertilizerToCatalogue({
-            fdm: fdm,
-            p_id_catalogue: product.p_id_catalogue,
-            p_source: product.p_source,
-            p_name_nl: product.p_name_nl,
-            p_name_en: product.p_name_en,
-            p_description: product.p_description,
-            properties: {
-                p_dm: product.p_dm,
-                p_om: product.p_om,
-                p_a: product.p_a,
-                p_hc: product.p_hc,
-                p_eom: product.p_eom,
-                p_eoc: product.p_eoc,
-                p_c_rt: product.p_c_rt,
-                p_c_of: product.p_c_of,
-                p_c_if: product.p_c_if,
-                p_c_fr: product.p_c_fr,
-                p_cn_of: product.p_cn_of,
-                p_n_rt: product.p_n_rt,
-                p_n_if: product.p_n_if,
-                p_n_of: product.p_n_of,
-                p_n_wc: product.p_n_wc,
-                p_p_rt: product.p_p_rt,
-                p_k_rt: product.p_k_rt,
-                p_mg_rt: product.p_mg_rt,
-                p_ca_rt: product.p_ca_rt,
-                p_ne: product.p_ne,
-                p_s_rt: product.p_s_rt,
-                p_s_wc: product.p_s_wc,
-                p_cu_rt: product.p_cu_rt,
-                p_zn_rt: product.p_zn_rt,
-                p_na_rt: product.p_na_rt,
-                p_si_rt: product.p_si_rt,
-                p_b_rt: product.p_b_rt,
-                p_mn_rt: product.p_mn_rt,
-                p_ni_rt: product.p_ni_rt,
-                p_fe_rt: product.p_fe_rt,
-                p_mo_rt: product.p_mo_rt,
-                p_co_rt: product.p_co_rt,
-                p_as_rt: product.p_as_rt,
-                p_cd_rt: product.p_cd_rt,
-                pr_cr_rt: product.p_cr_rt,
-                p_cr_vi: product.p_cr_vi,
-                p_pb_rt: product.p_pb_rt,
-                p_hg_rt: product.p_hg_rt
-            }
-        })
+        // Check if fertilizer is already present in catalogue
+        const fertilizerInCatalogue = fertilizersCatalogue.find((x: fdmSchema.fertilizersCatalogueTypeSelect): any => x.p_id_catalogue === fertilizer.p_id_catalogue)
+
+        // If fertilizer is not present in catalogue, add it to fdm instance
+        if (fertilizerInCatalogue) {
+            await addFertilizerToCatalogue({
+                fdm: fdm,
+                p_id_catalogue: fertilizer.p_id_catalogue,
+                p_source: fertilizer.p_source,
+                p_name_nl: fertilizer.p_name_nl,
+                p_name_en: fertilizer.p_name_en,
+                p_description: fertilizer.p_description,
+                properties: {
+                    p_dm: fertilizer.p_dm,
+                    p_om: fertilizer.p_om,
+                    p_a: fertilizer.p_a,
+                    p_hc: fertilizer.p_hc,
+                    p_eom: fertilizer.p_eom,
+                    p_eoc: fertilizer.p_eoc,
+                    p_c_rt: fertilizer.p_c_rt,
+                    p_c_of: fertilizer.p_c_of,
+                    p_c_if: fertilizer.p_c_if,
+                    p_c_fr: fertilizer.p_c_fr,
+                    p_cn_of: fertilizer.p_cn_of,
+                    p_n_rt: fertilizer.p_n_rt,
+                    p_n_if: fertilizer.p_n_if,
+                    p_n_of: fertilizer.p_n_of,
+                    p_n_wc: fertilizer.p_n_wc,
+                    p_p_rt: fertilizer.p_p_rt,
+                    p_k_rt: fertilizer.p_k_rt,
+                    p_mg_rt: fertilizer.p_mg_rt,
+                    p_ca_rt: fertilizer.p_ca_rt,
+                    p_ne: fertilizer.p_ne,
+                    p_s_rt: fertilizer.p_s_rt,
+                    p_s_wc: fertilizer.p_s_wc,
+                    p_cu_rt: fertilizer.p_cu_rt,
+                    p_zn_rt: fertilizer.p_zn_rt,
+                    p_na_rt: fertilizer.p_na_rt,
+                    p_si_rt: fertilizer.p_si_rt,
+                    p_b_rt: fertilizer.p_b_rt,
+                    p_mn_rt: fertilizer.p_mn_rt,
+                    p_ni_rt: fertilizer.p_ni_rt,
+                    p_fe_rt: fertilizer.p_fe_rt,
+                    p_mo_rt: fertilizer.p_mo_rt,
+                    p_co_rt: fertilizer.p_co_rt,
+                    p_as_rt: fertilizer.p_as_rt,
+                    p_cd_rt: fertilizer.p_cd_rt,
+                    pr_cr_rt: fertilizer.p_cr_rt,
+                    p_cr_vi: fertilizer.p_cr_vi,
+                    p_pb_rt: fertilizer.p_pb_rt,
+                    p_hg_rt: fertilizer.p_hg_rt
+                }
+            })
+        }        
     })
 }
