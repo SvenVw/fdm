@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest'
-import { createFdmLocal, migrateFdmLocal, type FdmType } from 'fdm-core'
+import { createFdmLocal, migrateFdmLocal, type FdmType } from '@svenvw/fdm-core'
 import { extendFertilizersCatalogue } from '.'
 
 describe('Fertilizers Data', () => {

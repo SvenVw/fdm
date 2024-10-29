@@ -1,5 +1,5 @@
 import srm from './srm.json'
-import { fdmSchema } from 'fdm-core'
+import { fdmSchema } from '@svenvw/fdm-core'
 
 export function getCatalogueSrm(): fdmSchema.fertilizersCatalogueTypeInsert[] {
 

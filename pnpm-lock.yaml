@@ -4,6 +4,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: 29a6694e1052b064eec0acf6b5bbd138
+
 importers:
 
   .:
@@ -103,7 +105,7 @@ importers:
 
   fdm-data:
     dependencies:
-      fdm-core:
+      '@svenvw/fdm-core':
         specifier: workspace:*
         version: link:../fdm-core
     devDependencies:

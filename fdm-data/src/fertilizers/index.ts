@@ -1,4 +1,4 @@
-import { addFertilizerToCatalogue, getFertilizersFromCatalogue, type FdmType, fdmSchema } from "fdm-core";
+import { addFertilizerToCatalogue, getFertilizersFromCatalogue, type FdmType, fdmSchema } from "@svenvw/fdm-core";
 import { getCatalogueSrm } from "./catalogues/srm";
 
 export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: string): Promise<void> {
