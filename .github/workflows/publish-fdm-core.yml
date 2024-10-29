@@ -42,7 +42,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter fdm-core
       - name: Create a development version
-        run: pnpm version prerelease --preid ${{ github.head_ref }} --no-git-tag-version
+        uses: adobe/update-prerelease-npm-version@v1.0.0
+        with: 
+          pre-release-tag: ${{ github.head_ref }}
       # - name: Run tests
       #   run: pnpm test
       - name: Publish the package
