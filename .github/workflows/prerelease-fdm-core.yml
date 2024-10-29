@@ -52,11 +52,11 @@ jobs:
         with:
           path: fdm-core
       - name: Create a prerelease version from PR
-        if: github.head_ref != 'main'
+        if: ${{ github.ref != 'refs/heads/main' }}
         run: pnpm version ${{ steps.package-version.outputs.current-version}}-${{ github.head_ref }}.${{ github.sha }} --no-git-tag-version
       - name: Create a prerelease version from main
-        if: github.head_ref == 'main'
-        run: pnpm version ${{ steps.package-version.outputs.current-version}}-${{ github.sha }} --no-git-tag-version
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: pnpm version ${{ steps.package-version.outputs.current-version}}.${{ github.sha }} --no-git-tag-version
       # - name: Run tests
       #   run: pnpm test
       - name: Publish the package
