@@ -15,7 +15,7 @@
     "build-docs": "turbo run build-docs",
     "watch": "turbo run watch",
     "changeset": "changeset",
-    "prerelease": "turbo build --filter=fdm-core --filter=fdm-data && changeset publish "
+    "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish "
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
