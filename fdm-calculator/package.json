@@ -45,13 +45,14 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@svenvw/fdm-core": "workspace:*",
     "typescript": "^5.5.3",
     "vite": "^5.4.8",
     "vite-plugin-dts": "^4.0.2",
     "vitest": "^2.0.5"
   },
-  "dependencies": {
-    "fdm-core": "workspace:*"
+  "peerDependencies": {
+    "@svenvw/fdm-core": "workspace:>=0.3.1"
   },
   "packageManager": "pnpm@9.12.2"
 }

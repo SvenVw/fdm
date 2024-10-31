@@ -6,6 +6,9 @@
   "bugs": "https://github.com/SvenVw/fdm/issues/new",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "fdm-core", "fdm-data", "fdm-docs"
+  ],
   "scripts": {
     "test": "turbo run test",
     "build": "turbo run build",
