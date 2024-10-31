@@ -34,6 +34,7 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
                 p_description: fertilizer.p_description,
                 properties: {
                     p_dm: fertilizer.p_dm,
+                    p_density: fertilizer.p_density,
                     p_om: fertilizer.p_om,
                     p_a: fertilizer.p_a,
                     p_hc: fertilizer.p_hc,
@@ -70,7 +71,10 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
                     pr_cr_rt: fertilizer.p_cr_rt,
                     p_cr_vi: fertilizer.p_cr_vi,
                     p_pb_rt: fertilizer.p_pb_rt,
-                    p_hg_rt: fertilizer.p_hg_rt
+                    p_hg_rt: fertilizer.p_hg_rt,
+                    p_type_manure: fertilizer.p_type_manure,
+                    p_type_mineral: fertilizer.p_type_mineral,
+                    p_type_compost: fertilizer.p_type_compost
                 }
             })
         }        
