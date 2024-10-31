@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    drizzle-orm:
+      specifier: ^0.35.3
+      version: 0.35.3
+
 packageExtensionsChecksum: 29a6694e1052b064eec0acf6b5bbd138
 
 importers:
@@ -17,24 +23,6 @@ importers:
         specifier: ^2.2.3
         version: 2.2.3
 
-  fdm-calculator:
-    devDependencies:
-      '@svenvw/fdm-core':
-        specifier: workspace:*
-        version: link:../fdm-core
-      typescript:
-        specifier: ^5.5.3
-        version: 5.6.3
-      vite:
-        specifier: ^5.4.8
-        version: 5.4.9(@types/node@22.7.9)(terser@5.36.0)
-      vite-plugin-dts:
-        specifier: ^4.0.2
-        version: 4.2.4(@types/node@22.7.9)(rollup@4.24.0)(typescript@5.6.3)(vite@5.4.9(@types/node@22.7.9)(terser@5.36.0))
-      vitest:
-        specifier: ^2.0.5
-        version: 2.1.3(@types/node@22.7.9)(terser@5.36.0)
-
   fdm-core:
     dependencies:
       '@electric-sql/pglite':
@@ -44,7 +32,7 @@ importers:
         specifier: ^0.8.5
         version: 0.8.5(drizzle-orm@0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.11)(postgres@3.4.4)(react@18.3.1))(graphql@16.9.0)
       drizzle-orm:
-        specifier: ^0.35.3
+        specifier: 'catalog:'
         version: 0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.11)(postgres@3.4.4)(react@18.3.1)
       graphql:
         specifier: ^16.9.0
@@ -110,6 +98,9 @@ importers:
       '@svenvw/fdm-core':
         specifier: workspace:*
         version: link:../fdm-core
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.11)(postgres@3.4.4)(react@18.3.1)
       typescript:
         specifier: ^5.5.3
         version: 5.6.3

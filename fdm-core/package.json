@@ -68,7 +68,7 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.2.12",
     "drizzle-graphql": "^0.8.5",
-    "drizzle-orm": "^0.35.3",
+    "drizzle-orm": "catalog:",
     "graphql": "^16.9.0",
     "nanoid": "^5.0.7",
     "postgres": "^3.4.4"
