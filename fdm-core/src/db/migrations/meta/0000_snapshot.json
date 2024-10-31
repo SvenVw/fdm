@@ -1,5 +1,5 @@
 {
-  "id": "ca7ff342-727b-4512-946e-d4fd95e324a2",
+  "id": "ba4dd387-e576-411c-8f10-79e84712e7a3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -115,7 +115,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "fdm-dev.farms": {
       "name": "farms",
@@ -173,7 +174,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "fdm-dev.fertilizer_aquiring": {
       "name": "fertilizer_aquiring",
@@ -249,7 +251,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "fdm-dev.fertilizer_picking": {
       "name": "fertilizer_picking",
@@ -319,7 +322,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "fdm-dev.fertilizers": {
       "name": "fertilizers",
@@ -364,7 +368,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "fdm-dev.fertilizers_catalogue": {
       "name": "fertilizers_catalogue",
@@ -402,6 +407,12 @@
         },
         "p_dm": {
           "name": "p_dm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_density": {
+          "name": "p_density",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -634,6 +645,24 @@
           "primaryKey": false,
           "notNull": false
         },
+        "p_type_manure": {
+          "name": "p_type_manure",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_type_mineral": {
+          "name": "p_type_mineral",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_type_compost": {
+          "name": "p_type_compost",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created": {
           "name": "created",
           "type": "timestamp with time zone",
@@ -667,7 +696,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     },
     "fdm-dev.fields": {
       "name": "fields",
@@ -718,7 +748,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "enums": {
@@ -745,6 +776,7 @@
     "fdm-dev": "fdm-dev"
   },
   "sequences": {},
+  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

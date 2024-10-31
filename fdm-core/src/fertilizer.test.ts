@@ -45,6 +45,7 @@ describe('Farm Data Model', () => {
         p_description,
         {
           p_dm: 37,
+          p_density: 20,
           p_om: 20,
           p_a: 30,
           p_hc: 40,
@@ -83,6 +84,9 @@ describe('Farm Data Model', () => {
           p_pb_rt: 370,
           p_hg_rt: 380,
           p_cl_rt: 390,
+          p_type_manure: true,
+          p_type_mineral: false,
+          p_type_compost: false
         }
       )
       expect(p_id_catalogue).toBeDefined()
@@ -114,6 +118,7 @@ describe('Farm Data Model', () => {
         p_description,
         {
           p_dm: 37,
+          p_density: 20,
           p_om: 20,
           p_a: 30,
           p_hc: 40,
@@ -152,6 +157,9 @@ describe('Farm Data Model', () => {
           p_pb_rt: 370,
           p_hg_rt: 380,
           p_cl_rt: 390,
+          p_type_manure: true,
+          p_type_mineral: false,
+          p_type_compost: false
         }
       )
 
@@ -183,6 +191,7 @@ describe('Farm Data Model', () => {
         p_description,
         {
           p_dm: 37,
+          p_density: 20,
           p_om: 20,
           p_a: 30,
           p_hc: 40,
@@ -221,6 +230,9 @@ describe('Farm Data Model', () => {
           p_pb_rt: 370,
           p_hg_rt: 380,
           p_cl_rt: 390,
+          p_type_manure: true,
+          p_type_mineral: false,
+          p_type_compost: false
         }
       )
 
@@ -264,6 +276,7 @@ describe('Farm Data Model', () => {
         p_description,
         {
           p_dm: 37,
+          p_density: 20,
           p_om: 20,
           p_a: 30,
           p_hc: 40,
@@ -302,6 +315,9 @@ describe('Farm Data Model', () => {
           p_pb_rt: 370,
           p_hg_rt: 380,
           p_cl_rt: 390,
+          p_type_manure: true,
+          p_type_mineral: false,
+          p_type_compost: false
         }
       )
 

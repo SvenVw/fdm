@@ -36,6 +36,7 @@ export async function addFertilizerToCatalogue(
     p_description: schema.fertilizersCatalogueTypeInsert['p_description'],
     properties: {
         p_dm: schema.fertilizersCatalogueTypeInsert['p_dm'],
+        p_density: schema.fertilizersCatalogueTypeInsert['p_density'],
         p_om: schema.fertilizersCatalogueTypeInsert['p_om'],
         p_a: schema.fertilizersCatalogueTypeInsert['p_a'],
         p_hc: schema.fertilizersCatalogueTypeInsert['p_hc'],
@@ -73,7 +74,10 @@ export async function addFertilizerToCatalogue(
         p_cr_vi: schema.fertilizersCatalogueTypeInsert['p_cr_vi'],
         p_pb_rt: schema.fertilizersCatalogueTypeInsert['p_pb_rt'],
         p_hg_rt: schema.fertilizersCatalogueTypeInsert['p_hg_rt'],
-        p_cl_rt: schema.fertilizersCatalogueTypeInsert['p_cl_cr']
+        p_cl_rt: schema.fertilizersCatalogueTypeInsert['p_cl_cr'],
+        p_type_manure: schema.fertilizersCatalogueTypeInsert['p_type_manure'],
+        p_type_mineral: schema.fertilizersCatalogueTypeInsert['p_type_mineral'],
+        p_type_compost: schema.fertilizersCatalogueTypeInsert['p_type_compost']
     }): Promise<schema.fertilizersCatalogueTypeInsert['p_id_catalogue']> {
 
     // Generate an ID for the fertilizer catalogue item
