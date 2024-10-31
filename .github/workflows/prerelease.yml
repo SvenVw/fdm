@@ -17,6 +17,9 @@ jobs:
     strategy:
       matrix:
         node-version: [20]
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
