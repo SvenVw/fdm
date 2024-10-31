@@ -14,7 +14,8 @@
     "build": "turbo run build",
     "build-docs": "turbo run build-docs",
     "watch": "turbo run watch",
-    "publish-packages": "turbo run build test && changeset version && changeset publish"
+    "changeset": "changeset",
+    "prerelease": "turbo build --filter=fdm-core --filter=fdm-data && changeset publish "
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
