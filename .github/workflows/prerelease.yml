@@ -49,12 +49,13 @@ jobs:
       - name: Install Dependencies
         run: pnpm i
 
-      - name: Create snapshot versions and publish them
-        id: changesets
-        uses: changesets/action@v1
-        with:
-          version: changeset version --snapshot ${{ github.head_ref }}
-          publish: pnpm prerelease
+      - name: Bump snapshot
+        run: pnpm changeset version --snapshot ${{ github.head_ref }} --ignore fdm-docs
+
+      - name: Build packages
+        run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data
+      
+      - name: Publish snapshot
+        run: pnpm changeset publish --tag ${{ github.head_ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
