@@ -2,9 +2,9 @@ name: Prerelease
 
 on:
   pull_request:
-    paths:
-      - 'fdm-core/**'
-      - 'fdm-data/**'
+    # paths:
+    #   - 'fdm-core/**'
+    #   - 'fdm-data/**'
     branches:
       - main
 
