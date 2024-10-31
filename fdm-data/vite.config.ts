@@ -41,6 +41,9 @@ export default defineConfig({
       }
   },
   plugins: [dts()],
+  resolve: {
+    preserveSymlinks: true
+  },
   test: {
     // ...
   } 
