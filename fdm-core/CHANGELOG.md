@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.4.0
+
+### Minor Changes
+
+- For `addFertilizersToCatalogue` include all parameters in `properties`
+- a2ee857: Add to `fertilizers_catalogue` the columns:`p_density`, `p_type_manure`, `p_type_mineral` and `p_type_compost`
+
 ## 0.3.1
 
 ### Patch Changes

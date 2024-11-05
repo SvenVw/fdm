@@ -1,5 +1,17 @@
 # fdm-data
 
+## 0.2.0
+### Minor Changes
+
+- e62c51d: Add `srm` as option for `datasetName` at `extendFertilizersCatalogue`
+
+### Patch Changes
+
+- 08ac0ed: Add workflow for prereleases
+- Updated dependencies
+- Updated dependencies [a2ee857]
+  - @svenvw/fdm-core@0.4.0
+
 ## 0.1.1
 
 ### Patch Changes

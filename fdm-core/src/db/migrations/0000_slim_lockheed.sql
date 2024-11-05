@@ -1,17 +1,7 @@
 CREATE SCHEMA "fdm-dev";
 --> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "fdm-dev"."b_manage_type" AS ENUM('owner', 'lease');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "fdm-dev"."b_sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
+CREATE TYPE "fdm-dev"."b_manage_type" AS ENUM('owner', 'lease');--> statement-breakpoint
+CREATE TYPE "fdm-dev"."b_sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."farm_managing" (
 	"b_id" text NOT NULL,
 	"b_id_farm" text NOT NULL,
@@ -61,6 +51,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers_catalogue" (
 	"p_name_en" text,
 	"p_description" text,
 	"p_dm" numeric,
+	"p_density" numeric,
 	"p_om" numeric,
 	"p_a" numeric,
 	"p_hc" numeric,
@@ -99,6 +90,9 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers_catalogue" (
 	"p_pb_rt" numeric,
 	"p_hg_rt" numeric,
 	"p_cl_cr" numeric,
+	"p_type_manure" boolean,
+	"p_type_mineral" boolean,
+	"p_type_compost" boolean,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );

@@ -1,7 +1,7 @@
 {
   "name": "@svenvw/fdm-core",
   "private": false,
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Interface for the Farm Data Model",
   "license": "MIT",
   "homepage": "https://svenvw.github.io/fdm/",
@@ -68,7 +68,7 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.2.12",
     "drizzle-graphql": "^0.8.5",
-    "drizzle-orm": "^0.35.3",
+    "drizzle-orm": "catalog:",
     "graphql": "^16.9.0",
     "nanoid": "^5.0.7",
     "postgres": "^3.4.4"
@@ -76,22 +76,5 @@
   "packageManager": "pnpm@9.12.2",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
-  },
-  "pnpm": {
-    "packageExtensions": {
-      "vite-plugin-dts": {
-        "dependenciesMeta": {
-          "@volar/typescript": {
-            "optional": true
-          },
-          "vue-tsc": {
-            "optional": true
-          },
-          "@vue/language-core": {
-            "optional": true
-          }
-        }
-      }
-    }
   }
 }

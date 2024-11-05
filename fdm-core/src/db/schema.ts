@@ -1,4 +1,4 @@
-import { pgSchema, text, date, timestamp, primaryKey, uniqueIndex} from 'drizzle-orm/pg-core'
+import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex} from 'drizzle-orm/pg-core'
 import { numericCasted } from './schema-custom-types'
 
 // Define postgres schema
@@ -95,6 +95,7 @@ export const fertilizersCatalogue = fdmSchema.table('fertilizers_catalogue', {
   p_name_en: text(),
   p_description: text(),
   p_dm: numericCasted(),
+  p_density: numericCasted(),
   p_om: numericCasted(),
   p_a: numericCasted(),
   p_hc: numericCasted(),
@@ -133,6 +134,9 @@ export const fertilizersCatalogue = fdmSchema.table('fertilizers_catalogue', {
   p_pb_rt: numericCasted(),
   p_hg_rt: numericCasted(),
   p_cl_cr: numericCasted(),
+  p_type_manure: boolean(),
+  p_type_mineral: boolean(),
+  p_type_compost: boolean(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => {
