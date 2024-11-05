@@ -24,7 +24,7 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
         const fertilizerInCatalogue = fertilizersCatalogue.find((x: fdmSchema.fertilizersCatalogueTypeSelect): any => x.p_id_catalogue === fertilizer.p_id_catalogue)
 
         // If fertilizer is not present in catalogue, add it to fdm instance
-        if (fertilizerInCatalogue) {
+        if (! fertilizerInCatalogue) {
             await addFertilizerToCatalogue({
                 fdm: fdm,
                 p_id_catalogue: fertilizer.p_id_catalogue,
