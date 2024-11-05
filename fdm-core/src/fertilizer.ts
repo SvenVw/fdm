@@ -30,11 +30,12 @@ export async function getFertilizersFromCatalogue(fdm: FdmType): Promise<schema.
  */
 export async function addFertilizerToCatalogue(
     fdm: FdmType,
-    p_source: schema.fertilizersCatalogueTypeInsert['p_source'],
-    p_name_nl: schema.fertilizersCatalogueTypeInsert['p_name_nl'],
-    p_name_en: schema.fertilizersCatalogueTypeInsert['p_name_en'],
-    p_description: schema.fertilizersCatalogueTypeInsert['p_description'],
     properties: {
+        p_id_catalogue: schema.fertilizersCatalogueTypeInsert['p_id_catalogue'],
+        p_source: schema.fertilizersCatalogueTypeInsert['p_source'],
+        p_name_nl: schema.fertilizersCatalogueTypeInsert['p_name_nl'],
+        p_name_en: schema.fertilizersCatalogueTypeInsert['p_name_en'],
+        p_description: schema.fertilizersCatalogueTypeInsert['p_description'],
         p_dm: schema.fertilizersCatalogueTypeInsert['p_dm'],
         p_density: schema.fertilizersCatalogueTypeInsert['p_density'],
         p_om: schema.fertilizersCatalogueTypeInsert['p_om'],
@@ -78,26 +79,12 @@ export async function addFertilizerToCatalogue(
         p_type_manure: schema.fertilizersCatalogueTypeInsert['p_type_manure'],
         p_type_mineral: schema.fertilizersCatalogueTypeInsert['p_type_mineral'],
         p_type_compost: schema.fertilizersCatalogueTypeInsert['p_type_compost']
-    }): Promise<schema.fertilizersCatalogueTypeInsert['p_id_catalogue']> {
-
-    // Generate an ID for the fertilizer catalogue item
-    const p_id_catalogue = nanoid()
+    }): Promise<void> {
 
     // Insert the farm in the db
-    const fertilizerData = {
-        p_id_catalogue: p_id_catalogue,
-        p_source: p_source,
-        p_name_nl: p_name_nl,
-        p_name_en: p_name_en,
-        p_description: p_description,
-        ...properties
-    }
-
     await fdm
         .insert(schema.fertilizersCatalogue)
-        .values(fertilizerData)
-
-    return p_id_catalogue
+        .values(properties)
 
 }
 

@@ -18,21 +18,21 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
     const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
 
     // Add fertilizers to catalogue
-    catalogue.map(async fertilizer => {
+    await Promise.all(catalogue.map(async fertilizer => {
 
         // Check if fertilizer is already present in catalogue
         const fertilizerInCatalogue = fertilizersCatalogue.find((x: fdmSchema.fertilizersCatalogueTypeSelect): any => x.p_id_catalogue === fertilizer.p_id_catalogue)
 
         // If fertilizer is not present in catalogue, add it to fdm instance
-        if (! fertilizerInCatalogue) {
-            await addFertilizerToCatalogue({
-                fdm: fdm,
-                p_id_catalogue: fertilizer.p_id_catalogue,
-                p_source: fertilizer.p_source,
-                p_name_nl: fertilizer.p_name_nl,
-                p_name_en: fertilizer.p_name_en,
-                p_description: fertilizer.p_description,
-                properties: {
+        if (!fertilizerInCatalogue) {
+            await addFertilizerToCatalogue(
+                fdm,
+                {
+                    p_id_catalogue: fertilizer.p_id_catalogue,
+                    p_source: fertilizer.p_source,
+                    p_name_nl: fertilizer.p_name_nl,
+                    p_name_en: fertilizer.p_name_en,
+                    p_description: fertilizer.p_description,
                     p_dm: fertilizer.p_dm,
                     p_density: fertilizer.p_density,
                     p_om: fertilizer.p_om,
@@ -76,7 +76,7 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
                     p_type_mineral: fertilizer.p_type_mineral,
                     p_type_compost: fertilizer.p_type_compost
                 }
-            })
-        }        
-    })
+            )
+        }
+    }))
 }

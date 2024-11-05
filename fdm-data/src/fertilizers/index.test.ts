@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest'
-import { fdmSchema as schema, type FdmType } from '@svenvw/fdm-core'
+import { getFertilizersFromCatalogue, fdmSchema as schema, type FdmType } from '@svenvw/fdm-core'
 import { extendFertilizersCatalogue } from '.'
 
 import { drizzle } from 'drizzle-orm/postgres-js'
@@ -52,7 +52,7 @@ describe('Fertilizers Data [server]', () => {
     it('should extend fertilizers catalogue with srm dataset', async () => {
         await extendFertilizersCatalogue(fdm, 'srm')
 
-        const result = await fdm.select().from(fdm.schema.fertilizersCatalogue)
+        const result = await getFertilizersFromCatalogue(fdm)
         expect(result.length).toBeGreaterThan(0)
     })
 })
