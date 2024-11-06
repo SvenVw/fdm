@@ -1,4 +1,6 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node"
+import { useLoaderData } from "@remix-run/react";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -6,17 +8,60 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 // Blocks
-import Farm from "@/components/blocks/farm";
+import { Farm } from "@/components/blocks/farm";
 
+// FDM
+import { fdm } from "@/fdm.server";
+import { getFertilizersFromCatalogue } from "@svenvw/fdm-core";
+
+// Meta
 export const meta: MetaFunction = () => {
-    return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
-    ];
+  return [
+    { title: "FDM App" },
+    { name: "description", content: "Welcome to FDM!" },
+  ];
 };
 
+// Loader
+export async function loader({
+  request,
+}: LoaderFunctionArgs) {
+  const fertilizers = await getFertilizersFromCatalogue(fdm);
+
+  const organicFertilizersList = fertilizers
+    .filter(x => { return (x.p_type_manure || x.p_type_compost) })
+    .map(x => {
+      return {
+        value: x.p_id_catalogue,
+        label: x.p_name_nl
+      }
+    })
+
+  const mineralFertilizersList = fertilizers
+    .filter(x => { return (x.p_type_mineral) })
+    .map(x => {
+      return {
+        value: x.p_id_catalogue,
+        label: x.p_name_nl
+      }
+    })
+
+  return json({
+    values: {
+      b_name_farm: null,
+      b_fertilizers_organic: null,
+    },
+    lists: {
+      organicFertilizersList: organicFertilizersList,
+      mineralFertilizersList: mineralFertilizersList
+    }
+  });
+}
+
+// Main
 export default function Index() {
-    return (
+  const loaderData = useLoaderData<typeof loader>();
+  return (
     <SidebarInset>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
         <SidebarTrigger className="-ml-1" />
@@ -28,8 +73,8 @@ export default function Index() {
                 Maak een bedrijf
               </BreadcrumbLink>
             </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem className="hidden md:block">
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem className="hidden md:block">
               <BreadcrumbLink href="#">
                 Bedrijf
               </BreadcrumbLink>
@@ -38,8 +83,16 @@ export default function Index() {
         </Breadcrumb>
       </header>
       <main>
-        <Farm/>
+        <Farm
+          b_name_farm={loaderData.values.b_name_farm}
+          b_fertilizers_organic={[]}
+          b_fertilizers_mineral={[]}
+          organicFertilizersList={loaderData.lists.organicFertilizersList}
+          mineralFertilizersList={loaderData.lists.mineralFertilizersList}
+        />
       </main>
     </SidebarInset >
   );
 }
+
+// Action

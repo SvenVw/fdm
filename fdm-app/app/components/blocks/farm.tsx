@@ -12,32 +12,28 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 
-import { MultiSelect } from "@/components/custom/multi-select";
+import { MultiSelect } from "@/components/custom/multi-select"
 
 
-const organicFertilizersList = [
-    { value: "diary", label: "Melkveehouderij" },
-    { value: "arable", label: "Akkerbouw" },
-    { value: "tree_nursery", label: "Boomkwekerij" },
-    { value: "bulbs", label: "Bloembollen" },
-];
-
-interface farmProps {
-    b_name_farm: string;
-    b_fertilizers_organic: string[];
+export interface fertilizersListType {
+    value: string
+    label: string
 }
 
+export interface farmType {
+    b_name_farm: string | null
+    b_fertilizers_organic: string[]
+    b_fertilizers_mineral: string[]
+    organicFertilizersList: fertilizersListType[]
+    mineralFertilizersList: fertilizersListType[]
+}
 
-export default function Farm(props: farmProps) {
+export function Farm(props: farmType) {
+    const organicFertilizersList = props.organicFertilizersList
+    const mineralFertilizersList = props.mineralFertilizersList
     const [selectedOrganicFertilizers, setOrganicFertilizers] = useState<string[]>(props.b_fertilizers_organic);
+    const [selectedMineralFertilizers, setMineralFertilizers] = useState<string[]>(props.b_fertilizers_mineral);
 
     return (
         <div className="flex h-screen items-center justify-center">
@@ -54,11 +50,23 @@ export default function Farm(props: farmProps) {
                                 <Input id="name" placeholder="Bv. Jansen V.O.F." />
                             </div>
                             <div className="flex flex-col space-y-1.5">
-                                <Label htmlFor="farm_sector">Welke <i>organische</i> meststoffen gebruikt u?</Label>
+                                <Label htmlFor="b_fertilizers_organic">Welke <i>organische</i> meststoffen gebruikt u?</Label>
                                 <MultiSelect
                                     options={organicFertilizersList}
                                     onValueChange={setOrganicFertilizers}
                                     defaultValue={selectedOrganicFertilizers}
+                                    placeholder="Selecteer meststoffen"
+                                    variant="inverted"
+                                    animation={0}
+                                    maxCount={10}
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <Label htmlFor="b_fertilizers_mineral">Welke <i>minerale</i> meststoffen gebruikt u?</Label>
+                                <MultiSelect
+                                    options={mineralFertilizersList}
+                                    onValueChange={setMineralFertilizers}
+                                    defaultValue={selectedMineralFertilizers}
                                     placeholder="Selecteer meststoffen"
                                     variant="inverted"
                                     animation={0}

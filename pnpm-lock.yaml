@@ -86,9 +86,18 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.14)
     devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: ^1.20.0
+        version: 1.20.1
       '@remix-run/dev':
         specifier: ^2.13.1
         version: 2.13.1(@remix-run/react@2.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(@remix-run/serve@2.13.1(typescript@5.6.3))(@types/node@22.7.9)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.10(@types/node@22.7.9)(terser@5.36.0))
+      '@svenvw/fdm-core':
+        specifier: workspace:*
+        version: link:../fdm-core
+      '@svenvw/fdm-data':
+        specifier: workspace:*
+        version: link:../fdm-data
       '@types/react':
         specifier: ^18.2.20
         version: 18.3.11
@@ -104,6 +113,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.20(postcss@8.4.47)
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.35.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.11)(postgres@3.4.4)(react@18.3.1)
       eslint:
         specifier: ^8.38.0
         version: 8.57.1

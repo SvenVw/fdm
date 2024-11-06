@@ -1,4 +1,4 @@
-// src/components/multi-select.tsx
+// https://github.com/sersavan/shadcn-multi-select-component
 
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -133,7 +133,7 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 10,
       modalPopover = false,
-      asChild = false,
+    //   asChild = false,
       className,
       ...props
     },
@@ -244,7 +244,7 @@ export const MultiSelect = React.forwardRef<
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {`+ ${selectedValues.length - maxCount} meer`}
                       <XCircle
                         className="ml-2 h-4 w-4 cursor-pointer"
                         onClick={(event) => {
@@ -291,7 +291,7 @@ export const MultiSelect = React.forwardRef<
               onKeyDown={handleInputKeyDown}
             />
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandEmpty>Geen resultaten gevonden.</CommandEmpty>
               <CommandGroup>
                 <CommandItem
                   key="all"
