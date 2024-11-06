@@ -1,6 +1,6 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node"
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, Form } from "@remix-run/react";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -89,6 +89,7 @@ export default function Index() {
           b_fertilizers_mineral={[]}
           organicFertilizersList={loaderData.lists.organicFertilizersList}
           mineralFertilizersList={loaderData.lists.mineralFertilizersList}
+          action={"/setup/farm"}
         />
       </main>
     </SidebarInset >
@@ -96,3 +97,22 @@ export default function Index() {
 }
 
 // Action
+export async function action({
+  request,
+}: ActionFunctionArgs) {
+  const formData = await request.formData();
+  const b_name_farm = formData.get('b_name_farm');
+  const b_fertilizers_organic = formData.get('b_fertilizers_organic');
+  const b_fertilizers_mineral = formData.getAll('b_fertilizers_mineral');
+
+  console.log(b_name_farm);
+  console.log(b_fertilizers_organic);
+  console.log(b_fertilizers_mineral);
+
+
+  // Create a farm
+
+  
+
+  return json({ ok: true });
+}

@@ -117,6 +117,8 @@ interface MultiSelectProps
    * Optional, can be used to add custom styles.
    */
   className?: string;
+
+  name?: string;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -135,6 +137,7 @@ export const MultiSelect = React.forwardRef<
       modalPopover = false,
     //   asChild = false,
       className,
+      name = 'multi-select',
       ...props
     },
     ref
@@ -205,6 +208,7 @@ export const MultiSelect = React.forwardRef<
               "flex w-full p-1 rounded-md border min-h-10 h-auto items-center justify-between bg-inherit hover:bg-inherit [&_svg]:pointer-events-auto",
               className
             )}
+            name={name}
           >
             {selectedValues.length > 0 ? (
               <div className="flex justify-between items-center w-full">
