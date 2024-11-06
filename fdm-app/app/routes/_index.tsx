@@ -1,7 +1,12 @@
+import type { MetaFunction } from "@remix-run/node";
+
+// Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import type { MetaFunction } from "@remix-run/node";
+
+// Blocks
+import MissingFarm from "@/components/blocks/missing-farm";
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,12 +27,12 @@ export default function Index() {
               <BreadcrumbLink href="#">
                 Start
               </BreadcrumbLink>
-            </BreadcrumbItem>            
+            </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
       </header>
       <main>
-        
+        <MissingFarm/>
       </main>
     </SidebarInset>
   );
