@@ -1,6 +1,6 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node"
-import { useLoaderData, Form } from "@remix-run/react";
+import { useLoaderData, Form, redirect } from "@remix-run/react";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -12,7 +12,7 @@ import { Farm } from "@/components/blocks/farm";
 
 // FDM
 import { fdm } from "@/fdm.server";
-import { getFertilizersFromCatalogue } from "@svenvw/fdm-core";
+import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -69,14 +69,14 @@ export default function Index() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">
+              <BreadcrumbLink>
                 Maak een bedrijf
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">
-                Bedrijf
+              <BreadcrumbLink>
+                Bedrijfsgegevens
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
@@ -89,7 +89,7 @@ export default function Index() {
           b_fertilizers_mineral={[]}
           organicFertilizersList={loaderData.lists.organicFertilizersList}
           mineralFertilizersList={loaderData.lists.mineralFertilizersList}
-          action={"/setup/farm"}
+          action={"/setup/farm/new"}
         />
       </main>
     </SidebarInset >
@@ -101,7 +101,7 @@ export async function action({
   request,
 }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const b_name_farm = formData.get('b_name_farm');
+  const b_name_farm = String(formData.get('b_name_farm'));
   const b_fertilizers_organic = formData.get('b_fertilizers_organic');
   const b_fertilizers_mineral = formData.getAll('b_fertilizers_mineral');
 
@@ -109,10 +109,8 @@ export async function action({
   console.log(b_fertilizers_organic);
   console.log(b_fertilizers_mineral);
 
-
   // Create a farm
-
+  const b_id_farm = await addFarm(fdm, b_name_farm, null)
   
-
-  return json({ ok: true });
+  return redirect(`../setup/farm/${b_id_farm}/map`)
 }

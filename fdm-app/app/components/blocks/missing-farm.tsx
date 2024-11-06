@@ -13,7 +13,11 @@ export default function MissingFarm() {
                         Gebruik onze wizard en maak snel je eigen bedrijf aan
                     </p>
                 </div>
-                <Button>Maak een bedrijf</Button>
+                <Button>
+                    <a href="/setup/farm/new">
+                        Maak een bedrijf
+                    </a>
+                </Button>
                 <p className="px-8 text-center text-sm text-muted-foreground">
                     De meeste gebruikers lukt het binnen 6 minuten.
                 </p>
