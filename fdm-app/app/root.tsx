@@ -7,9 +7,6 @@ import {
 } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-
 import "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -25,7 +22,7 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout() {
   return (
     <html lang="en">
       <head>
@@ -34,14 +31,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        <SidebarProvider>
-          <AppSidebar />
-          {/* <main> */}
-            {/* <SidebarTrigger /> */}
-            {children}
-          {/* </main> */}
-        </SidebarProvider>
+      <body>       
+        <Outlet />
         <ScrollRestoration />
         <Scripts />
       </body>

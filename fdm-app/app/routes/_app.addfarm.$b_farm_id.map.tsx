@@ -10,7 +10,7 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 
 // FDM
-import { fdm } from "@/fdm.server";
+import { fdm } from "../fdm.server";
 
 // Meta
 export const meta: MetaFunction = () => {
