@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
@@ -36,4 +37,24 @@ export async function signUpUser(fdm: FdmType, firstname: schema.usersTypeInsert
     })
 
     return session_id
+}
+
+export async function getUserFromSession(fdm: FdmType, session_id: schema.sessionTypeSelect["session_id"]) {
+
+    const user = await fdm
+        .select({
+            user_id: schema.users.user_id,
+            firstname: schema.users.firstname,
+            surname: schema.users.surname,
+            email: schema.users.email,
+            created: schema.users.created,
+            updated: schema.users.updated
+        })
+        .from(schema.session)
+        .innerJoin(schema.users, eq(schema.session.user_id, schema.users.user_id))
+        .where(eq(schema.session.session_id, session_id))
+        .limit(1)
+
+    return user[0]
+
 }
