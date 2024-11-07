@@ -8,6 +8,13 @@
       "when": 1730387776036,
       "tag": "0000_slim_lockheed",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1730989965360,
+      "tag": "0001_strange_landau",
+      "breakpoints": true
     }
   ]
 }
