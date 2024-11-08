@@ -1,6 +1,7 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node"
-import { useLoaderData, Form, redirect } from "@remix-run/react";
+import { useLoaderData, redirect } from "@remix-run/react";
+import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -10,9 +11,8 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 // Blocks
 import { Farm } from "@/components/blocks/farm";
 
-// FDM
+// Services
 import { fdm } from "../services/fdm.server";
-import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -111,6 +111,6 @@ export async function action({
 
   // Create a farm
   const b_id_farm = await addFarm(fdm, b_name_farm, null)
-  
+
   return redirect(`../addfarm/${b_id_farm}/map`)
 }
