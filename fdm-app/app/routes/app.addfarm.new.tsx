@@ -112,5 +112,5 @@ export async function action({
   // Create a farm
   const b_id_farm = await addFarm(fdm, b_name_farm, null)
   
-  return redirect(`../setup/farm/${b_id_farm}/map`)
+  return redirect(`../addfarm/${b_id_farm}/map`)
 }
