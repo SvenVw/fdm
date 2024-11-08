@@ -59,7 +59,7 @@ export default function Index() {
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
-        </Breadcrumb>        
+        </Breadcrumb>
       </header>
       <main>
         <ClientOnly
@@ -81,7 +81,32 @@ export async function action({
   request,
 }: ActionFunctionArgs) {
 
-  const nmiApiKey = String(process.env.NMI_API_KEY)
-  
+  const formData = await request.formData()
+  const question = String(formData.get('question'))
 
+  let response = null
+  if (question == 'get_brp_fields') {
+    const xmax = String(formData.get('xmax'))
+    const xmin = String(formData.get('xmin'))
+    const ymax = String(formData.get('ymax'))
+    const ymin = String(formData.get('ymin'))
+
+    const responseApi = await fetch("https://api.nmi-agro.nl/fields?" + new URLSearchParams({
+      xmax: xmax,
+      xmin: xmin,
+      ymax: ymax,
+      ymin: ymin,
+      b_lu_productive: String(true)
+    }),
+      {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${process.env.NMI_API_KEY}`,
+        },
+      })
+    const data = await responseApi.json()
+    response = data.data
+  }
+  
+  return json(response)
 }
