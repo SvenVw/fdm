@@ -89,7 +89,7 @@ export default function Index() {
           b_fertilizers_mineral={[]}
           organicFertilizersList={loaderData.lists.organicFertilizersList}
           mineralFertilizersList={loaderData.lists.mineralFertilizersList}
-          action={"./app/addfarm/new"}
+          action={"/app/addfarm/new"}
         />
       </main>
     </SidebarInset >

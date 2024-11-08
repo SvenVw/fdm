@@ -1,4 +1,6 @@
-import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { ClientOnly } from "remix-utils/client-only"
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -6,10 +8,12 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 
 // Blocks
-
+import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
 import { fdm } from "../services/fdm.server";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -23,12 +27,19 @@ export const meta: MetaFunction = () => {
 export async function loader({
   request,
 }: LoaderFunctionArgs) {
-    return null;
+
+  // Get the Mapbox token
+  const mapboxToken = String(process.env.MAPBOX_TOKEN)
+
+  return json({
+    mapboxToken: mapboxToken
+  })
+
 }
 
 // Main
 export default function Index() {
-//   const loaderData = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
   return (
     <SidebarInset>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -48,10 +59,18 @@ export default function Index() {
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
-        </Breadcrumb>
+        </Breadcrumb>        
       </header>
       <main>
-       
+        <ClientOnly
+          fallback={
+            <Skeleton className="h-full w-full rounded-xl" />
+          }                        >
+          {() => <FieldsMap
+            mapboxToken={loaderData.mapboxToken}
+          />
+          }
+        </ClientOnly>
       </main>
     </SidebarInset >
   );
@@ -61,5 +80,8 @@ export default function Index() {
 export async function action({
   request,
 }: ActionFunctionArgs) {
- 
+
+  const nmiApiKey = String(process.env.NMI_API_KEY)
+  
+
 }
