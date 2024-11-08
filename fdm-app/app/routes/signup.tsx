@@ -26,13 +26,12 @@ export async function loader({
 
 
   if (session.has("session_id")) {
-
     // Check if session is valid
-    const user = getUserFromSession(fdm, session.get("session_id"))
-    if (user.length == 0) {
+    const user = await getUserFromSession(fdm, String(session.get("session_id")))
+    if (! user) {
       session.flash("error", "Invalid session");
 
-      return redirect("./signup", {
+      return redirect("../login", {
         headers: {
           "Set-Cookie": await commitSession(session),
         },
@@ -134,12 +133,12 @@ export async function action({
   );
 
   const form = await request.formData()
-  const firstname = form.get("firstname")
-  const surname = form.get("surname")
-  const email = form.get("email")
+  const firstname = String(form.get("firstname"))
+  const surname = String(form.get("surname"))
+  const email = String(form.get("email"))
 
   // sign up user
-  const session_id = signUpUser(fdm, firstname, surname, email)
+  const session_id = await signUpUser(fdm, firstname, surname, email)
   session.set("session_id", session_id)
 
   // Login succeeded, send them to the home page.
