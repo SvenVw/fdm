@@ -12,7 +12,7 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRightLeft, GitPullRequestArrow, House, Map, PawPrint, Scale, Shapes, Sprout, Square } from "lucide-react"
+import { ArrowRightLeft, GitPullRequestArrow, House, LifeBuoy, Map, PawPrint, Scale, Send, Shapes, Sprout, Square } from "lucide-react"
 
 
 export function AppSidebar() {
@@ -92,46 +92,66 @@ export function AppSidebar() {
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarGroup>
-                <SidebarGroupLabel>Apps</SidebarGroupLabel>
-                <SidebarGroupContent>
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <a href="#">
-                                    <ArrowRightLeft />
-                                    <span>MINAS2</span>
-                                </a>
-                            </SidebarMenuButton>
-                            <SidebarMenuBadge>
-                                <Badge>Binnenkort</Badge>
-                            </SidebarMenuBadge>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <a href="#">
-                                    <Scale />
-                                    <span>OS Balans</span>
-                                </a>
-                            </SidebarMenuButton>
-                            <SidebarMenuBadge>
-                                <Badge>Binnenkort</Badge>
-                            </SidebarMenuBadge>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
-                                <a href="#">
-                                    <GitPullRequestArrow />
-                                    <span>BAAT</span>
-                                </a>
-                            </SidebarMenuButton>
-                            <SidebarMenuBadge>
-                                <Badge>Binnenkort</Badge>
-                            </SidebarMenuBadge>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </SidebarGroupContent>
+                    <SidebarGroupLabel>Apps</SidebarGroupLabel>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="#">
+                                        <ArrowRightLeft />
+                                        <span>MINAS2</span>
+                                    </a>
+                                </SidebarMenuButton>
+                                <SidebarMenuBadge>
+                                    <Badge>Binnenkort</Badge>
+                                </SidebarMenuBadge>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="#">
+                                        <Scale />
+                                        <span>OS Balans</span>
+                                    </a>
+                                </SidebarMenuButton>
+                                <SidebarMenuBadge>
+                                    <Badge>Binnenkort</Badge>
+                                </SidebarMenuBadge>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <a href="#">
+                                        <GitPullRequestArrow />
+                                        <span>BAAT</span>
+                                    </a>
+                                </SidebarMenuButton>
+                                <SidebarMenuBadge>
+                                    <Badge>Binnenkort</Badge>
+                                </SidebarMenuBadge>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
                 </SidebarGroup>
-                <SidebarGroup>
+                <SidebarGroup className="mt-auto">
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            <SidebarMenuItem key="support">
+                                <SidebarMenuButton asChild size="sm">
+                                    <a href="#">
+                                        <LifeBuoy />
+                                        <span>Ondersteuning</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem key="feedback">
+                                <SidebarMenuButton asChild size="sm">
+                                    <a href="#">
+                                        <Send />
+                                        <span>Feedback</span>
+                                    </a>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter />
