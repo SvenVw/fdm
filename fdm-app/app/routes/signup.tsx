@@ -3,7 +3,7 @@ import type {
   LoaderFunctionArgs,
 } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { useLoaderData, Form } from "@remix-run/react"
+import { Form } from "@remix-run/react"
 import { signUpUser, getUserFromSession } from "@svenvw/fdm-core"
 
 // Components
