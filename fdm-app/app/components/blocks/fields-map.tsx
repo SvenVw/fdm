@@ -16,6 +16,15 @@ const brpFieldsFillStyle = {
     'fill-outline-color': "#1e3a8a"
   }
 };
+const selectedFieldsStyle = {
+  id: 'selected-fields-fill',
+  type: 'fill',
+  paint: {
+    'fill-color': "#fca5a5",
+    'fill-opacity': 0.5,
+    'fill-outline-color': "#1e3a8a"
+  }
+};
 const brpFieldsLineStyle = {
   id: 'brp-fields-line',
   type: 'line',
@@ -33,29 +42,58 @@ export function FieldsMap(props: FieldsMapType) {
   const mapboxToken = props.mapboxToken
 
   const [bprFieldsData, setBrpFieldsData] = useState<any>(null);
+  const [selectedFieldsData, setSelectedFieldsData] = useState<any>(null);
 
-  async function loadBrpFields(evt) {  
-  
+  async function loadBrpFields(evt) {
+
     // Check if user zoomed in enough
     const zoom = evt.target.getZoom()
     if (zoom >= 12) {
-  
+
       // Get the bounding box of the map view
       const bbox = evt.target.getBounds(0.5)
-  
+
       const formBrpFields = new FormData();
       formBrpFields.append("question", 'get_brp_fields')
       formBrpFields.append("xmax", bbox.getEast())
       formBrpFields.append("xmin", bbox.getWest())
       formBrpFields.append("ymax", bbox.getNorth())
       formBrpFields.append("ymin", bbox.getSouth())
-  
+
       await fetcher.submit(formBrpFields, {
         method: "POST"
       })
       const brpFields = await fetcher.data
       setBrpFieldsData(brpFields)
 
+    }
+  }
+
+  function handleClickOnField(evt) {
+
+    if (evt.features && evt.features[0].properties) {
+
+      const feature = {
+        type: evt.features[0].type,
+        geometry: evt.features[0].geometry,
+        properties: evt.features[0].properties
+      }
+
+      if (selectedFieldsData) {
+        const featureCollection = selectedFieldsData
+        featureCollection.features.push(feature)
+        console.log(featureCollection)
+        setSelectedFieldsData(featureCollection)
+      } else {
+        const featureCollection = {
+          type: "FeatureCollection",
+          features: [
+            feature
+          ]
+        }
+        setSelectedFieldsData(featureCollection)
+        console.log(featureCollection)
+      }
     }
   }
 
@@ -70,12 +108,18 @@ export function FieldsMap(props: FieldsMapType) {
       mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
       mapboxAccessToken={mapboxToken}
       onZoomEnd={async evt => await loadBrpFields(evt)}
-      onMoveEnd={async evt => await loadBrpFields(evt)}      
+      onMoveEnd={async evt => await loadBrpFields(evt)}
+      onClick={evt => handleClickOnField(evt)}
+      interactiveLayerIds={['brp-fields-fill', 'selected-fields-fill', 'brp-fields-line']}
     >
       <Source id="brpFields" type="geojson" data={bprFieldsData}>
-          <Layer {...brpFieldsFillStyle} />
-          <Layer {...brpFieldsLineStyle} />
-        </Source>
+        <Layer {...brpFieldsFillStyle} />
+        <Layer {...brpFieldsLineStyle} />
+      </Source>
+      <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
+        <Layer {...selectedFieldsStyle} />
+        {/* <Layer {...brpFieldsLineStyle} /> */}
+      </Source>
       <NavigationControl />
       <GeolocateControl />
     </Map>
