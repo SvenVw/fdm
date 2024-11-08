@@ -1,4 +1,4 @@
-import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { redirect, json} from "@remix-run/node";
 import {useLoaderData, Outlet } from "@remix-run/react";
 import { getUserFromSession } from "@svenvw/fdm-core"
@@ -10,7 +10,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 // Blocks
 
 // Services
-import { getSession, commitSession } from "@/services/session.server";
+import { getSession, commitSession, destroySession } from "@/services/session.server";
 import { fdm } from "../fdm.server";
 
 export const meta: MetaFunction = () => {
@@ -69,3 +69,17 @@ export default function App() {
 
   );
 }
+
+// Action
+export const action = async ({
+  request,
+}: ActionFunctionArgs) => {
+  const session = await getSession(
+    request.headers.get("Cookie")
+  );
+  return redirect("../login", {
+    headers: {
+      "Set-Cookie": await destroySession(session),
+    },
+  });
+};

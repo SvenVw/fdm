@@ -16,7 +16,9 @@ import { ArrowRightLeft, BadgeCheck, ChevronsUpDown, GitPullRequestArrow, House,
 import { Avatar, AvatarFallback } from "./ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
-import {useIsMobile} from '@/hooks/use-mobile'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { Button } from "./ui/button"
+import { Form } from "@remix-run/react"
 
 interface SideBarType {
     user: {
@@ -30,7 +32,7 @@ interface SideBarType {
 
 export function AppSidebar(props: SideBarType) {
 
-    const user  = props.user
+    const user = props.user
     user.avatar = props.user.firstname.slice(0, 1).toUpperCase() + props.user.surname.slice(0, 1).toUpperCase()
     const isMobile = useIsMobile()
 
@@ -224,24 +226,26 @@ export function AppSidebar(props: SideBarType) {
                                         Account
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                    <Languages />
+                                        <Languages />
                                         Taal
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
-                                    <Settings />
+                                        <Settings />
                                         Instellingen
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                    <LogOut />
-                                    Uitloggen
+                                <LogOut />
+                                    <Form method="post" action="../app">                                        
+                                        <Button type="submit" variant="link">Uitloggen</Button>
+                                    </Form>                                    
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar>
+        </Sidebar >
     )
 }
