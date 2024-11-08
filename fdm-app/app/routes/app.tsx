@@ -11,7 +11,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 
 // Services
 import { getSession, commitSession, destroySession } from "@/services/session.server";
-import { fdm } from "../fdm.server";
+import { fdm } from "../services/fdm.server";
 
 export const meta: MetaFunction = () => {
   return [

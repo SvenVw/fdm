@@ -11,7 +11,7 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Farm } from "@/components/blocks/farm";
 
 // FDM
-import { fdm } from "../fdm.server";
+import { fdm } from "../services/fdm.server";
 import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
 // Meta

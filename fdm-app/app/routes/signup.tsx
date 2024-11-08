@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 
 // Services
 import { getSession, commitSession } from "@/services/session.server";
-import { fdm } from "../fdm.server";
+import { fdm } from "../services/fdm.server";
 import { Check } from "lucide-react"
 
 export async function loader({
