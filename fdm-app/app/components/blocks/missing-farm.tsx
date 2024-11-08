@@ -14,7 +14,7 @@ export default function MissingFarm() {
                     </p>
                 </div>
                 <Button>
-                    <a href="/setup/farm/new">
+                    <a href="./app/addfarm/new">
                         Maak een bedrijf
                     </a>
                 </Button>

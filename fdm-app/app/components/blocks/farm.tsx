@@ -27,7 +27,7 @@ export interface farmType {
     b_fertilizers_mineral: string[]
     organicFertilizersList: fertilizersListType[]
     mineralFertilizersList: fertilizersListType[]
-    action: "/setup/farm"
+    action: "./app/addfarm/new"
 }
 
 export function Farm(props: farmType) {
