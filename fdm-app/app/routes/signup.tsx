@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label"
 // Services
 import { getSession, commitSession } from "@/services/session.server";
 import { fdm } from "../fdm.server";
+import { Check } from "lucide-react"
 
 export async function loader({
   request,
@@ -28,7 +29,7 @@ export async function loader({
   if (session.has("session_id")) {
     // Check if session is valid
     const user = await getUserFromSession(fdm, String(session.get("session_id")))
-    if (! user) {
+    if (!user) {
       session.flash("error", "Invalid session");
 
       return redirect("../login", {
@@ -60,8 +61,59 @@ export default function SignUp() {
             {/* <img src="logo.png" alt="Logo FDM"/> */}
             <h1 className="text-3xl font-bold">FDM</h1>
             <p className="text-balance text-muted-foreground">
-              Vul je e-mailadres en wachtwoord om je te registreren
+              Maak een account aan en krijg toegang tot:
             </p>
+            <div className="space-y-5">
+              <div>
+                <div
+                  key="minas2"
+                  className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
+                >
+                  <span><Check /> </span>
+                  <div className="space-y-1">
+                    <p className="text-sm text-left font-medium leading-none">
+                      MINAS2
+                    </p>
+                    <p className="text-sm text-left text-muted-foreground">
+                      Mineralenbalans op bedrijfsniveau
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div
+                  key="osbalans"
+                  className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
+                >
+                  <span><Check /> </span>
+                  <div className="space-y-1">
+                    <p className="text-sm text-left font-medium leading-none">
+                      OS Balans
+                    </p>
+                    <p className="text-sm text-left text-muted-foreground">
+                      Opbouw van organische stof per perceel
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div
+                  key="baat"
+                  className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
+                >
+                  <span><Check /> </span>
+                  <div className="space-y-1">
+                    <p className="text-sm text-left font-medium leading-none">
+                      Meststofkeuzeadviestool
+                    </p>
+                    <p className="text-sm text-left text-muted-foreground">
+                      Integraal bemestingsadvies dat rekening houdt met productie en milieu
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
           <Form method="post">
             <div className="grid gap-4">
@@ -109,6 +161,11 @@ export default function SignUp() {
               <Button type="submit" className="">
                 Registreren
               </Button>
+              <div className="mt-4 text-center text-sm">
+                Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="#" className="underline">
+                  Veelgestelde Vragen
+                </a>
+              </div>
             </div>
           </Form>
         </div>
@@ -120,7 +177,7 @@ export default function SignUp() {
           height="1080"
           className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
       </div>
-    </div>
+    </div >
   )
 }
 
