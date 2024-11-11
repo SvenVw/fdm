@@ -80,9 +80,14 @@ export function FieldsMap(props: FieldsMapType) {
       }
 
       if (selectedFieldsData) {
-        const featureCollection = selectedFieldsData
-        featureCollection.features.push(feature)
-        console.log(featureCollection)
+        const featuresOld = selectedFieldsData.features
+        const featureCollection = {
+          type: "FeatureCollection",
+          features: [
+            ...featuresOld,
+            feature
+          ]
+        }
         setSelectedFieldsData(featureCollection)
       } else {
         const featureCollection = {
@@ -92,7 +97,6 @@ export function FieldsMap(props: FieldsMapType) {
           ]
         }
         setSelectedFieldsData(featureCollection)
-        console.log(featureCollection)
       }
     }
   }
