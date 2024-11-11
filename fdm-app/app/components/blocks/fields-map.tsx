@@ -70,7 +70,6 @@ export function FieldsMap(props: FieldsMapType) {
   }
 
   function handleClickOnField(evt) {
-
     if (evt.features && evt.features[0].properties) {
 
       const feature = {
@@ -80,16 +79,33 @@ export function FieldsMap(props: FieldsMapType) {
       }
 
       if (selectedFieldsData) {
+        // Check if field is already selected
+        const b_id = feature.properties.reference_id
         const featuresOld = selectedFieldsData.features
-        const featureCollection = {
-          type: "FeatureCollection",
-          features: [
-            ...featuresOld,
-            feature
-          ]
+
+        const featureToRemove = featuresOld.find(f => f.properties.reference_id === b_id)
+
+        if (featureToRemove) {
+          // Remove field from selection
+          const featuresWithRemoval = featuresOld.filter(f => f.properties.reference_id !== b_id)
+          const featureCollection = {
+            type: "FeatureCollection",
+            features: featuresWithRemoval
+          }
+          setSelectedFieldsData(featureCollection)
+        } else {
+          // Add field to selection
+          const featureCollection = {
+            type: "FeatureCollection",
+            features: [
+              ...featuresOld,
+              feature
+            ]
+          }
+          setSelectedFieldsData(featureCollection)
         }
-        setSelectedFieldsData(featureCollection)
       } else {
+        // Create selection with first field        
         const featureCollection = {
           type: "FeatureCollection",
           features: [
