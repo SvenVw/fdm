@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useNavigation } from "@remix-run/react";
 import { Map, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { Button } from "../ui/button";
 
 interface FieldsMapType {
   mapboxToken: string
@@ -37,7 +38,7 @@ const brpFieldsLineStyle = {
 
 
 export function FieldsMap(props: FieldsMapType) {
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
   const fetcher = useFetcher();
   const mapboxToken = props.mapboxToken
 
@@ -118,31 +119,41 @@ export function FieldsMap(props: FieldsMapType) {
   }
 
   return (
-    <Map
-      initialViewState={{
-        longitude: 5,
-        latitude: 52,
-        zoom: 10,
-      }}
-      style={{ height: "calc(100vh - 64px)" }}
-      mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
-      mapboxAccessToken={mapboxToken}
-      onZoomEnd={async evt => await loadBrpFields(evt)}
-      onMoveEnd={async evt => await loadBrpFields(evt)}
-      onClick={evt => handleClickOnField(evt)}
-      interactiveLayerIds={['brp-fields-fill', 'selected-fields-fill', 'brp-fields-line']}
-    >
-      <Source id="brpFields" type="geojson" data={bprFieldsData}>
-        <Layer {...brpFieldsFillStyle} />
-        <Layer {...brpFieldsLineStyle} />
-      </Source>
-      <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
-        <Layer {...selectedFieldsStyle} />
-        {/* <Layer {...brpFieldsLineStyle} /> */}
-      </Source>
-      <NavigationControl />
-      <GeolocateControl />
-    </Map>
+    <div style={{ position: "relative" }}>
+      <Map
+        initialViewState={{
+          longitude: 5,
+          latitude: 52,
+          zoom: 10,
+        }}
+        style={{ height: "calc(100vh - 64px)" }}
+        mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
+        mapboxAccessToken={mapboxToken}
+        onZoomEnd={async evt => await loadBrpFields(evt)}
+        onMoveEnd={async evt => await loadBrpFields(evt)}
+        onClick={evt => handleClickOnField(evt)}
+        interactiveLayerIds={['brp-fields-fill', 'selected-fields-fill', 'brp-fields-line']}
+      >
+        <Source id="brpFields" type="geojson" data={bprFieldsData}>
+          <Layer {...brpFieldsFillStyle} />
+          <Layer {...brpFieldsLineStyle} />
+        </Source>
+        <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
+          <Layer {...selectedFieldsStyle} />
+          {/* <Layer {...brpFieldsLineStyle} /> */}
+        </Source>
+        <NavigationControl />
+        <GeolocateControl />
+
+      </Map>
+      <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translate(-50%, -50%)" }}>
+        <Button type="submit" disabled={!selectedFieldsData}>
+          {navigation.state === "submitting"
+            ? "Opslaan..."
+            : "Voeg geselecteerde percelen toe"}
+        </Button>
+      </div>
+    </div>
 
 
   )
