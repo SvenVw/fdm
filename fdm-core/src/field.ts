@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
@@ -11,6 +11,8 @@ import { type getFieldType } from './field.d'
  *
  * @param b_id_farm - ID of the farm.
  * @param b_name - Name of the field.
+ * @param b_id_source - ID of the field in source dataset
+ * @param b_geometry - Geometry of field in WKT format
  * @param b_manage_start - Start date of managing field.
  * @param b_manage_end - End date of managing field.
  * @param b_manage_type - Type of managing field.
@@ -18,14 +20,17 @@ import { type getFieldType } from './field.d'
  * @alpha
  */
 export async function addField(fdm: FdmType, b_id_farm: schema.farmManagingTypeInsert['b_id_farm'],
-    b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
+    b_name: schema.fieldsTypeInsert['b_name'], b_id_source: schema.fieldsTypeInsert['b_id_source'], b_geometry: schema.fieldsTypeInsert['b_geometry'],
+    b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
     // Generate an ID for the field
     const b_id = nanoid()
 
     // Insert field
     const fieldData = {
-        b_id,
-        b_name
+        b_id: b_id,
+        b_name: b_name,
+        b_id_source: b_id_source,
+        b_geometry: sql`${b_geometry}::geometry(polygon)`
     }
     await fdm
         .insert(schema.fields)
@@ -60,6 +65,8 @@ export async function getField(fdm: FdmType, b_id: schema.fieldsTypeSelect['b_id
             b_id: schema.fields.b_id,
             b_name: schema.fields.b_name,
             b_id_farm: schema.farmManaging.b_id_farm,
+            b_id_source: schema.fields.b_id_source,
+            b_geometry: schema.fields.b_geometry,
             b_manage_start: schema.farmManaging.b_manage_start,
             b_manage_end: schema.farmManaging.b_manage_end,
             b_manage_type: schema.farmManaging.b_manage_type,
@@ -79,6 +86,8 @@ export async function getField(fdm: FdmType, b_id: schema.fieldsTypeSelect['b_id
  *
  * @param b_id - ID of the field.
  * @param b_name - Name of the field.
+ * @param b_id_source - ID of the field in source dataset.
+ * @param b_geometry - Geometry of field in WKT format
  * @param b_manage_start - Start date of managing field.
  * @param b_manage_end - End date of managing field.
  * @param b_manage_type - Type of managing field.
@@ -86,12 +95,14 @@ export async function getField(fdm: FdmType, b_id: schema.fieldsTypeSelect['b_id
  * @alpha
  */
 export async function updateField(fdm: FdmType, b_id: schema.fieldsTypeInsert['b_id'],
-    b_name: schema.fieldsTypeInsert['b_name'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<getFieldType> {
+    b_name: schema.fieldsTypeInsert['b_name'], b_id_source: schema.fieldsTypeInsert['b_id_source'], b_geometry: schema.fieldsTypeInsert['b_geometry'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<getFieldType> {
     const updatedField = await fdm.transaction(async (tx: FdmType) => {
         try {
             await tx.update(schema.fields)
                 .set({
-                    b_name,
+                    b_name: b_name,
+                    b_id_source: b_id_source,
+                    b_geometry: sql`${b_geometry}::geometry(polygon)`,
                     updated: new Date()
                 })
                 .where(eq(schema.fields.b_id, b_id))
@@ -108,8 +119,10 @@ export async function updateField(fdm: FdmType, b_id: schema.fieldsTypeInsert['b
             const field = await tx
                 .select({
                     b_id: schema.fields.b_id,
-                    b_name: schema.fields.b_name,
+                    b_name: schema.fields.b_name,                    
                     b_id_farm: schema.farmManaging.b_id_farm,
+                    b_id_source: schema.fields.b_id_source,
+                    b_geometry: schema.fields.b_geometry,
                     b_manage_start: schema.farmManaging.b_manage_start,
                     b_manage_end: schema.farmManaging.b_manage_end,
                     b_manage_type: schema.farmManaging.b_manage_type,

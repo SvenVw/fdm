@@ -1,6 +1,6 @@
 {
-  "id": "214b6897-1203-4d5e-92b9-fb18803cac46",
-  "prevId": "ba4dd387-e576-411c-8f10-79e84712e7a3",
+  "id": "1c3a0a34-c816-49a1-a809-484f60720e3c",
+  "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -53,29 +53,7 @@
           "notNull": false
         }
       },
-      "indexes": {
-        "b_id_b_id_farm_idx": {
-          "name": "b_id_b_id_farm_idx",
-          "columns": [
-            {
-              "expression": "b_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "b_id_farm",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "farm_managing_b_id_fields_b_id_fk": {
           "name": "farm_managing_b_id_fields_b_id_fk",
@@ -715,6 +693,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "b_geometry": {
+          "name": "b_geometry",
+          "type": "geometry(polygon)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_id_source": {
+          "name": "b_id_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created": {
           "name": "created",
           "type": "timestamp with time zone",
@@ -743,6 +733,21 @@
           "isUnique": true,
           "concurrently": false,
           "method": "btree",
+          "with": {}
+        },
+        "b_geom_idx": {
+          "name": "b_geom_idx",
+          "columns": [
+            {
+              "expression": "b_geometry",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
           "with": {}
         }
       },

@@ -191,6 +191,9 @@ importers:
       postgres:
         specifier: ^3.4.4
         version: 3.4.4
+      wkx:
+        specifier: ^0.5.0
+        version: 0.5.0
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: ^1.20.1
@@ -8779,6 +8782,9 @@ packages:
   wildcard@2.0.1:
     resolution: {integrity: sha512-CC1bOL87PIWSBhDcTrdeLo6eGT7mCFtrg0uIJtqJUFyK+eJnzl8A1niH56uu7KMa5XFrtiV+AQuHO3n7DsHnLQ==}
 
+  wkx@0.5.0:
+    resolution: {integrity: sha512-Xng/d4Ichh8uN4l0FToV/258EjMGU9MGcA0HV2d9B/ZpZB3lqQm7nkOdZdm5GhKtLLhAE7PiVQwN4eN+2YJJUg==}
+
   word-wrap@1.2.5:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
@@ -12457,7 +12463,7 @@ snapshots:
 
   '@types/sax@1.2.7':
     dependencies:
-      '@types/node': 17.0.45
+      '@types/node': 22.7.9
 
   '@types/semver@7.5.8': {}
 
@@ -19424,6 +19430,10 @@ snapshots:
       string-width: 5.1.2
 
   wildcard@2.0.1: {}
+
+  wkx@0.5.0:
+    dependencies:
+      '@types/node': 22.7.9
 
   word-wrap@1.2.5: {}
 

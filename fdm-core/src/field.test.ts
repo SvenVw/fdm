@@ -33,15 +33,19 @@ describe('Farm Data Model', () => {
       const b_id_farm = await addFarm(fdm, farmName, farmSector)
 
       const fieldName = 'Test Field'
+      const fieldIDSource = 'test-field-id'
+      const fieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
       const manageStart = new Date('2023-01-01')
       const manageEnd = new Date('2023-12-31')
       const manageType = 'owner'
-      const b_id = await addField(fdm, b_id_farm, fieldName, manageStart, manageEnd, manageType)
+      const b_id = await addField(fdm, b_id_farm, fieldName, fieldIDSource, fieldGeometry, manageStart, manageEnd, manageType)
       expect(b_id).toBeDefined()
 
       const field = await getField(fdm, b_id)
       expect(field.b_name).toBe(fieldName)
       expect(field.b_id_farm).toBe(b_id_farm)
+      expect(field.b_id_source).toBe(fieldIDSource)
+      expect(field.b_geometry).toBe(fieldGeometry)
       expect(field.b_manage_start).toEqual(manageStart)
       expect(field.b_manage_end).toEqual(manageEnd)
       expect(field.b_manage_type).toBe(manageType)
@@ -53,14 +57,18 @@ describe('Farm Data Model', () => {
       const b_id_farm = await addFarm(fdm, farmName, farmSector)
 
       const fieldName = 'Test Field'
+      const fieldIDSource = 'test-field-id'
+      const fieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
       const manageStart = new Date('2023-01-01')
       const manageEnd = new Date('2023-12-31')
       const manageType = 'owner'
-      const b_id = await addField(fdm, b_id_farm, fieldName, manageStart, manageEnd, manageType)
+      const b_id = await addField(fdm, b_id_farm, fieldName, fieldIDSource, fieldGeometry, manageStart, manageEnd, manageType)
 
       const field = await getField(fdm, b_id)
       expect(field.b_name).toBe(fieldName)
       expect(field.b_id_farm).toBe(b_id_farm)
+      expect(field.b_id_source).toBe(fieldIDSource)
+      expect(field.b_geometry).toBe(fieldGeometry)
       expect(field.b_manage_start).toEqual(manageStart)
       expect(field.b_manage_end).toEqual(manageEnd)
       expect(field.b_manage_type).toBe(manageType)
@@ -72,17 +80,23 @@ describe('Farm Data Model', () => {
       const b_id_farm = await addFarm(fdm, farmName, farmSector)
 
       const fieldName = 'Test Field'
+      const fieldIDSource = 'test-field-id'
+      const fieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
       const manageStart = new Date('2023-01-01')
       const manageEnd = new Date('2023-12-31')
       const manageType = 'owner'
-      const b_id = await addField(fdm, b_id_farm, fieldName, manageStart, manageEnd, manageType)
+      const b_id = await addField(fdm, b_id_farm, fieldName, fieldIDSource, fieldGeometry, manageStart, manageEnd, manageType)
 
       const updatedFieldName = 'Updated Test Field'
+      const updatedFieldIDSource = 'updated-test-field-id'
+      const updatedFieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
       const updatedManageStart = new Date('2024-01-01')
       const updatedManageEnd = new Date('2024-12-31')
       const updatedManageType = 'lease'
-      const updatedField = await updateField(fdm, b_id, updatedFieldName, updatedManageStart, updatedManageEnd, updatedManageType)
+      const updatedField = await updateField(fdm, b_id, updatedFieldName, updatedFieldIDSource, updatedFieldGeometry, updatedManageStart, updatedManageEnd, updatedManageType)
       expect(updatedField.b_name).toBe(updatedFieldName)
+      expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
+      expect(updatedField.b_geometry).toBe(fieldGeometry)
       expect(updatedField.b_manage_start).toEqual(updatedManageStart)
       expect(updatedField.b_manage_end).toEqual(updatedManageEnd)
       expect(updatedField.b_manage_type).toBe(updatedManageType)
