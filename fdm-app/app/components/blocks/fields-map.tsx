@@ -66,7 +66,6 @@ export function FieldsMap(props: FieldsMapType) {
       })
       const brpFields = await fetcher.data
       setBrpFieldsData(brpFields)
-
     }
   }
 
@@ -118,6 +117,21 @@ export function FieldsMap(props: FieldsMapType) {
     }
   }
 
+  async function handleClickOnSubmit()  {
+    
+    selectedFieldsData
+
+    const formSelectedFields = new FormData();
+    formSelectedFields.append("question", 'submit_selected_fields')
+    formSelectedFields.append("selected_fields", JSON.stringify(selectedFieldsData.features))
+
+    await fetcher.submit(formSelectedFields, {
+      method: "POST",
+    })
+
+
+  }
+
   return (
     <div style={{ position: "relative" }}>
       <Map
@@ -144,18 +158,15 @@ export function FieldsMap(props: FieldsMapType) {
         </Source>
         <NavigationControl />
         <GeolocateControl />
-
       </Map>
       <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translate(-50%, -50%)" }}>
-        <Button type="submit" disabled={!selectedFieldsData}>
+        <Button onClick={handleClickOnSubmit} disabled={!selectedFieldsData}>
           {navigation.state === "submitting"
             ? "Opslaan..."
             : "Voeg geselecteerde percelen toe"}
         </Button>
       </div>
     </div>
-
-
   )
 }
 

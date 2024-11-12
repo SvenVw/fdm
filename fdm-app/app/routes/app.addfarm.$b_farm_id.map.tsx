@@ -1,5 +1,5 @@
 import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useNavigation, useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only"
 
 // Components
@@ -13,6 +13,7 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 // FDM
 import { fdm } from "../services/fdm.server";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 
 // Meta
@@ -40,6 +41,8 @@ export async function loader({
 // Main
 export default function Index() {
   const loaderData = useLoaderData<typeof loader>();
+  // const navigation = useNavigation();
+
   return (
     <SidebarInset>
       <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -106,7 +109,13 @@ export async function action({
       })
     const data = await responseApi.json()
     response = data.data
+  } else if (question === 'submit_selected_fields') {
+    const selectedFields = JSON.parse(String(formData.get('selected_fields')))
+    
+
+    
+  } else {
+    throw new Error("Invalid POST question")
   }
-  
   return json(response)
 }
