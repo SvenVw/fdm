@@ -162,7 +162,7 @@ describe('Fertilizer Data Model', () => {
       await removeFertilizer(fdm, p_id)
 
       const fertilizer = await getFertilizer(fdm, p_id)
-      expect(fertilizer.p_id).toBeUndefined()
+      expect(fertilizer).toBeUndefined()
     })
   })
 })
