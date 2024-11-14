@@ -2,7 +2,7 @@ import { describe, expect, it, beforeEach } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
 import { addFarm } from './farm'
-import { addField, getField, updateField } from './field'
+import { addField, getField, getFields, updateField } from './field'
 
 describe('Farm Data Model', () => {
   let fdm: FdmServerType
@@ -72,6 +72,49 @@ describe('Farm Data Model', () => {
       expect(field.b_manage_start).toEqual(manageStart)
       expect(field.b_manage_end).toEqual(manageEnd)
       expect(field.b_manage_type).toBe(manageType)
+    })
+
+    it('should get fields by farm ID', async () => {
+      const farmName = 'Test Farm'
+      const farmSector = 'diary'
+      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+
+      const fieldName1 = 'Test Field 1'
+      const fieldIDSource1 = 'test-field-id-1'
+      const fieldGeometry1 = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
+      const manageStart1 = new Date('2023-01-01')
+      const manageEnd1 = new Date('2023-12-31')
+      const manageType1 = 'owner'
+      const b_id1 = await addField(fdm, b_id_farm, fieldName1, fieldIDSource1, fieldGeometry1, manageStart1, manageEnd1, manageType1)
+
+      const fieldName2 = 'Test Field 2'
+      const fieldIDSource2 = 'test-field-id-2'
+      const fieldGeometry2 = 'POLYGON((50 50,60 60,40 60,30 40,50 50))'
+      const manageStart2 = new Date('2024-01-01')
+      const manageEnd2 = new Date('2024-12-31')
+      const manageType2 = 'lease'
+      const b_id2 = await addField(fdm, b_id_farm, fieldName2, fieldIDSource2, fieldGeometry2, manageStart2, manageEnd2, manageType2)
+
+      const fields = await getFields(fdm, b_id_farm)
+      expect(fields.length).toBe(2)
+
+      const field1 = fields.find(field => field.b_id === b_id1)
+      expect(field1?.b_name).toBe(fieldName1)
+      expect(field1?.b_id_farm).toBe(b_id_farm)
+      expect(field1?.b_id_source).toBe(fieldIDSource1)
+      expect(field1?.b_geometry).toBe(fieldGeometry1)
+      expect(field1?.b_manage_start).toEqual(manageStart1)
+      expect(field1?.b_manage_end).toEqual(manageEnd1)
+      expect(field1?.b_manage_type).toBe(manageType1)
+
+      const field2 = fields.find(field => field.b_id === b_id2)
+      expect(field2?.b_name).toBe(fieldName2)
+      expect(field2?.b_id_farm).toBe(b_id_farm)
+      expect(field2?.b_id_source).toBe(fieldIDSource2)
+      expect(field2?.b_geometry).toBe(fieldGeometry2)
+      expect(field2?.b_manage_start).toEqual(manageStart2)
+      expect(field2?.b_manage_end).toEqual(manageEnd2)
+      expect(field2?.b_manage_type).toBe(manageType2)
     })
 
     it('should update a field', async () => {

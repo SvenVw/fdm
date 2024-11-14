@@ -82,6 +82,36 @@ export async function getField(fdm: FdmType, b_id: schema.fieldsTypeSelect['b_id
 }
 
 /**
+* Get the details of the field for a specific farm
+*
+* @param b_id_farm - The id of the farm to be requested.
+* @returns A Promise that resolves with an array of objects that contains the details of fields related to the farm
+* @alpha
+*/
+export async function getFields(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<getFieldType[]> {
+    // Get properties of the requested field
+    const fields = await fdm
+        .select({
+            b_id: schema.fields.b_id,
+            b_name: schema.fields.b_name,
+            b_id_farm: schema.farms.b_id_farm,
+            b_id_source: schema.fields.b_id_source,
+            b_geometry: schema.fields.b_geometry,
+            b_manage_start: schema.farmManaging.b_manage_start,
+            b_manage_end: schema.farmManaging.b_manage_end,
+            b_manage_type: schema.farmManaging.b_manage_type,
+            created: schema.fields.created,
+            updated: schema.fields.updated
+        })
+        .from(schema.fields)
+        .innerJoin(schema.farmManaging, eq(schema.fields.b_id, schema.farmManaging.b_id))
+        .innerJoin(schema.farms, eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm))
+        .where(eq(schema.farms.b_id_farm, b_id_farm))
+
+    return fields
+}
+
+/**
  * Update the details of a field
  *
  * @param b_id - ID of the field.
