@@ -1,19 +1,20 @@
-import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, json } from "@remix-run/node";
-import { useNavigation, useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
+import { useNavigation, useLoaderData, useParams } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only"
+import wkx from 'wkx'
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Blocks
 import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { addField } from "@svenvw/fdm-core";
 
 
 // Meta
@@ -81,7 +82,7 @@ export default function Index() {
 
 // Action
 export async function action({
-  request,
+  request, params
 }: ActionFunctionArgs) {
 
   const formData = await request.formData()
@@ -110,10 +111,23 @@ export async function action({
     const data = await responseApi.json()
     response = data.data
   } else if (question === 'submit_selected_fields') {
+    const b_id_farm = params.b_farm_id
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
-    
 
-    
+    // Add fields to farm
+    await selectedFields.map(async field => {
+
+      const b_id_name = 'New Field' 
+      const b_id_source = field.properties.reference_id
+      const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
+      const b_geometry = fieldGeometry.toWkt()
+      const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, null, null, null)
+
+      return b_id
+    })
+
+    return redirect(`../addfarm/${b_id_farm}/fields`)
+
   } else {
     throw new Error("Invalid POST question")
   }

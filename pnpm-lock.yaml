@@ -106,6 +106,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.14)
+      wkx:
+        specifier: ^0.5.0
+        version: 0.5.0
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: ^1.20.0
