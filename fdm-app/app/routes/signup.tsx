@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 // Services
-import { getSession, commitSession } from "@/services/session.server";
+import { getSession, commitSession, destroySession } from "@/services/session.server";
 import { fdm } from "../services/fdm.server";
 import { Check } from "lucide-react"
 
@@ -32,9 +32,9 @@ export async function loader({
     if (!user) {
       session.flash("error", "Invalid session");
 
-      return redirect("../login", {
+      return redirect("../signup", {
         headers: {
-          "Set-Cookie": await commitSession(session),
+          "Set-Cookie": await destroySession(session),
         },
       });
     }

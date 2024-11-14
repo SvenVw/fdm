@@ -33,7 +33,7 @@ export async function loader({
   if (!session.has("session_id")) {
     session.flash("error", "No session");
 
-    return redirect("../login", {
+    return redirect("../signup", {
       headers: {
         "Set-Cookie": await commitSession(session),
       },
@@ -45,7 +45,7 @@ export async function loader({
   if (! user) {
     session.flash("error", "Invalid session");
 
-    return redirect("../login", {
+    return redirect("../signup", {
       headers: {
         "Set-Cookie": await commitSession(session),
       },
