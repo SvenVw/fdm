@@ -17,7 +17,7 @@ export default function AppIndex() {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="#">
+                            <BreadcrumbLink href="/">
                                 Start
                             </BreadcrumbLink>
                         </BreadcrumbItem>
