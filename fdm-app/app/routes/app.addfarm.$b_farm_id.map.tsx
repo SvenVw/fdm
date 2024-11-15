@@ -116,8 +116,7 @@ export async function action({
 
     // Add fields to farm
     await selectedFields.map(async field => {
-
-      const b_id_name = 'New Field' 
+      const b_id_name = 'Perceel ' + Number(parseInt(selectedFields.findIndex(x => x.properties.reference_id === field.properties.reference_id)) + parseInt("1"))
       const b_id_source = field.properties.reference_id
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
