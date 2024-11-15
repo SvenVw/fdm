@@ -108,6 +108,11 @@ export async function action({
           "Authorization": `Bearer ${process.env.NMI_API_KEY}`,
         },
       })
+
+    if (!responseApi.ok) {
+      throw new Error(`Failed to fetch fields data: ${responseApi.status} ${responseApi.statusText}`);
+    }
+
     const data = await responseApi.json()
     response = data.data
   } else if (question === 'submit_selected_fields') {
