@@ -43,15 +43,19 @@ export function Fields(props: fieldsType) {
     return (
         <div className="grid  grid-cols-1 md:grid-cols-2 space-y-6">
             {props.fields.map(field => {
-                return (<Field
-                    b_id={field.b_id}
-                    b_name={field.b_name}
-                    b_area={10}
-                    b_soiltype_agr={"klei"}
-                    b_geojson={field.b_geojson}
-                    action={props.action}
-                    mapboxToken={props.mapboxToken}
-                />)
+                return (
+                    <div key={field.b_id}>
+                        <Field
+                            b_id={field.b_id}
+                            b_name={field.b_name}
+                            b_area={10}
+                            b_soiltype_agr={"klei"}
+                            b_geojson={field.b_geojson}
+                            action={props.action}
+                            mapboxToken={props.mapboxToken}
+                        />
+                    </div>
+                )
             })}
         </div>
     )
@@ -82,8 +86,8 @@ function Field(props: fieldType) {
                     <CardContent>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid w-full items-center gap-4">
-                                <div>                                    
-                                    <Input id="b_id" name="b_id" type= "hidden" value={props.b_id} />
+                                <div>
+                                    <Input id="b_id" name="b_id" type="hidden" value={props.b_id} />
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_name">Perceelsnaam</Label>
