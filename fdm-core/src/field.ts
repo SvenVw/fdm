@@ -128,28 +128,46 @@ export async function updateField(fdm: FdmType, b_id: schema.fieldsTypeInsert['b
     b_name: schema.fieldsTypeInsert['b_name'], b_id_source: schema.fieldsTypeInsert['b_id_source'], b_geometry: schema.fieldsTypeInsert['b_geometry'], b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<getFieldType> {
     const updatedField = await fdm.transaction(async (tx: FdmType) => {
         try {
+            const updated = new Date()
+
+            const setFields: Partial<schema.fieldsTypeInsert> = {}
+            if (b_name !== undefined) {
+                setFields.b_name = b_name
+            }
+            if (b_id_source !== undefined) {
+                setFields.b_id_source = b_id_source
+            }
+            if (b_geometry !== undefined) {
+                setFields.b_geometry = sql`${b_geometry}::geometry(polygon)`
+            }
+            setFields.updated = updated
+
+
             await tx.update(schema.fields)
-                .set({
-                    b_name: b_name,
-                    b_id_source: b_id_source,
-                    b_geometry: sql`${b_geometry}::geometry(polygon)`,
-                    updated: new Date()
-                })
+                .set(setFields)
                 .where(eq(schema.fields.b_id, b_id))
 
+
+            const setFarmManaging: Partial<schema.farmManagingTypeInsert> = {}
+            if (b_manage_start !== undefined) {
+                setFarmManaging.b_manage_start = b_manage_start
+            }
+            if (b_manage_end !== undefined) {
+                setFarmManaging.b_manage_end = b_manage_end
+            }
+            if (b_manage_type !== undefined) {
+                setFarmManaging.b_manage_type = b_manage_type
+            }
+            setFarmManaging.updated = updated
+
             await tx.update(schema.farmManaging)
-                .set({
-                    b_manage_start,
-                    b_manage_end,
-                    b_manage_type,
-                    updated: new Date()
-                })
+                .set(setFarmManaging)
                 .where(eq(schema.farmManaging.b_id, b_id))
 
             const field = await tx
                 .select({
                     b_id: schema.fields.b_id,
-                    b_name: schema.fields.b_name,                    
+                    b_name: schema.fields.b_name,
                     b_id_farm: schema.farmManaging.b_id_farm,
                     b_id_source: schema.fields.b_id_source,
                     b_geometry: schema.fields.b_geometry,

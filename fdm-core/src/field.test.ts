@@ -144,5 +144,62 @@ describe('Farm Data Model', () => {
       expect(updatedField.b_manage_end).toEqual(updatedManageEnd)
       expect(updatedField.b_manage_type).toBe(updatedManageType)
     })
+
+    it('should update a field partially', async () => {
+      const farmName = 'Test Farm'
+      const farmSector = 'diary'
+      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+
+      const fieldName = 'Test Field'
+      const fieldIDSource = 'test-field-id'
+      const fieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
+      const manageStart = new Date('2023-01-01')
+      const manageEnd = new Date('2023-12-31')
+      const manageType = 'owner'
+      const b_id = await addField(fdm, b_id_farm, fieldName, fieldIDSource, fieldGeometry, manageStart, manageEnd, manageType)
+
+      // Update only the name
+      const updatedFieldName = 'Updated Test Field'
+      const updatedField = await updateField(fdm, b_id, updatedFieldName, undefined, undefined, undefined, undefined, undefined)
+
+      expect(updatedField.b_name).toBe(updatedFieldName)
+      expect(updatedField.b_id_source).toBe(fieldIDSource) // Should remain the same
+      expect(updatedField.b_geometry).toBe(fieldGeometry) // Should remain the same
+      expect(updatedField.b_manage_start).toEqual(manageStart) // Should remain the same
+      expect(updatedField.b_manage_end).toEqual(manageEnd) // Should remain the same
+      expect(updatedField.b_manage_type).toBe(manageType) // Should remain the same
+
+
+      // Update only the manage type
+      const updatedManageType = 'lease'
+      const updatedField2 = await updateField(fdm, b_id, undefined, undefined, undefined, undefined, undefined, updatedManageType)
+      expect(updatedField2.b_name).toBe(updatedFieldName) // Should remain the same
+      expect(updatedField2.b_id_source).toBe(fieldIDSource) // Should remain the same
+      expect(updatedField2.b_geometry).toBe(fieldGeometry) // Should remain the same
+      expect(updatedField2.b_manage_start).toEqual(manageStart) // Should remain the same
+      expect(updatedField2.b_manage_end).toEqual(manageEnd) // Should remain the same
+      expect(updatedField2.b_manage_type).toBe(updatedManageType) // Should be updated
+
+
+      //Partial updates for `fields` table
+       const updatedFieldIDSource = 'updated-test-field-id'
+       const updatedField3 = await updateField(fdm, b_id, undefined, updatedFieldIDSource, undefined, undefined, undefined, undefined)
+       expect(updatedField3.b_name).toBe(updatedFieldName) // Should remain the same
+       expect(updatedField3.b_id_source).toBe(updatedFieldIDSource) // Should be updated
+       expect(updatedField3.b_geometry).toBe(fieldGeometry) // Should remain the same
+       expect(updatedField3.b_manage_start).toEqual(manageStart) // Should remain the same
+       expect(updatedField3.b_manage_end).toEqual(manageEnd) // Should remain the same
+       expect(updatedField3.b_manage_type).toBe(updatedManageType) // Should remain the same
+
+      // Partial updates for `farmManaging` table
+      const updatedManageStart = new Date('2024-01-01')
+      const updatedField4 = await updateField(fdm, b_id, undefined, undefined, undefined, updatedManageStart, undefined, undefined)
+      expect(updatedField4.b_name).toBe(updatedFieldName) // Should remain the same
+      expect(updatedField4.b_id_source).toBe(updatedFieldIDSource) // Should remain the same
+      expect(updatedField4.b_geometry).toBe(fieldGeometry) // Should remain the same
+      expect(updatedField4.b_manage_start).toEqual(updatedManageStart) // Should be updated
+      expect(updatedField4.b_manage_end).toEqual(manageEnd) // Should remain the same
+      expect(updatedField4.b_manage_type).toBe(updatedManageType) // Should remain the same
+  })
   })
 })
