@@ -1,7 +1,13 @@
 import { redirect } from "@remix-run/node"
 
-export async function loader() {
+import type { LoaderFunction } from "@remix-run/node";
 
-    // Temporary until iam is completed
-    return redirect("../signup");
+export const loader: LoaderFunction = async () => {
+    try {
+        // Temporary until iam is completed
+        return redirect("/signup");
+    } catch (error) {
+        console.error("Login redirect failed:", error);
+        throw error;
+    }
 }
