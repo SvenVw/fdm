@@ -35,17 +35,18 @@ export function FieldMap(props: FieldMapType) {
     const bounds = geojsonExtent(props.b_geojson)
 
     return (
-        <Map
+        <MapGL
             initialViewState={{
                 bounds: bounds,
                 fitBoundsOptions: {
                     padding: 40
                 }
             }}
-            style={{}}
+            style={{ width: '100%', height: '100%' }}
             interactive={false}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
             mapboxAccessToken={mapboxToken}
+            onError={(e) => console.error('Map error:', e)}
         >
             <Source id="fieldMap" type="geojson" data={props.b_geojson}>
                 <Layer {...brpFieldsFillStyle} />
