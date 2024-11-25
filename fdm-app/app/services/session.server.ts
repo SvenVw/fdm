@@ -1,6 +1,9 @@
 import { createCookieSessionStorage } from "@remix-run/node";
 
-const fdmSessionSecret = String(process.env.FDM_SESSION_SECRECT)
+const fdmSessionSecret = process.env.FDM_SESSION_SECRET;
+if (!fdmSessionSecret) {
+  throw new Error("FDM_SESSION_SECRET must be set");
+}
 type SessionData = {
   session_id: string
 };
