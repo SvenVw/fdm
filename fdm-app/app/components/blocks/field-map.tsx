@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Map, Source, Layer } from 'react-map-gl'
 import type { FeatureCollection } from "geojson";
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -32,7 +33,14 @@ export function FieldMap(props: FieldMapType) {
     const mapboxToken = props.mapboxToken
 
     // Convert geometry to geoJSON
-    const bounds = geojsonExtent(props.b_geojson)
+    const bounds = useMemo(() => {
+        try {
+            return geojsonExtent(props.b_geojson);
+        } catch (error) {
+            console.error('Failed to calculate bounds:', error);
+            return [-180, -90, 180, 90]; // Default world bounds
+        }
+    }, [props.b_geojson]);
 
     return (
         <MapGL
