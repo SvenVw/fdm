@@ -102,7 +102,7 @@ export function AppSidebar(props: SideBarType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./fertilizers">
+                                    <a href="./stable">
                                         <PawPrint />
                                         <span>Stal & dieren</span>
                                     </a>
