@@ -33,7 +33,7 @@ interface SideBarType {
 export function AppSidebar(props: SideBarType) {
 
     const user = props.user
-    user.avatar = props.user.firstname.slice(0, 1).toUpperCase() + props.user.surname.slice(0, 1).toUpperCase()
+    const avatarInitials = props.user.firstname.slice(0, 1).toUpperCase() + props.user.surname.slice(0, 1).toUpperCase()
     const isMobile = useIsMobile()
 
     return (
@@ -184,8 +184,8 @@ export function AppSidebar(props: SideBarType) {
                                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
-                                        {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                                        <AvatarFallback className="rounded-lg">{user.avatar}</AvatarFallback>
+                                        {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
+                                        <AvatarFallback className="rounded-lg">{avatarInitials}</AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">{user.firstname + " " + user.surname}</span>
@@ -203,8 +203,8 @@ export function AppSidebar(props: SideBarType) {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="h-8 w-8 rounded-lg">
-                                            {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
-                                            <AvatarFallback className="rounded-lg">{user.avatar}</AvatarFallback>
+                                            {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
+                                            <AvatarFallback className="rounded-lg">{avatarInitials}</AvatarFallback>
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
                                             <span className="truncate font-semibold">{user.firstname + " " + user.surname}</span>
