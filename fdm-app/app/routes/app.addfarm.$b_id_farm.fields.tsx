@@ -29,9 +29,16 @@ export async function loader({
     request, params
 }: LoaderFunctionArgs) {
     const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        throw new Response("Farm ID is required", { status: 400 });
+    }
+
     const fields = await getFields(fdm, b_id_farm)
 
     const fieldsWithGeojson = fields.map(field => {
+        if (!field.b_geometry) {
+            return field;
+        }
         field.b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
         return field
     });
@@ -39,9 +46,10 @@ export async function loader({
     // Sort by created
     fieldsWithGeojson.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
 
-
-    // Get the Mapbox token
-    const mapboxToken = String(process.env.MAPBOX_TOKEN)
+    const mapboxToken = process.env.MAPBOX_TOKEN;
+    if (!mapboxToken) {
+        throw new Error("MAPBOX_TOKEN environment variable is not set");
+    }
 
     return json({
         fields: fieldsWithGeojson,
