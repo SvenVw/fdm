@@ -102,17 +102,30 @@ export default function Index() {
 export async function action({
     request, params
 }: LoaderFunctionArgs) {
-
     const formData = await request.formData()
-    const b_id = formData.get('b_id')
-    const b_name = formData.get('b_name')
-    const b_id_source = undefined
-    const b_geometry = undefined
-    const b_manage_start = undefined
-    const b_manage_end = undefined
-    const b_manage_type = undefined
+    const b_id = formData.get('b_id')?.toString();
+    const b_name = formData.get('b_name')?.toString();
 
-    const updatedField = await updateField(fdm, b_id, b_name, b_id_source, b_geometry, b_manage_start, b_manage_end, b_manage_type)
+    if (!b_id) {
+        throw new Response("Field ID is required", { status: 400 });
+    }
 
-    return (json({ field: updatedField }))
+    try {
+        const updatedField = await updateField(
+            fdm,
+            b_id,
+            b_name,
+            undefined, // b_id_source
+            undefined, // b_geometry
+            undefined, // b_manage_start
+            undefined, // b_manage_end
+            undefined  // b_manage_type
+        );
+        return json({ field: updatedField });
+    } catch (error) {
+        throw new Response(
+            `Failed to update field: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            { status: 500 }
+        );
+    }
 }
