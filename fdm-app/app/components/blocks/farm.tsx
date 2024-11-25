@@ -52,8 +52,8 @@ export function Farm(props: farmType) {
                         <CardContent>
                             <div className="grid w-full items-center gap-4">
                                 <div className="flex flex-col space-y-1.5">
-                                    <Label htmlFor="b_name_farm">Bedrijfsnaam</Label>
-                                    <Input id="b_name_farm" name="b_name_farm" placeholder="Bv. Jansen V.O.F." />
+                                    <Label htmlFor="b_name_farm">Bedrijfsnaam <span className="text-red-500">*</span></Label>
+                                    <Input id="b_name_farm" name="b_name_farm" placeholder="Bv. Jansen V.O.F." aria-required="true"/>
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_fertilizers_organic">Welke <i>organische</i> meststoffen gebruikt u?</Label>
