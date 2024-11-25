@@ -70,14 +70,22 @@ function Field(props: fieldType) {
     const navigation = useNavigation();
     const { toast } = useToast()
 
-
-
-    function onSubmit(evt) {
-        console.log(evt)
-        toast({
-            title: "Perceel is bijgewerkt",
-            description: "",
-        })
+    function onSubmit(evt: React.FormEvent<HTMLFormElement>) {
+        evt.preventDefault();
+        try {
+            toast({
+                title: "Perceel is bijgewerkt",
+                description: "",
+            })
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast({
+                    title: "Error updating field",
+                    description: error.message,
+                    variant: "destructive"
+                })
+            }
+        }
     }
 
     return (
