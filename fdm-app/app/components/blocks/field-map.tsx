@@ -46,14 +46,14 @@ export function FieldMap(props: FieldMapType) {
             interactive={false}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
             mapboxAccessToken={mapboxToken}
-            onError={(e: string) => console.error('Map error:', e)}
+            onError={(e: Error) => console.error('Map error:', e)}
         >
 
             <Source
                 id="fieldMap"
                 type="geojson"
                 data={props.b_geojson}
-                onError={(e: string) => console.error('Source loading error:', e)}>
+                onError={(e: Error) => console.error('Source loading error:', e)}>
 
                 <Layer {...brpFieldsFillStyle} />
                 <Layer {...brpFieldsLineStyle} />
