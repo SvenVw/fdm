@@ -1,10 +1,10 @@
-
 import { Map, Source, Layer } from 'react-map-gl'
+import type { FeatureCollection } from "geojson";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import geojsonExtent from '@mapbox/geojson-extent'
 
 interface FieldMapType {
-    b_geojson: any
+    b_geojson: FeatureCollection
     mapboxToken: string
 }
 

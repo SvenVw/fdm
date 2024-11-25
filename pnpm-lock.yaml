@@ -73,6 +73,9 @@ importers:
       '@remix-run/serve':
         specifier: ^2.13.1
         version: 2.13.1(typescript@5.6.3)
+      '@types/geojson':
+        specifier: ^7946.0.14
+        version: 7946.0.14
       '@types/mapbox-gl':
         specifier: ^3.4.1
         version: 3.4.1
@@ -128,6 +131,9 @@ importers:
       '@svenvw/fdm-data':
         specifier: workspace:*
         version: link:../fdm-data
+      '@types/mapbox__geojson-extent':
+        specifier: ^1.0.3
+        version: 1.0.3
       '@types/react':
         specifier: ^18.2.20
         version: 18.3.11
@@ -3070,6 +3076,9 @@ packages:
 
   '@types/mapbox-gl@3.4.1':
     resolution: {integrity: sha512-NsGKKtgW93B+UaLPti6B7NwlxYlES5DpV5Gzj9F75rK5ALKsqSk15CiEHbOnTr09RGbr6ZYiCdI+59NNNcAImg==}
+
+  '@types/mapbox__geojson-extent@1.0.3':
+    resolution: {integrity: sha512-i7r+3Iencd5PMleZmIRciaN8ntaGvwPA2sHts50YFrZeH9FIJFAjK64HgDaqzrtecmPbMvIltQuwuEbEQfoUJA==}
 
   '@types/mapbox__point-geometry@0.1.4':
     resolution: {integrity: sha512-mUWlSxAmYLfwnRBmgYV86tgYmMIICX4kza8YnE/eIlywGe2XoOxlpVnXWwir92xRLjwyarqwpu2EJKD2pk0IUA==}
@@ -12473,6 +12482,10 @@ snapshots:
   '@types/json5@0.0.29': {}
 
   '@types/mapbox-gl@3.4.1':
+    dependencies:
+      '@types/geojson': 7946.0.14
+
+  '@types/mapbox__geojson-extent@1.0.3':
     dependencies:
       '@types/geojson': 7946.0.14
 
