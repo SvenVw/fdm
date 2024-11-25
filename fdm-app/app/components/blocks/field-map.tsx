@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Map, Source, Layer } from 'react-map-gl'
+import { Map as MapGL, Source, Layer } from 'react-map-gl'
 import type { FeatureCollection } from "geojson";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import geojsonExtent from '@mapbox/geojson-extent'
