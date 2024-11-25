@@ -24,12 +24,17 @@ export interface soilTypesListType {
 }
 
 export interface fieldType {
+    /** Mapbox API token for map rendering */
     mapboxToken: string;
+    /** Unique identifier for the field */
     b_id: string
+    /** Display name of the field */
     b_name: string
+    /** Area of the field in hectares */
     b_area: number | null
+    /** Agricultural soil type classification */
     b_soiltype_agr: string | null
-    b_geojson: any
+    b_geojson: GeoJSON.Feature | GeoJSON.FeatureCollection
     action: string
 }
 
