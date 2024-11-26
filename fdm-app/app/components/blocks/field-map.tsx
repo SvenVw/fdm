@@ -54,7 +54,7 @@ export function FieldMap(props: FieldMapType) {
             interactive={false}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
             mapboxAccessToken={mapboxToken}
-            onError={(e: Error) => console.error('Map error:', e)}
+            onError={(e) => console.error('Map error:', e)}
         >
 
             <Source
