@@ -7,7 +7,7 @@
   "type": "module",
   "private": true,
   "workspaces": [
-    "fdm-core", "fdm-data", "fdm-docs"
+    "fdm-core", "fdm-data", "fdm-docs", "fdm-app"
   ],
   "scripts": {
     "test": "turbo run test",

@@ -1,5 +1,5 @@
-import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex} from 'drizzle-orm/pg-core'
-import { numericCasted } from './schema-custom-types'
+import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex, index} from 'drizzle-orm/pg-core'
+import { geometryPolygon, numericCasted } from './schema-custom-types'
 
 // Define postgres schema
 export const fdmSchema = pgSchema('fdm-dev')
@@ -36,8 +36,7 @@ export const farmManaging = fdmSchema.table('farm_managing', {
   updated: timestamp({ withTimezone: true })
 }, (table) => {
   return {
-    pk: primaryKey({ columns: [table.b_id, table.b_id_farm] }),
-    b_id_b_id_farm_idx: uniqueIndex('b_id_b_id_farm_idx').on(table.b_id, table.b_id_farm)
+    pk: primaryKey({ columns: [table.b_id, table.b_id_farm] })
   }
 })
 
@@ -48,12 +47,14 @@ export type farmManagingTypeInsert = typeof farmManaging.$inferInsert
 export const fields = fdmSchema.table('fields', {
   b_id: text().primaryKey(),
   b_name: text(),
-  // b_geometry: PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
+  b_geometry: geometryPolygon(), // PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
+  b_id_source: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => {
   return {
-    b_id_idx: uniqueIndex('b_id_idx').on(table.b_id)
+    b_id_idx: uniqueIndex('b_id_idx').on(table.b_id),
+    b_geom_idx: index('b_geom_idx').using('gist', table.b_geometry)
   }
 })
 
@@ -159,3 +160,47 @@ export const fertilizerPicking = fdmSchema.table('fertilizer_picking', {
 
 export type fertilizerPickingTypeSelect = typeof fertilizerPicking.$inferSelect
 export type fertilizerPickingTypeInsert = typeof fertilizerPicking.$inferInsert
+
+// IAM part
+// IN DEVELOPMENT!!
+// Will be more advanced in future updates
+
+export const users = fdmSchema.table('users', {
+  user_id: text().primaryKey(),  
+  firstname: text(),
+  surname: text(),
+  email: text(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    user_id_idx: uniqueIndex('user_id_idx').on(table.user_id)
+  }
+})
+
+export type usersTypeSelect = typeof users.$inferSelect
+export type usersTypeInsert = typeof users.$inferInsert
+
+export const session = fdmSchema.table('session', {
+  session_id: text().primaryKey(),
+  user_id: text().notNull().references(() => users.user_id),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    session_id_idx: uniqueIndex('session_id_idx').on(table.session_id)
+  }
+})
+
+export type sessionTypeSelect = typeof session.$inferSelect
+export type sessionTypeInsert = typeof session.$inferInsert
+
+export const grants = fdmSchema.table('grants', {
+  b_farm_id: text().notNull().references(() => farms.b_id_farm),
+  user_id: text().notNull().references(() => users.user_id),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  destroyed: timestamp({ withTimezone: true })
+})
+
+export type grantsTypeSelect = typeof grants.$inferSelect
+export type grantsTypeInsert = typeof grants.$inferInsert

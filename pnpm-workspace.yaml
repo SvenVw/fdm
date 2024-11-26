@@ -3,6 +3,7 @@ packages:
   - 'fdm-data'
   # - 'fdm-calculator'
   - 'fdm-docs'
+  - 'fdm-app'
 
 catalog:
   drizzle-orm: ^0.35.3
