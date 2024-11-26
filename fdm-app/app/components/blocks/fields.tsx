@@ -1,4 +1,5 @@
 import { Form, useNavigation } from "@remix-run/react";
+import type { FeatureCollection } from "geojson";
 
 // Components
 import { Button } from "@/components/ui/button"
@@ -34,7 +35,7 @@ export interface fieldType {
     b_area: number | null
     /** Agricultural soil type classification */
     b_soiltype_agr: string | null
-    b_geojson: GeoJSON.Feature | GeoJSON.FeatureCollection
+    b_geojson: FeatureCollection
     action: string
 }
 
