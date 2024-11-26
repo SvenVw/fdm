@@ -1,4 +1,5 @@
 import { Form, useNavigation } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import type { FeatureCollection } from "geojson";
 
 // Components
@@ -18,6 +19,7 @@ import { useToast } from "@/hooks/use-toast"
 import { FieldMap } from "@/components/blocks/field-map";
 import { ClientOnly } from "remix-utils/client-only";
 import { Skeleton } from "../ui/skeleton";
+
 
 export interface soilTypesListType {
     value: string
@@ -68,31 +70,31 @@ export function Fields(props: fieldsType) {
 }
 
 function Field(props: fieldType) {
-    const navigation = useNavigation();
+    const navigation = useNavigation()
     const { toast } = useToast()
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    function onSubmit(evt: React.FormEvent<HTMLFormElement>) {
-        evt.preventDefault();
-        try {
+    useEffect(() => {
+        if (navigation.state === "idle" && isSubmitting) {
             toast({
                 title: "Perceel is bijgewerkt",
                 description: "",
-            })
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                toast({
-                    title: "Error updating field",
-                    description: error.message,
-                    variant: "destructive"
-                })
-            }
+            });
+            setIsSubmitting(false);
         }
+    }, [navigation.state, isSubmitting, toast])
+
+    function handleSubmit() {
+        setIsSubmitting(true);
     }
 
     return (
         <div id={props.b_id} className="flex items-center justify-center">
             <Card className="w-full max-w-[350px]">
-                <Form className="" action={props.action} method="post">
+                <Form className="space-y-6"
+                    action={props.action}
+                    method="post"
+                    onSubmit={handleSubmit}>
                     <CardHeader>
                         {/* <CardTitle>{props.b_name}</CardTitle>
                         <CardDescription>{props.b_area} ha</CardDescription> */}
@@ -138,7 +140,7 @@ function Field(props: fieldType) {
                         </div>
                     </CardContent>
                     <CardFooter className="flex justify-between">
-                        <Button type="submit" onClick={onSubmit}>
+                        <Button type="submit">
                             {navigation.state === "submitting"
                                 ? "Opslaan..."
                                 : "Bijwerken"}
