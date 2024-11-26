@@ -7,7 +7,7 @@
 - 5fa0cdc: Add `getFields` function to get details of fields based on `b_id_farm`
 - f9050b0: Setting arguments for `updateFields` to undefined won't update the values anymore
 - Add `b_geometry` for fields
-- 7aff5c6: Add `signUpUser` and `getUserFromSession` to create an user and retrieve user information from session
+- 7aff5c6: Add `signUpUser` and `getUserFromSession` to create a user and retrieve user information from session
 
 ## 0.4.0
 
