@@ -60,7 +60,7 @@
   "peerDependencies": {
     "@svenvw/fdm-core": "workspace:>=0.5.0"
   },
-  "packageManager": "pnpm@9.12.2",
+  "packageManager": "pnpm@9.14.2",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   }
