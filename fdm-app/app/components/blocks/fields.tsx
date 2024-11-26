@@ -46,7 +46,7 @@ export interface fieldsType {
 
 export function Fields(props: fieldsType) {
     return (
-        <div className="grid  grid-cols-1 md:grid-cols-2 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
             {props.fields.map(field => {
                 return (
                     <div key={field.b_id}>
@@ -90,15 +90,15 @@ function Field(props: fieldType) {
 
     return (
         <div id={props.b_id} className="flex items-center justify-center">
-            <Card className="w-2/3">
-                <Form className="space-y-6" action={props.action} method="post">
+            <Card className="w-full max-w-[350px]">
+                <Form className="" action={props.action} method="post">
                     <CardHeader>
                         {/* <CardTitle>{props.b_name}</CardTitle>
                         <CardDescription>{props.b_area} ha</CardDescription> */}
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="grid w-full items-center gap-4">
+                            <div className="grid w-full items-center gap-2">
                                 <div>
                                     <Input id="b_id" name="b_id" type="hidden" value={props.b_id} />
                                 </div>
