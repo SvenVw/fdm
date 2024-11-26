@@ -122,7 +122,7 @@ function Field(props: fieldType) {
                                     </Select>
                                 </div>
                             </div>
-                            <div className="w-full items-center">
+                            <div className="w-full h-[150px] items-center">
                                 <ClientOnly
                                     fallback={
                                         <Skeleton className="h-full w-full rounded-xl" />
