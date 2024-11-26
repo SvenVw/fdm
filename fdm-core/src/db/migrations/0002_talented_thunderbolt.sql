@@ -2,6 +2,22 @@ CREATE SCHEMA "fdm-dev";
 --> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_manage_type" AS ENUM('owner', 'lease');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "fdm-dev"."cultivations" (
+	"b_lu" text PRIMARY KEY NOT NULL,
+	"b_lu_catalogue" text NOT NULL,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "fdm-dev"."cultivations_catalogue" (
+	"b_lu_catalogue" text PRIMARY KEY NOT NULL,
+	"b_lu_source" text NOT NULL,
+	"b_lu_name" text NOT NULL,
+	"b_lu_name_en" text,
+	"b_lu_hcat3" text,
+	"b_lu_hcat3_name" text
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."farm_managing" (
 	"b_id" text NOT NULL,
 	"b_id_farm" text NOT NULL,
@@ -97,6 +113,17 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers_catalogue" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "fdm-dev"."field_sowing" (
+	"b_id" text NOT NULL,
+	"b_lu" text NOT NULL,
+	"b_sowing_date" timestamp with time zone,
+	"b_sowing_amount" numeric,
+	"b_sowing_method" text,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone,
+	CONSTRAINT "field_sowing_b_id_b_lu_pk" PRIMARY KEY("b_id","b_lu")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
 	"b_name" text,
@@ -128,6 +155,12 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."users" (
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "fdm-dev"."cultivations" ADD CONSTRAINT "cultivations_b_lu_catalogue_cultivations_catalogue_b_lu_catalogue_fk" FOREIGN KEY ("b_lu_catalogue") REFERENCES "fdm-dev"."cultivations_catalogue"("b_lu_catalogue") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "fdm-dev"."farm_managing" ADD CONSTRAINT "farm_managing_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;
@@ -166,6 +199,18 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "fdm-dev"."field_sowing" ADD CONSTRAINT "field_sowing_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "fdm-dev"."field_sowing" ADD CONSTRAINT "field_sowing_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm-dev"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "fdm-dev"."grants" ADD CONSTRAINT "grants_b_farm_id_farms_b_id_farm_fk" FOREIGN KEY ("b_farm_id") REFERENCES "fdm-dev"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -183,6 +228,8 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "b_lu_idx" ON "fdm-dev"."cultivations" USING btree ("b_lu");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "b_lu_catalogue_idx" ON "fdm-dev"."cultivations_catalogue" USING btree ("b_lu_catalogue");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_id_farm_idx" ON "fdm-dev"."farms" USING btree ("b_id_farm");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "p_id_idx" ON "fdm-dev"."fertilizers" USING btree ("p_id");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "p_id_catalogue_idx" ON "fdm-dev"."fertilizers_catalogue" USING btree ("p_id_catalogue");--> statement-breakpoint

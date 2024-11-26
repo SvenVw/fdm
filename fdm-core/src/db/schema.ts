@@ -68,7 +68,7 @@ export const fertilizers = fdmSchema.table('fertilizers', {
   updated: timestamp({ withTimezone: true })
 }, (table) => {
   return {
-    b_id_idx: uniqueIndex('p_id_idx').on(table.p_id)
+    p_id_idx: uniqueIndex('p_id_idx').on(table.p_id)
   }
 })
 
@@ -161,6 +161,56 @@ export const fertilizerPicking = fdmSchema.table('fertilizer_picking', {
 export type fertilizerPickingTypeSelect = typeof fertilizerPicking.$inferSelect
 export type fertilizerPickingTypeInsert = typeof fertilizerPicking.$inferInsert
 
+// Define cultivations table
+export const cultivations = fdmSchema.table('cultivations', {
+  b_lu: text().primaryKey(),
+  b_lu_catalogue: text().notNull().references(() => cultivationsCatalogue.b_lu_catalogue),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    b_lu_idx: uniqueIndex('b_lu_idx').on(table.b_lu)
+  }
+})
+
+export type cultivationsTypeSelect = typeof cultivations.$inferSelect
+export type cultivationsTypeInsert = typeof cultivations.$inferInsert
+
+// Define field_sowing table
+export const fieldSowing = fdmSchema.table('field_sowing', {
+  b_id: text().notNull().references(() => fields.b_id),
+  b_lu: text().notNull().references(() => cultivations.b_lu),
+  b_sowing_date: timestamp({ withTimezone: true }),
+  b_sowing_amount: numericCasted(),
+  b_sowing_method: text(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.b_id, table.b_lu] })
+  }
+})
+
+export type fieldSowingTypeSelect = typeof fieldSowing.$inferSelect
+export type fieldSowingTypeInsert = typeof fieldSowing.$inferInsert
+
+// Define cultivations_catalogue table
+export const cultivationsCatalogue = fdmSchema.table('cultivations_catalogue', {
+  b_lu_catalogue: text().primaryKey(),
+  b_lu_source: text().notNull(),
+  b_lu_name: text().notNull(),
+  b_lu_name_en: text(),
+  b_lu_hcat3: text(),
+  b_lu_hcat3_name: text()
+}, (table) => {
+  return {
+    b_lu_catalogue_idx: uniqueIndex('b_lu_catalogue_idx').on(table.b_lu_catalogue)
+  }
+})
+
+export type cultivationsCatalogueTypeSelect = typeof cultivationsCatalogue.$inferSelect
+export type cultivationsCatalogueTypeInsert = typeof cultivationsCatalogue.$inferInsert
+
 // IAM part
 // IN DEVELOPMENT!!
 // Will be more advanced in future updates
@@ -172,7 +222,7 @@ export const users = fdmSchema.table('users', {
   email: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
+}, (table: { user_id: any }) => {
   return {
     user_id_idx: uniqueIndex('user_id_idx').on(table.user_id)
   }
@@ -186,7 +236,7 @@ export const session = fdmSchema.table('session', {
   user_id: text().notNull().references(() => users.user_id),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
+}, (table: { session_id: any }) => {
   return {
     session_id_idx: uniqueIndex('session_id_idx').on(table.session_id)
   }

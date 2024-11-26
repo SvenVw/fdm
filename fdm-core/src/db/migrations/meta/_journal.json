@@ -15,6 +15,13 @@
       "when": 1731415851157,
       "tag": "0001_ambiguous_golden_guardian",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1732630805391,
+      "tag": "0002_talented_thunderbolt",
+      "breakpoints": true
     }
   ]
 }
