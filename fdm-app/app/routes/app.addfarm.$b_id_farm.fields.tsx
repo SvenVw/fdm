@@ -54,6 +54,7 @@ export async function loader({
     return json({
         fields: fieldsWithGeojson,
         mapboxToken: mapboxToken,
+        b_id_farm: b_id_farm,
         action: `/app/addfarm/${b_id_farm}/fields`
     })
 
@@ -62,7 +63,7 @@ export async function loader({
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>();
-    // const navigation = useNavigation();
+
 
     return (
         <SidebarInset>
@@ -82,9 +83,12 @@ export default function Index() {
                                 Vul perceelsinformatie in
                             </BreadcrumbLink>
                         </BreadcrumbItem>
-                    </BreadcrumbList>                    
+                    </BreadcrumbList>
                 </Breadcrumb>
-                <Button className="mx-auto">Doorgaan</Button>
+                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="mx-auto">
+                    <Button>Doorgaan</Button>
+                </a>
+
             </header>
             <main>
                 <Fields
