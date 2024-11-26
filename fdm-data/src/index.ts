@@ -12,3 +12,4 @@
  */
 
 export { extendFertilizersCatalogue} from './fertilizers'
+export { extendCultivationsCatalogue} from './cultivations'
