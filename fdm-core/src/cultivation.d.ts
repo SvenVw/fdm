@@ -8,6 +8,6 @@ export interface getCultivationType {
     b_lu_name_en: schema.cultivationsCatalogueTypeSelect['b_lu_name_en'],
     b_lu_hcat3: schema.cultivationsCatalogueTypeSelect['b_lu_hcat3'],
     b_lu_hcat3_name: schema.cultivationsCatalogueTypeSelect['b_lu_hcat3_name'],
-    b_sowing_date: schema.fieldSowingTypeSelectTypeSelect['b_sowing_date'],
-    b_id: schema.fieldSowingTypeSelectTypeSelect['b_id'],
+    b_sowing_date: schema.fieldSowingTypeSelect['b_sowing_date'],
+    b_id: schema.fieldSowingTypeSelect['b_id'],
 }
