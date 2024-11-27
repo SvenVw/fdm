@@ -112,7 +112,10 @@ export async function addCultivation(
  *
  * @param fdm The FDM instance.
  * @param b_lu The ID of the cultivation.
- * @returns A promise that resolves with the cultivation details, or undefined if not found.
+ * @param fdm The FDM instance.
+ * @param b_lu The ID of the cultivation.
+ * @returns A promise that resolves with the cultivation details.
+ * @throws If the cultivation does not exist.
  */
 export async function getCultivation(fdm: FdmType, b_lu: schema.cultivationsTypeSelect['b_lu']): Promise<getCultivationType> {
 
