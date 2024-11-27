@@ -16,40 +16,48 @@ describe('Fertilizers Data [server]', () => {
         const password = process.env.POSTGRES_PASSWORD
         const database = process.env.POSTGRES_DB
         const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
-        
-        // Does not work yet :(
-        // const fdm = await createFdmServer(
-        //     host,
-        //     port,
-        //     user,
-        //     password,
-        //     database
-        //   )
-        // await migrateFdmServer(fdm)
 
-        // Workaround
-        fdm = drizzle({
-            connection : {
-              user : user,
-              password : password,
-              host : host,
-              port : port,
-              database : database
-            },
-            logger: false,
-            schema: schema
-          })
-          
-          // Run migration
-          await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
-        
+        try {
+            // TODO: Replace workaround with createFdmServer once issue is resolved
+            // Current blocker: Migration does not work with fdmServer
+            // const fdm = await createFdmServer(
+            //     host,
+            //     port,
+            //     user,
+            //     password,
+            //     database
+            //   )
+            // await migrateFdmServer(fdm)
+
+            // Workaround
+            fdm = drizzle({
+                connection: {
+                    user: user,
+                    password: password,
+                    host: host,
+                    port: port,
+                    database: database
+                },
+                logger: false,
+                schema: schema
+            })
+
+            // Run migration
+            await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
+        } catch (error) {
+            console.error('Failed to setup database:', error);
+            throw error;
+        }
+
     })
 
     afterAll(async () => {
         try {
             // Clean up test data
-            await fdm.delete(schema.fertilizerPicking).execute();
-            await fdm.delete(schema.fertilizersCatalogue).execute();
+            await fdm.transaction(async (tx) => {
+                await tx.delete(schema.fertilizerPicking).execute();
+                await tx.delete(schema.fertilizersCatalogue).execute();
+            });
         } catch (error) {
             console.error('Failed to cleanup:', error);
             throw error;
