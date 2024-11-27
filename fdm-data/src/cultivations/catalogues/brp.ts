@@ -9,11 +9,12 @@ import { fdmSchema } from '@svenvw/fdm-core'
 export function getCatalogueBrp(): fdmSchema.cultivationsCatalogueTypeInsert[] {
 
     const catalogueSrm = brp.map(cultivation => {
+    const catalogueBrp = brp.map(cultivation => {
         return {
             b_lu_source: 'brp',
            ...cultivation
         }
     })
 
-    return catalogueSrm
+    return catalogueBrp
 }
