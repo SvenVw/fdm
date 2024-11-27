@@ -26,24 +26,33 @@ export async function extendCultivationsCatalogue(fdm: FdmType, catalogueName: s
     const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
 
     // Add cultivations to catalogue
-    await Promise.all(catalogue.map(async cultivation => {
+    try {
+        await Promise.all(catalogue.map(async cultivation => {
 
-        // Check if cultivation is already present in catalogue
-const cultivationInCatalogue = cultivationsCatalogue.find((x: fdmSchema.cultivationsCatalogueTypeSelect) => x.b_lu_catalogue === cultivation.b_lu_catalogue)
+            // Check if cultivation is already present in catalogue
+            const cultivationInCatalogue = cultivationsCatalogue.find(
+                (x: fdmSchema.cultivationsCatalogueTypeSelect) =>
+                    x.b_lu_catalogue === cultivation.b_lu_catalogue
+            );
 
-        // If fcultivation is not present in catalogue, add it to fdm instance
-        if (!cultivationInCatalogue) {
-            await addCultivationToCatalogue(
-                fdm,
-                {
-                    b_lu_catalogue: cultivation.b_lu_catalogue,
-                    b_lu_source: cultivation.b_lu_source,
-                    b_lu_name: cultivation.b_lu_name,
-                    b_lu_name_en: cultivation.b_lu_name_en,
-                    b_lu_hcat3: cultivation.b_lu_hcat3,
-                    b_lu_hcat3_name: cultivation.b_lu_hcat3_name
-                }
-            )
-        }
-    }))
+            // If cultivation is not present in catalogue, add it to fdm instance
+            // TODO: Update values if they differ
+            if (!cultivationInCatalogue) {
+                await addCultivationToCatalogue(
+                    fdm,
+                    {
+                        b_lu_catalogue: cultivation.b_lu_catalogue,
+                        b_lu_source: cultivation.b_lu_source,
+                        b_lu_name: cultivation.b_lu_name,
+                        b_lu_name_en: cultivation.b_lu_name_en,
+                        b_lu_hcat3: cultivation.b_lu_hcat3,
+                        b_lu_hcat3_name: cultivation.b_lu_hcat3_name
+                    }
+                )
+            }
+        }))
+    } catch (error) {
+        throw new Error(`Failed to extend cultivations catalogue: ${(error as Error).message}`);
+    }
 }
+
