@@ -195,10 +195,14 @@ export async function removeCultivation(
                 .delete(schema.fieldSowing)
                 .where(eq(schema.fieldSowing.b_lu, b_lu))
 
-            await tx
+            const deletedResult = await tx
                 .delete(schema.cultivations)
                 .where(eq(schema.cultivations.b_lu, b_lu))
+                .returning({b_lu: schema.cultivations.b_lu})
 
+            if (deletedResult.rowCount === 0) {
+                throw new Error(`Cultivation with b_lu ${b_lu} does not exist`)
+            }
         }
         catch (error) {
             tx.rollback()
