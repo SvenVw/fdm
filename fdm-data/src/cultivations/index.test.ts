@@ -27,32 +27,37 @@ describe('Cultivations Catalogue', () => {
         const database = process.env.POSTGRES_DB
         const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
 
-        // TODO: Replace workaround with createFdmServer once issue is resolved
-        // Current blocker: Migration does not work with fdmServer
-        // const fdm = await createFdmServer(
-        //     host,
-        //     port,
-        //     user,
-        //     password,
-        //     database
-        //   )
-        // await migrateFdmServer(fdm)
+        try {
+            // TODO: Replace workaround with createFdmServer once issue is resolved
+            // Current blocker: Migration does not work with fdmServer
+            // const fdm = await createFdmServer(
+            //     host,
+            //     port,
+            //     user,
+            //     password,
+            //     database
+            //   )
+            // await migrateFdmServer(fdm)
 
-        // Workaround
-        fdm = drizzle({
-            connection: {
-                user: user,
-                password: password,
-                host: host,
-                port: port,
-                database: database
-            },
-            logger: false,
-            schema: schema
-        })
+            // Workaround
+            fdm = drizzle({
+                connection: {
+                    user: user,
+                    password: password,
+                    host: host,
+                    port: port,
+                    database: database
+                },
+                logger: false,
+                schema: schema
+            })
 
-        // Run migration
-        await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
+            // Run migration
+            await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
+        } catch (error) {
+            console.error('Failed to setup database:', error);
+            throw error;
+        }
     })
 
     afterAll(async () => {
