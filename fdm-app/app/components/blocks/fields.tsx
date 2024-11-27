@@ -49,7 +49,7 @@ export interface fieldsType {
 
 export function Fields(props: fieldsType) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+        <div className="mx-auto grid grid-cols-1 gap-6 my-4">
             {props.fields.map(field => {
                 return (
                     <div key={field.b_id}>

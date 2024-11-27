@@ -85,10 +85,9 @@ export default function Index() {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="mx-auto">
+                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
                     <Button>Doorgaan</Button>
                 </a>
-
             </header>
             <main>
                 <Fields
