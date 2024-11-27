@@ -29,7 +29,7 @@ export async function extendCultivationsCatalogue(fdm: FdmType, catalogueName: s
     await Promise.all(catalogue.map(async cultivation => {
 
         // Check if cultivation is already present in catalogue
-        const cultivationInCatalogue = cultivationsCatalogue.find((x: fdmSchema.cultivationsCatalogueTypeSelect): any => x.b_lu_catalogue === cultivation.b_lu_catalogue)
+const cultivationInCatalogue = cultivationsCatalogue.find((x: fdmSchema.cultivationsCatalogueTypeSelect) => x.b_lu_catalogue === cultivation.b_lu_catalogue)
 
         // If fcultivation is not present in catalogue, add it to fdm instance
         if (!cultivationInCatalogue) {
