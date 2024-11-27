@@ -22,7 +22,7 @@ describe('Cultivation Data Model', () => {
 
         const host = process.env.POSTGRES_HOST
         const port = Number(process.env.POSTGRES_PORT)
-        if (isNaN(port)) {
+        if (Number.isNaN(port)) {
             throw new Error('POSTGRES_PORT must be a valid number');
         }
         const user = process.env.POSTGRES_USER
