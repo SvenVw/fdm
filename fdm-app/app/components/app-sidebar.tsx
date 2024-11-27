@@ -119,7 +119,7 @@ export function AppSidebar(props: SideBarType) {
                                 <SidebarMenuButton asChild>
                                     <a href="#">
                                         <ArrowRightLeft />
-                                        <span>MINAS2</span>
+                                        <span>Nutriëntenbalans</span>
                                     </a>
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
