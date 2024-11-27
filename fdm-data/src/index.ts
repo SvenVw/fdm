@@ -11,5 +11,5 @@
  * @packageDocumentation
  */
 
-export { extendFertilizersCatalogue} from './fertilizers'
-export { extendCultivationsCatalogue} from './cultivations'
+export { extendFertilizersCatalogue } from './fertilizers'
+export { extendCultivationsCatalogue } from './cultivations'
