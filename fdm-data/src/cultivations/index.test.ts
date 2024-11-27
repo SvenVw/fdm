@@ -10,12 +10,22 @@ describe('Cultivations Catalogue', () => {
     let fdm: FdmServerType
 
     beforeEach(async () => {
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
+const requiredEnvVars = ['POSTGRES_HOST', 'POSTGRES_PORT', 'POSTGRES_USER', 'POSTGRES_PASSWORD', 'POSTGRES_DB'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    throw new Error(`Missing required environment variable: ${envVar}`);
+  }
+}
+
+const host = process.env.POSTGRES_HOST
+const port = Number(process.env.POSTGRES_PORT)
+if (isNaN(port)) {
+  throw new Error('POSTGRES_PORT must be a valid number');
+}
+const user = process.env.POSTGRES_USER
+const password = process.env.POSTGRES_PASSWORD
+const database = process.env.POSTGRES_DB
+const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
 
         // Does not work yet :(
         // const fdm = await createFdmServer(
