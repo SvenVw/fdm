@@ -13,8 +13,18 @@ describe('Cultivation Data Model', () => {
     let b_id: string
 
     beforeEach(async () => {
+        const requiredEnvVars = ['POSTGRES_HOST', 'POSTGRES_PORT', 'POSTGRES_USER', 'POSTGRES_PASSWORD', 'POSTGRES_DB'];
+        for (const envVar of requiredEnvVars) {
+            if (!process.env[envVar]) {
+                throw new Error(`Missing required environment variable: ${envVar}`);
+            }
+        }
+
         const host = process.env.POSTGRES_HOST
         const port = Number(process.env.POSTGRES_PORT)
+        if (isNaN(port)) {
+            throw new Error('POSTGRES_PORT must be a valid number');
+        }
         const user = process.env.POSTGRES_USER
         const password = process.env.POSTGRES_PASSWORD
         const database = process.env.POSTGRES_DB
@@ -22,7 +32,6 @@ describe('Cultivation Data Model', () => {
 
         fdm = await createFdmServer(host, port, user, password, database)
         await migrateFdmServer(fdm, migrationsFolderPath)
-
 
         b_lu_catalogue = nanoid()
         b_id_farm = await addFarm(fdm, 'test farm', 'arable')
