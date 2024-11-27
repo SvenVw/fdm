@@ -13,8 +13,9 @@ import { Fields } from "@/components/blocks/fields";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getFields, updateField } from "@svenvw/fdm-core";
+import { getCultivationsFromCatalogue, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
+import { cultivationsCatalogue } from "node_modules/@svenvw/fdm-core/dist/db/schema";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -28,11 +29,14 @@ export const meta: MetaFunction = () => {
 export async function loader({
     request, params
 }: LoaderFunctionArgs) {
+
+    // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
         throw new Response("Farm ID is required", { status: 400 });
     }
 
+    // Get the fields
     const fields = await getFields(fdm, b_id_farm)
 
     const fieldsWithGeojson = fields.map(field => {
@@ -46,13 +50,24 @@ export async function loader({
     // Sort by created
     fieldsWithGeojson.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
 
+    // Get the Mapbox Token
     const mapboxToken = process.env.MAPBOX_TOKEN;
     if (!mapboxToken) {
         throw new Error("MAPBOX_TOKEN environment variable is not set");
     }
 
+    // Get the available cultivations
+    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+    const cultivationOptions = cultivationsCatalogue.map(cultivation => {
+        return {
+            value: cultivation.b_lu_catalogue,
+            label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split('_')[1]})`
+        }
+    })
+
     return json({
         fields: fieldsWithGeojson,
+        cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
         action: `/app/addfarm/${b_id_farm}/fields`
@@ -63,7 +78,6 @@ export async function loader({
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>();
-
 
     return (
         <SidebarInset>
@@ -92,6 +106,7 @@ export default function Index() {
             <main>
                 <Fields
                     fields={loaderData.fields}
+                    cultivationOptions={loaderData.cultivationOptions}
                     mapboxToken={loaderData.mapboxToken}
                     action={loaderData.action}
                 />

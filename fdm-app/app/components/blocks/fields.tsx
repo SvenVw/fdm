@@ -19,6 +19,21 @@ import { useToast } from "@/hooks/use-toast"
 import { FieldMap } from "@/components/blocks/field-map";
 import { ClientOnly } from "remix-utils/client-only";
 import { Skeleton } from "../ui/skeleton";
+import { cn } from "@/lib/utils"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { ChevronsUpDown, Check } from "lucide-react"
 
 
 export interface soilTypesListType {
@@ -38,16 +53,70 @@ export interface fieldType {
     /** Agricultural soil type classification */
     b_soiltype_agr: string | null
     b_geojson: FeatureCollection
+    cultivationOptions: any[]
     action: string
 }
 
 export interface fieldsType {
     fields: fieldType[]
+    cultivationOptions: any[]
     mapboxToken: string
     action: string
 }
 
+function CultivationCombobox(cultivationOptions: any) {
+    const [open, setOpen] = useState(false)
+    const [value, setValue] = useState("")
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="w-[342px] justify-between"
+                >
+                    {value
+                        ? cultivationOptions.cultivationOptions.find((cultivation) => cultivation.label === value)?.label
+                        : "Selecteer hoofdgewas..."}
+                    <ChevronsUpDown className="opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[342px] p-0">
+                <Command>
+                    <CommandInput placeholder="Zoek gewas" className="h-9" />
+                    <CommandList>
+                        <CommandEmpty>Geen gewas gevonden</CommandEmpty>
+                        <CommandGroup>
+                            {cultivationOptions.cultivationOptions.map((cultivation) => (
+                                <CommandItem
+                                    key={cultivation.value}
+                                    value={cultivation.label}
+                                    onSelect={(currentValue) => {
+                                        setValue(currentValue === value ? "" : currentValue)
+                                        setOpen(false)
+                                    }}
+                                >
+                                    {cultivation.label}
+                                    <Check
+                                        className={cn(
+                                            "ml-auto",
+                                            value === cultivation.valuee ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    )
+}
+
 export function Fields(props: fieldsType) {
+
     return (
         <div className="mx-auto grid grid-cols-1 gap-6 my-4">
             {props.fields.map(field => {
@@ -59,6 +128,7 @@ export function Fields(props: fieldsType) {
                             b_area={10}
                             b_soiltype_agr={"dekzand"}
                             b_geojson={field.b_geojson}
+                            cultivationOptions={props.cultivationOptions}
                             action={props.action}
                             mapboxToken={props.mapboxToken}
                         />
@@ -111,18 +181,9 @@ function Field(props: fieldType) {
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_lu">Hoofdgewas</Label>
-                                    <Select>
-                                        <SelectTrigger className="">
-                                            <SelectValue placeholder="Select a fruit" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="apple">Apple</SelectItem>
-                                            <SelectItem value="banana">Banana</SelectItem>
-                                            <SelectItem value="blueberry">Blueberry</SelectItem>
-                                            <SelectItem value="grapes">Grapes</SelectItem>
-                                            <SelectItem value="pineapple">Pineapple</SelectItem>
-                                        </SelectContent>
-                                    </Select>
+                                    <CultivationCombobox
+                                        cultivationOptions={props.cultivationOptions}
+                                    />
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_soiltype_agr">Bodemtype</Label>
