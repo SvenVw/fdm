@@ -102,7 +102,7 @@ function CultivationCombobox(cultivationOptions: any) {
                                     <Check
                                         className={cn(
                                             "ml-auto",
-                                            value === cultivation.valuee ? "opacity-100" : "opacity-0"
+                                            value === cultivation.value ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                 </CommandItem>
