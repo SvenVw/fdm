@@ -222,7 +222,7 @@ export const users = fdmSchema.table('users', {
   email: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table: { user_id: any }) => {
+}, (table) => {
   return {
     user_id_idx: uniqueIndex('user_id_idx').on(table.user_id)
   }
@@ -236,7 +236,7 @@ export const session = fdmSchema.table('session', {
   user_id: text().notNull().references(() => users.user_id),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table: { session_id: any }) => {
+}, (table) => {
   return {
     session_id_idx: uniqueIndex('session_id_idx').on(table.session_id)
   }
