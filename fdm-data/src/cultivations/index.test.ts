@@ -1,9 +1,10 @@
 import { describe, expect, it, beforeEach, afterAll } from 'vitest'
-import { createFdmServer, migrateFdmServer } from '@svenvw/fdm-core'
 import { extendCultivationsCatalogue } from './index'
 import { getCatalogueBrp } from './catalogues/brp'
-import { type FdmServerType } from '@svenvw/fdm-core'
+import { getCultivationsFromCatalogue, fdmSchema as schema, type FdmServerType } from '@svenvw/fdm-core'
 
+import { drizzle } from 'drizzle-orm/postgres-js'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
 
 describe('Cultivations Catalogue', () => {
     let fdm: FdmServerType
@@ -14,10 +15,33 @@ describe('Cultivations Catalogue', () => {
         const user = process.env.POSTGRES_USER
         const password = process.env.POSTGRES_PASSWORD
         const database = process.env.POSTGRES_DB
-        const migrationsFolderPath = 'src/db/migrations'
+        const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
 
-        fdm = await createFdmServer(host, port, user, password, database)
-        await migrateFdmServer(fdm, migrationsFolderPath)
+        // Does not work yet :(
+        // const fdm = await createFdmServer(
+        //     host,
+        //     port,
+        //     user,
+        //     password,
+        //     database
+        //   )
+        // await migrateFdmServer(fdm)
+
+        // Workaround
+        fdm = drizzle({
+            connection : {
+              user : user,
+              password : password,
+              host : host,
+              port : port,
+              database : database
+            },
+            logger: false,
+            schema: schema
+          })
+          
+          // Run migration
+          await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
     })
 
     afterAll(async () => {
@@ -30,7 +54,7 @@ describe('Cultivations Catalogue', () => {
         await extendCultivationsCatalogue(fdm, catalogueName)
 
         // Retrieve the catalogue from the database to verify
-        const dbCatalogue = await fdm.select().from(fdm.fdmSchema.cultivationsCatalogue)
+        const dbCatalogue = await getCultivationsFromCatalogue(fdm)
 
         // Get the expected catalogue
         const expectedCatalogue = getCatalogueBrp()
@@ -39,7 +63,7 @@ describe('Cultivations Catalogue', () => {
         expect(dbCatalogue.length).toBeGreaterThanOrEqual(expectedCatalogue.length)
 
         for (const expectedItem of expectedCatalogue) {
-          const dbItem = dbCatalogue.find(item => item.b_lu_catalogue === expectedItem.b_lu_catalogue)
+          const dbItem = dbCatalogue.find((item: schema.cultivationsCatalogueTypeSelect) => item.b_lu_catalogue === expectedItem.b_lu_catalogue)
           expect(dbItem).toBeDefined()
           expect(dbItem!.b_lu_source).toBe(expectedItem.b_lu_source)
           expect(dbItem!.b_lu_name).toBe(expectedItem.b_lu_name)
