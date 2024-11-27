@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, afterAll } from 'vitest'
 import { getFertilizersFromCatalogue, fdmSchema as schema, type FdmType } from '@svenvw/fdm-core'
 import { extendFertilizersCatalogue } from '.'
 
@@ -43,6 +43,17 @@ describe('Fertilizers Data [server]', () => {
           // Run migration
           await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
         
+    })
+
+    afterAll(async () => {
+        try {
+            // Clean up test data
+            await fdm.delete(schema.fertilizerPicking).execute();
+            await fdm.delete(schema.fertilizersCatalogue).execute();
+        } catch (error) {
+            console.error('Failed to cleanup:', error);
+            throw error;
+        }
     })
 
     it('should throw error if dataset is not recognized', async () => {
