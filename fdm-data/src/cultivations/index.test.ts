@@ -27,7 +27,8 @@ describe('Cultivations Catalogue', () => {
         const database = process.env.POSTGRES_DB
         const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
 
-        // Does not work yet :(
+        // TODO: Replace workaround with createFdmServer once issue is resolved
+        // Current blocker: Migration does not work with fdmServer
         // const fdm = await createFdmServer(
         //     host,
         //     port,
@@ -68,6 +69,10 @@ describe('Cultivations Catalogue', () => {
 
 
     it('should extend cultivations catalogue with brp', async () => {
+        // Verify initial state
+        const initialCatalogue = await getCultivationsFromCatalogue(fdm)
+        expect(initialCatalogue).toHaveLength(0)
+
         const catalogueName = 'brp'
         await extendCultivationsCatalogue(fdm, catalogueName)
 
