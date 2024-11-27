@@ -57,7 +57,7 @@ export function Fields(props: fieldsType) {
                             b_id={field.b_id}
                             b_name={field.b_name}
                             b_area={10}
-                            b_soiltype_agr={"klei"}
+                            b_soiltype_agr={"dekzand"}
                             b_geojson={field.b_geojson}
                             action={props.action}
                             mapboxToken={props.mapboxToken}
@@ -90,18 +90,18 @@ function Field(props: fieldType) {
 
     return (
         <div id={props.b_id} className="flex items-center justify-center">
-            <Card className="w-full max-w-[350px]">
+            <Card className="w-full max-w-[750px]">
                 <Form className="space-y-6"
                     action={props.action}
                     method="post"
                     onSubmit={handleSubmit}>
                     <CardHeader>
-                        {/* <CardTitle>{props.b_name}</CardTitle>
-                        <CardDescription>{props.b_area} ha</CardDescription> */}
+                        <CardTitle>{props.b_name}</CardTitle>
+                        <CardDescription>{props.b_area} ha</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="grid w-full items-center gap-2">
+                            <div className="grid w-full items-center gap-3">
                                 <div>
                                     <Input id="b_id" name="b_id" type="hidden" value={props.b_id} />
                                 </div>
@@ -124,8 +124,26 @@ function Field(props: fieldType) {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="b_soiltype_agr">Bodemtype</Label>
+                                    <Select defaultValue={props.b_soiltype_agr}>
+                                        <SelectTrigger className="">
+                                            <SelectValue placeholder="Selecteer een bodemtype" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="moerige_klei">Moerige klei</SelectItem>
+                                            <SelectItem value="rivierklei">Rivierklei</SelectItem>
+                                            <SelectItem value="dekzand">Dekzand</SelectItem>
+                                            <SelectItem value="zeeklei">Zeeklei</SelectItem>
+                                            <SelectItem value="veen">Veen</SelectItem>
+                                            <SelectItem value="loess">Löss</SelectItem>
+                                            <SelectItem value="duinzand">Duinzand</SelectItem>
+                                            <SelectItem value="maasklei">Maasklei</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
-                            <div className="w-full h-[150px] items-center">
+                            <div className="w-full h-full items-center">
                                 <ClientOnly
                                     fallback={
                                         <Skeleton className="h-full w-full rounded-xl" />
