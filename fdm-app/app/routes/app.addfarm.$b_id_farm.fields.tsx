@@ -57,13 +57,22 @@ export async function loader({
     }
 
     // Get the available cultivations
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    const cultivationOptions = cultivationsCatalogue.map(cultivation => {
-        return {
-            value: cultivation.b_lu_catalogue,
-            label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split('_')[1]})`
-        }
-    })
+    let cultivationOptions = [];
+    try {
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        cultivationOptions = cultivationsCatalogue
+            .filter(cultivation => cultivation?.b_lu_catalogue && cultivation?.b_lu_name)
+            .map(cultivation => ({
+                value: cultivation.b_lu_catalogue,
+                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split('_')[1]})`
+            }));
+    } catch (error) {
+        console.error('Failed to fetch cultivations:', error);
+        throw new Response(
+            'Failed to load cultivation options',
+            { status: 500 }
+        );
+    }
 
     return json({
         fields: fieldsWithGeojson,
