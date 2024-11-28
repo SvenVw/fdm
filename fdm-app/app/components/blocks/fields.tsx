@@ -187,7 +187,10 @@ function Field(props: fieldType) {
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_soiltype_agr">Bodemtype</Label>
-                                    <Select defaultValue={props.b_soiltype_agr}>
+                                    <Select
+                                        name="b_soiltype_agr"
+                                        id="b_soiltype_agr"
+                                        defaultValue={props.b_soiltype_agr}>
                                         <SelectTrigger className="">
                                             <SelectValue placeholder="Selecteer een bodemtype" />
                                         </SelectTrigger>
