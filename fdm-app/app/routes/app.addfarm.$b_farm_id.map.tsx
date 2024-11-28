@@ -133,6 +133,9 @@ export async function action({
       if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
         throw new Error('Future dates are not allowed')
       }
+      if (new Date(b_date_sowing) < new Date(b_manage_start)) {
+        throw new Error('Sowing should happen after field started to be managed')
+      }
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
 
