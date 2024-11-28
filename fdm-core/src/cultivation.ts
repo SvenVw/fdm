@@ -41,22 +41,23 @@ export async function addCultivationToCatalogue(
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert['b_lu_hcat3_name']
     }
 ): Promise<void> {
+    await fdm.transaction(async (tx) => {
+        // Check for existing cultivation
+        const existing = await tx
+            .select()
+            .from(schema.cultivationsCatalogue)
+            .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, properties.b_lu_catalogue))
+            .limit(1)
 
-    // Check for existing cultivation
-    const existing = await fdm
-        .select()
-        .from(schema.cultivationsCatalogue)
-        .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, properties.b_lu_catalogue))
-        .limit(1)
+        if (existing.length > 0) { 
+            throw new Error('Cultivation already exists in catalogue') 
+        }
 
-    if (existing.length > 0) {
-        throw new Error('Cultivation already exists in catalogue')
-    }
-
-    // Insert the cultivation in the db
-    await fdm
-        .insert(schema.cultivationsCatalogue)
-        .values(properties)
+        // Insert the cultivation in the db
+        await tx
+            .insert(schema.cultivationsCatalogue)
+            .values(properties)
+    })
 }
 
 
@@ -110,28 +111,19 @@ export async function addCultivation(
             }
 
             // Validate if cultivation is not an duplicate of already existing cultivation
-            const existingCultivation2 = await tx
-                .select()
-                .from(schema.fieldSowing)
-                .innerJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
-                .where(and(
-                    eq(schema.fieldSowing.b_id, b_id),
-                    eq(schema.fieldSowing.b_sowing_date, b_sowing_date),
-                    eq(schema.cultivations.b_lu_catalogue, b_lu_catalogue)
-                ))
-                .limit(1)
-            if (existingCultivation2.length > 0) {
-                throw new Error('Cultivation already exists')
-            }
-
-
-            // Check for existing cultivation for this field
             const existingCultivation = await tx
                 .select()
                 .from(schema.fieldSowing)
+                .leftJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
                 .where(and(
                     eq(schema.fieldSowing.b_id, b_id),
-                    eq(schema.fieldSowing.b_lu, b_lu)
+                    or(
+                        eq(schema.fieldSowing.b_lu, b_lu),
+                        and(
+                            eq(schema.fieldSowing.b_sowing_date, b_sowing_date),
+                            eq(schema.cultivations.b_lu_catalogue, b_lu_catalogue)
+                        )
+                    )
                 ))
                 .limit(1)
 
