@@ -67,6 +67,7 @@ function CultivationCombobox(props: { cultivationOptions: CultivationOption[] })
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
     const cultivationOptions = props.cultivationOptions
+    const name = "b_lu"
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -75,6 +76,7 @@ function CultivationCombobox(props: { cultivationOptions: CultivationOption[] })
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
+                    name={name}
                     className="w-[342px] justify-between"
                 >
                     {value
@@ -164,7 +166,20 @@ function Field(props: fieldType) {
                 <Form className="space-y-6"
                     action={props.action}
                     method="post"
-                    onSubmit={handleSubmit}>
+                    onSubmit={(e) => {
+                        const form = e.currentTarget;
+                        if (!form.b_lu.value || !form.b_soiltype_agr.value) {
+                            e.preventDefault();
+                            toast({
+                                title: "Fout",
+                                description: "Hoofdgewas en bodemtype zijn verplicht",
+                                variant: "destructive",
+                            });
+                            return;
+                        }
+                        handleSubmit();
+                    }}
+                >
                     <CardHeader>
                         <CardTitle>{props.b_name}</CardTitle>
                         <CardDescription>{props.b_area} ha</CardDescription>
