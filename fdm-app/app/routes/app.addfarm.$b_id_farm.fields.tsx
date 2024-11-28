@@ -13,7 +13,7 @@ import { Fields } from "@/components/blocks/fields";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getCultivationsFromCatalogue, getFields, updateField } from "@svenvw/fdm-core";
+import { getCultivations, getCultivationsFromCatalogue, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 
 // Meta
@@ -38,13 +38,18 @@ export async function loader({
     // Get the fields
     const fields = await getFields(fdm, b_id_farm)
 
-    const fieldsWithGeojson = fields.map(field => {
+    const fieldsWithGeojson = await Promise.all(fields.map(async field => {
         if (!field.b_geometry) {
             return field;
         }
         field.b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
+
+        // Get cultivation of field
+        const cultivations = await getCultivations(fdm, field.b_id)
+        field.cultivations = cultivations[0] ?? { b_lu: ""};
+
         return field
-    });
+    }));
 
     // Sort by created
     fieldsWithGeojson.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())

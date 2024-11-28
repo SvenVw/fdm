@@ -52,6 +52,7 @@ interface fieldType {
     /** Agricultural soil type classification */
     b_soiltype_agr: string | null
     b_geojson: FeatureCollection
+    cultivations: {b_lu_catalogue: string}
     cultivationOptions: CultivationOption[]
     action: string
 }
@@ -63,9 +64,9 @@ interface fieldsType {
     action: string
 }
 
-function CultivationCombobox(props: { cultivationOptions: CultivationOption[] }) {
+function CultivationCombobox(props: {cultivations: {b_lu_catalogue: string}, cultivationOptions: CultivationOption[], defaultValue?: string }) {
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState("")
+    const [value, setValue] = useState(props.cultivations.b_lu_catalogue ?? "")
     const cultivationOptions = props.cultivationOptions
     const name = "b_lu"
 
@@ -79,9 +80,7 @@ function CultivationCombobox(props: { cultivationOptions: CultivationOption[] })
                     name={name}
                     className="w-[342px] justify-between"
                 >
-                    {value
-                        ? cultivationOptions.find((cultivation: CultivationOption) => cultivation.label === value)?.label
-                        : "Selecteer hoofdgewas..."}
+                    {props.defaultValue || "Selecteer hoofdgewas..."}
                     <ChevronsUpDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>
@@ -118,7 +117,6 @@ function CultivationCombobox(props: { cultivationOptions: CultivationOption[] })
 }
 
 export function Fields(props: fieldsType) {
-
     return (
         <div className="mx-auto grid grid-cols-1 gap-6 my-4">
             {props.fields.map(field => {
@@ -130,6 +128,7 @@ export function Fields(props: fieldsType) {
                             b_area={10}
                             b_soiltype_agr={"dekzand"}
                             b_geojson={field.b_geojson}
+                            cultivations={field.cultivations}
                             cultivationOptions={props.cultivationOptions}
                             action={props.action}
                             mapboxToken={props.mapboxToken}
@@ -160,6 +159,8 @@ function Field(props: fieldType) {
         setIsSubmitting(true);
     }
 
+    const defaultCultivationValue = props.cultivations.b_lu_catalogue; // Access the correct property containing the cultivation value
+    const defaultCultivationLabel = props.cultivationOptions.find(option => option.value === defaultCultivationValue)?.label;
     return (
         <div id={props.b_id} className="flex items-center justify-center">
             <Card className="w-full max-w-[750px]">
@@ -197,7 +198,9 @@ function Field(props: fieldType) {
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_lu">Hoofdgewas</Label>
                                     <CultivationCombobox
+                                        cultivations={props.cultivations}
                                         cultivationOptions={props.cultivationOptions}
+                                        defaultValue={defaultCultivationLabel} 
                                     />
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
