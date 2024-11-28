@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq, isNotNull } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
@@ -173,6 +173,77 @@ export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingType
         .where(eq(schema.fieldSowing.b_id, b_id))
 
     return cultivations
+}
+
+/**
+ * Retrieves a cultivation plan for a specific farm.
+ *
+ * The cultivation plan is an array of objects, where each object represents a unique cultivation
+ * identified by its `b_lu_catalogue`. Each cultivation object also contains a `fields` array,
+ * listing the fields associated with that specific cultivation.  The `fields` array contains objects,
+ * each specifying the `b_lu` (cultivation ID) and `b_id` (field ID) combination.
+ *
+ * @param fdm The FDM instance.
+ * @param b_id_farm The ID of the farm for which to retrieve the cultivation plan.
+ * @returns A Promise that resolves with an array representing the cultivation plan.  
+ *          Each element in the array is an object with the following structure:
+ *          ```
+ *          {
+ *              b_lu_catalogue: string;  // Unique ID of the cultivation catalogue item
+ *              b_lu_name: string;      // Name of the cultivation
+ *              fields: {               // Array of fields associated with this cultivation
+ *                  b_lu: string;          // Unique ID of the cultivation 
+ *                  b_id: string;          // Unique ID of the field
+ *              }[];
+ *          }
+ *          ```
+ *          Returns an empty array if no cultivations are found for the specified farm.
+ * @example
+ * ```typescript
+ * const cultivationPlan = await getCultivationPlan(fdm, 'farm123');
+ * if (cultivationPlan.length > 0) {
+ *   console.log("Cultivation Plan:", cultivationPlan); 
+ * } else {
+ *   console.log("No cultivations found for this farm.");
+ * }
+ * ```
+ * @alpha
+ */
+export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<void> {
+
+    const cultivations = await fdm
+        .select({
+            b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+            b_lu_name: schema.cultivationsCatalogue.b_lu_name,
+            b_lu: schema.cultivations.b_lu,
+            b_id: schema.fields.b_id            
+        })
+        .from(schema.farms)
+        .leftJoin(schema.farmManaging, eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm))
+        .leftJoin(schema.fields, eq(schema.farmManaging.b_id, schema.fields.b_id))
+        .leftJoin(schema.fieldSowing, eq(schema.fields.b_id, schema.fieldSowing.b_id))
+        .leftJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
+        .leftJoin(schema.cultivationsCatalogue, eq(schema.cultivations.b_lu_catalogue, schema.cultivationsCatalogue.b_lu_catalogue))
+        .where(and(
+            eq(schema.farms.b_id_farm, b_id_farm), 
+            isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
+        )
+
+        const cultivationPlan = cultivations.reduce((acc, curr) => {
+            const existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue)
+            if (existingCultivation) {
+                existingCultivation.fields.push({ b_lu: curr.b_lu, b_id: curr.b_id })
+            } else {
+                acc.push({
+                    b_lu_catalogue: curr.b_lu_catalogue,
+                    b_lu_name: curr.b_lu_name,
+                    fields: [{ b_lu: curr.b_lu, b_id: curr.b_id }]
+                });
+            }
+            return acc
+        }, []);
+
+        return cultivationPlan
 }
 
 /**

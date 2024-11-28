@@ -1,7 +1,7 @@
 import { describe, expect, it, afterAll, beforeEach } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
-import { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations } from './cultivation'
+import { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations, getCultivationPlan } from './cultivation'
 import { addFarm } from './farm'
 import { addField } from './field'
 import { nanoid } from 'nanoid'
@@ -144,4 +144,65 @@ describe('Cultivation Data Model', () => {
 
 
     })
+
+    describe('getCultivationPlan', () => {
+        it('should return an empty array if no cultivations are found', async () => {
+            const cultivationPlan = await getCultivationPlan(fdm, b_id_farm);
+            expect(cultivationPlan).toEqual([]);
+        });
+
+        it('should return a cultivation plan with unique cultivations and their fields', async () => {
+            const catalogueItem1 = nanoid()
+            const catalogueItem2 = nanoid()
+
+
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue: catalogueItem1,
+                b_lu_source: 'test-source-1',
+                b_lu_name: 'test-name-1',
+                b_lu_name_en: 'test-name-en-1',
+                b_lu_hcat3: 'test-hcat3-1',
+                b_lu_hcat3_name: 'test-hcat3-name-1'
+            })
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue: catalogueItem2,
+                b_lu_source: 'test-source-2',
+                b_lu_name: 'test-name-2',
+                b_lu_name_en: 'test-name-en-2',
+                b_lu_hcat3: 'test-hcat3-2',
+                b_lu_hcat3_name: 'test-hcat3-name-2'
+            })
+
+
+            const b_sowing_date = '2024-01-01'
+            await addCultivation(fdm, catalogueItem1, b_id, b_sowing_date)            
+            const b_id2 = await addField(
+                fdm,
+                b_id_farm,
+                'test field 2',
+                'test source 2',
+                'POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))',
+                '2023-01-01',
+                '2023-12-31',
+                'owner'
+            )
+            await addCultivation(fdm, catalogueItem1, b_id2, b_sowing_date)
+            await addCultivation(fdm, catalogueItem2, b_id, b_sowing_date)
+
+
+            const cultivationPlan = await getCultivationPlan(fdm, b_id_farm);
+
+            expect(cultivationPlan.length).toBe(2);
+
+
+            const cultivation1 = cultivationPlan.find(item => item.b_lu_catalogue === catalogueItem1);
+            expect(cultivation1).toBeDefined();
+            expect(cultivation1?.fields.length).toBe(2);
+
+            const cultivation2 = cultivationPlan.find(item => item.b_lu_catalogue === catalogueItem2);
+            expect(cultivation2).toBeDefined();
+            expect(cultivation2?.fields.length).toBe(1);
+
+        });
+    });
 })
