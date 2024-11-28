@@ -130,8 +130,14 @@ export async function action({
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
 
-      const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
-      const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+      try {
+        const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
+        const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+        return { b_id, b_lu }
+      } catch (error) {
+        console.error(`Failed to process field ${b_id_name}:`, error)
+        throw new Error(`Failed to add field ${b_id_name}: ${error.message}`)
+      }
 
       return {
         b_id: b_id,
