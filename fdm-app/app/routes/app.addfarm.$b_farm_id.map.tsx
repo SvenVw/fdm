@@ -120,7 +120,7 @@ export async function action({
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
     // Add fields to farm
-    await selectedFields.map(async field => {
+    await Promise.all(selectedFields.map(async field => {
       const b_id_name = 'Perceel ' + Number(parseInt(selectedFields.findIndex(x => x.properties.reference_id === field.properties.reference_id)) + parseInt("1"))
       const b_id_source = field.properties.reference_id
       const b_lu_catalogue = field.properties.b_lu
@@ -144,12 +144,7 @@ export async function action({
         console.error(`Failed to process field ${b_id_name}:`, error)
         throw new Error(`Failed to add field ${b_id_name}: ${error.message}`)
       }
-
-      return {
-        b_id: b_id,
-        b_lu: b_lu
-      }
-    })
+    }))
 
     return redirect(`../addfarm/${b_id_farm}/fields`)
 
