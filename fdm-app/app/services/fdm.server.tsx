@@ -33,7 +33,15 @@ export const fdm = drizzle({
 await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
 
 // Add SRM fertilzers to catalogue
-await extendFertilizersCatalogue(fdm, 'srm')
+const FERTILIZERS_CATALOGUE = 'srm'
+const CULTIVATIONS_CATALOGUE = 'brp'
 
-// Add BRP cultivations to catalogue
-await extendCultivationsCatalogue(fdm, 'brp')
+try {
+  await Promise.all([
+    extendFertilizersCatalogue(fdm, FERTILIZERS_CATALOGUE),
+    extendCultivationsCatalogue(fdm, CULTIVATIONS_CATALOGUE)
+  ]);
+} catch (error) {
+  console.error('Failed to extend catalogues:', error);
+  throw error;
+}
