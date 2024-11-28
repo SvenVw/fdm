@@ -14,7 +14,7 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { addField } from "@svenvw/fdm-core";
+import { addCultivation, addField } from "@svenvw/fdm-core";
 
 
 // Meta
@@ -123,11 +123,20 @@ export async function action({
     await selectedFields.map(async field => {
       const b_id_name = 'Perceel ' + Number(parseInt(selectedFields.findIndex(x => x.properties.reference_id === field.properties.reference_id)) + parseInt("1"))
       const b_id_source = field.properties.reference_id
+      const b_lu_catalogue = field.properties.b_lu
+      const currentYear = new Date().getFullYear() 
+      const b_manage_start = `${currentYear}-01-01`
+      const b_date_sowing = `${currentYear}-01-01`
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
-      const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, null, null, null)
 
-      return b_id
+      const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
+      const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+
+      return {
+        b_id: b_id,
+        b_lu: b_lu
+      }
     })
 
     return redirect(`../addfarm/${b_id_farm}/fields`)
