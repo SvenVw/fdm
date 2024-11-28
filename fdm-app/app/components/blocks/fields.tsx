@@ -125,7 +125,7 @@ export function Fields(props: fieldsType) {
                         <Field
                             b_id={field.b_id}
                             b_name={field.b_name}
-                            b_area={10}
+                            b_area={Math.round(field.b_area*10)/10}
                             b_soiltype_agr={"dekzand"}
                             b_geojson={field.b_geojson}
                             cultivations={field.cultivations}
