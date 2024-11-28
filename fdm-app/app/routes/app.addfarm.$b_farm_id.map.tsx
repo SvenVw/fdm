@@ -125,8 +125,14 @@ export async function action({
       const b_id_source = field.properties.reference_id
       const b_lu_catalogue = field.properties.b_lu
       const currentYear = new Date().getFullYear() 
-      const b_manage_start = `${currentYear}-01-01`
-      const b_date_sowing = `${currentYear}-01-01`
+      const defaultDate = new Date(currentYear, 0, 1)
+      const b_manage_start = defaultDate.toISOString().split('T')[0]
+      const b_date_sowing = defaultDate.toISOString().split('T')[0]
+      
+      // Validate dates
+      if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
+        throw new Error('Future dates are not allowed')
+      }
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
 
