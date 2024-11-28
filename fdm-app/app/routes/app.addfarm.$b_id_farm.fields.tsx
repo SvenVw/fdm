@@ -1,5 +1,5 @@
-import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, redirect, json } from "@remix-run/node";
-import { useNavigation, useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import wkx from 'wkx'
 
 // Components
@@ -15,7 +15,6 @@ import { Fields } from "@/components/blocks/fields";
 import { fdm } from "../services/fdm.server";
 import { getCultivationsFromCatalogue, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
-import { cultivationsCatalogue } from "node_modules/@svenvw/fdm-core/dist/db/schema";
 
 // Meta
 export const meta: MetaFunction = () => {
