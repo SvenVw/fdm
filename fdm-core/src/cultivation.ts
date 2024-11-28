@@ -41,22 +41,23 @@ export async function addCultivationToCatalogue(
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert['b_lu_hcat3_name']
     }
 ): Promise<void> {
+    await fdm.transaction(async (tx) => {
+        // Check for existing cultivation
+        const existing = await tx
+            .select()
+            .from(schema.cultivationsCatalogue)
+            .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, properties.b_lu_catalogue))
+            .limit(1)
 
-    // Check for existing cultivation
-    const existing = await fdm
-        .select()
-        .from(schema.cultivationsCatalogue)
-        .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, properties.b_lu_catalogue))
-        .limit(1)
+        if (existing.length > 0) { 
+            throw new Error('Cultivation already exists in catalogue') 
+        }
 
-    if (existing.length > 0) { 
-        throw new Error('Cultivation already exists in catalogue') 
-    }
-
-    // Insert the cultivation in the db
-    await fdm
-        .insert(schema.cultivationsCatalogue)
-        .values(properties)
+        // Insert the cultivation in the db
+        await tx
+            .insert(schema.cultivationsCatalogue)
+            .values(properties)
+    })
 }
 
 
