@@ -120,8 +120,8 @@ export async function action({
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
     // Add fields to farm
-    await Promise.all(selectedFields.map(async field => {
-      const b_id_name = 'Perceel ' + Number(parseInt(selectedFields.findIndex(x => x.properties.reference_id === field.properties.reference_id)) + parseInt("1"))
+    await Promise.all(selectedFields.map(async (field, index) => {
+      const b_id_name = 'Perceel ' + (index + 1)
       const b_id_source = field.properties.reference_id
       const b_lu_catalogue = field.properties.b_lu
       const currentYear = new Date().getFullYear() 
