@@ -84,6 +84,11 @@ export async function addCultivation(
     await fdm.transaction(async (tx: FdmType) => {
         try {
 
+            // Validate if b_sowing_date is a string with date format
+            if (typeof b_sowing_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b_sowing_date)) {
+                throw new Error('Invalid sowing date')
+            }
+
             // Validate if field exists
             const field = await tx
                 .select()
@@ -92,6 +97,46 @@ export async function addCultivation(
                 .limit(1)
             if (field.length === 0) {
                 throw new Error('Field does not exist')
+            }
+
+            // Validate if cultivation exists in catalogue
+            const cultivation = await tx
+                .select()
+                .from(schema.cultivationsCatalogue)
+                .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, b_lu_catalogue))
+                .limit(1)
+            if (cultivation.length === 0) {
+                throw new Error('Cultivation in catalogue does not exist')
+            }
+
+            // Validate if cultivation is not an duplicate of already existing cultivation
+            const existingCultivation2 = await tx
+                .select()
+                .from(schema.fieldSowing)
+                .innerJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
+                .where(and(
+                    eq(schema.fieldSowing.b_id, b_id),
+                    eq(schema.fieldSowing.b_sowing_date, b_sowing_date),
+                    eq(schema.cultivations.b_lu_catalogue, b_lu_catalogue)
+                ))
+                .limit(1)
+            if (existingCultivation2.length > 0) {
+                throw new Error('Cultivation already exists')
+            }
+
+
+            // Check for existing cultivation for this field
+            const existingCultivation = await tx
+                .select()
+                .from(schema.fieldSowing)
+                .where(and(
+                    eq(schema.fieldSowing.b_id, b_id),
+                    eq(schema.fieldSowing.b_lu, b_lu)
+                ))
+                .limit(1)
+
+            if (existingCultivation.length > 0) {
+                throw new Error('Cultivation already exists')
             }
 
             await tx
