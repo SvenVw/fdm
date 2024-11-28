@@ -49,8 +49,8 @@ export async function addCultivationToCatalogue(
         .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, properties.b_lu_catalogue))
         .limit(1)
 
-    if (existing.length > 0) { 
-        throw new Error('Cultivation already exists in catalogue') 
+    if (existing.length > 0) {
+        throw new Error('Cultivation already exists in catalogue')
     }
 
     // Insert the cultivation in the db
@@ -154,8 +154,8 @@ export async function addCultivation(
                     b_sowing_date: b_sowing_date
                 })
 
-        } catch (error) {      
-            throw new Error('addCultivation failed with error ' + error)
+        } catch (error) {
+            throw new Error(`addCultivation failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
         }
     })
 
@@ -165,8 +165,6 @@ export async function addCultivation(
 /**
  * Retrieves the details of a specific cultivation.
  *
- * @param fdm The FDM instance.
- * @param b_lu The ID of the cultivation.
  * @param fdm The FDM instance.
  * @param b_lu The ID of the cultivation.
  * @returns A promise that resolves with the cultivation details.
@@ -331,21 +329,28 @@ export async function removeCultivation(
 
     await fdm.transaction(async (tx: FdmType) => {
         try {
+            const existing = await tx
+                .select()
+                .from(schema.cultivations)
+                .where(eq(schema.cultivations.b_lu, b_lu))
+                .limit(1)
+
+            if (existing.length === 0) {
+                throw new Error(`Cultivation with b_lu ${b_lu} does not exist`)
+            }
+
+
             await tx
                 .delete(schema.fieldSowing)
                 .where(eq(schema.fieldSowing.b_lu, b_lu))
 
-            const deletedResult = await tx
+            await tx
                 .delete(schema.cultivations)
                 .where(eq(schema.cultivations.b_lu, b_lu))
-                .returning({ b_lu: schema.cultivations.b_lu })
 
-            if (deletedResult.rowCount === 0) {
-                throw new Error(`Cultivation with b_lu ${b_lu} does not exist`)
-            }
         }
         catch (error) {
-      
+
             throw new Error(`Failed to remove cultivation: ${error}`);
         }
     })
