@@ -272,40 +272,47 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
         b_id: string;
     }>;
 }>> {
+    if (!b_id_farm) {
+        throw new Error('Farm ID is required')
+    }
 
-    const cultivations = await fdm
-        .select({
-            b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
-            b_lu_name: schema.cultivationsCatalogue.b_lu_name,
-            b_lu: schema.cultivations.b_lu,
-            b_id: schema.fields.b_id
-        })
-        .from(schema.farms)
-        .leftJoin(schema.farmManaging, eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm))
-        .leftJoin(schema.fields, eq(schema.farmManaging.b_id, schema.fields.b_id))
-        .leftJoin(schema.fieldSowing, eq(schema.fields.b_id, schema.fieldSowing.b_id))
-        .leftJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
-        .leftJoin(schema.cultivationsCatalogue, eq(schema.cultivations.b_lu_catalogue, schema.cultivationsCatalogue.b_lu_catalogue))
-        .where(and(
-            eq(schema.farms.b_id_farm, b_id_farm),
-            isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
-        )
+    try {
+        const cultivations = await fdm
+            .select({
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                b_lu_name: schema.cultivationsCatalogue.b_lu_name,
+                b_lu: schema.cultivations.b_lu,
+                b_id: schema.fields.b_id
+            })
+            .from(schema.farms)
+            .leftJoin(schema.farmManaging, eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm))
+            .leftJoin(schema.fields, eq(schema.farmManaging.b_id, schema.fields.b_id))
+            .leftJoin(schema.fieldSowing, eq(schema.fields.b_id, schema.fieldSowing.b_id))
+            .leftJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
+            .leftJoin(schema.cultivationsCatalogue, eq(schema.cultivations.b_lu_catalogue, schema.cultivationsCatalogue.b_lu_catalogue))
+            .where(and(
+                eq(schema.farms.b_id_farm, b_id_farm),
+                isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
+            )
 
-    const cultivationPlan = cultivations.reduce((acc, curr) => {
-        const existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue)
-        if (existingCultivation) {
-            existingCultivation.fields.push({ b_lu: curr.b_lu, b_id: curr.b_id })
-        } else {
-            acc.push({
-                b_lu_catalogue: curr.b_lu_catalogue,
-                b_lu_name: curr.b_lu_name,
-                fields: [{ b_lu: curr.b_lu, b_id: curr.b_id }]
-            });
-        }
-        return acc
-    }, []);
+        const cultivationPlan = cultivations.reduce((acc, curr) => {
+            const existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue)
+            if (existingCultivation) {
+                existingCultivation.fields.push({ b_lu: curr.b_lu, b_id: curr.b_id })
+            } else {
+                acc.push({
+                    b_lu_catalogue: curr.b_lu_catalogue,
+                    b_lu_name: curr.b_lu_name,
+                    fields: [{ b_lu: curr.b_lu, b_id: curr.b_id }]
+                });
+            }
+            return acc
+        }, []);
 
-    return cultivationPlan
+        return cultivationPlan
+    } catch (error) {
+        throw new Error(`Failed to get cultivation plan: ${error}`)
+    }
 }
 
 /**
