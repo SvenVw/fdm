@@ -31,7 +31,7 @@ export async function signUpUser(fdm: FdmType, firstname: schema.usersTypeInsert
                 })
 
         } catch (error) {     
-            throw new Error('Faild to sign up user with error ' + error)
+            throw new Error(`Failed to sign up user: ${error instanceof Error ? error.message : String(error)}`)
         }
     })
 
