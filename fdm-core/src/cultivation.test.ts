@@ -41,8 +41,8 @@ describe('Cultivation Data Model', () => {
             'test field',
             'test source',
             'POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))',
-            new Date(),
-            new Date(),
+            '2023-01-01',
+            '2023-12-31',
             'owner'
         )
     })
@@ -91,7 +91,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             })
 
-            const b_sowing_date = new Date()
+            const b_sowing_date = '2024-01-01'
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date)
             expect(b_lu).toBeDefined()
 
@@ -114,9 +114,9 @@ describe('Cultivation Data Model', () => {
             })
 
 
-            const b_sowing_date = new Date()
+            const b_sowing_date = '2024-01-01'
             await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date)
-            await addCultivation(fdm, b_lu_catalogue, b_id, new Date())
+            await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date)
 
             const cultivations = await getCultivations(fdm, b_id)
             expect(cultivations.length).toBe(2)
@@ -133,7 +133,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             })
 
-            const b_sowing_date = new Date()
+            const b_sowing_date = '2024-01-01'
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date)
 
 

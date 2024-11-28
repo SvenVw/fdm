@@ -29,8 +29,8 @@ export const manageTypeEnum = fdmSchema.enum('b_manage_type', ['owner', 'lease']
 export const farmManaging = fdmSchema.table('farm_managing', {
   b_id: text().notNull().references(() => fields.b_id),
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
-  b_manage_start: date({ mode: 'date' }),
-  b_manage_end: date({ mode: 'date' }),
+  b_manage_start: date({ mode: 'string' }),
+  b_manage_end: date({ mode: 'string' }),
   b_manage_type: manageTypeEnum(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
@@ -180,7 +180,7 @@ export type cultivationsTypeInsert = typeof cultivations.$inferInsert
 export const fieldSowing = fdmSchema.table('field_sowing', {
   b_id: text().notNull().references(() => fields.b_id),
   b_lu: text().notNull().references(() => cultivations.b_lu),
-  b_sowing_date: timestamp({ withTimezone: true }),
+  b_sowing_date: date({ mode: 'string' }),
   b_sowing_amount: numericCasted(),
   b_sowing_method: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),

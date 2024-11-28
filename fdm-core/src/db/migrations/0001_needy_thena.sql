@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizers_catalogue" (
 CREATE TABLE IF NOT EXISTS "fdm-dev"."field_sowing" (
 	"b_id" text NOT NULL,
 	"b_lu" text NOT NULL,
-	"b_sowing_date" timestamp with time zone,
+	"b_sowing_date" date,
 	"b_sowing_amount" numeric,
 	"b_sowing_method" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
