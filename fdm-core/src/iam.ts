@@ -30,8 +30,7 @@ export async function signUpUser(fdm: FdmType, firstname: schema.usersTypeInsert
                     user_id: user_id
                 })
 
-        } catch (error) {
-            tx.rollback()
+        } catch (error) {     
             throw new Error('Faild to sign up user with error ' + error)
         }
     })

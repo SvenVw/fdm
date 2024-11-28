@@ -182,8 +182,7 @@ export async function updateField(fdm: FdmType, b_id: schema.fieldsTypeInsert['b
                 .where(eq(schema.fields.b_id, b_id))
                 .limit(1)
             return field[0]
-        } catch (error) {
-            tx.rollback()
+        } catch (error) {        
             throw new Error('Update of field failed with error ' + error)
         }
     })

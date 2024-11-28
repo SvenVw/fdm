@@ -141,8 +141,7 @@ export async function addFertilizer(
                 .insert(schema.fertilizerPicking)
                 .values(fertilizerPickingData)
 
-        } catch (error) {
-            tx.rollback()
+        } catch (error) {        
             throw new Error('Add fertilizer failed with error ' + error)
         }
     })
@@ -249,8 +248,7 @@ export async function removeFertilizer(
                 .delete(schema.fertilizers)
                 .where(eq(schema.fertilizers.p_id, p_id))
         }
-        catch (error) {
-            tx.rollback()
+        catch (error) {            
             throw new Error('Remove fertilizer failed with error ' + error)
         }
     })

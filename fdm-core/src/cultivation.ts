@@ -109,8 +109,7 @@ export async function addCultivation(
                     b_sowing_date: b_sowing_date
                 })
 
-        } catch (error) {
-            tx.rollback()
+        } catch (error) {      
             throw new Error('addCultivation failed with error ' + error)
         }
     })
@@ -294,7 +293,7 @@ export async function removeCultivation(
             }
         }
         catch (error) {
-            tx.rollback()
+      
             throw new Error(`Failed to remove cultivation: ${error}`);
         }
     })
