@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Add `b_area` with the are of the field in hectares to the output of `geField` and `getFields`
+Add `b_area` with the area of the field in hectares to the output of `getField` and `getFields`
