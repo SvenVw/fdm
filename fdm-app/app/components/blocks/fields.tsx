@@ -35,13 +35,12 @@ import {
 } from "@/components/ui/popover"
 import { ChevronsUpDown, Check } from "lucide-react"
 
-
-export interface soilTypesListType {
-    value: string
-    label: string
+interface CultivationOption {
+    value: string;
+    label: string;
 }
 
-export interface fieldType {
+interface fieldType {
     /** Mapbox API token for map rendering */
     mapboxToken: string;
     /** Unique identifier for the field */
@@ -53,20 +52,21 @@ export interface fieldType {
     /** Agricultural soil type classification */
     b_soiltype_agr: string | null
     b_geojson: FeatureCollection
-    cultivationOptions: any[]
+    cultivationOptions: CultivationOption[]
     action: string
 }
 
-export interface fieldsType {
+interface fieldsType {
     fields: fieldType[]
-    cultivationOptions: any[]
+    cultivationOptions: CultivationOption[]
     mapboxToken: string
     action: string
 }
 
-function CultivationCombobox(cultivationOptions: any) {
+function CultivationCombobox(props: { cultivationOptions: CultivationOption[] }) {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
+    const cultivationOptions = props.cultivationOptions
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -78,7 +78,7 @@ function CultivationCombobox(cultivationOptions: any) {
                     className="w-[342px] justify-between"
                 >
                     {value
-                        ? cultivationOptions.cultivationOptions.find((cultivation) => cultivation.label === value)?.label
+                        ? cultivationOptions.find((cultivation: CultivationOption) => cultivation.label === value)?.label
                         : "Selecteer hoofdgewas..."}
                     <ChevronsUpDown className="opacity-50" />
                 </Button>
@@ -89,7 +89,7 @@ function CultivationCombobox(cultivationOptions: any) {
                     <CommandList>
                         <CommandEmpty>Geen gewas gevonden</CommandEmpty>
                         <CommandGroup>
-                            {cultivationOptions.cultivationOptions.map((cultivation) => (
+                            {cultivationOptions.map((cultivation: CultivationOption) => (
                                 <CommandItem
                                     key={cultivation.value}
                                     value={cultivation.label}
