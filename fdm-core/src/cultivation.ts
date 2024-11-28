@@ -209,7 +209,14 @@ export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingType
  * ```
  * @alpha
  */
-export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<void> {
+export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<Array<{
+    b_lu_catalogue: string;
+    b_lu_name: string;
+    fields: Array<{
+        b_lu: string;
+        b_id: string;
+    }>;
+}>> {
 
     const cultivations = await fdm
         .select({
