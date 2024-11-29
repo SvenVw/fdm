@@ -22,11 +22,6 @@ type optionType = {
     label: string
 }
 
-type optionType = {
-    value: string
-    label: string
-}
-
 export function Combobox(props: { options: { value: string, label: string }[], defaultValue?: string }) {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState(props.defaultValue ?? "")
@@ -61,7 +56,7 @@ export function Combobox(props: { options: { value: string, label: string }[], d
                                         setOpen(false)
                                     }}
                                 >
-                                    {option.label}
+                                    <p className="text-pretty w-[350px]">{option.label}</p>                                    
                                     <Check
                                         className={cn(
                                             "ml-auto",
