@@ -80,15 +80,35 @@ export default function Index() {
         </Breadcrumb>
       </header>
       <main>
-        <ClientOnly
-          fallback={
-            <Skeleton className="h-full w-full rounded-xl" />
-          }                        >
-          {() => <FieldsMap
-            mapboxToken={loaderData.mapboxToken}
-          />
-          }
-        </ClientOnly>
+        <div className="space-y-6 p-10 pb-0">
+          <div className="flex items-center">
+            <div className="space-y-0.5">
+              <h2 className="text-2xl font-bold tracking-tight">Kaart</h2>
+              <p className="text-muted-foreground">
+                Zoom in en selecteer je percelen
+              </p>
+            </div>
+
+            <div className="ml-auto">
+              {/* <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+                <Button>Doorgaan</Button>
+              </a> */}
+            </div>
+          </div>
+          <Separator className="my-6" />
+        </div>
+        <div>
+          <ClientOnly
+            fallback={
+              <Skeleton className="h-full w-full rounded-xl" />
+            }                        >
+            {() => <FieldsMap
+              mapboxToken={loaderData.mapboxToken}
+            />
+            }
+          </ClientOnly>
+        </div>
+
       </main>
     </SidebarInset >
   );

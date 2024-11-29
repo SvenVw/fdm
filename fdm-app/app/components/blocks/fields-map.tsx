@@ -140,7 +140,7 @@ export function FieldsMap(props: FieldsMapType) {
           latitude: 52,
           zoom: 10,
         }}
-        style={{ height: "calc(100vh - 64px)" }}
+        style={{ height: "calc(100vh - 64px - 123px)" }}
         mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
         mapboxAccessToken={mapboxToken}
         onZoomEnd={async evt => await loadBrpFields(evt)}
