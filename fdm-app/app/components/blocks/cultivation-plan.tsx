@@ -18,7 +18,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
     return (
         <nav
             className={cn(
-                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1",
+                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 truncate",
                 className
             )}
             {...props}
@@ -46,6 +46,7 @@ import { Separator } from "@/components/ui/separator"
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { ComboboxFertilizers } from "../custom/combobox-fertilizers";
 
 export default function Cultivation(props) {
     const navigation = useNavigation();
@@ -66,13 +67,13 @@ export default function Cultivation(props) {
             <div>
                 <h3 className="text-lg font-medium">{props.cultivation.b_lu_name}</h3>
                 <p className="text-sm text-muted-foreground">
-                    Werk de opbrengst, stikstofgehalte en zaai- en oogstdatum bij voor dit gewas.
+                    {fieldNames}
                 </p>
             </div>
             <div>
-                <p className="text-sm text-muted-foreground">
-                    {fieldNames}
-                </p>
+            <p className="text-sm text-muted-foreground">
+                    Werk de opbrengst, stikstofgehalte en zaai- en oogstdatum bij voor dit gewas.
+                </p>                
             </div>
             <Separator />
             <Form method="post" action={props.action}>
@@ -99,10 +100,7 @@ export default function Cultivation(props) {
                                 onSelect={setDateSowing}
                                 className="rounded-md border"
                                 weekStartsOn={1}
-                                month={dateSowing}
-                                footer={
-                                    dateSowing ? `Zaaidatum: ${dateSowing.toLocaleDateString('nl')}` : "Kies een zaaidatum"
-                                }
+                                month={dateSowing}                                
                             />
                         </div>
                         <div className="flex flex-col space-y-1.5">
@@ -114,10 +112,7 @@ export default function Cultivation(props) {
                                 onSelect={setDateHarvesting}
                                 className="rounded-md border"
                                 weekStartsOn={1}
-                                month={dateHarvesting}
-                                footer={
-                                    dateHarvesting ? `Oogstdatum: ${dateHarvesting.toLocaleDateString('nl')}` : "Kies een oogstdatum"
-                                }
+                                month={dateHarvesting}                               
                             />
                         </div>
                     </div>
@@ -126,6 +121,9 @@ export default function Cultivation(props) {
                     <p className="text-sm text-muted-foreground">
                         Vul de bemesting voor dit gewas in
                     </p>
+                    <ComboboxFertilizers
+                        options={props.fertilizerOptions}
+                    />
                     <Separator />
                     <h3 className="text-lg font-medium">Vanggewas</h3>
                 </div>

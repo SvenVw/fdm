@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getCultivationPlan } from "@svenvw/fdm-core";
+import { getCultivationPlan, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 import Cultivation, { SidebarNav } from "@/components/blocks/cultivation-plan";
 
@@ -46,10 +46,20 @@ export async function loader({
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
     const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue)
 
+    // Fertilizer options
+    const fertilizers = await getFertilizersFromCatalogue(fdm)
+    const fertilizerOptions = fertilizers.map(fertilizer => {
+        return {
+            value: fertilizer.p_id_catalogue,
+            label: fertilizer.p_name_nl
+        }
+    })
+
     return json({        
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        cultivation: cultivation
+        cultivation: cultivation,
+        fertilizerOptions: fertilizerOptions
     })
 
 }
@@ -61,6 +71,7 @@ export default function Index() {
     return (
         <Cultivation
             cultivation={loaderData.cultivation}
+            fertilizerOptions={loaderData.fertilizerOptions}
         />
     );
 }
