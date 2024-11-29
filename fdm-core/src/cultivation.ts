@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid'
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
 import { getCultivationType } from './cultivation.d'
+import { b } from 'vitest/dist/chunks/suite.BMWOKiTe.js'
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -272,7 +273,8 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
                 b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
                 b_lu_name: schema.cultivationsCatalogue.b_lu_name,
                 b_lu: schema.cultivations.b_lu,
-                b_id: schema.fields.b_id
+                b_id: schema.fields.b_id,
+                b_name: schema.fields.b_name
             })
             .from(schema.farms)
             .leftJoin(schema.farmManaging, eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm))
@@ -288,12 +290,12 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
         const cultivationPlan = cultivations.reduce((acc, curr) => {
             const existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue)
             if (existingCultivation) {
-                existingCultivation.fields.push({ b_lu: curr.b_lu, b_id: curr.b_id })
+                existingCultivation.fields.push({ b_lu: curr.b_lu, b_id: curr.b_id, b_name: curr.b_name })
             } else {
                 acc.push({
                     b_lu_catalogue: curr.b_lu_catalogue,
                     b_lu_name: curr.b_lu_name,
-                    fields: [{ b_lu: curr.b_lu, b_id: curr.b_id }]
+                    fields: [{ b_lu: curr.b_lu, b_id: curr.b_id, b_name: curr.b_name }]
                 });
             }
             return acc
