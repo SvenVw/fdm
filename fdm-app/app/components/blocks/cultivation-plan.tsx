@@ -47,6 +47,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useState } from "react";
 import { ComboboxFertilizers } from "../custom/combobox-fertilizers";
+import { ComboboxCultivations } from "../custom/combobox-cultivations";
 
 export default function Cultivation(props) {
     const navigation = useNavigation();
@@ -88,7 +89,7 @@ export default function Cultivation(props) {
                     </div>
                     <div className="flex flex-col space-y-1.5">
                         <Label htmlFor="b_name_farm">Stikstofgehalte gewas (kg N / ton DS) <span className="text-red-500">*</span></Label>
-                        <Input id="b_name_farm" type="number" name="b_name_farm" placeholder="Bv. Jansen V.O.F." aria-required="true" />
+                        <Input id="b_name_farm" type="number" name="b_name_farm" placeholder="4 kg N / ton DS" aria-required="true" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col space-y-1.5">
@@ -119,13 +120,19 @@ export default function Cultivation(props) {
                     <Separator />
                     <h3 className="text-lg font-medium">Bemesting</h3>
                     <p className="text-sm text-muted-foreground">
-                        Vul de bemesting voor dit gewas in
+                        Vul de bemesting op bouwplanniveau in voor dit gewas.
                     </p>
                     <ComboboxFertilizers
                         options={props.fertilizerOptions}
                     />
                     <Separator />
                     <h3 className="text-lg font-medium">Vanggewas</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Teelt je een vanggewas na dit gewas? Voeg dat hier toe.
+                    </p>
+                    <ComboboxCultivations
+                        options={props.cultivationOptions}
+                    />
                 </div>
             </Form>
         </div>

@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getCultivationPlan, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
+import { getCultivationPlan, getCultivationsFromCatalogue, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 import Cultivation, { SidebarNav } from "@/components/blocks/cultivation-plan";
 
@@ -36,19 +36,25 @@ export async function loader({
     }
 
     // Get the cultivation
-    const b_lu_catalogue = params.b_lu_catalogue
-    console.log(b_lu_catalogue)
-    // if (!b_id_farm) {
-    //     throw new Response("Farm ID is required", { status: 400 });
-    // }
+    const b_lu_catalogue = params.b_lu_catalogue    
+
 
     // Get the cultivation details for this cultivation
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
     const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue)
 
+    // Cultivation options
+    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+    const cultivationOptions = cultivationsCatalogue.map(cultivation => {
+        return {
+            value: cultivation.b_lu_catalogue,
+            label: cultivation.b_lu_name
+        }
+    })
+
     // Fertilizer options
-    const fertilizers = await getFertilizersFromCatalogue(fdm)
-    const fertilizerOptions = fertilizers.map(fertilizer => {
+    const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
+    const fertilizerOptions = fertilizersCatalogue.map(fertilizer => {
         return {
             value: fertilizer.p_id_catalogue,
             label: fertilizer.p_name_nl
@@ -59,7 +65,8 @@ export async function loader({
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
         cultivation: cultivation,
-        fertilizerOptions: fertilizerOptions
+        fertilizerOptions: fertilizerOptions,
+        cultivationOptions: cultivationOptions
     })
 
 }
@@ -72,6 +79,7 @@ export default function Index() {
         <Cultivation
             cultivation={loaderData.cultivation}
             fertilizerOptions={loaderData.fertilizerOptions}
+            cultivationOptions={loaderData.cultivationOptions}
         />
     );
 }
