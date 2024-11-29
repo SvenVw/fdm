@@ -40,8 +40,8 @@ export async function loader({
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
 
     // Create the sidenav
-    const sidebarNavItems = cultivationPlan.map(cultivation =>{
-        return{
+    const sidebarNavItems = cultivationPlan.map(cultivation => {
+        return {
             title: cultivation.b_lu_name,
             href: `/app/addfarm/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
         }
@@ -86,11 +86,31 @@ export default function Index() {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
-                    <Button>Doorgaan</Button>
-                </a>
             </header>
             <main>
+                <div className="space-y-6 p-10 pb-16">
+                    <div className="flex items-center">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-bold tracking-tight">Bouwplan</h2>
+                            <p className="text-muted-foreground">
+                                Werk de eigenschappen per gewas in je bouwplan bij.
+                            </p>
+                        </div>
+
+                        <div className="ml-auto">
+                            <a href={`/app/addfarm/${loaderData.b_id_farm}/cattle`} className="ml-auto">
+                                <Button>Doorgaan</Button>
+                            </a>
+                        </div>
+                    </div>
+                    <Separator className="my-6" />
+                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <aside className="-mx-4 lg:w-1/5">
+                            <SidebarNav items={loaderData.sidebarNavItems} />
+                        </aside>
+                        <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
+                    </div>
+                </div>
                 <div className="hidden space-y-6 p-10 pb-16 md:block">
                     <div className="space-y-0.5">
                         <h2 className="text-2xl font-bold tracking-tight">Bouwplan</h2>
@@ -103,9 +123,9 @@ export default function Index() {
                         <aside className="-mx-4 lg:w-1/5">
                             <SidebarNav items={loaderData.sidebarNavItems} />
                         </aside>
-                        <div className="flex-1 lg:max-w-2xl"><Outlet/></div>                        
+                        <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
                     </div>
-                </div>                           
+                </div>
             </main>
             <Toaster />
         </SidebarInset >

@@ -120,17 +120,33 @@ export default function Index() {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
-                    <Button>Doorgaan</Button>
-                </a>
             </header>
             <main>
-                <Fields
-                    fields={loaderData.fields}
-                    cultivationOptions={loaderData.cultivationOptions}
-                    mapboxToken={loaderData.mapboxToken}
-                    action={loaderData.action}
-                />
+                <div className="space-y-6 p-10 pb-16">
+                    <div className="flex items-center">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-bold tracking-tight">Percelen</h2>
+                            <p className="text-muted-foreground">
+                                Pas de naam aan, controleer het gewas en bodemtype
+                            </p>
+                        </div>
+
+                        <div className="ml-auto">
+                            <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+                                <Button>Doorgaan</Button>
+                            </a>
+                        </div>
+                    </div>
+                    <Separator className="my-6" />
+                    <div className="flex flex-col p-10 space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <Fields
+                            fields={loaderData.fields}
+                            cultivationOptions={loaderData.cultivationOptions}
+                            mapboxToken={loaderData.mapboxToken}
+                            action={loaderData.action}
+                        />
+                    </div>
+                </div>
             </main>
             <Toaster />
         </SidebarInset >
