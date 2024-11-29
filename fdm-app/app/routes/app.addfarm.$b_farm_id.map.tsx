@@ -14,7 +14,7 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { addCultivation, addField } from "@svenvw/fdm-core";
+import { addCultivation, addField, getFarm } from "@svenvw/fdm-core";
 
 
 // Meta
@@ -27,13 +27,21 @@ export const meta: MetaFunction = () => {
 
 // Loader
 export async function loader({
-  request,
+  request, params
 }: LoaderFunctionArgs) {
+
+  // Get the Id and name of the farm
+  const b_farm_id = params.b_farm_id
+  if (!b_farm_id) {
+    throw new Response("Farm ID is required", { status: 400 });
+  }
+  const farm = await getFarm(fdm, b_farm_id)
 
   // Get the Mapbox token
   const mapboxToken = String(process.env.MAPBOX_TOKEN)
 
   return json({
+    b_name_farm: farm.b_name_farm,
     mapboxToken: mapboxToken
   })
 
@@ -54,6 +62,12 @@ export default function Index() {
             <BreadcrumbItem className="hidden md:block">
               <BreadcrumbLink>
                 Maak een bedrijf
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink>
+                {loaderData.b_name_farm}
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" />
@@ -124,11 +138,11 @@ export async function action({
       const b_id_name = 'Perceel ' + (index + 1)
       const b_id_source = field.properties.reference_id
       const b_lu_catalogue = field.properties.b_lu
-      const currentYear = new Date().getFullYear() 
+      const currentYear = new Date().getFullYear()
       const defaultDate = new Date(currentYear, 0, 1)
       const b_manage_start = defaultDate.toISOString().split('T')[0]
       const b_date_sowing = defaultDate.toISOString().split('T')[0]
-      
+
       // Validate dates
       if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
         throw new Error('Future dates are not allowed')

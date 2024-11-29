@@ -13,7 +13,7 @@ import { Fields } from "@/components/blocks/fields";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getCultivations, getCultivationsFromCatalogue, getFields, updateField } from "@svenvw/fdm-core";
+import { getCultivations, getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 
 // Meta
@@ -29,14 +29,15 @@ export async function loader({
     request, params
 }: LoaderFunctionArgs) {
 
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
+    // Get the Id and name of the farm
+    const b_farm_id = params.b_farm_id
+    if (!b_farm_id) {
         throw new Response("Farm ID is required", { status: 400 });
     }
+    const farm = await getFarm(fdm, b_farm_id)
 
     // Get the fields
-    const fields = await getFields(fdm, b_id_farm)
+    const fields = await getFields(fdm, b_farm_id)
 
     const fieldsWithGeojson = await Promise.all(fields.map(async field => {
         if (!field.b_geometry) {
@@ -46,7 +47,7 @@ export async function loader({
 
         // Get cultivation of field
         const cultivations = await getCultivations(fdm, field.b_id)
-        field.cultivations = cultivations[0] ?? { b_lu: ""};
+        field.cultivations = cultivations[0] ?? { b_lu: "" };
 
         return field
     }));
@@ -82,8 +83,8 @@ export async function loader({
         fields: fieldsWithGeojson,
         cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
-        b_id_farm: b_id_farm,
-        action: `/app/addfarm/${b_id_farm}/fields`
+        b_farm_id: b_farm_id,
+        action: `/app/addfarm/${b_farm_id}/fields`
     })
 
 }
@@ -107,12 +108,18 @@ export default function Index() {
                         <BreadcrumbSeparator className="hidden md:block" />
                         <BreadcrumbItem className="hidden md:block">
                             <BreadcrumbLink>
+                                {loaderData.b_name_farm}
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator className="hidden md:block" />
+                        <BreadcrumbItem className="hidden md:block">
+                            <BreadcrumbLink>
                                 Vul perceelsinformatie in
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+                <a href={`/app/addfarm/${loaderData.b_farm_id}/cultivations`} className="ml-auto">
                     <Button>Doorgaan</Button>
                 </a>
             </header>
