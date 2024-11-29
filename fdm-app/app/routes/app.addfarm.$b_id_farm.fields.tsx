@@ -30,14 +30,14 @@ export async function loader({
 }: LoaderFunctionArgs) {
 
     // Get the Id and name of the farm
-    const b_farm_id = params.b_farm_id
-    if (!b_farm_id) {
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
         throw new Response("Farm ID is required", { status: 400 });
     }
-    const farm = await getFarm(fdm, b_farm_id)
+    const farm = await getFarm(fdm, b_id_farm)
 
     // Get the fields
-    const fields = await getFields(fdm, b_farm_id)
+    const fields = await getFields(fdm, b_id_farm)
 
     const fieldsWithGeojson = await Promise.all(fields.map(async field => {
         if (!field.b_geometry) {
@@ -83,8 +83,9 @@ export async function loader({
         fields: fieldsWithGeojson,
         cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
-        b_farm_id: b_farm_id,
-        action: `/app/addfarm/${b_farm_id}/fields`
+        b_id_farm: b_id_farm,
+        b_name_farm: farm.b_name_farm,
+        action: `/app/addfarm/${b_id_farm}/fields`
     })
 
 }
@@ -119,7 +120,7 @@ export default function Index() {
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <a href={`/app/addfarm/${loaderData.b_farm_id}/cultivations`} className="ml-auto">
+                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
                     <Button>Doorgaan</Button>
                 </a>
             </header>

@@ -31,11 +31,11 @@ export async function loader({
 }: LoaderFunctionArgs) {
 
   // Get the Id and name of the farm
-  const b_farm_id = params.b_farm_id
-  if (!b_farm_id) {
+  const b_id_farm = params.b_id_farm
+  if (!b_id_farm) {
     throw new Response("Farm ID is required", { status: 400 });
   }
-  const farm = await getFarm(fdm, b_farm_id)
+  const farm = await getFarm(fdm, b_id_farm)
 
   // Get the Mapbox token
   const mapboxToken = String(process.env.MAPBOX_TOKEN)
@@ -130,7 +130,7 @@ export async function action({
     const data = await responseApi.json()
     response = data.data
   } else if (question === 'submit_selected_fields') {
-    const b_id_farm = params.b_farm_id
+    const b_id_farm = params.b_id_farm
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
     // Add fields to farm
