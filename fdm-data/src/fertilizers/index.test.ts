@@ -54,7 +54,7 @@ describe('Fertilizers Data [server]', () => {
     afterAll(async () => {
         try {
             // Clean up test data
-            await fdm.transaction(async (tx) => {
+            await fdm.transaction(async (tx: FdmType) => {
                 await tx.delete(schema.fertilizerPicking).execute();
                 await tx.delete(schema.fertilizersCatalogue).execute();
             });
