@@ -37,11 +37,19 @@ export async function loader({
 
     // Get the cultivation
     const b_lu_catalogue = params.b_lu_catalogue    
-
+    if (!b_lu_catalogue) {
+        throw new Response("Cultivation catalogue ID is required", { status: 400 });
+    }
 
     // Get the cultivation details for this cultivation
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
-    const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue)
+    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
+        throw new Response("Failed to fetch cultivation plan", { status: 500 });
+    });
+
+    const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue);
+    if (!cultivation) {
+        throw new Response("Cultivation not found", { status: 404 });
+    }
 
     // Cultivation options
     const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)

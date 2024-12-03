@@ -64,10 +64,25 @@ interface fieldsType {
     action: string
 }
 
-function CultivationCombobox(props: {cultivations: {b_lu_catalogue: string}, cultivationOptions: CultivationOption[], defaultValue?: string }) {
+interface CultivationComboboxProps {
+    cultivations: {
+        b_lu_catalogue: string
+    };
+    cultivationOptions: CultivationOption[];
+    defaultValue?: string;
+    error?: boolean;
+    onValueChange?: (value: string) => void;
+}
+
+function CultivationCombobox({
+    cultivations,
+    cultivationOptions,
+    defaultValue,
+    error = false,
+    onValueChange
+}: CultivationComboboxProps) {
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState(props.cultivations.b_lu_catalogue ?? "")
-    const cultivationOptions = props.cultivationOptions
+    const [value, setValue] = useState(cultivations.b_lu_catalogue ?? "")
     const name = "b_lu"
 
     return (
