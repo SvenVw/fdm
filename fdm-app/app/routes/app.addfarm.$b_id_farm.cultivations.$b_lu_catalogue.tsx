@@ -37,7 +37,9 @@ export async function loader({
 
     // Get the cultivation
     const b_lu_catalogue = params.b_lu_catalogue    
-
+    if (!b_lu_catalogue) {
+        throw new Response("Cultivation catalogue ID is required", { status: 400 });
+    }
 
     // Get the cultivation details for this cultivation
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
