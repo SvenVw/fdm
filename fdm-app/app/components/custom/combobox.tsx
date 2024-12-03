@@ -22,9 +22,29 @@ type optionType = {
     label: string
 }
 
-export function Combobox(props: { options: { value: string, label: string }[], defaultValue?: string }) {
+interface ComboboxProps {
+    options: { value: string, label: string }[]
+    value?: string
+    defaultValue?: string
+    onChange?: (value: string) => void
+    onOpenChange?: (open: boolean) => void
+}
+
+export function Combobox({
+    options,
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    onOpenChange
+}: ComboboxProps) {
     const [open, setOpen] = useState(false)
-    const [value, setValue] = useState(props.defaultValue ?? "")
+    const [internalValue, setInternalValue] = useState(defaultValue ?? "")
+    
+    const value = controlledValue ?? internalValue
+    const handleValueChange = (newValue: string) => {
+        setInternalValue(newValue)
+        onChange?.(newValue)
+    }
     const name = "combobox"
 
     return (
