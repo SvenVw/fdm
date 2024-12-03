@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { fdm } from "../services/fdm.server";
 import { getCultivationPlan, getCultivationsFromCatalogue, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
-import Cultivation, { SidebarNav } from "@/components/blocks/cultivation-plan";
+import Cultivation from "@/components/blocks/cultivation-plan";
 import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
 import { ComboboxCultivations } from "@/components/custom/combobox-cultivations";
 
@@ -31,23 +31,23 @@ export async function loader({
     // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw new Response("Farm ID is required", { status: 400 });
+        throw new Response("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
 
     // Get the cultivation
     const b_lu_catalogue = params.b_lu_catalogue
     if (!b_lu_catalogue) {
-        throw new Response("Cultivation catalogue ID is required", { status: 400 });
+        throw new Response("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
     }
 
     // Get the cultivation details for this cultivation
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
-        throw new Response("Failed to fetch cultivation plan", { status: 500 });
+        throw new Response("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
     });
 
     const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue);
     if (!cultivation) {
-        throw new Response("Cultivation not found", { status: 404 });
+        throw new Response("Cultivation not found", { status: 404, statusText: "Cultivation not found" });
     }
 
     // Cultivation options
