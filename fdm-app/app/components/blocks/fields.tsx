@@ -95,7 +95,7 @@ function CultivationCombobox({
                     name={name}
                     className="w-[342px] justify-between"
                 >
-                    {props.defaultValue || "Selecteer hoofdgewas..."}
+                    {defaultValue || "Selecteer hoofdgewas..."}
                     <ChevronsUpDown className="opacity-50" />
                 </Button>
             </PopoverTrigger>

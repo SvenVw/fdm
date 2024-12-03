@@ -67,12 +67,12 @@ export function Combobox({
                     <CommandList>
                         <CommandEmpty>Niks gevonden</CommandEmpty>
                         <CommandGroup>
-                            {props.options.map((option: optionType) => (
+                            {options.map((option: optionType) => (
                                 <CommandItem
                                     key={option.value}
                                     value={option.label}
                                     onSelect={(currentValue) => {
-                                        setValue(currentValue === value ? "" : currentValue)
+                                        setInternalValue(currentValue === value ? "" : currentValue)
                                         setOpen(false)
                                     }}
                                 >
