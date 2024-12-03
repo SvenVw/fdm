@@ -56,27 +56,14 @@ export default function Cultivation(props) {
     const [dateSowing, setDateSowing] = useState<Date | undefined>(new Date('2024-03-01'))
     const [dateHarvesting, setDateHarvesting] = useState<Date | undefined>(new Date('2024-10-01'))
 
-    // Get field names
-    let fieldNames = props.cultivation.fields.map(field => field.b_name)
-    if (fieldNames.length > 1) {
-        fieldNames = fieldNames.join(", ")
-        fieldNames = fieldNames.replace(/,(?=[^,]+$)/, ', en') //Replace last comma with and        
-    }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6">            
             <div>
-                <h3 className="text-lg font-medium">{props.cultivation.b_lu_name}</h3>
                 <p className="text-sm text-muted-foreground">
-                    {fieldNames}
-                </p>
-            </div>
-            <div>
-            <p className="text-sm text-muted-foreground">
                     Werk de opbrengst, stikstofgehalte en zaai- en oogstdatum bij voor dit gewas.
-                </p>                
-            </div>
-            <Separator />
+                </p>
+            </div>       
             <Form method="post" action={props.action}>
                 <fieldset
                     disabled={navigation.state === "submitting"}
@@ -101,7 +88,7 @@ export default function Cultivation(props) {
                                 onSelect={setDateSowing}
                                 className="rounded-md border"
                                 weekStartsOn={1}
-                                month={dateSowing}                                
+                                month={dateSowing}
                             />
                         </div>
                         <div className="flex flex-col space-y-1.5">
@@ -113,26 +100,10 @@ export default function Cultivation(props) {
                                 onSelect={setDateHarvesting}
                                 className="rounded-md border"
                                 weekStartsOn={1}
-                                month={dateHarvesting}                               
+                                month={dateHarvesting}
                             />
                         </div>
                     </div>
-                    <Separator />
-                    <h3 className="text-lg font-medium">Bemesting</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Vul de bemesting op bouwplanniveau in voor dit gewas.
-                    </p>
-                    <ComboboxFertilizers
-                        options={props.fertilizerOptions}
-                    />
-                    <Separator />
-                    <h3 className="text-lg font-medium">Vanggewas</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Teelt je een vanggewas na dit gewas? Voeg dat hier toe.
-                    </p>
-                    <ComboboxCultivations
-                        options={props.cultivationOptions}
-                    />
                 </div>
             </Form>
         </div>
