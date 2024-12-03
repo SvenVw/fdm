@@ -35,6 +35,15 @@ export async function loader({
         throw new Response("Farm ID is required", { status: 400 });
     }
     const farm = await getFarm(fdm, b_id_farm)
+        .catch(error => {
+            throw new Response(`Failed to fetch farm: ${error.message}`, { 
+                status: 404 
+            });
+        });
+    
+    if (!farm) {
+        throw new Response("Farm not found", { status: 404 });
+    }
 
     // Get the cultivationPlan
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
