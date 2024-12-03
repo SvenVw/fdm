@@ -37,6 +37,10 @@ export async function loader({
   }
   const farm = await getFarm(fdm, b_id_farm)
 
+  if (!farm) {
+    throw new Response("Farm not found", { status: 404 });
+  }
+
   // Get the Mapbox token
   const mapboxToken = String(process.env.MAPBOX_TOKEN)
 
