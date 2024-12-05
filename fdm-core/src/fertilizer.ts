@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'

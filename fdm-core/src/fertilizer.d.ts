@@ -3,7 +3,7 @@ export interface getFertilizerType {
     p_name_nl: string | null
     p_name_en: string | null
     p_description: string | null
-    p_amount: number | null
+    p_app_amount: number | null
     p_date_acquiring: Date | null
     p_picking_date: Date | null
     p_n_rt: number | null
