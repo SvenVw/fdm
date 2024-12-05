@@ -2,7 +2,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import { fdmSchema as schema } from '@svenvw/fdm-core'
-import {extendFertilizersCatalogue} from '@svenvw/fdm-data'
+import {extendFertilizersCatalogue, extendCultivationsCatalogue} from '@svenvw/fdm-data'
 
 // Get credentials to connect to db
 const host = process.env.POSTGRES_HOST ?? 
@@ -33,4 +33,15 @@ export const fdm = drizzle({
 await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
 
 // Add SRM fertilzers to catalogue
-await extendFertilizersCatalogue(fdm, 'srm')
+const FERTILIZERS_CATALOGUE = 'srm'
+const CULTIVATIONS_CATALOGUE = 'brp'
+
+try {
+  await Promise.all([
+    extendFertilizersCatalogue(fdm, FERTILIZERS_CATALOGUE),
+    extendCultivationsCatalogue(fdm, CULTIVATIONS_CATALOGUE)
+  ]);
+} catch (error) {
+  console.error('Failed to extend catalogues:', error);
+  throw error;
+}

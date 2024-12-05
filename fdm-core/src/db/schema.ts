@@ -29,8 +29,8 @@ export const manageTypeEnum = fdmSchema.enum('b_manage_type', ['owner', 'lease']
 export const farmManaging = fdmSchema.table('farm_managing', {
   b_id: text().notNull().references(() => fields.b_id),
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
-  b_manage_start: date({ mode: 'date' }),
-  b_manage_end: date({ mode: 'date' }),
+  b_manage_start: date({ mode: 'string' }),
+  b_manage_end: date({ mode: 'string' }),
   b_manage_type: manageTypeEnum(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
@@ -68,7 +68,7 @@ export const fertilizers = fdmSchema.table('fertilizers', {
   updated: timestamp({ withTimezone: true })
 }, (table) => {
   return {
-    b_id_idx: uniqueIndex('p_id_idx').on(table.p_id)
+    p_id_idx: uniqueIndex('p_id_idx').on(table.p_id)
   }
 })
 
@@ -160,6 +160,56 @@ export const fertilizerPicking = fdmSchema.table('fertilizer_picking', {
 
 export type fertilizerPickingTypeSelect = typeof fertilizerPicking.$inferSelect
 export type fertilizerPickingTypeInsert = typeof fertilizerPicking.$inferInsert
+
+// Define cultivations table
+export const cultivations = fdmSchema.table('cultivations', {
+  b_lu: text().primaryKey(),
+  b_lu_catalogue: text().notNull().references(() => cultivationsCatalogue.b_lu_catalogue),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    b_lu_idx: uniqueIndex('b_lu_idx').on(table.b_lu)
+  }
+})
+
+export type cultivationsTypeSelect = typeof cultivations.$inferSelect
+export type cultivationsTypeInsert = typeof cultivations.$inferInsert
+
+// Define field_sowing table
+export const fieldSowing = fdmSchema.table('field_sowing', {
+  b_id: text().notNull().references(() => fields.b_id),
+  b_lu: text().notNull().references(() => cultivations.b_lu),
+  b_sowing_date: date({ mode: 'string' }),
+  b_sowing_amount: numericCasted(),
+  b_sowing_method: text(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.b_id, table.b_lu] })
+  }
+})
+
+export type fieldSowingTypeSelect = typeof fieldSowing.$inferSelect
+export type fieldSowingTypeInsert = typeof fieldSowing.$inferInsert
+
+// Define cultivations_catalogue table
+export const cultivationsCatalogue = fdmSchema.table('cultivations_catalogue', {
+  b_lu_catalogue: text().primaryKey(),
+  b_lu_source: text().notNull(),
+  b_lu_name: text().notNull(),
+  b_lu_name_en: text(),
+  b_lu_hcat3: text(),
+  b_lu_hcat3_name: text()
+}, (table) => {
+  return {
+    b_lu_catalogue_idx: uniqueIndex('b_lu_catalogue_idx').on(table.b_lu_catalogue)
+  }
+})
+
+export type cultivationsCatalogueTypeSelect = typeof cultivationsCatalogue.$inferSelect
+export type cultivationsCatalogueTypeInsert = typeof cultivationsCatalogue.$inferInsert
 
 // IAM part
 // IN DEVELOPMENT!!

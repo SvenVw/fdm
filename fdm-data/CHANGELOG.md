@@ -1,5 +1,23 @@
 # fdm-data
 
+## 0.4.0
+
+### Minor Changes
+
+- d39b097: Add `extendCultivationsCatalogue` to extend the `cultivations_catalogue` table
+- d39b097: Add `brp` as catalogue for cultivations
+
+### Patch Changes
+
+- 35c55e1: Add example configuration file as `.env.example`
+- 6694029: Upgrade `pnpm` to 9.14.2
+- Updated dependencies [35c55e1]
+- Updated dependencies [6694029]
+- Updated dependencies [c316d5c]
+- Updated dependencies [b1dea77]
+- Updated dependencies [49aa60c]
+  - @svenvw/fdm-core@0.6.0
+
 ## 0.3.0
 
 ### Patch Changes

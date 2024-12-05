@@ -66,16 +66,16 @@ export default function SignUp() {
             <div className="space-y-5">
               <div>
                 <div
-                  key="minas2"
+                  key="nutrientenbalans"
                   className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
                 >
                   <span><Check /> </span>
                   <div className="space-y-1">
                     <p className="text-sm text-left font-medium leading-none">
-                      MINAS2
+                      Nutriëntenbalans
                     </p>
                     <p className="text-sm text-left text-muted-foreground">
-                      Mineralenbalans op bedrijfsniveau
+                      Aanvoer en afvoer van nutriënten op bedrijfsniveau
                     </p>
                   </div>
                 </div>

@@ -14,7 +14,7 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { addField } from "@svenvw/fdm-core";
+import { addCultivation, addField, getFarm } from "@svenvw/fdm-core";
 
 
 // Meta
@@ -27,13 +27,25 @@ export const meta: MetaFunction = () => {
 
 // Loader
 export async function loader({
-  request,
+  request, params
 }: LoaderFunctionArgs) {
+
+  // Get the Id and name of the farm
+  const b_id_farm = params.b_id_farm
+  if (!b_id_farm) {
+    throw new Response("Farm ID is required", { status: 400 });
+  }
+  const farm = await getFarm(fdm, b_id_farm)
+
+  if (!farm) {
+    throw new Response("Farm not found", { status: 404 });
+  }
 
   // Get the Mapbox token
   const mapboxToken = String(process.env.MAPBOX_TOKEN)
 
   return json({
+    b_name_farm: farm.b_name_farm,
     mapboxToken: mapboxToken
   })
 
@@ -59,6 +71,12 @@ export default function Index() {
             <BreadcrumbSeparator className="hidden md:block" />
             <BreadcrumbItem className="hidden md:block">
               <BreadcrumbLink>
+                {loaderData.b_name_farm}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink>
                 Selecteer percelen
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -66,15 +84,35 @@ export default function Index() {
         </Breadcrumb>
       </header>
       <main>
-        <ClientOnly
-          fallback={
-            <Skeleton className="h-full w-full rounded-xl" />
-          }                        >
-          {() => <FieldsMap
-            mapboxToken={loaderData.mapboxToken}
-          />
-          }
-        </ClientOnly>
+        <div className="space-y-6 p-10 pb-0">
+          <div className="flex items-center">
+            <div className="space-y-0.5">
+              <h2 className="text-2xl font-bold tracking-tight">Kaart</h2>
+              <p className="text-muted-foreground">
+                Zoom in en selecteer je percelen
+              </p>
+            </div>
+
+            <div className="ml-auto">
+              {/* <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+                <Button>Doorgaan</Button>
+              </a> */}
+            </div>
+          </div>
+          <Separator className="my-6" />
+        </div>
+        <div>
+          <ClientOnly
+            fallback={
+              <Skeleton className="h-full w-full rounded-xl" />
+            }                        >
+            {() => <FieldsMap
+              mapboxToken={loaderData.mapboxToken}
+            />
+            }
+          </ClientOnly>
+        </div>
+
       </main>
     </SidebarInset >
   );
@@ -116,19 +154,42 @@ export async function action({
     const data = await responseApi.json()
     response = data.data
   } else if (question === 'submit_selected_fields') {
-    const b_id_farm = params.b_farm_id
+    const b_id_farm = params.b_id_farm
+
+    if (!b_id_farm) {
+      throw new Response("Farm ID is required", { status: 400 });
+    }
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
     // Add fields to farm
-    await selectedFields.map(async field => {
-      const b_id_name = 'Perceel ' + Number(parseInt(selectedFields.findIndex(x => x.properties.reference_id === field.properties.reference_id)) + parseInt("1"))
+    await Promise.all(selectedFields.map(async (field, index) => {
+      const b_id_name = 'Perceel ' + (index + 1)
       const b_id_source = field.properties.reference_id
+      const b_lu_catalogue = field.properties.b_lu
+      const currentYear = new Date().getFullYear()
+      const defaultDate = new Date(currentYear, 0, 1)
+      const b_manage_start = defaultDate.toISOString().split('T')[0]
+      const b_date_sowing = defaultDate.toISOString().split('T')[0]
+
+      // Validate dates
+      if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
+        throw new Error('Future dates are not allowed')
+      }
+      if (new Date(b_date_sowing) < new Date(b_manage_start)) {
+        throw new Error('Sowing should happen after field started to be managed')
+      }
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
-      const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, null, null, null)
 
-      return b_id
-    })
+      try {
+        const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
+        const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+        return { b_id, b_lu }
+      } catch (error) {
+        console.error(`Failed to process field ${b_id_name}:`, error)
+        throw new Error(`Failed to add field ${b_id_name}: ${error.message}`)
+      }
+    }))
 
     return redirect(`../addfarm/${b_id_farm}/fields`)
 

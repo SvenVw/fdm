@@ -1,5 +1,5 @@
-import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, redirect, json } from "@remix-run/node";
-import { useNavigation, useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import wkx from 'wkx'
 
 // Components
@@ -13,7 +13,7 @@ import { Fields } from "@/components/blocks/fields";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getFields, updateField } from "@svenvw/fdm-core";
+import { getCultivations, getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 
 // Meta
@@ -28,33 +28,63 @@ export const meta: MetaFunction = () => {
 export async function loader({
     request, params
 }: LoaderFunctionArgs) {
+
+    // Get the Id and name of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
         throw new Response("Farm ID is required", { status: 400 });
     }
+    const farm = await getFarm(fdm, b_id_farm)
 
+    // Get the fields
     const fields = await getFields(fdm, b_id_farm)
 
-    const fieldsWithGeojson = fields.map(field => {
+    const fieldsWithGeojson = await Promise.all(fields.map(async field => {
         if (!field.b_geometry) {
             return field;
         }
         field.b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
+
+        // Get cultivation of field
+        const cultivations = await getCultivations(fdm, field.b_id)
+        field.cultivations = cultivations[0] ?? { b_lu: "" };
+
         return field
-    });
+    }));
 
     // Sort by created
     fieldsWithGeojson.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
 
+    // Get the Mapbox Token
     const mapboxToken = process.env.MAPBOX_TOKEN;
     if (!mapboxToken) {
         throw new Error("MAPBOX_TOKEN environment variable is not set");
     }
 
+    // Get the available cultivations
+    let cultivationOptions = [];
+    try {
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        cultivationOptions = cultivationsCatalogue
+            .filter(cultivation => cultivation?.b_lu_catalogue && cultivation?.b_lu_name)
+            .map(cultivation => ({
+                value: cultivation.b_lu_catalogue,
+                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split('_')[1]})`
+            }));
+    } catch (error) {
+        console.error('Failed to fetch cultivations:', error);
+        throw new Response(
+            'Failed to load cultivation options',
+            { status: 500 }
+        );
+    }
+
     return json({
         fields: fieldsWithGeojson,
+        cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
+        b_name_farm: farm.b_name_farm,
         action: `/app/addfarm/${b_id_farm}/fields`
     })
 
@@ -63,7 +93,6 @@ export async function loader({
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>();
-
 
     return (
         <SidebarInset>
@@ -80,22 +109,44 @@ export default function Index() {
                         <BreadcrumbSeparator className="hidden md:block" />
                         <BreadcrumbItem className="hidden md:block">
                             <BreadcrumbLink>
+                                {loaderData.b_name_farm}
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator className="hidden md:block" />
+                        <BreadcrumbItem className="hidden md:block">
+                            <BreadcrumbLink>
                                 Vul perceelsinformatie in
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                     </BreadcrumbList>
                 </Breadcrumb>
-                <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="mx-auto">
-                    <Button>Doorgaan</Button>
-                </a>
-
             </header>
             <main>
-                <Fields
-                    fields={loaderData.fields}
-                    mapboxToken={loaderData.mapboxToken}
-                    action={loaderData.action}
-                />
+                <div className="space-y-6 p-10 pb-16">
+                    <div className="flex items-center">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-bold tracking-tight">Percelen</h2>
+                            <p className="text-muted-foreground">
+                                Pas de naam aan, controleer het gewas en bodemtype
+                            </p>
+                        </div>
+
+                        <div className="ml-auto">
+                            <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+                                <Button>Doorgaan</Button>
+                            </a>
+                        </div>
+                    </div>
+                    <Separator className="my-6" />
+                    <div className="flex flex-col p-10 space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <Fields
+                            fields={loaderData.fields}
+                            cultivationOptions={loaderData.cultivationOptions}
+                            mapboxToken={loaderData.mapboxToken}
+                            action={loaderData.action}
+                        />
+                    </div>
+                </div>
             </main>
             <Toaster />
         </SidebarInset >

@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, afterAll } from 'vitest'
 import { getFertilizersFromCatalogue, fdmSchema as schema, type FdmType } from '@svenvw/fdm-core'
 import { extendFertilizersCatalogue } from '.'
 
@@ -16,33 +16,52 @@ describe('Fertilizers Data [server]', () => {
         const password = process.env.POSTGRES_PASSWORD
         const database = process.env.POSTGRES_DB
         const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
-        
-        // Does not work yet :(
-        // const fdm = await createFdmServer(
-        //     host,
-        //     port,
-        //     user,
-        //     password,
-        //     database
-        //   )
-        // await migrateFdmServer(fdm)
 
-        // Workaround
-        fdm = drizzle({
-            connection : {
-              user : user,
-              password : password,
-              host : host,
-              port : port,
-              database : database
-            },
-            logger: false,
-            schema: schema
-          })
-          
-          // Run migration
-          await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
-        
+        try {
+            // TODO: Replace workaround with createFdmServer once issue is resolved
+            // Current blocker: Migration does not work with fdmServer
+            // const fdm = await createFdmServer(
+            //     host,
+            //     port,
+            //     user,
+            //     password,
+            //     database
+            //   )
+            // await migrateFdmServer(fdm)
+
+            // Workaround
+            fdm = drizzle({
+                connection: {
+                    user: user,
+                    password: password,
+                    host: host,
+                    port: port,
+                    database: database
+                },
+                logger: false,
+                schema: schema
+            })
+
+            // Run migration
+            await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
+        } catch (error) {
+            console.error('Failed to setup database:', error);
+            throw error;
+        }
+
+    })
+
+    afterAll(async () => {
+        try {
+            // Clean up test data
+            await fdm.transaction(async (tx: FdmType) => {
+                await tx.delete(schema.fertilizerPicking).execute();
+                await tx.delete(schema.fertilizersCatalogue).execute();
+            });
+        } catch (error) {
+            console.error('Failed to cleanup:', error);
+            throw error;
+        }
     })
 
     it('should throw error if dataset is not recognized', async () => {

@@ -19,14 +19,28 @@ import { useToast } from "@/hooks/use-toast"
 import { FieldMap } from "@/components/blocks/field-map";
 import { ClientOnly } from "remix-utils/client-only";
 import { Skeleton } from "../ui/skeleton";
+import { cn } from "@/lib/utils"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { ChevronsUpDown, Check } from "lucide-react"
 
-
-export interface soilTypesListType {
-    value: string
-    label: string
+interface CultivationOption {
+    value: string;
+    label: string;
 }
 
-export interface fieldType {
+interface fieldType {
     /** Mapbox API token for map rendering */
     mapboxToken: string;
     /** Unique identifier for the field */
@@ -38,27 +52,99 @@ export interface fieldType {
     /** Agricultural soil type classification */
     b_soiltype_agr: string | null
     b_geojson: FeatureCollection
+    cultivations: {b_lu_catalogue: string}
+    cultivationOptions: CultivationOption[]
     action: string
 }
 
-export interface fieldsType {
+interface fieldsType {
     fields: fieldType[]
+    cultivationOptions: CultivationOption[]
     mapboxToken: string
     action: string
 }
 
+interface CultivationComboboxProps {
+    cultivations: {
+        b_lu_catalogue: string
+    };
+    cultivationOptions: CultivationOption[];
+    defaultValue?: string;
+    error?: boolean;
+    onValueChange?: (value: string) => void;
+}
+
+function CultivationCombobox({
+    cultivations,
+    cultivationOptions,
+    defaultValue,
+    error = false,
+    onValueChange
+}: CultivationComboboxProps) {
+    const [open, setOpen] = useState(false)
+    const [value, setValue] = useState(cultivations.b_lu_catalogue ?? "")
+    const name = "b_lu"
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    name={name}
+                    className="w-[342px] justify-between"
+                >
+                    {defaultValue || "Selecteer hoofdgewas..."}
+                    <ChevronsUpDown className="opacity-50" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[342px] p-0">
+                <Command>
+                    <CommandInput placeholder="Zoek gewas" className="h-9" />
+                    <CommandList>
+                        <CommandEmpty>Geen gewas gevonden</CommandEmpty>
+                        <CommandGroup>
+                            {cultivationOptions.map((cultivation: CultivationOption) => (
+                                <CommandItem
+                                    key={cultivation.value}
+                                    value={cultivation.label}
+                                    onSelect={(currentValue) => {
+                                        setValue(currentValue === value ? "" : currentValue)
+                                        setOpen(false)
+                                    }}
+                                >
+                                    {cultivation.label}
+                                    <Check
+                                        className={cn(
+                                            "ml-auto",
+                                            value === cultivation.value ? "opacity-100" : "opacity-0"
+                                        )}
+                                    />
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </CommandList>
+                </Command>
+            </PopoverContent>
+        </Popover>
+    )
+}
+
 export function Fields(props: fieldsType) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
+        <div className="mx-auto grid grid-cols-1 gap-6 my-4">
             {props.fields.map(field => {
                 return (
                     <div key={field.b_id}>
                         <Field
                             b_id={field.b_id}
                             b_name={field.b_name}
-                            b_area={10}
-                            b_soiltype_agr={"klei"}
+                            b_area={Math.round(field.b_area*10)/10}
+                            b_soiltype_agr={"dekzand"}
                             b_geojson={field.b_geojson}
+                            cultivations={field.cultivations}
+                            cultivationOptions={props.cultivationOptions}
                             action={props.action}
                             mapboxToken={props.mapboxToken}
                         />
@@ -88,20 +174,35 @@ function Field(props: fieldType) {
         setIsSubmitting(true);
     }
 
+    const defaultCultivationValue = props.cultivations.b_lu_catalogue; // Access the correct property containing the cultivation value
+    const defaultCultivationLabel = props.cultivationOptions.find(option => option.value === defaultCultivationValue)?.label;
     return (
         <div id={props.b_id} className="flex items-center justify-center">
-            <Card className="w-full max-w-[350px]">
+            <Card className="w-full max-w-[750px]">
                 <Form className="space-y-6"
                     action={props.action}
                     method="post"
-                    onSubmit={handleSubmit}>
+                    onSubmit={(e) => {
+                        const form = e.currentTarget;
+                        if (!form.b_lu.value || !form.b_soiltype_agr.value) {
+                            e.preventDefault();
+                            toast({
+                                title: "Fout",
+                                description: "Hoofdgewas en bodemtype zijn verplicht",
+                                variant: "destructive",
+                            });
+                            return;
+                        }
+                        handleSubmit();
+                    }}
+                >
                     <CardHeader>
-                        {/* <CardTitle>{props.b_name}</CardTitle>
-                        <CardDescription>{props.b_area} ha</CardDescription> */}
+                        <CardTitle>{props.b_name}</CardTitle>
+                        <CardDescription>{props.b_area} ha</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="grid w-full items-center gap-2">
+                            <div className="grid w-full items-center gap-3">
                                 <div>
                                     <Input id="b_id" name="b_id" type="hidden" value={props.b_id} />
                                 </div>
@@ -111,21 +212,35 @@ function Field(props: fieldType) {
                                 </div>
                                 <div className="flex flex-col space-y-1.5">
                                     <Label htmlFor="b_lu">Hoofdgewas</Label>
-                                    <Select>
+                                    <CultivationCombobox
+                                        cultivations={props.cultivations}
+                                        cultivationOptions={props.cultivationOptions}
+                                        defaultValue={defaultCultivationLabel} 
+                                    />
+                                </div>
+                                <div className="flex flex-col space-y-1.5">
+                                    <Label htmlFor="b_soiltype_agr">Bodemtype</Label>
+                                    <Select
+                                        name="b_soiltype_agr"
+                                        id="b_soiltype_agr"
+                                        defaultValue={props.b_soiltype_agr}>
                                         <SelectTrigger className="">
-                                            <SelectValue placeholder="Select a fruit" />
+                                            <SelectValue placeholder="Selecteer een bodemtype" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="apple">Apple</SelectItem>
-                                            <SelectItem value="banana">Banana</SelectItem>
-                                            <SelectItem value="blueberry">Blueberry</SelectItem>
-                                            <SelectItem value="grapes">Grapes</SelectItem>
-                                            <SelectItem value="pineapple">Pineapple</SelectItem>
+                                            <SelectItem value="moerige_klei">Moerige klei</SelectItem>
+                                            <SelectItem value="rivierklei">Rivierklei</SelectItem>
+                                            <SelectItem value="dekzand">Dekzand</SelectItem>
+                                            <SelectItem value="zeeklei">Zeeklei</SelectItem>
+                                            <SelectItem value="veen">Veen</SelectItem>
+                                            <SelectItem value="loess">Löss</SelectItem>
+                                            <SelectItem value="duinzand">Duinzand</SelectItem>
+                                            <SelectItem value="maasklei">Maasklei</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
-                            <div className="w-full h-[150px] items-center">
+                            <div className="w-full h-full items-center">
                                 <ClientOnly
                                     fallback={
                                         <Skeleton className="h-full w-full rounded-xl" />

@@ -16,9 +16,11 @@
 import * as fdmSchema from './db/schema'
 export { fdmSchema }
 export {type FdmType } from './fdm.d'
+export {type FdmServerType } from './fdm-server.d'
 export { createFdmServer, migrateFdmServer } from './fdm-server'
 // export { createFdmLocal, migrateFdmLocal } from './fdm-local'
 export { addFarm, getFarm, updateFarm, } from './farm'
 export { addField, getField, getFields, updateField } from './field'
 export { addFertilizerToCatalogue, getFertilizersFromCatalogue, addFertilizer, removeFertilizer } from './fertilizer'
+export { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations, getCultivationPlan } from './cultivation'
 export { signUpUser, getUserFromSession} from './iam'
