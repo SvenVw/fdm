@@ -261,6 +261,7 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
     fields: Array<{
         b_lu: string;
         b_id: string;
+        b_name: string;
     }>;
 }>> {
     if (!b_id_farm) {
