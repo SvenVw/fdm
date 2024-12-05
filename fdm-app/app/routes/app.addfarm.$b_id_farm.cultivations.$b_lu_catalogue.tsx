@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { type MetaFunction, type LoaderFunctionArgs, json, ActionFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
 // Components
@@ -115,6 +115,7 @@ export default function Index() {
                             Vul de bemesting op bouwplanniveau in voor dit gewas.
                         </p>
                         <ComboboxFertilizers
+                            action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}`}
                             options={loaderData.fertilizerOptions}
                         />
                     </div>
@@ -131,6 +132,23 @@ export default function Index() {
                 </TabsContent>
             </Tabs>
         </div>
-
     );
+}
+
+export async function action({
+    request, params
+}: ActionFunctionArgs) {
+
+    const b_id_farm = params.b_id_farm
+    const b_lu_catalogue = params.b_lu_catalogue
+    const formData = await request.formData()
+    const form  = formData.get('form')
+
+
+    if ( form === 'addFertilizer') {
+        return json({ success: true })        
+    } else {
+        throw new Error("Invalid POST actionForm")    
+    }
+
 }
