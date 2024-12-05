@@ -1,5 +1,5 @@
 {
-  "id": "8cdcc8c2-e03e-48d7-b7b4-c78810a9c0e1",
+  "id": "babd366d-a6e5-4b0e-8093-6c8ddd5134c3",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -346,6 +346,112 @@
         "fertilizer_aquiring_p_id_fertilizers_p_id_fk": {
           "name": "fertilizer_aquiring_p_id_fertilizers_p_id_fk",
           "tableFrom": "fertilizer_aquiring",
+          "tableTo": "fertilizers",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id"
+          ],
+          "columnsTo": [
+            "p_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "fdm-dev.fertilizer_applying": {
+      "name": "fertilizer_applying",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_app_id": {
+          "name": "p_app_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_amount": {
+          "name": "p_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_app_method": {
+          "name": "p_app_method",
+          "type": "p_app_method",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_app_date": {
+          "name": "p_app_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_app_idx": {
+          "name": "p_app_idx",
+          "columns": [
+            {
+              "expression": "p_app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "fertilizer_applying_b_id_fields_b_id_fk": {
+          "name": "fertilizer_applying_b_id_fields_b_id_fk",
+          "tableFrom": "fertilizer_applying",
+          "tableTo": "fields",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "b_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fertilizer_applying_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_applying_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_applying",
           "tableTo": "fertilizers",
           "schemaTo": "fdm-dev",
           "columnsFrom": [
