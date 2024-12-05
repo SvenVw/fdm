@@ -96,7 +96,7 @@ export async function addFertilizerToCatalogue(
  * @param fdm The FDM instance.
  * @param p_id_catalogue The catalogue ID of the fertilizer.
  * @param b_id_farm The ID of the farm.
- * @param p_app_acquiring_amount The amount of fertilizer applied.
+ * @param p_app_amount The amount of fertilizer applied.
  * @param p_acquiring_date The date the fertilizer was acquired.
  * @returns A Promise that resolves with the ID of the fertilizer application record.
  * @throws If adding the fertilizer application record fails.
@@ -276,7 +276,7 @@ export type FertilizerApplicationType = schema.fertilizerApplicationTypeSelect;
  * @param fdm The FDM instance.
  * @param b_id The ID of the field.
  * @param p_id The ID of the fertilizer.
- * @param p_app_acquiring_amount The amount of fertilizer applied.
+ * @param p_app_amount The amount of fertilizer applied.
  * @param p_app_method The method of fertilizer application.
  * @param p_app_date The date of fertilizer application.
  * @returns A Promise that resolves with the ID of the fertilizer application record.
@@ -286,7 +286,7 @@ export async function addFertilizerApplication(
     fdm: FdmType,
     b_id: schema.fertilizerApplicationTypeInsert['b_id'],
     p_id: schema.fertilizerApplicationTypeInsert['p_id'],
-    p_app_acquiring_amount: schema.fertilizerApplicationTypeInsert['p_app_acquiring_amount'],
+    p_app_amount: schema.fertilizerApplicationTypeInsert['p_app_amount'],
     p_app_method: schema.fertilizerApplicationTypeInsert['p_app_method'],
     p_app_date: schema.fertilizerApplicationTypeInsert['p_app_date']
 ): Promise<schema.fertilizerApplicationTypeInsert['p_app_id']> {
@@ -297,7 +297,7 @@ export async function addFertilizerApplication(
             p_app_id,
             b_id,
             p_id,
-            p_app_acquiring_amount,
+            p_app_amount,
             p_app_method,
             p_app_date,
         });
@@ -317,7 +317,7 @@ export async function addFertilizerApplication(
  * @param p_app_id The ID of the fertilizer application record to update.
  * @param b_id The ID of the field.
  * @param p_id The ID of the fertilizer.
- * @param p_app_acquiring_amount The amount of fertilizer applied.
+ * @param p_app_amount The amount of fertilizer applied.
  * @param p_app_method The method of fertilizer application.
  * @param p_app_date The date of fertilizer application.
  * @returns A Promise that resolves when the record has been updated.
@@ -328,14 +328,14 @@ export async function updateFertilizerApplication(
     p_app_id: schema.fertilizerApplicationTypeInsert['p_app_id'],
     b_id: schema.fertilizerApplicationTypeInsert['b_id'],
     p_id: schema.fertilizerApplicationTypeInsert['p_id'],
-    p_app_acquiring_amount: schema.fertilizerApplicationTypeInsert['p_app_acquiring_amount'],
+    p_app_amount: schema.fertilizerApplicationTypeInsert['p_app_amount'],
     p_app_method: schema.fertilizerApplicationTypeInsert['p_app_method'],
     p_app_date: schema.fertilizerApplicationTypeInsert['p_app_date']
 ): Promise<void> {
     try {
         await fdm
             .update(schema.fertilizerApplication)
-            .set({b_id, p_id, p_app_acquiring_amount, p_app_method, p_app_date})
+            .set({b_id, p_id, p_app_amount, p_app_method, p_app_date})
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id));
     } catch (error) {
         throw new Error(`Failed to update fertilizer application: ${error}`);
