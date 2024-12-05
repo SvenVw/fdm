@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_aquiring" (
 	"b_id_farm" text NOT NULL,
 	"p_id" text NOT NULL,
 	"p_amount" numeric,
-	"p_date_acquiring" timestamp with time zone,
+	"p_acquiring_date" date,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );

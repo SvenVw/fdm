@@ -1,5 +1,5 @@
 {
-  "id": "3e245459-8868-4bb8-916c-287ad9d0b80a",
+  "id": "8cdcc8c2-e03e-48d7-b7b4-c78810a9c0e1",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -307,9 +307,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "p_date_acquiring": {
-          "name": "p_date_acquiring",
-          "type": "timestamp with time zone",
+        "p_acquiring_date": {
+          "name": "p_acquiring_date",
+          "type": "date",
           "primaryKey": false,
           "notNull": false
         },

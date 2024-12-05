@@ -95,7 +95,7 @@ export async function addFertilizerToCatalogue(
  * @param p_id_catalogue - Catalogue id of the fertilizer
  * @param b_id_farm - ID of the farm
  * @param p_amount - Amount of product that is acquired for this field
- * @param p_date_acquiring - Date on which the fertilizer is acquired
+ * @param p_acquiring_date - Date on which the fertilizer is acquired
  * @returns A Promise that resolves with the if of the fertilizer
  * @alpha
  */
@@ -104,7 +104,7 @@ export async function addFertilizer(
     p_id_catalogue: schema.fertilizersCatalogueTypeInsert['p_id_catalogue'],
     b_id_farm: schema.fertilizerAcquiringTypeInsert['b_id_farm'],
     p_amount: schema.fertilizerAcquiringTypeInsert['p_amount'],
-    p_date_acquiring: schema.fertilizerAcquiringTypeInsert['p_date_acquiring']
+    p_acquiring_date: schema.fertilizerAcquiringTypeInsert['p_acquiring_date']
 ): Promise<schema.fertilizerAcquiringTypeInsert['p_id']> {
 
     // Generate an ID for the fertilizer
@@ -115,7 +115,7 @@ export async function addFertilizer(
         b_id_farm: b_id_farm,
         p_id: p_id,
         p_amount: p_amount,
-        p_date_acquiring: p_date_acquiring
+        p_acquiring_date: p_acquiring_date
     }
 
     const fertilizerPickingData = {
@@ -166,7 +166,7 @@ export async function getFertilizer(fdm: FdmType, p_id: schema.fertilizersTypeSe
             p_name_en: schema.fertilizersCatalogue.p_name_en,
             p_description: schema.fertilizersCatalogue.p_description,
             p_amount: schema.fertilizerAcquiring.p_amount,
-            p_date_acquiring: schema.fertilizerAcquiring.p_date_acquiring,
+            p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
             p_picking_date: schema.fertilizerPicking.p_picking_date,
             p_n_rt: schema.fertilizersCatalogue.p_n_rt,
             p_n_if: schema.fertilizersCatalogue.p_n_if,

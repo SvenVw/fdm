@@ -80,7 +80,7 @@ export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
   p_amount: numericCasted(), //kg
-  p_date_acquiring: timestamp({ withTimezone: true }),
+  p_acquiring_date: date({ mode: 'string' }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })

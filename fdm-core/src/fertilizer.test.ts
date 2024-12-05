@@ -180,13 +180,13 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_amount = 1000
-      const p_date_acquiring = new Date()
+      const p_acquiring_date = new Date().toISOString().split('T')[0]
       const p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
         b_id_farm,
         p_amount,
-        p_date_acquiring
+        p_acquiring_date
       )
       expect(p_id).toBeDefined()
 
@@ -259,11 +259,11 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_amount = 1000
-      const p_date_acquiring = new Date()
+      const p_acquiring_date = new Date().toISOString().split('T')[0]
 
       // Add two fertilizers to the farm
-      await addFertilizer(fdm, p_id_catalogue, b_id_farm, p_amount, p_date_acquiring)
-      await addFertilizer(fdm, p_id_catalogue, b_id_farm, 1500, p_date_acquiring)
+      await addFertilizer(fdm, p_id_catalogue, b_id_farm, p_amount, p_acquiring_date)
+      await addFertilizer(fdm, p_id_catalogue, b_id_farm, 1500, p_acquiring_date)
 
       const fertilizers = await getFertilizers(fdm, b_id_farm)
       expect(fertilizers.length).toBe(2)
@@ -334,13 +334,13 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_amount = 1000
-      const p_date_acquiring = new Date()
+      const p_acquiring_date = new Date().toISOString().split('T')[0]
       const p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
         b_id_farm,
         p_amount,
-        p_date_acquiring
+        p_acquiring_date
       )
       expect(p_id).toBeDefined()
 
