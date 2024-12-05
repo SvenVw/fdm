@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Form, useLocation, useNavigation } from "@remix-run/react";
 
 import { cn } from "@/lib/utils"
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 // import { nl } from "react-day-picker/locale" // Could not be found somehow
@@ -42,14 +45,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
     )
 }
 
-import { Separator } from "@/components/ui/separator"
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { useState } from "react";
-import { ComboboxFertilizers } from "../custom/combobox-fertilizers";
-import { ComboboxCultivations } from "../custom/combobox-cultivations";
-
-export default function Cultivation(props) {
+export default function Cultivation(props: { action: string | undefined; }) {
     const navigation = useNavigation();
 
     // Get sowing and harvesting dates

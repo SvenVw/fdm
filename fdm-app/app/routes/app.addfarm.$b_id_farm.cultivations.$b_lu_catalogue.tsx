@@ -3,17 +3,15 @@ import { useLoaderData } from "@remix-run/react";
 
 // Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
+import { ComboboxCultivations } from "@/components/custom/combobox-cultivations";
 
 // Blocks
-
+import Cultivation from "@/components/blocks/cultivation-plan";
 
 // FDM
 import { fdm } from "../services/fdm.server";
 import { getCultivationPlan, getCultivationsFromCatalogue, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
-import { Button } from "@/components/ui/button";
-import Cultivation from "@/components/blocks/cultivation-plan";
-import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
-import { ComboboxCultivations } from "@/components/custom/combobox-cultivations";
 
 // Meta
 export const meta: MetaFunction = () => {
