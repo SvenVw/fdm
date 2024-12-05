@@ -106,7 +106,7 @@ export async function addFertilizer(
     fdm: FdmType,
     p_id_catalogue: schema.fertilizersCatalogueTypeInsert['p_id_catalogue'],
     b_id_farm: schema.fertilizerAcquiringTypeInsert['b_id_farm'],
-    p_app_amount: schema.fertilizerAcquiringTypeInsert['p_app_amount'],
+    p_amount: schema.fertilizerAcquiringTypeInsert['p_amount'],
     p_acquiring_date: schema.fertilizerAcquiringTypeInsert['p_acquiring_date']
 ): Promise<schema.fertilizerAcquiringTypeInsert['p_id']> {
 
@@ -117,7 +117,7 @@ export async function addFertilizer(
     const fertilizerAcquiringData = {
         b_id_farm: b_id_farm,
         p_id: p_id,
-        p_app_amount: p_app_amount,
+        p_amount: p_amount,
         p_acquiring_date: p_acquiring_date
     }
 
@@ -170,7 +170,7 @@ export async function getFertilizer(fdm: FdmType, p_id: schema.fertilizersTypeSe
             p_name_nl: schema.fertilizersCatalogue.p_name_nl,
             p_name_en: schema.fertilizersCatalogue.p_name_en,
             p_description: schema.fertilizersCatalogue.p_description,
-            p_app_amount: schema.fertilizerAcquiring.p_app_amount,
+            p_amount: schema.fertilizerAcquiring.p_amount,
             p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
             p_picking_date: schema.fertilizerPicking.p_picking_date,
             p_n_rt: schema.fertilizersCatalogue.p_n_rt,
