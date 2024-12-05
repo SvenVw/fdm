@@ -6,10 +6,10 @@ import { type FdmType } from './fdm'
 import { getFertilizersType, getFertilizerType } from './fertilizer.d'
 
 /**
- * Get fertilizers available in catalogue
+ * Retrieves all fertilizers from the catalogue.
  *
- * @param fdm - 
- * @returns A Promise that resolves with an array of fertilizers and the details.
+ * @param fdm The FDM instance.
+ * @returns A Promise that resolves with an array of fertilizer catalogue entries.
  * @alpha
  */
 export async function getFertilizersFromCatalogue(fdm: FdmType): Promise<schema.fertilizersCatalogueTypeSelect[]> {
@@ -22,10 +22,12 @@ export async function getFertilizersFromCatalogue(fdm: FdmType): Promise<schema.
 }
 
 /**
- * Add fertilizer to the catalogue
+ * Adds a new fertilizer to the catalogue.
  *
- * @param fdm - 
- * @returns A Promise that resolves with the catalogue id of the fertilizer
+ * @param fdm The FDM instance.
+ * @param properties The properties of the fertilizer to add.
+ * @returns A Promise that resolves when the fertilizer has been added.
+ * @throws If adding the fertilizer fails.
  * @alpha
  */
 export async function addFertilizerToCatalogue(
@@ -89,14 +91,15 @@ export async function addFertilizerToCatalogue(
 }
 
 /**
- * Add fertilizer to farm
+ * Adds a fertilizer application record to a farm.
  *
- * @param fdm - 
- * @param p_id_catalogue - Catalogue id of the fertilizer
- * @param b_id_farm - ID of the farm
- * @param p_amount - Amount of product that is acquired for this field
- * @param p_acquiring_date - Date on which the fertilizer is acquired
- * @returns A Promise that resolves with the if of the fertilizer
+ * @param fdm The FDM instance.
+ * @param p_id_catalogue The catalogue ID of the fertilizer.
+ * @param b_id_farm The ID of the farm.
+ * @param p_amount The amount of fertilizer applied.
+ * @param p_acquiring_date The date the fertilizer was acquired.
+ * @returns A Promise that resolves with the ID of the fertilizer application record.
+ * @throws If adding the fertilizer application record fails.
  * @alpha
  */
 export async function addFertilizer(
@@ -150,11 +153,13 @@ export async function addFertilizer(
 }
 
 /**
- * Get the details of a fertilizer
- * 
- * @param fdm 
- * @param p_id - ID of requested fertilizer
- * @returns A promise that resolves with properties of requested fertilizer
+ * Retrieves the details of a specific fertilizer.
+ *
+ * @param fdm The FDM instance.
+ * @param p_id The ID of the fertilizer.
+ * @returns A Promise that resolves with the fertilizer details.
+ * @throws If retrieving the fertilizer details fails or the fertilizer is not found.
+ * @alpha
  */
 export async function getFertilizer(fdm: FdmType, p_id: schema.fertilizersTypeSelect['p_id']): Promise<getFertilizerType> {
 
@@ -207,6 +212,14 @@ export async function getFertilizer(fdm: FdmType, p_id: schema.fertilizersTypeSe
     return fertilizer[0]
 }
 
+/**
+ * Retrieves all fertilizer available for a given farm.
+ *
+ * @param fdm The FDM instance.
+ * @param b_id_farm The ID of the farm.
+ * @returns A Promise that resolves with an array of fertilizer IDs.
+ * @alpha
+ */
 export async function getFertilizers(fdm: FdmType, b_id_farm: schema.fertilizerAcquiringTypeSelect['b_id_farm']): Promise<getFertilizersType[]> {
 
     const fertilizers = await fdm
@@ -222,11 +235,12 @@ export async function getFertilizers(fdm: FdmType, b_id_farm: schema.fertilizerA
 }
 
 /**
- * Remove fertilizer from farm
+ * Removes a fertilizer from a farm.
  *
- * @param fdm - 
- * @param p_id - ID of the fertilizer to be remove
- * @returns A Promise that resolves when the fertilizer is removed from the farm
+ * @param fdm The FDM instance.
+ * @param p_id The ID of the fertilizer to remove.
+ * @returns A Promise that resolves when the fertilizer has been removed.
+ * @throws If removing the fertilizer fails.
  * @alpha
  */
 export async function removeFertilizer(
