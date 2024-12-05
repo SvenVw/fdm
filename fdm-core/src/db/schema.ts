@@ -1,4 +1,4 @@
-import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex, index, pgEnum} from 'drizzle-orm/pg-core'
+import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex, index} from 'drizzle-orm/pg-core'
 import { geometryPolygon, numericCasted } from './schema-custom-types'
 
 // Define postgres schema
@@ -89,7 +89,7 @@ export type fertilizerAcquiringTypeSelect = typeof fertilizerAcquiring.$inferSel
 export type fertilizerAcquiringTypeInsert = typeof fertilizerAcquiring.$inferInsert
 
 // Define fertilizers application table
-const applicationMethodEnum = pgEnum("p_app_method", ["slotted coulter", "incorporation", "injection", "spraying", "broadcasting","spoke wheel", "pocket placement"])
+const applicationMethodEnum = fdmSchema.enum("p_app_method", ["slotted coulter", "incorporation", "injection", "spraying", "broadcasting","spoke wheel", "pocket placement"])
 export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
   p_app_id: text().primaryKey(),
   b_id: text().notNull().references(() => fields.b_id),

@@ -1,5 +1,5 @@
 {
-  "id": "d025e16a-fb80-4728-af02-63a43308f2ac",
+  "id": "24be8121-2571-46e8-b311-aad926511dfb",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -393,7 +393,7 @@
         "p_app_method": {
           "name": "p_app_method",
           "type": "p_app_method",
-          "typeSchema": "public",
+          "typeSchema": "fdm-dev",
           "primaryKey": false,
           "notNull": false
         },

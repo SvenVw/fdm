@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_applying" (
 	"b_id" text NOT NULL,
 	"p_id" text NOT NULL,
 	"p_app_amount" numeric,
-	"p_app_method" "p_app_method",
+	"p_app_method" "fdm-dev"."p_app_method",
 	"p_app_date" date,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
