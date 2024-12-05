@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.1.3
+
+### Patch Changes
+
+- 6694029: Upgrade `pnpm` to 9.14.2
+
 ## 0.1.2
 
 ### Patch Changes
