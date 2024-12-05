@@ -1,5 +1,5 @@
 {
-  "id": "24be8121-2571-46e8-b311-aad926511dfb",
+  "id": "f721777c-941f-4d87-ac67-a74751a9c313",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -1281,6 +1281,19 @@
     }
   },
   "enums": {
+    "fdm-dev.p_app_method": {
+      "name": "p_app_method",
+      "schema": "fdm-dev",
+      "values": [
+        "slotted coulter",
+        "incorporation",
+        "injection",
+        "spraying",
+        "broadcasting",
+        "spoke wheel",
+        "pocket placement"
+      ]
+    },
     "fdm-dev.b_manage_type": {
       "name": "b_manage_type",
       "schema": "fdm-dev",
