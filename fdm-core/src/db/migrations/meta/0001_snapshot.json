@@ -1,5 +1,5 @@
 {
-  "id": "babd366d-a6e5-4b0e-8093-6c8ddd5134c3",
+  "id": "d025e16a-fb80-4728-af02-63a43308f2ac",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -384,8 +384,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "p_amount": {
-          "name": "p_amount",
+        "p_app_amount": {
+          "name": "p_app_amount",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false

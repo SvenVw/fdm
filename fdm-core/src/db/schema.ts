@@ -94,7 +94,7 @@ export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
   p_app_id: text().primaryKey(),
   b_id: text().notNull().references(() => fields.b_id),
   p_id: text().notNull().references(() => fertilizers.p_id),
-  p_amount: numericCasted(), // kg / ha
+  p_app_amount: numericCasted(), // kg / ha
   p_app_method: applicationMethodEnum(),
   p_app_date: date({ mode: 'string' }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
