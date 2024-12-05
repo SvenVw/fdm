@@ -1,5 +1,5 @@
 {
-  "id": "f721777c-941f-4d87-ac67-a74751a9c313",
+  "id": "fc19cc8e-a8b5-41a4-8439-1d7d77bc1a1f",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -301,8 +301,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "p_amount": {
-          "name": "p_amount",
+        "p_acquiring_amount": {
+          "name": "p_acquiring_amount",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -384,8 +384,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "p_app_amount": {
-          "name": "p_app_amount",
+        "p_app_acquiring_amount": {
+          "name": "p_app_acquiring_amount",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false

@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_aquiring" (
 	"b_id_farm" text NOT NULL,
 	"p_id" text NOT NULL,
-	"p_amount" numeric,
+	"p_acquiring_amount" numeric,
 	"p_acquiring_date" date,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_applying" (
 	"p_app_id" text PRIMARY KEY NOT NULL,
 	"b_id" text NOT NULL,
 	"p_id" text NOT NULL,
-	"p_app_amount" numeric,
+	"p_app_acquiring_amount" numeric,
 	"p_app_method" "fdm-dev"."p_app_method",
 	"p_app_date" date,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,

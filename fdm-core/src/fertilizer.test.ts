@@ -181,13 +181,13 @@ describe('Fertilizer Data Model', () => {
         }
       )
 
-      const p_amount = 1000
+      const p_acquiring_amount = 1000
       const p_acquiring_date = new Date().toISOString().split('T')[0]
       const p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
         b_id_farm,
-        p_amount,
+        p_acquiring_amount,
         p_acquiring_date
       )
       expect(p_id).toBeDefined()
@@ -260,11 +260,11 @@ describe('Fertilizer Data Model', () => {
         }
       )
 
-      const p_amount = 1000
+      const p_acquiring_amount = 1000
       const p_acquiring_date = new Date().toISOString().split('T')[0]
 
       // Add two fertilizers to the farm
-      await addFertilizer(fdm, p_id_catalogue, b_id_farm, p_amount, p_acquiring_date)
+      await addFertilizer(fdm, p_id_catalogue, b_id_farm, p_acquiring_amount, p_acquiring_date)
       await addFertilizer(fdm, p_id_catalogue, b_id_farm, 1500, p_acquiring_date)
 
       const fertilizers = await getFertilizers(fdm, b_id_farm)
@@ -335,13 +335,13 @@ describe('Fertilizer Data Model', () => {
         }
       )
 
-      const p_amount = 1000
+      const p_acquiring_amount = 1000
       const p_acquiring_date = new Date().toISOString().split('T')[0]
       const p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
         b_id_farm,
-        p_amount,
+        p_acquiring_amount,
         p_acquiring_date
       )
       expect(p_id).toBeDefined()
@@ -433,13 +433,13 @@ describe('Fertilizer Data Model', () => {
         }
       )
 
-      const p_amount = 1000
+      const p_acquiring_amount = 1000
       const p_acquiring_date = new Date().toISOString().split('T')[0]
       p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
         b_id_farm,
-        p_amount,
+        p_acquiring_amount,
         p_acquiring_date
       )
 
@@ -464,7 +464,7 @@ describe('Fertilizer Data Model', () => {
       expect(fertilizerApplication).toBeDefined();
       expect(fertilizerApplication?.b_id).toBe(b_id);
       expect(fertilizerApplication?.p_id).toBe(p_id);
-      expect(fertilizerApplication?.p_app_amount).toBe(100);
+      expect(fertilizerApplication?.p_app_acquiring_amount).toBe(100);
       expect(fertilizerApplication?.p_app_method).toBe('broadcasting');
       expect(fertilizerApplication?.p_app_date).toEqual('2024-03-15');
     });
@@ -476,7 +476,7 @@ describe('Fertilizer Data Model', () => {
       await updateFertilizerApplication(fdm, p_app_id, b_id, p_id, 200, 'injection', '2024-04-20');
 
       const updatedApplication = await getFertilizerApplication(fdm, p_app_id);
-      expect(updatedApplication?.p_app_amount).toBe(200);
+      expect(updatedApplication?.p_app_acquiring_amount).toBe(200);
       expect(updatedApplication?.p_app_method).toBe('injection');
       expect(updatedApplication?.p_app_date).toEqual('2024-04-20');
 

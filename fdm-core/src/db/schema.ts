@@ -79,7 +79,7 @@ export type fertilizersTypeInsert = typeof fertilizers.$inferInsert
 export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
-  p_amount: numericCasted(), //kg
+  p_acquiring_amount: numericCasted(), //kg
   p_acquiring_date: date({ mode: 'string' }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
@@ -94,7 +94,7 @@ export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
   p_app_id: text().primaryKey(),
   b_id: text().notNull().references(() => fields.b_id),
   p_id: text().notNull().references(() => fertilizers.p_id),
-  p_app_amount: numericCasted(), // kg / ha
+  p_app_acquiring_amount: numericCasted(), // kg / ha
   p_app_method: applicationMethodEnum(),
   p_app_date: date({ mode: 'string' }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
