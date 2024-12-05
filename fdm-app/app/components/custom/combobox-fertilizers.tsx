@@ -7,7 +7,12 @@ import { Label } from "../ui/label"
 
 import { Combobox } from "../custom/combobox"
 import { Form, useFetcher, useNavigation } from "@remix-run/react"
-import { FormEvent } from "react"
+import { format } from "date-fns"
+import { FormEvent, useState } from "react"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { cn } from "@/lib/utils"
+import { CalendarIcon } from "lucide-react"
+import { Calendar } from "../ui/calendar"
 
 export function ComboboxFertilizers(props: { options: { value: string, label: string }[], defaultValue?: string, action: string }) {
     const navigation = useNavigation();
@@ -37,6 +42,8 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
         })
     }
 
+    const [date, setDate] = useState()
+
     return (
         <div>
             <Form action={props.action} method="post">
@@ -54,7 +61,28 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                     </div>
                     <div>
                         <Label htmlFor="b_name_farm">Datum<span className="text-red-500">*</span></Label>
-                        <Input id="p_app_date" name="p_app_date" placeholder="2024-03-05" aria-required="true" required />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                        "justify-start text-left font-normal",
+                                        !date && "text-muted-foreground"
+                                    )}
+                                >
+                                    <CalendarIcon />
+                                    {date ? format(date, "yyyy-MM-dd") : <span>Kies een datum</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>                        
                     </div>
                     <div className="justify-self-end">
                         <Button type="submit">
@@ -64,58 +92,58 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                         </Button>
                     </div>
                 </div>
-                <div>
-                    <Separator className="my-4" />
-                    <div className="space-y-4">
-                        {/* <div className="text-sm font-medium">Meststoffen</div> */}
-                        <div className="grid gap-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium leading-none">
-                                        Runderdrijfmest
-                                    </p>
-                                    {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-light leading-none">
-                                        30 ton / ha
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-light leading-none">
-                                        2024-04-01
-                                    </p>
-                                </div>
-                                <div>
-                                    <Button variant="destructive">Verwijder</Button>                                    
-                                </div>
-                                {/* </div> */}
+            </Form>
+            <div>
+                <Separator className="my-4" />
+                <div className="space-y-4">
+                    {/* <div className="text-sm font-medium">Meststoffen</div> */}
+                    <div className="grid gap-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium leading-none">
+                                    Runderdrijfmest
+                                </p>
+                                {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
                             </div>
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium leading-none">
-                                        Runderdrijfmest
-                                    </p>
-                                    {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
-                                </div>
-                                <div>
-                                    <p className="text-sm font-light leading-none">
-                                        30 ton / ha
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-sm font-light leading-none">
-                                        2024-04-01
-                                    </p>
-                                </div>
-                                <div>
-                                    <Button variant="destructive">Verwijder</Button>
-                                </div>
+                            <div>
+                                <p className="text-sm font-light leading-none">
+                                    30 ton / ha
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-sm font-light leading-none">
+                                    2024-04-01
+                                </p>
+                            </div>
+                            <div>
+                                <Button variant="destructive">Verwijder</Button>
+                            </div>
+                            {/* </div> */}
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium leading-none">
+                                    Runderdrijfmest
+                                </p>
+                                {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
+                            </div>
+                            <div>
+                                <p className="text-sm font-light leading-none">
+                                    30 ton / ha
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-sm font-light leading-none">
+                                    2024-04-01
+                                </p>
+                            </div>
+                            <div>
+                                <Button variant="destructive">Verwijder</Button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </Form>
+            </div>
         </div >
     )
 }
