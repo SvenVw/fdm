@@ -1,9 +1,10 @@
-import { describe, expect, it, afterAll, beforeEach } from 'vitest'
+import { describe, expect, it, afterAll, beforeEach, beforeAll } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
-import { addFertilizerToCatalogue, getFertilizersFromCatalogue, addFertilizer, removeFertilizer, getFertilizer, getFertilizers } from './fertilizer'
+import { addFertilizerToCatalogue, getFertilizersFromCatalogue, addFertilizer, removeFertilizer, getFertilizer, getFertilizers, removeFertilizerApplication, addFertilizerApplication, getFertilizerApplication, updateFertilizerApplication, getFertilizerApplications } from './fertilizer'
 import { addFarm } from './farm'
 import { nanoid } from 'nanoid'
+import { addField } from './field'
 
 describe('Fertilizer Data Model', () => {
   let fdm: FdmServerType
@@ -33,6 +34,7 @@ describe('Fertilizer Data Model', () => {
   afterAll(async () => {
     // Clean up the database after each test
     // await fdm.execute(sql`TRUNCATE TABLE fertilizers_catalogue CASCADE`)
+    // await fdm.execute(sql`TRUNCATE TABLE fertilizer_picking CASCADE`)
     // await fdm.execute(sql`TRUNCATE TABLE fertilizers CASCADE`)
     // await fdm.execute(sql`TRUNCATE TABLE farms CASCADE`)
   })
@@ -350,4 +352,168 @@ describe('Fertilizer Data Model', () => {
       expect(fertilizer).toBeUndefined()
     })
   })
+
+  describe('Fertilizer Application', () => {
+    let b_id: string;
+    let p_id: string;
+    let p_id_catalogue: string;
+
+    beforeAll(async () => {
+
+      const b_id_farm = await addFarm(fdm, 'test farm', 'arable');
+
+      b_id = await addField(
+        fdm,
+        b_id_farm,
+        'test field',
+        'test source',
+        'POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))',
+        '2023-01-01',
+        '2024-01-01',
+        'owner',
+      );
+
+      // Add fertilizer to catalogue
+      p_id_catalogue = nanoid()
+      const p_source = 'custom'
+      const p_name_nl = 'Test Fertilizer'
+      const p_name_en = 'Test Fertilizer (EN)'
+      const p_description = 'This is a test fertilizer'
+      await addFertilizerToCatalogue(
+        fdm,
+        {
+          p_id_catalogue,
+          p_source,
+          p_name_nl,
+          p_name_en,
+          p_description,
+          p_dm: 37,
+          p_density: 20,
+          p_om: 20,
+          p_a: 30,
+          p_hc: 40,
+          p_eom: 50,
+          p_eoc: 60,
+          p_c_rt: 70,
+          p_c_of: 80,
+          p_c_if: 90,
+          p_c_fr: 100,
+          p_cn_of: 110,
+          p_n_rt: 120,
+          p_n_if: 130,
+          p_n_of: 140,
+          p_n_wc: 150,
+          p_p_rt: 160,
+          p_k_rt: 170,
+          p_mg_rt: 180,
+          p_ca_rt: 190,
+          p_ne: 200,
+          p_s_rt: 210,
+          p_s_wc: 220,
+          p_cu_rt: 230,
+          p_zn_rt: 240,
+          p_na_rt: 250,
+          p_si_rt: 260,
+          p_b_rt: 270,
+          p_mn_rt: 280,
+          p_ni_rt: 290,
+          p_fe_rt: 300,
+          p_mo_rt: 310,
+          p_co_rt: 320,
+          p_as_rt: 330,
+          p_cd_rt: 340,
+          pr_cr_rt: 350,
+          p_cr_vi: 360,
+          p_pb_rt: 370,
+          p_hg_rt: 380,
+          p_cl_rt: 390,
+          p_type_manure: true,
+          p_type_mineral: false,
+          p_type_compost: false
+        }
+      )
+
+      const p_amount = 1000
+      const p_acquiring_date = new Date().toISOString().split('T')[0]
+      p_id = await addFertilizer(
+        fdm,
+        p_id_catalogue,
+        b_id_farm,
+        p_amount,
+        p_acquiring_date
+      )
+
+    });
+
+    afterAll(async () => {
+      // Clean up the database after each test (optional)
+    });
+
+    it('should add a new fertilizer application', async () => {
+      const new_p_app_id = await addFertilizerApplication(
+        fdm,
+        b_id,
+        p_id,
+        100,
+        'broadcasting',
+        '2024-03-15',
+      );
+      expect(new_p_app_id).toBeDefined();
+
+      const fertilizerApplication = await getFertilizerApplication(fdm, new_p_app_id);
+      expect(fertilizerApplication).toBeDefined();
+      expect(fertilizerApplication?.b_id).toBe(b_id);
+      expect(fertilizerApplication?.p_id).toBe(p_id);
+      expect(fertilizerApplication?.p_app_amount).toBe(100);
+      expect(fertilizerApplication?.p_app_method).toBe('broadcasting');
+      expect(fertilizerApplication?.p_app_date).toEqual('2024-03-15');
+    });
+
+
+    it('should update a fertilizer application', async () => {
+      const p_app_id = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
+
+      await updateFertilizerApplication(fdm, p_app_id, b_id, p_id, 200, 'injection', '2024-04-20');
+
+      const updatedApplication = await getFertilizerApplication(fdm, p_app_id);
+      expect(updatedApplication?.p_app_amount).toBe(200);
+      expect(updatedApplication?.p_app_method).toBe('injection');
+      expect(updatedApplication?.p_app_date).toEqual('2024-04-20');
+
+    });
+
+
+    it('should remove a fertilizer application', async () => {
+      const new_p_app_id = await addFertilizerApplication(
+        fdm,
+        b_id,
+        p_id,
+        100,
+        'broadcasting',
+        '2024-03-15',
+      );
+
+      await removeFertilizerApplication(fdm, new_p_app_id);
+
+      const deletedApplication = await getFertilizerApplication(fdm, new_p_app_id);
+      expect(deletedApplication).toBeNull();
+    });
+
+    it('should get a fertilizer application', async () => {
+      const p_app_id = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
+      const fertilizerApplication = await getFertilizerApplication(fdm, p_app_id);
+      expect(fertilizerApplication).toBeDefined();
+      expect(fertilizerApplication?.p_app_id).toBe(p_app_id);
+    });
+
+    it('should get fertilizer applications for a field', async () => {
+      await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
+      await addFertilizerApplication(fdm, b_id, p_id, 150, 'injection', '2024-04-18');
+
+
+      const fertilizerApplications = await getFertilizerApplications(fdm, b_id);
+      expect(fertilizerApplications.length).toBeGreaterThanOrEqual(2);
+    });
+
+  });
 })
