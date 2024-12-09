@@ -102,12 +102,8 @@ export async function action({
 }: ActionFunctionArgs) {
   const formData = await request.formData();
   const b_name_farm = String(formData.get('b_name_farm'));
-  const b_fertilizers_organic = formData.get('b_fertilizers_organic');
-  const b_fertilizers_mineral = formData.getAll('b_fertilizers_mineral');
-
-  console.log(b_name_farm);
-  console.log(b_fertilizers_organic);
-  console.log(b_fertilizers_mineral);
+  // const b_fertilizers_organic = formData.get('b_fertilizers_organic');
+  // const b_fertilizers_mineral = formData.getAll('b_fertilizers_mineral');
 
   // Create a farm
   const b_id_farm = await addFarm(fdm, b_name_farm, null)
