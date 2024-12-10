@@ -118,7 +118,7 @@ export function Farm(props: farmType) {
                                 </div>
                             </CardContent>
                             <CardFooter className="flex justify-between">
-                                <Button variant="outline">Terug</Button>
+                                <Button variant="outline" onClick={() => window.history.back()}>Terug</Button>
                                 <Button type="submit">
                                     {form.formState.isSubmitting
                                         ? <div className="flex items-center space-x-2">
