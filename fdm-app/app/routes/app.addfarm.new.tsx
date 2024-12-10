@@ -1,6 +1,7 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node"
 import { useLoaderData, redirect } from "@remix-run/react";
+import { z } from "zod"
 import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
 // Components
@@ -13,6 +14,7 @@ import { Farm } from "@/components/blocks/farm";
 
 // Services
 import { fdm } from "../services/fdm.server";
+import { extractFormValuesFromRequest } from "@/lib/form";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -21,6 +23,14 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Welcome to FDM!" },
   ];
 };
+
+const FormSchema = z.object({
+  b_name_farm: z.string({
+      required_error: "Naam van bedrijf is verplicht",
+  }).min(3, {
+      message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+  }),
+})
 
 // Loader
 export async function loader({
@@ -90,6 +100,7 @@ export default function Index() {
           organicFertilizersList={loaderData.lists.organicFertilizersList}
           mineralFertilizersList={loaderData.lists.mineralFertilizersList}
           action={"/app/addfarm/new"}
+          FormSchema={FormSchema}
         />
       </main>
     </SidebarInset >
@@ -100,10 +111,8 @@ export default function Index() {
 export async function action({
   request,
 }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const b_name_farm = String(formData.get('b_name_farm')).replace(/['"]+/g, '');
-  // const b_fertilizers_organic = formData.get('b_fertilizers_organic');
-  // const b_fertilizers_mineral = formData.getAll('b_fertilizers_mineral');
+  const formValues = await extractFormValuesFromRequest(request, FormSchema)
+  const { b_name_farm } = formValues;
 
   // Create a farm
   const b_id_farm = await addFarm(fdm, b_name_farm, null)

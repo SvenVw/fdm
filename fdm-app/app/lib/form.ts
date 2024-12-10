@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export async function extractFormValuesFromRequest(request: Request, FormSchema: z.ZodSchema): Promise<{ [key: string]: any }> {
+export async function extractFormValuesFromRequest(request: Request, FormSchema: z.ZodSchema<any>): Promise<{ [key: string]: any }> {
 
   // Get the formData
   const form = await request.formData()

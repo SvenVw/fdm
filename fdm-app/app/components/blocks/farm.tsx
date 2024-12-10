@@ -40,20 +40,13 @@ export interface farmType {
     organicFertilizersList: fertilizersListType[]
     mineralFertilizersList: fertilizersListType[]
     action: "/app/addfarm/new"
+    FormSchema: z.Schema<any>
 }
-
-const FormSchema = z.object({
-    b_name_farm: z.string({
-        required_error: "Naam van bedrijf is verplicht",
-    }).min(3, {
-        message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
-    }),
-})
-
 
 export function Farm(props: farmType) {
     const organicFertilizersList = props.organicFertilizersList
     const mineralFertilizersList = props.mineralFertilizersList
+    const FormSchema = props.FormSchema
     const [selectedOrganicFertilizers, setOrganicFertilizers] = useState<string[]>(props.b_fertilizers_organic);
     const [selectedMineralFertilizers, setMineralFertilizers] = useState<string[]>(props.b_fertilizers_mineral);
 
@@ -125,7 +118,7 @@ export function Farm(props: farmType) {
                                 </div>
                             </CardContent>
                             <CardFooter className="flex justify-between">
-                                <Button variant="outline">Terug</Button>                                
+                                <Button variant="outline">Terug</Button>
                                 <Button type="submit">
                                     {form.formState.isSubmitting
                                         ? <div className="flex items-center space-x-2">
