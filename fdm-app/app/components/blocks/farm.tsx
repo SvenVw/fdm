@@ -61,7 +61,7 @@ export function Farm(props: farmType) {
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            b_name_farm: "",
+            b_name_farm: props.b_name_farm ?? "",
         },
     })
 
