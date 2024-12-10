@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.3.0
+
+### Minor Changes
+
+- c86567e: Add client-side validation of signup form, addfarm and addfields. Add also visual clue that fields are loaded on the map
+
 ## 0.2.0
 
 ### Minor Changes
