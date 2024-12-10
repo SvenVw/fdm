@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useFetcher } from "@remix-run/react";
-import { Map, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
+import { Map as MapGL, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from "../ui/button";
 import { LoadingSpinner } from "../custom/loadingspinner";
@@ -157,7 +157,7 @@ export function FieldsMap(props: FieldsMapType) {
 
   return (
     <div style={{ position: "relative" }}>
-      <Map
+      <MapGL
         initialViewState={{
           longitude: 5,
           latitude: 52,
@@ -181,7 +181,7 @@ export function FieldsMap(props: FieldsMapType) {
         </Source>
         <NavigationControl />
         <GeolocateControl />
-      </Map>
+      </MapGL>
       <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translate(-50%, -50%)" }}>
         <Button onClick={handleClickOnSubmit} disabled={!selectedFieldsData || isSubmitting || isLoading}>
           {isSubmitting ?
