@@ -273,7 +273,7 @@ export async function action({
   );
 
   const formValues = await extractFormValuesFromRequest(request, FormSchema)
-  const { firstname, surname, email, agreed } = formValues;
+  const { firstname, surname, email } = formValues;
 
   // sign up user
   const session_id = await signUpUser(fdm, firstname, surname, email)
