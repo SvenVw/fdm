@@ -3,6 +3,7 @@ import { useFetcher, useNavigation } from "@remix-run/react";
 import { Map, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from "../ui/button";
+import { LoadingSpinner } from "../custom/loadingspinner";
 
 interface FieldsMapType {
   mapboxToken: string
@@ -44,6 +45,9 @@ export function FieldsMap(props: FieldsMapType) {
 
   const [bprFieldsData, setBrpFieldsData] = useState<any>(null);
   const [selectedFieldsData, setSelectedFieldsData] = useState<any>(null);
+
+  const isSubmitting = fetcher.state === "submitting" && fetcher.formData?.get("question") === 'submit_selected_fields'
+  const isLoading = fetcher.state === "submitting" && fetcher.formData?.get("question") === 'get_brp_fields'
 
   async function loadBrpFields(evt) {
 
@@ -117,10 +121,7 @@ export function FieldsMap(props: FieldsMapType) {
     }
   }
 
-  async function handleClickOnSubmit()  {
-    
-    selectedFieldsData
-
+  async function handleClickOnSubmit() {
     const formSelectedFields = new FormData();
     formSelectedFields.append("question", 'submit_selected_fields')
     formSelectedFields.append("selected_fields", JSON.stringify(selectedFieldsData.features))
@@ -128,7 +129,6 @@ export function FieldsMap(props: FieldsMapType) {
     await fetcher.submit(formSelectedFields, {
       method: "POST",
     })
-
 
   }
 
@@ -160,10 +160,19 @@ export function FieldsMap(props: FieldsMapType) {
         <GeolocateControl />
       </Map>
       <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translate(-50%, -50%)" }}>
-        <Button onClick={handleClickOnSubmit} disabled={!selectedFieldsData}>
-          {navigation.state === "submitting"
-            ? "Opslaan..."
-            : "Voeg geselecteerde percelen toe"}
+        <Button onClick={handleClickOnSubmit} disabled={!selectedFieldsData || isSubmitting || isLoading}>
+          {isSubmitting ?
+            <div className="flex items-center space-x-2">
+              <LoadingSpinner />
+              <span>Opslaan...</span>
+            </div>
+            : isLoading ?
+              <div className="flex items-center space-x-2">
+                <LoadingSpinner />
+                <span>Laden van BRP percelen...</span>
+              </div>
+              : "Voeg geselecteerde percelen toe"
+          }
         </Button>
       </div>
     </div>
