@@ -27,6 +27,7 @@ import {
 import { getSession, commitSession, destroySession } from "@/services/session.server";
 import { fdm } from "../services/fdm.server";
 import { Check } from "lucide-react"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
 
 const FormSchema = z.object({
   firstname: z.string().min(2, {
@@ -207,13 +208,18 @@ export default function SignUp() {
                               Ik ga akkoord met de Algemene Voorwaarden en Privacyverklaring
                             </FormLabel>
                             {/* <FormMessage className="text-sm font-light" />                                      */}
-                          </div>                          
+                          </div>
                         </FormItem>
                       )}
                     />
                   </div>
-                  <Button type="submit" className="">
-                    Registreren
+                  <Button type="submit">
+                    {navigation.state === "submitting"
+                      ? <div className="flex items-center space-x-2">
+                        <LoadingSpinner />
+                        <span>Registeren...</span>
+                      </div>
+                      : "Registeren"}
                   </Button>
                   <div className="mt-4 text-center text-sm">
                     Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="#" className="underline">
