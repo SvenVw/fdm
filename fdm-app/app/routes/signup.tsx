@@ -237,9 +237,9 @@ export default function SignUp() {
                     {form.formState.isSubmitting
                       ? <div className="flex items-center space-x-2">
                         <LoadingSpinner />
-                        <span>Registeren...</span>
+                        <span>Registreren...</span>
                       </div>
-                      : "Registeren"}
+                      : "Registreren"}
                   </Button>
                   <div className="mt-4 text-center text-sm">
                     Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="#" className="underline">
