@@ -30,13 +30,19 @@ import { Check } from "lucide-react"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 
 const FormSchema = z.object({
-  firstname: z.string().min(2, {
+  firstname: z.string({
+    required_error: "Voornaam is verplicht",
+  }).min(2, {
     message: "Voornaam moet minimaal 2 karakters bevatten",
   }),
-  surname: z.string().min(2, {
+  surname: z.string({
+    required_error: "Achternaam is verplicht",
+  }).min(2, {
     message: "Achternaam moet minimaal 2 karakters bevatten",
   }),
-  email: z.string().email({
+  email: z.string({
+    required_error: "E-mail is verplicht",
+  }).email({
     message: "Voer een geldig emailadres in",
   }),
   agreed: z.boolean().default(false).refine((val) => val === true, {
@@ -160,38 +166,54 @@ export default function SignUp() {
               >
                 <div className="grid gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="firstname">Voornaam</Label>
-                    <Input
-                      id="firstname"
+                    <FormField
+                      control={form.control}
                       name="firstname"
-                      type="text"
-                      placeholder=""
-                      required
-                    />
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Voornaam</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="text" required />
+                          </FormControl>
+                          <FormDescription />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />                   
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="surname">Achternaam</Label>
-                    <Input
-                      id="surname"
+                    <FormField
+                      control={form.control}
                       name="surname"
-                      type="text"
-                      placeholder=""
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Achternaam</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="text" required />
+                          </FormControl>
+                          <FormDescription />
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
+                    <FormField
+                      control={form.control}
                       name="email"
-                      type="email"
-                      placeholder=""
-                      required
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input {...field} type="email" required />
+                          </FormControl>
+                          <FormDescription />
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                   <div className="grid gap-2">
-
-
                     <FormField
                       control={form.control}
                       name="agreed"
@@ -252,9 +274,14 @@ export async function action({
   );
 
   const form = await request.formData()
-  const firstname = String(form.get("firstname"))
-  const surname = String(form.get("surname"))
-  const email = String(form.get("email"))
+  const firstname = String(form.get("firstname")).replace(/['"]+/g, '')
+  const surname = String(form.get("surname")).replace(/['"]+/g, '')
+  const email = String(form.get("email")).replace(/['"]+/g, '')
+  const agreed = Boolean(form.get("agreed"))
+
+  if (agreed !== true) {
+    throw new Error('User did not agree with Terms and Conditions')
+  }
 
   // sign up user
   const session_id = await signUpUser(fdm, firstname, surname, email)
