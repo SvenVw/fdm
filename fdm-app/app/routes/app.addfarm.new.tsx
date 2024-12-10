@@ -101,7 +101,7 @@ export async function action({
   request,
 }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const b_name_farm = String(formData.get('b_name_farm'));
+  const b_name_farm = String(formData.get('b_name_farm')).replace(/['"]+/g, '');
   // const b_fertilizers_organic = formData.get('b_fertilizers_organic');
   // const b_fertilizers_mineral = formData.getAll('b_fertilizers_mineral');
 
