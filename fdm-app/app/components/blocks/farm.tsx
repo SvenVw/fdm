@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form"
 
 import { MultiSelect } from "@/components/custom/multi-select"
+import { LoadingSpinner } from "../custom/loadingspinner";
 
 
 export interface fertilizersListType {
@@ -90,7 +91,7 @@ export function Farm(props: farmType) {
                                                     <FormControl>
                                                         <Input placeholder="Bv. Jansen V.O.F." aria-required="true" {...field} />
                                                     </FormControl>
-                                                    <FormDescription/>                                                        
+                                                    <FormDescription />
                                                     <FormMessage />
                                                 </FormItem>
 
@@ -126,11 +127,14 @@ export function Farm(props: farmType) {
                                 </div>
                             </CardContent>
                             <CardFooter className="flex justify-between">
-                                <Button variant="outline">Terug</Button>
+                                <Button variant="outline">Terug</Button>                                
                                 <Button type="submit">
                                     {navigation.state === "submitting"
-                                        ? "Opslaan..."
-                                        : "Verder"}
+                                        ? <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Opslaan...</span>
+                                        </div>
+                                        : "Volgende"}
                                 </Button>
                             </CardFooter>
                         </fieldset>
