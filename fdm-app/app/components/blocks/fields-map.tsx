@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFetcher, useNavigation } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Map, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from "../ui/button";
@@ -7,6 +7,23 @@ import { LoadingSpinner } from "../custom/loadingspinner";
 
 interface FieldsMapType {
   mapboxToken: string
+}
+
+interface GeoJSONFeature {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: number[][][];
+  };
+  properties: {
+    reference_id: string;
+    [key: string]: any;
+  };
+}
+
+interface GeoJSONCollection {
+  type: "FeatureCollection";
+  features: GeoJSONFeature[];
 }
 
 const brpFieldsFillStyle = {
@@ -39,12 +56,11 @@ const brpFieldsLineStyle = {
 
 
 export function FieldsMap(props: FieldsMapType) {
-  const navigation = useNavigation();
   const fetcher = useFetcher();
   const mapboxToken = props.mapboxToken
 
-  const [bprFieldsData, setBrpFieldsData] = useState<any>(null);
-  const [selectedFieldsData, setSelectedFieldsData] = useState<any>(null);
+  const [bprFieldsData, setBrpFieldsData] = useState<GeoJSONCollection | null>(null);
+  const [selectedFieldsData, setSelectedFieldsData] = useState<GeoJSONCollection | null>(null);
 
   const isSubmitting = fetcher.state === "submitting" && fetcher.formData?.get("question") === 'submit_selected_fields'
   const isLoading = fetcher.state === "submitting" && fetcher.formData?.get("question") === 'get_brp_fields'
@@ -122,13 +138,20 @@ export function FieldsMap(props: FieldsMapType) {
   }
 
   async function handleClickOnSubmit() {
-    const formSelectedFields = new FormData();
-    formSelectedFields.append("question", 'submit_selected_fields')
-    formSelectedFields.append("selected_fields", JSON.stringify(selectedFieldsData.features))
 
-    await fetcher.submit(formSelectedFields, {
-      method: "POST",
-    })
+    try {
+      const formSelectedFields = new FormData();
+      formSelectedFields.append("question", 'submit_selected_fields')
+      formSelectedFields.append("selected_fields", JSON.stringify(selectedFieldsData.features))
+
+      await fetcher.submit(formSelectedFields, {
+        method: "POST",
+      })
+
+    } catch (error) {
+      console.error('Failed to submit fields: ', error);
+      // TODO: adding a toast notification with error
+    }
 
   }
 
