@@ -177,7 +177,7 @@ export default function SignUp() {
                           <FormMessage />
                         </FormItem>
                       )}
-                    />                   
+                    />
                   </div>
                   <div className="grid gap-2">
                     <FormField
@@ -275,9 +275,9 @@ export async function action({
   const firstname = String(form.get("firstname")).replace(/['"]+/g, '')
   const surname = String(form.get("surname")).replace(/['"]+/g, '')
   const email = String(form.get("email")).replace(/['"]+/g, '')
-  const agreed = Boolean(form.get("agreed"))
+  const agreed = form.get("agreed") === "true"
 
-  if (agreed !== true) {
+  if (!agreed) {
     throw new Error('User did not agree with Terms and Conditions')
   }
 
