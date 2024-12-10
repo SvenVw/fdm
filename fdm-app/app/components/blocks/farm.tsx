@@ -68,10 +68,10 @@ export function Farm(props: farmType) {
         <div className="flex h-screen items-center justify-center">
             <Card className="w-[350px]">
                 <RemixFormProvider {...form}>
-                    <Form id="formFarm" onSubmit={form.handleSubmit}>
-                        {/* <fieldset
+                    <Form id="formFarm" onSubmit={form.handleSubmit} method="POST">
+                        <fieldset
                             disabled={navigation.state === "submitting"}
-                        > */}
+                        >
                             <CardHeader>
                                 <CardTitle>Bedrijf</CardTitle>
                                 <CardDescription>Wat voor soort bedrijf heb je?</CardDescription>
@@ -88,9 +88,7 @@ export function Farm(props: farmType) {
                                                     <FormControl>
                                                         <Input placeholder="Bv. Jansen V.O.F." aria-required="true" {...field} />
                                                     </FormControl>
-                                                    <FormDescription>
-                                                        De naam van je bedrijf
-                                                    </FormDescription>
+                                                    <FormDescription/>                                                        
                                                     <FormMessage />
                                                 </FormItem>
 
@@ -133,7 +131,7 @@ export function Farm(props: farmType) {
                                         : "Verder"}
                                 </Button>
                             </CardFooter>
-                        {/* </fieldset> */}
+                        </fieldset>
                     </Form>
                 </RemixFormProvider>
             </Card>
