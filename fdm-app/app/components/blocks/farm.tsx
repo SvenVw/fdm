@@ -42,7 +42,9 @@ export interface farmType {
 }
 
 const FormSchema = z.object({
-    b_name_farm: z.string().min(3, {
+    b_name_farm: z.string({
+        required_error: "Naam van bedrijf is verplicht",
+    }).min(3, {
         message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
     }),
 })
