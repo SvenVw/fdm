@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigation, Form } from "@remix-run/react";
+import { Form } from "@remix-run/react";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRemixForm, RemixFormProvider } from "remix-hook-form"
 import { z } from "zod"
@@ -52,8 +52,6 @@ const FormSchema = z.object({
 
 
 export function Farm(props: farmType) {
-    const navigation = useNavigation();
-
     const organicFertilizersList = props.organicFertilizersList
     const mineralFertilizersList = props.mineralFertilizersList
     const [selectedOrganicFertilizers, setOrganicFertilizers] = useState<string[]>(props.b_fertilizers_organic);
@@ -73,7 +71,7 @@ export function Farm(props: farmType) {
                 <RemixFormProvider {...form}>
                     <Form id="formFarm" onSubmit={form.handleSubmit} method="POST">
                         <fieldset
-                            disabled={navigation.state === "submitting"}
+                            disabled={form.formState.isSubmitting}
                         >
                             <CardHeader>
                                 <CardTitle>Bedrijf</CardTitle>
@@ -129,7 +127,7 @@ export function Farm(props: farmType) {
                             <CardFooter className="flex justify-between">
                                 <Button variant="outline">Terug</Button>                                
                                 <Button type="submit">
-                                    {navigation.state === "submitting"
+                                    {form.formState.isSubmitting
                                         ? <div className="flex items-center space-x-2">
                                             <LoadingSpinner />
                                             <span>Opslaan...</span>

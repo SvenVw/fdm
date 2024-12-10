@@ -3,7 +3,7 @@ import type {
   LoaderFunctionArgs,
 } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useNavigation } from "@remix-run/react"
+import { Form } from "@remix-run/react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRemixForm, RemixFormProvider } from "remix-hook-form"
 import { z } from "zod"
@@ -85,7 +85,6 @@ export async function loader({
 }
 
 export default function SignUp() {
-  const navigation = useNavigation();
 
   const form = useRemixForm<z.infer<typeof FormSchema>>({
     mode: "onTouched",
@@ -161,7 +160,7 @@ export default function SignUp() {
           <RemixFormProvider {...form}>
             <Form id="formFarm" onSubmit={form.handleSubmit} method="POST">
               <fieldset
-                disabled={navigation.state === "submitting"}
+                disabled={form.formState.isSubmitting}
               >
                 <div className="grid gap-4">
                   <div className="grid gap-2">
@@ -235,7 +234,7 @@ export default function SignUp() {
                     />
                   </div>
                   <Button type="submit">
-                    {navigation.state === "submitting"
+                    {form.formState.isSubmitting
                       ? <div className="flex items-center space-x-2">
                         <LoadingSpinner />
                         <span>Registeren...</span>
