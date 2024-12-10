@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.6.1
+
+### Patch Changes
+
+- Patch for CVE-2024-55565
+
 ## 0.6.0
 
 ### Minor Changes
