@@ -3,7 +3,10 @@ import type {
   LoaderFunctionArgs,
 } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form } from "@remix-run/react"
+import { Form, useNavigation } from "@remix-run/react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useRemixForm, RemixFormProvider } from "remix-hook-form"
+import { z } from "zod"
 import { signUpUser, getUserFromSession } from "@svenvw/fdm-core"
 
 // Components
@@ -11,11 +14,34 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 
 // Services
 import { getSession, commitSession, destroySession } from "@/services/session.server";
 import { fdm } from "../services/fdm.server";
 import { Check } from "lucide-react"
+
+const FormSchema = z.object({
+  firstname: z.string().min(2, {
+    message: "Voornaam moet minimaal 2 karakters bevatten",
+  }),
+  surname: z.string().min(2, {
+    message: "Achternaam moet minimaal 2 karakters bevatten",
+  }),
+  email: z.string().email({
+    message: "Voer een geldig emailadres in",
+  }),
+  agreed: z.boolean().default(false).refine((val) => val === true, {
+    message: "Je moet akkoord gaan met de Algemene Voorwaarden en Privacyverklaring"
+  })
+})
 
 export async function loader({
   request,
@@ -53,6 +79,17 @@ export async function loader({
 }
 
 export default function SignUp() {
+  const navigation = useNavigation();
+
+  const form = useRemixForm<z.infer<typeof FormSchema>>({
+    mode: "onTouched",
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      agreed: false,
+    },
+  })
+
+
   return (
     <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
       <div className="flex h-screen items-center justify-center py-12">
@@ -115,59 +152,78 @@ export default function SignUp() {
               </div>
             </div>
           </div>
-          <Form method="post">
-            <div className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="firstname">Voornaam</Label>
-                <Input
-                  id="firstname"
-                  name="firstname"
-                  type="text"
-                  placeholder=""
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="surname">Achternaam</Label>
-                <Input
-                  id="surname"
-                  name="surname"
-                  type="text"
-                  placeholder=""
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder=""
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Ik ga akkoord met de Algemene Voorwaarden en Privacyverklaring
-                  </label>
+          <RemixFormProvider {...form}>
+            <Form id="formFarm" onSubmit={form.handleSubmit} method="POST">
+              <fieldset
+                disabled={navigation.state === "submitting"}
+              >
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="firstname">Voornaam</Label>
+                    <Input
+                      id="firstname"
+                      name="firstname"
+                      type="text"
+                      placeholder=""
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="surname">Achternaam</Label>
+                    <Input
+                      id="surname"
+                      name="surname"
+                      type="text"
+                      placeholder=""
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder=""
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+
+
+                    <FormField
+                      control={form.control}
+                      name="agreed"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-0 leading-none">
+                            <FormLabel>
+                              Ik ga akkoord met de Algemene Voorwaarden en Privacyverklaring
+                            </FormLabel>
+                            {/* <FormMessage className="text-sm font-light" />                                      */}
+                          </div>                          
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <Button type="submit" className="">
+                    Registreren
+                  </Button>
+                  <div className="mt-4 text-center text-sm">
+                    Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="#" className="underline">
+                      Veelgestelde Vragen
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <Button type="submit" className="">
-                Registreren
-              </Button>
-              <div className="mt-4 text-center text-sm">
-                Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="#" className="underline">
-                  Veelgestelde Vragen
-                </a>
-              </div>
-            </div>
-          </Form>
+              </fieldset>
+            </Form>
+          </RemixFormProvider>
         </div>
       </div>
       <div className="hidden bg-muted lg:block">
