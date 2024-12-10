@@ -27,24 +27,25 @@ import { getSession, commitSession, destroySession } from "@/services/session.se
 import { fdm } from "../services/fdm.server";
 import { Check } from "lucide-react"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import { extractFormValuesFromRequest } from "@/lib/form"
 
 const FormSchema = z.object({
-  firstname: z.string({
+  firstname: z.coerce.string({
     required_error: "Voornaam is verplicht",
   }).min(2, {
-    message: "Voornaam moet minimaal 2 karakters bevatten",
+    message: "Voornaam moet minimaal 2 karakters bevatten"
   }),
-  surname: z.string({
+  surname: z.coerce.string({
     required_error: "Achternaam is verplicht",
   }).min(2, {
     message: "Achternaam moet minimaal 2 karakters bevatten",
   }),
-  email: z.string({
+  email: z.coerce.string({
     required_error: "E-mail is verplicht",
   }).email({
     message: "Voer een geldig emailadres in",
   }),
-  agreed: z.boolean().default(false).refine((val) => val === true, {
+  agreed: z.coerce.boolean().default(false).refine((val) => val === true, {
     message: "Je moet akkoord gaan met de Algemene Voorwaarden en Privacyverklaring"
   })
 })
@@ -158,7 +159,7 @@ export default function SignUp() {
             </div>
           </div>
           <RemixFormProvider {...form}>
-            <Form id="formFarm" onSubmit={form.handleSubmit} method="POST">
+            <Form id="formFarm" onSubmit={form.handleSubmit} method="post">
               <fieldset
                 disabled={form.formState.isSubmitting}
               >
@@ -167,7 +168,7 @@ export default function SignUp() {
                     <FormField
                       control={form.control}
                       name="firstname"
-                      render={({ field }) => (
+                      render={({ field }) => (                        
                         <FormItem>
                           <FormLabel>Voornaam</FormLabel>
                           <FormControl>
@@ -175,7 +176,7 @@ export default function SignUp() {
                           </FormControl>
                           <FormDescription />
                           <FormMessage />
-                        </FormItem>
+                        </FormItem>                  
                       )}
                     />
                   </div>
@@ -271,15 +272,8 @@ export async function action({
     request.headers.get("Cookie")
   );
 
-  const form = await request.formData()
-  const firstname = String(form.get("firstname")).replace(/['"]+/g, '')
-  const surname = String(form.get("surname")).replace(/['"]+/g, '')
-  const email = String(form.get("email")).replace(/['"]+/g, '')
-  const agreed = form.get("agreed") === "true"
-
-  if (!agreed) {
-    throw new Error('User did not agree with Terms and Conditions')
-  }
+  const formValues = await extractFormValuesFromRequest(request, FormSchema)
+  const { firstname, surname, email, agreed } = formValues;
 
   // sign up user
   const session_id = await signUpUser(fdm, firstname, surname, email)
