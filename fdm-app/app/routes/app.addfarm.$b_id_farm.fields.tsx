@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
 import { useLoaderData } from "react-router";
 import wkx from 'wkx'
 
@@ -58,7 +58,7 @@ export async function loader({
     // Get the Mapbox Token
     const mapboxToken = process.env.MAPBOX_TOKEN;
     if (!mapboxToken) {
-        throw new Error("MAPBOX_TOKEN environment variable is not set");
+        throw data("MAPBOX_TOKEN environment variable is not set", { status: 500 });
     }
 
     // Get the available cultivations
