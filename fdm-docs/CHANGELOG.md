@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.1.4
+
+### Patch Changes
+
+- 7edc605: Upgrade to docusaurus v3.6 and enable docusaurus/faster
+
 ## 0.1.3
 
 ### Patch Changes

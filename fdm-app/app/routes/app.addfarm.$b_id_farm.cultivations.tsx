@@ -1,5 +1,5 @@
-import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -32,17 +32,18 @@ export async function loader({
     // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw new Response("Farm ID is required", { status: 400 });
+        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
     const farm = await getFarm(fdm, b_id_farm)
         .catch(error => {
-            throw new Response(`Failed to fetch farm: ${error.message}`, { 
-                status: 404 
+            throw data(`Failed to fetch farm: ${error.message}`, { 
+                status: 404,
+                statusText: "Farm not found"
             });
         });
     
     if (!farm) {
-        throw new Response("Farm not found", { status: 404 });
+        throw data("Farm not found", { status: 404, statusText: "Farm not found" });
     }
 
     // Get the cultivationPlan
@@ -56,12 +57,12 @@ export async function loader({
         }
     })
 
-    return json({
+    return {
         cultivationPlan: cultivationPlan,
         sidebarNavItems: sidebarNavItems,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
-    })
+    }
 
 }
 

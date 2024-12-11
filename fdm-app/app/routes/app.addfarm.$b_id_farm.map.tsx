@@ -1,5 +1,11 @@
-import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
-import { useNavigation, useLoaderData, useParams } from "@remix-run/react";
+import {
+  type MetaFunction,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  redirect,
+  data,
+  useLoaderData 
+} from "react-router";
 import { ClientOnly } from "remix-utils/client-only"
 import wkx from 'wkx'
 
@@ -33,21 +39,21 @@ export async function loader({
   // Get the Id and name of the farm
   const b_id_farm = params.b_id_farm
   if (!b_id_farm) {
-    throw new Response("Farm ID is required", { status: 400 });
+    throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
   }
   const farm = await getFarm(fdm, b_id_farm)
 
   if (!farm) {
-    throw new Response("Farm not found", { status: 404 });
+    throw data("Farm not found", { status: 404, statusText: "Farm not found" });
   }
 
   // Get the Mapbox token
   const mapboxToken = String(process.env.MAPBOX_TOKEN)
 
-  return json({
+  return {
     b_name_farm: farm.b_name_farm,
     mapboxToken: mapboxToken
-  })
+  }
 
 }
 
@@ -148,16 +154,16 @@ export async function action({
       })
 
     if (!responseApi.ok) {
-      throw new Error(`Failed to fetch fields data: ${responseApi.status} ${responseApi.statusText}`);
+      throw data(responseApi.statusText, { status: responseApi.status, statusText: responseApi.statusText })
     }
 
-    const data = await responseApi.json()
-    response = data.data
+    const result = await responseApi.json()
+    response = result.data
   } else if (question === 'submit_selected_fields') {
     const b_id_farm = params.b_id_farm
 
     if (!b_id_farm) {
-      throw new Response("Farm ID is required", { status: 400 });
+      throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
@@ -173,10 +179,10 @@ export async function action({
 
       // Validate dates
       if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
-        throw new Error('Future dates are not allowed')
+        throw data('Future dates are not allowed', { status: 400, statusText: 'Future dates are not allowed' })
       }
       if (new Date(b_date_sowing) < new Date(b_manage_start)) {
-        throw new Error('Sowing should happen after field started to be managed')
+        throw data('Sowing should happen after field started to be managed', { status: 400, statusText: 'Sowing should happen after field started to be managed' })
       }
       const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
       const b_geometry = fieldGeometry.toWkt()
@@ -187,14 +193,18 @@ export async function action({
         return { b_id, b_lu }
       } catch (error) {
         console.error(`Failed to process field ${b_id_name}:`, error)
-        throw new Error(`Failed to add field ${b_id_name}: ${error.message}`)
+        throw data(`Failed to add field ${b_id_name}: ${error.message}`, { status: 500, statusText: `Failed to add field ${b_id_name}` })
       }
     }))
 
     return redirect(`../addfarm/${b_id_farm}/fields`)
 
   } else {
-    throw new Error("Invalid POST question")
+    throw data("Invalid POST question", { status: 400, statusText: "Invalid POST question" })
   }
-  return json(response)
+
+  if (!response) {
+    throw data("No data returned", { status: 404, statusText: "No data returned" });
+  }
+  return response;
 }

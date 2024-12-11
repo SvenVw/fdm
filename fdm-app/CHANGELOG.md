@@ -1,5 +1,18 @@
 # Changelog fdm-app
 
+## 0.3.1
+
+### Patch Changes
+
+- 9a410b1: Migrated from Remix v2 to React Router v7
+
+## 0.3.0
+
+### Minor Changes
+
+- Implement client-side form validation using Zod for the signup, add farm, and add fields forms.
+- Add visual indicators when fields are loading on the map to enhance user experience.
+
 ## 0.2.0
 
 ### Minor Changes
