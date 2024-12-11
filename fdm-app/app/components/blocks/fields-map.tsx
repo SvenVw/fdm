@@ -96,48 +96,34 @@ export function FieldsMap(props: FieldsMapType) {
   function handleClickOnField(evt) {
     if (evt.features && evt.features[0].properties) {
 
-      const feature = {
+      const newFeature = {
         type: evt.features[0].type,
         geometry: evt.features[0].geometry,
         properties: evt.features[0].properties
-      }
+      };
+      const b_id = newFeature.properties.reference_id;
 
-      if (selectedFieldsData) {
-        // Check if field is already selected
-        const b_id = feature.properties.reference_id
-        const featuresOld = selectedFieldsData.features
-
-        const featureToRemove = featuresOld.find(f => f.properties.reference_id === b_id)
-
-        if (featureToRemove) {
-          // Remove field from selection
-          const featuresWithRemoval = featuresOld.filter(f => f.properties.reference_id !== b_id)
-          const featureCollection = {
+      setSelectedFieldsData(prevData => {
+        if (!prevData) {
+          return {
             type: "FeatureCollection",
-            features: featuresWithRemoval
-          }
-          setSelectedFieldsData(featureCollection)
-        } else {
-          // Add field to selection
-          const featureCollection = {
-            type: "FeatureCollection",
-            features: [
-              ...featuresOld,
-              feature
-            ]
-          }
-          setSelectedFieldsData(featureCollection)
+            features: [newFeature]
+          };
         }
-      } else {
-        // Create selection with first field        
-        const featureCollection = {
+
+        const isSelected = prevData.features.some(f =>
+          f.properties.reference_id === b_id
+        );
+
+        return {
           type: "FeatureCollection",
-          features: [
-            feature
-          ]
-        }
-        setSelectedFieldsData(featureCollection)
-      }
+          features: isSelected
+            ? prevData.features.filter(f =>
+              f.properties.reference_id !== b_id
+            )
+            : [...prevData.features, newFeature]
+        };
+      });
     }
   }
 
