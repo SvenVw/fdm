@@ -1,5 +1,4 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node"
 import { useLoaderData, redirect } from "@remix-run/react";
 import { z } from "zod"
 import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
@@ -56,7 +55,7 @@ export async function loader({
       }
     })
 
-  return json({
+  return {
     values: {
       b_name_farm: null,
       b_fertilizers_organic: null,
@@ -65,7 +64,7 @@ export async function loader({
       organicFertilizersList: organicFertilizersList,
       mineralFertilizersList: mineralFertilizersList
     }
-  });
+  };
 }
 
 /**

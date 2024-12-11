@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { type MetaFunction, type LoaderFunctionArgs} from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 
 // Components
@@ -56,12 +56,12 @@ export async function loader({
         }
     })
 
-    return json({
+    return {
         cultivationPlan: cultivationPlan,
         sidebarNavItems: sidebarNavItems,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
-    })
+    }
 
 }
 

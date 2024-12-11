@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
+import { type MetaFunction, type LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import wkx from 'wkx'
 
@@ -79,14 +79,14 @@ export async function loader({
         );
     }
 
-    return json({
+    return {
         fields: fieldsWithGeojson,
         cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
         action: `/app/addfarm/${b_id_farm}/fields`
-    })
+    }
 
 }
 
@@ -176,7 +176,7 @@ export async function action({
             undefined, // b_manage_end
             undefined  // b_manage_type
         );
-        return json({ field: updatedField });
+        return { field: updatedField };
     } catch (error) {
         throw new Response(
             `Failed to update field: ${error instanceof Error ? error.message : 'Unknown error'}`,

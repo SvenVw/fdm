@@ -1,5 +1,5 @@
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { redirect, json} from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import {useLoaderData, Outlet } from "@remix-run/react";
 import { getUserFromSession } from "@svenvw/fdm-core"
 
@@ -53,9 +53,9 @@ export async function loader({
   }
 
   // Return user information from loader
-  return json({
+  return {
     user: user
-  })
+  }
 }
 
 export default function App() {

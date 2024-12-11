@@ -1,5 +1,5 @@
-import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, json, redirect } from "@remix-run/node";
-import { useNavigation, useLoaderData, useParams } from "@remix-run/react";
+import { type MetaFunction, type ActionFunctionArgs, type LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import { ClientOnly } from "remix-utils/client-only"
 import wkx from 'wkx'
 
@@ -44,10 +44,10 @@ export async function loader({
   // Get the Mapbox token
   const mapboxToken = String(process.env.MAPBOX_TOKEN)
 
-  return json({
+  return {
     b_name_farm: farm.b_name_farm,
     mapboxToken: mapboxToken
-  })
+  }
 
 }
 
@@ -196,5 +196,5 @@ export async function action({
   } else {
     throw new Error("Invalid POST question")
   }
-  return json(response)
+  return response
 }
