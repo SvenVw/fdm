@@ -1,9 +1,7 @@
-import type {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
-} from "@remix-run/node"
-import { json, redirect } from "@remix-run/node"
-import { Form } from "@remix-run/react"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import { redirect } from "react-router";
+import { Form } from "react-router";
+import { data } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRemixForm, RemixFormProvider } from "remix-hook-form"
 import { z } from "zod"
@@ -76,13 +74,13 @@ export async function loader({
     return redirect("../app");
   }
 
-  const data = { error: session.get("error") };
+  const response = { error: session.get("error") };
 
-  return json(data, {
+  return data(response, {
     headers: {
       "Set-Cookie": await commitSession(session),
-    },
-  });
+    }
+  })
 }
 
 /**
@@ -173,7 +171,7 @@ export default function SignUp() {
                     <FormField
                       control={form.control}
                       name="firstname"
-                      render={({ field }) => (                        
+                      render={({ field }) => (
                         <FormItem>
                           <FormLabel>Voornaam</FormLabel>
                           <FormControl>
@@ -181,7 +179,7 @@ export default function SignUp() {
                           </FormControl>
                           <FormDescription />
                           <FormMessage />
-                        </FormItem>                  
+                        </FormItem>
                       )}
                     />
                   </div>

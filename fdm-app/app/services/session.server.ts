@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from "@remix-run/node";
+import { createCookieSessionStorage } from "react-router";
 
 const fdmSessionSecret = process.env.FDM_SESSION_SECRET;
 if (!fdmSessionSecret) {

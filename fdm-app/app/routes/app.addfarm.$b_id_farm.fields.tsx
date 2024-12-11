@@ -1,5 +1,5 @@
-import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { useLoaderData } from "react-router";
 import wkx from 'wkx'
 
 // Components
@@ -32,7 +32,7 @@ export async function loader({
     // Get the Id and name of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw new Response("Farm ID is required", { status: 400 });
+        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
     const farm = await getFarm(fdm, b_id_farm)
 
@@ -58,7 +58,7 @@ export async function loader({
     // Get the Mapbox Token
     const mapboxToken = process.env.MAPBOX_TOKEN;
     if (!mapboxToken) {
-        throw new Error("MAPBOX_TOKEN environment variable is not set");
+        throw data("MAPBOX_TOKEN environment variable is not set", { status: 500, statusText: "MAPBOX_TOKEN environment variable is not set" });
     }
 
     // Get the available cultivations
@@ -73,20 +73,20 @@ export async function loader({
             }));
     } catch (error) {
         console.error('Failed to fetch cultivations:', error);
-        throw new Response(
+        throw data(
             'Failed to load cultivation options',
-            { status: 500 }
+            { status: 500, statusText: 'Failed to load cultivation options' }
         );
     }
 
-    return json({
+    return {
         fields: fieldsWithGeojson,
         cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
         action: `/app/addfarm/${b_id_farm}/fields`
-    })
+    }
 
 }
 
@@ -162,7 +162,10 @@ export async function action({
     const b_name = formData.get('b_name')?.toString();
 
     if (!b_id) {
-        throw new Response("Field ID is required", { status: 400 });
+        throw data("Field ID is required", { status: 400, statusText: "Field ID is required" });
+    }
+    if (!b_name) {
+        throw data("Field name is required", { status: 400, statusText: "Field name is required" });
     }
 
     try {
@@ -176,11 +179,11 @@ export async function action({
             undefined, // b_manage_end
             undefined  // b_manage_type
         );
-        return json({ field: updatedField });
+        return { field: updatedField };
     } catch (error) {
-        throw new Response(
+        throw data(
             `Failed to update field: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            { status: 500 }
+            { status: 500, statusText: 'Failed to update field' }
         );
     }
 }

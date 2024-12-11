@@ -1,5 +1,5 @@
-import { type MetaFunction, type LoaderFunctionArgs, json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { useLoaderData } from "react-router";
 
 // Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -29,23 +29,23 @@ export async function loader({
     // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw new Response("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
 
     // Get the cultivation
     const b_lu_catalogue = params.b_lu_catalogue
     if (!b_lu_catalogue) {
-        throw new Response("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
+        throw data("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
     }
 
     // Get the cultivation details for this cultivation
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
-        throw new Response("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
+        throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
     });
 
     const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue);
     if (!cultivation) {
-        throw new Response("Cultivation not found", { status: 404, statusText: "Cultivation not found" });
+        throw data("Cultivation not found", { status: 404, statusText: "Cultivation not found" });
     }
 
     // Cultivation options
@@ -66,14 +66,13 @@ export async function loader({
         }
     })
 
-    return json({
+    return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
         cultivation: cultivation,
         fertilizerOptions: fertilizerOptions,
         cultivationOptions: cultivationOptions
-    })
-
+    }
 }
 
 // Main
