@@ -137,6 +137,9 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
+  future: {
+    experimental_faster: true,
+  }
 };
 
 export default config;
