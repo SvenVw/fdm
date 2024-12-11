@@ -43,6 +43,11 @@ export interface farmType {
     FormSchema: z.Schema<any>
 }
 
+/**
+ * Renders the Farm component, which displays the farm form with validation.
+ * @param props - Properties of type `farmType`, including form data and validation schema.
+ * @returns The JSX element representing the farm form.
+ */
 export function Farm(props: farmType) {
     const organicFertilizersList = props.organicFertilizersList
     const mineralFertilizersList = props.mineralFertilizersList

@@ -85,6 +85,11 @@ export async function loader({
   });
 }
 
+/**
+ * SignUp component renders the signup form with client-side validation.
+ * Utilizes react-hook-form and Zod for form handling and validation.
+ * @returns The JSX element representing the signup form.
+ */
 export default function SignUp() {
 
   const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -264,6 +269,12 @@ export default function SignUp() {
   )
 }
 
+/**
+ * Action function for processing the signup form submission.
+ * Validates user input and creates a new user account.
+ * @param request - The incoming request object containing form data.
+ * @returns A redirect response upon successful signup or error handling.
+ */
 export async function action({
   request,
 }: ActionFunctionArgs) {

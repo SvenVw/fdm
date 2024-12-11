@@ -54,7 +54,11 @@ const brpFieldsLineStyle = {
   }
 };
 
-
+/**
+ * FieldsMap component renders a map interface for selecting and displaying fields.
+ * Manages GeoJSON data and handles submission states.
+ * @returns The JSX element representing the interactive fields map.
+ */
 export function FieldsMap(props: FieldsMapType) {
   const fetcher = useFetcher();
   const mapboxToken = props.mapboxToken

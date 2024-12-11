@@ -5,6 +5,11 @@ export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
     className?: string;
 }
 
+/**
+ * LoadingSpinner component displays a loading spinner SVG.
+ * @param props - SVG properties including optional `size` and `className`.
+ * @returns The SVG element representing the loading spinner.
+ */
 export const LoadingSpinner = ({
     size = 24,
     className,

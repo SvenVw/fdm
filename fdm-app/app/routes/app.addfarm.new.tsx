@@ -68,8 +68,12 @@ export async function loader({
   });
 }
 
-// Main
-export default function Index() {
+/**
+ * Default component for the Add Farm page.
+ * Renders the farm form and passes the validation schema to the Farm component.
+ * @returns The JSX element representing the add farm page.
+ */
+export default function AddFarmPage() {
   const loaderData = useLoaderData<typeof loader>();
   return (
     <SidebarInset>
@@ -107,7 +111,12 @@ export default function Index() {
   );
 }
 
-// Action
+/**
+ * Action function for handling the submission of the add farm form.
+ * Processes and validates form data to create a new farm.
+ * @param request - The incoming request object containing form data.
+ * @returns A redirect response to the newly created farm's page.
+ */
 export async function action({
   request,
 }: ActionFunctionArgs) {
