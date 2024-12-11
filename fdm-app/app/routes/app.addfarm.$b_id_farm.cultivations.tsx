@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
 import { Outlet, useLoaderData } from "react-router";
 
 // Components
@@ -42,7 +42,7 @@ export async function loader({
         });
     
     if (!farm) {
-        throw new Response("Farm not found", { status: 404 });
+        throw data("Farm not found", { status: 404, statusText: "Farm not found" });
     }
 
     // Get the cultivationPlan

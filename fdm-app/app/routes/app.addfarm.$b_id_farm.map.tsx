@@ -3,6 +3,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
   redirect,
+  data,
 } from "react-router";
 import { useLoaderData } from "react-router";
 import { ClientOnly } from "remix-utils/client-only"
@@ -201,5 +202,9 @@ export async function action({
   } else {
     throw new Error("Invalid POST question")
   }
-  return response
+
+  if (!response) {
+    throw data("No data returned", { status: 404 });
+  }
+  return response;
 }
