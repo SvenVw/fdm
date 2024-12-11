@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.3.1
+
+### Patch Changes
+
+- 9a410b1: Migrated from Remix v2 to React Router v7
+
 ## 0.3.0
 
 ### Minor Changes
