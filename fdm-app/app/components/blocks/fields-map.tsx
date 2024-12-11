@@ -142,6 +142,9 @@ export function FieldsMap(props: FieldsMapType) {
   }
 
   async function handleClickOnSubmit() {
+    if (!selectedFieldsData?.features?.length) {
+      return;
+    }
 
     try {
       const formSelectedFields = new FormData();
@@ -152,8 +155,9 @@ export function FieldsMap(props: FieldsMapType) {
         method: "POST",
       })
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to submit fields: ', error);
+      throw new Error(`Failed to submit fields: ${error instanceof Error ? error.message : String(error)}`);
       // TODO: adding a toast notification with error
     }
 
