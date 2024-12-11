@@ -4,7 +4,8 @@
 
 ### Minor Changes
 
-- c86567e: Add client-side validation of signup form, addfarm and addfields. Add also visual clue that fields are loaded on the map
+- Implement client-side form validation using Zod for the signup, add farm, and add fields forms.
+- Add visual indicators when fields are loading on the map to enhance user experience.
 
 ## 0.2.0
 
