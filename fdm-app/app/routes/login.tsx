@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { data, redirect } from "react-router";
 
 import type { LoaderFunction } from "react-router";
 
@@ -8,6 +8,9 @@ export const loader: LoaderFunction = async () => {
         return redirect("/signup");
     } catch (error) {
         console.error("Login redirect failed:", error);
-        throw error;
+        throw data("Login redirect failed", {
+            status: 500,
+            statusText: "Login redirect failed",
+        });
     }
 }

@@ -32,12 +32,13 @@ export async function loader({
     // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw new Response("Farm ID is required", { status: 400 });
+        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
     const farm = await getFarm(fdm, b_id_farm)
         .catch(error => {
-            throw new Response(`Failed to fetch farm: ${error.message}`, { 
-                status: 404 
+            throw data(`Failed to fetch farm: ${error.message}`, { 
+                status: 404,
+                statusText: "Farm not found"
             });
         });
     

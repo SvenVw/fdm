@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFetcher } from "react-router";
+import { data, useFetcher } from "react-router";
 import { Map as MapGL, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from "../ui/button";
@@ -143,7 +143,7 @@ export function FieldsMap(props: FieldsMapType) {
 
     } catch (error: unknown) {
       console.error('Failed to submit fields: ', error);
-      throw new Error(`Failed to submit fields: ${error instanceof Error ? error.message : String(error)}`);
+      throw data({ status: 500, statusText: `Failed to submit fields: ${error}` })
       // TODO: adding a toast notification with error
     }
 
