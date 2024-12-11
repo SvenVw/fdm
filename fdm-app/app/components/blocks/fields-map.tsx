@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher } from "react-router";
 import { Map as MapGL, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from "../ui/button";

@@ -1,5 +1,5 @@
-import { type MetaFunction, type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
 import wkx from 'wkx'
 
 // Components

@@ -1,5 +1,5 @@
-import { type MetaFunction, type LoaderFunctionArgs} from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { type MetaFunction, type LoaderFunctionArgs } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
