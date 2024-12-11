@@ -1,11 +1,29 @@
 import { useState } from "react";
-import { useFetcher, useNavigation } from "@remix-run/react";
-import { Map, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
+import { useFetcher } from "@remix-run/react";
+import { Map as MapGL, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Button } from "../ui/button";
+import { LoadingSpinner } from "../custom/loadingspinner";
 
 interface FieldsMapType {
   mapboxToken: string
+}
+
+interface GeoJSONFeature {
+  type: string;
+  geometry: {
+    type: string;
+    coordinates: number[][][];
+  };
+  properties: {
+    reference_id: string;
+    [key: string]: any;
+  };
+}
+
+interface GeoJSONCollection {
+  type: "FeatureCollection";
+  features: GeoJSONFeature[];
 }
 
 const brpFieldsFillStyle = {
@@ -36,14 +54,20 @@ const brpFieldsLineStyle = {
   }
 };
 
-
+/**
+ * FieldsMap component renders a map interface for selecting and displaying fields.
+ * Manages GeoJSON data and handles submission states.
+ * @returns The JSX element representing the interactive fields map.
+ */
 export function FieldsMap(props: FieldsMapType) {
-  const navigation = useNavigation();
   const fetcher = useFetcher();
   const mapboxToken = props.mapboxToken
 
-  const [bprFieldsData, setBrpFieldsData] = useState<any>(null);
-  const [selectedFieldsData, setSelectedFieldsData] = useState<any>(null);
+  const [bprFieldsData, setBrpFieldsData] = useState<GeoJSONCollection | null>(null);
+  const [selectedFieldsData, setSelectedFieldsData] = useState<GeoJSONCollection | null>(null);
+
+  const isSubmitting = fetcher.state === "submitting" && fetcher.formData?.get("question") === 'submit_selected_fields'
+  const isLoading = fetcher.state === "submitting" && fetcher.formData?.get("question") === 'get_brp_fields'
 
   async function loadBrpFields(evt) {
 
@@ -117,24 +141,27 @@ export function FieldsMap(props: FieldsMapType) {
     }
   }
 
-  async function handleClickOnSubmit()  {
-    
-    selectedFieldsData
+  async function handleClickOnSubmit() {
 
-    const formSelectedFields = new FormData();
-    formSelectedFields.append("question", 'submit_selected_fields')
-    formSelectedFields.append("selected_fields", JSON.stringify(selectedFieldsData.features))
+    try {
+      const formSelectedFields = new FormData();
+      formSelectedFields.append("question", 'submit_selected_fields')
+      formSelectedFields.append("selected_fields", JSON.stringify(selectedFieldsData.features))
 
-    await fetcher.submit(formSelectedFields, {
-      method: "POST",
-    })
+      await fetcher.submit(formSelectedFields, {
+        method: "POST",
+      })
 
+    } catch (error) {
+      console.error('Failed to submit fields: ', error);
+      // TODO: adding a toast notification with error
+    }
 
   }
 
   return (
     <div style={{ position: "relative" }}>
-      <Map
+      <MapGL
         initialViewState={{
           longitude: 5,
           latitude: 52,
@@ -158,12 +185,21 @@ export function FieldsMap(props: FieldsMapType) {
         </Source>
         <NavigationControl />
         <GeolocateControl />
-      </Map>
+      </MapGL>
       <div style={{ position: "absolute", bottom: 10, left: "50%", transform: "translate(-50%, -50%)" }}>
-        <Button onClick={handleClickOnSubmit} disabled={!selectedFieldsData}>
-          {navigation.state === "submitting"
-            ? "Opslaan..."
-            : "Voeg geselecteerde percelen toe"}
+        <Button onClick={handleClickOnSubmit} disabled={!selectedFieldsData || isSubmitting || isLoading}>
+          {isSubmitting ?
+            <div className="flex items-center space-x-2">
+              <LoadingSpinner />
+              <span>Opslaan...</span>
+            </div>
+            : isLoading ?
+              <div className="flex items-center space-x-2">
+                <LoadingSpinner />
+                <span>Laden van BRP percelen...</span>
+              </div>
+              : "Voeg geselecteerde percelen toe"
+          }
         </Button>
       </div>
     </div>
