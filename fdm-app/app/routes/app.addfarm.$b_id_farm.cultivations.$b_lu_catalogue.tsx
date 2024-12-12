@@ -57,21 +57,10 @@ export async function loader({
         }
     })
 
-    // Fertilizer options
-    const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
-    const fertilizerOptions = fertilizersCatalogue.map(fertilizer => {
-        return {
-            value: fertilizer.p_id_catalogue,
-            label: fertilizer.p_name_nl
-        }
-    })
-
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        cultivation: cultivation,
-        fertilizerOptions: fertilizerOptions,
-        cultivationOptions: cultivationOptions
+        cultivation: cultivation
     }
 }
 
@@ -94,7 +83,7 @@ export default function Index() {
         },
         {
             title: 'Bemesting',
-            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizer`
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`
         },
         {
             title: 'Vanggewas',
@@ -115,9 +104,10 @@ export default function Index() {
                 <PaginationContent className="">
 
                     {items.map((item) => (
-                        <PaginationItem>
+                        <PaginationItem
+                            key={item.href}
+                        >
                             <PaginationLink
-                                key={item.href}
                                 href={item.href}
                                 size="default"
                                 isActive={pathname === item.href}
