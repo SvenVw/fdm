@@ -160,39 +160,8 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                                         </FormItem>
                                     )}
                                 />
-                            </div>
-
-                            {/* <div>
-                                <Label htmlFor="p_app_date">Datum<span className="text-red-500">*</span></Label>
-                                <Popover>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            variant={"outline"}
-                                            className={cn(
-                                                "justify-start text-left font-normal",
-                                                !date && "text-muted-foreground"
-                                            )}
-                                        >
-                                            <CalendarIcon />
-                                            {date ? format(date, "yyyy-MM-dd") : <span>Kies een datum</span>}
-                                        </Button>
-                                    </PopoverTrigger>
-                                    <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar
-                                            mode="single"
-                                            selected={date}
-                                            onSelect={setDate}
-                                            initialFocus
-                                        />
-                                    </PopoverContent>
-                                </Popover>
-                            </div> */}
-                            <div className="justify-self-end">
-                                {/* <Button type="submit">
-                                    {navigation.state === "submitting"
-                                        ? "Opslaan..."
-                                        : "Voeg toe"}
-                                </Button> */}
+                            </div>                          
+                            <div className="justify-self-end">                               
                                 <Button type="submit">
                                     {form.formState.isSubmitting
                                         ? <div className="flex items-center space-x-2">
