@@ -1,13 +1,13 @@
-import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, useLocation, Outlet } from "react-router";
 import { useLoaderData } from "react-router";
 
 // Components
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
-import { ComboboxCultivations } from "@/components/custom/combobox-cultivations";
-
-// Blocks
-import Cultivation from "@/components/blocks/cultivation-plan";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+} from "@/components/ui/pagination"
 
 // FDM
 import { fdm } from "../services/fdm.server";
@@ -78,6 +78,7 @@ export async function loader({
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>();
+    const { pathname } = useLocation();
 
     // Get field names
     let fieldNames = loaderData.cultivation.fields.map(field => field.b_name)
@@ -86,6 +87,20 @@ export default function Index() {
         fieldNames = fieldNames.replace(/,(?=[^,]+$)/, ', en') //Replace last comma with and        
     }
 
+    const items = [
+        {
+            title: 'Gewas',
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`
+        },
+        {
+            title: 'Bemesting',
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizer`
+        },
+        {
+            title: 'Vanggewas',
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`
+        }
+    ]
 
     return (
         <div className="space-y-6">
@@ -95,7 +110,27 @@ export default function Index() {
                     {fieldNames}
                 </p>
             </div>
-            <Tabs defaultValue="cultivation_main" className="w-full">
+
+            <Pagination>
+                <PaginationContent className="">
+
+                    {items.map((item) => (
+                        <PaginationItem>
+                            <PaginationLink
+                                key={item.href}
+                                href={item.href}
+                                size="default"
+                                isActive={pathname === item.href}
+                            >
+                                {item.title}
+                            </PaginationLink>
+                        </PaginationItem>
+                    ))}
+                </PaginationContent>
+            </Pagination>
+            <Outlet />
+
+            {/* <Tabs defaultValue="cultivation_main" className="w-full">
                 <TabsList>
                     <TabsTrigger value="cultivation_main">Hoofdgewas</TabsTrigger>
                     <TabsTrigger value="fertilizations">Bemesting </TabsTrigger>
@@ -129,25 +164,7 @@ export default function Index() {
                         />
                     </div>
                 </TabsContent>
-            </Tabs>
+            </Tabs> */}
         </div>
     );
-}
-
-export async function action({
-    request, params
-}: ActionFunctionArgs) {
-
-    const b_id_farm = params.b_id_farm
-    const b_lu_catalogue = params.b_lu_catalogue
-    const formData = await request.formData()
-    const form  = formData.get('form')
-
-
-    if ( form === 'addFertilizer') {
-        return json({ success: true })        
-    } else {
-        throw new Error("Invalid POST actionForm")    
-    }
-
 }
