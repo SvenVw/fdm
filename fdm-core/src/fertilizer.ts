@@ -3,7 +3,7 @@ import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
-import { getFertilizersType, getFertilizerType } from './fertilizer.d'
+import { getFertilizerType } from './fertilizer.d'
 
 /**
  * Retrieves all fertilizers from the catalogue.
@@ -220,16 +220,51 @@ export async function getFertilizer(fdm: FdmType, p_id: schema.fertilizersTypeSe
  * @returns A Promise that resolves with an array of fertilizer IDs.
  * @alpha
  */
-export async function getFertilizers(fdm: FdmType, b_id_farm: schema.fertilizerAcquiringTypeSelect['b_id_farm']): Promise<getFertilizersType[]> {
+export async function getFertilizers(fdm: FdmType, b_id_farm: schema.fertilizerAcquiringTypeSelect['b_id_farm']): Promise<getFertilizerType[]> {
 
     const fertilizers = await fdm
         .select({
-            p_id: schema.fertilizers.p_id
+            p_id: schema.fertilizers.p_id,
+            p_name_nl: schema.fertilizersCatalogue.p_name_nl,
+            p_name_en: schema.fertilizersCatalogue.p_name_en,
+            p_description: schema.fertilizersCatalogue.p_description,
+            p_acquiring_amount: schema.fertilizerAcquiring.p_acquiring_amount,
+            p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
+            p_picking_date: schema.fertilizerPicking.p_picking_date,
+            p_n_rt: schema.fertilizersCatalogue.p_n_rt,
+            p_n_if: schema.fertilizersCatalogue.p_n_if,
+            p_n_of: schema.fertilizersCatalogue.p_n_of,
+            p_n_wc: schema.fertilizersCatalogue.p_n_wc,
+            p_p_rt: schema.fertilizersCatalogue.p_p_rt,
+            p_k_rt: schema.fertilizersCatalogue.p_k_rt,
+            p_mg_rt: schema.fertilizersCatalogue.p_mg_rt,
+            p_ca_rt: schema.fertilizersCatalogue.p_ca_rt,
+            p_ne: schema.fertilizersCatalogue.p_ne,
+            p_s_rt: schema.fertilizersCatalogue.p_s_rt,
+            p_s_wc: schema.fertilizersCatalogue.p_s_wc,
+            p_cu_rt: schema.fertilizersCatalogue.p_cu_rt,
+            p_zn_rt: schema.fertilizersCatalogue.p_zn_rt,
+            p_na_rt: schema.fertilizersCatalogue.p_na_rt,
+            p_si_rt: schema.fertilizersCatalogue.p_si_rt,
+            p_b_rt: schema.fertilizersCatalogue.p_b_rt,
+            p_mn_rt: schema.fertilizersCatalogue.p_mn_rt,
+            p_ni_rt: schema.fertilizersCatalogue.p_ni_rt,
+            p_fe_rt: schema.fertilizersCatalogue.p_fe_rt,
+            p_mo_rt: schema.fertilizersCatalogue.p_mo_rt,
+            p_co_rt: schema.fertilizersCatalogue.p_co_rt,
+            p_as_rt: schema.fertilizersCatalogue.p_as_rt,
+            p_cd_rt: schema.fertilizersCatalogue.p_cd_rt,
+            p_cr_rt: schema.fertilizersCatalogue.p_cr_rt,
+            p_cr_vi: schema.fertilizersCatalogue.p_cr_vi,
+            p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
+            p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
+            p_cl_cr: schema.fertilizersCatalogue.p_cl_cr
         })
         .from(schema.fertilizers)
         .leftJoin(schema.fertilizerAcquiring, eq(schema.fertilizers.p_id, schema.fertilizerAcquiring.p_id))
+        .leftJoin(schema.fertilizerPicking, eq(schema.fertilizers.p_id, schema.fertilizerPicking.p_id))
+        .leftJoin(schema.fertilizersCatalogue, eq(schema.fertilizerPicking.p_id_catalogue, schema.fertilizersCatalogue.p_id_catalogue))
         .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
-
 
     return fertilizers
 }

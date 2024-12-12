@@ -35,7 +35,3 @@ export interface getFertilizerType {
     p_hg_rt: number | null
     p_cl_cr: number | null    
 }
-
-export interface getFertilizersType {
-    p_id: string
-}
