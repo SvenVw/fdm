@@ -1,9 +1,10 @@
 import { useLoaderData, type LoaderFunctionArgs, data, ActionFunctionArgs } from "react-router";
-import { extractFormValuesFromRequest } from "@/lib/form";
-import { FormSchema } from "@/components/custom/combobox-fertilizers";
+import { dataWithSuccess} from "remix-toast";
 
 // Components
 import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
+import { extractFormValuesFromRequest } from "@/lib/form";
+import { FormSchema } from "@/components/custom/combobox-fertilizers";
 
 // FDM
 import { fdm } from "../services/fdm.server";
@@ -38,8 +39,8 @@ export async function loader({
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        fertilizerOptions: fertilizerOptions
-    }
+        fertilizerOptions: fertilizerOptions,
+    };
 }
 
 export default function Index() {
@@ -101,8 +102,6 @@ export async function action({
 
     })
 
-    return {
-        ok: true,
-    }
+    return dataWithSuccess({ result: "Data saved successfully" }, { message: "Bemesting is toegevoegd! 🎉" })
 
 }

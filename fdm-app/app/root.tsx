@@ -1,5 +1,9 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
-import type { LinksFunction } from "react-router";
+import { useEffect } from "react";
+import { data, Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "react-router";
+import type { LinksFunction, LoaderFunctionArgs } from "react-router";
+import { getToast } from "remix-toast";
+import { Toaster } from "@/components/ui/sonner"
+import { toast as notify } from "sonner";
 
 import styles from "~/tailwind.css?url";
 
@@ -17,7 +21,24 @@ export const links: LinksFunction = () => [
   },
 ];
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const { toast, headers } = await getToast(request);
+  return data({ toast }, { headers });
+}
+
 export function Layout() {
+  const { toast } = useLoaderData<typeof loader>();
+
+  // Hook to show the toasts
+  useEffect(() => {
+    if (toast?.type === "error") {
+      notify.error(toast.message);
+    }
+    if (toast?.type === "success") {
+      notify.success(toast.message);
+    }
+  }, [toast]);
+
   return (
     <html lang="en">
       <head>
@@ -26,8 +47,9 @@ export function Layout() {
         <Meta />
         <Links />
       </head>
-      <body>       
+      <body>
         <Outlet />
+        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>

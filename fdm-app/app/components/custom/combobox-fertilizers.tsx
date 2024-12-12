@@ -1,6 +1,5 @@
-import { Form, useFetcher, useNavigation } from "react-router"
+import { Form } from "react-router"
 import { format } from "date-fns"
-import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRemixForm, RemixFormProvider } from "remix-hook-form"
 import { z } from "zod"
@@ -10,7 +9,6 @@ import { CalendarIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -48,7 +46,6 @@ export const FormSchema = z.object({
 })
 
 export function ComboboxFertilizers(props: { options: { value: string, label: string }[], defaultValue?: string, action: string }) {
-    const fetcher = useFetcher();
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -58,30 +55,6 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
             // p_app_date: new Date(),
         },
     })
-
-
-    // async function handleClickOnSubmitAddFertilizer(e: FormEvent) {
-
-    //     e.currentTarget
-    //     const formData = new FormData(e.currentTarget);
-    //     formData.append("actionForm", 'addFertilizer')
-    //     console.log(e.currentTarget)
-
-    //     await fetcher.submit(formData, {
-    //         method: "POST",
-    //     })
-
-
-    // }
-    async function handleClickOnSubmitRemoveFertilizer() {
-
-        const formData = new FormData();
-        formData.append("actionForm", 'removeFertilizer')
-
-        await fetcher.submit(formData, {
-            method: "POST",
-        })
-    }
 
     return (
         <div>
