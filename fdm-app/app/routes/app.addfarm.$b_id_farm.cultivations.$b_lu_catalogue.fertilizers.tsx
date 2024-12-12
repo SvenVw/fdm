@@ -68,7 +68,6 @@ export async function action({
     console.log(formValues)
 
     const {p_app_amount, p_app_date} = formValues;
-    console.log(format(p_app_date))
     
     return {
         ok: true,

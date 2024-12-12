@@ -14,6 +14,14 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
 import { ChevronsUpDown, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -24,71 +32,76 @@ type optionType = {
 
 interface ComboboxProps {
     options: { value: string, label: string }[]
-    value?: string
-    defaultValue?: string
-    onChange?: (value: string) => void
-    onOpenChange?: (open: boolean) => void
+    form: any
+    name: string
+    label: any
 }
 
 export function Combobox({
     options,
-    value: controlledValue,
-    defaultValue,
-    onChange,
-    onOpenChange
+    form,
+    name,
+    label
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
-    const [internalValue, setInternalValue] = useState(defaultValue ?? "")
-    
-    const value = controlledValue ?? internalValue
-    const handleValueChange = (newValue: string) => {
-        setInternalValue(newValue)
-        onChange?.(newValue)
-    }
-    const name = "combobox"
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    name={name}
-                    className="w-full justify-between opacity-50"
-                >
-                    {value || "Begin met typen..."}
-                    <ChevronsUpDown className="opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-                <Command>
-                    <CommandInput placeholder="Begin met typen..." className="h-9" />
-                    <CommandList>
-                        <CommandEmpty>Niks gevonden</CommandEmpty>
-                        <CommandGroup>
-                            {options.map((option: optionType) => (
-                                <CommandItem
-                                    key={option.value}
-                                    value={option.label}
-                                    onSelect={(currentValue) => {
-                                        setInternalValue(currentValue === value ? "" : currentValue)
-                                        setOpen(false)
-                                    }}
+        <FormField
+            control={form.control}
+            name={name}
+            render={({ field }) => (
+                <FormItem className="flex flex-col">
+                    <FormLabel>{label}</FormLabel>
+                    <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    aria-expanded={open}
+                                    name={name}
+                                    className="w-full justify-between"
                                 >
-                                    <p className="text-pretty w-[350px]">{option.label}</p>                                    
-                                    <Check
-                                        className={cn(
-                                            "ml-auto",
-                                            value === option.label ? "opacity-100" : "opacity-0"
-                                        )}
-                                    />
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+                                    {options.find(option => option.value === field.value)?.label || "Begin met typen..."}
+                                    <ChevronsUpDown className="opacity-50" />
+                                </Button>
+                            </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                            <Command>
+                                <CommandInput placeholder="Begin met typen..." className="h-9" />
+                                <CommandList>
+                                    <CommandEmpty>Niks gevonden</CommandEmpty>
+                                    <CommandGroup>
+                                        {options.map((option: optionType) => (
+                                            <CommandItem
+                                                value={option.value}
+                                                key={option.value}
+                                                onSelect={() => {
+                                                    form.setValue(name, option.value)
+                                                    setOpen(false)
+                                                }}
+                                            >
+                                                <p className="text-pretty w-[350px]">{option.label}</p>
+                                                <Check
+                                                    className={cn(
+                                                        "ml-auto",
+                                                        option.value === field.value
+                                                            ? "opacity-100"
+                                                            : "opacity-0"
+                                                    )}
+                                                />
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <FormDescription />
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
     )
 }

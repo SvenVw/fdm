@@ -41,10 +41,13 @@ export const FormSchema = z.object({
         required_error: "Datum is verplicht",
         invalid_type_error: "Datum is ongeldig",
     }),
+    p_id: z.coerce.string({ // TODO: Validate against the options that are available
+        required_error: "Keuze van meststof is verplicht",
+        invalid_type_error: "Meststof is ongeldig",
+    })
 })
 
 export function ComboboxFertilizers(props: { options: { value: string, label: string }[], defaultValue?: string, action: string }) {
-    const navigation = useNavigation();
     const fetcher = useFetcher();
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -52,7 +55,7 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
         resolver: zodResolver(FormSchema),
         defaultValues: {
             p_app_amount: 0,
-            p_app_date: new Date(),
+            // p_app_date: new Date(),
         },
     })
 
@@ -81,7 +84,6 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
     }
 
     const [date, setDate] = useState()
-
     return (
         <div>
             <RemixFormProvider {...form}>
@@ -92,10 +94,13 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                         <input type="hidden" name="form" value="addFertilizerApplication" />
                         <div className="grid grid-cols-5 items-end gap-x-3 justify-between">
                             <div className="col-span-2">
-                                {/* <Label htmlFor="b_name_farm">Meststof<span className="text-red-500">*</span></Label>
+                                {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
                                 <Combobox
                                     options={props.options}
-                                /> */}
+                                    form={form}
+                                    name="fertilizer"
+                                    label={<span>Meststof<span className="text-red-500">*</span></span>}                              
+                                />
                             </div>
                             <div>
                             <FormField
