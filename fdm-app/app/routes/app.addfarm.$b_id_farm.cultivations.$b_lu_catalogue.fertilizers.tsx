@@ -7,7 +7,7 @@ import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getCultivationPlan, getCultivationsFromCatalogue, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
+import { getCultivationPlan, getFertilizers, addFertilizerApplication, getFertilizer } from "@svenvw/fdm-core";
 
 // Loader
 export async function loader({
@@ -27,14 +27,13 @@ export async function loader({
     }
 
     // Fertilizer options
-    const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
-    const fertilizerOptions = fertilizersCatalogue.map(fertilizer => {
+    const fertilizers = await getFertilizers(fdm, b_id_farm)
+    const fertilizerOptions = fertilizers.map(fertilizer => {
         return {
-            value: fertilizer.p_id_catalogue,
+            value: fertilizer.p_id,
             label: fertilizer.p_name_nl
         }
     })
-
 
     return {
         b_lu_catalogue: b_lu_catalogue,
@@ -60,17 +59,50 @@ export default function Index() {
 }
 
 export async function action({
-    request,
-  }: ActionFunctionArgs) {
-    console.log("action")
-  
-    const formValues = await extractFormValuesFromRequest(request, FormSchema)
-    console.log(formValues)
+    request, params
+}: ActionFunctionArgs) {
 
-    const {p_app_amount, p_app_date} = formValues;
-    
+    // Get the Id of the farm
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+    }
+
+    // Get the cultivation
+    const b_lu_catalogue = params.b_lu_catalogue
+    if (!b_lu_catalogue) {
+        throw data("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
+    }
+
+    // Collect form entry
+    const formValues = await extractFormValuesFromRequest(request, FormSchema)
+    const { p_id, p_app_amount, p_app_date } = formValues;
+
+    // Get the cultivation details for this cultivation
+    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
+        throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
+    });
+
+    // Get the id of the fields with this cultivation
+    const fields = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue).fields
+
+    fields.map(async (field) => {
+
+        const b_id = field.b_id
+        await addFertilizerApplication(
+            fdm,
+            b_id,
+            p_id,
+            p_app_amount,
+            null,
+            p_app_date
+        )
+
+
+    })
+
     return {
         ok: true,
     }
-  
-  }
+
+}
