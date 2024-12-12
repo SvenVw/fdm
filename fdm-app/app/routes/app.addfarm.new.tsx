@@ -1,7 +1,7 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { useLoaderData, redirect } from "react-router";
 import { z } from "zod"
-import { addFarm, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
+import { addFarm, addFertilizer, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -25,9 +25,9 @@ export const meta: MetaFunction = () => {
 
 const FormSchema = z.object({
   b_name_farm: z.string({
-      required_error: "Naam van bedrijf is verplicht",
+    required_error: "Naam van bedrijf is verplicht",
   }).min(3, {
-      message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
+    message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
   }),
 })
 
@@ -35,35 +35,9 @@ const FormSchema = z.object({
 export async function loader({
   request,
 }: LoaderFunctionArgs) {
-  const fertilizers = await getFertilizersFromCatalogue(fdm);
-
-  const organicFertilizersList = fertilizers
-    .filter(x => { return (x.p_type_manure || x.p_type_compost) })
-    .map(x => {
-      return {
-        value: x.p_id_catalogue,
-        label: x.p_name_nl
-      }
-    })
-
-  const mineralFertilizersList = fertilizers
-    .filter(x => { return (x.p_type_mineral) })
-    .map(x => {
-      return {
-        value: x.p_id_catalogue,
-        label: x.p_name_nl
-      }
-    })
 
   return {
-    values: {
-      b_name_farm: null,
-      b_fertilizers_organic: null,
-    },
-    lists: {
-      organicFertilizersList: organicFertilizersList,
-      mineralFertilizersList: mineralFertilizersList
-    }
+    b_name_farm: null,
   };
 }
 
@@ -97,11 +71,7 @@ export default function AddFarmPage() {
       </header>
       <main>
         <Farm
-          b_name_farm={loaderData.values.b_name_farm}
-          b_fertilizers_organic={[]}
-          b_fertilizers_mineral={[]}
-          organicFertilizersList={loaderData.lists.organicFertilizersList}
-          mineralFertilizersList={loaderData.lists.mineralFertilizersList}
+          b_name_farm={loaderData.b_name_farm}
           action={"/app/addfarm/new"}
           FormSchema={FormSchema}
         />
@@ -124,6 +94,12 @@ export async function action({
 
   // Create a farm
   const b_id_farm = await addFarm(fdm, b_name_farm, null)
+
+  // Add the fertilizers from the catalogue to the database
+  const fertilizers = await getFertilizersFromCatalogue(fdm);
+  await fertilizers.map(async (fertilizer) => {
+    await addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
+  })
 
   return redirect(`../addfarm/${b_id_farm}/map`)
 }

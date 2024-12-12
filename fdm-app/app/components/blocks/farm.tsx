@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Form } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRemixForm, RemixFormProvider } from "remix-hook-form"
@@ -14,7 +13,6 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
     FormControl,
     FormDescription,
@@ -23,10 +21,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-
-import { MultiSelect } from "@/components/custom/multi-select"
 import { LoadingSpinner } from "../custom/loadingspinner";
-
 
 export interface fertilizersListType {
     value: string
@@ -35,10 +30,6 @@ export interface fertilizersListType {
 
 export interface farmType {
     b_name_farm: string | null
-    b_fertilizers_organic: string[]
-    b_fertilizers_mineral: string[]
-    organicFertilizersList: fertilizersListType[]
-    mineralFertilizersList: fertilizersListType[]
     action: "/app/addfarm/new"
     FormSchema: z.Schema<any>
 }
@@ -49,11 +40,7 @@ export interface farmType {
  * @returns The JSX element representing the farm form.
  */
 export function Farm(props: farmType) {
-    const organicFertilizersList = props.organicFertilizersList
-    const mineralFertilizersList = props.mineralFertilizersList
     const FormSchema = props.FormSchema
-    const [selectedOrganicFertilizers, setOrganicFertilizers] = useState<string[]>(props.b_fertilizers_organic);
-    const [selectedMineralFertilizers, setMineralFertilizers] = useState<string[]>(props.b_fertilizers_mineral);
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -90,34 +77,7 @@ export function Farm(props: farmType) {
                                                     <FormDescription />
                                                     <FormMessage />
                                                 </FormItem>
-
                                             )}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
-                                        <Label htmlFor="b_fertilizers_organic">Welke <i>organische</i> meststoffen gebruikt u?</Label>
-                                        <MultiSelect
-                                            options={organicFertilizersList}
-                                            onValueChange={setOrganicFertilizers}
-                                            defaultValue={selectedOrganicFertilizers}
-                                            placeholder="Selecteer meststoffen"
-                                            variant="inverted"
-                                            animation={0}
-                                            maxCount={10}
-                                            name="b_fertilizers_organic"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
-                                        <Label htmlFor="b_fertilizers_mineral">Welke <i>minerale</i> meststoffen gebruikt u?</Label>
-                                        <MultiSelect
-                                            options={mineralFertilizersList}
-                                            onValueChange={setMineralFertilizers}
-                                            defaultValue={selectedMineralFertilizers}
-                                            placeholder="Selecteer meststoffen"
-                                            variant="inverted"
-                                            animation={0}
-                                            maxCount={10}
-                                            name="b_fertilizers_mineral"
                                         />
                                     </div>
                                 </div>
