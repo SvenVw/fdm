@@ -15,6 +15,13 @@
       "when": 1733407330727,
       "tag": "0001_hesitant_brood",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1734018887811,
+      "tag": "0002_famous_skullbuster",
+      "breakpoints": true
     }
   ]
 }

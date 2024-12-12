@@ -243,7 +243,7 @@ describe('Cultivation Data Model', () => {
             const p_name_en = 'Test Fertilizer (EN)';
             const p_description = 'This is a test fertilizer';
             const p_acquiring_amount = 1000;
-            const p_acquiring_date = new Date().toISOString().split('T')[0];
+            const p_acquiring_date = new Date();
 
             await addFertilizerToCatalogue(
                 fdm, {
@@ -308,7 +308,7 @@ describe('Cultivation Data Model', () => {
 
 
         it('should get cultivation plan for a farm', async () => {
-            await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
+            await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', new Date('2024-03-15'));
 
             const cultivationPlan = await getCultivationPlan(fdm, b_id_farm);
 

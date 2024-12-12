@@ -182,7 +182,7 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_acquiring_amount = 1000
-      const p_acquiring_date = new Date().toISOString().split('T')[0]
+      const p_acquiring_date = new Date()
       const p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
@@ -261,7 +261,7 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_acquiring_amount = 1000
-      const p_acquiring_date = new Date().toISOString().split('T')[0]
+      const p_acquiring_date = new Date()
 
       // Add two fertilizers to the farm
       await addFertilizer(fdm, p_id_catalogue, b_id_farm, p_acquiring_amount, p_acquiring_date)
@@ -336,7 +336,7 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_acquiring_amount = 1000
-      const p_acquiring_date = new Date().toISOString().split('T')[0]
+      const p_acquiring_date = new Date()
       const p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
@@ -434,7 +434,7 @@ describe('Fertilizer Data Model', () => {
       )
 
       const p_acquiring_amount = 1000
-      const p_acquiring_date = new Date().toISOString().split('T')[0]
+      const p_acquiring_date = new Date()
       p_id = await addFertilizer(
         fdm,
         p_id_catalogue,
@@ -450,13 +450,15 @@ describe('Fertilizer Data Model', () => {
     });
 
     it('should add a new fertilizer application', async () => {
+      const p_app_date = new Date('2024-03-15'); 
+
       const new_p_app_id = await addFertilizerApplication(
         fdm,
         b_id,
         p_id,
         100,
         'broadcasting',
-        '2024-03-15',
+        p_app_date
       );
       expect(new_p_app_id).toBeDefined();
 
@@ -466,19 +468,22 @@ describe('Fertilizer Data Model', () => {
       expect(fertilizerApplication?.p_id).toBe(p_id);
       expect(fertilizerApplication?.p_app_amount).toBe(100);
       expect(fertilizerApplication?.p_app_method).toBe('broadcasting');
-      expect(fertilizerApplication?.p_app_date).toEqual('2024-03-15');
+      expect(fertilizerApplication?.p_app_date).toEqual(p_app_date);
     });
 
 
     it('should update a fertilizer application', async () => {
-      const p_app_id = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
+      const p_app_date1 = new Date('2024-03-15'); 
+      const p_app_date2 = new Date('2024-04-20'); 
 
-      await updateFertilizerApplication(fdm, p_app_id, b_id, p_id, 200, 'injection', '2024-04-20');
+      const p_app_id = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', p_app_date1);
+
+      await updateFertilizerApplication(fdm, p_app_id, b_id, p_id, 200, 'injection', p_app_date2);
 
       const updatedApplication = await getFertilizerApplication(fdm, p_app_id);
       expect(updatedApplication?.p_app_amount).toBe(200);
       expect(updatedApplication?.p_app_method).toBe('injection');
-      expect(updatedApplication?.p_app_date).toEqual('2024-04-20');
+      expect(updatedApplication?.p_app_date).toEqual(p_app_date2);
 
     });
 
@@ -490,7 +495,7 @@ describe('Fertilizer Data Model', () => {
         p_id,
         100,
         'broadcasting',
-        '2024-03-15',
+        new Date('2024-03-15'),
       );
 
       await removeFertilizerApplication(fdm, new_p_app_id);
@@ -500,15 +505,15 @@ describe('Fertilizer Data Model', () => {
     });
 
     it('should get a fertilizer application', async () => {
-      const p_app_id = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
+      const p_app_id = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', new Date('2024-03-15'));
       const fertilizerApplication = await getFertilizerApplication(fdm, p_app_id);
       expect(fertilizerApplication).toBeDefined();
       expect(fertilizerApplication?.p_app_id).toBe(p_app_id);
     });
 
     it('should get fertilizer applications for a field', async () => {
-      await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', '2024-03-15');
-      await addFertilizerApplication(fdm, b_id, p_id, 150, 'injection', '2024-04-18');
+      await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', new Date('2024-03-15'));
+      await addFertilizerApplication(fdm, b_id, p_id, 150, 'injection', new Date('2024-04-18'));
 
 
       const fertilizerApplications = await getFertilizerApplications(fdm, b_id);

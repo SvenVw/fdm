@@ -80,7 +80,7 @@ export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
   p_acquiring_amount: numericCasted(), //kg
-  p_acquiring_date: date({ mode: 'string' }),
+  p_acquiring_date: timestamp({ withTimezone: true }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })
@@ -96,7 +96,7 @@ export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
   p_id: text().notNull().references(() => fertilizers.p_id),
   p_app_amount: numericCasted(), // kg / ha
   p_app_method: applicationMethodEnum(),
-  p_app_date: date({ mode: 'string' }),
+  p_app_date: timestamp({ withTimezone: true }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => {

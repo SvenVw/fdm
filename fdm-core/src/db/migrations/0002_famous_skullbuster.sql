@@ -1,0 +1,2 @@
+ALTER TABLE "fdm-dev"."fertilizer_aquiring" ALTER COLUMN "p_acquiring_date" SET DATA TYPE timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."fertilizer_applying" ALTER COLUMN "p_app_date" SET DATA TYPE timestamp with time zone;
