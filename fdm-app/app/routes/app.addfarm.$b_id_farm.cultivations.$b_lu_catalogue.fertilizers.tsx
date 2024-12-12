@@ -66,6 +66,9 @@ export async function action({
   
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     console.log(formValues)
+
+    const {p_app_amount, p_app_date} = formValues;
+    console.log(format(p_app_date))
     
     return {
         ok: true,

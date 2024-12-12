@@ -91,28 +91,74 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                     >
                         <input type="hidden" name="form" value="addFertilizerApplication" />
                         <div className="grid grid-cols-5 items-end gap-x-3 justify-between">
-                            {/* <div className="col-span-2">
-                                <Label htmlFor="b_name_farm">Meststof<span className="text-red-500">*</span></Label>
+                            <div className="col-span-2">
+                                {/* <Label htmlFor="b_name_farm">Meststof<span className="text-red-500">*</span></Label>
                                 <Combobox
                                     options={props.options}
-                                />
-                            </div> */}
-                            <div>
-                                <FormField
-                                    control={form.control}
-                                    name="p_app_amount"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Hoeveelheid<span className="text-red-500">*</span></FormLabel>
-                                            <FormControl>
-                                                <Input {...field} type="number" value={field.value === 0 ? '' : field.value} placeholder="12 ton/ha" aria-required="true" required />
-                                            </FormControl>
-                                            <FormDescription />
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
+                                /> */}
                             </div>
+                            <div>
+                            <FormField
+                                control={form.control}
+                                name="p_app_amount"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Hoeveelheid<span className="text-red-500">*</span></FormLabel>
+                                        <FormControl>
+                                            <Input {...field} type="number" value={field.value === 0 ? '' : field.value} placeholder="12 ton/ha" aria-required="true" required />
+                                        </FormControl>
+                                        <FormDescription />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            </div>
+                            
+                            <div>
+                            <FormField
+                                control={form.control}
+                                name="p_app_date"
+                                render={({ field }) => (
+                                    <FormItem className="">
+                                        <FormLabel>Datum</FormLabel>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <FormControl>
+                                                    <Button
+                                                        variant={"outline"}
+                                                        className={cn(
+                                                            "w-full text-left font-normal",
+                                                            !field.value && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {field.value ? (
+                                                            format(field.value, "yyyy-MM-dd")
+                                                        ) : (
+                                                            <span>Kies een datum</span>
+                                                        )}
+                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                    </Button>
+                                                </FormControl>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    // disabled={(date) =>
+                                                    //     date > new Date() || date < new Date("1900-01-01")
+                                                    // }
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                        <FormDescription />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            </div>
+                            
                             {/* <div>
                                 <Label htmlFor="p_app_date">Datum<span className="text-red-500">*</span></Label>
                                 <Popover>
