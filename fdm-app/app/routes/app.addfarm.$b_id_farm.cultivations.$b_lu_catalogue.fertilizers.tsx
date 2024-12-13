@@ -36,10 +36,18 @@ export async function loader({
         }
     })
 
+    // Get the fertilizer applications
+    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
+        throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
+    });
+    const fields = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue).fields
+    const fertilizerApplications = fields[0].fertilizer_applications;
+
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
         fertilizerOptions: fertilizerOptions,
+        fertilizerApplications: fertilizerApplications
     };
 }
 
@@ -52,6 +60,7 @@ export default function Index() {
                 Vul de bemesting op bouwplanniveau in voor dit gewas.
             </p>
             <ComboboxFertilizers
+                fertilizerApplications={loaderData.fertilizerApplications}
                 action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
                 options={loaderData.fertilizerOptions}
             />
@@ -88,7 +97,6 @@ export async function action({
     const fields = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue).fields
 
     fields.map(async (field) => {
-
         const b_id = field.b_id
         await addFertilizerApplication(
             fdm,
@@ -98,8 +106,6 @@ export async function action({
             null,
             p_app_date
         )
-
-
     })
 
     return dataWithSuccess({ result: "Data saved successfully" }, { message: "Bemesting is toegevoegd! 🎉" })

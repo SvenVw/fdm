@@ -45,7 +45,7 @@ export const FormSchema = z.object({
     })
 })
 
-export function ComboboxFertilizers(props: { options: { value: string, label: string }[], defaultValue?: string, action: string }) {
+export function ComboboxFertilizers(props: { fertilizerApplications: any, options: { value: string, label: string }[], defaultValue?: string, action: string }) {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -133,8 +133,8 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                                         </FormItem>
                                     )}
                                 />
-                            </div>                          
-                            <div className="justify-self-end">                               
+                            </div>
+                            <div className="justify-self-end">
                                 <Button type="submit">
                                     {form.formState.isSubmitting
                                         ? <div className="flex items-center space-x-2">
@@ -153,49 +153,30 @@ export function ComboboxFertilizers(props: { options: { value: string, label: st
                 <div className="space-y-4">
                     {/* <div className="text-sm font-medium">Meststoffen</div> */}
                     <div className="grid gap-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium leading-none">
-                                    Runderdrijfmest
-                                </p>
-                                {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
+                        {props.fertilizerApplications.map((application) => (
+                            <div className="flex items-center justify-between" key={application.p_app_id}>
+                                <div>
+                                    <p className="text-sm font-medium leading-none">
+                                        {application.p_name_nl}
+                                    </p>
+                                    {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-light leading-none">
+                                        {application.p_app_amount} ton / ha
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm font-light leading-none">
+                                        {format(application.p_app_date, "yyyy-MM-dd")}
+                                    </p>
+                                </div>
+                                <div>
+                                    <Button variant="destructive">Verwijder</Button>
+                                </div>
+
                             </div>
-                            <div>
-                                <p className="text-sm font-light leading-none">
-                                    30 ton / ha
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm font-light leading-none">
-                                    2024-04-01
-                                </p>
-                            </div>
-                            <div>
-                                <Button variant="destructive">Verwijder</Button>
-                            </div>
-                            {/* </div> */}
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium leading-none">
-                                    Runderdrijfmest
-                                </p>
-                                {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
-                            </div>
-                            <div>
-                                <p className="text-sm font-light leading-none">
-                                    30 ton / ha
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-sm font-light leading-none">
-                                    2024-04-01
-                                </p>
-                            </div>
-                            <div>
-                                <Button variant="destructive">Verwijder</Button>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
