@@ -23,6 +23,7 @@ import { Combobox } from "@/components/custom/combobox"
 
 import { cn } from "@/lib/utils"
 import { LoadingSpinner } from "./loadingspinner"
+import { useEffect } from "react"
 
 export const FormSchema = z.object({
     p_app_amount: z.coerce.number({
@@ -53,8 +54,14 @@ export function ComboboxFertilizers(props: { fertilizerApplications: any, option
         defaultValues: {
             p_app_amount: 0,
             // p_app_date: new Date(),
-        },
+        }
     })
+
+    useEffect(() => {
+        if (form.formState.isSubmitSuccessful) {
+            form.reset()
+        }
+    }, [form.formState])
 
     return (
         <div>
