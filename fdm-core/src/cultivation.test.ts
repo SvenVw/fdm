@@ -308,7 +308,8 @@ describe('Cultivation Data Model', () => {
 
 
         it('should get cultivation plan for a farm', async () => {
-            await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', new Date('2024-03-15'));
+            const p_app_id1 = await addFertilizerApplication(fdm, b_id, p_id, 100, 'broadcasting', new Date('2024-03-15'));
+            const p_app_id2 = await addFertilizerApplication(fdm, b_id, p_id, 200, 'broadcasting', new Date('2024-04-15'));
 
             const cultivationPlan = await getCultivationPlan(fdm, b_id_farm);
 
@@ -323,14 +324,20 @@ describe('Cultivation Data Model', () => {
             expect(fieldInPlan).toBeDefined();
 
 
-            expect(fieldInPlan?.fertilizer_applications.length).toBeGreaterThan(0);
+            expect(fieldInPlan?.fertilizer_applications.length).toEqual(2);
 
-            const fertilizerApp = fieldInPlan!.fertilizer_applications.find(fa => fa.p_app_id != null)
+            const fertilizerApp1 = fieldInPlan!.fertilizer_applications.find(fa => fa.p_app_id === p_app_id1)
 
             //Check for some key fertilizer application details (adapt as needed based on your data)
-            expect(fertilizerApp!.p_app_amount).toEqual(100)
-            expect(fertilizerApp!.p_app_method).toEqual('broadcasting')
+            expect(fertilizerApp1!.p_app_amount).toEqual(100)
+            expect(fertilizerApp1!.p_app_method).toEqual('broadcasting')
 
+
+            const fertilizerApp2 = fieldInPlan!.fertilizer_applications.find(fa => fa.p_app_id === p_app_id2)
+
+            //Check for some key fertilizer application details (adapt as needed based on your data)
+            expect(fertilizerApp2!.p_app_amount).toEqual(200)
+            expect(fertilizerApp2!.p_app_method).toEqual('broadcasting')
 
         });
 

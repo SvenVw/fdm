@@ -299,57 +299,43 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
                 isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
             )
 
-        const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr) => {
-            const existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
-            if (existingCultivation) {
-                const existingField = existingCultivation.fields.find(field => field.b_id === curr);
-                if (existingField) {
-                    if (curr.p_app_id) {
-                        existingField.fertilizer_applications.push({
-                            p_id_catalogue: curr.p_id_catalogue,
-                            p_name_nl: curr.p_name_nl,
-                            p_app_amount: curr.p_app_amount,
-                            p_app_method: curr.p_app_method,
-                            p_app_date: curr.p_app_date,
-                            p_app_id: curr.p_app_id
-                        });
-                    }
-                } else {
-                    existingCultivation.fields.push({
+            const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr) => {
+                let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
+            
+                if (!existingCultivation) {
+                    existingCultivation = {
+                        b_lu_catalogue: curr.b_lu_catalogue,
+                        b_lu_name: curr.b_lu_name,
+                        fields: []
+                    };
+                    acc.push(existingCultivation);
+                }
+            
+                let existingField = existingCultivation.fields.find(field => field.b_id === curr.b_id);
+            
+                if (!existingField) {
+                    existingField = {
                         b_lu: curr.b_lu,
                         b_id: curr.b_id,
                         b_name: curr.b_name,
-                        fertilizer_applications: curr.p_app_id ? [{
-                            p_id_catalogue: curr.p_id_catalogue,
-                            p_name_nl: curr.p_name_nl,
-                            p_app_amount: curr.p_app_amount,
-                            p_app_method: curr.p_app_method,
-                            p_app_date: curr.p_app_date,
-                            p_app_id: curr.p_app_id
-                        }] : [],
+                        fertilizer_applications: []
+                    };
+                    existingCultivation.fields.push(existingField);
+                }
+            
+                if (curr.p_app_id) {  // Only add if it's a fertilizer application
+                    existingField.fertilizer_applications.push({
+                        p_id_catalogue: curr.p_id_catalogue,
+                        p_name_nl: curr.p_name_nl,
+                        p_app_amount: curr.p_app_amount,
+                        p_app_method: curr.p_app_method,
+                        p_app_date: curr.p_app_date,
+                        p_app_id: curr.p_app_id
                     });
                 }
-            } else {
-                acc.push({
-                    b_lu_catalogue: curr.b_lu_catalogue,
-                    b_lu_name: curr.b_lu_name,
-                    fields: [{
-                        b_lu: curr.b_lu,
-                        b_id: curr.b_id,
-                        b_name: curr.b_name,
-                        fertilizer_applications: curr.p_app_id ? [{
-                            p_id_catalogue: curr.p_id_catalogue,
-                            p_name_nl: curr.p_name_nl,
-                            p_app_amount: curr.p_app_amount,
-                            p_app_method: curr.p_app_method,
-                            p_app_date: curr.p_app_date,
-                            p_app_id: curr.p_app_id
-                        }] : [],
-                    }],
-                });
-            }
-            return acc;
-        }, []);
+            
+                return acc;
+            }, []);
 
         return cultivationPlan
     } catch (error) {
