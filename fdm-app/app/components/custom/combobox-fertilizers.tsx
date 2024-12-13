@@ -154,8 +154,8 @@ export function ComboboxFertilizers(props: { fertilizerApplications: any, option
                     {/* <div className="text-sm font-medium">Meststoffen</div> */}
                     <div className="grid gap-6">
                         {props.fertilizerApplications.map((application) => (
-                            <div className="flex items-center justify-between" key={application.p_app_id}>
-                                <div>
+                            <div className="grid grid-cols-5 gap-x-3 items-center" key={application.p_app_id}>
+                                <div className="col-span-2">
                                     <p className="text-sm font-medium leading-none">
                                         {application.p_name_nl}
                                     </p>
@@ -171,7 +171,7 @@ export function ComboboxFertilizers(props: { fertilizerApplications: any, option
                                         {format(application.p_app_date, "yyyy-MM-dd")}
                                     </p>
                                 </div>
-                                <div>
+                                <div className="justify-self-end">
                                     <Button variant="destructive">Verwijder</Button>
                                 </div>
 
