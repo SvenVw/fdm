@@ -50,7 +50,7 @@ export function Combobox({
             control={form.control}
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem>
                     <FormLabel>{label}</FormLabel>
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
