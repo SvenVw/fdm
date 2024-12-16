@@ -46,7 +46,7 @@ export const FormSchema = z.object({
     })
 })
 
-export function ComboboxFertilizers(props: { fertilizerApplications: any, options: { value: string, label: string }[], defaultValue?: string, action: string }) {
+export function ComboboxFertilizers(props: { fertilizerApplications: any[], options: { value: string, label: string }[], defaultValue?: string, action: string }) {
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
