@@ -350,7 +350,7 @@ export async function addFertilizerApplication(
             p_app_date,
         });
     } catch (error) {
-        throw new Error(`Failed to add fertilizer application: ${error}`);
+        throw new Error(`Failed to add fertilizer application: ${error instanceof Error ? error.message : String(error)}`, { cause: error });
     }
 
     return p_app_id;
