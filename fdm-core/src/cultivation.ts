@@ -4,7 +4,6 @@ import { nanoid } from 'nanoid'
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
 import { cultivationPlanType, getCultivationType } from './cultivation.d'
-import { b } from 'vitest/dist/chunks/suite.BMWOKiTe.js'
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -42,7 +41,7 @@ export async function addCultivationToCatalogue(
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert['b_lu_hcat3_name']
     }
 ): Promise<void> {
-    await fdm.transaction(async (tx) => {
+    await fdm.transaction(async (tx: FdmType) => {
         // Check for existing cultivation
         const existing = await tx
             .select()
@@ -148,7 +147,7 @@ export async function addCultivation(
                 })
 
         } catch (error) {
-            throw new Error(`addCultivation failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
+            throw new Error(`addCultivation failed: ${error instanceof Error ? error.message : String(error)}`)
         }
     })
 
@@ -299,7 +298,7 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
                 isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
             )
 
-            const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr) => {
+            const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr: any) => {
                 let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
             
                 if (!existingCultivation) {
