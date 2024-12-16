@@ -142,7 +142,7 @@ export async function action({
                 b_id,
                 p_id,
                 p_app_amount,
-                null,
+                undefined,
                 p_app_date
             )
         })
