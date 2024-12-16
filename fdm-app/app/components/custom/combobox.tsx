@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { ReactNode, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -34,7 +34,7 @@ interface ComboboxProps {
     options: { value: string, label: string }[]
     form: any
     name: string
-    label: any
+    label: ReactNode
 }
 
 export function Combobox({
