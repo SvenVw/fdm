@@ -56,8 +56,8 @@ export async function loader({
                 app1.p_id_catalogue === app2.p_id_catalogue &&
                 app1.p_app_amount === app2.p_app_amount &&
                 app1.p_app_method === app2.p_app_method &&
-                app1.p_app_date === app2.p_app_date;
-
+                app1.p_app_date.getTime() === app2.p_app_date.getTime();
+               
             const existingApplication = accumulator.find(existingApp => 
                 isSimilarApplication(existingApp, app)
             );
@@ -73,6 +73,8 @@ export async function loader({
 
         return accumulator;
     }, []);
+    console.log(fertilizerApplications)
+
 
     return {
         b_lu_catalogue: b_lu_catalogue,
