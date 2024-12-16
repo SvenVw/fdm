@@ -53,8 +53,8 @@ export function FertilizerApplicationsForm(props: { fertilizerApplications: any[
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            p_app_amount: 0,
-            // p_app_date: new Date(),
+            p_app_amount: undefined,
+            p_app_date: new Date(),
         }
     })
 
