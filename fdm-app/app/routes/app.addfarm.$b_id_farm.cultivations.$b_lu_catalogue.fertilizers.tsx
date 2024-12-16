@@ -2,9 +2,9 @@ import { useLoaderData, type LoaderFunctionArgs, data, ActionFunctionArgs } from
 import { dataWithError, dataWithSuccess } from "remix-toast";
 
 // Components
-import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
+import { FertilizerApplicationsForm } from "@/components/custom/fertilizer-applications";
 import { extractFormValuesFromRequest } from "@/lib/form";
-import { FormSchema } from "@/components/custom/combobox-fertilizers";
+import { FormSchema } from "@/components/custom/fertilizer-applications";
 
 // FDM
 import { fdm } from "../services/fdm.server";
@@ -97,7 +97,7 @@ export default function Index() {
             <p className="text-sm text-muted-foreground">
                 Vul de bemesting op bouwplanniveau in voor dit gewas.
             </p>
-            <ComboboxFertilizers
+            <FertilizerApplicationsForm
                 fertilizerApplications={loaderData.fertilizerApplications}
                 action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
                 options={loaderData.fertilizerOptions}
