@@ -22,8 +22,13 @@ export const links: LinksFunction = () => [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { toast, headers } = await getToast(request);
-  return data({ toast }, { headers });
+  try {
+    const { toast, headers } = await getToast(request);
+    return data({ toast }, { headers });
+  } catch (error) {
+    console.error('Failed to get toast:', error);
+    return data({ toast: null }, {});
+  }
 }
 
 export function Layout() {
