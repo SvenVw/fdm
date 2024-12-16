@@ -152,21 +152,20 @@ export async function action({
     } else if (request.method == 'DELETE') {
 
         const formData = await request.formData();
-        const p_app_ids = formData.get("p_app_ids")?.toString();
+        const rawAppIds = formData.get("p_app_ids");
 
-        if (!p_app_ids) {
+        if (!rawAppIds || typeof rawAppIds !== 'string') {
             return dataWithError(
-                'Missing values for p_app_ids',
+                'Invalid or missing p_app_ids value',
                 "Oops! Something went wrong. Please try again later."
             );
-
         }
 
         try {
 
-            const p_app_ids_array = p_app_ids.split(',');
+            const p_app_ids = rawAppIds.split(',');
             await Promise.all(
-                p_app_ids_array.map((p_app_id: string) =>
+                p_app_ids.map((p_app_id: string) =>
                     removeFertilizerApplication(fdm, p_app_id)
                 )
             );
