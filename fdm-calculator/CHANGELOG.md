@@ -1,5 +1,12 @@
 # fdm-calculator
 
+## 0.0.2
+
+### Patch Changes
+
+- Upgrade to use ES2022
+
+
 ## 0.0.1
 
 ### Patch Changes

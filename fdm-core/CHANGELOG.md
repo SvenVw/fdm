@@ -16,6 +16,7 @@
 ### Patch Changes
 
 - a948c61: Fix by adding `b_name` to output type of `getCultivationPlan`
+- Upgrade to use ES2022
 
 ## 0.6.1
 

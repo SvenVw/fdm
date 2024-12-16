@@ -4,6 +4,7 @@
 
 ### Patch Changes
 
+- Upgrade to use ES2022
 - Updated dependencies [7af3fda]
 - Updated dependencies [bc4e75f]
 - Updated dependencies [a948c61]
