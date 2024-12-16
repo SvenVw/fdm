@@ -234,7 +234,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: "test"
             })
 
-            b_lu = await addCultivation(fdm, 'wheat', b_id, '2024-03-01')
+            b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, '2024-03-01')
 
             // Add fertilizer to catalogue (needed for fertilizer application)
             const p_id_catalogue = nanoid();
@@ -316,7 +316,7 @@ describe('Cultivation Data Model', () => {
             expect(cultivationPlan).toBeDefined();
             expect(cultivationPlan.length).toBeGreaterThan(0);
 
-            const wheatCultivation = cultivationPlan.find((c) => c.b_lu_catalogue === 'wheat');
+            const wheatCultivation = cultivationPlan.find((c) => c.b_lu_catalogue === b_lu_catalogue);
             expect(wheatCultivation).toBeDefined();
 
             expect(wheatCultivation?.fields.length).toBeGreaterThan(0);
