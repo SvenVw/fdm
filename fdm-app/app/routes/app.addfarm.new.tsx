@@ -1,5 +1,5 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { useLoaderData, redirect } from "react-router";
+import { useLoaderData, redirect, data } from "react-router";
 import { z } from "zod"
 import { addFarm, addFertilizer, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
@@ -14,6 +14,7 @@ import { Farm } from "@/components/blocks/farm";
 // Services
 import { fdm } from "../services/fdm.server";
 import { extractFormValuesFromRequest } from "@/lib/form";
+import { dataWithError, dataWithSuccess, redirectWithSuccess } from "remix-toast";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -106,8 +107,8 @@ export async function action({
   } catch (error) {
     console.error('Failed to add fertilizers:', error);
     // Consider how to handle this error - perhaps return a specific error response
-    throw error;
+    return dataWithError(null, "Oops! Something went wrong. Please try again later.");
   }
 
-  return redirect(`../addfarm/${b_id_farm}/map`)
+  return redirectWithSuccess(`../addfarm/${b_id_farm}/map`, { message: "Bedrijf is toegevoegd! 🎉" })
 }
