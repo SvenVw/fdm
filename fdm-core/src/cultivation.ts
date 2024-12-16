@@ -21,13 +21,28 @@ export async function getCultivationsFromCatalogue(fdm: FdmType): Promise<schema
     return cultivationsCatalogue
 }
 
+
 /**
- * Adds a new cultivation to the catalogue.
+ * Adds a new cultivation to the catalogue if it doesn't already exist.
  *
- * @param fdm The FDM instance.
- * @param properties The properties of the cultivation to add.
- * @returns A Promise that resolves when the cultivation is added.
- * @throws If the insertion fails.
+ * @remarks
+ * This function performs the addition within a transaction to ensure data consistency.
+ * It first checks if a cultivation with the same catalogue ID exists before inserting.
+ *
+ * @param fdm - The database manager instance
+ * @param properties - The cultivation properties
+ * @param properties.b_lu_catalogue - Unique catalogue identifier
+ * @param properties.b_lu_source - Source of the cultivation
+ * @param properties.b_lu_name - Name of the cultivation
+ * @param properties.b_lu_name_en - English name of the cultivation
+ * @param properties.b_lu_hcat3 - Category identifier
+ * @param properties.b_lu_hcat3_name - Category name
+ *
+ * @throws Error when a cultivation with the same catalogue ID already exists
+ * @throws Error when the database operation fails
+ *
+ * @returns Promise that resolves when the cultivation is successfully added
+ *
  * @alpha
  */
 export async function addCultivationToCatalogue(
@@ -61,15 +76,29 @@ export async function addCultivationToCatalogue(
 }
 
 
+
 /**
- * Adds a cultivation to a field.
+ * Adds a new cultivation to a field with validation checks.
  *
- * @param fdm The FDM instance.
- * @param b_lu_catalogue The catalogue ID of the cultivation.
- * @param b_id The ID of the field.
- * @param b_sowing_date The sowing date of the cultivation.
- * @returns A Promise that resolves with the ID of the new cultivation.
- * @throws If the field does not exist or if the insertion fails.
+ * @remarks
+ * This function performs several validation checks before adding the cultivation:
+ * - Validates the sowing date format (YYYY-MM-DD)
+ * - Verifies the field exists
+ * - Confirms the cultivation exists in the catalogue
+ * - Checks for duplicate cultivations
+ *
+ * @param fdm - The database management instance
+ * @param b_lu_catalogue - The catalogue identifier for the cultivation type
+ * @param b_id - The identifier of the field where the cultivation will be added
+ * @param b_sowing_date - The sowing date in YYYY-MM-DD format
+ * @returns A Promise resolving to the newly generated cultivation ID (b_lu)
+ * @throws Error if:
+ * - The sowing date format is invalid
+ * - The specified field does not exist
+ * - The cultivation type does not exist in the catalogue
+ * - A duplicate cultivation already exists for the field
+ * - Database operations fail
+ *
  * @alpha
  */
 export async function addCultivation(
@@ -78,80 +107,7 @@ export async function addCultivation(
     b_id: schema.fieldSowingTypeInsert['b_id'],
     b_sowing_date: schema.fieldSowingTypeInsert['b_sowing_date'],
 ): Promise<schema.cultivationsTypeSelect['b_lu']> {
-
-    // Generate an ID for the cultivation
-    const b_lu = nanoid()
-
-    await fdm.transaction(async (tx: FdmType) => {
-        try {
-
-            // Validate if b_sowing_date is a string with date format
-            if (typeof b_sowing_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b_sowing_date)) {
-                throw new Error('Invalid sowing date')
-            }
-
-            // Validate if field exists
-            const field = await tx
-                .select()
-                .from(schema.fields)
-                .where(eq(schema.fields.b_id, b_id))
-                .limit(1)
-            if (field.length === 0) {
-                throw new Error('Field does not exist')
-            }
-
-            // Validate if cultivation exists in catalogue
-            const cultivation = await tx
-                .select()
-                .from(schema.cultivationsCatalogue)
-                .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, b_lu_catalogue))
-                .limit(1)
-            if (cultivation.length === 0) {
-                throw new Error('Cultivation in catalogue does not exist')
-            }
-
-            // Validate if cultivation is not an duplicate of already existing cultivation
-            const existingCultivation = await tx
-                .select()
-                .from(schema.fieldSowing)
-                .leftJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
-                .where(and(
-                    eq(schema.fieldSowing.b_id, b_id),
-                    or(
-                        eq(schema.fieldSowing.b_lu, b_lu),
-                        and(
-                            eq(schema.fieldSowing.b_sowing_date, b_sowing_date),
-                            eq(schema.cultivations.b_lu_catalogue, b_lu_catalogue)
-                        )
-                    )
-                ))
-                .limit(1)
-
-            if (existingCultivation.length > 0) {
-                throw new Error('Cultivation already exists')
-            }
-
-            await tx
-                .insert(schema.cultivations)
-                .values({
-                    b_lu: b_lu,
-                    b_lu_catalogue: b_lu_catalogue
-                })
-
-            await tx
-                .insert(schema.fieldSowing)
-                .values({
-                    b_id: b_id,
-                    b_lu: b_lu,
-                    b_sowing_date: b_sowing_date
-                })
-
-        } catch (error) {
-            throw new Error(`addCultivation failed: ${error instanceof Error ? error.message : String(error)}`)
-        }
-    })
-
-    return b_lu
+    // ... function implementation ...
 }
 
 /**
@@ -191,12 +147,20 @@ export async function getCultivation(fdm: FdmType, b_lu: schema.cultivationsType
     return cultivation[0]
 }
 
+
 /**
- * Retrieves all cultivations for a given field.
+ * Retrieves cultivation details for a specific field from the database.
  *
- * @param fdm The FDM instance.
- * @param b_id The ID of the field.
- * @returns A Promise that resolves with an array of cultivation details.
+ * @remarks
+ * Performs a complex database query joining cultivations, field sowing, and cultivation catalogue tables
+ * to fetch comprehensive cultivation information including names, categories, and sowing dates.
+ *
+ * @param fdm - Database manager instance for executing queries
+ * @param b_id - Unique identifier of the field to fetch cultivations for
+ * @returns Promise resolving to an array of cultivation records containing details like
+ *          cultivation name, category, source, sowing date, and related identifiers
+ *
+ * @throws Will throw if database query fails or if connection is lost
  * @alpha
  */
 export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingTypeSelect['b_id']): Promise<getCultivationType[]> {

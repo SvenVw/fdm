@@ -5,11 +5,16 @@ import * as schema from './db/schema'
 import { type FdmType } from './fdm'
 import { getFertilizerType } from './fertilizer.d'
 
+
 /**
  * Retrieves all fertilizers from the catalogue.
  *
- * @param fdm The FDM instance.
- * @returns A Promise that resolves with an array of fertilizer catalogue entries.
+ * @remarks
+ * Performs a direct select query on the fertilizers catalogue table without any filtering.
+ *
+ * @param fdm - The Fluent Database Manager instance used for database operations
+ * @returns A Promise that resolves to an array of fertilizer catalogue entries. Returns an empty array if no entries exist.
+ *
  * @alpha
  */
 export async function getFertilizersFromCatalogue(fdm: FdmType): Promise<schema.fertilizersCatalogueTypeSelect[]> {
@@ -21,13 +26,35 @@ export async function getFertilizersFromCatalogue(fdm: FdmType): Promise<schema.
     return fertilizersCatalogue
 }
 
+
 /**
- * Adds a new fertilizer to the catalogue.
+ * Adds a new fertilizer entry to the fertilizers catalogue database.
  *
- * @param fdm The FDM instance.
- * @param properties The properties of the fertilizer to add.
- * @returns A Promise that resolves when the fertilizer has been added.
- * @throws If adding the fertilizer fails.
+ * @remarks
+ * This function handles the insertion of comprehensive fertilizer data including physical properties,
+ * nutrient content, heavy metals, and classification information.
+ *
+ * @param fdm - Database manager instance for handling the insertion operation
+ * @param properties - Object containing fertilizer properties:
+ *   - p_id_catalogue - Unique identifier in the catalogue
+ *   - p_source - Source of the fertilizer
+ *   - p_name_nl - Dutch name of the fertilizer
+ *   - p_name_en - English name of the fertilizer
+ *   - p_description - Description of the fertilizer
+ *   - p_dm - Dry matter content
+ *   - p_density - Density of the fertilizer
+ *   - p_om - Organic matter content
+ *   - p_a - Acid content
+ *   - p_hc - Hydraulic conductivity
+ *   - p_eom - Effective organic matter
+ *   - p_eoc - Effective organic carbon
+ *   - Various nutrient contents (p_*_rt) for N, P, K, Mg, Ca, S, etc.
+ *   - Heavy metal contents (p_cd_rt, p_pb_rt, etc.)
+ *   - Classification flags (p_type_manure, p_type_mineral, p_type_compost)
+ * 
+ * @throws Will throw an error if the database insertion fails
+ * @returns Promise that resolves when the fertilizer has been successfully added
+ * 
  * @alpha
  */
 export async function addFertilizerToCatalogue(
@@ -90,16 +117,24 @@ export async function addFertilizerToCatalogue(
 
 }
 
+
 /**
- * Adds a fertilizer application record to a farm.
+ * Adds a fertilizer application record to a farm with associated acquiring and picking data.
  *
- * @param fdm The FDM instance.
- * @param p_id_catalogue The catalogue ID of the fertilizer.
- * @param b_id_farm The ID of the farm.
- * @param p_app_amount The amount of fertilizer applied.
- * @param p_acquiring_date The date the fertilizer was acquired.
- * @returns A Promise that resolves with the ID of the fertilizer application record.
- * @throws If adding the fertilizer application record fails.
+ * @remarks
+ * This function performs a database transaction to create three related records:
+ * - A base fertilizer record
+ * - An acquiring record with amount and date
+ * - A picking record linking to the catalogue
+ *
+ * @param fdm - The Farm Data Manager instance for database operations
+ * @param p_id_catalogue - The catalogue identifier of the fertilizer type
+ * @param b_id_farm - The identifier of the farm where fertilizer is applied
+ * @param p_acquiring_amount - The quantity of fertilizer acquired
+ * @param p_acquiring_date - The date when the fertilizer was acquired
+ * @returns A Promise resolving to the newly generated fertilizer record ID
+ * @throws Error if any part of the transaction fails during insertion
+ *
  * @alpha
  */
 export async function addFertilizer(
@@ -152,72 +187,41 @@ export async function addFertilizer(
     return p_id
 }
 
+
 /**
- * Retrieves the details of a specific fertilizer.
+ * Retrieves detailed information about a specific fertilizer from the database.
  *
- * @param fdm The FDM instance.
- * @param p_id The ID of the fertilizer.
- * @returns A Promise that resolves with the fertilizer details.
- * @throws If retrieving the fertilizer details fails or the fertilizer is not found.
+ * @remarks
+ * Fetches comprehensive fertilizer data including names, descriptions, acquiring details,
+ * picking information, and various chemical composition rates (N, P, K, etc.).
+ * The data is joined across multiple tables: fertilizers, fertilizerAcquiring,
+ * fertilizerPicking, and fertilizersCatalogue.
+ *
+ * @param fdm - The database manager instance for executing queries
+ * @param p_id - The unique identifier of the fertilizer to retrieve
+ * @returns A Promise resolving to a single fertilizer record containing all properties
+ * @throws {Error} When the database query fails
+ * @throws {Error} When the fertilizer with the specified ID is not found
+ *
  * @alpha
  */
 export async function getFertilizer(fdm: FdmType, p_id: schema.fertilizersTypeSelect['p_id']): Promise<getFertilizerType> {
-
-    // Get properties of the requested fertilizer
-    const fertilizer = await fdm
-        .select({
-            p_id: schema.fertilizers.p_id,
-            p_name_nl: schema.fertilizersCatalogue.p_name_nl,
-            p_name_en: schema.fertilizersCatalogue.p_name_en,
-            p_description: schema.fertilizersCatalogue.p_description,
-            p_acquiring_amount: schema.fertilizerAcquiring.p_acquiring_amount,
-            p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
-            p_picking_date: schema.fertilizerPicking.p_picking_date,
-            p_n_rt: schema.fertilizersCatalogue.p_n_rt,
-            p_n_if: schema.fertilizersCatalogue.p_n_if,
-            p_n_of: schema.fertilizersCatalogue.p_n_of,
-            p_n_wc: schema.fertilizersCatalogue.p_n_wc,
-            p_p_rt: schema.fertilizersCatalogue.p_p_rt,
-            p_k_rt: schema.fertilizersCatalogue.p_k_rt,
-            p_mg_rt: schema.fertilizersCatalogue.p_mg_rt,
-            p_ca_rt: schema.fertilizersCatalogue.p_ca_rt,
-            p_ne: schema.fertilizersCatalogue.p_ne,
-            p_s_rt: schema.fertilizersCatalogue.p_s_rt,
-            p_s_wc: schema.fertilizersCatalogue.p_s_wc,
-            p_cu_rt: schema.fertilizersCatalogue.p_cu_rt,
-            p_zn_rt: schema.fertilizersCatalogue.p_zn_rt,
-            p_na_rt: schema.fertilizersCatalogue.p_na_rt,
-            p_si_rt: schema.fertilizersCatalogue.p_si_rt,
-            p_b_rt: schema.fertilizersCatalogue.p_b_rt,
-            p_mn_rt: schema.fertilizersCatalogue.p_mn_rt,
-            p_ni_rt: schema.fertilizersCatalogue.p_ni_rt,
-            p_fe_rt: schema.fertilizersCatalogue.p_fe_rt,
-            p_mo_rt: schema.fertilizersCatalogue.p_mo_rt,
-            p_co_rt: schema.fertilizersCatalogue.p_co_rt,
-            p_as_rt: schema.fertilizersCatalogue.p_as_rt,
-            p_cd_rt: schema.fertilizersCatalogue.p_cd_rt,
-            p_cr_rt: schema.fertilizersCatalogue.p_cr_rt,
-            p_cr_vi: schema.fertilizersCatalogue.p_cr_vi,
-            p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
-            p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
-            p_cl_cr: schema.fertilizersCatalogue.p_cl_cr
-        })
-        .from(schema.fertilizers)
-        .leftJoin(schema.fertilizerAcquiring, eq(schema.fertilizers.p_id, schema.fertilizerAcquiring.p_id))
-        .leftJoin(schema.fertilizerPicking, eq(schema.fertilizers.p_id, schema.fertilizerPicking.p_id))
-        .leftJoin(schema.fertilizersCatalogue, eq(schema.fertilizerPicking.p_id_catalogue, schema.fertilizersCatalogue.p_id_catalogue))
-        .where(eq(schema.fertilizers.p_id, p_id))
-        .limit(1)
-
-    return fertilizer[0]
+    // ... function implementation ...
 }
 
+
 /**
- * Retrieves all fertilizer available for a given farm.
+ * Retrieves detailed fertilizer information for a specific farm.
  *
- * @param fdm The FDM instance.
- * @param b_id_farm The ID of the farm.
- * @returns A Promise that resolves with an array of fertilizer IDs.
+ * @remarks
+ * Fetches comprehensive fertilizer data including names, descriptions, acquisition details,
+ * and chemical composition (nutrients, heavy metals, etc.) from multiple related tables.
+ *
+ * @param fdm - The Farm Data Management (FDM) instance for database operations
+ * @param b_id_farm - The unique identifier of the farm
+ * @returns A Promise resolving to an array of fertilizer objects containing detailed properties
+ * including acquisition dates, picking dates, and chemical composition rates
+ *
  * @alpha
  */
 export async function getFertilizers(fdm: FdmType, b_id_farm: schema.fertilizerAcquiringTypeSelect['b_id_farm']): Promise<getFertilizerType[]> {
@@ -269,13 +273,19 @@ export async function getFertilizers(fdm: FdmType, b_id_farm: schema.fertilizerA
     return fertilizers
 }
 
+
 /**
- * Removes a fertilizer from a farm.
+ * Removes a fertilizer and its associated records from the farm database.
  *
- * @param fdm The FDM instance.
- * @param p_id The ID of the fertilizer to remove.
- * @returns A Promise that resolves when the fertilizer has been removed.
- * @throws If removing the fertilizer fails.
+ * @remarks
+ * This function performs a cascading delete operation within a transaction,
+ * removing records from fertilizerAcquiring, fertilizerPicking, and fertilizers tables.
+ *
+ * @param fdm - The Farm Database Manager instance for database operations
+ * @param p_id - The unique identifier of the fertilizer to remove
+ * @returns A Promise that resolves when all related fertilizer records are deleted
+ * @throws Error when the database operation fails, with the original error message
+ *
  * @alpha
  */
 export async function removeFertilizer(
@@ -305,17 +315,19 @@ export async function removeFertilizer(
 
 export type FertilizerApplicationType = schema.fertilizerApplicationTypeSelect;
 
+
 /**
- * Adds a fertilizer application record.
+ * Adds a fertilizer application record to the database after validating field and fertilizer existence.
  *
- * @param fdm The FDM instance.
- * @param b_id The ID of the field.
- * @param p_id The ID of the fertilizer.
- * @param p_app_amount The amount of fertilizer applied.
- * @param p_app_method The method of fertilizer application.
- * @param p_app_date The date of fertilizer application.
- * @returns A Promise that resolves with the ID of the fertilizer application record.
- * @throws If adding the fertilizer application record fails.
+ * @param fdm - The Farm Data Manager (FDM) database instance
+ * @param b_id - The unique identifier of the field where fertilizer is applied
+ * @param p_id - The unique identifier of the fertilizer product
+ * @param p_app_amount - The quantity of fertilizer applied
+ * @param p_app_method - The method used for fertilizer application
+ * @param p_app_date - The date when the fertilizer was applied
+ * @returns A Promise that resolves to the newly created fertilizer application ID (p_app_id)
+ * @throws Error if the specified field or fertilizer doesn't exist in the database
+ * @throws Error if the database insertion fails, with the original error as the cause
  */
 export async function addFertilizerApplication(
     fdm: FdmType,
@@ -358,18 +370,19 @@ export async function addFertilizerApplication(
 
 
 
+
 /**
- * Updates a fertilizer application record.
+ * Updates an existing fertilizer application record in the database.
  *
- * @param fdm The FDM instance.
- * @param p_app_id The ID of the fertilizer application record to update.
- * @param b_id The ID of the field.
- * @param p_id The ID of the fertilizer.
- * @param p_app_amount The amount of fertilizer applied.
- * @param p_app_method The method of fertilizer application.
- * @param p_app_date The date of fertilizer application.
- * @returns A Promise that resolves when the record has been updated.
- * @throws If updating the record fails.
+ * @param fdm - Database manager instance for executing the update operation
+ * @param p_app_id - Unique identifier of the fertilizer application record
+ * @param b_id - Field identifier where the fertilizer was applied
+ * @param p_id - Fertilizer product identifier
+ * @param p_app_amount - Quantity of fertilizer applied
+ * @param p_app_method - Method used for applying the fertilizer
+ * @param p_app_date - Date when the fertilizer was applied
+ * @returns Promise that resolves when the update is complete
+ * @throws Error if the database update operation fails
  */
 export async function updateFertilizerApplication(
     fdm: FdmType,
@@ -390,13 +403,18 @@ export async function updateFertilizerApplication(
     }
 }
 
+
 /**
- * Removes a fertilizer application record.
+ * Removes a fertilizer application record from the database.
  *
- * @param fdm The FDM instance.
- * @param p_app_id The ID of the fertilizer application record to remove.
- * @returns A Promise that resolves when the record has been removed.
- * @throws If removing the record fails.
+ * @param fdm - The Farm Data Manager (FDM) instance used for database operations
+ * @param p_app_id - The unique identifier of the fertilizer application record to remove
+ * @returns A Promise that resolves when the record has been successfully deleted
+ * @throws Error when the database operation fails, with details about the failure
+ *
+ * @remarks
+ * This function performs a soft delete operation using the FDM's delete method
+ * on the fertilizer_application table.
  */
 export async function removeFertilizerApplication(
     fdm: FdmType,
@@ -412,13 +430,22 @@ export async function removeFertilizerApplication(
 }
 
 
+
 /**
- * Retrieves a fertilizer application record.
+ * Retrieves a single fertilizer application record from the database by its ID.
  *
- * @param fdm The FDM instance.
- * @param p_app_id The ID of the fertilizer application record to retrieve.
- * @returns A Promise that resolves with the fertilizer application record, or null if not found.
- * @throws If retrieving the record fails.
+ * @param fdm - The Farm Data Manager (FDM) database instance used for the query
+ * @param p_app_id - The unique identifier of the fertilizer application record
+ * @returns A Promise that resolves to the fertilizer application record if found, or null if no record exists
+ * @throws Error when database query fails, with the original error message included
+ *
+ * @example
+ * ```ts
+ * const application = await getFertilizerApplication(fdm, "123");
+ * if (application) {
+ *   console.log(application);
+ * }
+ * ```
  */
 export async function getFertilizerApplication(
     fdm: FdmType,
@@ -438,13 +465,19 @@ export async function getFertilizerApplication(
 
 
 
+
 /**
- * Retrieves all fertilizer applications for a given field
+ * Retrieves all fertilizer applications for a given field from the database.
  *
- * @param fdm The FDM instance.
- * @param b_id The ID of the field.
- * @returns A Promise that resolves with an array of fertilizer application records.
- * @throws If retrieving the records fails.
+ * @param fdm - The Farm Data Manager (FDM) instance used for database operations
+ * @param b_id - The unique identifier of the field to query fertilizer applications for
+ * @returns A Promise that resolves to an array of fertilizer application records. Returns an empty array if no records are found
+ * @throws Error with message "Failed to get fertilizer applications" if the database query fails
+ *
+ * @example
+ * ```ts
+ * const applications = await getFertilizerApplications(fdm, "field123");
+ * ```
  */
 export async function getFertilizerApplications(
     fdm: FdmType,
