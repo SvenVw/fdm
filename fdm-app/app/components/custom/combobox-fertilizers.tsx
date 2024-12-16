@@ -1,4 +1,4 @@
-import { Form } from "react-router"
+import { Form, useFetcher } from "react-router"
 import { format } from "date-fns"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRemixForm, RemixFormProvider } from "remix-hook-form"
@@ -47,6 +47,7 @@ export const FormSchema = z.object({
 })
 
 export function ComboboxFertilizers(props: { fertilizerApplications: any[], options: { value: string, label: string }[], defaultValue?: string, action: string }) {
+    const fetcher = useFetcher();
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -62,6 +63,13 @@ export function ComboboxFertilizers(props: { fertilizerApplications: any[], opti
             form.reset()
         }
     }, [form.formState])
+
+    const handleDelete = (p_app_ids: string[]) => {
+        fetcher.submit(
+            { p_app_ids }, 
+            { method: "delete", action: props.action }
+        );
+    };
 
     return (
         <div>
@@ -179,7 +187,9 @@ export function ComboboxFertilizers(props: { fertilizerApplications: any[], opti
                                     </p>
                                 </div>
                                 <div className="justify-self-end">
-                                    <Button variant="destructive">Verwijder</Button>
+                                    <Button variant="destructive" onClick={() => handleDelete(application.p_app_ids)}>
+                                        Verwijder
+                                    </Button>
                                 </div>
 
                             </div>

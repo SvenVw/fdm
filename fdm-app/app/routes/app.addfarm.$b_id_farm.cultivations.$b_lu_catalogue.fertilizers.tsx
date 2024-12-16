@@ -1,5 +1,5 @@
 import { useLoaderData, type LoaderFunctionArgs, data, ActionFunctionArgs } from "react-router";
-import { dataWithSuccess } from "remix-toast";
+import { dataWithError, dataWithSuccess } from "remix-toast";
 
 // Components
 import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
@@ -8,7 +8,7 @@ import { FormSchema } from "@/components/custom/combobox-fertilizers";
 
 // FDM
 import { fdm } from "../services/fdm.server";
-import { getCultivationPlan, getFertilizers, addFertilizerApplication, getFertilizer } from "@svenvw/fdm-core";
+import { getCultivationPlan, getFertilizers, addFertilizerApplication, getFertilizer, removeFertilizerApplication } from "@svenvw/fdm-core";
 
 // Loader
 export async function loader({
@@ -21,7 +21,7 @@ export async function loader({
         throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
     }
 
-     // Extract cultivation catalogue ID from URL parameters
+    // Extract cultivation catalogue ID from URL parameters
     const b_lu_catalogue = params.b_lu_catalogue
     if (!b_lu_catalogue) {
         throw data("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
@@ -37,7 +37,7 @@ export async function loader({
         }
     })
 
-     // Fetch the cultivation plan for the farm
+    // Fetch the cultivation plan for the farm
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
         throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
     });
@@ -122,30 +122,62 @@ export async function action({
         throw data("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
     }
 
-    // Collect form entry
-    const formValues = await extractFormValuesFromRequest(request, FormSchema)
-    const { p_id, p_app_amount, p_app_date } = formValues;
+    if (request.method == 'POST') {
+        // Collect form entry
+        const formValues = await extractFormValuesFromRequest(request, FormSchema)
+        const { p_id, p_app_amount, p_app_date } = formValues;
 
-    // Get the cultivation details for this cultivation
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
-        throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
-    });
+        // Get the cultivation details for this cultivation
+        const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
+            throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
+        });
 
-    // Get the id of the fields with this cultivation
-    const fields = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue).fields
+        // Get the id of the fields with this cultivation
+        const fields = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue).fields
 
-    fields.map(async (field) => {
-        const b_id = field.b_id
-        await addFertilizerApplication(
-            fdm,
-            b_id,
-            p_id,
-            p_app_amount,
-            null,
-            p_app_date
-        )
-    })
+        fields.map(async (field) => {
+            const b_id = field.b_id
+            await addFertilizerApplication(
+                fdm,
+                b_id,
+                p_id,
+                p_app_amount,
+                null,
+                p_app_date
+            )
+        })
 
-    return dataWithSuccess({ result: "Data saved successfully" }, { message: "Bemesting is toegevoegd! 🎉" })
+        return dataWithSuccess({ result: "Data saved successfully" }, { message: "Bemesting is toegevoegd! 🎉" })
+
+    } else if (request.method == 'DELETE') {
+
+        const formData = await request.formData();
+        const p_app_ids = formData.get("p_app_ids")?.toString();
+
+        if (!p_app_ids) {
+            return dataWithError(
+                'Missing values for p_app_ids',
+                "Oops! Something went wrong. Please try again later."
+            );
+
+        }
+
+        try {
+
+            p_app_ids.split(',').map(async (p_app_id: string) => {
+                await removeFertilizerApplication(fdm, p_app_id);
+            })
+
+            return dataWithSuccess({}, { message: "Bemesting is verwijderd" });
+        } catch (error) {
+            // Handle errors appropriately. Log the error for debugging purposes.
+            console.error("Error deleting fertilizer application:", error);
+            return dataWithError(null, "Oops! Something went wrong. Please try again later.");
+        }
+    }
+
+    //  Handle other methods. This returns an error response for methods other than POST or DELETE, which may or may not be what's desired.
+    console.error(`${request.method} is not supported`)
+    return dataWithError(null, "Oops! Something went wrong. Please try again later.");
 
 }
