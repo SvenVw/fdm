@@ -164,9 +164,12 @@ export async function action({
 
         try {
 
-            p_app_ids.split(',').map(async (p_app_id: string) => {
-                await removeFertilizerApplication(fdm, p_app_id);
-            })
+            const p_app_ids_array = p_app_ids.split(',');
+            await Promise.all(
+                p_app_ids_array.map((p_app_id: string) =>
+                    removeFertilizerApplication(fdm, p_app_id)
+                )
+            );
 
             return dataWithSuccess({}, { message: "Bemesting is verwijderd" });
         } catch (error) {
