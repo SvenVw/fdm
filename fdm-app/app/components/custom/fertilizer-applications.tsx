@@ -45,8 +45,27 @@ export const FormSchema = z.object({
         invalid_type_error: "Meststof is ongeldig",
     })
 })
+interface FertilizerApplication {
+    p_app_id: string;
+    p_app_ids: string[];
+    p_name_nl: string;
+    p_app_amount: number;
+    p_app_date: Date;
+  }
+  
+  interface FertilizerOption {
+    value: string;
+    label: string;
+  }
+  
+  interface FertilizerApplicationsFormProps {
+    fertilizerApplications: FertilizerApplication[];
+    options: FertilizerOption[];
+    defaultValue?: string;
+    action: string;
+  }
 
-export function FertilizerApplicationsForm(props: { fertilizerApplications: any[], options: { value: string, label: string }[], defaultValue?: string, action: string }) {
+export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProps) {
     const fetcher = useFetcher();
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
