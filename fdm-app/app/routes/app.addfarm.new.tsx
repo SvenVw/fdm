@@ -104,11 +104,10 @@ export async function action({
         addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
       )
     );
+    return redirectWithSuccess(`../addfarm/${b_id_farm}/map`, { message: "Bedrijf is toegevoegd! 🎉" })
   } catch (error) {
     console.error('Failed to add fertilizers:', error);
     // Consider how to handle this error - perhaps return a specific error response
     return dataWithError(null, "Oops! Something went wrong. Please try again later.");
   }
-
-  return redirectWithSuccess(`../addfarm/${b_id_farm}/map`, { message: "Bedrijf is toegevoegd! 🎉" })
 }
