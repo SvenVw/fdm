@@ -65,8 +65,10 @@ export function FertilizerApplicationsForm(props: { fertilizerApplications: any[
     }, [form.formState])
 
     const handleDelete = (p_app_ids: string[]) => {
+        if (fetcher.state === 'submitting') return;
+
         fetcher.submit(
-            { p_app_ids }, 
+            { p_app_ids },
             { method: "delete", action: props.action }
         );
     };
@@ -187,8 +189,18 @@ export function FertilizerApplicationsForm(props: { fertilizerApplications: any[
                                     </p>
                                 </div>
                                 <div className="justify-self-end">
-                                    <Button variant="destructive" onClick={() => handleDelete(application.p_app_ids)}>
-                                        Verwijder
+                                    <Button
+                                        variant="destructive"
+                                        disabled={fetcher.state === 'submitting'}
+                                        onClick={() => handleDelete(application.p_app_ids)}>
+                                        {fetcher.state === 'submitting' ? (
+                                            <div className="flex items-center space-x-2">
+                                                <LoadingSpinner />
+                                                <span>Verwijderen...</span>
+                                            </div>
+                                        ) : (
+                                            "Verwijder"
+                                        )}
                                     </Button>
                                 </div>
 
