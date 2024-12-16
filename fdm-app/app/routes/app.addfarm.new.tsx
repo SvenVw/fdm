@@ -94,20 +94,17 @@ export async function action({
   const { b_name_farm } = formValues;
 
   // Create a farm
-  const b_id_farm = await addFarm(fdm, b_name_farm, null)
-
-  // Add the fertilizers from the catalogue to the database
   try {
+    const b_id_farm = await addFarm(fdm, b_name_farm, null);
     const fertilizers = await getFertilizersFromCatalogue(fdm);
     await Promise.all(
-      fertilizers.map(fertilizer => 
+      fertilizers.map(fertilizer =>
         addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
       )
     );
-    return redirectWithSuccess(`../addfarm/${b_id_farm}/map`, { message: "Bedrijf is toegevoegd! 🎉" })
+    return redirectWithSuccess(`../addfarm/${b_id_farm}/map`, { message: "Bedrijf is toegevoegd! 🎉" });
   } catch (error) {
-    console.error('Failed to add fertilizers:', error);
-    // Consider how to handle this error - perhaps return a specific error response
-    return dataWithError(null, "Oops! Something went wrong. Please try again later.");
+    console.error('Failed to create farm with fertilizers:', error);
+    return dataWithError(null, "Er is iets misgegaan bij het aanmaken van het bedrijf.");
   }
 }
