@@ -73,8 +73,6 @@ export async function loader({
 
         return accumulator;
     }, []);
-    console.log(fertilizerApplications)
-
 
     return {
         b_lu_catalogue: b_lu_catalogue,
