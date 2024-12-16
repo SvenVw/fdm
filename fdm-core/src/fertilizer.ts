@@ -325,6 +325,19 @@ export async function addFertilizerApplication(
     p_app_method: schema.fertilizerApplicationTypeInsert['p_app_method'],
     p_app_date: schema.fertilizerApplicationTypeInsert['p_app_date']
 ): Promise<schema.fertilizerApplicationTypeInsert['p_app_id']> {
+
+    // Validate that the field exists
+    const fieldExists = await fdm.select().from(schema.fields).where(eq(schema.fields.b_id, b_id)).limit(1);
+    if (fieldExists.length === 0) {
+        throw new Error(`Field with b_id ${b_id} does not exist`);
+    }
+
+    // Validate that the fertilizer exists
+    const fertilizerExists = await fdm.select().from(schema.fertilizers).where(eq(schema.fertilizers.p_id, p_id)).limit(1);
+    if (fertilizerExists.length === 0) {
+        throw new Error(`Fertilizer with p_id ${p_id} does not exist`);
+    }
+
     const p_app_id = nanoid();
 
     try {
@@ -370,7 +383,7 @@ export async function updateFertilizerApplication(
     try {
         await fdm
             .update(schema.fertilizerApplication)
-            .set({b_id, p_id, p_app_amount, p_app_method, p_app_date})
+            .set({ b_id, p_id, p_app_amount, p_app_method, p_app_date })
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id));
     } catch (error) {
         throw new Error(`Failed to update fertilizer application: ${error}`);
