@@ -52,21 +52,14 @@ export async function loader({
     const fertilizerApplications = targetCultivation.fields.reduce((accumulator, field) => {
         field.fertilizer_applications.forEach(app => {
             // Create a key based on application properties to identify similar applications.
-            const applicationKey = JSON.stringify({
-                p_id_catalogue: app.p_id_catalogue,
-                p_app_amount: app.p_app_amount,
-                p_app_method: app.p_app_method,
-                p_app_date: app.p_app_date,
-            });
+            const isSimilarApplication = (app1: any, app2: any) => 
+                app1.p_id_catalogue === app2.p_id_catalogue &&
+                app1.p_app_amount === app2.p_app_amount &&
+                app1.p_app_method === app2.p_app_method &&
+                app1.p_app_date === app2.p_app_date;
 
-            // Check if a similar application already exists in the accumulator.
-            const existingApplication = accumulator.find(
-                (existingApp) => JSON.stringify({
-                    p_id_catalogue: existingApp.p_id_catalogue,
-                    p_app_amount: existingApp.p_app_amount,
-                    p_app_method: existingApp.p_app_method,
-                    p_app_date: existingApp.p_app_date,
-                }) === applicationKey
+            const existingApplication = accumulator.find(existingApp => 
+                isSimilarApplication(existingApp, app)
             );
 
             if (existingApplication) {

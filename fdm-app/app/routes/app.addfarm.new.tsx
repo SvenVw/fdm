@@ -96,10 +96,18 @@ export async function action({
   const b_id_farm = await addFarm(fdm, b_name_farm, null)
 
   // Add the fertilizers from the catalogue to the database
-  const fertilizers = await getFertilizersFromCatalogue(fdm);
-  await fertilizers.map(async (fertilizer) => {
-    await addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
-  })
+  try {
+    const fertilizers = await getFertilizersFromCatalogue(fdm);
+    await Promise.all(
+      fertilizers.map(fertilizer => 
+        addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
+      )
+    );
+  } catch (error) {
+    console.error('Failed to add fertilizers:', error);
+    // Consider how to handle this error - perhaps return a specific error response
+    throw error;
+  }
 
   return redirect(`../addfarm/${b_id_farm}/map`)
 }
