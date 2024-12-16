@@ -52,13 +52,13 @@ export async function loader({
     const fertilizerApplications = targetCultivation.fields.reduce((accumulator, field) => {
         field.fertilizer_applications.forEach(app => {
             // Create a key based on application properties to identify similar applications.
-            const isSimilarApplication = (app1: any, app2: any) => 
+            const isSimilarApplication = (app1: any, app2: any) =>
                 app1.p_id_catalogue === app2.p_id_catalogue &&
                 app1.p_app_amount === app2.p_app_amount &&
                 app1.p_app_method === app2.p_app_method &&
                 app1.p_app_date.getTime() === app2.p_app_date.getTime();
-               
-            const existingApplication = accumulator.find(existingApp => 
+
+            const existingApplication = accumulator.find(existingApp =>
                 isSimilarApplication(existingApp, app)
             );
 
@@ -167,7 +167,10 @@ export async function action({
         } catch (error) {
             // Handle errors appropriately. Log the error for debugging purposes.
             console.error("Error deleting fertilizer application:", error);
-            return dataWithError(null, "Oops! Something went wrong. Please try again later.");
+            return dataWithError(
+                error instanceof Error ? error.message : "Unknown error",
+                "Er is een fout opgetreden bij het verwijderen van de bemesting. Probeer het later opnieuw."
+            );
         }
     }
 
