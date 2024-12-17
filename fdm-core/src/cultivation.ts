@@ -3,8 +3,7 @@ import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
-import { getCultivationType } from './cultivation.d'
-import { b } from 'vitest/dist/chunks/suite.BMWOKiTe.js'
+import { cultivationPlanType, getCultivationType } from './cultivation.d'
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -42,7 +41,7 @@ export async function addCultivationToCatalogue(
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert['b_lu_hcat3_name']
     }
 ): Promise<void> {
-    await fdm.transaction(async (tx) => {
+    await fdm.transaction(async (tx: FdmType) => {
         // Check for existing cultivation
         const existing = await tx
             .select()
@@ -50,8 +49,8 @@ export async function addCultivationToCatalogue(
             .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, properties.b_lu_catalogue))
             .limit(1)
 
-        if (existing.length > 0) { 
-            throw new Error('Cultivation already exists in catalogue') 
+        if (existing.length > 0) {
+            throw new Error('Cultivation already exists in catalogue')
         }
 
         // Insert the cultivation in the db
@@ -148,7 +147,7 @@ export async function addCultivation(
                 })
 
         } catch (error) {
-            throw new Error(`addCultivation failed: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
+            throw new Error(`addCultivation failed: ${error instanceof Error ? error.message : String(error)}`)
         }
     })
 
@@ -198,6 +197,7 @@ export async function getCultivation(fdm: FdmType, b_lu: schema.cultivationsType
  * @param fdm The FDM instance.
  * @param b_id The ID of the field.
  * @returns A Promise that resolves with an array of cultivation details.
+ * @alpha
  */
 export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingTypeSelect['b_id']): Promise<getCultivationType[]> {
 
@@ -226,20 +226,29 @@ export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingType
  *
  * The cultivation plan is an array of objects, where each object represents a unique cultivation
  * identified by its `b_lu_catalogue`. Each cultivation object also contains a `fields` array,
- * listing the fields associated with that specific cultivation.  The `fields` array contains objects,
- * each specifying the `b_lu` (cultivation ID) and `b_id` (field ID) combination.
+ * listing the fields associated with that specific cultivation. Within each field object, there's
+ * a `fertilizer_applications` array detailing the fertilizers applied to that field.
  *
  * @param fdm The FDM instance.
  * @param b_id_farm The ID of the farm for which to retrieve the cultivation plan.
- * @returns A Promise that resolves with an array representing the cultivation plan.  
+ * @returns A Promise that resolves with an array representing the cultivation plan.
  *          Each element in the array is an object with the following structure:
  *          ```
  *          {
  *              b_lu_catalogue: string;  // Unique ID of the cultivation catalogue item
  *              b_lu_name: string;      // Name of the cultivation
  *              fields: {               // Array of fields associated with this cultivation
- *                  b_lu: string;          // Unique ID of the cultivation 
+ *                  b_lu: string;          // Unique ID of the cultivation
  *                  b_id: string;          // Unique ID of the field
+ *                  b_name: string;        // Name of the field
+ *                  fertilizer_applications: { // Array of fertilizer applications on this field
+ *                      p_id_catalogue: string; // Fertilizer catalogue ID
+ *                      p_name_nl: string;    // Fertilizer name (Dutch)
+ *                      p_app_amount: number;  // Amount applied
+ *                      p_app_method: string;  // Application method
+ *                      p_app_date: Date;     // Application date
+ *                      p_app_id: string;      // Unique ID of the application
+ *                  }[]
  *              }[];
  *          }
  *          ```
@@ -248,21 +257,14 @@ export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingType
  * ```typescript
  * const cultivationPlan = await getCultivationPlan(fdm, 'farm123');
  * if (cultivationPlan.length > 0) {
- *   console.log("Cultivation Plan:", cultivationPlan); 
+ *   console.log("Cultivation Plan:", cultivationPlan);
  * } else {
  *   console.log("No cultivations found for this farm.");
  * }
  * ```
  * @alpha
  */
-export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<Array<{
-    b_lu_catalogue: string;
-    b_lu_name: string;
-    fields: Array<{
-        b_lu: string;
-        b_id: string;
-    }>;
-}>> {
+export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<cultivationPlanType[]> {
     if (!b_id_farm) {
         throw new Error('Farm ID is required')
     }
@@ -274,7 +276,13 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
                 b_lu_name: schema.cultivationsCatalogue.b_lu_name,
                 b_lu: schema.cultivations.b_lu,
                 b_id: schema.fields.b_id,
-                b_name: schema.fields.b_name
+                b_name: schema.fields.b_name,
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                p_name_nl: schema.fertilizersCatalogue.p_name_nl,
+                p_app_amount: schema.fertilizerApplication.p_app_amount,
+                p_app_method: schema.fertilizerApplication.p_app_method,
+                p_app_date: schema.fertilizerApplication.p_app_date,
+                p_app_id: schema.fertilizerApplication.p_app_id
             })
             .from(schema.farms)
             .leftJoin(schema.farmManaging, eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm))
@@ -282,24 +290,51 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
             .leftJoin(schema.fieldSowing, eq(schema.fields.b_id, schema.fieldSowing.b_id))
             .leftJoin(schema.cultivations, eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu))
             .leftJoin(schema.cultivationsCatalogue, eq(schema.cultivations.b_lu_catalogue, schema.cultivationsCatalogue.b_lu_catalogue))
+            .leftJoin(schema.fertilizerApplication, eq(schema.fertilizerApplication.b_id, schema.fields.b_id))
+            .leftJoin(schema.fertilizerPicking, eq(schema.fertilizerPicking.p_id, schema.fertilizerApplication.p_id))
+            .leftJoin(schema.fertilizersCatalogue, eq(schema.fertilizersCatalogue.p_id_catalogue, schema.fertilizerPicking.p_id_catalogue))
             .where(and(
                 eq(schema.farms.b_id_farm, b_id_farm),
                 isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
             )
 
-        const cultivationPlan = cultivations.reduce((acc, curr) => {
-            const existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue)
-            if (existingCultivation) {
-                existingCultivation.fields.push({ b_lu: curr.b_lu, b_id: curr.b_id, b_name: curr.b_name })
-            } else {
-                acc.push({
-                    b_lu_catalogue: curr.b_lu_catalogue,
-                    b_lu_name: curr.b_lu_name,
-                    fields: [{ b_lu: curr.b_lu, b_id: curr.b_id, b_name: curr.b_name }]
-                });
-            }
-            return acc
-        }, []);
+            const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr: any) => {
+                let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
+            
+                if (!existingCultivation) {
+                    existingCultivation = {
+                        b_lu_catalogue: curr.b_lu_catalogue,
+                        b_lu_name: curr.b_lu_name,
+                        fields: []
+                    };
+                    acc.push(existingCultivation);
+                }
+            
+                let existingField = existingCultivation.fields.find(field => field.b_id === curr.b_id);
+            
+                if (!existingField) {
+                    existingField = {
+                        b_lu: curr.b_lu,
+                        b_id: curr.b_id,
+                        b_name: curr.b_name,
+                        fertilizer_applications: []
+                    };
+                    existingCultivation.fields.push(existingField);
+                }
+            
+                if (curr.p_app_id) {  // Only add if it's a fertilizer application
+                    existingField.fertilizer_applications.push({
+                        p_id_catalogue: curr.p_id_catalogue,
+                        p_name_nl: curr.p_name_nl,
+                        p_app_amount: curr.p_app_amount,
+                        p_app_method: curr.p_app_method,
+                        p_app_date: curr.p_app_date,
+                        p_app_id: curr.p_app_id
+                    });
+                }
+            
+                return acc;
+            }, []);
 
         return cultivationPlan
     } catch (error) {

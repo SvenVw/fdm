@@ -1,5 +1,26 @@
 # Changelog fdm-app
 
+## 0.4.0
+
+### Minor Changes
+
+- bee0e62: Add `FertilizerApplicationsForm` to list, add and delete fertilizer applications
+- 4112897: Remove selection of fertilizers for acquiring but select all fertilizers
+
+### Patch Changes
+
+- Updated dependencies [7af3fda]
+- Updated dependencies [bc4e75f]
+- Updated dependencies [a948c61]
+- Updated dependencies [efa423d]
+- Updated dependencies [b0c001e]
+- Updated dependencies [6ef3d44]
+- Updated dependencies [61da12f]
+- Updated dependencies [5be0abc]
+- Updated dependencies [4189f5d]
+  - @svenvw/fdm-core@0.7.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.3.1
 
 ### Patch Changes

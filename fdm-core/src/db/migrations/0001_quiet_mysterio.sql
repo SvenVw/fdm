@@ -1,5 +1,6 @@
 CREATE SCHEMA "fdm-dev";
 --> statement-breakpoint
+CREATE TYPE "fdm-dev"."p_app_method" AS ENUM('slotted coulter', 'incorporation', 'injection', 'spraying', 'broadcasting', 'spoke wheel', 'pocket placement');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_manage_type" AS ENUM('owner', 'lease');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fdm-dev"."cultivations" (
@@ -40,8 +41,19 @@ CREATE TABLE IF NOT EXISTS "fdm-dev"."farms" (
 CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_aquiring" (
 	"b_id_farm" text NOT NULL,
 	"p_id" text NOT NULL,
-	"p_amount" numeric,
-	"p_date_acquiring" timestamp with time zone,
+	"p_acquiring_amount" numeric,
+	"p_acquiring_date" timestamp with time zone,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "fdm-dev"."fertilizer_applying" (
+	"p_app_id" text PRIMARY KEY NOT NULL,
+	"b_id" text NOT NULL,
+	"p_id" text NOT NULL,
+	"p_app_amount" numeric,
+	"p_app_method" "fdm-dev"."p_app_method",
+	"p_app_date" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -187,6 +199,18 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "fdm-dev"."fertilizer_applying" ADD CONSTRAINT "fertilizer_applying_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "fdm-dev"."fertilizer_applying" ADD CONSTRAINT "fertilizer_applying_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "fdm-dev"."fertilizer_picking" ADD CONSTRAINT "fertilizer_picking_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -231,6 +255,7 @@ END $$;
 CREATE UNIQUE INDEX IF NOT EXISTS "b_lu_idx" ON "fdm-dev"."cultivations" USING btree ("b_lu");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_lu_catalogue_idx" ON "fdm-dev"."cultivations_catalogue" USING btree ("b_lu_catalogue");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_id_farm_idx" ON "fdm-dev"."farms" USING btree ("b_id_farm");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "p_app_idx" ON "fdm-dev"."fertilizer_applying" USING btree ("p_app_id");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "p_id_idx" ON "fdm-dev"."fertilizers" USING btree ("p_id");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "p_id_catalogue_idx" ON "fdm-dev"."fertilizers_catalogue" USING btree ("p_id_catalogue");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "b_id_idx" ON "fdm-dev"."fields" USING btree ("b_id");--> statement-breakpoint

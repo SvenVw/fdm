@@ -1,65 +1,24 @@
 import { useState } from "react";
-import { Form, useLocation, useNavigation } from "react-router";
+import { Form, useNavigation } from "react-router";
 
-import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-// import { nl } from "react-day-picker/locale" // Could not be found somehow
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-    items: {
-        href: string
-        title: string
-    }[]
-}
-
-export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
-    const { pathname } = useLocation();
-
-    return (
-        <nav
-            className={cn(
-                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 truncate",
-                className
-            )}
-            {...props}
-        >
-            {items.map((item) => (
-                <a
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                        buttonVariants({ variant: "ghost" }),
-                        pathname === item.href
-                            ? "bg-muted hover:bg-muted"
-                            : "hover:bg-transparent hover:underline",
-                        "justify-start"
-                    )}
-                >
-                    {item.title}
-                </a>
-            ))}
-        </nav>
-    )
-}
-
-export default function Cultivation(props: { action: string | undefined; }) {
+export default function Index(props: { action: string | undefined; }) {
     const navigation = useNavigation();
 
     // Get sowing and harvesting dates
     const [dateSowing, setDateSowing] = useState<Date | undefined>(new Date('2024-03-01'))
     const [dateHarvesting, setDateHarvesting] = useState<Date | undefined>(new Date('2024-10-01'))
 
-
     return (
-        <div className="space-y-6">            
+        <div className="space-y-6">
             <div>
                 <p className="text-sm text-muted-foreground">
                     Werk de opbrengst, stikstofgehalte en zaai- en oogstdatum bij voor dit gewas.
                 </p>
-            </div>       
+            </div>
             <Form method="post" action={props.action}>
                 <fieldset
                     disabled={navigation.state === "submitting"}

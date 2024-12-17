@@ -1,5 +1,23 @@
 # Changelog fdm-core
 
+## 0.7.0
+
+### Minor Changes
+
+- 7af3fda: Rename `p_amount` at `fertilizer_acquiring` to `p_acquiring_amount`
+- bc4e75f: Rename `p_date_acquiring` to `p_acquiring_date` anc convert type from timestamp to date
+- efa423d: Export `getFertilizer` and `getFertilizers`
+- b0c001e: Add functions `addFertilizerApplication`, `updateFertilizerApplication`, `removeFertilizerApplication`, `getFertilizerApplication` and `getFertilizerApplications`
+- 6ef3d44: Alter `p_acquiring_date` and `p_picking_date` from date to timestamptz
+- 61da12f: Add to output of `getCultivationPlan` the `fertilizer_applications`
+- 5be0abc: `getFertilizers` returns the details of the fertilizers similiar as `getFertilizer`
+- 4189f5d: Add `fertilizer_application` table
+
+### Patch Changes
+
+- a948c61: Fix by adding `b_name` to output type of `getCultivationPlan`
+- Upgrade to use ES2022
+
 ## 0.6.1
 
 ### Patch Changes

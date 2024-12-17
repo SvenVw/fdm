@@ -1,13 +1,13 @@
-import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, useLocation, Outlet } from "react-router";
 import { useLoaderData } from "react-router";
 
 // Components
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ComboboxFertilizers } from "@/components/custom/combobox-fertilizers";
-import { ComboboxCultivations } from "@/components/custom/combobox-cultivations";
-
-// Blocks
-import Cultivation from "@/components/blocks/cultivation-plan";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+} from "@/components/ui/pagination"
 
 // FDM
 import { fdm } from "../services/fdm.server";
@@ -57,27 +57,17 @@ export async function loader({
         }
     })
 
-    // Fertilizer options
-    const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
-    const fertilizerOptions = fertilizersCatalogue.map(fertilizer => {
-        return {
-            value: fertilizer.p_id_catalogue,
-            label: fertilizer.p_name_nl
-        }
-    })
-
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        cultivation: cultivation,
-        fertilizerOptions: fertilizerOptions,
-        cultivationOptions: cultivationOptions
+        cultivation: cultivation
     }
 }
 
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>();
+    const { pathname } = useLocation();
 
     // Get field names
     let fieldNames = loaderData.cultivation.fields.map(field => field.b_name)
@@ -86,6 +76,20 @@ export default function Index() {
         fieldNames = fieldNames.replace(/,(?=[^,]+$)/, ', en') //Replace last comma with and        
     }
 
+    const items = [
+        {
+            title: 'Gewas',
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`
+        },
+        {
+            title: 'Bemesting',
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`
+        },
+        {
+            title: 'Vanggewas',
+            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`
+        }
+    ]
 
     return (
         <div className="space-y-6">
@@ -95,7 +99,28 @@ export default function Index() {
                     {fieldNames}
                 </p>
             </div>
-            <Tabs defaultValue="cultivation_main" className="w-full">
+
+            <Pagination>
+                <PaginationContent className="">
+
+                    {items.map((item) => (
+                        <PaginationItem
+                            key={item.href}
+                        >
+                            <PaginationLink
+                                href={item.href}
+                                size="default"
+                                isActive={pathname === item.href}
+                            >
+                                {item.title}
+                            </PaginationLink>
+                        </PaginationItem>
+                    ))}
+                </PaginationContent>
+            </Pagination>
+            <Outlet />
+
+            {/* <Tabs defaultValue="cultivation_main" className="w-full">
                 <TabsList>
                     <TabsTrigger value="cultivation_main">Hoofdgewas</TabsTrigger>
                     <TabsTrigger value="fertilizations">Bemesting </TabsTrigger>
@@ -114,6 +139,7 @@ export default function Index() {
                             Vul de bemesting op bouwplanniveau in voor dit gewas.
                         </p>
                         <ComboboxFertilizers
+                            action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}`}
                             options={loaderData.fertilizerOptions}
                         />
                     </div>
@@ -128,8 +154,7 @@ export default function Index() {
                         />
                     </div>
                 </TabsContent>
-            </Tabs>
+            </Tabs> */}
         </div>
-
     );
 }

@@ -79,14 +79,34 @@ export type fertilizersTypeInsert = typeof fertilizers.$inferInsert
 export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
-  p_amount: numericCasted(), //kg
-  p_date_acquiring: timestamp({ withTimezone: true }),
+  p_acquiring_amount: numericCasted(), //kg
+  p_acquiring_date: timestamp({ withTimezone: true }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 })
 
 export type fertilizerAcquiringTypeSelect = typeof fertilizerAcquiring.$inferSelect
 export type fertilizerAcquiringTypeInsert = typeof fertilizerAcquiring.$inferInsert
+
+// Define fertilizers application table
+export const applicationMethodEnum = fdmSchema.enum("p_app_method", ["slotted coulter", "incorporation", "injection", "spraying", "broadcasting","spoke wheel", "pocket placement"])
+export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
+  p_app_id: text().primaryKey(),
+  b_id: text().notNull().references(() => fields.b_id),
+  p_id: text().notNull().references(() => fertilizers.p_id),
+  p_app_amount: numericCasted(), // kg / ha
+  p_app_method: applicationMethodEnum(),
+  p_app_date: timestamp({ withTimezone: true }),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => {
+  return {
+    p_app_idx: uniqueIndex('p_app_idx').on(table.p_app_id)
+  }
+})
+
+export type fertilizerApplicationTypeSelect = typeof fertilizerApplication.$inferSelect
+export type fertilizerApplicationTypeInsert = typeof fertilizerApplication.$inferInsert
 
 // Define fertilizers_catalogue table
 export const fertilizersCatalogue = fdmSchema.table('fertilizers_catalogue', {
