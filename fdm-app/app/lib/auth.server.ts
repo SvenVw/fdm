@@ -36,7 +36,7 @@ await migrate(fdmAuth, { migrationsFolder: migrationsFolderPath, migrationsSchem
 export const auth = betterAuth({
   database: drizzleAdapter(fdmAuth, {
     provider: "pg",
-    schema: authSchema, 
+    schema: authSchema,
   }),
   user: {
     additionalFields: {
@@ -57,6 +57,10 @@ export const auth = betterAuth({
       }
     }
   },
+  session: {
+    expiresIn: 60 * 60 * 24 * 30, // 30 days
+    updateAge: 60 * 60 * 24 // 1 day (every 1 day the session expiration is updated)
+  },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -66,7 +70,7 @@ export const auth = betterAuth({
           name: profile.name,
           email: profile.email,
           image: profile.picture,
-          firstname : profile.given_name,
+          firstname: profile.given_name,
           surname: profile.family_name,
         }
       }
