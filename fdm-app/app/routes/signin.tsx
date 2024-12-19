@@ -17,11 +17,24 @@ import { Check } from "lucide-react"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { cn } from "@/lib/utils";
 import { signIn } from "@/lib/auth-client";
+import { auth } from "@/lib/auth.server";
 
 export async function loader({
-    request,
+  request,
 }: LoaderFunctionArgs) {
 
+  // Get the session
+  const session = await auth.api.getSession({
+    headers: request.headers 
+  })
+
+  // If user has an session redirect to app
+  if (session?.session) { 
+    return redirect("/app")
+  }
+
+  // Return user information from loader
+  return {}
 }
 
 
