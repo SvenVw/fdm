@@ -48,3 +48,10 @@ export const verification = pgTable("verification", {
 	createdAt: timestamp('createdAt'),
 	updatedAt: timestamp('updatedAt')
 });
+
+export const rateLimit = pgTable("rateLimit", {
+	id: text("id").primaryKey(),
+	key: text('key'),
+	count: integer('count'),
+	lastRequest: integer('lastRequest')
+});

@@ -76,4 +76,7 @@ export const auth = betterAuth({
       }
     },
   },
+  rateLimit: {
+    storage: "database",
+  },
 });

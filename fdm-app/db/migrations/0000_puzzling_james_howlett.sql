@@ -14,6 +14,13 @@ CREATE TABLE "account" (
 	"updatedAt" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "rateLimit" (
+	"id" text PRIMARY KEY NOT NULL,
+	"key" text,
+	"count" integer,
+	"lastRequest" integer
+);
+--> statement-breakpoint
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expiresAt" timestamp NOT NULL,
