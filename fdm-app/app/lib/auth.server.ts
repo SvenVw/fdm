@@ -1,6 +1,8 @@
 import { drizzle } from 'drizzle-orm/postgres-js'
+import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import * as authSchema from "db/schema";
 
 // Initialize fdmAuth instance
 // Get credentials to connect to db
@@ -14,6 +16,7 @@ const password = process.env.POSTGRES_PASSWORD ??
   (() => { throw new Error('POSTGRES_PASSWORD environment variable is required') })()
 const databaseAuth = process.env.POSTGRES_DB_AUTH ??
   (() => { throw new Error('POSTGRES_DB_AUTH environment variable is required') })()
+const migrationsFolderPath = 'db/migrations'
 
 export const fdmAuth = drizzle({
   connection: {
@@ -26,10 +29,14 @@ export const fdmAuth = drizzle({
   logger: false,
 })
 
+// Run migration
+await migrate(fdmAuth, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
+
 // Initialize better-auth instance
 export const auth = betterAuth({
   database: drizzleAdapter(fdmAuth, {
     provider: "pg",
+    schema: authSchema, 
   }),
   user: {
     additionalFields: {
@@ -54,6 +61,15 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      mapProfileToUser: (profile) => {
+        return {
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          firstname : profile.given_name,
+          surname: profile.family_name,
+        }
+      }
     },
   },
 });
