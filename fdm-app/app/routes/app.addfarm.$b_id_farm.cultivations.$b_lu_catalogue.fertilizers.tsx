@@ -7,8 +7,8 @@ import { extractFormValuesFromRequest } from "@/lib/form";
 import { FormSchema } from "@/components/custom/fertilizer-applications";
 
 // FDM
-import { fdm } from "../services/fdm.server";
-import { getCultivationPlan, getFertilizers, addFertilizerApplication, getFertilizer, removeFertilizerApplication } from "@svenvw/fdm-core";
+import { fdm } from "../lib/fdm.server";
+import { getCultivationPlan, getFertilizers, addFertilizerApplication, removeFertilizerApplication } from "@svenvw/fdm-core";
 
 // Loader
 export async function loader({

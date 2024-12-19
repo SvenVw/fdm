@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/toaster"
 
 
 // FDM
-import { fdm } from "../services/fdm.server";
+import { fdm } from "../lib/fdm.server";
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

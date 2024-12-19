@@ -7,7 +7,7 @@
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx",
     ".react-router/types/**/*"
-  ],
+, "app/routes/app.$.tsx"  ],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["@react-router/node", "vite/client"],
