@@ -1,5 +1,13 @@
 # fdm-data
 
+## 0.6.0
+
+### Patch Changes
+
+- Updated dependencies [83c589b]
+- Updated dependencies [6a3e6db]
+  - @svenvw/fdm-core@0.8.0
+
 ## 0.5.0
 
 ### Patch Changes

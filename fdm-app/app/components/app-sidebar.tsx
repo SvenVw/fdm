@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRightLeft, BadgeCheck, ChevronsUpDown, GitPullRequestArrow, House, Languages, LifeBuoy, LogOut, Map as MapIcon, PawPrint, Scale, Send, Settings, Shapes, Sparkles, Sprout, Square } from "lucide-react"
-import { Avatar, AvatarFallback } from "./ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -184,7 +184,7 @@ export function AppSidebar(props: SideBarType) {
                                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
-                                        {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
+                                        <AvatarImage src={user.image} alt={user.name} />
                                         <AvatarFallback className="rounded-lg">{avatarInitials}</AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">

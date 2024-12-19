@@ -6,4 +6,5 @@ packages:
   - 'fdm-app'
 
 catalog:
-  drizzle-orm: ^0.35.3
+  drizzle-orm: ^0.38.2
+  drizzle-kit: ^0.30.1
