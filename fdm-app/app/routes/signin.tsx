@@ -128,7 +128,7 @@ export default function SignIn() {
                         </Button>
                     </div>
                     <div className="mt-4 text-center text-sm">
-                        Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="#" className="underline">
+                        Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="/faq" className="underline">
                             Veelgestelde Vragen
                         </a>
                     </div>
