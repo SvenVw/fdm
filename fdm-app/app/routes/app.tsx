@@ -22,9 +22,6 @@ export async function loader({
   request,
 }: LoaderFunctionArgs) {
 
-  // const session = await authClient.getSession(request); // <-- Correct server-side method
-
-
   // Get the session
   const session = await auth.api.getSession({
     headers: request.headers 
@@ -52,10 +49,3 @@ export default function App() {
 
   );
 }
-
-// Action
-export const action = async ({
-  request,
-}: ActionFunctionArgs) => {
-
-};
