@@ -140,11 +140,3 @@ export default function SignIn() {
         </div >
     )
 }
-
-export async function action({
-    request,
-}: ActionFunctionArgs) {
-
-
-
-}
