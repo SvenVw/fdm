@@ -1,7 +1,6 @@
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 import { useLoaderData, Outlet } from "react-router";
-import { getUserFromSession } from "@svenvw/fdm-core"
 
 // Components
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -10,8 +9,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 // Blocks
 
 // Services
-import { getSession, commitSession, destroySession } from "@/services/session.server";
-import { fdm } from "../services/fdm.server";
+import { auth } from "@/lib/auth.server"
 
 export const meta: MetaFunction = () => {
   return [
@@ -24,37 +22,22 @@ export async function loader({
   request,
 }: LoaderFunctionArgs) {
 
+  // const session = await authClient.getSession(request); // <-- Correct server-side method
+
+
   // Get the session
-  const session = await getSession(
-    request.headers.get("Cookie")
-  );
+  const session = await auth.api.getSession({
+    headers: request.headers 
+  })
+  console.log(session)
 
-  // Check if session is present
-  if (!session.has("session_id")) {
-    session.flash("error", "No session");
-
-    return redirect("../signup", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
-  }
-
-  // Validate the session
-  const user = await getUserFromSession(fdm, String(session.get("session_id")))
-  if (! user) {
-    session.flash("error", "Invalid session");
-
-    return redirect("../signup", {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    });
+  if (!session?.user) { 
+    return redirect("/signin")
   }
 
   // Return user information from loader
   return {
-    user: user
+    user: session.user,
   }
 }
 
@@ -63,7 +46,7 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <AppSidebar user={loaderData.user}/>
+      <AppSidebar user={loaderData.user} />
       <Outlet />
     </SidebarProvider>
 
@@ -74,12 +57,5 @@ export default function App() {
 export const action = async ({
   request,
 }: ActionFunctionArgs) => {
-  const session = await getSession(
-    request.headers.get("Cookie")
-  );
-  return redirect("../login", {
-    headers: {
-      "Set-Cookie": await destroySession(session),
-    },
-  });
+
 };
