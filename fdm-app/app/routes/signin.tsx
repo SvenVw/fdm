@@ -11,21 +11,21 @@ import { signIn } from "@/lib/auth-client";
 import { auth } from "@/lib/auth.server";
 
 export async function loader({
-  request,
+    request,
 }: LoaderFunctionArgs) {
 
-  // Get the session
-  const session = await auth.api.getSession({
-    headers: request.headers 
-  })
+    // Get the session
+    const session = await auth.api.getSession({
+        headers: request.headers
+    })
 
-  // If user has an session redirect to app
-  if (session?.session) { 
-    return redirect("/app")
-  }
+    // If user has an session redirect to app
+    if (session?.session) {
+        return redirect("/app")
+    }
 
-  // Return user information from loader
-  return {}
+    // Return user information from loader
+    return {}
 }
 
 
@@ -103,10 +103,14 @@ export default function SignIn() {
                                 "w-full gap-2"
                             )}
                             onClick={async () => {
-                                await signIn.social({
-                                    provider: "google",
-                                    callbackURL: "/app"
-                                });
+                                try {
+                                    await signIn.social({
+                                        provider: "google",
+                                        callbackURL: "/app"
+                                    });
+                                } catch (error) {
+                                    console.error('Social sign-in failed:', error);                                  
+                                }
                             }}
                         >
                             <svg
