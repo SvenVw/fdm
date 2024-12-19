@@ -24,11 +24,10 @@ export async function loader({
 
   // Get the session
   const session = await auth.api.getSession({
-    headers: request.headers 
+    headers: request.headers
   })
-  console.log(session)
 
-  if (!session?.user) { 
+  if (!session?.user) {
     return redirect("/signin")
   }
 
@@ -48,4 +47,24 @@ export default function App() {
     </SidebarProvider>
 
   );
+}
+
+export async function action({
+  request,
+}: ActionFunctionArgs) {
+
+  // Get the session token
+  const session = await auth.api.getSession({
+    headers: request.headers
+  })
+
+  // Revoke the session
+  await auth.api.revokeSession({
+    headers: request.headers,
+    body: {
+      token: session?.session.token
+    }
+  })
+
+  return redirect("/signin")
 }
