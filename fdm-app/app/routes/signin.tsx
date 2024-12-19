@@ -1,20 +1,11 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { data } from "react-router";
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useRemixForm, RemixFormProvider } from "remix-hook-form"
-import { z } from "zod"
-import { signUpUser, getUserFromSession } from "@svenvw/fdm-core"
 
 // Components
 import { Button } from "@/components/ui/button"
-
-// Services
-import { getSession, commitSession, destroySession } from "@/services/session.server";
-import { fdm } from "../services/fdm.server";
 import { Check } from "lucide-react"
 
-import { extractFormValuesFromRequest } from "@/lib/form"
+// Services
 import { cn } from "@/lib/utils";
 import { signIn } from "@/lib/auth-client";
 import { auth } from "@/lib/auth.server";
