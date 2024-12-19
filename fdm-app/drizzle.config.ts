@@ -10,10 +10,11 @@ export default defineConfig({
     schema: "fdm-migration"
   },
   dbCredentials: {
-    host: String(process.env.POSTGRES_HOST),
-    port: Number(process.env.POSTGRES_PORT),
-    database: String(process.env.POSTGRES_DB_AUTH),
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
+    host: process.env.POSTGRES_HOST ?? throw new Error('POSTGRES_HOST is required'),
+    port: Number(process.env.POSTGRES_PORT) || 5432,
+    database: process.env.POSTGRES_DB_AUTH ?? throw new Error('POSTGRES_DB_AUTH is required'),
+    user: process.env.POSTGRES_USER ?? throw new Error('POSTGRES_USER is required'),
+    password: process.env.POSTGRES_PASSWORD ?? throw new Error('POSTGRES_PASSWORD is required'),
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : false,
   },
 });
