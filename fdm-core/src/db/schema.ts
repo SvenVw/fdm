@@ -76,7 +76,7 @@ export type fertilizersTypeSelect = typeof fertilizers.$inferSelect
 export type fertilizersTypeInsert = typeof fertilizers.$inferInsert
 
 // Define fertilizers acquiring table
-export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
+export const fertilizerAcquiring = fdmSchema.table('fertilizer_acquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
   p_acquiring_amount: numericCasted(), //kg

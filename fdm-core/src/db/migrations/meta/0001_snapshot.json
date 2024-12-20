@@ -1,5 +1,5 @@
 {
-  "id": "a5d908ff-b57d-431a-be80-643f89a9dc61",
+  "id": "25e4ea17-96eb-4f82-88ce-16ddd2cf24d9",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -293,8 +293,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "fdm-dev.fertilizer_aquiring": {
-      "name": "fertilizer_aquiring",
+    "fdm-dev.fertilizer_acquiring": {
+      "name": "fertilizer_acquiring",
       "schema": "fdm-dev",
       "columns": {
         "b_id_farm": {
@@ -337,9 +337,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "fertilizer_aquiring_b_id_farm_farms_b_id_farm_fk": {
-          "name": "fertilizer_aquiring_b_id_farm_farms_b_id_farm_fk",
-          "tableFrom": "fertilizer_aquiring",
+        "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk": {
+          "name": "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk",
+          "tableFrom": "fertilizer_acquiring",
           "tableTo": "farms",
           "schemaTo": "fdm-dev",
           "columnsFrom": [
@@ -351,9 +351,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "fertilizer_aquiring_p_id_fertilizers_p_id_fk": {
-          "name": "fertilizer_aquiring_p_id_fertilizers_p_id_fk",
-          "tableFrom": "fertilizer_aquiring",
+        "fertilizer_acquiring_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_acquiring_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_acquiring",
           "tableTo": "fertilizers",
           "schemaTo": "fdm-dev",
           "columnsFrom": [
