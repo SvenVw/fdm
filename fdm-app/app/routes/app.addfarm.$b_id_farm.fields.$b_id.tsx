@@ -15,8 +15,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { getField } from "@svenvw/fdm-core";
-
+import { getCultivationsFromCatalogue, getField } from "@svenvw/fdm-core";
+import { Combobox } from "@/components/custom/combobox";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -54,7 +54,7 @@ const FormSchema = z.object({
         message: "Fosfaat PAE moet minimaal 0.1 zijn",
     }).lte(100, {
         message: "Fosfaat PAE moet mag maximaal 100 zijn",
-    }),  
+    }),
     a_som_loi: z.number({
         required_error: "Organische stofgehalte is verplicht",
     }).gte(0.5, {
@@ -94,6 +94,24 @@ export async function loader({
     const b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
     // console.log(b_geojson)
 
+    // Get the available cultivations
+    let cultivationOptions = [];
+    try {
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        cultivationOptions = cultivationsCatalogue
+            .filter(cultivation => cultivation?.b_lu_catalogue && cultivation?.b_lu_name)
+            .map(cultivation => ({
+                value: cultivation.b_lu_catalogue,
+                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split('_')[1]})`
+            }));
+    } catch (error) {
+        console.error('Failed to fetch cultivations:', error);
+        throw data(
+            'Failed to load cultivation options',
+            { status: 500, statusText: 'Failed to load cultivation options' }
+        );
+    }
+
     // Get Mapbox token
     const mapboxToken = String(process.env.MAPBOX_TOKEN)
     if (!mapboxToken) {
@@ -104,8 +122,14 @@ export async function loader({
         b_id: b_id,
         b_id_farm: b_id_farm,
         b_name: field.b_name,
+        b_soiltype_agr: field.b_soiltype_agr,
+        b_gwl_class: field.b_gwl_class,
+        a_p_al: field.a_p_al,
+        a_p_cc: field.a_p_cc,
+        a_som_loi: field.a_som_loi,
         b_area: field.b_area,
         b_geojson: b_geojson,
+        cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken
     }
 }
@@ -119,6 +143,11 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
+            b_soiltype_agr: loaderData.b_soiltype_agr ?? "",
+            b_gwl_class: loaderData.b_gwl_class ?? "",
+            a_p_al: loaderData.a_p_al ?? "",
+            a_p_cc: loaderData.a_p_cc ?? "",
+            a_som_loi: loaderData.a_som_loi ?? "",
         },
     })
 
@@ -154,7 +183,16 @@ export default function Index() {
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>                                    
+                                    </div>
+                                    <div className="flex flex-col space-y-1.5">
+                                        <Combobox
+                                            options={loaderData.cultivationOptions}                                 
+                                            form={form}
+                                            name={"b_lu"}
+                                            label={"Hoofdgewas"}
+
+                                        />
+                                    </div>
                                     <div className="flex flex-col space-y-1.5">
                                         <FormField
                                             control={form.control}
@@ -220,7 +258,7 @@ export default function Index() {
                                                             <SelectItem value="sVII">Gt sVII</SelectItem>
                                                             <SelectItem value="bVII">Gt bVII</SelectItem>
                                                             <SelectItem value="VII">Gt VII</SelectItem>
-                                                            <SelectItem value="VIII">Gt VIII</SelectItem>                                               
+                                                            <SelectItem value="VIII">Gt VIII</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                     <FormDescription />
