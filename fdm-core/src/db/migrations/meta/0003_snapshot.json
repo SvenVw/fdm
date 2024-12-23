@@ -1,5 +1,5 @@
 {
-  "id": "a264e47e-6dd6-4866-88a1-8468bb4da5f3",
+  "id": "1d630d17-3b4e-4ccc-9cb7-81d0b8817c0c",
   "prevId": "b51971e7-228c-4ab3-a034-0fe24081ed54",
   "version": "7",
   "dialect": "postgresql",
@@ -1183,12 +1183,6 @@
         "b_sampling_date": {
           "name": "b_sampling_date",
           "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "b_sampling_geometry": {
-          "name": "b_sampling_geometry",
-          "type": "geometry(multipoint)",
           "primaryKey": false,
           "notNull": false
         }

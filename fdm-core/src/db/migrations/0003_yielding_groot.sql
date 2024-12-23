@@ -16,8 +16,7 @@ CREATE TABLE "fdm-dev"."soil_sampling" (
 	"b_id" text NOT NULL,
 	"a_id" text NOT NULL,
 	"b_depth" numeric,
-	"b_sampling_date" timestamp with time zone,
-	"b_sampling_geometry" geometry(multipoint)
+	"b_sampling_date" timestamp with time zone
 );
 --> statement-breakpoint
 ALTER TABLE "fdm-dev"."soil_sampling" ADD CONSTRAINT "soil_sampling_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

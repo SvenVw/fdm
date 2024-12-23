@@ -1,1 +1,0 @@
-ALTER TABLE "fdm-dev"."soil_sampling" ALTER COLUMN "b_sampling_geometry" SET DATA TYPE geometry(point);

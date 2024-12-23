@@ -58,13 +58,13 @@ describe('Soil Analysis Functions', () => {
         const a_source = 'test source'
         const b_depth = 10
         const b_sampling_date = new Date()
-        const b_sampling_geometry = 'MULTIPOINT((0 0))'
+        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
         const a_p_al = 5
         const a_p_cc = 5
         const b_soiltype_agr = 'rivierklei'
         const b_gwl_class = 'II'
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_p_al: a_p_al, a_p_cc: a_p_cc, b_soiltype_agr: b_soiltype_agr, b_gwl_class: b_gwl_class })
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, { a_p_al: a_p_al, a_p_cc: a_p_cc, b_soiltype_agr: b_soiltype_agr, b_gwl_class: b_gwl_class })
 
         expect(test_a_id).toBeDefined()
 
@@ -92,10 +92,10 @@ describe('Soil Analysis Functions', () => {
         const a_source = 'test source'
         const b_depth = 10
         const b_sampling_date = new Date()
-        const b_sampling_geometry = 'MULTIPOINT((0 0))'
+        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry)
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date)
 
         // Test updating existing soil data
         const updated_a_source = 'updated test source'
@@ -112,10 +112,10 @@ describe('Soil Analysis Functions', () => {
         const a_source = 'test source'
         const b_depth = 10
         const b_sampling_date = new Date()
-        const b_sampling_geometry = 'MULTIPOINT((0 0))'
+        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry)
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date)
 
         // Test removing existing soil data
         await removeSoilAnalysis(fdm, test_a_id)
@@ -135,15 +135,15 @@ describe('Soil Analysis Functions', () => {
         const a_som_loi = 5
         const b_depth = 10
         const b_sampling_date = new Date()
-        const b_sampling_geometry = 'MULTIPOINT((0 0))'
+        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
-        test_a_id = await addSoilAnalysis(fdm, a_date_old, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry)
+        test_a_id = await addSoilAnalysis(fdm, a_date_old, a_source, b_id, b_depth, b_sampling_date,)
 
 
         const a_date_new = new Date(Date.now() + 1000) // Increment by 1 second
 
 
-        await addSoilAnalysis(fdm, a_date_new, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
+        await addSoilAnalysis(fdm, a_date_new, a_source, b_id, b_depth, b_sampling_date,  { a_som_loi: a_som_loi })
 
         // get latest soil analysis for field
         const latestAnalysis = await getSoilAnalysis(fdm, b_id)
@@ -160,13 +160,13 @@ describe('Soil Analysis Functions', () => {
         const a_som_loi = 7
         const b_depth = 10
         const b_sampling_date = new Date()
-        const b_sampling_geometry = 'MULTIPOINT((0 0))'
+        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
         // Add first soil analysis
-        await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
+        await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, { a_som_loi: a_som_loi })
 
         // Add second soil analysis
-        await addSoilAnalysis(fdm, new Date(Date.now() + 1000), a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
+        await addSoilAnalysis(fdm, new Date(Date.now() + 1000), a_source, b_id, b_depth, b_sampling_date, { a_som_loi: a_som_loi })
 
         const allAnalyses = await getSoilAnalyses(fdm, b_id)
         expect(allAnalyses).toHaveLength(2)

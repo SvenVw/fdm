@@ -41,17 +41,17 @@ export const geometryPolygon = customType<{
 })
 
 // Workaround for geometry column with multipoint
-export const geometryMultipoint = customType<{
-	data: string
-	driverData: string
-}>({
-	dataType: () => {
-		return `geometry(point)`
-	},
-	fromDriver: (value: string) => {
-		const wkbBuffer = Buffer.from(value, 'hex')
-		const geometry = wkx.Geometry.parse(wkbBuffer)
-		return geometry.toWkt()
-	}, 
-	toDriver: (value: string) => sql`ST_GeomFromText('${value}', 4326)`
-})
+// export const geometryMultipoint = customType<{
+// 	data: string
+// 	driverData: string
+// }>({
+// 	dataType: () => {
+// 		return `geometry(point)`
+// 	},
+// 	fromDriver: (value: string) => {
+// 		const wkbBuffer = Buffer.from(value, 'hex')
+// 		const geometry = wkx.Geometry.parse(wkbBuffer)
+// 		return geometry.toWkt()
+// 	}, 
+// 	toDriver: (value: string) => sql`ST_GeomFromText('${value}', 4326)`
+// })

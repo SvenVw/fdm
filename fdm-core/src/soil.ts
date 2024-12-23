@@ -26,7 +26,7 @@ export async function addSoilAnalysis(
     b_id: schema.soilSamplingTypeInsert['b_id'],
     b_depth: schema.soilSamplingTypeInsert['b_depth'],
     b_sampling_date: schema.soilSamplingTypeInsert['b_sampling_date'],
-    b_sampling_geometry: schema.soilSamplingTypeInsert['b_sampling_geometry'],
+    // b_sampling_geometry: schema.soilSamplingTypeInsert['b_sampling_geometry'],
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>
 ): Promise<schema.soilAnalysisTypeSelect['a_id']> {
 
@@ -55,7 +55,7 @@ export async function addSoilAnalysis(
                     a_id: a_id,
                     b_depth: b_depth,
                     b_sampling_date: b_sampling_date,
-                    b_sampling_geometry: b_sampling_geometry,
+                    // b_sampling_geometry: b_sampling_geometry,
                 })
         }
         catch (error) {
@@ -144,7 +144,7 @@ export async function getSoilAnalysis(
             b_id_sampling: schema.soilSampling.b_id_sampling,
             b_depth: schema.soilSampling.b_depth,
             b_sampling_date: schema.soilSampling.b_sampling_date,
-            b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
+            // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
         })
         .from(schema.soilAnalysis)
         .innerJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
@@ -179,7 +179,7 @@ export async function getSoilAnalyses(
             b_id_sampling: schema.soilSampling.b_id_sampling,
             b_depth: schema.soilSampling.b_depth,
             b_sampling_date: schema.soilSampling.b_sampling_date,
-            b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
+            // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
         })
         .from(schema.soilAnalysis)
         .innerJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
