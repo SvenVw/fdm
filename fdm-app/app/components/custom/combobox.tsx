@@ -35,15 +35,22 @@ interface ComboboxProps {
     form: any
     name: string
     label: ReactNode
+    defaultValue?: string 
 }
 
 export function Combobox({
     options,
     form,
     name,
-    label
+    label,
+    defaultValue
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
+
+    // Set default value if provided
+    const defaultLabel = defaultValue 
+        ? options.find(option => option.value === defaultValue)?.label
+        : undefined;
 
     return (
         <FormField
@@ -62,7 +69,7 @@ export function Combobox({
                                     name={name}
                                     className="w-full justify-between truncate"
                                 >
-                                    {options.find(option => option.value === field.value)?.label || "Begin met typen..."}
+                                    {options.find(option => option.value === field.value)?.label || defaultLabel || "Begin met typen..."}
                                     <ChevronsUpDown className="opacity-50" />
                                 </Button>
                             </FormControl>

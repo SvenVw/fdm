@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis } from "@svenvw/fdm-core";
+import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis, getCultivation, getCultivations } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
 
 // Meta
@@ -96,7 +96,6 @@ export async function loader({
         throw data("Field geometry is required", { status: 400, statusText: "Field geometry is required" });
     }
     const b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
-    // console.log(b_geojson)
 
     // Get soil analysis data
     const soilAnalysis = await getSoilAnalysis(fdm, b_id)
@@ -119,6 +118,10 @@ export async function loader({
         );
     }
 
+    // Get the cultivation
+    const cultivations = await getCultivations(fdm, b_id)
+    const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
+
     // Get Mapbox token
     const mapboxToken = String(process.env.MAPBOX_TOKEN)
     if (!mapboxToken) {
@@ -129,6 +132,7 @@ export async function loader({
         b_id: b_id,
         b_id_farm: b_id_farm,
         b_name: field.b_name,
+        b_lu_catalogue: b_lu_catalogue,
         b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
         b_gwl_class: soilAnalysis?.b_gwl_class,
         a_p_al: soilAnalysis?.a_p_al,
@@ -197,7 +201,7 @@ export default function Index() {
                                             form={form}
                                             name={"b_lu"}
                                             label={"Hoofdgewas"}
-
+                                            defaultValue={loaderData.b_lu_catalogue}
                                         />
                                     </div>
                                     <div className="flex flex-col space-y-1.5">
