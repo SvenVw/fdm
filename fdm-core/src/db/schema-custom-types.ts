@@ -33,7 +33,7 @@ export const geometryPolygon = customType<{
 		return `geometry(polygon)`
 	},
 	fromDriver: (value: string) => {
-		const wkbBuffer = new Buffer(value, 'hex')
+		const wkbBuffer = Buffer.from(value, 'hex')
 		const geometry = wkx.Geometry.parse(wkbBuffer)
 		return geometry.toWkt()
 	}, 
