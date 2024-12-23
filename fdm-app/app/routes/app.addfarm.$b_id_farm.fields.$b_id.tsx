@@ -41,21 +41,21 @@ const FormSchema = z.object({
     b_gwl_class: z.enum(gwlClassOptions, {
         errorMap: () => ({ message: "Selecteer een grondwatertrap uit de lijst" })
     }),
-    a_p_al: z.number({
+    a_p_al: z.coerce.number({
         required_error: "Fosfaat PAL is verplicht",
     }).gte(1, {
         message: "Fosfaat PAL moet minimaal 1 zijn",
     }).lte(250, {
         message: "Fosfaat PAL mag maximaal 250 zijn",
     }),
-    a_p_cc: z.number({
+    a_p_cc: z.coerce.number({
         required_error: "Fosfaat PAE is verplicht",
     }).gte(0.1, {
         message: "Fosfaat PAE moet minimaal 0.1 zijn",
     }).lte(100, {
         message: "Fosfaat PAE moet mag maximaal 100 zijn",
     }),
-    a_som_loi: z.number({
+    a_som_loi: z.coerce.number({
         required_error: "Organische stofgehalte is verplicht",
     }).gte(0.5, {
         message: "Organische stofgehalte moet minimaal 0.5 zijn",
@@ -154,16 +154,16 @@ export default function Index() {
     return (
         <>
             <div className="flex-1 lg:max-w-3xl">
-                <div className="space-y-6">
-                    <div>
-                        <h3 className="text-lg font-medium">{loaderData.b_name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                            {Math.round(loaderData.b_area * 10) / 10} ha
-                        </p>
-                    </div>
+                <RemixFormProvider {...form}>
+                    <Form id="formField" onSubmit={form.handleSubmit} method="POST">
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-lg font-medium">{loaderData.b_name}</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    {Math.round(loaderData.b_area * 10) / 10} ha
+                                </p>
+                            </div>
 
-                    <RemixFormProvider {...form}>
-                        <Form id="formField" onSubmit={form.handleSubmit} method="POST">
                             <fieldset
                                 disabled={form.formState.isSubmitting}
                             >
@@ -186,7 +186,7 @@ export default function Index() {
                                     </div>
                                     <div className="flex flex-col space-y-1.5">
                                         <Combobox
-                                            options={loaderData.cultivationOptions}                                 
+                                            options={loaderData.cultivationOptions}
                                             form={form}
                                             name={"b_lu"}
                                             label={"Hoofdgewas"}
@@ -286,7 +286,7 @@ export default function Index() {
                                     <div className="flex flex-col space-y-1.5">
                                         <FormField
                                             control={form.control}
-                                            name="a_p_wa"
+                                            name="a_p_cc"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Fosfaat PAE </FormLabel>
@@ -317,9 +317,19 @@ export default function Index() {
                                     </div>
                                 </div>
                             </fieldset>
-                        </Form>
-                    </RemixFormProvider>
-                </div>
+                            <div className="ml-auto">
+                                <Button
+                                    type="submit"
+                                    disabled={form.formState.isSubmitting}
+                                    className="m-auto"
+                                >
+                                    {form.formState.isSubmitting && <LoadingSpinner />}
+                                    Bijwerken
+                                </Button>
+                            </div>
+                        </div>
+                    </Form>
+                </RemixFormProvider>
             </div >
             <aside>
                 <FieldMap
