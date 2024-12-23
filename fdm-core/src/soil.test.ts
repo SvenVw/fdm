@@ -4,10 +4,12 @@ import * as schema from './db/schema'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
+import { addField } from './field'
+import { addFarm } from './farm'
 
 describe('Soil Analysis Functions', () => {
     let fdm: FdmServerType
-    let test_b_id: string
+    let b_id: string
     let test_a_id: string
 
     beforeEach(async () => {
@@ -29,17 +31,25 @@ describe('Soil Analysis Functions', () => {
         await migrateFdmServer(fdm, migrationsFolderPath)
 
         // Create test field and analyses before each test
-        test_b_id = `test-field-${Date.now()}`
+        const farmName = 'Test Farm'
+        const farmSector = 'diary'
+        const b_id_farm = await addFarm(fdm, farmName, farmSector)
 
-        await fdm.insert(schema.fields).values({ b_id: test_b_id, b_name: 'Test Field', b_geometry: 'POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))', b_id_source: "test" })
+        const fieldName = 'Test Field'
+        const fieldIDSource = 'test-field-id'
+        const fieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
+        const manageStart = '2023-01-01'
+        const manageEnd = '2023-12-31'
+        const manageType = 'owner'
+        b_id = await addField(fdm, b_id_farm, fieldName, fieldIDSource, fieldGeometry, manageStart, manageEnd, manageType)
 
     })
 
     afterEach(async () => {
         // Clean up the test data after each test
-        await fdm.delete(schema.soilSampling).where(eq(schema.soilSampling.b_id, test_b_id))
-        await fdm.delete(schema.soilAnalysis).where(eq(schema.soilAnalysis.a_id, test_a_id))
-        await fdm.delete(schema.fields).where(eq(schema.fields.b_id, test_b_id))
+        // await fdm.delete(schema.soilSampling).where(eq(schema.soilSampling.b_id, b_id))
+        // await fdm.delete(schema.soilAnalysis).where(eq(schema.soilAnalysis.a_id, test_a_id))
+        // await fdm.delete(schema.fields).where(eq(schema.fields.b_id, b_id))
     })
 
 
@@ -54,7 +64,7 @@ describe('Soil Analysis Functions', () => {
         const b_soiltype_agr = 'rivierklei'
         const b_gwl_class = 'II'
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, test_b_id, b_depth, b_sampling_date)
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_p_al: a_p_al, a_p_cc: a_p_cc, b_soiltype_agr: b_soiltype_agr, b_gwl_class: b_gwl_class })
 
         expect(test_a_id).toBeDefined()
 
@@ -71,7 +81,7 @@ describe('Soil Analysis Functions', () => {
         const addedSampling = await fdm.select().from(schema.soilSampling).where(eq(schema.soilSampling.a_id, test_a_id)).limit(1)
 
         expect(addedSampling).toHaveLength(1)
-        expect(addedSampling[0].b_id).toEqual(test_b_id)
+        expect(addedSampling[0].b_id).toEqual(b_id)
 
     })
 
@@ -85,7 +95,7 @@ describe('Soil Analysis Functions', () => {
         const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry)
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry)
 
         // Test updating existing soil data
         const updated_a_source = 'updated test source'
@@ -105,7 +115,7 @@ describe('Soil Analysis Functions', () => {
         const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry)
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry)
 
         // Test removing existing soil data
         await removeSoilAnalysis(fdm, test_a_id)
@@ -127,16 +137,16 @@ describe('Soil Analysis Functions', () => {
         const b_sampling_date = new Date()
         const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
-        test_a_id = await addSoilAnalysis(fdm, a_date_old, a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry)
+        test_a_id = await addSoilAnalysis(fdm, a_date_old, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry)
 
 
         const a_date_new = new Date(Date.now() + 1000) // Increment by 1 second
 
 
-        await addSoilAnalysis(fdm, a_date_new, a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
+        await addSoilAnalysis(fdm, a_date_new, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
 
         // get latest soil analysis for field
-        const latestAnalysis = await getSoilAnalysis(fdm, test_b_id)
+        const latestAnalysis = await getSoilAnalysis(fdm, b_id)
         expect(latestAnalysis?.a_date).toEqual(a_date_new)
         expect(latestAnalysis?.a_som_loi).toEqual(a_som_loi)
     })
@@ -153,12 +163,12 @@ describe('Soil Analysis Functions', () => {
         const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
         // Add first soil analysis
-        await addSoilAnalysis(fdm, a_date, a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
+        await addSoilAnalysis(fdm, a_date, a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
 
         // Add second soil analysis
-        await addSoilAnalysis(fdm, new Date(Date.now() + 1000), a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
+        await addSoilAnalysis(fdm, new Date(Date.now() + 1000), a_source, b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_som_loi: a_som_loi })
 
-        const allAnalyses = await getSoilAnalyses(fdm, test_b_id)
+        const allAnalyses = await getSoilAnalyses(fdm, b_id)
         expect(allAnalyses).toHaveLength(2)
     })
 
