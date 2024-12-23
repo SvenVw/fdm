@@ -33,11 +33,17 @@ const FormSchema = z.object({
     }).min(3, {
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
     }),
-    b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
-        errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
+    // b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
+    //     errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
+    // }),
+    // b_gwl_class: z.enum(fdmSchema.gwlClasses, {
+    //     errorMap: () => ({ message: "Selecteer een grondwatertrap uit de lijst" })
+    // }),
+    b_soiltype_agr: z.string({
+        required_error: "Grondsoort is verplicht",
     }),
-    b_gwl_class: z.enum(fdmSchema.gwlClasses, {
-        errorMap: () => ({ message: "Selecteer een grondwatertrap uit de lijst" })
+    b_gwl_class: z.string({
+        required_error: "Grondwatertrap is verplicht",
     }),
     a_p_al: z.coerce.number({
         required_error: "Fosfaat PAL is verplicht",
@@ -144,11 +150,11 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
-            b_soiltype_agr: loaderData.b_soiltype_agr ?? "",
-            b_gwl_class: loaderData.b_gwl_class ?? "",
-            a_p_al: loaderData.a_p_al ?? "",
-            a_p_cc: loaderData.a_p_cc ?? "",
-            a_som_loi: loaderData.a_som_loi ?? "",
+            b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
+            b_gwl_class: loaderData.b_gwl_class ?? undefined,
+            a_p_al: loaderData.a_p_al ?? undefined,
+            a_p_cc: loaderData.a_p_cc ?? undefined,
+            a_som_loi: loaderData.a_som_loi ?? undefined,
         },
     })
 
@@ -201,7 +207,7 @@ export default function Index() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Grondsoort</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
                                                                 <SelectValue placeholder="Selecteer een grondsoort" />
@@ -211,7 +217,7 @@ export default function Index() {
                                                             <SelectItem value="moerige_klei">Moerige klei</SelectItem>
                                                             <SelectItem value="rivierklei">Rivierklei</SelectItem>
                                                             <SelectItem value="dekzand">Dekzand</SelectItem>
-                                                            <SelectItem value="zeeklei|">Zeeklei</SelectItem>
+                                                            <SelectItem value="zeeklei">Zeeklei</SelectItem>
                                                             <SelectItem value="dalgrond">Dalgrond</SelectItem>
                                                             <SelectItem value="veen">Veen</SelectItem>
                                                             <SelectItem value="loess">Löss</SelectItem>
@@ -232,7 +238,7 @@ export default function Index() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Grondwatertrap</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger>
                                                                 <SelectValue placeholder="Selecteer een grondwatrap" />
