@@ -3,7 +3,7 @@ import { redirect } from "react-router";
 
 // Components
 import { Button } from "@/components/ui/button"
-import { Check } from "lucide-react"
+import { Check, MoveDown } from "lucide-react"
 
 // Services
 import { cn } from "@/lib/utils";
@@ -128,9 +128,15 @@ export default function SignIn() {
                         </Button>
                     </div>
                     <div className="mt-4 text-center text-sm">
-                        Wil je eerst meer weten over FDM? Kijk dan bij onze <a href="/faq" className="underline">
-                            Veelgestelde Vragen
-                        </a>
+                    Door verder te gaan, gaat u akkoord met het <a href="/privacy" className="underline">
+                            Privacybeleid
+                        </a>                       
+                    </div>
+                    <div className="mb-4 text-center text-sm">
+                      <Button
+                      variant={"outline"}>
+                        Lees meer over FDM <MoveDown />
+                      </Button>
                     </div>
                 </div>
             </div>
