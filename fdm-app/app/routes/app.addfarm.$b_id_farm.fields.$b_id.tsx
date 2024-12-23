@@ -17,6 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fdm } from "../lib/fdm.server";
 import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis, getCultivation, getCultivations } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ClientOnly } from "remix-utils/client-only";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -343,10 +345,17 @@ export default function Index() {
                 </RemixFormProvider>
             </div >
             <aside>
-                <FieldMap
-                    b_geojson={loaderData.b_geojson}
-                    mapboxToken={loaderData.mapboxToken}
-                />
+                <ClientOnly
+                    fallback={
+                        <Skeleton className="h-full w-full rounded-xl" />
+                    }                        >
+                    {() => <FieldMap
+                        b_geojson={loaderData.b_geojson}
+                        mapboxToken={loaderData.mapboxToken}
+                    />
+                    }
+                </ClientOnly>
+
             </aside>
         </>
     );
