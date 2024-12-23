@@ -76,7 +76,7 @@ export type fertilizersTypeSelect = typeof fertilizers.$inferSelect
 export type fertilizersTypeInsert = typeof fertilizers.$inferInsert
 
 // Define fertilizers acquiring table
-export const fertilizerAcquiring = fdmSchema.table('fertilizer_aquiring', {
+export const fertilizerAcquiring = fdmSchema.table('fertilizer_acquiring', {
   b_id_farm: text().notNull().references(() => farms.b_id_farm),
   p_id: text().notNull().references(() => fertilizers.p_id),
   p_acquiring_amount: numericCasted(), //kg
@@ -230,47 +230,3 @@ export const cultivationsCatalogue = fdmSchema.table('cultivations_catalogue', {
 
 export type cultivationsCatalogueTypeSelect = typeof cultivationsCatalogue.$inferSelect
 export type cultivationsCatalogueTypeInsert = typeof cultivationsCatalogue.$inferInsert
-
-// IAM part
-// IN DEVELOPMENT!!
-// Will be more advanced in future updates
-
-export const users = fdmSchema.table('users', {
-  user_id: text().primaryKey(),  
-  firstname: text(),
-  surname: text(),
-  email: text(),
-  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    user_id_idx: uniqueIndex('user_id_idx').on(table.user_id)
-  }
-})
-
-export type usersTypeSelect = typeof users.$inferSelect
-export type usersTypeInsert = typeof users.$inferInsert
-
-export const session = fdmSchema.table('session', {
-  session_id: text().primaryKey(),
-  user_id: text().notNull().references(() => users.user_id),
-  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    session_id_idx: uniqueIndex('session_id_idx').on(table.session_id)
-  }
-})
-
-export type sessionTypeSelect = typeof session.$inferSelect
-export type sessionTypeInsert = typeof session.$inferInsert
-
-export const grants = fdmSchema.table('grants', {
-  b_farm_id: text().notNull().references(() => farms.b_id_farm),
-  user_id: text().notNull().references(() => users.user_id),
-  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-  destroyed: timestamp({ withTimezone: true })
-})
-
-export type grantsTypeSelect = typeof grants.$inferSelect
-export type grantsTypeInsert = typeof grants.$inferInsert

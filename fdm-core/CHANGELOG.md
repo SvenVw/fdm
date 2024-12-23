@@ -1,5 +1,15 @@
 # Changelog fdm-core
 
+## 0.8.0
+
+### Minor Changes
+
+- 6a3e6db: Remove `iam` functions from package as `fdm-app` handles authentication
+
+### Patch Changes
+
+- 83c589b: Upgrade `drizzle-orm` to v0.38.2 and `drizzle-kit` to v0.30.1
+
 ## 0.7.0
 
 ### Minor Changes

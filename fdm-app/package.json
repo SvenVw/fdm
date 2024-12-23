@@ -1,11 +1,12 @@
 {
   "name": "@svenvw/fdm-app",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "sideEffects": false,
   "type": "module",
   "scripts": {
     "build": "react-router build",
+    "db:generate": "@better-auth/cli generate --output ./db/schema.ts && drizzle-kit generate",
     "dev": "dotenvx run -- react-router dev",
     "dotenvx": "dotenvx",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
@@ -30,6 +31,7 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@react-router/node": "^7.0.2",
     "@react-router/serve": "^7.0.2",
+    "better-auth": "^1.0.22",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
@@ -67,6 +69,7 @@
     "@types/react": "^18.3.16",
     "@types/react-dom": "^18.3.5",
     "autoprefixer": "^10.4.20",
+    "drizzle-kit": "catalog:",
     "drizzle-orm": "catalog:",
     "eslint": "^9.16.0",
     "postcss": "^8.4.49",
@@ -77,8 +80,8 @@
     "vite-tsconfig-paths": "^4.3.2"
   },
   "peerDependencies": {
-    "@svenvw/fdm-core": "workspace:>=0.7.0",
-    "@svenvw/fdm-data": "workspace:>=0.5.0"
+    "@svenvw/fdm-core": "workspace:>=0.8.0",
+    "@svenvw/fdm-data": "workspace:>=0.6.0"
   },
   "engines": {
     "node": ">=20.0.0"

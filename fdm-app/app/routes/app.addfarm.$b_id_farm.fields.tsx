@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { Fields } from "@/components/blocks/fields";
 
 // FDM
-import { fdm } from "../services/fdm.server";
+import { fdm } from "../lib/fdm.server";
 import { getCultivations, getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 

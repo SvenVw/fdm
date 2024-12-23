@@ -1,5 +1,19 @@
 # Changelog fdm-app
 
+## 0.5.0
+
+### Minor Changes
+
+- 47e2651: Switch to sign in method for authentication including social log in
+
+### Patch Changes
+
+- 83c589b: Upgrade `drizzle-orm` to v0.38.2 and `drizzle-kit` to v0.30.1
+- Updated dependencies [83c589b]
+- Updated dependencies [6a3e6db]
+  - @svenvw/fdm-core@0.8.0
+  - @svenvw/fdm-data@0.6.0
+
 ## 0.4.0
 
 ### Minor Changes

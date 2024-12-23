@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/pagination"
 
 // FDM
-import { fdm } from "../services/fdm.server";
-import { getCultivationPlan, getCultivationsFromCatalogue, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
+import { fdm } from "../lib/fdm.server";
+import { getCultivationPlan, getCultivationsFromCatalogue } from "@svenvw/fdm-core";
 
 // Meta
 export const meta: MetaFunction = () => {

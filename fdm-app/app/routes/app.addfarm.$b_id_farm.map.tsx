@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
-import { fdm } from "../services/fdm.server";
+import { fdm } from "../lib/fdm.server";
 import { addCultivation, addField, getFarm } from "@svenvw/fdm-core";
 
 
