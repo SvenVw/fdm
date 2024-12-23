@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
@@ -149,7 +149,7 @@ export async function getSoilAnalysis(
         .from(schema.soilAnalysis)
         .innerJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
         .where(eq(schema.soilSampling.b_id, b_id))
-        .orderBy(schema.soilAnalysis.a_date, 'desc')
+        .orderBy(desc(schema.soilSampling.b_sampling_date))
         .limit(1)
 
     return  soilAnalysis[0] || null 
@@ -184,7 +184,7 @@ export async function getSoilAnalyses(
         .from(schema.soilAnalysis)
         .innerJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
         .where(eq(schema.soilSampling.b_id, b_id))
-        .orderBy(schema.soilAnalysis.a_date, 'desc')
+        .orderBy(desc(schema.soilSampling.b_sampling_date))
 
 
     return soilAnalyses

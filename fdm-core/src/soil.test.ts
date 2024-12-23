@@ -45,14 +45,6 @@ describe('Soil Analysis Functions', () => {
 
     })
 
-    afterEach(async () => {
-        // Clean up the test data after each test
-        // await fdm.delete(schema.soilSampling).where(eq(schema.soilSampling.b_id, b_id))
-        // await fdm.delete(schema.soilAnalysis).where(eq(schema.soilAnalysis.a_id, test_a_id))
-        // await fdm.delete(schema.fields).where(eq(schema.fields.b_id, b_id))
-    })
-
-
     it('should add a new soil analysis', async () => {
         const a_date = new Date()
         const a_source = 'test source'
@@ -130,30 +122,31 @@ describe('Soil Analysis Functions', () => {
 
 
     it('should get latest soil analysis', async () => {
-        const a_date_old = new Date()
+        const a_date_old = new Date('2024-01-02T00:00:00Z'); 
         const a_source = 'test source'
         const a_som_loi = 5
         const b_depth = 10
-        const b_sampling_date = new Date()
+        const b_sampling_date_old = new Date('2024-01-01T00:00:00Z'); 
         // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
-        test_a_id = await addSoilAnalysis(fdm, a_date_old, a_source, b_id, b_depth, b_sampling_date,)
+        test_a_id = await addSoilAnalysis(fdm, a_date_old, a_source, b_id, b_depth, b_sampling_date_old)
 
+        const b_sampling_date_new = new Date(b_sampling_date_old.getTime() + 5000); // Add 5 seconds
 
-        const a_date_new = new Date(Date.now() + 1000) // Increment by 1 second
+        await addSoilAnalysis(fdm, a_date_old, a_source, b_id, b_depth, b_sampling_date_new, { a_som_loi: a_som_loi })
 
-
-        await addSoilAnalysis(fdm, a_date_new, a_source, b_id, b_depth, b_sampling_date,  { a_som_loi: a_som_loi })
+        const allAnalyses = await getSoilAnalyses(fdm, b_id)
+        expect(allAnalyses).toHaveLength(2)
 
         // get latest soil analysis for field
         const latestAnalysis = await getSoilAnalysis(fdm, b_id)
-        expect(latestAnalysis?.a_date).toEqual(a_date_new)
+        expect(latestAnalysis?.a_date).toEqual(a_date_old)
+        expect(latestAnalysis?.b_sampling_date).toEqual(b_sampling_date_new)
         expect(latestAnalysis?.a_som_loi).toEqual(a_som_loi)
     })
 
 
     it('should get all soil analysis', async () => {
-
 
         const a_date = new Date()
         const a_source = 'test source'
