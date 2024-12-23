@@ -1,5 +1,6 @@
 import { type MetaFunction, type LoaderFunctionArgs, data, useLocation, Outlet } from "react-router";
 import { useLoaderData } from "react-router";
+import wkx from 'wkx'
 
 // Components
 import {
@@ -11,7 +12,8 @@ import {
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { getCultivationPlan, getCultivationsFromCatalogue, getField } from "@svenvw/fdm-core";
+import { getField } from "@svenvw/fdm-core";
+import { FieldMap } from "@/components/blocks/field-map";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -44,23 +46,26 @@ export async function loader({
         throw data("Field not found", { status: 404, statusText: "Field not found" });
     }
 
-    // Get the cultivation data of field
+    // Get the geojson
+    if (!field.b_geometry) {
+        throw data("Field geometry is required", { status: 400, statusText: "Field geometry is required" });
+    }
+    const b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
+    // console.log(b_geojson)
 
-
-    // Cultivation options
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    const cultivationOptions = cultivationsCatalogue.map(cultivation => {
-        return {
-            value: cultivation.b_lu_catalogue,
-            label: cultivation.b_lu_name
-        }
-    })
+    // Get Mapbox token
+    const mapboxToken = String(process.env.MAPBOX_TOKEN)
+    if (!mapboxToken) {
+        throw data("MAPBOX_TOKEN environment variable is not set", { status: 500, statusText: "MAPBOX_TOKEN environment variable is not set" });
+    }
 
     return {
         b_id: b_id,
         b_id_farm: b_id_farm,
-        field: field,
-        cultivationOptions: cultivationOptions
+        b_name: field.b_name,
+        b_area: field.b_area,
+        b_geojson: b_geojson,
+        mapboxToken: mapboxToken
     }
 }
 
@@ -89,32 +94,42 @@ export default function Index() {
     ]
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">{loaderData.field.b_name}</h3>
-                <p className="text-sm text-muted-foreground">
-                    {Math.round(loaderData.field.b_area * 10) / 10} ha
-                </p>
-            </div>
+        <>
+            <div className="flex-1 lg:max-w-3xl">
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="text-lg font-medium">{loaderData.b_name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                            {Math.round(loaderData.b_area * 10) / 10} ha
+                        </p>
+                    </div>
 
-            <Pagination>
-                <PaginationContent className="">
-                    {items.map((item) => (
-                        <PaginationItem
-                            key={item.href}
-                        >
-                            <PaginationLink
-                                href={item.href}
-                                size="default"
-                                isActive={pathname === item.href}
-                            >
-                                {item.title}
-                            </PaginationLink>
-                        </PaginationItem>
-                    ))}
-                </PaginationContent>
-            </Pagination>
-            <Outlet />
-        </div>
+                    <Pagination>
+                        <PaginationContent className="">
+                            {items.map((item) => (
+                                <PaginationItem
+                                    key={item.href}
+                                >
+                                    <PaginationLink
+                                        href={item.href}
+                                        size="default"
+                                        isActive={pathname === item.href}
+                                    >
+                                        {item.title}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                        </PaginationContent>
+                    </Pagination>
+                    <Outlet />
+                </div>
+            </div>
+            <aside>
+                <FieldMap
+                    b_geojson={loaderData.b_geojson}
+                    mapboxToken={loaderData.mapboxToken}
+                />
+            </aside>
+        </>
     );
 }

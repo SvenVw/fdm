@@ -151,7 +151,7 @@ export default function Index() {
                         <aside className="-mx-4 lg:w-1/5">
                             <SidebarPage items={loaderData.sidebarPageItems} />
                         </aside>
-                        <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
+                        <Outlet />                        
                     </div>
                 </div>
             </main>
