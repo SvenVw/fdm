@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { getCultivationsFromCatalogue, getField, fdmSchema } from "@svenvw/fdm-core";
+import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
 
 // Meta
@@ -92,6 +92,9 @@ export async function loader({
     const b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
     // console.log(b_geojson)
 
+    // Get soil analysis data
+    const soilAnalysis = await getSoilAnalysis(fdm, b_id)
+
     // Get the available cultivations
     let cultivationOptions = [];
     try {
@@ -120,11 +123,11 @@ export async function loader({
         b_id: b_id,
         b_id_farm: b_id_farm,
         b_name: field.b_name,
-        b_soiltype_agr: field.b_soiltype_agr,
-        b_gwl_class: field.b_gwl_class,
-        a_p_al: field.a_p_al,
-        a_p_cc: field.a_p_cc,
-        a_som_loi: field.a_som_loi,
+        b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
+        b_gwl_class: soilAnalysis?.b_gwl_class,
+        a_p_al: soilAnalysis?.a_p_al,
+        a_p_cc: soilAnalysis?.a_p_cc,
+        a_som_loi: soilAnalysis?.a_som_loi,
         b_area: field.b_area,
         b_geojson: b_geojson,
         cultivationOptions: cultivationOptions,
