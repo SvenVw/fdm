@@ -46,7 +46,7 @@ export const geometryMultipoint = customType<{
 	driverData: string
 }>({
 	dataType: () => {
-		return `geometry(multipoint)`
+		return `geometry(point)`
 	},
 	fromDriver: (value: string) => {
 		const wkbBuffer = Buffer.from(value, 'hex')
