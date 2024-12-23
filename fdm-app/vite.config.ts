@@ -10,4 +10,7 @@ export default defineConfig({
   define: {
     global: {},
   },
+  build: {
+    sourcemap: process.env.NODE_ENV === 'production' ? false : 'inline', // Only generate sourcemaps in development
+  },
 });

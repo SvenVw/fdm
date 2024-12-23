@@ -61,7 +61,8 @@ export function FieldMap(props: FieldMapType) {
                 id="fieldMap"
                 type="geojson"
                 data={props.b_geojson}
-                onError={(e: Error) => console.error('Source loading error:', e)}>
+                onError={(e) => console.error('Source loading error:', e)}
+                >
 
                 <Layer {...brpFieldsFillStyle} />
                 <Layer {...brpFieldsLineStyle} />

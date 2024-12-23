@@ -119,42 +119,6 @@ export default function Index() {
                 </PaginationContent>
             </Pagination>
             <Outlet />
-
-            {/* <Tabs defaultValue="cultivation_main" className="w-full">
-                <TabsList>
-                    <TabsTrigger value="cultivation_main">Hoofdgewas</TabsTrigger>
-                    <TabsTrigger value="fertilizations">Bemesting </TabsTrigger>
-                    <TabsTrigger value="cultivation_cover">Vanggewas</TabsTrigger>
-                </TabsList>
-                <TabsContent value="cultivation_main">
-                    <Cultivation
-                        cultivation={loaderData.cultivation}
-                        fertilizerOptions={loaderData.fertilizerOptions}
-                        cultivationOptions={loaderData.cultivationOptions}
-                    />
-                </TabsContent>
-                <TabsContent value="fertilizations">
-                    <div className="space-y-6">
-                        <p className="text-sm text-muted-foreground">
-                            Vul de bemesting op bouwplanniveau in voor dit gewas.
-                        </p>
-                        <ComboboxFertilizers
-                            action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}`}
-                            options={loaderData.fertilizerOptions}
-                        />
-                    </div>
-                </TabsContent>
-                <TabsContent value="cultivation_cover">
-                    <div className="space-y-6">
-                        <p className="text-sm text-muted-foreground">
-                            Teelt je een vanggewas na dit gewas? Voeg dat hier toe.
-                        </p>
-                        <ComboboxCultivations
-                            options={loaderData.cultivationOptions}
-                        />
-                    </div>
-                </TabsContent>
-            </Tabs> */}
         </div>
     );
 }
