@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, data, useLocation } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
 import { Outlet, useLoaderData } from "react-router";
 
 // Components
@@ -6,6 +6,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster"
+import { Button } from "@/components/ui/button";
+import { SidebarPage } from "@/components/custom/sidebar-page";
 
 // Blocks
 
@@ -13,8 +15,6 @@ import { Toaster } from "@/components/ui/toaster"
 // FDM
 import { fdm } from "../lib/fdm.server";
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -50,7 +50,7 @@ export async function loader({
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
 
     // Create the sidenav
-    const sidebarNavItems = cultivationPlan.map(cultivation => {
+    const sidebarPageItems = cultivationPlan.map(cultivation => {
         return {
             title: cultivation.b_lu_name,
             href: `/app/addfarm/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
@@ -59,7 +59,7 @@ export async function loader({
 
     return {
         cultivationPlan: cultivationPlan,
-        sidebarNavItems: sidebarNavItems,
+        sidebarPageItems: sidebarPageItems,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
     }
@@ -116,7 +116,7 @@ export default function Index() {
                     <Separator className="my-6" />
                     <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                         <aside className="-mx-4 lg:w-1/5">
-                            <SidebarNav items={loaderData.sidebarNavItems} />
+                            <SidebarPage items={loaderData.sidebarPageItems} />
                         </aside>
                         <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
                     </div>
@@ -127,39 +127,3 @@ export default function Index() {
     );
 }
 
-interface SidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-    items: {
-        href: string
-        title: string
-    }[]
-}
-
-export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
-    const { pathname } = useLocation();
-
-    return (
-        <nav
-            className={cn(
-                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 truncate",
-                className
-            )}
-            {...props}
-        >
-            {items.map((item) => (
-                <a
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                        buttonVariants({ variant: "ghost" }),
-                        pathname === item.href
-                            ? "bg-muted hover:bg-muted"
-                            : "hover:bg-transparent hover:underline",
-                        "justify-start"
-                    )}
-                >
-                    {item.title}
-                </a>
-            ))}
-        </nav>
-    )
-}
