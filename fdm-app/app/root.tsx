@@ -32,14 +32,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 }
 
 export function Layout() {
-  const { toast } = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
+  const toast = loaderData?.toast;
 
   // Hook to show the toasts
   useEffect(() => {
-    if (toast?.type === "error") {
+    if (toast && toast.type === "error") {
       notify.error(toast.message);
     }
-    if (toast?.type === "success") {
+    if (toast && toast.type === "success") { 
       notify.success(toast.message);
     }
   }, [toast]);
