@@ -1,5 +1,5 @@
 import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex, index } from 'drizzle-orm/pg-core'
-import { geometryPolygon, numericCasted } from './schema-custom-types'
+import { geometryMultipoint, geometryPolygon, numericCasted } from './schema-custom-types'
 
 // Define postgres schema
 export const fdmSchema = pgSchema('fdm-dev')
@@ -216,3 +216,36 @@ export const cultivationsCatalogue = fdmSchema.table('cultivations_catalogue', {
 
 export type cultivationsCatalogueTypeSelect = typeof cultivationsCatalogue.$inferSelect
 export type cultivationsCatalogueTypeInsert = typeof cultivationsCatalogue.$inferInsert
+
+// Define soil_analyis table
+export const soilTypes = ['moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei']
+export const gwlClassess = ['II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa']
+export const soiltypeEnum = fdmSchema.enum('b_soiltype_agr', soilTypes)
+export const gwlClassEnum = fdmSchema.enum('b_gwl_class', gwlClassess)
+
+export const soilAnalysis = fdmSchema.table('soil_analysis', {
+  a_id: text().primaryKey(),
+  a_date: timestamp({ withTimezone: true }),
+  a_source: text(),
+  a_p_al: numericCasted(),
+  a_p_cc: numericCasted(),
+  a_som_loi: numericCasted(),
+  b_gwl_class: gwlClassEnum(),
+  b_soiltype_agr: soiltypeEnum()
+})
+
+export type soilAnalysisTypeSelect = typeof soilAnalysis.$inferSelect
+export type soilAnalysisTypeInsert = typeof soilAnalysis.$inferInsert
+
+// Define soil_sampling table
+export const soilSampling = fdmSchema.table('soil_sampling', {
+  b_id_sampling: text().primaryKey(),
+  b_id: text().notNull().references(() => fields.b_id),
+  a_id: text().notNull().references(() => soilAnalysis.a_id),
+  b_depth: numericCasted(),
+  b_sampling_date: timestamp({ withTimezone: true }),
+  b_sampling_geometry: geometryMultipoint()
+})
+
+export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
+export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
