@@ -60,7 +60,7 @@ export function Combobox({
                                     role="combobox"
                                     aria-expanded={open}
                                     name={name}
-                                    className="w-full justify-between"
+                                    className="w-full justify-between truncate"
                                 >
                                     {options.find(option => option.value === field.value)?.label || "Begin met typen..."}
                                     <ChevronsUpDown className="opacity-50" />
