@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { getCultivationsFromCatalogue, getField } from "@svenvw/fdm-core";
+import { getCultivationsFromCatalogue, getField, fdmSchema } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
 
 // Meta
@@ -27,18 +27,16 @@ export const meta: MetaFunction = () => {
 };
 
 // Form Schema
-const soilTypeOptions = ['moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei']
-const gwlClassOptions = ['II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa']
 const FormSchema = z.object({
     b_name: z.string({
         required_error: "Naam van perceel is verplicht",
     }).min(3, {
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
     }),
-    b_soiltype_agr: z.enum(soilTypeOptions, {
+    b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
         errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
     }),
-    b_gwl_class: z.enum(gwlClassOptions, {
+    b_gwl_class: z.enum(fdmSchema.gwlClasses, {
         errorMap: () => ({ message: "Selecteer een grondwatertrap uit de lijst" })
     }),
     a_p_al: z.coerce.number({
