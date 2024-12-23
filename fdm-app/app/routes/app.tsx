@@ -4,7 +4,7 @@ import { useLoaderData, Outlet } from "react-router";
 
 // Components
 import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
+import { SidebarApp } from "@/components/custom/sidebar-app"
 
 // Blocks
 
@@ -42,7 +42,7 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <AppSidebar user={loaderData.user} />
+      <SidebarApp user={loaderData.user} />
       <Outlet />
     </SidebarProvider>
 

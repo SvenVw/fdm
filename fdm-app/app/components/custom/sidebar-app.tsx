@@ -13,14 +13,14 @@ import {
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRightLeft, BadgeCheck, ChevronsUpDown, GitPullRequestArrow, House, Languages, LifeBuoy, LogOut, Map as MapIcon, PawPrint, Scale, Send, Settings, Shapes, Sparkles, Sprout, Square } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 import { useIsMobile } from '@/hooks/use-mobile'
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 import { Form } from "react-router";
 
-interface SideBarType {
+interface SideBarAppType {
     user: {
         firstname: string
         surname: string
@@ -29,8 +29,7 @@ interface SideBarType {
     }
 }
 
-
-export function AppSidebar(props: SideBarType) {
+export function SidebarApp(props: SideBarAppType) {
 
     const user = props.user
     const avatarInitials = props.user.firstname.slice(0, 1).toUpperCase() + props.user.surname.slice(0, 1).toUpperCase()
