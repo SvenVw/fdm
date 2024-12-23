@@ -15,6 +15,13 @@
       "when": 1734682781959,
       "tag": "0001_motionless_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1734958349937,
+      "tag": "0002_minor_sunset_bain",
+      "breakpoints": true
     }
   ]
 }
