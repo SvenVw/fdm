@@ -49,14 +49,23 @@ describe('Soil Analysis Functions', () => {
         const b_depth = 10
         const b_sampling_date = new Date()
         const b_sampling_geometry = 'MULTIPOINT((0 0))'
+        const a_p_al = 5
+        const a_p_cc = 5
+        const b_soiltype_agr = 'rivierklei'
+        const b_gwl_class = 'II'
 
-        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, test_b_id, b_depth, b_sampling_date, b_sampling_geometry, { a_p_al: 5 })
+        test_a_id = await addSoilAnalysis(fdm, a_date, a_source, test_b_id, b_depth, b_sampling_date)
 
         expect(test_a_id).toBeDefined()
 
         const addedAnalysis = await fdm.select().from(schema.soilAnalysis).where(eq(schema.soilAnalysis.a_id, test_a_id)).limit(1)
         expect(addedAnalysis).toHaveLength(1)
         expect(addedAnalysis[0].a_date).toEqual(a_date)
+        expect(addedAnalysis[0].a_source).toEqual(a_source)
+        expect(addedAnalysis[0].a_p_al).toEqual(a_p_al)
+        expect(addedAnalysis[0].a_p_cc).toEqual(a_p_cc)
+        expect(addedAnalysis[0].b_soiltype_agr).toEqual(b_soiltype_agr)
+        expect(addedAnalysis[0].b_gwl_class).toEqual(b_gwl_class)
 
 
         const addedSampling = await fdm.select().from(schema.soilSampling).where(eq(schema.soilSampling.a_id, test_a_id)).limit(1)

@@ -31,6 +31,7 @@ export async function addSoilAnalysis(
 ): Promise<schema.soilAnalysisTypeSelect['a_id']> {
 
     const a_id = nanoid()
+    const b_id_sampling = nanoid()
 
     await fdm.transaction(async (tx: FdmType) => {
         try {
@@ -49,7 +50,7 @@ export async function addSoilAnalysis(
             await tx
                 .insert(schema.soilSampling)
                 .values({
-                    b_id_sampling: nanoid(),
+                    b_id_sampling: b_id_sampling,
                     b_id: b_id,
                     a_id: a_id,
                     b_depth: b_depth,
