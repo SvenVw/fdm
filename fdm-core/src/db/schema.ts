@@ -219,9 +219,9 @@ export type cultivationsCatalogueTypeInsert = typeof cultivationsCatalogue.$infe
 
 // Define soil_analyis table
 export const soilTypes = ['moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei']
-export const gwlClassess = ['II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa']
+export const gwlClasses = ['II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa']
 export const soiltypeEnum = fdmSchema.enum('b_soiltype_agr', soilTypes)
-export const gwlClassEnum = fdmSchema.enum('b_gwl_class', gwlClassess)
+export const gwlClassEnum = fdmSchema.enum('b_gwl_class', gwlClasses)
 
 export const soilAnalysis = fdmSchema.table('soil_analysis', {
   a_id: text().primaryKey(),
