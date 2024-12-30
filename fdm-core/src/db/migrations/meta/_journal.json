@@ -12,36 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1734682781959,
-      "tag": "0001_motionless_wasp",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1734958349937,
-      "tag": "0002_minor_sunset_bain",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1734964394836,
-      "tag": "0003_yielding_groot",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1735560683320,
-      "tag": "0004_robust_mad_thinker",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1735561389147,
-      "tag": "0005_sparkling_senator_kelly",
+      "when": 1735564069319,
+      "tag": "0001_complete_the_watchers",
       "breakpoints": true
     }
   ]

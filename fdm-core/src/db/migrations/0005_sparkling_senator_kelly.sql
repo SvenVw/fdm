@@ -1,1 +1,0 @@
-ALTER TABLE "fdm-dev"."field_sowing" ALTER COLUMN "b_sowing_date" SET DATA TYPE timestamp with time zone;
