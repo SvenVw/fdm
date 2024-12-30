@@ -73,7 +73,7 @@ export function Combobox({
                                     aria-expanded={open}
                                     name={name}
                                     className="w-full justify-between truncate focus-visible:ring-2"
-                                    aria-label={`Select ${options.find(option => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
+                                    aria-label={`Selecteer ${options.find(option => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
                                     aria-controls="combobox-options"
                                     aria-haspopup="listbox"
                                 >
@@ -82,7 +82,7 @@ export function Combobox({
                                 </Button>
                             </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full p-0">
+                        <PopoverContent id="combobox-options" className="w-full p-0">
                             <Command>
                                 <CommandInput placeholder="Begin met typen..." className="h-9" />
                                 <CommandList>
