@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, NavLink } from "react-router";
 import { Outlet, useLoaderData } from "react-router";
 
 // Components
@@ -53,7 +53,7 @@ export async function loader({
     const sidebarPageItems = cultivationPlan.map(cultivation => {
         return {
             title: cultivation.b_lu_name,
-            href: `/app/addfarm/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
+            to: `/app/addfarm/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
         }
     })
 
@@ -108,9 +108,9 @@ export default function Index() {
                         </div>
 
                         <div className="ml-auto">
-                            <a href={`/app/addfarm/${loaderData.b_id_farm}/cattle`} className="ml-auto">
+                            <NavLink to={`/app/addfarm/${loaderData.b_id_farm}/cattle`} className="ml-auto">
                                 <Button>Doorgaan</Button>
-                            </a>
+                            </NavLink>
                         </div>
                     </div>
                     <Separator className="my-6" />

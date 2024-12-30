@@ -1,11 +1,11 @@
-import { useLocation } from "react-router";
+import { useLocation, NavLink } from "react-router";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 interface SidebarPageProps extends React.HTMLAttributes<HTMLElement> {
     items: {
-        href: string
+        to: string
         title: string
     }[]
 }
@@ -22,9 +22,9 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
             {...props}
         >
             {items.map((item) => (
-                <a
+                <NavLink
                     key={item.href}
-                    href={item.href}
+                    to={item.href}
                     className={cn(
                         buttonVariants({ variant: "ghost" }),
                         pathname === item.href
@@ -34,7 +34,7 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
                     )}
                 >
                     {item.title}
-                </a>
+                </NavLink>
             ))}
         </nav>
     )

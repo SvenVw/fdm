@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, data, Outlet } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, Outlet, NavLink } from "react-router";
 import { useLoaderData } from "react-router";
 import wkx from 'wkx'
 
@@ -84,7 +84,7 @@ export async function loader({
     const sidebarPageItems = fields.map(field => {
         return {
             title: field.b_name,
-            href: `/app/addfarm/${b_id_farm}/fields/${field.b_id}`
+            to: `/app/addfarm/${b_id_farm}/fields/${field.b_id}`
         }
     })
 
@@ -141,9 +141,9 @@ export default function Index() {
                         </div>
 
                         <div className="ml-auto">
-                            <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+                            <NavLink to={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
                                 <Button>Doorgaan</Button>
-                            </a>
+                            </NavLink>
                         </div>
                     </div>
                     <Separator className="my-6" />
