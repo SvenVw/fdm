@@ -177,7 +177,7 @@ export async function action({
       const currentYear = new Date().getFullYear()
       const defaultDate = new Date(currentYear, 0, 1)
       const b_manage_start = defaultDate.toISOString().split('T')[0]
-      const b_date_sowing = defaultDate.toISOString().split('T')[0]
+      const b_date_sowing = defaultDate
 
       // Validate dates
       if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
