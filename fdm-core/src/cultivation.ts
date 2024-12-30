@@ -62,14 +62,23 @@ export async function addCultivationToCatalogue(
 
 
 /**
- * Adds a cultivation to a field.
+ * Adds a new cultivation to a specific field.
  *
- * @param fdm The FDM instance.
- * @param b_lu_catalogue The catalogue ID of the cultivation.
- * @param b_id The ID of the field.
- * @param b_sowing_date The sowing date of the cultivation.
- * @returns A Promise that resolves with the ID of the new cultivation.
- * @throws If the field does not exist or if the insertion fails.
+ * @remarks
+ * This function performs multiple validations before inserting a cultivation:
+ * - Checks if the sowing date is a valid Date object
+ * - Verifies the field exists
+ * - Confirms the cultivation exists in the catalogue
+ * - Prevents duplicate cultivations for the same field and date
+ *
+ * @param fdm - The database transaction manager
+ * @param b_lu_catalogue - Unique identifier for the cultivation in the catalogue
+ * @param b_id - Identifier of the field where cultivation will be added
+ * @param b_sowing_date - Date when the cultivation will be sown
+ * @returns A Promise resolving to the unique identifier of the newly added cultivation
+ *
+ * @throws {Error} If field does not exist, cultivation is not in catalogue, or a duplicate cultivation is detected
+ *
  * @alpha
  */
 export async function addCultivation(
@@ -222,46 +231,31 @@ export async function getCultivations(fdm: FdmType, b_id: schema.fieldSowingType
 }
 
 /**
- * Retrieves a cultivation plan for a specific farm.
+ * Retrieves a comprehensive cultivation plan for a specific farm.
  *
- * The cultivation plan is an array of objects, where each object represents a unique cultivation
- * identified by its `b_lu_catalogue`. Each cultivation object also contains a `fields` array,
- * listing the fields associated with that specific cultivation. Within each field object, there's
- * a `fertilizer_applications` array detailing the fertilizers applied to that field.
+ * @remarks
+ * This function aggregates cultivation data across multiple database tables, organizing cultivations by their catalogue entries and including associated field and fertilizer application details.
  *
- * @param fdm The FDM instance.
- * @param b_id_farm The ID of the farm for which to retrieve the cultivation plan.
- * @returns A Promise that resolves with an array representing the cultivation plan.
- *          Each element in the array is an object with the following structure:
- *          ```
- *          {
- *              b_lu_catalogue: string;  // Unique ID of the cultivation catalogue item
- *              b_lu_name: string;      // Name of the cultivation
- *              fields: {               // Array of fields associated with this cultivation
- *                  b_lu: string;          // Unique ID of the cultivation
- *                  b_id: string;          // Unique ID of the field
- *                  b_name: string;        // Name of the field
- *                  fertilizer_applications: { // Array of fertilizer applications on this field
- *                      p_id_catalogue: string; // Fertilizer catalogue ID
- *                      p_name_nl: string;    // Fertilizer name (Dutch)
- *                      p_app_amount: number;  // Amount applied
- *                      p_app_method: string;  // Application method
- *                      p_app_date: Date;     // Application date
- *                      p_app_id: string;      // Unique ID of the application
- *                  }[]
- *              }[];
- *          }
- *          ```
- *          Returns an empty array if no cultivations are found for the specified farm.
+ * @param fdm - The FDM database interface instance
+ * @param b_id_farm - The unique identifier of the farm for which the cultivation plan is being retrieved
+ * @returns A promise resolving to an array of cultivation plan entries, each containing catalogue details, fields, and fertilizer applications
+ *
+ * @throws {Error} If the farm ID is missing or if the database query fails
+ *
  * @example
  * ```typescript
  * const cultivationPlan = await getCultivationPlan(fdm, 'farm123');
- * if (cultivationPlan.length > 0) {
- *   console.log("Cultivation Plan:", cultivationPlan);
- * } else {
- *   console.log("No cultivations found for this farm.");
- * }
+ * cultivationPlan.forEach(cultivation => {
+ *   console.log(`Cultivation: ${cultivation.b_lu_name}`);
+ *   cultivation.fields.forEach(field => {
+ *     console.log(`Field: ${field.b_name}`);
+ *     field.fertilizer_applications.forEach(app => {
+ *       console.log(`Fertilizer: ${app.p_name_nl}, Amount: ${app.p_app_amount}`);
+ *     });
+ *   });
+ * });
  * ```
+ *
  * @alpha
  */
 export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTypeSelect['b_id_farm']): Promise<cultivationPlanType[]> {
@@ -343,13 +337,22 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
 }
 
 /**
- * Removes a cultivation from a field.
- *
- * @param fdm The FDM instance.
- * @param b_lu The ID of the cultivation to remove.
- * @returns A Promise that resolves when the cultivation is removed.
- * @throws If the deletion fails.
- * @alpha
+ * Removes a specific cultivation from a field.
+ * 
+ * @param fdm - Database transaction manager for executing database operations
+ * @param b_lu - Unique identifier of the cultivation to be removed
+ * @returns A promise that resolves when the cultivation is successfully deleted
+ * 
+ * @throws {Error} If the cultivation does not exist or deletion fails
+ * 
+ * @remarks
+ * This function performs a cascading deletion by removing the cultivation from both
+ * the `fieldSowing` and `cultivations` tables within a single database transaction.
+ * 
+ * @example
+ * ```typescript
+ * await removeCultivation(fdmInstance, 'CULT_123');
+ * ```
  */
 export async function removeCultivation(
     fdm: FdmType,
@@ -386,14 +389,28 @@ export async function removeCultivation(
 }
 
 /**
- * Updates an existing cultivation.
- *
- * @param fdm The FDM instance.
- * @param b_lu The ID of the cultivation to update.
- * @param b_lu_catalogue The catalogue ID of the cultivation.
- * @param b_sowing_date The sowing date of the cultivation.
- * @returns A Promise that resolves when the cultivation is updated.
- * @throws If the update fails.
+ * Updates an existing cultivation's details.
+ * 
+ * @remarks
+ * Allows updating the catalogue ID and/or sowing date for a specific cultivation.
+ * Performs validation checks to ensure the cultivation and catalogue entry exist.
+ * 
+ * @param fdm - The database transaction manager
+ * @param b_lu - Unique identifier of the cultivation to update
+ * @param b_lu_catalogue - Optional new catalogue ID for the cultivation
+ * @param b_sowing_date - Optional new sowing date for the cultivation
+ * 
+ * @returns A promise that resolves when the cultivation is successfully updated
+ * 
+ * @throws {Error} If the cultivation does not exist
+ * @throws {Error} If the specified catalogue entry does not exist
+ * @throws {Error} If the sowing date is not a valid Date object
+ * 
+ * @example
+ * ```typescript
+ * await updateCultivation(fdm, 'cultivation123', 'catalogue456', new Date())
+ * ```
+ * 
  * @alpha
  */
 export async function updateCultivation(

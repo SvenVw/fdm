@@ -6,18 +6,36 @@ import { type FdmType } from './fdm'
 import { getSoilAnalysisType } from './soil.d'
 
 /**
- * Adds a new soil analysis record, including soil sampling details.
- *
- * @param fdm The FDM database instance.
- * @param a_date The date of the soil analysis.
- * @param a_source The source of the soil analysis data.
- * @param b_id The ID of the field where the soil sample was taken.
- * @param b_depth The depth of the soil sample.
- * @param b_sampling_date The date the soil sample was taken.
- * @param b_sampling_geometry The geometry of the sampling location (e.g., point, multipoint).
- * @param soilAnalysisData Additional soil analysis data (e.g., pH, nutrient levels).
- * @returns The ID of the newly added soil analysis record.
- * @throws If there's an error during the database transaction.
+ * Adds a new soil analysis record along with its associated soil sampling details.
+ * 
+ * @remarks
+ * This function performs a transactional database operation to insert both soil analysis and sampling records.
+ * It generates unique identifiers for the analysis and sampling records using nanoid.
+ * 
+ * @param fdm - The database transaction manager instance
+ * @param a_date - The date of the soil analysis
+ * @param a_source - The origin or method of soil analysis data collection
+ * @param b_id - The unique identifier of the field where the soil sample was collected
+ * @param b_depth - The depth at which the soil sample was taken
+ * @param b_sampling_date - The date when the soil sample was collected
+ * @param soilAnalysisData - Optional additional soil analysis parameters
+ * 
+ * @returns The unique identifier of the newly created soil analysis record
+ * 
+ * @throws {Error} If the database transaction fails during record insertion
+ * 
+ * @example
+ * ```typescript
+ * const newAnalysisId = await addSoilAnalysis(
+ *   fdmInstance, 
+ *   new Date(), 
+ *   'Lab Analysis', 
+ *   'field123', 
+ *   '0-30cm', 
+ *   new Date(),
+ *   { ph: 6.5, nitrogen: 45 }
+ * )
+ * ```
  */
 export async function addSoilAnalysis(
     fdm: FdmType,
@@ -67,12 +85,25 @@ export async function addSoilAnalysis(
 }
 
 /**
- * Updates an existing soil analysis record.
- *
- * @param fdm The FDM database instance.
- * @param a_id The ID of the soil analysis record to update.
- * @param soilAnalysisData The data to update.  Partial updates are supported.
- * @throws If there's an error during the database transaction.
+ * Updates an existing soil analysis record and its associated sampling data.
+ * 
+ * @remarks
+ * Performs a database transaction to update both the soil analysis and soil sampling records.
+ * Supports partial updates of the soil analysis data.
+ * 
+ * @param fdm - The database transaction instance for performing updates
+ * @param a_id - The unique identifier of the soil analysis record to be updated
+ * @param soilAnalysisData - Partial data to update in the soil analysis record
+ * 
+ * @throws {Error} If the database transaction fails during the update process
+ * 
+ * @example
+ * ```typescript
+ * await updateSoilAnalysis(fdmInstance, 'soil_analysis_123', { 
+ *   a_ph: 6.5, 
+ *   a_organic_matter: 4.2 
+ * });
+ * ```
  */
 export async function updateSoilAnalysis(
     fdm: FdmType,
@@ -100,11 +131,15 @@ export async function updateSoilAnalysis(
 }
 
 /**
- * Removes a soil analysis record and associated sampling data.
- *
- * @param fdm The FDM database instance.
- * @param a_id The ID of the soil analysis record to remove.
- * @throws If there's an error during the database transaction.
+ * Removes a soil analysis record and its associated sampling data from the database.
+ * 
+ * @param fdm - The database transaction instance for performing database operations
+ * @param a_id - The unique identifier of the soil analysis record to be deleted
+ * @throws {Error} If the deletion process fails during the database transaction
+ * 
+ * @remarks
+ * This function performs a cascading deletion of both soil analysis and soil sampling records
+ * within a single database transaction. It ensures that related records are removed atomically.
  */
 export async function removeSoilAnalysis(
     fdm: FdmType,
@@ -128,11 +163,24 @@ export async function removeSoilAnalysis(
 }
 
 /**
- * Retrieves the latest soil analysis for a given field.
- *
- * @param fdm The FDM database instance.
- * @param b_id The ID of the field.
- * @returns The latest soil analysis data for the field, or null if no analysis is found.
+ * Retrieves the latest soil analysis for a specified field.
+ * 
+ * @remarks
+ * Performs a database query to fetch the most recent soil analysis record for a given field by joining soil analysis and sampling tables.
+ * 
+ * @param fdm - The database transaction or connection instance
+ * @param b_id - The unique identifier of the field to retrieve soil analysis for
+ * @returns The most recent soil analysis record or null if no analysis exists for the field
+ * 
+ * @throws {Error} If there are issues executing the database query
+ * 
+ * @example
+ * ```typescript
+ * const latestAnalysis = await getSoilAnalysis(fdmInstance, 'field123');
+ * if (latestAnalysis) {
+ *   console.log('Latest soil analysis date:', latestAnalysis.a_date);
+ * }
+ * ```
  */
 export async function getSoilAnalysis(
     fdm: FdmType,
@@ -163,11 +211,22 @@ export async function getSoilAnalysis(
 }
 
 /**
- * Retrieves all soil analyses for a given field, ordered by date (latest first).
- *
- * @param fdm The FDM database instance.
- * @param b_id The ID of the field.
- * @returns An array of soil analysis data for the field. The array will be empty if no analyses are found.
+ * Retrieves all soil analyses for a specified field, sorted by sampling date in descending order.
+ * 
+ * @remarks
+ * This function performs a database query joining soil analysis and soil sampling tables to fetch comprehensive soil analysis data for a given field.
+ * 
+ * @param fdm - The database transaction or connection instance
+ * @param b_id - The unique identifier of the field for which soil analyses are to be retrieved
+ * @returns An array of soil analysis records, with the most recent sampling date first. Returns an empty array if no analyses are found for the field.
+ * 
+ * @throws {Error} Throws an error if the database query fails
+ * 
+ * @example
+ * ```typescript
+ * const fieldSoilAnalyses = await getSoilAnalyses(fdmInstance, 'field123');
+ * // Returns array of soil analysis records for field 'field123'
+ * ```
  */
 export async function getSoilAnalyses(
     fdm: FdmType,
