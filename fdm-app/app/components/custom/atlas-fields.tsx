@@ -4,13 +4,12 @@ import geojsonExtent from '@mapbox/geojson-extent'
 import type { FeatureCollection } from "geojson";
 import { useMemo, useState } from 'react';
 
-export function MapFields({
+export function AtlasFields({
     interactive,
     mapboxToken,
     mapStyle,
     fieldsSelected,
 }: MapFieldsProps) {
-
 
     // Set controls
     let Controls = <></>
