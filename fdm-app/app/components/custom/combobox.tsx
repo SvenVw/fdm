@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react"
+import { ReactNode, useState, useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -48,9 +48,12 @@ export function Combobox({
     const [open, setOpen] = useState(false)
 
     // Set default value if provided
-    const defaultLabel = defaultValue 
-        ? options.find(option => option.value === defaultValue)?.label
-        : undefined;
+    const defaultLabel = useMemo(() =>
+        defaultValue
+            ? options.find(option => option.value === defaultValue)?.label
+            : undefined,
+        [defaultValue, options]
+    );
 
     return (
         <FormField
