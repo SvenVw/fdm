@@ -85,9 +85,9 @@ export async function addCultivation(
     await fdm.transaction(async (tx: FdmType) => {
         try {
 
-            // Validate if b_sowing_date is a string with date format
-            if (typeof b_sowing_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b_sowing_date)) {
-                throw new Error('Invalid sowing date')
+            // Validate b_sowing_date is a Date object
+            if (!(b_sowing_date instanceof Date)) {
+                throw new Error('Invalid sowing date: Must be a Date object')
             }
 
             // Validate if field exists
@@ -298,43 +298,43 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
                 isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
             )
 
-            const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr: any) => {
-                let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
-            
-                if (!existingCultivation) {
-                    existingCultivation = {
-                        b_lu_catalogue: curr.b_lu_catalogue,
-                        b_lu_name: curr.b_lu_name,
-                        fields: []
-                    };
-                    acc.push(existingCultivation);
-                }
-            
-                let existingField = existingCultivation.fields.find(field => field.b_id === curr.b_id);
-            
-                if (!existingField) {
-                    existingField = {
-                        b_lu: curr.b_lu,
-                        b_id: curr.b_id,
-                        b_name: curr.b_name,
-                        fertilizer_applications: []
-                    };
-                    existingCultivation.fields.push(existingField);
-                }
-            
-                if (curr.p_app_id) {  // Only add if it's a fertilizer application
-                    existingField.fertilizer_applications.push({
-                        p_id_catalogue: curr.p_id_catalogue,
-                        p_name_nl: curr.p_name_nl,
-                        p_app_amount: curr.p_app_amount,
-                        p_app_method: curr.p_app_method,
-                        p_app_date: curr.p_app_date,
-                        p_app_id: curr.p_app_id
-                    });
-                }
-            
-                return acc;
-            }, []);
+        const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr: any) => {
+            let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
+
+            if (!existingCultivation) {
+                existingCultivation = {
+                    b_lu_catalogue: curr.b_lu_catalogue,
+                    b_lu_name: curr.b_lu_name,
+                    fields: []
+                };
+                acc.push(existingCultivation);
+            }
+
+            let existingField = existingCultivation.fields.find(field => field.b_id === curr.b_id);
+
+            if (!existingField) {
+                existingField = {
+                    b_lu: curr.b_lu,
+                    b_id: curr.b_id,
+                    b_name: curr.b_name,
+                    fertilizer_applications: []
+                };
+                existingCultivation.fields.push(existingField);
+            }
+
+            if (curr.p_app_id) {  // Only add if it's a fertilizer application
+                existingField.fertilizer_applications.push({
+                    p_id_catalogue: curr.p_id_catalogue,
+                    p_name_nl: curr.p_name_nl,
+                    p_app_amount: curr.p_app_amount,
+                    p_app_method: curr.p_app_method,
+                    p_app_date: curr.p_app_date,
+                    p_app_id: curr.p_app_id
+                });
+            }
+
+            return acc;
+        }, []);
 
         return cultivationPlan
     } catch (error) {

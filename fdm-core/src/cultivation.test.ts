@@ -83,7 +83,7 @@ describe('Cultivation Data Model', () => {
 
         it('should throw an error when adding a cultivation with an invalid catalogue ID', async () => {
             const invalid_b_lu_catalogue = 'invalid-catalogue-id';
-            const b_sowing_date = '2024-01-01';
+            const b_sowing_date = new Date('2024-01-01');
 
             await expect(
                 addCultivation(fdm, invalid_b_lu_catalogue, b_id, b_sowing_date)
@@ -100,7 +100,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             })
 
-            const b_sowing_date = '2024-01-01'
+            const b_sowing_date = new Date('2024-01-01')
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date)
             expect(b_lu).toBeDefined()
 
@@ -120,7 +120,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             });
 
-            const b_sowing_date = '2024-01-01';
+            const b_sowing_date = new Date('2024-01-01');
             await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date);
 
             // Attempt to add the same cultivation again
@@ -139,29 +139,12 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             });
 
-            const b_sowing_date = '2024-01-01';
+            const b_sowing_date = new Date('2024-01-01');
             const invalid_b_id = 'invalid-field-id';
 
             await expect(
                 addCultivation(fdm, b_lu_catalogue, invalid_b_id, b_sowing_date)
             ).rejects.toThrow('Field does not exist');
-        });
-
-        it('should throw an error when adding a cultivation with an invalid sowing date', async () => {
-            await addCultivationToCatalogue(fdm, {
-                b_lu_catalogue,
-                b_lu_source: 'test-source',
-                b_lu_name: 'test-name',
-                b_lu_name_en: 'test-name-en',
-                b_lu_hcat3: 'test-hcat3',
-                b_lu_hcat3_name: 'test-hcat3-name'
-            });
-
-            const invalid_b_sowing_date = 'invalid-date';
-
-            await expect(
-                addCultivation(fdm, b_lu_catalogue, b_id, invalid_b_sowing_date)
-            ).rejects.toThrow('Invalid sowing date');
         });
 
         it('should get cultivations by field ID', async () => {
@@ -174,8 +157,8 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             })
 
-            await addCultivation(fdm, b_lu_catalogue, b_id, '2024-01-01')
-            await addCultivation(fdm, b_lu_catalogue, b_id, '2024-03-01')
+            await addCultivation(fdm, b_lu_catalogue, b_id, new Date('2024-01-01'))
+            await addCultivation(fdm, b_lu_catalogue, b_id, new Date('2024-03-01'))
 
             const cultivations = await getCultivations(fdm, b_id)
             expect(cultivations.length).toBe(2)
@@ -192,7 +175,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: 'test-hcat3-name'
             })
 
-            const b_sowing_date = '2024-01-01'
+            const b_sowing_date = new Date('2024-01-01')
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date)
 
 
