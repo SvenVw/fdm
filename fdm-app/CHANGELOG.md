@@ -1,5 +1,20 @@
 # Changelog fdm-app
 
+## 0.6.0
+
+### Minor Changes
+
+- Refactor design `fields` page in `addfarm` and enable to see soil status and update the properties of the field
+
+### Patch Changes
+
+- Updated dependencies [441decd]
+- Updated dependencies [71cbba3]
+- Updated dependencies [5d0e1f7]
+- Updated dependencies [315710b]
+  - @svenvw/fdm-core@0.9.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.5.0
 
 ### Minor Changes
