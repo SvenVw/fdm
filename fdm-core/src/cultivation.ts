@@ -384,3 +384,71 @@ export async function removeCultivation(
         }
     })
 }
+
+/**
+ * Updates an existing cultivation.
+ *
+ * @param fdm The FDM instance.
+ * @param b_lu The ID of the cultivation to update.
+ * @param b_lu_catalogue The catalogue ID of the cultivation.
+ * @param b_sowing_date The sowing date of the cultivation.
+ * @returns A Promise that resolves when the cultivation is updated.
+ * @throws If the update fails.
+ * @alpha
+ */
+export async function updateCultivation(
+    fdm: FdmType,
+    b_lu: schema.cultivationsTypeSelect['b_lu'],
+    b_lu_catalogue?: schema.cultivationsTypeInsert['b_lu_catalogue'],
+    b_sowing_date?: schema.fieldSowingTypeInsert['b_sowing_date'],
+): Promise<void> {
+
+    await fdm.transaction(async (tx: FdmType) => {
+        try {
+
+            // Validate if cultivation exists
+            const cultivation = await tx
+                .select()
+                .from(schema.cultivations)
+                .where(eq(schema.cultivations.b_lu, b_lu))
+                .limit(1)
+
+            if (cultivation.length === 0) {
+                throw new Error('Cultivation does not exist')
+            }
+
+            const updated = new Date()
+
+            if (b_lu_catalogue) {
+                // Validate if cultivation exists in catalogue
+                const cultivationCatalogue = await tx
+                    .select()
+                    .from(schema.cultivationsCatalogue)
+                    .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, b_lu_catalogue))
+                    .limit(1)
+                if (cultivationCatalogue.length === 0) {
+                    throw new Error('Cultivation in catalogue does not exist')
+                }
+
+                await tx
+                    .update(schema.cultivations)
+                    .set({ updated: updated, b_lu_catalogue: b_lu_catalogue })
+                    .where(eq(schema.cultivations.b_lu, b_lu))
+            }
+
+            if (b_sowing_date) {
+                // Validate b_sowing_date is a Date object
+                if (!(b_sowing_date instanceof Date)) {
+                    throw new Error('Invalid sowing date: Must be a Date object')
+                }
+
+                await tx
+                    .update(schema.fieldSowing)
+                    .set({ updated: updated, b_sowing_date: b_sowing_date })
+                    .where(eq(schema.fieldSowing.b_lu, b_lu))
+            }
+        } catch (error) {
+            throw new Error(`updateCultivation failed: ${error instanceof Error ? error.message : String(error)}`)
+        }
+    })
+}

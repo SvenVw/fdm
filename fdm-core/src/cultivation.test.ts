@@ -1,7 +1,7 @@
 import { describe, expect, it, afterAll, beforeEach, beforeAll } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
-import { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations, getCultivationPlan } from './cultivation'
+import { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations, getCultivationPlan, updateCultivation } from './cultivation'
 import { addFarm } from './farm'
 import { addField } from './field'
 import { nanoid } from 'nanoid'
@@ -183,6 +183,58 @@ describe('Cultivation Data Model', () => {
 
             await expect(getCultivation(fdm, b_lu)).rejects.toThrowError('Cultivation does not exist')
         })
+
+        it('should update an existing cultivation', async () => {
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue,
+                b_lu_source: 'test-source',
+                b_lu_name: 'test-name',
+                b_lu_name_en: 'test-name-en',
+                b_lu_hcat3: 'test-hcat3',
+                b_lu_hcat3_name: 'test-hcat3-name'
+            })
+
+            const originalSowingDate = new Date('2024-01-01');
+            const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, originalSowingDate)
+
+            const newSowingDate = new Date('2024-02-01');
+            const newCatalogueId = nanoid();
+
+            // Add the new cultivation to the catalogue first
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue: newCatalogueId,
+                b_lu_source: 'new-source',
+                b_lu_name: 'new-name',
+                b_lu_name_en: 'new-name-en',
+                b_lu_hcat3: 'new-hcat3',
+                b_lu_hcat3_name: 'new-hcat3-name'
+            });
+
+
+            await updateCultivation(fdm, b_lu, newCatalogueId, newSowingDate);
+
+            const updatedCultivation = await getCultivation(fdm, b_lu);
+            expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate);
+            expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId);
+
+
+        })
+
+        it('should throw an error when updating a non-existent cultivation', async () => {
+            const nonExistentBlu = nanoid();
+            await expect(updateCultivation(fdm, nonExistentBlu, b_lu_catalogue, new Date())).rejects.toThrowError('Cultivation does not exist');
+        });
+
+        it('should throw an error when updating with invalid catalogue id', async () => {
+
+            const originalSowingDate = new Date('2024-01-01');
+            const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, originalSowingDate)
+
+
+            const nonExistentCatalogueId = nanoid();
+
+            await expect(updateCultivation(fdm, b_lu, nonExistentCatalogueId, new Date())).rejects.toThrowError('Cultivation in catalogue does not exist');
+        });
 
 
     })
