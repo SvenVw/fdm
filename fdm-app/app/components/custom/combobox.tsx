@@ -70,7 +70,10 @@ export function Combobox({
                                     role="combobox"
                                     aria-expanded={open}
                                     name={name}
-                                    className="w-full justify-between truncate"
+                                    className="w-full justify-between truncate focus-visible:ring-2"
+                                    aria-label={`Select ${options.find(option => option.value === field.value)?.label || defaultLabel || "Begin met typen..."}`}
+                                    aria-controls="combobox-options"
+                                    aria-haspopup="listbox"
                                 >
                                     {options.find(option => option.value === field.value)?.label || defaultLabel || "Begin met typen..."}
                                     <ChevronsUpDown className="opacity-50" />
