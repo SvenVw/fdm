@@ -73,7 +73,7 @@ export function Combobox({
                                     aria-expanded={open}
                                     name={name}
                                     className="w-full justify-between truncate focus-visible:ring-2"
-                                    aria-label={`Select ${options.find(option => option.value === field.value)?.label || defaultLabel || "Begin met typen..."}`}
+                                    aria-label={`Select ${options.find(option => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
                                     aria-controls="combobox-options"
                                     aria-haspopup="listbox"
                                 >

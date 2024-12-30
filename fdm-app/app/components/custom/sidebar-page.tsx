@@ -25,6 +25,8 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
                 <NavLink
                     key={item.to}
                     to={item.to}
+                    aria-current={pathname === item.to ? "page" : undefined}
+                    aria-label={item.title}
                     className={cn(
                         buttonVariants({ variant: "ghost" }),
                         pathname.startsWith(item.to)
