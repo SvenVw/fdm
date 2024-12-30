@@ -79,11 +79,18 @@ export async function updateSoilAnalysis(
     a_id: schema.soilAnalysisTypeSelect['a_id'],
     soilAnalysisData: Partial<schema.soilAnalysisTypeInsert>
 ): Promise<void> {
+
+    const updated = new Date()
     await fdm.transaction(async (tx: FdmType) => {
         try {
             await tx.update(schema.soilAnalysis)
-                .set(soilAnalysisData)
+                .set({ updated: updated, ...soilAnalysisData })
                 .where(eq(schema.soilAnalysis.a_id, a_id))
+
+
+            await tx.update(schema.soilSampling)
+                .set({ updated: updated })
+                .where(eq(schema.soilSampling.a_id, a_id))
 
         } catch (error) {
             throw new Error(`Failed to update soil analysis: ${error}`)

@@ -209,7 +209,9 @@ export const cultivationsCatalogue = fdmSchema.table('cultivations_catalogue', {
   b_lu_name: text().notNull(),
   b_lu_name_en: text(),
   b_lu_hcat3: text(),
-  b_lu_hcat3_name: text()
+  b_lu_hcat3_name: text(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
 }, (table) => [
   uniqueIndex('b_lu_catalogue_idx').on(table.b_lu_catalogue)
 ])
@@ -231,7 +233,9 @@ export const soilAnalysis = fdmSchema.table('soil_analysis', {
   a_p_cc: numericCasted(),
   a_som_loi: numericCasted(),
   b_gwl_class: gwlClassEnum(),
-  b_soiltype_agr: soiltypeEnum()
+  b_soiltype_agr: soiltypeEnum(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
 })
 
 export type soilAnalysisTypeSelect = typeof soilAnalysis.$inferSelect
@@ -245,6 +249,8 @@ export const soilSampling = fdmSchema.table('soil_sampling', {
   b_depth: numericCasted(),
   b_sampling_date: timestamp({ withTimezone: true }),
   // b_sampling_geometry: geometryMultipoint()
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
 })
 
 export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
