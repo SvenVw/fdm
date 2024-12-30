@@ -23,6 +23,7 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 import { fdm } from "../lib/fdm.server";
 import { addCultivation, addField, getFarm, addSoilAnalysis } from "@svenvw/fdm-core";
 import { redirectWithSuccess } from "remix-toast";
+import { MapFields } from "@/components/custom/map-fields";
 
 
 // Meta
@@ -114,7 +115,9 @@ export default function Index() {
             fallback={
               <Skeleton className="h-full w-full rounded-xl" />
             }                        >
-            {() => <FieldsMap
+            {() => <MapFields 
+              interactive={true}
+              mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
               mapboxToken={loaderData.mapboxToken}
             />
             }
