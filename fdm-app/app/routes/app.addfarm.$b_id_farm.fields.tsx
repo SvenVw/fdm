@@ -16,6 +16,7 @@ import { fdm } from "../lib/fdm.server";
 import { getCultivations, getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 import { SidebarPage } from "@/components/custom/sidebar-page";
+import { cn } from "@/lib/utils";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -141,8 +142,15 @@ export default function Index() {
                         </div>
 
                         <div className="ml-auto">
-                            <NavLink to={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
-                                <Button>Doorgaan</Button>
+                            <NavLink
+                                to={`/app/addfarm/${loaderData.b_id_farm}/cultivations`}
+                                className={cn("ml-auto", {
+                                    "pointer-events-none": loaderData.sidebarPageItems.length === 0
+                                })}
+                            >
+                                <Button disabled={loaderData.sidebarPageItems.length === 0}>
+                                    Doorgaan
+                                </Button>
                             </NavLink>
                         </div>
                     </div>
@@ -151,7 +159,7 @@ export default function Index() {
                         <aside className="-mx-4 lg:w-1/5">
                             <SidebarPage items={loaderData.sidebarPageItems} />
                         </aside>
-                        <Outlet />                        
+                        <Outlet />
                     </div>
                 </div>
             </main>

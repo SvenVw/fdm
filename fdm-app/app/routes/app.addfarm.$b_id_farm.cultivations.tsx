@@ -15,6 +15,7 @@ import { SidebarPage } from "@/components/custom/sidebar-page";
 // FDM
 import { fdm } from "../lib/fdm.server";
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
+import { cn } from "@/lib/utils";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -36,12 +37,12 @@ export async function loader({
     }
     const farm = await getFarm(fdm, b_id_farm)
         .catch(error => {
-            throw data(`Failed to fetch farm: ${error.message}`, { 
+            throw data(`Failed to fetch farm: ${error.message}`, {
                 status: 404,
                 statusText: "Farm not found"
             });
         });
-    
+
     if (!farm) {
         throw data("Farm not found", { status: 404, statusText: "Farm not found" });
     }
@@ -108,8 +109,15 @@ export default function Index() {
                         </div>
 
                         <div className="ml-auto">
-                            <NavLink to={`/app/addfarm/${loaderData.b_id_farm}/cattle`} className="ml-auto">
-                                <Button>Doorgaan</Button>
+                            <NavLink
+                                to={`/app/addfarm/${loaderData.b_id_farm}/cattle`}
+                                className={cn("ml-auto", {
+                                    "pointer-events-none": loaderData.cultivationPlan.length === 0
+                                })}
+                            >
+                                <Button disabled={loaderData.cultivationPlan.length === 0}>
+                                    Doorgaan
+                                </Button>
                             </NavLink>
                         </div>
                     </div>
@@ -120,7 +128,7 @@ export default function Index() {
                         </aside>
                         <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
                     </div>
-                </div>              
+                </div>
             </main>
             <Toaster />
         </SidebarInset >
