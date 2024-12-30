@@ -46,13 +46,15 @@ export function Combobox({
     defaultValue
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
+    const optionsMap = useMemo(
+        () => new Map(options.map(option => [option.value, option.label])),
+        [options]
+    );
 
     // Set default value if provided
     const defaultLabel = useMemo(() =>
-        defaultValue
-            ? options.find(option => option.value === defaultValue)?.label
-            : undefined,
-        [defaultValue, options]
+        defaultValue ? optionsMap.get(defaultValue) : undefined,
+        [defaultValue, optionsMap]
     );
 
     return (
