@@ -24,8 +24,9 @@ interface SideBarAppType {
     user: {
         firstname: string
         surname: string
+        name: string
         email: string
-        avatar: string | null
+        image: string | undefined
     }
 }
 
