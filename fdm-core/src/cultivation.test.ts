@@ -227,6 +227,19 @@ describe('Cultivation Data Model', () => {
 
         it('should throw an error when updating with invalid catalogue id', async () => {
 
+            // Add the new cultivation to the catalogue first
+            const b_lu_catalogue = nanoid();
+
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue: b_lu_catalogue,
+                b_lu_source: 'new-source',
+                b_lu_name: 'new-name',
+                b_lu_name_en: 'new-name-en',
+                b_lu_hcat3: 'new-hcat3',
+                b_lu_hcat3_name: 'new-hcat3-name'
+            });
+
+
             const originalSowingDate = new Date('2024-01-01');
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, originalSowingDate)
 
@@ -269,7 +282,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: "test"
             })
 
-            b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, '2024-03-01')
+            b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, new Date('2024-03-01'))
 
             // Add fertilizer to catalogue (needed for fertilizer application)
             const p_id_catalogue = nanoid();
