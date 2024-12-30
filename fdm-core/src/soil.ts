@@ -59,7 +59,7 @@ export async function addSoilAnalysis(
                 })
         }
         catch (error) {
-            throw new Error(`Failed to add soil analysis: ${error}`)
+            throw new Error(`Failed to add soil analysis: ${error instanceof Error ? error.stack : error}`)
         }
     })
 
@@ -93,7 +93,7 @@ export async function updateSoilAnalysis(
                 .where(eq(schema.soilSampling.a_id, a_id))
 
         } catch (error) {
-            throw new Error(`Failed to update soil analysis: ${error}`)
+            throw new Error(`Failed to update soil analysis: ${error instanceof Error ? error.stack : error}`)
         }
 
     })
@@ -122,7 +122,7 @@ export async function removeSoilAnalysis(
 
 
         } catch (error) {
-            throw new Error(`Failed to remove soil analysis: ${error}`)
+            throw new Error(`Failed to remove soil analysis: ${error instanceof Error ? error.stack : error}`)
         }
     })
 }
