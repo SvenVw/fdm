@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, data, Form } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, Form, ActionFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 import { z } from "zod";
@@ -15,10 +15,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis, getCultivation, getCultivations } from "@svenvw/fdm-core";
+import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis, getCultivation, getCultivations, updateField, addSoilAnalysis, updateCultivation } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClientOnly } from "remix-utils/client-only";
+import { extractFormValuesFromRequest } from "@/lib/form";
+import { dataWithError, dataWithSuccess } from "remix-toast";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -34,6 +36,9 @@ const FormSchema = z.object({
         required_error: "Naam van perceel is verplicht",
     }).min(3, {
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
+    }),
+    b_lu_catalogue: z.string({
+        required_error: "Hoofdgewas is verplicht",
     }),
     // b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
     //     errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
@@ -201,7 +206,7 @@ export default function Index() {
                                         <Combobox
                                             options={loaderData.cultivationOptions}
                                             form={form}
-                                            name={"b_lu"}
+                                            name={"b_lu_catalogue"}
                                             label={"Hoofdgewas"}
                                             defaultValue={loaderData.b_lu_catalogue}
                                         />
@@ -359,4 +364,77 @@ export default function Index() {
             </aside>
         </>
     );
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+    const b_id = params.b_id;
+    const b_id_farm = params.b_id_farm;
+
+
+    if (!b_id || !b_id_farm) {
+        return dataWithError(null, "Missing field or farm ID.");
+    }
+
+    try {
+        const formValues = await extractFormValuesFromRequest(request, FormSchema);
+
+        await updateField(
+            fdm,
+            b_id,
+            formValues.b_name
+        );
+
+        const cultivations = await getCultivations(fdm, b_id);
+        if (cultivations && cultivations.length > 0) {
+
+            await updateCultivation(fdm, cultivations[0].b_lu,
+                formValues.b_lu_catalogue,
+            );
+
+        } else {
+            // Handle the case where there are no cultivations found (although there should always be at least one)
+            console.error("No existing cultivation found for field ", b_id);
+            return dataWithError(null, "Failed to update cultivation. No cultivation found for field.")
+        }
+
+        const currentSoilAnalysis = await getSoilAnalysis(fdm, b_id);
+        const soilPropertiesChanged =
+            currentSoilAnalysis?.b_soiltype_agr !== formValues.b_soiltype_agr ||
+            currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
+            currentSoilAnalysis?.a_p_al !== formValues.a_p_al ||
+            currentSoilAnalysis?.a_p_cc !== formValues.a_p_cc ||
+            currentSoilAnalysis?.a_som_loi !== formValues.a_som_loi;
+
+        if (soilPropertiesChanged) {
+
+            const currentYear = new Date().getFullYear()
+            const defaultDate = new Date(currentYear, 0, 1)
+            await addSoilAnalysis(
+                fdm,
+                defaultDate,
+                'user',
+                b_id,
+                30,
+                defaultDate,
+                {
+                    a_p_al: formValues.a_p_al,
+                    a_p_cc: formValues.a_p_cc,
+                    a_som_loi: formValues.a_som_loi,
+                    b_soiltype_agr: formValues.b_soiltype_agr,
+                    b_gwl_class: formValues.b_gwl_class,
+                }
+            );
+        }
+
+        return dataWithSuccess(
+            `fields have been updated`,
+            { message: `${formValues.b_name} is bijgewerkt! 🎉` }
+        );
+    } catch (error) {
+        console.error("Failed to update field:", error);
+        return dataWithError(
+            null,
+            `Er is iets misgegaan bij het bijwerken van het perceel: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+    }
 }
