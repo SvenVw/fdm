@@ -23,11 +23,11 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
         >
             {items.map((item) => (
                 <NavLink
-                    key={item.href}
-                    to={item.href}
+                    key={item.to}
+                    to={item.to}
                     className={cn(
                         buttonVariants({ variant: "ghost" }),
-                        pathname === item.href
+                        pathname === item.to
                             ? "bg-muted hover:bg-muted"
                             : "hover:bg-transparent hover:underline",
                         "justify-start"
