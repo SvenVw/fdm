@@ -27,7 +27,7 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
                     to={item.to}
                     className={cn(
                         buttonVariants({ variant: "ghost" }),
-                        pathname === item.to
+                        pathname.startsWith(item.to)
                             ? "bg-muted hover:bg-muted"
                             : "hover:bg-transparent hover:underline",
                         "justify-start"
