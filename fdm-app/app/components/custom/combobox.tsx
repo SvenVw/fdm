@@ -35,7 +35,7 @@ interface ComboboxProps {
     form: any
     name: string
     label: ReactNode
-    defaultValue?: string 
+    defaultValue?: optionType['value']
 }
 
 export function Combobox({
