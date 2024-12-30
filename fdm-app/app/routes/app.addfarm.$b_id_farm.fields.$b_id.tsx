@@ -161,6 +161,7 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
+            b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
             b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
             b_gwl_class: loaderData.b_gwl_class ?? undefined,
             a_p_al: loaderData.a_p_al ?? undefined,
