@@ -75,7 +75,14 @@ const FormSchema = z.object({
     })
 })
 
-// Loader
+/**
+ * Loader function for the field details page.
+ * Fetches field data, soil analysis, cultivation options, and geojson data.
+ * @param request - The incoming request object.
+ * @param params - URL parameters containing `b_id_farm` (farm ID) and `b_id` (field ID).
+ * @returns An object containing field details, cultivation options, and mapbox token.
+ * Throws an error if farm ID, field ID, or field data is missing.
+ */
 export async function loader({
     request, params
 }: LoaderFunctionArgs) {
@@ -152,7 +159,11 @@ export async function loader({
     }
 }
 
-// Main
+/**
+ * Component for displaying and updating field details.
+ * Renders a form with field information, including name, crop, soil type, and soil analysis data.
+ * @returns The JSX element representing the field details page.
+ */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>();
 
@@ -367,6 +378,15 @@ export default function Index() {
     );
 }
 
+/**
+ * Action function for updating field details.
+ * Handles form submission, updates field data in the database,
+ * and manages soil analysis updates.
+ * @param request - The incoming request object containing form data.
+ * @param params - URL parameters containing `b_id` (field ID) and `b_id_farm` (farm ID).
+ * @returns A success or error toast based on the outcome of the update operation.
+ * Throws an error if field or farm ID is missing.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     const b_id = params.b_id;
     const b_id_farm = params.b_id_farm;
