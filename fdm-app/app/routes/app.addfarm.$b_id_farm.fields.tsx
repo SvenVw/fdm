@@ -44,19 +44,6 @@ export async function loader({
     // Sort by name
     fields.sort((a, b) => a.b_name.localeCompare(b.b_name));
 
-    // const fieldsWithGeojson = await Promise.all(fields.map(async field => {
-    //     if (!field.b_geometry) {
-    //         return field;
-    //     }
-    //     field.b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
-
-    //     // Get cultivation of field
-    //     const cultivations = await getCultivations(fdm, field.b_id)
-    //     field.cultivations = cultivations[0] ?? { b_lu: "" };
-
-    //     return field
-    // }));
-
     // Get the Mapbox Token
     const mapboxToken = process.env.MAPBOX_TOKEN;
     if (!mapboxToken) {
