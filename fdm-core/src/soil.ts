@@ -156,10 +156,10 @@ export async function getSoilAnalysis(
         .from(schema.soilAnalysis)
         .innerJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
         .where(eq(schema.soilSampling.b_id, b_id))
-        .orderBy(desc(schema.soilSampling.b_sampling_date))
+        .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
         .limit(1)
 
-    return  soilAnalysis[0] || null 
+    return soilAnalysis[0] || null
 }
 
 /**
