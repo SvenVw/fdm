@@ -22,6 +22,7 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 // FDM
 import { fdm } from "../lib/fdm.server";
 import { addCultivation, addField, getFarm, addSoilAnalysis } from "@svenvw/fdm-core";
+import { redirectWithSuccess } from "remix-toast";
 
 
 // Meta
@@ -169,7 +170,7 @@ export async function action({
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
     // Add fields to farm
-    await Promise.all(selectedFields.map(async (field, index) => {
+    const b_ids = await Promise.all(selectedFields.map(async (field, index) => {
       const b_id_name = 'Perceel ' + (index + 1)
       const b_id_source = field.properties.reference_id
       const b_lu_catalogue = field.properties.b_lu
@@ -219,6 +220,8 @@ export async function action({
           await addSoilAnalysis(fdm, defaultDate, 'NMI', b_id, 30, defaultDate, { a_p_al: response.a_p_al, a_p_cc: response.a_p_cc, a_som_loi: response.a_som_loi, b_soiltype_agr: response.b_soiltype_agr, b_gwl_class: response.b_gwl_class })
           
         }
+
+        return b_id
     
       } catch (error) {
         console.error(`Failed to process field ${b_id_name}:`, error)
@@ -226,7 +229,7 @@ export async function action({
       }
     }))
 
-    return redirect(`../addfarm/${b_id_farm}/fields`)
+    return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, { message: "Percelen zijn toegevoegd! 🎉" });
 
   } else {
     throw data("Invalid POST question", { status: 400, statusText: "Invalid POST question" })
