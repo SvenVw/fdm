@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { addSoilAnalysis, getSoilAnalysis, getSoilAnalyses, removeSoilAnalysis, updateSoilAnalysis } from './soil'
 import * as schema from './db/schema'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
 import { addField } from './field'
