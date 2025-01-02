@@ -1,14 +1,18 @@
-import { Map as MapGL, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
+import { Map as MapGL, useMap, GeolocateControl, NavigationControl, Source, Layer } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import geojsonExtent from '@mapbox/geojson-extent'
 import type { FeatureCollection } from "geojson";
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { deserialize } from 'flatgeobuf/lib/mjs/geojson.js';
+import type { LayerProps } from 'react-map-gl';
+import throttle from "lodash.throttle";
 
 export function AtlasFields({
     interactive,
     mapboxToken,
     mapStyle,
     fieldsSelected,
+    fieldsAvailableUrl
 }: MapFieldsProps) {
 
     // Set controls
@@ -31,7 +35,7 @@ export function AtlasFields({
                 return geojsonExtent(fieldsSelected);
             } catch (error) {
                 console.error('Failed to calculate bounds:', error);
-                return initialBounds; 
+                return initialBounds;
             }
         }, [fieldsSelected]);
         setViewState({
@@ -49,37 +53,116 @@ export function AtlasFields({
             interactive={interactive}
             mapStyle={mapStyle}
             mapboxAccessToken={mapboxToken}
-        // onZoomEnd={async evt => await loadBrpFields(evt)}
-        // onMoveEnd={async evt => await loadBrpFields(evt)}
-        // onClick={evt => handleClickOnField(evt)}
-        // interactiveLayerIds={['brp-fields-fill', 'selected-fields-fill', 'brp-fields-line']}
+            // onClick={evt => handleClickOnField(evt)}
+            interactiveLayerIds={['available-fields-fill']}
         >
 
             {Controls}
+            <AvailableFieldsSource url={fieldsAvailableUrl} >       
+                    <Layer {...availableFieldsFillStyle} />
+                    {/* <Layer {...availableFieldsLineStyle} /> */}
+            </AvailableFieldsSource>
+
         </MapGL>
     )
 }
+
+const generateFeatureClass = () => ({
+    type: "FeatureCollection",
+    features: []
+});
+
+
+function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType, children: JSX.Element }) {
+
+    if (!url) throw new Error("url is required");
+
+    const { current: map } = useMap();
+    const [data, setData] = useState(generateFeatureClass());
+
+    useEffect(() => {
+        async function loadData() {
+
+            if (map) {
+
+                const zoom = map.getZoom()
+
+                if (zoom && zoom > 12) {
+                    const bounds = map.getBounds(0.8)
+
+                    if (bounds) {
+                        const [[minX, minY], [maxX, maxY]] = bounds.toArray();
+                        const bbox = {
+                            minX,
+                            maxX,
+                            minY,
+                            maxY
+                        };
+                        const iter = deserialize(url, bbox);
+
+                        let i = 0;
+                        const featureClass = generateFeatureClass();
+
+                        for await (let feature of iter) {
+                            featureClass.features.push({ ...feature, id: i });
+                            i += 1;
+                        }
+                        setData(featureClass);
+                    } else {
+                        setData(generateFeatureClass())
+                    }
+                } else {
+                    setData(generateFeatureClass())
+                }
+            }
+        }
+
+        const throttledLoadData = throttle(loadData, 250, { trailing: true });
+
+        if (map) {
+            map.on("moveend", throttledLoadData);
+            map.on("zoomend", throttledLoadData);
+            map.once("load", loadData);
+            return () => {
+                map.off("moveend", throttledLoadData);
+                map.off("zoomend", throttledLoadData);
+            };
+        }
+
+    }, []);
+
+    return (
+        <Source id="availableFields" type="geojson" data={data}>
+            {children}
+        </Source>
+    );
+}
+
+const availableFieldsFillStyle: LayerProps & { id: string; type: string; paint: { 'fill-color': string; 'fill-opacity': number; 'fill-outline-color': string; } } = {
+    id: 'available-fields-fill',
+    type: 'fill',
+    paint: {
+        'fill-color': "#93c5fd",
+        'fill-opacity': 0.5,
+        'fill-outline-color': "#1e3a8a"
+    },
+};
+const availableFieldsLineStyle = {
+    id: 'available-fields-line',
+    type: 'line',
+    paint: {
+        'line-color': "#1e3a8a",
+        'line-opacity': 0.8,
+        'line-width': 2,
+    }
+};
+
+type fieldsAvailableUrlType = string | undefined
 
 interface MapFieldsProps {
     interactive: boolean
     mapboxToken: string
     mapStyle: "mapbox://styles/mapbox/satellite-streets-v12"
     fieldsSelected: FeatureCollection | null
-}
-
-interface GeoJSONFeature {
-    type: string;
-    geometry: {
-        type: string;
-        coordinates: number[][][];
-    };
-    properties: {
-        reference_id: string;
-        [key: string]: any;
-    };
-}
-
-interface GeoJSONCollection {
-    type: "FeatureCollection";
-    features: GeoJSONFeature[];
+    fieldsAvailableUrl: fieldsAvailableUrlType
 }

@@ -55,7 +55,8 @@ export async function loader({
 
   return {
     b_name_farm: farm.b_name_farm,
-    mapboxToken: mapboxToken
+    mapboxToken: mapboxToken,
+    fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL
   }
 
 }
@@ -119,6 +120,8 @@ export default function Index() {
               interactive={true}
               mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
               mapboxToken={loaderData.mapboxToken}
+              fieldsSelected={null}
+              fieldsAvailableUrl={loaderData.fieldsAvailableUrl}
             />
             }
           </ClientOnly>
