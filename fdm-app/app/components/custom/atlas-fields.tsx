@@ -54,14 +54,17 @@ export function AtlasFields({
             mapStyle={mapStyle}
             mapboxAccessToken={mapboxToken}
             // onClick={evt => handleClickOnField(evt)}
-            interactiveLayerIds={['available-fields-fill']}
+            interactiveLayerIds={['available-fields-fill', 'selected-fields-fill']}
         >
 
             {Controls}
-            <AvailableFieldsSource url={fieldsAvailableUrl} >       
-                    <Layer {...availableFieldsFillStyle} />
-                    {/* <Layer {...availableFieldsLineStyle} /> */}
-            </AvailableFieldsSource>
+            <SelectedFieldsSource >
+                <Layer {...selectedFieldsStyle} />              
+            </SelectedFieldsSource>
+            <AvailableFieldsSource url={fieldsAvailableUrl} >
+                <Layer {...availableFieldsFillStyle} />
+                {/* <Layer {...availableFieldsLineStyle} /> */}
+            </AvailableFieldsSource>          
 
         </MapGL>
     )
@@ -107,6 +110,7 @@ function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType,
                             featureClass.features.push({ ...feature, id: i });
                             i += 1;
                         }
+                        console.log(featureClass)
                         setData(featureClass);
                     } else {
                         setData(generateFeatureClass())
@@ -138,6 +142,64 @@ function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType,
     );
 }
 
+function SelectedFieldsSource({ children }: { children: JSX.Element }) {
+
+    const { current: map } = useMap();
+    const [data, setData] = useState(generateFeatureClass());
+
+    useEffect(() => {
+        async function clickOnMap(evt) {
+            // console.log('hoi')
+
+            if (map) {
+                
+                const features = map.queryRenderedFeatures(evt.point, {
+                    layers: ['available-fields-fill'] // Specify the layer ID
+                });
+                // console.log(features);
+
+                if (features.length > 0) {
+                   
+                    // console.log(features[0].properties);
+                    
+                    setData(featureClass => {
+                        const feature = {
+                            type: features[0].type,
+                            geometry: features[0].geometry,
+                            properties: features[0].properties,
+                            id: featureClass.features.length
+                        }
+                        return {
+                            ...featureClass,
+                            features: [...featureClass.features, feature]
+                        }
+
+                    })
+
+                } else {
+                    console.log("No features found at clicked point.");
+                }
+
+                console.log(data)
+            }
+        }
+
+        if (map) {
+            map.on("click", clickOnMap);
+            return () => {
+                map.off("click", clickOnMap);
+            };
+        }
+
+    }, []);
+
+    return (
+        <Source id="selectedFields" type="geojson" data={data}>
+            {children}
+        </Source>
+    );
+}
+
 const availableFieldsFillStyle: LayerProps & { id: string; type: string; paint: { 'fill-color': string; 'fill-opacity': number; 'fill-outline-color': string; } } = {
     id: 'available-fields-fill',
     type: 'fill',
@@ -154,6 +216,15 @@ const availableFieldsLineStyle = {
         'line-color': "#1e3a8a",
         'line-opacity': 0.8,
         'line-width': 2,
+    }
+};
+const selectedFieldsStyle: LayerProps & { id: string; type: string; paint: { 'fill-color': string; 'fill-opacity': number; 'fill-outline-color': string; } } = {
+    id: 'selected-fields-fill',
+    type: 'fill',
+    paint: {
+        'fill-color': "#fca5a5",
+        'fill-opacity': 0.8,
+        'fill-outline-color': "#1e3a8a"
     }
 };
 
