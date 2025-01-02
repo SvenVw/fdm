@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, data } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, Outlet, NavLink } from "react-router";
 import { useLoaderData } from "react-router";
 import wkx from 'wkx'
 
@@ -15,6 +15,8 @@ import { Fields } from "@/components/blocks/fields";
 import { fdm } from "../lib/fdm.server";
 import { getCultivations, getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
+import { SidebarPage } from "@/components/custom/sidebar-page";
+import { cn } from "@/lib/utils";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -39,21 +41,8 @@ export async function loader({
     // Get the fields
     const fields = await getFields(fdm, b_id_farm)
 
-    const fieldsWithGeojson = await Promise.all(fields.map(async field => {
-        if (!field.b_geometry) {
-            return field;
-        }
-        field.b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
-
-        // Get cultivation of field
-        const cultivations = await getCultivations(fdm, field.b_id)
-        field.cultivations = cultivations[0] ?? { b_lu: "" };
-
-        return field
-    }));
-
-    // Sort by created
-    fieldsWithGeojson.sort((a, b) => new Date(a.created).getTime() - new Date(b.created).getTime())
+    // Sort by name
+    fields.sort((a, b) => a.b_name.localeCompare(b.b_name));
 
     // Get the Mapbox Token
     const mapboxToken = process.env.MAPBOX_TOKEN;
@@ -79,8 +68,16 @@ export async function loader({
         );
     }
 
+    // Create the sidenav
+    const sidebarPageItems = fields.map(field => {
+        return {
+            title: field.b_name,
+            to: `/app/addfarm/${b_id_farm}/fields/${field.b_id}`
+        }
+    })
+
     return {
-        fields: fieldsWithGeojson,
+        sidebarPageItems: sidebarPageItems,
         cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
@@ -127,24 +124,29 @@ export default function Index() {
                         <div className="space-y-0.5">
                             <h2 className="text-2xl font-bold tracking-tight">Percelen</h2>
                             <p className="text-muted-foreground">
-                                Pas de naam aan, controleer het gewas en bodemtype
+                                Pas de naam aan, controleer het gewas en bodemgegevens
                             </p>
                         </div>
 
                         <div className="ml-auto">
-                            <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
-                                <Button>Doorgaan</Button>
-                            </a>
+                            <NavLink
+                                to={`/app/addfarm/${loaderData.b_id_farm}/cultivations`}
+                                className={cn("ml-auto", {
+                                    "pointer-events-none": loaderData.sidebarPageItems.length === 0
+                                })}
+                            >
+                                <Button disabled={loaderData.sidebarPageItems.length === 0}>
+                                    Doorgaan
+                                </Button>
+                            </NavLink>
                         </div>
                     </div>
                     <Separator className="my-6" />
-                    <div className="flex flex-col p-10 space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                        <Fields
-                            fields={loaderData.fields}
-                            cultivationOptions={loaderData.cultivationOptions}
-                            mapboxToken={loaderData.mapboxToken}
-                            action={loaderData.action}
-                        />
+                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <aside className="-mx-4 lg:w-1/5">
+                            <SidebarPage items={loaderData.sidebarPageItems} />
+                        </aside>
+                        <Outlet />
                     </div>
                 </div>
             </main>

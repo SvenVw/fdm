@@ -7,6 +7,7 @@ import {
   useLoaderData 
 } from "react-router";
 import { ClientOnly } from "remix-utils/client-only"
+import { centroid } from "@turf/centroid";
 import wkx from 'wkx'
 
 // Components
@@ -20,7 +21,8 @@ import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
 import { fdm } from "../lib/fdm.server";
-import { addCultivation, addField, getFarm } from "@svenvw/fdm-core";
+import { addCultivation, addField, getFarm, addSoilAnalysis } from "@svenvw/fdm-core";
+import { redirectWithSuccess } from "remix-toast";
 
 
 // Meta
@@ -168,14 +170,14 @@ export async function action({
     const selectedFields = JSON.parse(String(formData.get('selected_fields')))
 
     // Add fields to farm
-    await Promise.all(selectedFields.map(async (field, index) => {
+    const b_ids = await Promise.all(selectedFields.map(async (field, index) => {
       const b_id_name = 'Perceel ' + (index + 1)
       const b_id_source = field.properties.reference_id
       const b_lu_catalogue = field.properties.b_lu
       const currentYear = new Date().getFullYear()
       const defaultDate = new Date(currentYear, 0, 1)
       const b_manage_start = defaultDate.toISOString().split('T')[0]
-      const b_date_sowing = defaultDate.toISOString().split('T')[0]
+      const b_date_sowing = defaultDate
 
       // Validate dates
       if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
@@ -189,15 +191,45 @@ export async function action({
 
       try {
         const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
-        const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
-        return { b_id, b_lu }
+        await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+
+        if (process.env.NMI_API_KEY) {
+
+          const fieldCentroid = centroid(field.geometry)
+          const a_lon = fieldCentroid.geometry.coordinates[0]   
+          const a_lat = fieldCentroid.geometry.coordinates[1]
+   
+          const responseApi = await fetch("https://api.nmi-agro.nl/estimates?" + new URLSearchParams({
+            a_lat: a_lat.toString(),
+            a_lon: a_lon.toString()      
+          }),
+            {
+              method: "GET",
+              headers: {
+                "Authorization": `Bearer ${process.env.NMI_API_KEY}`,
+              },
+            })
+      
+          if (!responseApi.ok) {
+            throw data(responseApi.statusText, { status: responseApi.status, statusText: responseApi.statusText })
+          }
+      
+          const result = await responseApi.json()
+          response = result.data
+
+          await addSoilAnalysis(fdm, defaultDate, 'NMI', b_id, 30, defaultDate, { a_p_al: response.a_p_al, a_p_cc: response.a_p_cc, a_som_loi: response.a_som_loi, b_soiltype_agr: response.b_soiltype_agr, b_gwl_class: response.b_gwl_class })
+          
+        }
+
+        return b_id
+    
       } catch (error) {
         console.error(`Failed to process field ${b_id_name}:`, error)
         throw data(`Failed to add field ${b_id_name}: ${error.message}`, { status: 500, statusText: `Failed to add field ${b_id_name}` })
       }
     }))
 
-    return redirect(`../addfarm/${b_id_farm}/fields`)
+    return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, { message: "Percelen zijn toegevoegd! 🎉" });
 
   } else {
     throw data("Invalid POST question", { status: 400, statusText: "Invalid POST question" })

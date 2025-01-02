@@ -1,4 +1,4 @@
-import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex, index} from 'drizzle-orm/pg-core'
+import { pgSchema, text, date, timestamp, boolean, primaryKey, uniqueIndex, index } from 'drizzle-orm/pg-core'
 import { geometryPolygon, numericCasted } from './schema-custom-types'
 
 // Define postgres schema
@@ -14,11 +14,9 @@ export const farms = fdmSchema.table('farms', {
   b_sector: sectorEnum(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    b_id_farm_idx: uniqueIndex('b_id_farm_idx').on(table.b_id_farm)
-  }
-})
+}, (table) => [
+  uniqueIndex('b_id_farm_idx').on(table.b_id_farm),
+])
 
 export type farmsTypeSelect = typeof farms.$inferSelect
 export type farmsTypeInsert = typeof farms.$inferInsert
@@ -35,9 +33,9 @@ export const farmManaging = fdmSchema.table('farm_managing', {
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => {
-  return {
+  return [{
     pk: primaryKey({ columns: [table.b_id, table.b_id_farm] })
-  }
+  }]
 })
 
 export type farmManagingTypeSelect = typeof farmManaging.$inferSelect
@@ -51,12 +49,10 @@ export const fields = fdmSchema.table('fields', {
   b_id_source: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    b_id_idx: uniqueIndex('b_id_idx').on(table.b_id),
-    b_geom_idx: index('b_geom_idx').using('gist', table.b_geometry)
-  }
-})
+}, (table) => [
+  uniqueIndex('b_id_idx').on(table.b_id),
+  index('b_geom_idx').using('gist', table.b_geometry)
+])
 
 export type fieldsTypeSelect = typeof fields.$inferSelect
 export type fieldsTypeInsert = typeof fields.$inferInsert
@@ -66,11 +62,9 @@ export const fertilizers = fdmSchema.table('fertilizers', {
   p_id: text().primaryKey(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    p_id_idx: uniqueIndex('p_id_idx').on(table.p_id)
-  }
-})
+}, (table) => [
+  uniqueIndex('p_id_idx').on(table.p_id)
+])
 
 export type fertilizersTypeSelect = typeof fertilizers.$inferSelect
 export type fertilizersTypeInsert = typeof fertilizers.$inferInsert
@@ -89,7 +83,7 @@ export type fertilizerAcquiringTypeSelect = typeof fertilizerAcquiring.$inferSel
 export type fertilizerAcquiringTypeInsert = typeof fertilizerAcquiring.$inferInsert
 
 // Define fertilizers application table
-export const applicationMethodEnum = fdmSchema.enum("p_app_method", ["slotted coulter", "incorporation", "injection", "spraying", "broadcasting","spoke wheel", "pocket placement"])
+export const applicationMethodEnum = fdmSchema.enum("p_app_method", ["slotted coulter", "incorporation", "injection", "spraying", "broadcasting", "spoke wheel", "pocket placement"])
 export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
   p_app_id: text().primaryKey(),
   b_id: text().notNull().references(() => fields.b_id),
@@ -99,11 +93,9 @@ export const fertilizerApplication = fdmSchema.table('fertilizer_applying', {
   p_app_date: timestamp({ withTimezone: true }),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    p_app_idx: uniqueIndex('p_app_idx').on(table.p_app_id)
-  }
-})
+}, (table) => [
+  uniqueIndex('p_app_idx').on(table.p_app_id)
+])
 
 export type fertilizerApplicationTypeSelect = typeof fertilizerApplication.$inferSelect
 export type fertilizerApplicationTypeInsert = typeof fertilizerApplication.$inferInsert
@@ -160,11 +152,9 @@ export const fertilizersCatalogue = fdmSchema.table('fertilizers_catalogue', {
   p_type_compost: boolean(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    p_id_catalogue_idx: uniqueIndex('p_id_catalogue_idx').on(table.p_id_catalogue)
-  }
-})
+}, (table) => [
+  uniqueIndex('p_id_catalogue_idx').on(table.p_id_catalogue)
+])
 
 export type fertilizersCatalogueTypeSelect = typeof fertilizersCatalogue.$inferSelect
 export type fertilizersCatalogueTypeInsert = typeof fertilizersCatalogue.$inferInsert
@@ -187,11 +177,9 @@ export const cultivations = fdmSchema.table('cultivations', {
   b_lu_catalogue: text().notNull().references(() => cultivationsCatalogue.b_lu_catalogue),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
-}, (table) => {
-  return {
-    b_lu_idx: uniqueIndex('b_lu_idx').on(table.b_lu)
-  }
-})
+}, (table) => [
+  uniqueIndex('b_lu_idx').on(table.b_lu)
+])
 
 export type cultivationsTypeSelect = typeof cultivations.$inferSelect
 export type cultivationsTypeInsert = typeof cultivations.$inferInsert
@@ -200,15 +188,15 @@ export type cultivationsTypeInsert = typeof cultivations.$inferInsert
 export const fieldSowing = fdmSchema.table('field_sowing', {
   b_id: text().notNull().references(() => fields.b_id),
   b_lu: text().notNull().references(() => cultivations.b_lu),
-  b_sowing_date: date({ mode: 'string' }),
+  b_sowing_date: timestamp({ withTimezone: true }),
   b_sowing_amount: numericCasted(),
   b_sowing_method: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => {
-  return {
+  return [{
     pk: primaryKey({ columns: [table.b_id, table.b_lu] })
-  }
+  }]
 })
 
 export type fieldSowingTypeSelect = typeof fieldSowing.$inferSelect
@@ -221,12 +209,49 @@ export const cultivationsCatalogue = fdmSchema.table('cultivations_catalogue', {
   b_lu_name: text().notNull(),
   b_lu_name_en: text(),
   b_lu_hcat3: text(),
-  b_lu_hcat3_name: text()
-}, (table) => {
-  return {
-    b_lu_catalogue_idx: uniqueIndex('b_lu_catalogue_idx').on(table.b_lu_catalogue)
-  }
-})
+  b_lu_hcat3_name: text(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+}, (table) => [
+  uniqueIndex('b_lu_catalogue_idx').on(table.b_lu_catalogue)
+])
 
 export type cultivationsCatalogueTypeSelect = typeof cultivationsCatalogue.$inferSelect
 export type cultivationsCatalogueTypeInsert = typeof cultivationsCatalogue.$inferInsert
+
+// Define soil_analyis table
+export const soilTypes = ['moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei']
+export const gwlClasses = ['II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa']
+export const soiltypeEnum = fdmSchema.enum('b_soiltype_agr', soilTypes)
+export const gwlClassEnum = fdmSchema.enum('b_gwl_class', gwlClasses)
+
+export const soilAnalysis = fdmSchema.table('soil_analysis', {
+  a_id: text().primaryKey(),
+  a_date: timestamp({ withTimezone: true }),
+  a_source: text(),
+  a_p_al: numericCasted(),
+  a_p_cc: numericCasted(),
+  a_som_loi: numericCasted(),
+  b_gwl_class: gwlClassEnum(),
+  b_soiltype_agr: soiltypeEnum(),
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+})
+
+export type soilAnalysisTypeSelect = typeof soilAnalysis.$inferSelect
+export type soilAnalysisTypeInsert = typeof soilAnalysis.$inferInsert
+
+// Define soil_sampling table
+export const soilSampling = fdmSchema.table('soil_sampling', {
+  b_id_sampling: text().primaryKey(),
+  b_id: text().notNull().references(() => fields.b_id),
+  a_id: text().notNull().references(() => soilAnalysis.a_id),
+  b_depth: numericCasted(),
+  b_sampling_date: timestamp({ withTimezone: true }),
+  // b_sampling_geometry: geometryMultipoint()
+  created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+  updated: timestamp({ withTimezone: true })
+})
+
+export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
+export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert

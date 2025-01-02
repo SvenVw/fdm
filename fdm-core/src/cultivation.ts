@@ -85,9 +85,9 @@ export async function addCultivation(
     await fdm.transaction(async (tx: FdmType) => {
         try {
 
-            // Validate if b_sowing_date is a string with date format
-            if (typeof b_sowing_date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(b_sowing_date)) {
-                throw new Error('Invalid sowing date')
+            // Validate b_sowing_date is a Date object
+            if (!(b_sowing_date instanceof Date)) {
+                throw new Error('Invalid sowing date: Must be a Date object')
             }
 
             // Validate if field exists
@@ -298,43 +298,43 @@ export async function getCultivationPlan(fdm: FdmType, b_id_farm: schema.farmsTy
                 isNotNull(schema.cultivationsCatalogue.b_lu_catalogue))
             )
 
-            const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr: any) => {
-                let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
-            
-                if (!existingCultivation) {
-                    existingCultivation = {
-                        b_lu_catalogue: curr.b_lu_catalogue,
-                        b_lu_name: curr.b_lu_name,
-                        fields: []
-                    };
-                    acc.push(existingCultivation);
-                }
-            
-                let existingField = existingCultivation.fields.find(field => field.b_id === curr.b_id);
-            
-                if (!existingField) {
-                    existingField = {
-                        b_lu: curr.b_lu,
-                        b_id: curr.b_id,
-                        b_name: curr.b_name,
-                        fertilizer_applications: []
-                    };
-                    existingCultivation.fields.push(existingField);
-                }
-            
-                if (curr.p_app_id) {  // Only add if it's a fertilizer application
-                    existingField.fertilizer_applications.push({
-                        p_id_catalogue: curr.p_id_catalogue,
-                        p_name_nl: curr.p_name_nl,
-                        p_app_amount: curr.p_app_amount,
-                        p_app_method: curr.p_app_method,
-                        p_app_date: curr.p_app_date,
-                        p_app_id: curr.p_app_id
-                    });
-                }
-            
-                return acc;
-            }, []);
+        const cultivationPlan = cultivations.reduce((acc: cultivationPlanType[], curr: any) => {
+            let existingCultivation = acc.find(item => item.b_lu_catalogue === curr.b_lu_catalogue);
+
+            if (!existingCultivation) {
+                existingCultivation = {
+                    b_lu_catalogue: curr.b_lu_catalogue,
+                    b_lu_name: curr.b_lu_name,
+                    fields: []
+                };
+                acc.push(existingCultivation);
+            }
+
+            let existingField = existingCultivation.fields.find(field => field.b_id === curr.b_id);
+
+            if (!existingField) {
+                existingField = {
+                    b_lu: curr.b_lu,
+                    b_id: curr.b_id,
+                    b_name: curr.b_name,
+                    fertilizer_applications: []
+                };
+                existingCultivation.fields.push(existingField);
+            }
+
+            if (curr.p_app_id) {  // Only add if it's a fertilizer application
+                existingField.fertilizer_applications.push({
+                    p_id_catalogue: curr.p_id_catalogue,
+                    p_name_nl: curr.p_name_nl,
+                    p_app_amount: curr.p_app_amount,
+                    p_app_method: curr.p_app_method,
+                    p_app_date: curr.p_app_date,
+                    p_app_id: curr.p_app_id
+                });
+            }
+
+            return acc;
+        }, []);
 
         return cultivationPlan
     } catch (error) {
@@ -381,6 +381,74 @@ export async function removeCultivation(
         catch (error) {
 
             throw new Error(`Failed to remove cultivation: ${error}`);
+        }
+    })
+}
+
+/**
+ * Updates an existing cultivation.
+ *
+ * @param fdm The FDM instance.
+ * @param b_lu The ID of the cultivation to update.
+ * @param b_lu_catalogue The catalogue ID of the cultivation.
+ * @param b_sowing_date The sowing date of the cultivation.
+ * @returns A Promise that resolves when the cultivation is updated.
+ * @throws If the update fails.
+ * @alpha
+ */
+export async function updateCultivation(
+    fdm: FdmType,
+    b_lu: schema.cultivationsTypeSelect['b_lu'],
+    b_lu_catalogue?: schema.cultivationsTypeInsert['b_lu_catalogue'],
+    b_sowing_date?: schema.fieldSowingTypeInsert['b_sowing_date'],
+): Promise<void> {
+
+    await fdm.transaction(async (tx: FdmType) => {
+        try {
+
+            // Validate if cultivation exists
+            const cultivation = await tx
+                .select()
+                .from(schema.cultivations)
+                .where(eq(schema.cultivations.b_lu, b_lu))
+                .limit(1)
+
+            if (cultivation.length === 0) {
+                throw new Error('Cultivation does not exist')
+            }
+
+            const updated = new Date()
+
+            if (b_lu_catalogue) {
+                // Validate if cultivation exists in catalogue
+                const cultivationCatalogue = await tx
+                    .select()
+                    .from(schema.cultivationsCatalogue)
+                    .where(eq(schema.cultivationsCatalogue.b_lu_catalogue, b_lu_catalogue))
+                    .limit(1)
+                if (cultivationCatalogue.length === 0) {
+                    throw new Error('Cultivation in catalogue does not exist')
+                }
+
+                await tx
+                    .update(schema.cultivations)
+                    .set({ updated: updated, b_lu_catalogue: b_lu_catalogue })
+                    .where(eq(schema.cultivations.b_lu, b_lu))
+            }
+
+            if (b_sowing_date) {
+                // Validate b_sowing_date is a Date object
+                if (!(b_sowing_date instanceof Date)) {
+                    throw new Error('Invalid sowing date: Must be a Date object')
+                }
+
+                await tx
+                    .update(schema.fieldSowing)
+                    .set({ updated: updated, b_sowing_date: b_sowing_date })
+                    .where(eq(schema.fieldSowing.b_lu, b_lu))
+            }
+        } catch (error) {
+            throw new Error(`updateCultivation failed: ${error instanceof Error ? error.message : String(error)}`)
         }
     })
 }

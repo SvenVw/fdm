@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react"
+import { ReactNode, useState, useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -35,15 +35,29 @@ interface ComboboxProps {
     form: any
     name: string
     label: ReactNode
+    defaultValue?: optionType['value']
 }
 
 export function Combobox({
     options,
     form,
     name,
-    label
+    label,
+    defaultValue
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
+
+    /** Map of option values to their labels for efficient lookup */
+    const optionsMap = useMemo(
+        () => new Map(options.map(option => [option.value, option.label])),
+        [options]
+    );
+
+    /** Computed label for the default value if provided */
+    const defaultLabel = useMemo(() =>
+        defaultValue ? optionsMap.get(defaultValue) : undefined,
+        [defaultValue, optionsMap]
+    );
 
     return (
         <FormField
@@ -60,14 +74,17 @@ export function Combobox({
                                     role="combobox"
                                     aria-expanded={open}
                                     name={name}
-                                    className="w-full justify-between"
+                                    className="w-full justify-between truncate focus-visible:ring-2"
+                                    aria-label={`Selecteer ${options.find(option => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
+                                    aria-controls="combobox-options"
+                                    aria-haspopup="listbox"
                                 >
-                                    {options.find(option => option.value === field.value)?.label || "Begin met typen..."}
+                                    {options.find(option => option.value === field.value)?.label || defaultLabel || "Begin met typen..."}
                                     <ChevronsUpDown className="opacity-50" />
                                 </Button>
                             </FormControl>
                         </PopoverTrigger>
-                        <PopoverContent className="w-full p-0">
+                        <PopoverContent id="combobox-options" className="w-full p-0">
                             <Command>
                                 <CommandInput placeholder="Begin met typen..." className="h-9" />
                                 <CommandList>

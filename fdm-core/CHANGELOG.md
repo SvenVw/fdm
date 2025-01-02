@@ -1,5 +1,17 @@
 # Changelog fdm-core
 
+## 0.9.0
+
+### Minor Changes
+
+- 441decd: Change `b_sowing_date` from date column with string input to timestamp with Date input
+- 5d0e1f7: Add `updateCultivation` to update details of a cultivation
+- 315710b: Add functions for soil analysis: `AddSoilAnalysis`, `updateSoilAnalysis`, `removeSoilAnalysis`, `getSoilAnalysis` and `getSoilAnalyses`
+
+### Patch Changes
+
+- 71cbba3: Refactored depecrated index function
+
 ## 0.8.0
 
 ### Minor Changes
