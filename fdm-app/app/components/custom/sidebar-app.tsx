@@ -13,24 +13,24 @@ import {
 } from "@/components/ui/sidebar"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRightLeft, BadgeCheck, ChevronsUpDown, GitPullRequestArrow, House, Languages, LifeBuoy, LogOut, Map as MapIcon, PawPrint, Scale, Send, Settings, Shapes, Sparkles, Sprout, Square } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 import { useIsMobile } from '@/hooks/use-mobile'
-import { Button } from "./ui/button"
-import { Form } from "react-router";
+import { Button } from "@/components/ui/button"
+import { Form, NavLink} from "react-router";
 
-interface SideBarType {
+interface SideBarAppType {
     user: {
         firstname: string
         surname: string
+        name: string
         email: string
-        avatar: string | null
+        image: string | undefined
     }
 }
 
-
-export function AppSidebar(props: SideBarType) {
+export function SidebarApp(props: SideBarAppType) {
 
     const user = props.user
     const avatarInitials = props.user.firstname.slice(0, 1).toUpperCase() + props.user.surname.slice(0, 1).toUpperCase()
@@ -42,7 +42,7 @@ export function AppSidebar(props: SideBarType) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="/">
+                            <NavLink to="/">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                     <Sprout className="size-4" />
                                 </div>
@@ -50,7 +50,7 @@ export function AppSidebar(props: SideBarType) {
                                     <span className="font-semibold">FDM</span>
                                     {/* <span className="">2024</span> */}
                                 </div>
-                            </a>
+                            </NavLink>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -62,50 +62,50 @@ export function AppSidebar(props: SideBarType) {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./farm">
+                                    <NavLink to="./farm">
                                         <House />
                                         <span>Bedrijf</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./map">
+                                    <NavLink to="./map">
                                         <MapIcon />
                                         <span>Kaart</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./fields">
+                                    <NavLink to="./fields">
                                         <Square />
                                         <span>Percelen</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./cultivations">
+                                    <NavLink to="./cultivations">
                                         <Sprout />
                                         <span>Gewassen</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./fertilizers">
+                                    <NavLink to="./fertilizers">
                                         <Shapes />
                                         <span>Meststoffen</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="./stable">
+                                    <NavLink to="./stable">
                                         <PawPrint />
                                         <span>Stal & dieren</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -117,10 +117,10 @@ export function AppSidebar(props: SideBarType) {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="#">
+                                    <NavLink to="#">
                                         <ArrowRightLeft />
                                         <span>Nutriëntenbalans</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -128,10 +128,10 @@ export function AppSidebar(props: SideBarType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="#">
+                                    <NavLink to="#">
                                         <Scale />
                                         <span>OS Balans</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -139,10 +139,10 @@ export function AppSidebar(props: SideBarType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <a href="#">
+                                    <NavLink to="#">
                                         <GitPullRequestArrow />
                                         <span>BAAT</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -156,18 +156,18 @@ export function AppSidebar(props: SideBarType) {
                         <SidebarMenu>
                             <SidebarMenuItem key="support">
                                 <SidebarMenuButton asChild size="sm">
-                                    <a href="#">
+                                    <NavLink to="#">
                                         <LifeBuoy />
                                         <span>Ondersteuning</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem key="feedback">
                                 <SidebarMenuButton asChild size="sm">
-                                    <a href="#">
+                                    <NavLink to="#">
                                         <Send />
                                         <span>Feedback</span>
-                                    </a>
+                                    </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
