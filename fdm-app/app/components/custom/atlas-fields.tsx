@@ -6,6 +6,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { deserialize } from 'flatgeobuf/lib/mjs/geojson.js';
 import type { LayerProps } from 'react-map-gl';
 import throttle from "lodash.throttle";
+import xxhash from "xxhash-wasm";
+
+const { create64 } = await xxhash();
 
 export function AtlasFields({
     interactive,
@@ -166,14 +169,17 @@ function SelectedFieldsSource({ children }: { children: JSX.Element }) {
                         const feature = {
                             type: features[0].type,
                             geometry: features[0].geometry,
-                            properties: features[0].properties,
-                            id: featureClass.features.length
+                            properties: features[0].properties                               
+                        }
+                        const featureWithId = {
+                            ...feature,
+                            id: create64().update(JSON.stringify(features[0])).digest().toString()
                         }
                         return {
                             ...featureClass,
-                            features: [...featureClass.features, feature]
+                            features: [...featureClass.features, featureWithId]
                         }
-
+                        
                     })
 
                 } else {
