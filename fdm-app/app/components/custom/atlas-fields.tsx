@@ -17,7 +17,12 @@ export function AtlasFields({
     fieldsSelected,
     fieldsAvailableUrl
 }: MapFieldsProps) {
+
+    // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(generateFeatureClass());
+    if (fieldsSelected) {
+        setSelectedFieldsData(fieldsSelected)
+    }
 
     // Set controls
     let Controls = <></>
@@ -87,7 +92,6 @@ const generateFeatureClass = () => ({
     type: "FeatureCollection",
     features: []
 });
-
 
 function AvailableFieldsSource({ url, zoomLevelFields, children }: { url: fieldsAvailableUrlType, zoomLevelFields: number, children: JSX.Element }) {
 
