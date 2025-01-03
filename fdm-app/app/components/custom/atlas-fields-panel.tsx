@@ -50,6 +50,16 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                         fieldCountText = `Je hebt 1 perceel geselecteerd`
                     }
 
+                    const cultivations = fields.features.reduce((acc: { b_lu_name: string; count: number; }[], feature) => {
+                        const existingCultivation = acc.find(c => c.b_lu_name === feature.properties.b_lu_name);
+                        if (existingCultivation) {
+                            existingCultivation.count++;
+                        } else {
+                            acc.push({ b_lu_name: feature.properties.b_lu_name, count: 1 });
+                        }
+                        return acc;
+                    }, []);
+
 
                     fieldsText = <>
                         <Card className={cn("w-full")}>
@@ -58,7 +68,26 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                                 <CardDescription>{fieldCountText}</CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4">
-                              
+                                <div>
+                                    {cultivations.map((cultivation, index) => (
+                                        // let cultivationCountText = `${cultivation.count + 1} percelen`
+
+                                        <div
+                                            key={index}
+                                            className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
+                                        >
+                                            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-medium leading-none">
+                                                    {cultivation.b_lu_name}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {`${cultivation.count + 1} percelen`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </CardContent>
                             <CardFooter>
                                 <Button className="w-full">
@@ -75,7 +104,7 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                                 <CardDescription>Je hebt geen percelen geselecteerd</CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4">
-                           
+
                             </CardContent>
                             <CardFooter>
                                 <Button className="w-full" disabled>
