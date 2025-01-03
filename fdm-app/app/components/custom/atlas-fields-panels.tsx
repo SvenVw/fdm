@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-export function FieldsPanelZoom({zoomLevelFields}: {zoomLevelFields: number}) {
+export function FieldsPanelZoom({ zoomLevelFields }: { zoomLevelFields: number }) {
     const { current: map } = useMap();
     const [panel, setPanel] = useState(<></>);
 
@@ -56,7 +56,6 @@ export function FieldsPanelZoom({zoomLevelFields}: {zoomLevelFields: number}) {
     );
 }
 
-
 export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) {
 
     const { current: map } = useMap();
@@ -71,7 +70,7 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                 if (fields.features.length > 0) {
                     console.log(fields.features)
 
-                    const fieldCount = fields.features.length + 1
+                    const fieldCount = fields.features.length
                     let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
                     if (fieldCount === 1) {
                         fieldCountText = `Je hebt 1 perceel geselecteerd`
@@ -109,7 +108,7 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                                                     {cultivation.b_lu_name}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {`${cultivation.count + 1} percelen`}
+                                                    {`${cultivation.count} percelen`}
                                                 </p>
                                             </div>
                                         </div>
@@ -140,18 +139,11 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                             </CardFooter>
                         </Card>
                     </>)
-                }             
+                }
             }
         }
-
-        if (map) {
-            map.once('click', updatePanel)
-            map.once("load", updatePanel);
-            return () => {
-            };
-        }
         updatePanel()
-    }, [fields, map]);
+    }, [fields]);
 
     return (
         panel
@@ -182,7 +174,7 @@ export function FieldsPanelHover({ zoomLevelFields }: { zoomLevelFields: number 
                                 <CardHeader>
                                     <CardTitle>{featuresSelected[0].properties.b_lu_name}</CardTitle>
                                     <CardDescription>Klik om te verwijderen</CardDescription>
-                                </CardHeader>                               
+                                </CardHeader>
                             </Card>
                         </>)
                     } else {
@@ -194,11 +186,13 @@ export function FieldsPanelHover({ zoomLevelFields }: { zoomLevelFields: number 
                         if (featuresAvailable.length > 0) {
                             setPanel(<>
                                 <Card className={cn("w-ful")}>
-                                    <CardHeader>
-                                        <CardTitle>                                                                                        
-                                            {featuresAvailable[0].properties.b_lu_name}        
+                                    <CardHeader>                                        
+                                        <CardTitle>
+                                            {featuresAvailable[0].properties.b_lu_name}
                                         </CardTitle>
-                                        <CardDescription>Klik om te selecteren</CardDescription>
+                                        <CardDescription>
+                                            Klik om te selecteren
+                                        </CardDescription>
                                     </CardHeader>
                                 </Card>
                             </>)
