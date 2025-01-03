@@ -21,9 +21,11 @@ export function AtlasFields({
 
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(generateFeatureClass());
-    if (fieldsSelected) {
-        setSelectedFieldsData(fieldsSelected)
-    }
+    useEffect(() => {
+      if (fieldsSelected) {
+        setSelectedFieldsData(fieldsSelected);
+      }
+    }, [fieldsSelected]);
 
     // Set controls
     let Controls = <></>
@@ -39,22 +41,24 @@ export function AtlasFields({
             padding: 0
         }
     });
-    if (fieldsSelected) {
-        const bounds = useMemo(() => {
-            try {
-                return geojsonExtent(fieldsSelected);
-            } catch (error) {
-                console.error('Failed to calculate bounds:', error);
-                return initialBounds;
-            }
-        }, [fieldsSelected]);
-        setViewState({
-            bounds: bounds,
-            fitBoundsOptions: {
-                padding: 10
-            }
-        })
-    }
+    const bounds = useMemo(() => {
+      if (!fieldsSelected) {
+        return initialBounds;
+      }
+      try {
+        return geojsonExtent(fieldsSelected);
+      } catch (error) {
+        console.error("Failed to calculate bounds:", error);
+        return initialBounds;
+      }
+    }, [fieldsSelected]);
+
+    useEffect(() => {
+      setViewState({
+        bounds: bounds,
+        fitBoundsOptions: { padding: 10 }
+      });
+    }, [bounds]);
 
     return (
         <>
