@@ -7,6 +7,7 @@ import { deserialize } from 'flatgeobuf/lib/mjs/geojson.js';
 import type { LayerProps } from 'react-map-gl';
 import throttle from "lodash.throttle";
 import xxhash from "xxhash-wasm";
+import FieldsPanel from './atlas-fields-panel';
 
 const { create64 } = await xxhash();
 
@@ -17,6 +18,7 @@ export function AtlasFields({
     fieldsSelected,
     fieldsAvailableUrl
 }: MapFieldsProps) {
+    const [selectedFieldsData, setSelectedFieldsData] = useState(generateFeatureClass());
 
     // Set controls
     let Controls = <></>
@@ -50,26 +52,30 @@ export function AtlasFields({
     }
 
     return (
-        <MapGL
-            {...viewState}
-            style={{ height: "calc(100vh - 64px - 123px)" }}
-            interactive={interactive}
-            mapStyle={mapStyle}
-            mapboxAccessToken={mapboxToken}
-            // onClick={evt => handleClickOnField(evt)}
-            interactiveLayerIds={['available-fields-fill', 'selected-fields-fill']}
-        >
+        <>
+            <MapGL
+                {...viewState}
+                style={{ height: "calc(100vh - 64px - 123px)" }}
+                interactive={interactive}
+                mapStyle={mapStyle}
+                mapboxAccessToken={mapboxToken}
+                // onClick={evt => handleClickOnField(evt)}
+                interactiveLayerIds={['available-fields-fill', 'selected-fields-fill']}
+            >
 
-            {Controls}
-            <SelectedFieldsSource >
-                <Layer {...selectedFieldsStyle} />
-            </SelectedFieldsSource>
-            <AvailableFieldsSource url={fieldsAvailableUrl} >
-                <Layer {...availableFieldsFillStyle} />
-                {/* <Layer {...availableFieldsLineStyle} /> */}
-            </AvailableFieldsSource>
+                {Controls}
+                <SelectedFieldsSource selectedFieldsData={selectedFieldsData} setSelectedFieldsData={setSelectedFieldsData} >
+                    <Layer {...selectedFieldsStyle} />
+                </SelectedFieldsSource>
+                <AvailableFieldsSource url={fieldsAvailableUrl} >
+                    <Layer {...availableFieldsFillStyle} />
+                    {/* <Layer {...availableFieldsLineStyle} /> */}
+                </AvailableFieldsSource>
+                <FieldsPanel fields={selectedFieldsData} />
+            </MapGL>
+           
+        </>
 
-        </MapGL>
     )
 }
 
@@ -145,10 +151,9 @@ function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType,
     );
 }
 
-function SelectedFieldsSource({ children }: { children: JSX.Element }) {
+function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData, children }: { selectedFieldsData: FeatureCollection, setSelectedFieldsData: React.Dispatch<React.SetStateAction<FeatureCollection>>, children: JSX.Element }) {
 
     const { current: map } = useMap();
-    const [data, setData] = useState(generateFeatureClass());
 
     useEffect(() => {
         async function clickOnMap(evt) {
@@ -165,7 +170,7 @@ function SelectedFieldsSource({ children }: { children: JSX.Element }) {
 
                     // console.log(features[0].properties);
 
-                    setData(featureClass => {
+                    setSelectedFieldsData(featureClass => {
                         const feature = {
                             type: features[0].type,
                             geometry: features[0].geometry,
@@ -184,14 +189,14 @@ function SelectedFieldsSource({ children }: { children: JSX.Element }) {
                                 ...featureClass,
                                 features: featureClass.features.filter(f => f.id !== featureWithId.id)
                             }
-                           
+
                         } else {
                             // Add field to selection
                             return {
                                 ...featureClass,
                                 features: [...featureClass.features, featureWithId]
                             }
-                         
+
                         }
 
                     })
@@ -200,7 +205,7 @@ function SelectedFieldsSource({ children }: { children: JSX.Element }) {
                     console.log("No features found at clicked point.");
                 }
 
-                console.log(data)
+                console.log(selectedFieldsData)
             }
         }
 
@@ -214,11 +219,13 @@ function SelectedFieldsSource({ children }: { children: JSX.Element }) {
     }, []);
 
     return (
-        <Source id="selectedFields" type="geojson" data={data}>
+        <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
             {children}
         </Source>
     );
 }
+
+
 
 const availableFieldsFillStyle: LayerProps & { id: string; type: string; paint: { 'fill-color': string; 'fill-opacity': number; 'fill-outline-color': string; } } = {
     id: 'available-fields-fill',
