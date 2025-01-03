@@ -102,7 +102,7 @@ export async function action({
         addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
       )
     );
-    return redirectWithSuccess(`../addfarm/${b_id_farm}/map`, { message: "Bedrijf is toegevoegd! 🎉" });
+    return redirectWithSuccess(`../addfarm/${b_id_farm}/atlas`, { message: "Bedrijf is toegevoegd! 🎉" });
   } catch (error) {
     console.error('Failed to create farm with fertilizers:', error);
     return dataWithError(null, "Er is iets misgegaan bij het aanmaken van het bedrijf.");
