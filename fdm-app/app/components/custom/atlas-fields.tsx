@@ -6,10 +6,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { deserialize } from 'flatgeobuf/lib/mjs/geojson.js';
 import type { LayerProps } from 'react-map-gl';
 import throttle from "lodash.throttle";
-import xxhash from "xxhash-wasm";
 import { FieldsPanelZoom, FieldsPanelSelection } from './atlas-fields-panels';
 
-const { create64 } = await xxhash();
 
 export function AtlasFields({
     interactive,
@@ -178,15 +176,11 @@ function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData, child
                         geometry: features[0].geometry,
                         properties: features[0].properties
                     }
-                    const featureWithId = {
-                        ...feature,
-                        id: create64().update(JSON.stringify(features[0])).digest().toString()
-                    }
 
                     setSelectedFieldsData(prevFieldsData => {                      
 
                         // Check if field is not already selected by comparing ids
-                        const isAlreadySelected = prevFieldsData.features.some(f => f.id === featureWithId.id);
+                        const isAlreadySelected = prevFieldsData.features.some(f => f.properties.b_id_source === feature.properties.b_id_source);
                         if (isAlreadySelected) {
                             // Remove field from selection
                             return {
