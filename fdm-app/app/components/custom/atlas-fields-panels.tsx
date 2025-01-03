@@ -158,4 +158,73 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
     );
 }
 
-// export default React.memo(FieldsPanel);
+export function FieldsPanelHover({ zoomLevelFields }: { zoomLevelFields: number }) {
+    const { current: map } = useMap();
+    const [panel, setPanel] = useState(<></>);
+
+    useEffect(() => {
+        function updatePanel(evt) {
+
+            if (map) {
+
+                // Set message about zoom level
+                const zoom = map.getZoom()
+                if (zoom && zoom > zoomLevelFields) {
+
+
+                    const featuresSelected = map.queryRenderedFeatures(evt.point, {
+                        layers: ['selected-fields-fill'] // Specify the layer ID
+                    });
+
+                    if (featuresSelected.length > 0) {
+                        setPanel(<>
+                            <Card className={cn("w-full")}>
+                                <CardHeader>
+                                    <CardTitle>{featuresSelected[0].properties.b_lu_name}</CardTitle>
+                                    <CardDescription>Klik om te verwijderen</CardDescription>
+                                </CardHeader>                               
+                            </Card>
+                        </>)
+                    } else {
+
+                        const featuresAvailable = map.queryRenderedFeatures(evt.point, {
+                            layers: ['available-fields-fill'] // Specify the layer ID
+                        });
+
+                        if (featuresAvailable.length > 0) {
+                            setPanel(<>
+                                <Card className={cn("w-ful")}>
+                                    <CardHeader>
+                                        <CardTitle>                                                                                        
+                                            {featuresAvailable[0].properties.b_lu_name}        
+                                        </CardTitle>
+                                        <CardDescription>Klik om te selecteren</CardDescription>
+                                    </CardHeader>
+                                </Card>
+                            </>)
+                        } else {
+                            setPanel(<></>)
+                        }
+                    }
+                } else {
+                    setPanel(<></>)
+                }
+            }
+        }
+
+        const throttledUpdatePanel = throttle(updatePanel, 250, { trailing: true });
+
+        if (map) {
+            map.on("mousemove", throttledUpdatePanel);
+            map.once("click", updatePanel);
+            map.once("load", updatePanel);
+            return () => {
+                map.off("mousemove", throttledUpdatePanel);
+            };
+        }
+    }, [map]);
+
+    return (
+        panel
+    );
+}

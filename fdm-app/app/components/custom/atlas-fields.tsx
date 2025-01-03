@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { deserialize } from 'flatgeobuf/lib/mjs/geojson.js';
 import type { LayerProps } from 'react-map-gl';
 import throttle from "lodash.throttle";
-import { FieldsPanelZoom, FieldsPanelSelection } from './atlas-fields-panels';
+import { FieldsPanelZoom, FieldsPanelSelection, FieldsPanelHover } from './atlas-fields-panels';
 
 const ZOOM_LEVEL_FIELDS = 12;
 
@@ -73,6 +73,7 @@ export function AtlasFields({
                 <div className='fields-panel grid gap-4 w-[350px]'>
                     <FieldsPanelSelection fields={selectedFieldsData} zoomLevelFields={ZOOM_LEVEL_FIELDS} />
                     <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                    <FieldsPanelHover zoomLevelFields={ZOOM_LEVEL_FIELDS} />
                 </div>
                 
             </MapGL>
