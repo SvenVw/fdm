@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { data, useFetcher } from 'react-router';
+import { LoadingSpinner } from './loadingspinner';
 
 export function FieldsPanelZoom({ zoomLevelFields }: { zoomLevelFields: number }) {
     const { current: map } = useMap();
@@ -63,12 +64,14 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
     const { current: map } = useMap();
     const [panel, setPanel] = useState(<></>);
 
+    const isSubmitting = fetcher.state === "submitting"
+
     async function submitSelectedFields(fields: FeatureCollection) {
 
         try {
             const formSelectedFields = new FormData();
             formSelectedFields.append("selected_fields", JSON.stringify(fields))
-    
+
             await fetcher.submit(formSelectedFields, {
                 method: "POST"
             })
@@ -77,7 +80,7 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
             throw data({ status: 500, statusText: `Failed to submit fields: ${error}` })
             // TODO: adding a toast notification with error
         }
-    }    
+    }
 
     useEffect(() => {
         function updatePanel() {
@@ -134,8 +137,17 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button className="w-full" onClick={() => submitSelectedFields(fields)}>
-                                    <Check /> Sla geselecteerde percelen op
+                                <Button onClick={() => submitSelectedFields(fields)} disabled={isSubmitting}>
+                                    {isSubmitting ?
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Sla geselecteerde percelen op</span>
+                                        </div>
+                                        : <div className="flex items-center space-x-2">
+                                            <Check />
+                                            <span>Sla geselecteerde percelen op</span>
+                                        </div>
+                                    }
                                 </Button>
                             </CardFooter>
                         </Card>
