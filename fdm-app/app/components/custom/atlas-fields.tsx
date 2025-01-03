@@ -7,7 +7,7 @@ import { deserialize } from 'flatgeobuf/lib/mjs/geojson.js';
 import type { LayerProps } from 'react-map-gl';
 import throttle from "lodash.throttle";
 import xxhash from "xxhash-wasm";
-import FieldsPanel from './atlas-fields-panel';
+import { FieldsPanelZoom, FieldsPanelSelection } from './atlas-fields-panels';
 
 const { create64 } = await xxhash();
 
@@ -71,7 +71,11 @@ export function AtlasFields({
                     <Layer {...availableFieldsFillStyle} />
                     {/* <Layer {...availableFieldsLineStyle} /> */}
                 </AvailableFieldsSource>
-                <FieldsPanel fields={selectedFieldsData} />
+                <div className='fields-panel grid gap-4 w-[350px]'>
+                    <FieldsPanelSelection fields={selectedFieldsData} />
+                    <FieldsPanelZoom />
+                </div>
+                
             </MapGL>
 
         </>

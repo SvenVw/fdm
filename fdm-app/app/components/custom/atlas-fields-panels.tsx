@@ -10,23 +10,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
-
+export function FieldsPanelZoom() {
     const { current: map } = useMap();
-    const [panel, setPanel] = useState({ zoomText: <></>, fieldsText: <></> });
+    const [panel, setPanel] = useState(<></>);
 
     useEffect(() => {
         function updatePanel() {
 
             if (map) {
 
-                let zoomText = panel.zoomText
-                let fieldsText = panel.fieldsText
-
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom <= 12) {
-                    zoomText = <>
+                    setPanel(<>
                         <Alert>
                             <Info className="h-4 w-4" />
                             <AlertTitle>Let op!</AlertTitle>
@@ -34,11 +30,42 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                                 Zoom in om percelen te kunnen selecteren.
                             </AlertDescription>
                         </Alert>
-                    </>
+                    </>)
                 } else {
-                    zoomText = <></>
+                    setPanel(<></>)
 
                 }
+            }
+        }
+
+        const throttledUpdatePanel = throttle(updatePanel, 250, { trailing: true });
+
+        if (map) {
+            map.on("move", throttledUpdatePanel);
+            map.on("zoom", throttledUpdatePanel);
+            map.once("load", throttledUpdatePanel);
+            return () => {
+                map.off("move", throttledUpdatePanel);
+                map.off("zoom", throttledUpdatePanel);
+            };
+        }
+    }, [map]);
+
+    return (
+        panel
+    );
+}
+
+
+export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) {
+
+    const { current: map } = useMap();
+    const [panel, setPanel] = useState(<></>);
+
+    useEffect(() => {
+        function updatePanel() {
+
+            if (map) {
 
                 // Set information about fields
                 if (fields.features.length > 0) {
@@ -61,7 +88,7 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                     }, []);
 
 
-                    fieldsText = <>
+                    setPanel(<>
                         <Card className={cn("w-full")}>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
@@ -95,9 +122,9 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                                 </Button>
                             </CardFooter>
                         </Card>
-                    </>
+                    </>)
                 } else {
-                    fieldsText = <>
+                    setPanel(<>
                         <Card className={cn("w-[380px]")}>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
@@ -112,37 +139,22 @@ export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
                                 </Button>
                             </CardFooter>
                         </Card>
-                    </>
-                }
-
-                setPanel({
-                    zoomText: zoomText,
-                    fieldsText: fieldsText
-                })
+                    </>)
+                }             
             }
         }
 
-        const throttledUpdatePanel = throttle(updatePanel, 250, { trailing: true });
-
         if (map) {
-            map.on("move", throttledUpdatePanel);
-            map.on("zoom", throttledUpdatePanel);
             map.once('click', updatePanel)
-            map.once("load", throttledUpdatePanel);
+            map.once("load", updatePanel);
             return () => {
-                map.off("move", throttledUpdatePanel);
-                map.off("zoom", throttledUpdatePanel);
-                // map.off('click', updatePanel)
             };
         }
         updatePanel()
     }, [fields, map]);
 
     return (
-        <div className='fields-panel grid gap-4 w-[350px]'>
-            {panel.zoomText}
-            {panel.fieldsText}
-        </div>
+        panel
     );
 }
 
