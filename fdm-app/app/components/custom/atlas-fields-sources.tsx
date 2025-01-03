@@ -29,16 +29,22 @@ export function AvailableFieldsSource({ url, zoomLevelFields, children }: { url:
                             minY,
                             maxY
                         };
-                        const iter = deserialize(url, bbox);
+                        try {
+                            const iter = deserialize(url, bbox);
 
-                        let i = 0;
-                        const featureClass = generateFeatureClass();
+                            let i = 0;
+                            const featureClass = generateFeatureClass();
 
-                        for await (let feature of iter) {
-                            featureClass.features.push({ ...feature, id: i });
-                            i += 1;
+                            for await (let feature of iter) {
+                                featureClass.features.push({ ...feature, id: i });
+                                i += 1;
+                            }
+                            setData(featureClass);
+                        } catch (error) {
+                            console.error("Failed to deserialize data: ", error);
+                            setData(generateFeatureClass());
                         }
-                        setData(featureClass);
+
                     } else {
                         setData(generateFeatureClass())
                     }
