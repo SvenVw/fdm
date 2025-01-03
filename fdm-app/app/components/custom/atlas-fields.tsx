@@ -73,7 +73,7 @@ export function AtlasFields({
                 </AvailableFieldsSource>
                 <FieldsPanel fields={selectedFieldsData} />
             </MapGL>
-           
+
         </>
 
     )
@@ -156,7 +156,7 @@ function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData, child
     const { current: map } = useMap();
 
     useEffect(() => {
-        async function clickOnMap(evt) {
+        function clickOnMap(evt) {
             // console.log('hoi')
 
             if (map) {
@@ -169,34 +169,32 @@ function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData, child
                 if (features.length > 0) {
 
                     // console.log(features[0].properties);
+                    const feature = {
+                        type: features[0].type,
+                        geometry: features[0].geometry,
+                        properties: features[0].properties
+                    }
+                    const featureWithId = {
+                        ...feature,
+                        id: create64().update(JSON.stringify(features[0])).digest().toString()
+                    }
 
-                    setSelectedFieldsData(featureClass => {
-                        const feature = {
-                            type: features[0].type,
-                            geometry: features[0].geometry,
-                            properties: features[0].properties
-                        }
-                        const featureWithId = {
-                            ...feature,
-                            id: create64().update(JSON.stringify(features[0])).digest().toString()
-                        }
+                    setSelectedFieldsData(prevFieldsData => {                      
 
                         // Check if field is not already selected by comparing ids
-                        const isAlreadySelected = featureClass.features.some(f => f.id === featureWithId.id);
+                        const isAlreadySelected = prevFieldsData.features.some(f => f.id === featureWithId.id);
                         if (isAlreadySelected) {
                             // Remove field from selection
                             return {
-                                ...featureClass,
-                                features: featureClass.features.filter(f => f.id !== featureWithId.id)
-                            }
-
+                                ...prevFieldsData,
+                                features: prevFieldsData.features.filter(f => f.id !== featureWithId.id)
+                            };
                         } else {
                             // Add field to selection
                             return {
-                                ...featureClass,
-                                features: [...featureClass.features, featureWithId]
-                            }
-
+                                ...prevFieldsData,
+                                features: [...prevFieldsData.features, featureWithId]
+                            };
                         }
 
                     })

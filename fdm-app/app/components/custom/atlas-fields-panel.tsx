@@ -3,42 +3,93 @@ import * as React from 'react';
 import { useMap } from 'react-map-gl';
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Info } from 'lucide-react';
+import { Check, Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import throttle from 'lodash.throttle';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
-function FieldsPanel({ fields }: { fields: FeatureCollection }) {
+export default function FieldsPanel({ fields }: { fields: FeatureCollection }) {
 
     const { current: map } = useMap();
     const [panel, setPanel] = useState({ zoomText: <></>, fieldsText: <></> });
 
     useEffect(() => {
-        async function updatePanel() {
+        function updatePanel() {
 
             if (map) {
 
-                const zoom = map.getZoom()
+                let zoomText = panel.zoomText
+                let fieldsText = panel.fieldsText
 
+                // Set message about zoom level
+                const zoom = map.getZoom()
                 if (zoom && zoom <= 12) {
-                    setPanel({
-                        zoomText: <>
-                            <Alert>
-                                <Info className="h-4 w-4" />
-                                <AlertTitle>Let op!</AlertTitle>
-                                <AlertDescription>
-                                    Zoom in om percelen te kunnen selecteren.
-                                </AlertDescription>
-                            </Alert>
-                        </>,
-                        fieldsText: <></>
-                    }
-                    )
+                    zoomText = <>
+                        <Alert>
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>Let op!</AlertTitle>
+                            <AlertDescription>
+                                Zoom in om percelen te kunnen selecteren.
+                            </AlertDescription>
+                        </Alert>
+                    </>
                 } else {
-                    setPanel({
-                        zoomText: <></>,
-                        fieldsText: <></>
-                    })
+                    zoomText = <></>
+
                 }
+
+                // Set information about fields
+                if (fields.features.length > 0) {
+                    console.log(fields.features)
+
+                    const fieldCount = fields.features.length + 1
+                    let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
+                    if (fieldCount === 1) {
+                        fieldCountText = `Je hebt 1 perceel geselecteerd`
+                    }
+
+
+                    fieldsText = <>
+                        <Card className={cn("w-full")}>
+                            <CardHeader>
+                                <CardTitle>Percelen</CardTitle>
+                                <CardDescription>{fieldCountText}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                              
+                            </CardContent>
+                            <CardFooter>
+                                <Button className="w-full">
+                                    <Check /> Sla geselecteerde percelen op
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </>
+                } else {
+                    fieldsText = <>
+                        <Card className={cn("w-[380px]")}>
+                            <CardHeader>
+                                <CardTitle>Percelen</CardTitle>
+                                <CardDescription>Je hebt geen percelen geselecteerd</CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                           
+                            </CardContent>
+                            <CardFooter>
+                                <Button className="w-full" disabled>
+                                    <Check /> Sla geselecteerde percelen op
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </>
+                }
+
+                setPanel({
+                    zoomText: zoomText,
+                    fieldsText: fieldsText
+                })
             }
         }
 
@@ -47,20 +98,23 @@ function FieldsPanel({ fields }: { fields: FeatureCollection }) {
         if (map) {
             map.on("move", throttledUpdatePanel);
             map.on("zoom", throttledUpdatePanel);
+            map.once('click', updatePanel)
             map.once("load", throttledUpdatePanel);
             return () => {
                 map.off("move", throttledUpdatePanel);
                 map.off("zoom", throttledUpdatePanel);
+                // map.off('click', updatePanel)
             };
         }
-    }, []);
+        updatePanel()
+    }, [fields, map]);
 
     return (
-        <div className='fields-panel'>
+        <div className='fields-panel grid gap-4 w-[350px]'>
             {panel.zoomText}
             {panel.fieldsText}
         </div>
     );
 }
 
-export default React.memo(FieldsPanel);
+// export default React.memo(FieldsPanel);
