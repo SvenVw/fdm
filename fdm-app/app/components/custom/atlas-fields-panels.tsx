@@ -9,6 +9,7 @@ import throttle from 'lodash.throttle';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { data, useFetcher } from 'react-router';
 
 export function FieldsPanelZoom({ zoomLevelFields }: { zoomLevelFields: number }) {
     const { current: map } = useMap();
@@ -58,8 +59,25 @@ export function FieldsPanelZoom({ zoomLevelFields }: { zoomLevelFields: number }
 
 export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) {
 
+    const fetcher = useFetcher();
     const { current: map } = useMap();
     const [panel, setPanel] = useState(<></>);
+
+    async function submitSelectedFields(fields: FeatureCollection) {
+
+        try {
+            const formSelectedFields = new FormData();
+            formSelectedFields.append("selected_fields", JSON.stringify(fields))
+    
+            await fetcher.submit(formSelectedFields, {
+                method: "POST"
+            })
+        } catch (error: unknown) {
+            console.error('Failed to submit fields: ', error);
+            throw data({ status: 500, statusText: `Failed to submit fields: ${error}` })
+            // TODO: adding a toast notification with error
+        }
+    }    
 
     useEffect(() => {
         function updatePanel() {
@@ -116,7 +134,7 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button className="w-full">
+                                <Button className="w-full" onClick={() => submitSelectedFields(fields)}>
                                     <Check /> Sla geselecteerde percelen op
                                 </Button>
                             </CardFooter>
@@ -163,9 +181,8 @@ export function FieldsPanelHover({ zoomLevelFields }: { zoomLevelFields: number 
                 const zoom = map.getZoom()
                 if (zoom && zoom > zoomLevelFields) {
 
-
                     const featuresSelected = map.queryRenderedFeatures(evt.point, {
-                        layers: ['selected-fields-fill'] // Specify the layer ID
+                        layers: ['selected-fields-fill']
                     });
 
                     if (featuresSelected.length > 0) {
@@ -186,7 +203,7 @@ export function FieldsPanelHover({ zoomLevelFields }: { zoomLevelFields: number 
                         if (featuresAvailable.length > 0) {
                             setPanel(<>
                                 <Card className={cn("w-ful")}>
-                                    <CardHeader>                                        
+                                    <CardHeader>
                                         <CardTitle>
                                             {featuresAvailable[0].properties.b_lu_name}
                                         </CardTitle>

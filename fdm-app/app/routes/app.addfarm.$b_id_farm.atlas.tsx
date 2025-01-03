@@ -4,7 +4,7 @@ import {
   type LoaderFunctionArgs,
   redirect,
   data,
-  useLoaderData 
+  useLoaderData
 } from "react-router";
 import { ClientOnly } from "remix-utils/client-only"
 import { centroid } from "@turf/centroid";
@@ -138,111 +138,73 @@ export async function action({
 }: ActionFunctionArgs) {
 
   const formData = await request.formData()
-  const question = String(formData.get('question'))
+  const b_id_farm = params.b_id_farm
 
-  let response = null
-  if (question == 'get_brp_fields') {
-    const xmax = String(formData.get('xmax'))
-    const xmin = String(formData.get('xmin'))
-    const ymax = String(formData.get('ymax'))
-    const ymin = String(formData.get('ymin'))
+  if (!b_id_farm) {
+    throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+  }
+  const selectedFields = JSON.parse(String(formData.get('selected_fields')))
+  console.log(selectedFields)
 
-    const responseApi = await fetch("https://api.nmi-agro.nl/fields?" + new URLSearchParams({
-      xmax: xmax,
-      xmin: xmin,
-      ymax: ymax,
-      ymin: ymin,
-      b_lu_productive: String(true)
-    }),
-      {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${process.env.NMI_API_KEY}`,
-        },
-      })
+  // Add fields to farm
+  const b_ids = await Promise.all(selectedFields.features.map(async (field, index) => {
+    const b_id_name = 'Perceel ' + (index + 1)
+    const b_id_source = field.properties.b_id_source
+    const b_lu_catalogue = 'nl_' + field.properties.b_lu_catalogue //TEMPORARY
+    const currentYear = new Date().getFullYear()
+    const defaultDate = new Date(currentYear, 0, 1)
+    const b_manage_start = defaultDate.toISOString().split('T')[0]
+    const b_date_sowing = defaultDate
 
-    if (!responseApi.ok) {
-      throw data(responseApi.statusText, { status: responseApi.status, statusText: responseApi.statusText })
+    // Validate dates
+    if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
+      throw data('Future dates are not allowed', { status: 400, statusText: 'Future dates are not allowed' })
     }
-
-    const result = await responseApi.json()
-    response = result.data
-  } else if (question === 'submit_selected_fields') {
-    const b_id_farm = params.b_id_farm
-
-    if (!b_id_farm) {
-      throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+    if (new Date(b_date_sowing) < new Date(b_manage_start)) {
+      throw data('Sowing should happen after field started to be managed', { status: 400, statusText: 'Sowing should happen after field started to be managed' })
     }
-    const selectedFields = JSON.parse(String(formData.get('selected_fields')))
+    const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
+    const b_geometry = fieldGeometry.toWkt()
 
-    // Add fields to farm
-    const b_ids = await Promise.all(selectedFields.map(async (field, index) => {
-      const b_id_name = 'Perceel ' + (index + 1)
-      const b_id_source = field.properties.reference_id
-      const b_lu_catalogue = field.properties.b_lu
-      const currentYear = new Date().getFullYear()
-      const defaultDate = new Date(currentYear, 0, 1)
-      const b_manage_start = defaultDate.toISOString().split('T')[0]
-      const b_date_sowing = defaultDate
+    try {
+      const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
+      await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
 
-      // Validate dates
-      if (new Date(b_manage_start) > new Date() || new Date(b_date_sowing) > new Date()) {
-        throw data('Future dates are not allowed', { status: 400, statusText: 'Future dates are not allowed' })
-      }
-      if (new Date(b_date_sowing) < new Date(b_manage_start)) {
-        throw data('Sowing should happen after field started to be managed', { status: 400, statusText: 'Sowing should happen after field started to be managed' })
-      }
-      const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
-      const b_geometry = fieldGeometry.toWkt()
+      if (process.env.NMI_API_KEY) {
 
-      try {
-        const b_id = await addField(fdm, b_id_farm, b_id_name, b_id_source, b_geometry, b_manage_start, null, null)
-        await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+        const fieldCentroid = centroid(field.geometry)
+        const a_lon = fieldCentroid.geometry.coordinates[0]
+        const a_lat = fieldCentroid.geometry.coordinates[1]
 
-        if (process.env.NMI_API_KEY) {
+        const responseApi = await fetch("https://api.nmi-agro.nl/estimates?" + new URLSearchParams({
+          a_lat: a_lat.toString(),
+          a_lon: a_lon.toString()
+        }),
+          {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${process.env.NMI_API_KEY}`,
+            },
+          })
 
-          const fieldCentroid = centroid(field.geometry)
-          const a_lon = fieldCentroid.geometry.coordinates[0]   
-          const a_lat = fieldCentroid.geometry.coordinates[1]
-   
-          const responseApi = await fetch("https://api.nmi-agro.nl/estimates?" + new URLSearchParams({
-            a_lat: a_lat.toString(),
-            a_lon: a_lon.toString()      
-          }),
-            {
-              method: "GET",
-              headers: {
-                "Authorization": `Bearer ${process.env.NMI_API_KEY}`,
-              },
-            })
-      
-          if (!responseApi.ok) {
-            throw data(responseApi.statusText, { status: responseApi.status, statusText: responseApi.statusText })
-          }
-      
-          const result = await responseApi.json()
-          response = result.data
-
-          await addSoilAnalysis(fdm, defaultDate, 'NMI', b_id, 30, defaultDate, { a_p_al: response.a_p_al, a_p_cc: response.a_p_cc, a_som_loi: response.a_som_loi, b_soiltype_agr: response.b_soiltype_agr, b_gwl_class: response.b_gwl_class })
-          
+        if (!responseApi.ok) {
+          throw data(responseApi.statusText, { status: responseApi.status, statusText: responseApi.statusText })
         }
 
-        return b_id
-    
-      } catch (error) {
-        console.error(`Failed to process field ${b_id_name}:`, error)
-        throw data(`Failed to add field ${b_id_name}: ${error.message}`, { status: 500, statusText: `Failed to add field ${b_id_name}` })
+        const result = await responseApi.json()
+        const response = result.data
+
+        await addSoilAnalysis(fdm, defaultDate, 'NMI', b_id, 30, defaultDate, { a_p_al: response.a_p_al, a_p_cc: response.a_p_cc, a_som_loi: response.a_som_loi, b_soiltype_agr: response.b_soiltype_agr, b_gwl_class: response.b_gwl_class })
+
       }
-    }))
 
-    return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, { message: "Percelen zijn toegevoegd! 🎉" });
+      return b_id
 
-  } else {
-    throw data("Invalid POST question", { status: 400, statusText: "Invalid POST question" })
-  }
+    } catch (error) {
+      console.error(`Failed to process field ${b_id_name}:`, error)
+      throw data(`Failed to add field ${b_id_name}: ${error.message}`, { status: 500, statusText: `Failed to add field ${b_id_name}` })
+    }
+  }))
 
-  if (!response) {
-    throw data("No data returned", { status: 404, statusText: "No data returned" });
-  }
-  return response;
+  return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, { message: "Percelen zijn toegevoegd! 🎉" });
 }
