@@ -8,6 +8,7 @@ import type { LayerProps } from 'react-map-gl';
 import throttle from "lodash.throttle";
 import { FieldsPanelZoom, FieldsPanelSelection } from './atlas-fields-panels';
 
+const ZOOM_LEVEL_FIELDS = 12;
 
 export function AtlasFields({
     interactive,
@@ -65,13 +66,13 @@ export function AtlasFields({
                 <SelectedFieldsSource selectedFieldsData={selectedFieldsData} setSelectedFieldsData={setSelectedFieldsData} >
                     <Layer {...selectedFieldsStyle} />
                 </SelectedFieldsSource>
-                <AvailableFieldsSource url={fieldsAvailableUrl} >
+                <AvailableFieldsSource url={fieldsAvailableUrl} zoomLevelFields={ZOOM_LEVEL_FIELDS} >
                     <Layer {...availableFieldsFillStyle} />
                     {/* <Layer {...availableFieldsLineStyle} /> */}
                 </AvailableFieldsSource>
                 <div className='fields-panel grid gap-4 w-[350px]'>
-                    <FieldsPanelSelection fields={selectedFieldsData} />
-                    <FieldsPanelZoom />
+                    <FieldsPanelSelection fields={selectedFieldsData} zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                    <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
                 </div>
                 
             </MapGL>
@@ -87,7 +88,7 @@ const generateFeatureClass = () => ({
 });
 
 
-function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType, children: JSX.Element }) {
+function AvailableFieldsSource({ url, zoomLevelFields, children }: { url: fieldsAvailableUrlType, zoomLevelFields: number, children: JSX.Element }) {
 
     if (!url) throw new Error("url is required");
 
@@ -101,7 +102,7 @@ function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType,
 
                 const zoom = map.getZoom()
 
-                if (zoom && zoom > 12) {
+                if (zoom && zoom > zoomLevelFields) {
                     const bounds = map.getBounds(0.8)
 
                     if (bounds) {
@@ -121,7 +122,6 @@ function AvailableFieldsSource({ url, children }: { url: fieldsAvailableUrlType,
                             featureClass.features.push({ ...feature, id: i });
                             i += 1;
                         }
-                        console.log(featureClass)
                         setData(featureClass);
                     } else {
                         setData(generateFeatureClass())
@@ -159,14 +159,11 @@ function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData, child
 
     useEffect(() => {
         function clickOnMap(evt) {
-            // console.log('hoi')
-
             if (map) {
 
                 const features = map.queryRenderedFeatures(evt.point, {
                     layers: ['available-fields-fill'] // Specify the layer ID
                 });
-                // console.log(features);
 
                 if (features.length > 0) {
 
@@ -178,27 +175,22 @@ function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData, child
                     }
 
                     setSelectedFieldsData(prevFieldsData => {                      
-
                         // Check if field is not already selected by comparing ids
                         const isAlreadySelected = prevFieldsData.features.some(f => f.properties.b_id_source === feature.properties.b_id_source);
                         if (isAlreadySelected) {
                             // Remove field from selection
                             return {
                                 ...prevFieldsData,
-                                features: prevFieldsData.features.filter(f => f.id !== featureWithId.id)
+                                features: prevFieldsData.features.filter(f => f.properties.b_id_source !== feature.properties.b_id_source)
                             };
                         } else {
                             // Add field to selection
                             return {
                                 ...prevFieldsData,
-                                features: [...prevFieldsData.features, featureWithId]
+                                features: [...prevFieldsData.features, feature] 
                             };
                         }
-
                     })
-
-                } else {
-                    console.log("No features found at clicked point.");
                 }
 
                 console.log(selectedFieldsData)

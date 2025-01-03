@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-export function FieldsPanelZoom() {
+export function FieldsPanelZoom({zoomLevelFields}: {zoomLevelFields: number}) {
     const { current: map } = useMap();
     const [panel, setPanel] = useState(<></>);
 
@@ -21,7 +21,7 @@ export function FieldsPanelZoom() {
 
                 // Set message about zoom level
                 const zoom = map.getZoom()
-                if (zoom && zoom <= 12) {
+                if (zoom && zoom <= zoomLevelFields) {
                     setPanel(<>
                         <Alert>
                             <Info className="h-4 w-4" />
