@@ -21,9 +21,11 @@ export function AtlasFields({
 
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(generateFeatureClass());
-    if (fieldsSelected) {
-        setSelectedFieldsData(fieldsSelected)
-    }
+    useEffect(() => {
+      if (fieldsSelected) {
+        setSelectedFieldsData(fieldsSelected);
+      }
+    }, [fieldsSelected]);
 
     // Set controls
     let Controls = <></>
