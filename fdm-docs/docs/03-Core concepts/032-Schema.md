@@ -14,7 +14,7 @@ The `farms` table stores information about individual farms.
 |---------------|-------------|-------------------------------------------------------|
 | `b_id_farm`   | TEXT         | Unique identifier for the farm.       |
 | `b_name_farm` | TEXT         | Name of the farm.                     |
-| `b_sector`    | ENUM         | Sector of the farm. Can be one of the values: `diary`, `arable`, `tree_nursery` and `bulbs`                  |
+| `b_sector`    | ENUM         | Sector of the farm. Can be one of the values: `dairy`, `arable`, `tree_nursery` and `bulbs`                  |
 | `created`     | TIMESTAMPTZ  | Timestamp of record created.          |
 | `updated`     | TIMESTAMPTZ  | Timestamp of last update of record.   
 
