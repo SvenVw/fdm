@@ -4,7 +4,6 @@ import { type FdmServerType } from './fdm-server.d'
 import { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations, getCultivationPlan, updateCultivation } from './cultivation'
 import { addFarm } from './farm'
 import { addField } from './field'
-import { nanoid } from 'nanoid'
 import { addFertilizer, addFertilizerApplication, addFertilizerToCatalogue } from './fertilizer'
 import { createId } from './id'
 
