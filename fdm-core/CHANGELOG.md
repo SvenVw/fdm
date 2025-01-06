@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.9.1
+
+### Patch Changes
+
+- Replace id's with 16 characters and only safe and not lookalike characters
+
 ## 0.9.0
 
 ### Minor Changes
