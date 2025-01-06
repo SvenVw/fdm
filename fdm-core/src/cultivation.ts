@@ -1,9 +1,9 @@
 import { and, eq, isNotNull, or } from 'drizzle-orm'
-import { nanoid } from 'nanoid'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
 import { cultivationPlanType, getCultivationType } from './cultivation.d'
+import { createId } from './id'
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -80,7 +80,7 @@ export async function addCultivation(
 ): Promise<schema.cultivationsTypeSelect['b_lu']> {
 
     // Generate an ID for the cultivation
-    const b_lu = nanoid()
+    const b_lu = createId()
 
     await fdm.transaction(async (tx: FdmType) => {
         try {

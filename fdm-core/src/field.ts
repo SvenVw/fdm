@@ -1,5 +1,5 @@
 import { eq, sql } from 'drizzle-orm'
-import { nanoid } from 'nanoid'
+import { createId } from './id'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
@@ -23,7 +23,7 @@ export async function addField(fdm: FdmType, b_id_farm: schema.farmManagingTypeI
     b_name: schema.fieldsTypeInsert['b_name'], b_id_source: schema.fieldsTypeInsert['b_id_source'], b_geometry: schema.fieldsTypeInsert['b_geometry'],
     b_manage_start: schema.farmManagingTypeInsert['b_manage_start'], b_manage_end: schema.farmManagingTypeInsert['b_manage_end'], b_manage_type: schema.farmManagingTypeInsert['b_manage_type']): Promise<schema.fieldsTypeInsert['b_id']> {
     // Generate an ID for the field
-    const b_id = nanoid()
+    const b_id = createId()
 
     // Insert field
     const fieldData = {
