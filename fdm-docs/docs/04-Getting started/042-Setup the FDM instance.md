@@ -8,7 +8,7 @@ In the previous step we made sure that the all the prerequisites for `fdm-core` 
 
 `fdm-core` relies on environment variables for configuration. These variables specify crucial details for connecting to your database. Create a `.env` file in the root of your project and add the following, replacing the placeholders with your actual database credentials:
 
-```
+```env
 # DB configuration
 # The hostname or IP address of the PostgreSQL database server.
 POSTGRES_HOST=
@@ -24,6 +24,11 @@ POSTGRES_USER=
 
 # The password used to authenticate with the PostgreSQL database server.  Ensure this is stored securely and not exposed in version control.
 POSTGRES_PASSWORD=
+
+# Security Note:
+# 1. Never commit this .env file to version control
+# 2. Consider using a secrets management service in production
+# 3. Rotate credentials regularly
 ```
 
 ## Intialize the FDM Instance
