@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.2.0
+
+### Minor Changes
+
+- Restructure the docs and add a getting started guide
+
 ## 0.1.4
 
 ### Patch Changes
