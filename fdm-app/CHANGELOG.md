@@ -5,7 +5,7 @@
 ### Minor Changes
 
 - a2a7fea: Add panels to the atlas-fields component with information about the fields selected and hovered
-- a2a7fea: Refactor map page to atlas to improve extensibilty
+- a2a7fea: Refactor map page to atlas to improve extensibility
 - a2a7fea: Load fields from external flatgeobuffer source instead of an API to improve performance
 
 ## 0.6.0
