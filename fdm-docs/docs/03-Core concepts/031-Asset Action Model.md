@@ -29,7 +29,7 @@ The Asset-Action model's flexibility shines in its ability to represent a divers
 
 * **Diverse Relationships:** The model can capture complex relationships between assets and actions. A single action can affect multiple assets (e.g., harvesting a field involves both the field and the harvesting equipment). Similarly, multiple actions can be performed on a single asset over time (e.g., a field undergoes plowing, planting, fertilizing, and harvesting).
 
-* **Customizable Attributes:** Both assets and actions can be enriched with custom attributes to capture specific data relevant to the farm operation. For example, a "field" asset might include attributes like soil type, area, and historical yields. A "fertilizer application" action might include attributes like fertilizer type, application rate, and application method.
+* **Customizable Attributes:** Both assets and actions can be enriched with custom attributes to capture specific data relevant to the farm operation. For example, a "field" asset might include attributes like geometry. A "fertilizer application" action might include attributes like fertilizer type, application rate, and application method.
 
 * **Temporal Tracking:** The model naturally accommodates the temporal dimension of farming activities. Actions are typically associated with timestamps, allowing for analysis of how assets change over time in response to different actions.
 
@@ -41,4 +41,4 @@ The Asset-Action model has broad applicability across various agricultural domai
 * **Agricultural Research:** Facilitates the collection and analysis of experimental data, leading to improved understanding of crop growth and farm system dynamics.
 * **Sustainability Assessments:** Provides a framework for tracking resource use and environmental impacts associated with different farming practices.
 
-By capturing the essential elements of agricultural activities in a clear and structured way, the Asset-Action model empowers stakeholders across the agricultural value chain to make more informed decisions, optimize resource utilization, and improve farm productivity.
+By capturing the essential elements of agricultural activities in a clear and structured way, the Asset-Action model empowers stakeholders across the agricultural value chain to make more informed decisions, optimize resource utilization, lower environmental impact and improve farm productivity.
