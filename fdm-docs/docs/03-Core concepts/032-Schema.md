@@ -6,7 +6,7 @@ title: "Schema"
 
 This document provides a comprehensive overview of the Farm Data Model (FDM) database schema. It details each table, their properties, and columns, explaining their purpose and how they relate to the overall Asset-Action model.
 
-### Farms
+## Farms
 
 The `farms` table stores information about individual farms.
 
@@ -16,6 +16,6 @@ The `farms` table stores information about individual farms.
 | `b_name_farm` | TEXT         | Name of the farm.                     |
 | `b_sector`    | ENUM         | Sector of the farm. Can be one of the values: `dairy`, `arable`, `tree_nursery` and `bulbs`                  |
 | `created`     | TIMESTAMPTZ  | Timestamp of record created.          |
-| `updated`     | TIMESTAMPTZ  | Timestamp of last update of record.   
+| `updated`     | TIMESTAMPTZ  | Timestamp of last update of record.    |
 
 TODO: Add description of the other tables

@@ -2,7 +2,7 @@
 title: Setup the FDM instance
 ---
 
-In the previous step we made sure that the all the prerequisites for `fdm-core` are met. In this step we will setup a FDM instance.
+In the previous step, we made sure that all the prerequisites for `fdm-core` are met. In this step, we will set up an FDM instance.
 
 ## Configure Environment Variables
 

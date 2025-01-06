@@ -9,7 +9,8 @@ We welcome contributions to the Farm Data Model (FDM) project! Whether you're a 
 Your feedback is invaluable in shaping the future of FDM. We encourage you to share your thoughts, suggestions, and experiences. Here are some ways to provide feedback:
 
 * Discussions: Engage in discussions on the [FDM Discussions](https://github.com/SvenVw/fdm/discussions/). This is a great way to share your ideas and learn from others.
-* Direct Communication: Reach out to the FDM development team directly via email or other communication channels to share your feedback.
+* Direct Communication: For sensitive discussions or security-related matters, you can reach the FDM development team through:
+  * [GitHub Security Advisories](https://github.com/SvenVw/fdm/security/advisories/new) for security-related issues
 
 
 ## Requesting Features

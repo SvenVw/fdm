@@ -12,7 +12,7 @@ FDM consists of several packages, each serving a distinct purpose:
 
 * ``fdm-core``: This is the heart of FDM. It provides the core data schema and the functions to interact with it. It is a TypeScript library that can be integrated into your applications. ``fdm-core`` directly interacts with your database, enabling creation, retrieval, updating, and deletion of farm-related data.
 
-* ``fdm-data``: This package is an extension to ``fdm-core` and offers catalogues with data records. These catalogues can contain sets of fertilizers or cultivations for which an user can choose from. In this way you can choose yourself which list of fertilizers or cultivations you want to use or create your own catalogue easily.
+* ``fdm-data``: This package is an extension to ``fdm-core`` and offers catalogues with data records. These catalogues contain sets of fertilizers or cultivations that a user can choose from. You can select from existing lists of fertilizers or cultivations, or easily create your own catalogue.
 
 * ``fdm-calculator``: This package will enable domain-specific calculations based on the data stored in the database. Development of this package will start soon.
 
@@ -31,15 +31,15 @@ After setting up the database, you can integrate ``fdm-core`` into your applicat
 The FDM packages are currently not published yet, but you can intall and build from source. Follow these steps to get started:
 
 1. **Clone the Repository:**
-```
+```bash
 git clone https://github.com/SvenVw/fdm.git
 ```
 2. **Navigate to the FDM Directory:**
-```
+```bash
 cd fdm
 ```
 3. **Install Dependencies:**
-```
+```bash
 pnpm install
 ```
 
