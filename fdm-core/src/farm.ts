@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { nanoid } from 'nanoid'
+import { createId } from './id'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
@@ -14,7 +14,7 @@ import { type FdmType } from './fdm'
 */
 export async function addFarm(fdm: FdmType, b_name_farm: schema.farmsTypeInsert['b_name_farm'], b_sector: schema.farmsTypeInsert['b_sector']): Promise<schema.farmsTypeInsert['b_id_farm']> {
     // Generate an ID for the farm
-    const b_id_farm = nanoid()
+    const b_id_farm = createId()
 
     // Insert the farm in the dab
     const farmData = {

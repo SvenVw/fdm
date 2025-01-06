@@ -6,6 +6,7 @@ import { addFarm } from './farm'
 import { addField } from './field'
 import { nanoid } from 'nanoid'
 import { addFertilizer, addFertilizerApplication, addFertilizerToCatalogue } from './fertilizer'
+import { createId } from './id'
 
 describe('Cultivation Data Model', () => {
     let fdm: FdmServerType
@@ -34,7 +35,7 @@ describe('Cultivation Data Model', () => {
         fdm = await createFdmServer(host, port, user, password, database)
         await migrateFdmServer(fdm, migrationsFolderPath)
 
-        b_lu_catalogue = nanoid()
+        b_lu_catalogue = createId()
         b_id_farm = await addFarm(fdm, 'test farm', 'arable')
         b_id = await addField(
             fdm,
@@ -198,7 +199,7 @@ describe('Cultivation Data Model', () => {
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, originalSowingDate)
 
             const newSowingDate = new Date('2024-02-01');
-            const newCatalogueId = nanoid();
+            const newCatalogueId = createId();
 
             // Add the new cultivation to the catalogue first
             await addCultivationToCatalogue(fdm, {
@@ -221,14 +222,14 @@ describe('Cultivation Data Model', () => {
         })
 
         it('should throw an error when updating a non-existent cultivation', async () => {
-            const nonExistentBlu = nanoid();
+            const nonExistentBlu = createId();
             await expect(updateCultivation(fdm, nonExistentBlu, b_lu_catalogue, new Date())).rejects.toThrowError('Cultivation does not exist');
         });
 
         it('should throw an error when updating with invalid catalogue id', async () => {
 
             // Add the new cultivation to the catalogue first
-            const b_lu_catalogue = nanoid();
+            const b_lu_catalogue = createId();
 
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: b_lu_catalogue,
@@ -244,7 +245,7 @@ describe('Cultivation Data Model', () => {
             const b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, originalSowingDate)
 
 
-            const nonExistentCatalogueId = nanoid();
+            const nonExistentCatalogueId = createId();
 
             await expect(updateCultivation(fdm, b_lu, nonExistentCatalogueId, new Date())).rejects.toThrowError('Cultivation in catalogue does not exist');
         });
@@ -272,7 +273,7 @@ describe('Cultivation Data Model', () => {
                 'owner',
             );
 
-            b_lu_catalogue = nanoid()
+            b_lu_catalogue = createId()
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: b_lu_catalogue,
                 b_lu_source: 'test',
@@ -285,7 +286,7 @@ describe('Cultivation Data Model', () => {
             b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, new Date('2024-03-01'))
 
             // Add fertilizer to catalogue (needed for fertilizer application)
-            const p_id_catalogue = nanoid();
+            const p_id_catalogue = createId();
             const p_source = 'custom';
             const p_name_nl = 'Test Fertilizer';
             const p_name_en = 'Test Fertilizer (EN)';
@@ -391,7 +392,7 @@ describe('Cultivation Data Model', () => {
 
 
         it('should return an empty array if no cultivations are found for the farm', async () => {
-            const emptyPlan = await getCultivationPlan(fdm, nanoid()); // Use a non-existent farm ID
+            const emptyPlan = await getCultivationPlan(fdm, createId()); // Use a non-existent farm ID
             expect(emptyPlan).toEqual([]);
         });
 
