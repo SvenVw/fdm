@@ -117,6 +117,8 @@ export default function Index() {
               <Skeleton className="h-full w-full rounded-xl" />
             }                        >
             {() => <AtlasFields
+              height= "calc(100vh - 64px - 123px)"
+              width="100%"
               interactive={true}
               mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
               mapboxToken={loaderData.mapboxToken}

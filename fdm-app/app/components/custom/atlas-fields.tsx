@@ -11,6 +11,8 @@ import { AvailableFieldsSource, SelectedFieldsSource, generateFeatureClass, type
 const ZOOM_LEVEL_FIELDS = 12;
 
 export function AtlasFields({
+    height,
+    width,
     interactive,
     mapboxToken,
     mapStyle,
@@ -63,11 +65,10 @@ export function AtlasFields({
         <>
             <MapGL
                 {...viewState}
-                style={{ height: "calc(100vh - 64px - 123px)" }}
+                style={{ height: height || "100%", width: width || "100%" }}
                 interactive={interactive}
                 mapStyle={mapStyle}
                 mapboxAccessToken={mapboxToken}
-                // onClick={evt => handleClickOnField(evt)}
                 interactiveLayerIds={['available-fields-fill', 'selected-fields-fill']}
             >
 
@@ -121,6 +122,8 @@ const selectedFieldsStyle: LayerProps & { id: string; type: string; paint: { 'fi
 };
 
 interface MapFieldsProps {
+    height: string | undefined
+    width: string | undefined
     interactive: boolean
     mapboxToken: string
     mapStyle: "mapbox://styles/mapbox/satellite-streets-v12"
