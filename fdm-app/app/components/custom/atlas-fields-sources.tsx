@@ -81,57 +81,60 @@ export function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData
 
     useEffect(() => {
         function clickOnMap(evt) {
-            if (map) {
+            if (!map) return;
 
-                const features = map.queryRenderedFeatures(evt.point, {
-                    layers: ['available-fields-fill'] // Specify the layer ID
-                });
+            const features = map.queryRenderedFeatures(evt.point, {
+                layers: ['available-fields-fill']
+            });
 
-                if (features.length > 0) {
-
-                    // console.log(features[0].properties);
-                    const feature = {
-                        type: features[0].type,
-                        geometry: features[0].geometry,
-                        properties: features[0].properties
-                    }
-
-                    setSelectedFieldsData(prevFieldsData => {
-                        // Check if field is not already selected by comparing ids
-                        const isAlreadySelected = prevFieldsData.features.some(f => f.properties.b_id_source === feature.properties.b_id_source);
-                        if (isAlreadySelected) {
-                            // Remove field from selection
-                            return {
-                                ...prevFieldsData,
-                                features: prevFieldsData.features.filter(f => f.properties.b_id_source !== feature.properties.b_id_source)
-                            };
-                        } else {
-                            // Add field to selection
-                            return {
-                                ...prevFieldsData,
-                                features: [...prevFieldsData.features, feature]
-                            };
-                        }
-                    })
-                }
+            if (features.length > 0) {
+                handleFieldClick(features[0], setSelectedFieldsData);
             }
-        }
+        }     
 
         if (map) {
-            map.on("click", clickOnMap);
-            return () => {
-                map.off("click", clickOnMap);
-            };
-        }
+        map.on("click", clickOnMap);
+        return () => {
+            map.off("click", clickOnMap);
+        };
+    }
 
-    }, []);
+}, []);
 
-    return (
-        <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
-            {children}
-        </Source>
-    );
+return (
+    <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
+        {children}
+    </Source>
+);
 }
+
+function handleFieldClick(feature, setSelectedFieldsData) {
+    const fieldData = {
+      type: feature.type,
+      geometry: feature.geometry,
+      properties: feature.properties
+    };
+  
+    setSelectedFieldsData(prevFieldsData => {
+      const isAlreadySelected = prevFieldsData.features.some(
+        f => f.properties.b_id_source === fieldData.properties.b_id_source
+      );
+      
+      if (isAlreadySelected) {
+        return {
+          ...prevFieldsData,
+          features: prevFieldsData.features.filter(
+            f => f.properties.b_id_source !== fieldData.properties.b_id_source
+          )
+        };
+      }
+      
+      return {
+        ...prevFieldsData,
+        features: [...prevFieldsData.features, fieldData]
+      };
+    });
+  }
 
 export function generateFeatureClass(): FeatureCollection {
     return {
