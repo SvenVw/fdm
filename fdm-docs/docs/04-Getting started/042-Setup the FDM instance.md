@@ -53,17 +53,28 @@ const database = process.env.POSTGRES_DB ??
 const migrationsFolderPath = 'node_modules/@svenvw/fdm-core/dist/db/migrations'
 
 // initialize FDM instance
-export const fdm = drizzle({
-  connection : {
-    user : user,
-    password : password,
-    host : host,
-    port : port,
-    database : database
-  },
-  logger: false,
-  schema: schema
-})
+
+export const fdm = await (async () => {
+  try {
+    const db = drizzle({
+      connection : {
+        user : user,
+        password : password,
+        host : host,
+        port : port,
+        database : database
+      },
+      logger: false,
+      schema: schema
+    });
+    
+    console.log('Successfully connected to database');
+    return db;
+  } catch (error) {
+    console.error('Failed to connect to database:', error);
+    throw error;
+  }
+})();
 
 // Apply database migration if needed
 await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
