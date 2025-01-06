@@ -1,5 +1,5 @@
 import { desc, eq } from 'drizzle-orm'
-import { nanoid } from 'nanoid'
+import { createId } from './id'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
@@ -30,8 +30,8 @@ export async function addSoilAnalysis(
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>
 ): Promise<schema.soilAnalysisTypeSelect['a_id']> {
 
-    const a_id = nanoid()
-    const b_id_sampling = nanoid()
+    const a_id = createId()
+    const b_id_sampling = createId()
 
     await fdm.transaction(async (tx: FdmType) => {
         try {

@@ -3,7 +3,7 @@ import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
 import { addFertilizerToCatalogue, getFertilizersFromCatalogue, addFertilizer, removeFertilizer, getFertilizer, getFertilizers, removeFertilizerApplication, addFertilizerApplication, getFertilizerApplication, updateFertilizerApplication, getFertilizerApplications } from './fertilizer'
 import { addFarm } from './farm'
-import { nanoid } from 'nanoid'
+import { createId } from './id'
 import { addField } from './field'
 
 describe('Fertilizer Data Model', () => {
@@ -28,7 +28,7 @@ describe('Fertilizer Data Model', () => {
 
     await migrateFdmServer(fdm, migrationsFolderPath)
 
-    p_id_catalogue = nanoid()
+    p_id_catalogue = createId()
   })
 
   afterAll(async () => {
@@ -374,7 +374,7 @@ describe('Fertilizer Data Model', () => {
       );
 
       // Add fertilizer to catalogue
-      p_id_catalogue = nanoid()
+      p_id_catalogue = createId()
       const p_source = 'custom'
       const p_name_nl = 'Test Fertilizer'
       const p_name_en = 'Test Fertilizer (EN)'

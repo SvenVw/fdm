@@ -8,14 +8,14 @@ After setting up your FDM instance, you're ready to start populating it with dat
 
 ```typescript
 async function addFarm({
-    fdm,
-    b_name_farm,
-    b_sector
-  }: {
-    fdm: FdmType;
-    b_name_farm: string,
-    b_sector: FarmSector[]
-  }): Promise<Pick<farms, "b_id_farm" | "b_name_farm" | "b_sector">>;
+  fdm,
+  b_name_farm,
+  b_sector
+}: {
+  fdm: FdmType;
+  b_name_farm: string;
+  b_sector: FarmSector[];
+}): Promise<{ b_id_farm: string }> {
 
 ```
 

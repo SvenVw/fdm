@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { nanoid } from 'nanoid'
+import { createId } from './id'
 
 import * as schema from './db/schema'
 import { type FdmType } from './fdm'
@@ -111,7 +111,7 @@ export async function addFertilizer(
 ): Promise<schema.fertilizerAcquiringTypeInsert['p_id']> {
 
     // Generate an ID for the fertilizer
-    const p_id = nanoid()
+    const p_id = createId()
 
     // Insert the fertilizer in the db
     const fertilizerAcquiringData = {
@@ -338,7 +338,7 @@ export async function addFertilizerApplication(
         throw new Error(`Fertilizer with p_id ${p_id} does not exist`);
     }
 
-    const p_app_id = nanoid();
+    const p_app_id = createId();
 
     try {
         await fdm.insert(schema.fertilizerApplication).values({

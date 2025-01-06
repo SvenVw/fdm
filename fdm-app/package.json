@@ -1,6 +1,6 @@
 {
   "name": "@svenvw/fdm-app",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -31,13 +31,15 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@react-router/node": "^7.0.2",
     "@react-router/serve": "^7.0.2",
-    "better-auth": "^1.1.6",
     "@turf/centroid": "^7.1.0",
+    "better-auth": "^1.1.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
     "date-fns": "^4.1.0",
+    "flatgeobuf": "^3.36.0",
     "isbot": "^5.1.17",
+    "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.468.0",
     "mapbox-gl": "^3.8.0",
     "next-themes": "^0.4.4",
@@ -65,6 +67,7 @@
     "@svenvw/fdm-core": "workspace:*",
     "@svenvw/fdm-data": "workspace:*",
     "@types/geojson": "^7946.0.15",
+    "@types/lodash.throttle": "^4.1.9",
     "@types/mapbox-gl": "^3.4.1",
     "@types/mapbox__geojson-extent": "^1.0.3",
     "@types/react": "^18.3.16",
@@ -81,7 +84,7 @@
     "vite-tsconfig-paths": "^4.3.2"
   },
   "peerDependencies": {
-    "@svenvw/fdm-core": "workspace:>=0.9.0",
+    "@svenvw/fdm-core": "workspace:>=0.9.1",
     "@svenvw/fdm-data": "workspace:>=0.7.0"
   },
   "engines": {
