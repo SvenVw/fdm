@@ -17,8 +17,8 @@ The model revolves around two fundamental concepts:
 
 The intuitiveness of the Asset-Action model stems from its alignment with how farmers and agronomists naturally think about their operations. They manage things (assets) and perform activities (actions) upon them. This model directly reflects this real-world perspective, making it easy to understand and apply. For example:
 
-* A farmer doesn't simply think about "fertilizer." They think about applying a specific type and amount of fertilizer to a particular field on a specific date. The field is the asset, and the fertilizer application is the action.
-* An agronomist analyzing crop yield doesn't just look at the final output. They consider the entire lifecycle of the crop, from planting to harvest, including all the intervening actions like irrigation and pest control. The crop is the asset, and the various farming practices are the actions.
+* A farmer doesn't think solely in terms of an abstract "effective nitrogen dose." They consider the specific type and amount of fertilizer, the particular field it's applied to, and the date of application. In this context, the field is the asset, and the act of applying fertilizer is the action.
+* An agronomist analyzing nitrogen use efficiency doesn't simply take a single measurement. They analyze the total nitrogen applied to a specific field from all sources (like synthetic fertilizer and manure), the timing of each application in relation to the crop's growth stages, and the final crop yield and its nitrogen uptake. The field and the crop itself are considered assets, while the applications of fertilizer and manure are the actions.
 
 This inherent intuitiveness makes the Asset-Action model accessible to a broad range of users, regardless of their technical background.
 
