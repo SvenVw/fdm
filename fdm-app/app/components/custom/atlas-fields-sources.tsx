@@ -66,7 +66,7 @@ export function AvailableFieldsSource({ url, zoomLevelFields, children }: { url:
             };
         }
 
-    }, []);
+    }, [map, url, zoomLevelFields]);
 
     return (
         <Source id="availableFields" type="geojson" data={data}>
