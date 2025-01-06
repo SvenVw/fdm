@@ -29,6 +29,13 @@ jobs:
           key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-turbo-
+      - name: Cache build output
+        uses: actions/cache@v4
+        with:
+          path: ./build
+          key: ${{ runner.os }}-docusaurus-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-docusaurus-
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -41,5 +48,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter fdm-docs
+      - name: Check for broken links
+        run: pnpm dlx broken-link-checker-local ./build --recursive
       - name: Build website
         run: pnpm build-docs
