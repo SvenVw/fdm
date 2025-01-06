@@ -114,8 +114,6 @@ export function SelectedFieldsSource({ selectedFieldsData, setSelectedFieldsData
                         }
                     })
                 }
-
-                console.log(selectedFieldsData)
             }
         }
 
