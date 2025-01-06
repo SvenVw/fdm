@@ -2,9 +2,8 @@ import { Map as MapGL,  GeolocateControl, NavigationControl, Layer } from 'react
 import 'mapbox-gl/dist/mapbox-gl.css';
 import geojsonExtent from '@mapbox/geojson-extent'
 import type { FeatureCollection } from "geojson";
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { LayerProps } from 'react-map-gl';
-
 
 import { FieldsPanelZoom, FieldsPanelSelection, FieldsPanelHover } from './atlas-fields-panels';
 import { AvailableFieldsSource, SelectedFieldsSource, generateFeatureClass, type fieldsAvailableUrlType } from './atlas-fields-sources';
