@@ -39,7 +39,7 @@ The `addFarm` function includes robust error handling. It will reject the Promis
 * The b_sector is not provided or is invalid.
 * There are issues with database interaction during the farm creation process.
 
-It's crucial to handle these potential errors in your application logic to ensure data integrity and a smooth user experience. Using a try...catch block is the recommended approach.
+It's crucial to handle these potential errors in your application logic to ensure data integrity and a smooth user experience. Using a `try...catch block` is the recommended approach.
 
 ## Usage Example
 
