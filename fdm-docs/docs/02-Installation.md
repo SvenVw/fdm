@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: Getting started
+title: Installation
 ---
 
 Welcome to the Farm Data Model (FDM)! FDM provides a standardized schema and tools for managing and analyzing agricultural data. This guide will walk you through the initial setup and introduce you to the core components of the FDM ecosystem.
