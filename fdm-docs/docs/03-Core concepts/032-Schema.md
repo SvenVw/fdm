@@ -14,7 +14,7 @@ Defined in schema via `fdmSchema.table('farms', ...)`
 |-----------------|------------|-------------------------------------------------------------------|
 | **b_id_farm**   | `text`      | Primary key for the farm.                                         |
 | **b_name_farm** | `text`      | Name of the farm.                                                 |
-| **b_sector**    | `sectorEnum`| Enum-based sector(s), e.g., `'diary'|'arable'|'tree_nursery'|'bulbs'`. |
+| **b_sector**    | `sectorEnum`| Enum-based sector(s), e.g., `'dairy'|'arable'|'tree_nursery'|'bulbs'`. |
 | **created**     | `timestamp` | Timestamp when this record was created.                   |
 | **updated**     | `timestamp` | Automatic update timestamp (if set in Drizzle).                   |
 
@@ -72,16 +72,16 @@ Note: The actual area can be computed on-the-fly using `ST_Area` with Drizzle’
 ## **`cultivations`**  
 **Purpose**: Associates a cultivation record to its base catalogue ID, used to track actual cultivations in the fields.
 
-| Column               | Type    | Description                                                                         |
+| Column               | Type    | Description                                                                        |
 |----------------------|--------|-------------------------------------------------------------------------------------|
 | **b_lu**            | `text`  | Primary key for the actual cultivation instance.                                    |
-| **b_lu_catalogue**  | `text`  | References `cultivationsCatalogue.b_lu_catalogue`. 
+| **b_lu_catalogue**  | `text`  | References `cultivationsCatalogue.b_lu_catalogue`.                                  |
 | **created**         | `timestamp` | Timestamp when this record was created.                                         |
-| **updated**         | `timestamp`| Timestamp when this record was last updated.                                            |
+| **updated**         | `timestamp`| Timestamp when this record was last updated.                                     |
 
 ---
 
-## 11. **`fieldSowing`**  
+## **`fieldSowing`**  
 **Purpose**: Tracks the sowing events for a cultivation on a specific field, referencing both `fields` and `cultivations`.
 
 | Column             | Type        | Description                                                        |
@@ -185,11 +185,11 @@ Note: The actual area can be computed on-the-fly using `ST_Area` with Drizzle’
 
 ### `soiltypeEnum`  
 Name: `b_soiltype_agr`  
-Possible values: `moerige_klei, rivierklei, dekzand, zeeklei, dalgrond, veen, loess, duinzand', maasklei`         
+Possible values: `moerige_klei`, `rivierklei`, `dekzand`, `zeeklei`, `dalgrond`, `veen`, `loess`, `duinzand`, `maasklei`         
 
 ### `gwlClassEnum`  
 Name: `b_gwl_class`  
-Possible values: `II, IV, IIIb, V, VI, VII, Vb, -, Va, III, VIII, sVI, I, IIb, sVII, IVu, bVII, sV, sVb, bVI, IIIa`     
+Possible values: `II`, `IV`, `IIIb`, `V`, `VI`, `VII`, `Vb`, `-`, `Va`, `III`, `VIII`, `sVI`, `I`, `IIb`, `sVII`, `IVu`, `bVII`, `sV`, `sVb`, `bVI`, `IIIa`     
 
 ---
 
