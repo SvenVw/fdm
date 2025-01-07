@@ -3,7 +3,7 @@
 The `fdm-app` is a React application providing a user-friendly interface for visualizing and managing farm data based on the Farm Data Model (FDM) schema. It utilizes `fdm-core` for seamless database interaction and serves as a practical demonstration of FDM's capabilities.  This intuitive interface empowers users to interact with their farm data, gaining valuable insights and streamlining farm management decisions.
 
 > [!IMPORTANT]  
-> As `fdm-app` is still in pre-alpha phase, some of these features and functionalities are planned and not available yet
+> As `fdm-app` is still in the pre-alpha phase, some of these features and functionalities are planned and not available yet
 
 ## Key Features
 
