@@ -37,7 +37,7 @@ jobs:
       - name: Setup pnpm 9
         uses: pnpm/action-setup@v4
         with:
-          version: 9.12.2
+          version: 9.14.2
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4

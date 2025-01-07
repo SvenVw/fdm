@@ -1,30 +1,44 @@
-# Farm Data Model
+# Farm Data Model Core (`fdm-core`)
 
 > [!WARNING]  
-> Until version v1.0.0 no schema migrations are provided and the database schema will be broken between updates
+> Until version v1.0.0, no schema migrations are provided, and the database schema may break between updates.  **Back up your data before upgrading.**
 
-This repository contains the `fdm-core`  JavaScript/TypeScript package that enables to interact with Farm Data Model  (FDM) schema specification of the Farm Data Model (FDM). The goal of the FDM is to include the information about agronomic relevant activities, assets and insights. 
+The `fdm-core` package is the heart of the Farm Data Model (FDM) project. It provides the core data schema and essential functions for interacting with it.  This TypeScript library seamlessly integrates into various applications, offering a robust and standardized way to manage and analyze farm data.  `fdm-core` interacts directly with your PostgreSQL-compatible database, handling all CRUD (Create, Read, Update, Delete) operations.
 
-## Principles
-The FDM is based on the following principles:
+## Key Features
 
-1. Information can only be stored in a single place.
-2. The fdm object contains only 1 level and does not allow nesting. Information between objects can be connected using id's
-3. Names of parameters are based on `pandex`
-4. Assets can never be connected by an another asset object, but only via an activity. This is also true for an activity, an activity can only be connected to another activity via an asset.
-5. Assets names are always plural. Event names always consists out of 2 parts: the first part is the asset on which the event takes place in sungular format and the second part the name of the event.
+* **Standardized Schema:**  `fdm-core` implements the FDM schema, ensuring data consistency and interoperability across different agricultural systems. This structured approach facilitates easier data analysis and exchange.
+* **Asset-Action Model:**  The schema follows an intuitive Asset-Action model, clearly separating farm entities (Assets like fields, crops, equipment) from operations performed on them (Actions like planting, fertilizing, harvesting).
+* **Hierarchical Structure:** Data is organized hierarchically, enabling logical grouping and efficient querying. This facilitates deeper analysis and understanding of relationships between different data points.
+* **TypeScript Support:**  Built with TypeScript, `fdm-core` offers type safety and improved developer experience, reducing errors and enhancing code maintainability.
+* **Direct Database Interaction:**  The library interacts directly with your PostgreSQL database, managing all CRUD operations efficiently.
+* **Open Source & Extensible:** As an open-source project, `fdm-core` welcomes community contributions.  While standardized, the schema can be extended to accommodate specific needs without compromising its integrity.
 
-## Use cases
-The FDM can be used to exchange information between multiple parties, but also to be used as input for insights. These insights can contain advices, monitoring and extra information from other sources
+## Getting Started
+
+1. **Installation:**
+   ```bash
+   pnpm add @svenvw/fdm-core
+   ```
+2. **Database Setup:** `fdm-core` utilizes [Drizzle ORM](https://github.com/drizzle-team/drizzle-orm) and requires a PostgreSQL-compatible database. Configure your database connection details (URL, authentication) using environment variables as described in the documentation.
+
+3. **Integration:** Import `fdm-core` into your application and use the provided functions to interact with the FDM schema. See the documentation for detailed usage examples.
+
+## Key Functionalities
+`fdm-core` provides a range of functions for managing various aspects of farm data:
+
+* **Farm Management:** Create, update, retrieve, and delete farm records.
+* **Field Management:** Handle field data, including geometry and linking to farms.
+* **Cultivation Management:** Manage cultivation catalogues and track sowing events.
+* **Fertilizer Management:** Interact with fertilizer catalogues, track acquisition, picking, and application.
+* **Soil Analysis Management:** Record and retrieve soil analysis results and sampling details.
+
+## Contributing
+Contributions are welcome! See the main FDM project documentation for guidelines on contributing code, reporting bugs, and requesting features.
+
+## Made Possible By
+FDM is developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe projects: [NutriBudget](https://www.nutribudget.eu/) and [PPS BAAT](https://www.handboekbodemenbemesting.nl/nl/handboekbodemenbemesting/pps-baat.htm).
 
 ## Contact
-* Maintainer: @SvenVw
-
-## Made possible by
-The package `fdm` is developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe project: [NutriBudget](https://www.nutribudget.eu/)
-
-![Logo of NutriBudget](https://www.nutribudget.eu/wp-content/themes/nutribudget/images/logo-nutribudget.png)
-
-![Logo of EU](https://ec.europa.eu/regional_policy/images/information-sources/logo-download-center/eu_funded_en.jpg)
-
-![Logo of NMI](https://media.licdn.com/dms/image/C560BAQEYGcm4HjNnxA/company-logo_200_200/0?e=2159024400&v=beta&t=u40rJ7bixPWB2SAqaj3KCKzJRoKcqf0wUXCdmsTDQvw)
+Maintainer: @SvenVw
+Reviewer: @gerardhros
