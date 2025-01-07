@@ -47,6 +47,5 @@ FDM is developed by the [Nutriënten Management Instituut](https://www.nmi-agro.
 
 
 ## Contact
-
-Maintainer: [@SvenVw](https://github.com/SvenVw)
-Reviewer: [@gerardhros](https://github.com/gerardhros)
+Maintainer: @SvenVw
+Reviewer: @gerardhros
