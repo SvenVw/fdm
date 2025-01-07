@@ -47,6 +47,21 @@ export async function getFarm(fdm: FdmType, b_id_farm: schema.farmsTypeInsert['b
 }
 
 /**
+* Get a list of farms and their details
+*
+* @returns A Promise that resolves with a array of objecta that contain the details of the farms.
+* @alpha
+*/
+export async function getFarms(fdm: FdmType): Promise<schema.farmsTypeSelect[]> {
+    const farm = await fdm
+        .select()
+        .from(schema.farms)
+        .limit(1)
+
+    return farm
+}
+
+/**
 * Update the details of a farm.
 *
 * @param b_id_farm - The id of the farm to be updated.
