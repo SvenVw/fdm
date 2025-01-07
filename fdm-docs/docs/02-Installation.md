@@ -3,7 +3,7 @@ sidebar_position: 2
 title: Installation
 ---
 
-Welcome to the Farm Data Model (FDM)! FDM provides a standardized schema and tools for managing and analyzing agricultural data. This guide will walk you through the initial setup and introduce you to the core components of the FDM ecosystem.
+Welcome to the Farm Data Model (FDM)! FDM provides a standardized schema and tools for managing and analyzing agricultural dataon farm and field level. This guide will walk you through the initial setup and introduce you to the core components of the FDM ecosystem.
 
 **Pre-Alpha Software Warning**: FDM is currently in a pre-alpha stage of development. This means the software is still under active development and may have significant changes to its functionality, API, and schema between releases. **Until version 1.0.0, database schema migrations are not provided, and schema updates between versions might break existing databases**. Please use caution and be prepared for potential breaking changes. We encourage you to experiment and provide feedback, but be aware that FDM is not yet ready for production use.
 
