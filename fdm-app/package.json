@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "db:generate": "@better-auth/cli generate --output ./db/schema.ts && drizzle-kit generate",
+    "db:generate": "npx @better-auth/cli generate --output ./db/schema.ts --config app/lib/auth.server.ts && npx drizzle-kit generate",
     "dev": "dotenvx run -- react-router dev",
     "dotenvx": "dotenvx",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
