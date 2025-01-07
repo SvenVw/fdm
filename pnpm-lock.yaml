@@ -10,8 +10,8 @@ catalogs:
       specifier: ^0.30.1
       version: 0.30.1
     drizzle-orm:
-      specifier: ^0.38.2
-      version: 0.38.2
+      specifier: ^0.38.3
+      version: 0.38.3
 
 packageExtensionsChecksum: 29a6694e1052b064eec0acf6b5bbd138
 
@@ -205,7 +205,7 @@ importers:
         version: 0.30.1
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.16)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
+        version: 0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.16)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
       eslint:
         specifier: ^9.16.0
         version: 9.16.0(jiti@1.21.7)
@@ -235,10 +235,10 @@ importers:
         version: 0.2.12
       drizzle-graphql:
         specifier: ^0.8.5
-        version: 0.8.5(drizzle-orm@0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1))(graphql@16.9.0)
+        version: 0.8.5(drizzle-orm@0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1))(graphql@16.9.0)
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
+        version: 0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
       graphql:
         specifier: ^16.9.0
         version: 16.9.0
@@ -308,7 +308,7 @@ importers:
         version: link:../fdm-core
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
+        version: 0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
       typescript:
         specifier: ^5.6.3
         version: 5.6.3
@@ -4805,8 +4805,8 @@ packages:
     resolution: {integrity: sha512-HmA/NeewvHywhJ2ENXD3KvOuM/+K2dGLJfxVfIHsGwaqKICJnS+Ke2L6UcSrSrtMJLJaT0Im1Qv4TFXfaZShyw==}
     hasBin: true
 
-  drizzle-orm@0.38.2:
-    resolution: {integrity: sha512-eCE3yPRAskLo1WpM9OHpFaM70tBEDsWhwR/0M3CKyztAXKR9Qs3asZlcJOEliIcUSg8GuwrlY0dmYDgmm6y5GQ==}
+  drizzle-orm@0.38.3:
+    resolution: {integrity: sha512-w41Y+PquMpSff/QDRGdItG0/aWca+/J3Sda9PPGkTxBtjWQvgU1jxlFBXdjog5tYvTu58uvi3PwR1NuCx0KeZg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -5426,10 +5426,6 @@ packages:
   geotiff@2.1.3:
     resolution: {integrity: sha512-PT6uoF5a1+kbC3tHmZSUsLHBp2QJlHasxxxxPW47QIY1VBKpFB+FcDvX+MxER6UzgLQZ0xDzJ9s48B9JbOCTqA==}
     engines: {node: '>=10.19'}
-
-  get-intrinsic@1.2.4:
-    resolution: {integrity: sha512-5uYhsJH8VJBTv7oslg4BznJYhDoRI6waYCxMmCdnTrcCrHA/fCFKoTFz2JKKE0HdDFUF7/oQuhzumXJK7paBRQ==}
-    engines: {node: '>= 0.4'}
 
   get-intrinsic@1.2.5:
     resolution: {integrity: sha512-Y4+pKa7XeRUPWFNvOOYHkRYrfzW07oraURSvjDmRVOJ748OrVmeXtpE4+GCEHncjCjkTxPNRt8kEbxDhsn6VTg==}
@@ -14777,9 +14773,9 @@ snapshots:
 
   dotenv@16.4.7: {}
 
-  drizzle-graphql@0.8.5(drizzle-orm@0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1))(graphql@16.9.0):
+  drizzle-graphql@0.8.5(drizzle-orm@0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1))(graphql@16.9.0):
     dependencies:
-      drizzle-orm: 0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
+      drizzle-orm: 0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1)
       graphql: 16.9.0
       graphql-parse-resolve-info: 4.13.0(graphql@16.9.0)
     transitivePeerDependencies:
@@ -14794,7 +14790,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.16)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1):
+  drizzle-orm@0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@18.3.16)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1):
     optionalDependencies:
       '@electric-sql/pglite': 0.2.12
       '@libsql/client-wasm': 0.14.0
@@ -14803,7 +14799,7 @@ snapshots:
       postgres: 3.4.4
       react: 18.3.1
 
-  drizzle-orm@0.38.2(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1):
+  drizzle-orm@0.38.3(@electric-sql/pglite@0.2.12)(@libsql/client-wasm@0.14.0)(@types/react@19.0.3)(kysely@0.27.5)(postgres@3.4.4)(react@18.3.1):
     optionalDependencies:
       '@electric-sql/pglite': 0.2.12
       '@libsql/client-wasm': 0.14.0
