@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
-import { addFarm, getFarm, updateFarm } from './farm'
+import { addFarm, getFarm, getFarms, updateFarm } from './farm'
 import { type FdmServerType } from './fdm-server.d'
 
 describe('Farm Data Model', () => {
@@ -46,6 +46,14 @@ describe('Farm Data Model', () => {
       expect(farm.b_name_farm).toBe(farmName)
       expect(farm.b_sector).toBe(farmSector)
     })
+
+    it('should get a list of farms', async () => {
+      const farms = await getFarms(fdm);
+      expect(farms).toBeDefined();
+      expect(farms.length).toBeGreaterThanOrEqual(1); // At least 1 farm should exist
+      expect(farms[0].b_id_farm).toBeDefined();
+
+  });
 
     it('should update a farm', async () => {
       const farmName = 'Test Farm'
