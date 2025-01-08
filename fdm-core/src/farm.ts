@@ -60,7 +60,6 @@ export async function getFarms(fdm: FdmType): Promise<schema.farmsTypeSelect[]> 
     const farm = await fdm
         .select()
         .from(schema.farms)
-        .limit(1)
 
     return farm
 }
