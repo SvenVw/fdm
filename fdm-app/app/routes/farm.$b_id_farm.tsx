@@ -2,7 +2,6 @@ import { data, LoaderFunctionArgs, NavLink, Outlet, redirect, useLoaderData } fr
 import { getFarm, getFarms } from "@svenvw/fdm-core";
 import { fdm } from "../lib/fdm.server";
 import { auth } from "@/lib/auth.server";
-import { authClient } from "@/lib/auth-client";
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
