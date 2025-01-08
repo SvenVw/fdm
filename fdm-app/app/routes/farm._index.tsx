@@ -7,12 +7,11 @@ import { auth } from "@/lib/auth.server";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Check, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 // Blocks
 import MissingFarm from "@/components/blocks/missing-farm";
-import { cn } from "@/lib/utils";
 
 export async function loader({
     request,
@@ -66,21 +65,20 @@ export default function AppIndex() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="flex items-center gap-1">
                                     {loaderData.b_id_farm && loaderData.farmOptions ? (
-                                        loaderData.farmOptions.find(farm => farm.b_id_farm === loaderData.b_id_farm).b_name_farm
+                                        loaderData.farmOptions.find(option => option.value === loaderData.b_id_farm).label
                                     ) : `Kies een bedrijf`}
                                     <ChevronDown />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start">
-                                    {loaderData.farmOptions.map((farm) => (
+                                    {loaderData.farmOptions.map((option) => (
                                         <DropdownMenuCheckboxItem
-                                            checked={loaderData.b_id_farm === farm.value}
-                                            key={farm.value}
+                                            checked={loaderData.b_id_farm === option.value}
+                                            key={option.value}
                                         >
                                             <NavLink
-                                                key={farm.value}
-                                                to={`/farm/${farm.value}`}>
-
-                                                {farm.label}
+                                                key={option.value}
+                                                to={`/farm/${option.value}`}>
+                                                {option.label}
                                             </NavLink>
                                         </DropdownMenuCheckboxItem>
                                     ))}
