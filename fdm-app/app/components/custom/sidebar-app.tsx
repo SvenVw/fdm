@@ -237,7 +237,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
                                 <LogOut />
-                                    <Form method="post" action="../app">                                        
+                                    <Form method="post" action="../farm">                                        
                                         <Button type="submit" variant="link">Uitloggen</Button>
                                     </Form>                                    
                                 </DropdownMenuItem>
