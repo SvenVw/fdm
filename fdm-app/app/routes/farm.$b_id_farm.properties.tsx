@@ -49,9 +49,9 @@ export default function FarmPropertiesBlock() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name_farm: loaderData.farm.b_name_farm,
-            b_businessid_farm: loaderData.farm.b_businessid_farm,
-            b_address_farm: loaderData.farm.b_address_farm,
-            b_postalcode_farm: loaderData.farm.b_postalcode_farm,
+            b_businessid_farm: loaderData.farm.b_businessid_farm ? loaderData.farm.b_businessid_farm : "",
+            b_address_farm: loaderData.farm.b_address_farm ? loaderData.farm.b_address_farm : "",
+            b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
         },
     })
 
@@ -180,7 +180,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         await updateFarm(
             fdm,
             b_id_farm,
-            formValues.b_name_farm
+            formValues.b_name_farm,
+            formValues.b_businessid_farm,
+            formValues.b_address_farm,
+            formValues.b_postalcode_farm
         );
        
         return dataWithSuccess(
