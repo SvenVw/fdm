@@ -74,7 +74,7 @@ export default function CreateFarmBlock() {
       <main>
         <Farm
           b_name_farm={loaderData.b_name_farm}
-          action={"/app/addfarm/new"}
+          action={"/farm/create/new"}
           FormSchema={FormSchema}
         />
       </main>
