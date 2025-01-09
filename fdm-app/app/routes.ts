@@ -14,6 +14,9 @@ export default [
     // Sign in page
     route("signin", "./routes/signin.tsx"),
 
+    // Logout action
+    route("logout", "./routes/logout.tsx"),
+
     // Authenticated user part
     layout("./routes/layout.tsx", [
         ...prefix("farm", [
