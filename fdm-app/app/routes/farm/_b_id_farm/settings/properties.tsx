@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingSpinner } from "@/components/custom/loadingspinner";
 import { dataWithError, dataWithSuccess } from "remix-toast";
 import { extractFormValuesFromRequest } from "@/lib/form";
+import { useEffect } from "react";
 
 // Blocks
 
@@ -54,6 +55,16 @@ export default function FarmSettingsPropertiesBlock() {
             b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
         },
     })
+
+    
+    useEffect(() => {
+        form.reset({
+            b_name_farm: loaderData.farm.b_name_farm,
+            b_businessid_farm: loaderData.farm.b_businessid_farm ? loaderData.farm.b_businessid_farm : "",
+            b_address_farm: loaderData.farm.b_address_farm ? loaderData.farm.b_address_farm : "",
+            b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
+        });
+    }, [loaderData])
 
     return (
         <div className="space-y-6">
@@ -112,7 +123,7 @@ export default function FarmSettingsPropertiesBlock() {
                                             <FormLabel>Adres</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    placeholder="Nieuwe Kanaal 7 
+                                                    placeholder="bv. Nieuwe Kanaal 7 
 Wageningen"
                                                     className="resize-none"
                                                     autoComplete="address"
