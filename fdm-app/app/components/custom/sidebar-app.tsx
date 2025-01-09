@@ -18,7 +18,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
 
 import { useIsMobile } from '@/hooks/use-mobile'
 import { Button } from "@/components/ui/button"
-import { Form, NavLink} from "react-router";
+import { Form, NavLink } from "react-router";
 
 interface SideBarAppType {
     user: {
@@ -27,6 +27,7 @@ interface SideBarAppType {
         name: string
         email: string
         image: string | undefined
+        farm_active: string | undefined
     }
 }
 
@@ -62,10 +63,17 @@ export function SidebarApp(props: SideBarAppType) {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./farm">
-                                        <House />
-                                        <span>Bedrijf</span>
-                                    </NavLink>
+                                    {user.farm_active ? (
+                                         <NavLink to={`./farm/${user.farm_active}`} >
+                                         <House />
+                                         <span>Bedrijf</span>
+                                     </NavLink>
+                                        ) : (
+                                            <NavLink to="./farm">
+                                            <House />
+                                            <span>Bedrijf</span>
+                                        </NavLink>
+                                    )	}                                   
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>

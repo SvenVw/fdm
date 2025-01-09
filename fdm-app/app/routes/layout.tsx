@@ -31,9 +31,13 @@ export async function loader({
     return redirect("/signin")
   }
 
+  // Get the active farm
+  const farm_active = session.user.farm_active
+
   // Return user information from loader
   return {
     user: session.user,
+    farm_active: farm_active
   }
 }
 
@@ -42,7 +46,7 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <SidebarApp user={loaderData.user} />
+      <SidebarApp user={loaderData.user} farm_active={loaderData.farm_active} />
       <Outlet />
     </SidebarProvider>
 
