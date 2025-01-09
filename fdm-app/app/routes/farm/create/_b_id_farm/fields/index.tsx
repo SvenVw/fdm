@@ -20,6 +20,14 @@ export async function loader({
         // Get the fields
         const fields = await getFields(fdm, b_id_farm)
 
+        // Check if fields exist
+        if (fields.length === 0) {
+            throw data("No fields found for this farm", {
+                status: 404,
+                statusText: "No fields found"
+            });
+        }
+
         // Sort by name
         fields.sort((a, b) => a.b_name.localeCompare(b.b_name));
 
