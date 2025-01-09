@@ -21,6 +21,13 @@ export async function loader({
     // Sort the cultivations by name
     cultivationPlan.sort((a, b) => a.b_lu_name.localeCompare(b.b_lu_name))
 
+    if (cultivationPlan.length === 0) {
+        throw data("No cultivations found", {
+            status: 404,
+            statusText: "No cultivations available for this farm"
+        });
+    }
+
     // Get the first cultivation and redirect to it
     const firstCultivation = cultivationPlan[0].b_lu_catalogue
     return redirect(`/farm/create/${b_id_farm}/cultivations/${firstCultivation}`)
