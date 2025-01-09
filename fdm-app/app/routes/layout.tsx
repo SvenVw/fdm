@@ -46,7 +46,7 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <SidebarApp user={loaderData.user} farm_active={loaderData.farm_active} />
+      <SidebarApp user={loaderData.user} />
       <Outlet />
     </SidebarProvider>
 
