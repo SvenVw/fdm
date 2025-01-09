@@ -52,7 +52,7 @@
     "@dotenvx/dotenvx": "^1.20.1",
     "@svenvw/fdm-core": "workspace:*",
     "drizzle-orm": "catalog:",
-    "typescript": "^5.6.3",
+    "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "vitest": "catalog:"
