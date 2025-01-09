@@ -10,17 +10,16 @@ This document provides a comprehensive overview of the Farm Data Model (FDM) dat
 Defined in schema via `fdmSchema.table('farms', ...)`  
 **Purpose**: Stores basic information about each farm in the system.
 
-| Column          | Type        | Description                                                       |
-|-----------------|------------|-------------------------------------------------------------------|
-| **b_id_farm**   | `text`      | Primary key for the farm.                                         |
-| **b_name_farm** | `text`      | Name of the farm.                                                 |
-| **b_sector**    | `sectorEnum`| Enum-based sector(s), e.g., `'dairy'|'arable'|'tree_nursery'|'bulbs'`. |
-| **created**     | `timestamp` | Timestamp when this record was created.                   |
-| **updated**     | `timestamp` | Automatic update timestamp (if set in Drizzle).                   |
+| Column                | Type        | Description                                                       |
+|----------------------|------------|-------------------------------------------------------------------|
+| **b_id_farm**        | `text`      | Primary key for the farm.                                         |
+| **b_name_farm**      | `text`      | Name of the farm.                                                 |
+| **b_businessid_farm**| `text`      | Business identification number of the farm.                       |
+| **b_address_farm**   | `text`      | Physical address of the farm.                                     |
+| **b_postalcode_farm**| `text`      | Postal code of the farm's location.                              |
+| **created**          | `timestamp` | Timestamp when this record was created.                           |
+| **updated**          | `timestamp` | Automatic update timestamp (if set in Drizzle).                   |
 
-### `sectorEnum`  
-Name: `b_sector`  
-Possible values: `diary`, `arable`, `tree_nursery`, `bulbs`
 
 ## **`farmManaging`**  
 **Purpose**: Cross-reference table that links farms to fields and captures specific management details (start date, end date, management type).
