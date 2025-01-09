@@ -61,9 +61,9 @@
     "typedoc-plugin-missing-exports": "^3.1.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.19.1",
-    "vite": "^5.4.11",
-    "vite-plugin-dts": "^4.4.0",
-    "vitest": "^2.1.8"
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.15",
