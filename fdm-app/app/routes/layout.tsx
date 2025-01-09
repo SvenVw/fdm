@@ -32,7 +32,7 @@ export async function loader({
   }
 
   // Get the active farm
-  const farm_active = session.user.farm_active
+  const farm_active = session.user.farm_active ?? null
 
   // Return user information from loader
   return {

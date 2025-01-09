@@ -35,7 +35,7 @@ export default function CreateFarmCultivationBlock(props: { action: string | und
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="b_name_farm">Zaaidatum</Label>
+                            <Label htmlFor="b_date_sowing">Zaaidatum</Label>
                             <Calendar
                                 // locale={nl} TODO: library has installation issues somehow                                
                                 mode="single"

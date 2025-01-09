@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 // FDM
 import { fdm } from "@/lib/fdm.server";
-import { getCultivationsFromCatalogue, getField, getSoilAnalysis, getCultivation, getCultivations, updateField, addSoilAnalysis, updateCultivation } from "@svenvw/fdm-core";
+import { getCultivationsFromCatalogue, getField, getSoilAnalysis,  getCultivations, updateField, addSoilAnalysis, updateCultivation } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClientOnly } from "remix-utils/client-only";
@@ -101,7 +101,6 @@ export async function loader({
     }
 
     // Get the field data
-    console.log(b_id)
     const field = await getField(fdm, b_id)
     if (!field) {
         throw data("Field not found", { status: 404, statusText: "Field not found" });

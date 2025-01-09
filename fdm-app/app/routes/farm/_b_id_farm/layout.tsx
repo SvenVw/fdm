@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, NavLink, Outlet, redirect, useLoaderData } from "react-router";
 import { getFarms } from "@svenvw/fdm-core";
-import { fdm } from "../../../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import { auth } from "@/lib/auth.server";
 
 // Components
