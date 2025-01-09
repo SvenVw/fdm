@@ -19,9 +19,7 @@ export default [
         ...prefix("farm", [
 
             // Not selected a farm
-            layout("./routes/farm/layout.tsx", [
-                index("./routes/farm/index.tsx"),
-            ]),
+            index("./routes/farm/index.tsx"),
 
             // Selected a farm
             ...prefix(":b_id_farm", [
