@@ -1,6 +1,5 @@
 import { type MetaFunction, type LoaderFunctionArgs, data, Outlet, NavLink } from "react-router";
 import { useLoaderData } from "react-router";
-import wkx from 'wkx'
 
 // Components
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
@@ -8,12 +7,9 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster"
 
-// Blocks
-import { Fields } from "@/components/blocks/fields";
-
 // FDM
-import { fdm } from "../lib/fdm.server";
-import { getCultivations, getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
+import { fdm } from "@/lib/fdm.server";
+import { getCultivationsFromCatalogue, getFarm, getFields, updateField } from "@svenvw/fdm-core";
 import { Button } from "@/components/ui/button";
 import { SidebarPage } from "@/components/custom/sidebar-page";
 import { cn } from "@/lib/utils";
@@ -72,7 +68,7 @@ export async function loader({
     const sidebarPageItems = fields.map(field => {
         return {
             title: field.b_name,
-            to: `/app/addfarm/${b_id_farm}/fields/${field.b_id}`
+            to: `/farm/create/${b_id_farm}/fields/${field.b_id}`
         }
     })
 
@@ -82,13 +78,13 @@ export async function loader({
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
-        action: `/app/addfarm/${b_id_farm}/fields`
+        action: `/farm/create/${b_id_farm}/fields`
     }
 
 }
 
 // Main
-export default function Index() {
+export default function CreateFarmFieldsLayout() {
     const loaderData = useLoaderData<typeof loader>();
 
     return (
@@ -130,7 +126,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/app/addfarm/${loaderData.b_id_farm}/cultivations`}
+                                to={`/farm/create/${loaderData.b_id_farm}/cultivations`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none": loaderData.sidebarPageItems.length === 0
                                 })}

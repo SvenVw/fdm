@@ -2,7 +2,6 @@ import {
   type MetaFunction,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-  redirect,
   data,
   useLoaderData
 } from "react-router";
@@ -17,10 +16,9 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Blocks
-import { FieldsMap } from "@/components/blocks/fields-map";
 
 // FDM
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import { addCultivation, addField, getFarm, addSoilAnalysis } from "@svenvw/fdm-core";
 import { redirectWithSuccess } from "remix-toast";
 import { AtlasFields } from "@/components/custom/atlas-fields";
@@ -62,7 +60,7 @@ export async function loader({
 }
 
 // Main
-export default function Index() {
+export default function CreateFarmAtlasBlock() {
   const loaderData = useLoaderData<typeof loader>();
   // const navigation = useNavigation();
 
@@ -208,5 +206,5 @@ export async function action({
     }
   }))
 
-  return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, { message: "Percelen zijn toegevoegd! 🎉" });
+  return redirectWithSuccess(`../create/${b_id_farm}/fields/`, { message: "Percelen zijn toegevoegd! 🎉" });
 }

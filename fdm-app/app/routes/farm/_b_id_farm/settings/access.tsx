@@ -1,19 +1,12 @@
 import { ActionFunctionArgs, data, Form, LoaderFunctionArgs, useLoaderData } from "react-router";
-import { getFarm, updateFarm } from "@svenvw/fdm-core";
-import { fdm } from "../lib/fdm.server";
-import validator from 'validator';
-const { isPostalCode } = validator
+import { getFarm} from "@svenvw/fdm-core";
+import { fdm } from "@/lib/fdm.server";
 
 // Components
 import { Separator } from "@/components/ui/separator";
 import { RemixFormProvider, useRemixForm } from "remix-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { LoadingSpinner } from "@/components/custom/loadingspinner";
 import { dataWithError, dataWithSuccess } from "remix-toast";
 import { extractFormValuesFromRequest } from "@/lib/form";
 
@@ -41,7 +34,7 @@ export async function loader({
     }
 }
 
-export default function FarmAccessBlock() {
+export default function FarmSettingsAccessBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -55,15 +48,15 @@ export default function FarmAccessBlock() {
     return (
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-medium">Verwijderen</h3>
+                <h3 className="text-lg font-medium">Toegang</h3>
                 <p className="text-sm text-muted-foreground">
-                    Helaas, je hebt geen rechten om dit bedrijf te verwijderen
+                    Helaas, je hebt geen rechten om de toegang to dit bedrijf te beheren
                 </p>
             </div>
             <Separator />
             {/* <div className="flex flex-col space-y-1"> */}
             <RemixFormProvider {...form}>
-                <Form id="formFarmDelete" onSubmit={form.handleSubmit} method="POST">
+                <Form id="formFarmAccess" onSubmit={form.handleSubmit} method="POST">
                     <fieldset disabled={form.formState.isSubmitting}>
                         <div className="grid grid-cols-2 w-full items-center gap-4">
                            
@@ -101,13 +94,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return dataWithSuccess(
             `access is updated`,
-            { message: `${formValues.b_name_farm} verwijderd bijgewerkt` }
+            { message: `Toegang voor ${formValues.b_name_farm} is bijgewerkt! 🎉` }
         );
     } catch (error) {
         console.error("Failed to update farm:", error);
         return dataWithError(
             null,
-            `Er is iets misgegaan bij het verwijderen: ${error instanceof Error ? error.message : 'Onbekende fout'}`
+            `Er is iets misgegaan bij het bijwerken van de toegang: ${error instanceof Error ? error.message : 'Onbekende fout'}`
         );
     }
 }

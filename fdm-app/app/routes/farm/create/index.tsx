@@ -1,5 +1,5 @@
 import type { MetaFunction, ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { useLoaderData} from "react-router";
+import { useLoaderData } from "react-router";
 import { z } from "zod"
 import { addFarm, addFertilizer, getFertilizersFromCatalogue } from "@svenvw/fdm-core";
 
@@ -12,9 +12,10 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { Farm } from "@/components/blocks/farm";
 
 // Services
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import { extractFormValuesFromRequest } from "@/lib/form";
 import { dataWithError, redirectWithSuccess } from "remix-toast";
+import { auth } from "@/lib/auth.server";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -47,7 +48,7 @@ export async function loader({
  * Renders the farm form and passes the validation schema to the Farm component.
  * @returns The JSX element representing the add farm page.
  */
-export default function AddFarmPage() {
+export default function CreateFarmBlock() {
   const loaderData = useLoaderData<typeof loader>();
   return (
     <SidebarInset>
@@ -95,14 +96,23 @@ export async function action({
 
   // Create a farm
   try {
-    const b_id_farm = await addFarm(fdm, b_name_farm, null);
+    const b_id_farm = await addFarm(fdm, b_name_farm, null, null, null);
     const fertilizers = await getFertilizersFromCatalogue(fdm);
     await Promise.all(
       fertilizers.map(fertilizer =>
         addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm)
       )
     );
-    return redirectWithSuccess(`../addfarm/${b_id_farm}/atlas`, { message: "Bedrijf is toegevoegd! 🎉" });
+
+    // Set farm to active
+    await auth.api.updateUser({
+      body: {
+        farm_active: b_id_farm,
+      },
+      headers: request.headers
+    })
+
+    return redirectWithSuccess(`../farm/create/${b_id_farm}/atlas`, { message: "Bedrijf is toegevoegd! 🎉" });
   } catch (error) {
     console.error('Failed to create farm with fertilizers:', error);
     return dataWithError(null, "Er is iets misgegaan bij het aanmaken van het bedrijf.");

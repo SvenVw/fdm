@@ -1,6 +1,6 @@
-import { LoaderFunctionArgs, NavLink, redirect, useLoaderData } from "react-router";
+import { LoaderFunctionArgs, NavLink, Outlet, redirect, useLoaderData } from "react-router";
 import { getFarms } from "@svenvw/fdm-core";
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import { auth } from "@/lib/auth.server";
 
 // Components
@@ -11,7 +11,6 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { ChevronDown } from "lucide-react";
 
 // Blocks
-import MissingFarm from "@/components/blocks/missing-farm";
 
 export async function loader({
     request,
@@ -44,7 +43,7 @@ export async function loader({
     }
 }
 
-export default function AppIndex() {
+export default function CreateFarmCultivationsLayout() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
@@ -72,7 +71,7 @@ export default function AppIndex() {
                                 <DropdownMenuContent align="start">
                                     {loaderData.farmOptions.map((option) => (
                                         <DropdownMenuCheckboxItem
-                                            checked={loaderData.b_id_farm === option.value}
+                                            checked={false}
                                             key={option.value}
                                         >
                                             <NavLink
@@ -89,13 +88,7 @@ export default function AppIndex() {
                 </Breadcrumb>
             </header>
             <main>
-
-                {loaderData.farmOptions.length === 0 ? (
-                    <MissingFarm />
-                ) : (
-                    // Render something else if b_id_farms is not empty
-                    <div>Je hebt een bedrijf!</div>
-                )}
+                <Outlet />
             </main>
         </SidebarInset >
     )

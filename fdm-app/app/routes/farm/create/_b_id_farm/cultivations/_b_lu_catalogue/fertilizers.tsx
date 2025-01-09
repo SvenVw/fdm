@@ -7,7 +7,7 @@ import { extractFormValuesFromRequest } from "@/lib/form";
 import { FormSchema } from "@/components/custom/fertilizer-applications";
 
 // FDM
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "../../../../../../lib/fdm.server";
 import { getCultivationPlan, getFertilizers, addFertilizerApplication, removeFertilizerApplication } from "@svenvw/fdm-core";
 
 // Loader
@@ -82,7 +82,7 @@ export async function loader({
     };
 }
 
-export default function Index() {
+export default function createFarmCultivationFertilizersBlock() {
     const loaderData = useLoaderData<typeof loader>();
 
     return (
@@ -92,7 +92,7 @@ export default function Index() {
             </p>
             <FertilizerApplicationsForm
                 fertilizerApplications={loaderData.fertilizerApplications}
-                action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
+                action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
                 options={loaderData.fertilizerOptions}
             />
         </div>

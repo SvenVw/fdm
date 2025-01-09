@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/pagination"
 
 // FDM
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import { getCultivationPlan, getCultivationsFromCatalogue } from "@svenvw/fdm-core";
 
 // Meta
@@ -65,7 +65,7 @@ export async function loader({
 }
 
 // Main
-export default function Index() {
+export default function CreateFarmCultivationsLayout() {
     const loaderData = useLoaderData<typeof loader>();
     const { pathname } = useLocation();
 
@@ -79,15 +79,15 @@ export default function Index() {
     const items = [
         {
             title: 'Gewas',
-            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`
+            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}`
         },
         {
             title: 'Bemesting',
-            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`
+            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`
         },
         {
             title: 'Vanggewas',
-            href: `/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`
+            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`
         }
     ]
 

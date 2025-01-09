@@ -14,13 +14,14 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // FDM
-import { fdm } from "../lib/fdm.server";
-import { getCultivationsFromCatalogue, getField, fdmSchema, getSoilAnalysis, getCultivation, getCultivations, updateField, addSoilAnalysis, updateCultivation } from "@svenvw/fdm-core";
+import { fdm } from "@/lib/fdm.server";
+import { getCultivationsFromCatalogue, getField, getSoilAnalysis, getCultivation, getCultivations, updateField, addSoilAnalysis, updateCultivation } from "@svenvw/fdm-core";
 import { Combobox } from "@/components/custom/combobox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClientOnly } from "remix-utils/client-only";
 import { extractFormValuesFromRequest } from "@/lib/form";
 import { dataWithError, dataWithSuccess } from "remix-toast";
+import { useEffect } from "react";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -100,6 +101,7 @@ export async function loader({
     }
 
     // Get the field data
+    console.log(b_id)
     const field = await getField(fdm, b_id)
     if (!field) {
         throw data("Field not found", { status: 404, statusText: "Field not found" });
@@ -164,7 +166,7 @@ export async function loader({
  * Renders a form with field information, including name, crop, soil type, and soil analysis data.
  * @returns The JSX element representing the field details page.
  */
-export default function Index() {
+export default function CreateFarmFieldsBlock() {
     const loaderData = useLoaderData<typeof loader>();
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -180,6 +182,18 @@ export default function Index() {
             a_som_loi: loaderData.a_som_loi ?? undefined,
         },
     })
+
+    useEffect(() => {
+        form.reset({
+            b_name: loaderData.b_name ?? "",
+            b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
+            b_gwl_class: loaderData.b_gwl_class ?? undefined,
+            a_p_al: loaderData.a_p_al ?? undefined,
+            a_p_cc: loaderData.a_p_cc ?? undefined,
+            a_som_loi: loaderData.a_som_loi ?? undefined,
+        });
+    }, [loaderData]);
 
     return (
         <>
@@ -365,7 +379,8 @@ export default function Index() {
                 <ClientOnly
                     fallback={
                         <Skeleton className="h-full w-full rounded-xl" />
-                    }                        >
+                    }
+                >
                     {() => <FieldMap
                         b_geojson={loaderData.b_geojson}
                         mapboxToken={loaderData.mapboxToken}

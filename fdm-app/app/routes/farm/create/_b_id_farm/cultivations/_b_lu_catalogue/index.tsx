@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar"
 
-export default function Index(props: { action: string | undefined; }) {
+export default function CreateFarmCultivationBlock(props: { action: string | undefined; }) {
     const navigation = useNavigation();
 
     // Get sowing and harvesting dates

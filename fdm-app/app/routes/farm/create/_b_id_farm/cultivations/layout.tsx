@@ -13,7 +13,7 @@ import { SidebarPage } from "@/components/custom/sidebar-page";
 
 
 // FDM
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +54,7 @@ export async function loader({
     const sidebarPageItems = cultivationPlan.map(cultivation => {
         return {
             title: cultivation.b_lu_name,
-            to: `/app/addfarm/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
+            to: `/farm/create/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
         }
     })
 
@@ -110,7 +110,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/app/addfarm/${loaderData.b_id_farm}/cattle`}
+                                to={`/farm/create/${loaderData.b_id_farm}/cattle`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none": loaderData.cultivationPlan.length === 0
                                 })}

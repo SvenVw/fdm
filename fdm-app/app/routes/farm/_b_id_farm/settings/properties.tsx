@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, data, Form, LoaderFunctionArgs, useLoaderData } from "react-router";
 import { getFarm, updateFarm } from "@svenvw/fdm-core";
-import { fdm } from "../lib/fdm.server";
+import { fdm } from "@/lib/fdm.server";
 import validator from 'validator';
 const { isPostalCode } = validator
 
@@ -41,7 +41,7 @@ export async function loader({
     }
 }
 
-export default function FarmPropertiesBlock() {
+export default function FarmSettingsPropertiesBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
