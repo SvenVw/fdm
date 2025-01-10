@@ -206,5 +206,5 @@ export async function action({
     }
   }))
 
-  return redirectWithSuccess(`../create/${b_id_farm}/fields/`, { message: "Percelen zijn toegevoegd! 🎉" });
+  return redirectWithSuccess(`../create/new/${b_id_farm}/fields/`, { message: "Percelen zijn toegevoegd! 🎉" });
 }

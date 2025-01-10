@@ -6,6 +6,7 @@ import { auth } from "@/lib/auth.server";
 // Components
 import { Separator } from "@/components/ui/separator";
 import { SidebarPage } from "@/components/custom/sidebar-page";
+import { ContentLayout } from "@/components/custom/farm-layout/content";
 
 // Blocks
 
@@ -69,27 +70,13 @@ export async function loader({
 }
 
 export default function FarmSettingsLayout() {
-    const loaderData = useLoaderData<typeof loader>()
-
+    const loaderData = useLoaderData<typeof loader>();
+    
     return (
-        <>
-            <div className="space-y-6 p-10 pb-16">
-                <div className="flex items-center">
-                    <div className="space-y-0.5">
-                        <h2 className="text-2xl font-bold tracking-tight">Bedrijf</h2>
-                        <p className="text-muted-foreground">
-                            Beheer de gegevens en instellingen van dit bedrijf
-                        </p>
-                    </div>
-                </div>
-                <Separator className="my-6" />
-                <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                    <aside className="-mx-4 lg:w-1/5">
-                        <SidebarPage items={loaderData.sidebarPageItems} />
-                    </aside>
-                    <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
-                </div>
-            </div>
-        </>
-    )
-}
+      <ContentLayout
+        title="Bedrijf"
+        description="Beheer de gegevens en instellingen van dit bedrijf"
+        sidebarItems={loaderData.sidebarPageItems}
+      />
+    );
+  }

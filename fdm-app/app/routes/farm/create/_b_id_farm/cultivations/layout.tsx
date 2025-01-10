@@ -1,4 +1,4 @@
-import { type MetaFunction, type LoaderFunctionArgs, data, NavLink } from "react-router";
+import { type MetaFunction, type LoaderFunctionArgs, data, NavLink, useLocation } from "react-router";
 import { Outlet, useLoaderData } from "react-router";
 
 // Components
@@ -16,6 +16,7 @@ import { SidebarPage } from "@/components/custom/sidebar-page";
 import { fdm } from "@/lib/fdm.server";
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
 import { cn } from "@/lib/utils";
+import { PaginationLayout } from "@/components/custom/farm-layout/pagination";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -68,70 +69,41 @@ export async function loader({
 }
 
 // Main
-export default function Index() {
+export default function CreateFarmCultivationsLayout() {
     const loaderData = useLoaderData<typeof loader>();
+    const { pathname } = useLocation();
+
+    const items = [
+        { title: 'Gewas', href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}` },
+        { title: 'Bemesting', href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers` },
+        { title: 'Vanggewas', href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop` }
+    ];
 
     return (
-        <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                Maak een bedrijf
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                {loaderData.b_name_farm}
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                Vul gewasinformatie in
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
-            <main>
-                <div className="space-y-6 p-10 pb-16">
-                    <div className="flex items-center">
-                        <div className="space-y-0.5">
-                            <h2 className="text-2xl font-bold tracking-tight">Bouwplan</h2>
-                            <p className="text-muted-foreground">
-                                Werk de eigenschappen per gewas in je bouwplan bij.
-                            </p>
-                        </div>
-
-                        <div className="ml-auto">
-                            <NavLink
-                                to={`/farm/create/${loaderData.b_id_farm}/cattle`}
-                                className={cn("ml-auto", {
-                                    "pointer-events-none": loaderData.cultivationPlan.length === 0
-                                })}
-                            >
-                                <Button disabled={loaderData.cultivationPlan.length === 0}>
-                                    Doorgaan
-                                </Button>
-                            </NavLink>
-                        </div>
-                    </div>
-                    <Separator className="my-6" />
-                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                        <aside className="-mx-4 lg:w-1/5">
-                            <SidebarPage items={loaderData.sidebarPageItems} />
-                        </aside>
-                        <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
-                    </div>
+        <PaginationLayout
+            items={items}
+            currentPath={pathname}
+        >
+            <div className="space-y-6">
+                <div>
+                    <h3 className="text-lg font-medium">{loaderData.cultivation.b_lu_name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                        {formatFieldNames(loaderData.cultivation.fields)}
+                    </p>
                 </div>
-            </main>
-            <Toaster />
-        </SidebarInset >
+                <Outlet />
+            </div>
+        </PaginationLayout>
     );
 }
 
+function formatFieldNames(fields: { b_name: string }[]): string {
+    if (!fields?.length) return "Geen percelen geselecteerd";
+
+    const fieldNames = fields.map(field => field.b_name);
+    if (fieldNames.length === 1) return fieldNames[0];
+
+    if (fieldNames.length === 2) return `${fieldNames[0]} and ${fieldNames[1]}`;
+
+    return `${fieldNames.slice(0, -1).join(", ")}, and ${fieldNames[fieldNames.length - 1]}`;
+}
