@@ -1,5 +1,13 @@
 # Changelog fdm-core
 
+## 0.10.0
+
+### Minor Changes
+
+- ca3a1e6: Adds the `getFarms` function
+- cb0a838: Add `b_address`, `b_businessid_farm` and `b_postalcode_farm` as columns to `farms`
+- cb0a838: Remove `b_sector` as column of `farms`
+
 ## 0.9.1
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # Changelog fdm-app
 
+## 0.8.0
+
+### Minor Changes
+
+- 7bc5810: Add page with overview of farms and enable the user to select a farm.
+
+### Patch Changes
+
+- 1d79e30: Switch from file-based routing to route configuration in `app/routes.ts`
+- Updated dependencies [ca3a1e6]
+- Updated dependencies [cb0a838]
+- Updated dependencies [cb0a838]
+  - @svenvw/fdm-core@0.10.0
+  - @svenvw/fdm-data@0.8.0
+
 ## 0.7.0
 
 ### Minor Changes
