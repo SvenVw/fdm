@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.2.1
+
+### Patch Changes
+
+- 01ec187: Update the documentation to reflect the changes to the `farms` table
+
 ## 0.2.0
 
 ### Minor Changes

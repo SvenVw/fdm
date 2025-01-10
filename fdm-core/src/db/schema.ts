@@ -6,12 +6,12 @@ export const fdmSchema = pgSchema('fdm-dev')
 export type fdmSchemaTypeSelect = typeof fdmSchema
 
 // Define farms table
-export const sectorEnum = fdmSchema.enum('b_sector', ['diary', 'arable', 'tree_nursery', 'bulbs'])
-
 export const farms = fdmSchema.table('farms', {
   b_id_farm: text().primaryKey(),
   b_name_farm: text(),
-  b_sector: sectorEnum(),
+  b_businessid_farm: text(),
+  b_address_farm: text(),
+  b_postalcode_farm: text(),
   created: timestamp({ withTimezone: true }).notNull().defaultNow(),
   updated: timestamp({ withTimezone: true })
 }, (table) => [

@@ -31,9 +31,13 @@ export async function loader({
     return redirect("/signin")
   }
 
+  // Get the active farm
+  const farm_active = session.user.farm_active ?? null
+
   // Return user information from loader
   return {
     user: session.user,
+    farm_active: farm_active
   }
 }
 

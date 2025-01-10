@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar"
 
-export default function Index(props: { action: string | undefined; }) {
+export default function CreateFarmCultivationBlock(props: { action: string | undefined; }) {
     const navigation = useNavigation();
 
     // Get sowing and harvesting dates
@@ -35,7 +35,7 @@ export default function Index(props: { action: string | undefined; }) {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="flex flex-col space-y-1.5">
-                            <Label htmlFor="b_name_farm">Zaaidatum</Label>
+                            <Label htmlFor="b_date_sowing">Zaaidatum</Label>
                             <Calendar
                                 // locale={nl} TODO: library has installation issues somehow                                
                                 mode="single"
