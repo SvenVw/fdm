@@ -24,7 +24,7 @@ export async function loader({
     // Get the active farm and redirect to it
     const b_id_farm = session?.user?.farm_active
     if (b_id_farm) {
-        redirect(`/farm/${b_id_farm}`)
+        return redirect(`/farm/${b_id_farm}`)
     }
 
     // Get a list of possible farms of the user
@@ -64,7 +64,7 @@ export default function AppIndex() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="flex items-center gap-1">
                                     {loaderData.b_id_farm && loaderData.farmOptions ? (
-                                        loaderData.farmOptions.find(option => option.value === loaderData.b_id_farm).label
+                                        loaderData.farmOptions.find(option => option.value === loaderData.b_id_farm)?.label ?? 'Unknown farm'
                                     ) : `Kies een bedrijf`}
                                     <ChevronDown />
                                 </DropdownMenuTrigger>
