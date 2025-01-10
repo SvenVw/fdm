@@ -34,12 +34,20 @@ export async function loader({
     }
 
     // Set farm to active
-    await auth.api.updateUser({
-        body: {
-            farm_active: b_id_farm,
-        },
-        headers: request.headers
-    })
+    try {
+        await auth.api.updateUser({
+            body: {
+                farm_active: b_id_farm,
+            },
+            headers: request.headers
+        })
+    } catch (error) {
+        console.error("Failed to update active farm:", error);
+        throw data("Failed to update active farm", {
+            status: 500,
+            statusText: "Internal Server Error"
+        });
+    }
 
     // Get a list of possible farms of the user
     const farms = await getFarms(fdm)
