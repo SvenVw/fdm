@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 // components/custom/farm-layouts/types.ts
 export interface FarmOption {
     value: string;
@@ -28,7 +29,7 @@ export interface ContentLayoutProps extends BaseFarmLayoutProps {
     title: string;
     description?: string;
     sidebarItems?: SidebarNavItem[];
-    children?: React.ReactNode;
+    children?: ReactNode;
 }
 
 export interface PaginationItem {
