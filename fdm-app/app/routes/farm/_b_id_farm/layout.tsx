@@ -64,7 +64,7 @@ export default function AppIndex() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="flex items-center gap-1">
                                     {loaderData.b_id_farm && loaderData.farmOptions ? (
-                                        loaderData.farmOptions.find(option => option.value === loaderData.b_id_farm).label
+                                        loaderData.farmOptions.find(option => option.value === loaderData.b_id_farm)?.label ?? 'Unknown farm'
                                     ) : `Kies een bedrijf`}
                                     <ChevronDown />
                                 </DropdownMenuTrigger>
