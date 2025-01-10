@@ -13,25 +13,28 @@ import {
     children?: React.ReactNode;
   }
   
-  export function PaginationLayout({ items, currentPath, children }: PaginationLayoutProps) {
-    return (
-      <div className="space-y-6">
-        <Pagination>
-          <PaginationContent>
-            {items.map((item) => (
-              <PaginationItem key={item.href}>
-                <PaginationLink
-                  href={item.href}
-                  size="default"
-                  isActive={currentPath === item.href}
-                >
-                  {item.title}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-          </PaginationContent>
-        </Pagination>
-        {children}
-      </div>
-    );
-  }
+export function PaginationLayout({ items, currentPath, children }: PaginationLayoutProps) {
+  if (!items?.length) return null;
+
+  return (
+    <div className="space-y-6">
+      <Pagination aria-label="Farm navigation">
+        <PaginationContent role="navigation">
+          {items.map((item) => (
+            <PaginationItem key={item.href}>
+              <PaginationLink
+                href={item.href}
+                size="default"
+                isActive={currentPath === item.href}
+                aria-current={currentPath === item.href ? "page" : undefined}
+              >
+                {item.title}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+        </PaginationContent>
+      </Pagination>
+      {children}
+    </div>
+  );
+}
