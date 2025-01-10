@@ -15,30 +15,48 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 
+type LoaderReturn = {
+   farmOptions: Array<{ value: string; label: string }>
+}
+
 export async function loader({
     request,
-}: LoaderFunctionArgs) {
-
+}: LoaderFunctionArgs): Promise<LoaderReturn> {
     // Get the session
     const session = await auth.api.getSession({
         headers: request.headers
     })
 
+    if (!session) {
+        throw new Response('Unauthorized', { status: 401 })
+    }
+
     // Get a list of possible farms of the user
-    const farms = await getFarms(fdm)
-    const farmOptions = farms.map(farm => {
-        return {
-            value: farm.b_id_farm,
-            label: farm.b_name_farm
+    try {
+        const farms = await getFarms(fdm)
+        if (!Array.isArray(farms)) {
+            throw new Error('Invalid farms data structure')
         }
-    })
 
-    // Sort farms per name
-    farmOptions.sort((a, b) => a.label.localeCompare(b.label))
+        const farmOptions = farms.map(farm => {
+            if (!farm?.b_id_farm || !farm?.b_name_farm) {
+                throw new Error('Invalid farm data structure')
+            }
+            return {
+                value: farm.b_id_farm,
+                label: farm.b_name_farm
+            }
+        })
 
-    // Return user information from loader
-    return {
-        farmOptions: farmOptions
+        // Sort farms per name
+        farmOptions.sort((a, b) => a.label.localeCompare(b.label))
+
+        return {
+            farmOptions: farmOptions
+        }
+    } catch (error) {
+        console.error('Failed to fetch farms:', error)
+        throw new Response('Failed to load farms', { status: 500 })
     }
 }
 
