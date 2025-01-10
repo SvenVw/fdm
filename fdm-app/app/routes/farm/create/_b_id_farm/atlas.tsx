@@ -144,7 +144,6 @@ export async function action({
     throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
   }
   const selectedFields = JSON.parse(String(formData.get('selected_fields')))
-  console.log(selectedFields)
 
   // Add fields to farm
   const b_ids = await Promise.all(selectedFields.features.map(async (field, index) => {
@@ -206,5 +205,5 @@ export async function action({
     }
   }))
 
-  return redirectWithSuccess(`../create/new/${b_id_farm}/fields/`, { message: "Percelen zijn toegevoegd! 🎉" });
+  return redirectWithSuccess(`/farm/create/${b_id_farm}/fields/`, { message: "Percelen zijn toegevoegd! 🎉" });
 }
