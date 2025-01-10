@@ -9,8 +9,13 @@ import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 import { auth } from '@/lib/auth.server'
 
 
-export async function loader({ request }: LoaderFunctionArgs) {
-  return auth.handler(request)
+export async function loader({ request }: LoaderFunctionArgs): Promise<Response> {
+  try {
+    return auth.handler(request)
+  } catch (error) {
+    console.error('Social sign-in error:', error);
+    return new Response('Authentication failed', { status: 500 });
+  }
 }
 
 // Action
