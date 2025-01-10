@@ -42,7 +42,7 @@
     "preview": "vite preview",
     "test": "dotenvx run -- vitest run",
     "watch": "dotenvx run -- vitest",
-    "lint": "eslint ."
+    "lint": "biome lint --write ."
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.20.0",
