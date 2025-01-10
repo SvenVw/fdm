@@ -46,7 +46,7 @@
     "preview": "vite preview",
     "test": "dotenvx run -- vitest run",
     "watch": "dotenvx run -- vitest",
-    "lint": "biome lint --write ."
+    "lint": "biome check --fix --unsafe --organize-imports-enabled=true ./src && biome format --write ./src && biome lint --write --unsafe ./src"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.32.1",
