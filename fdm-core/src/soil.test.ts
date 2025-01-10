@@ -31,9 +31,11 @@ describe('Soil Analysis Functions', () => {
         await migrateFdmServer(fdm, migrationsFolderPath)
 
         // Create test field and analyses before each test
-        const farmName = 'Test Farm'
-        const farmSector = 'diary'
-        const b_id_farm = await addFarm(fdm, farmName, farmSector)
+        const farmName = 'Test Farm';
+        const farmBusinessId = '123456';
+        const farmAddress = '123 Farm Lane';
+        const farmPostalCode = '12345'; 
+        const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
         const fieldName = 'Test Field'
         const fieldIDSource = 'test-field-id'
