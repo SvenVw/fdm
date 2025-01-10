@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { NavLink } from "react-router";
 
 export default function MissingFarm() {
 
@@ -14,9 +15,9 @@ export default function MissingFarm() {
                     </p>
                 </div>
                 <Button>
-                    <a href="./farm/create/new">
+                    <NavLink to="./farm/create/new">
                         Maak een bedrijf
-                    </a>
+                    </NavLink>
                 </Button>
                 <p className="px-8 text-center text-sm text-muted-foreground">
                     De meeste gebruikers lukt het binnen 6 minuten.
