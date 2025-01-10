@@ -15,8 +15,9 @@ import { SidebarPage } from "@/components/custom/sidebar-page";
 // FDM
 import { fdm } from "@/lib/fdm.server";
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
-import { cn } from "@/lib/utils";
 import { PaginationLayout } from "@/components/custom/farm-layout/pagination";
+import { ContentLayout } from "@/components/custom/farm-layout/content";
+import { FarmHeader } from "@/components/custom/farm-layout/header";
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -71,39 +72,31 @@ export async function loader({
 // Main
 export default function CreateFarmCultivationsLayout() {
     const loaderData = useLoaderData<typeof loader>();
-    const { pathname } = useLocation();
-
-    const items = [
-        { title: 'Gewas', href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}` },
-        { title: 'Bemesting', href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers` },
-        { title: 'Vanggewas', href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop` }
-    ];
 
     return (
-        <PaginationLayout
-            items={items}
-            currentPath={pathname}
-        >
-            <div className="space-y-6">
-                <div>
-                    <h3 className="text-lg font-medium">{loaderData.cultivation.b_lu_name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                        {formatFieldNames(loaderData.cultivation.fields)}
-                    </p>
-                </div>
-                <Outlet />
-            </div>
-        </PaginationLayout>
+
+        <SidebarInset>
+            <FarmHeader
+                farmName={loaderData.b_name_farm}
+                breadcrumbs={[
+                    { label: "Maak een bedrijf" },
+                    { label: loaderData.b_name_farm },
+                    { label: "Vul het bouwplan in" }
+                ]}
+                action={{
+                    label: "Doorgaan",
+                    to: `/farm/create/${loaderData.b_id_farm}/cattle`,
+                    disabled: loaderData.sidebarPageItems.length === 0
+                }}
+            />
+            <ContentLayout
+                title="Bouwplan"
+                description="Vul de gegevens in per onderdeel van het bouwplan"
+                sidebarItems={loaderData.sidebarPageItems}
+            />
+            <Toaster />
+        </SidebarInset>
+
+
     );
-}
-
-function formatFieldNames(fields: { b_name: string }[]): string {
-    if (!fields?.length) return "Geen percelen geselecteerd";
-
-    const fieldNames = fields.map(field => field.b_name);
-    if (fieldNames.length === 1) return fieldNames[0];
-
-    if (fieldNames.length === 2) return `${fieldNames[0]} and ${fieldNames[1]}`;
-
-    return `${fieldNames.slice(0, -1).join(", ")}, and ${fieldNames[fieldNames.length - 1]}`;
 }
