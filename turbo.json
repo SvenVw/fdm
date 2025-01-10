@@ -22,6 +22,11 @@
                 "^check-types"
             ]
         },
+        "lint": {
+            "dependsOn": [
+                "^lint"
+            ]
+        },
         "test": {
             "outputs": [],
             "persistent": false,

@@ -15,6 +15,7 @@
   "scripts": {
     "test": "turbo run test",
     "build": "turbo run build",
+    "lint":  "turbo run lint",
     "build-docs": "turbo run build-docs",
     "watch": "turbo run watch",
     "changeset": "changeset",
