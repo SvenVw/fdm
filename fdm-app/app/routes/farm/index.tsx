@@ -24,12 +24,6 @@ export async function loader({
         headers: request.headers
     })
 
-    // Get the active farm and redirect to it
-    const b_id_farm = session?.user?.farm_active
-    if (b_id_farm) {
-        return redirect(`/farm/${b_id_farm}`)
-    }
-
     // Get a list of possible farms of the user
     const farms = await getFarms(fdm)
     const farmOptions = farms.map(farm => {
@@ -44,7 +38,6 @@ export async function loader({
 
     // Return user information from loader
     return {
-        b_id_farm: b_id_farm,
         farmOptions: farmOptions
     }
 }
