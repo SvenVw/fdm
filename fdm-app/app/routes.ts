@@ -81,9 +81,6 @@ export default [
     ]),
 
     // Authentication api
-    ...prefix("api/auth", [
-        route("sign-in/social", "./routes/api/auth/signin_social.tsx"),
-        route("callback/google", "./routes/api/auth/callback_google.tsx"),
-    ])
+    route("api/auth/*", "./routes/api/auth/index.tsx")
 
 ] satisfies RouteConfig;
