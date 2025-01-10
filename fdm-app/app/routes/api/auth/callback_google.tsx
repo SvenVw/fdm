@@ -1,4 +1,4 @@
-import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "react-router";
 
 // Components
 
@@ -8,12 +8,6 @@ import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "react
 // Services
 import { auth } from '@/lib/auth.server'
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "FDM App" },
-    { name: "description", content: "Welcome to FDM!" },
-  ];
-};
 
 export async function loader({ request }: LoaderFunctionArgs) {
   return auth.handler(request)
