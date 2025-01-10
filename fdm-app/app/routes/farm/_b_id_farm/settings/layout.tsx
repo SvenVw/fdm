@@ -1,11 +1,9 @@
-import { data, LoaderFunctionArgs, Outlet, useLoaderData } from "react-router";
+import { data, LoaderFunctionArgs, useLoaderData } from "react-router";
 import { getFarm, getFarms } from "@svenvw/fdm-core";
 import { fdm } from "@/lib/fdm.server";
 import { auth } from "@/lib/auth.server";
 
 // Components
-import { Separator } from "@/components/ui/separator";
-import { SidebarPage } from "@/components/custom/sidebar-page";
 import { ContentLayout } from "@/components/custom/farm-layout/content";
 
 // Blocks
@@ -21,9 +19,18 @@ export async function loader({
     }
 
     // Get details of farm
-    const farm = await getFarm(fdm, b_id_farm)
-    if (!farm) {
-        throw data("Farm is not found", { status: 404, statusText: "Farm is not found" });
+    let farm;
+    try {
+        const farm = await getFarm(fdm, b_id_farm)
+        if (!farm) {
+            throw data("Farm is not found", { status: 404, statusText: "Farm is not found" });
+        }
+    } catch (error) {
+        console.error("Failed to fetch farm details:", error);
+        throw data("Failed to fetch farm details", {
+            status: 500,
+            statusText: "Internal Server Error"
+        });
     }
 
     // Set farm to active
@@ -71,12 +78,12 @@ export async function loader({
 
 export default function FarmSettingsLayout() {
     const loaderData = useLoaderData<typeof loader>();
-    
+
     return (
-      <ContentLayout
-        title="Bedrijf"
-        description="Beheer de gegevens en instellingen van dit bedrijf"
-        sidebarItems={loaderData.sidebarPageItems}
-      />
+        <ContentLayout
+            title="Bedrijf"
+            description="Beheer de gegevens en instellingen van dit bedrijf"
+            sidebarItems={loaderData.sidebarPageItems}
+        />
     );
-  }
+}
