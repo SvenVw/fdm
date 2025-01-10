@@ -1,4 +1,3 @@
-// components/custom/farm-layouts/pagination.tsx
 import {
     Pagination,
     PaginationContent,
