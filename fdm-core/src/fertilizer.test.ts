@@ -118,9 +118,11 @@ describe('Fertilizer Data Model', () => {
     })
 
     it('should add a new fertilizer', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345'; 
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       // Add fertilizer to catalogue
       const p_source = 'custom'
@@ -197,9 +199,11 @@ describe('Fertilizer Data Model', () => {
     })
 
     it('should get fertilizers by farm ID', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345'; 
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       // Add fertilizer to catalogue
       const p_source = 'custom'
@@ -272,9 +276,11 @@ describe('Fertilizer Data Model', () => {
     })
 
     it('should remove a fertilizer', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345'; 
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       // Add fertilizer to catalogue
       const p_source = 'custom'
@@ -359,8 +365,11 @@ describe('Fertilizer Data Model', () => {
     let p_id_catalogue: string;
 
     beforeAll(async () => {
-
-      const b_id_farm = await addFarm(fdm, 'test farm', 'arable');
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345'; 
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       b_id = await addField(
         fdm,
