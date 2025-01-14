@@ -60,7 +60,7 @@ export default function FarmSettingsPropertiesBlock() {
             b_address_farm: loaderData.farm.b_address_farm ? loaderData.farm.b_address_farm : "",
             b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
         });
-    }, [loaderData, form])
+    }, [loaderData])
 
     return (
         <div className="space-y-6">
