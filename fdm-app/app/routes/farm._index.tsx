@@ -106,11 +106,14 @@ export default function AppIndex() {
                                                     </div>
 
                                                     <div className="">
-                                                        <NavLink to={`/farm/${option.b_id_farm}`}>
-                                                            <Button>
+                                                        <Button
+                                                            asChild
+                                                            aria-label={`Selecteer ${option.b_name_farm}`}
+                                                        >
+                                                            <NavLink to={`/farm/${option.b_id_farm}`}>
                                                                 Selecteer
-                                                            </Button>
-                                                        </NavLink>
+                                                            </NavLink>
+                                                        </Button>
                                                     </div>
 
                                                 </div>
