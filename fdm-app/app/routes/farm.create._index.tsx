@@ -95,7 +95,7 @@ export async function action({
 
   // Create a farm
   try {
-    const b_id_farm = await addFarm(fdm, b_name_farm, null);
+    const b_id_farm = await addFarm(fdm, b_name_farm, null, null, null);
     const fertilizers = await getFertilizersFromCatalogue(fdm);
     await Promise.all(
       fertilizers.map(fertilizer =>
