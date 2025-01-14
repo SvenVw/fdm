@@ -2,6 +2,7 @@ import { FarmContent } from "@/components/custom/farm/farm-content";
 import { FarmHeader } from "@/components/custom/farm/farm-header";
 import { FarmTitle } from "@/components/custom/farm/farm-title";
 import { SidebarInset } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { auth } from "@/lib/auth.server";
 import { fdm } from "@/lib/fdm.server";
 import { getFarm, getFarms } from "@svenvw/fdm-core";
@@ -101,6 +102,7 @@ export default function FarmContentBlock() {
                     sidebarItems={loaderData.sidebarPageItems}       
                     children={<Outlet/>}             
                 />
+                <Toaster/>
             </main>
         </SidebarInset>
     )
