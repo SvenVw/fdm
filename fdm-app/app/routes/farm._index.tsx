@@ -17,29 +17,45 @@ import { getTimeBasedGreeting } from "@/lib/greetings";
 export async function loader({
     request,
 }: LoaderFunctionArgs) {
-
-    // Get the session
-    const session = await auth.api.getSession({
-        headers: request.headers
-    })
-
-    // Get the active farm and redirect to it
-    const b_id_farm = session?.user?.farm_active
-
-    // Get a list of possible farms of the user
-    const farms = await getFarms(fdm)
-    const farmOptions = farms.map(farm => {
-        return {
-            b_id_farm: farm.b_id_farm,
-            b_name_farm: farm.b_name_farm
+    try {
+        // Get the session
+        const session = await auth.api.getSession({
+            headers: request.headers
+        })
+        
+        if (!session?.user) {
+            throw new Response("Unauthorized", { status: 401 });
         }
-    })
 
-    // Return user information from loader
-    return {
-        b_id_farm: b_id_farm,
-        farmOptions: farmOptions,
-        user: session?.user
+        // Get the active farm and redirect to it
+        const b_id_farm = session?.user?.farm_active
+
+        // Get a list of possible farms of the user
+        const farms = await getFarms(fdm)
+        if (!Array.isArray(farms)) {
+            throw new Error("Invalid farms data received");
+        }
+
+        const farmOptions = farms.map(farm => {
+            if (!farm?.b_id_farm || !farm?.b_name_farm) {
+                throw new Error("Invalid farm data structure");
+            }
+            return {
+                b_id_farm: farm.b_id_farm,
+                b_name_farm: farm.b_name_farm
+            }
+        })
+
+        // Return user information from loader
+        return {
+            b_id_farm: b_id_farm,
+            farmOptions: farmOptions,
+            user: session.user
+        }
+    } catch (error) {
+        throw new Response(error instanceof Error ? error.message : "Internal Server Error", {
+            status: error instanceof Response ? error.status : 500
+        });
     }
 }
 
