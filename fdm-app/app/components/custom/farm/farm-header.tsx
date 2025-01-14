@@ -28,7 +28,7 @@ export function FarmHeader({farmOptions, b_id_farm, action}: FarmHeaderProps) {
                             Bedrijf
                         </BreadcrumbLink>
                     </BreadcrumbItem>
-                    {farmOptions ?
+                    {farmOptions  && farmOptions.length > 0 ?
                         <>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem>

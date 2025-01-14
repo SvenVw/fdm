@@ -53,8 +53,8 @@ export async function loader({
     const farms = await getFarms(fdm)
     const farmOptions = farms.map(farm => {
         return {
-            value: farm.b_id_farm,
-            label: farm.b_name_farm
+            b_id_farm: farm.b_id_farm,
+            b_name_farm: farm.b_name_farm
         }
     })
 
