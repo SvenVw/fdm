@@ -12,10 +12,17 @@ export async function loader({
     }
 
     // Set the farm id to active
-    await auth.api.updateUser({
-        body: {
-            farm_active: b_id_farm,
-        },
-        headers: request.headers
-    })
+    try {
+        await auth.api.updateUser({
+            body: {
+                farm_active: b_id_farm,
+            },
+            headers: request.headers
+        })
+    } catch (error) {
+        throw data("Failed to update active farm", {
+            status: 500,
+            statusText: "Internal Server Error"
+        });
+    }
 }
