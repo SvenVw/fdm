@@ -14,6 +14,7 @@ import { z } from "zod";
 import validator from 'validator';
 import { dataWithError, dataWithSuccess } from "remix-toast";
 import { extractFormValuesFromRequest } from "@/lib/form";
+import { Separator } from "@/components/ui/separator";
 const { isPostalCode } = validator
 
 export async function loader({
@@ -59,105 +60,114 @@ export default function FarmSettingsPropertiesBlock() {
             b_address_farm: loaderData.farm.b_address_farm ? loaderData.farm.b_address_farm : "",
             b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
         });
-    }, [loaderData])
+    }, [loaderData, form])
 
     return (
-        <RemixFormProvider {...form}>
-            <Form id="formFarmProperties" onSubmit={form.handleSubmit} method="POST">
-                <fieldset disabled={form.formState.isSubmitting}>
-                    <div className="grid grid-cols-2 w-full items-center gap-4">
-                        <div className="flex flex-col space-y-1.5 col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="b_name_farm"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Bedrijfsnaam</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="bv. De Vries V.O.F." {...field} required />
-                                        </FormControl>
-                                        <FormDescription />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="flex flex-col space-y-1.5 col-span-1">
-                            <FormField
-                                control={form.control}
-                                name="b_businessid_farm"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Kvk nummer</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="bv. 9102 1934" {...field} />
-                                        </FormControl>
-                                        <FormDescription >
-                                            Het Kamer van Koophandel nummer waarmee dit bedrijf is ingeschreven
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="flex flex-col space-y-1.5 col-span-2">
-                            <FormField
-                                control={form.control}
-                                name="b_address_farm"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Adres</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                placeholder="bv. Nieuwe Kanaal 7 
+        <div className="space-y-6">
+            <div>
+                <h3 className="text-lg font-medium">Gegevens</h3>
+                <p className="text-sm text-muted-foreground">
+                    Werk de gegevens bij van dit bedrijf
+                </p>
+            </div>
+            <Separator />
+            <RemixFormProvider {...form}>
+                <Form id="formFarmProperties" onSubmit={form.handleSubmit} method="POST">
+                    <fieldset disabled={form.formState.isSubmitting}>
+                        <div className="grid grid-cols-2 w-full items-center gap-4">
+                            <div className="flex flex-col space-y-1.5 col-span-2">
+                                <FormField
+                                    control={form.control}
+                                    name="b_name_farm"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Bedrijfsnaam</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="bv. De Vries V.O.F." {...field} required />
+                                            </FormControl>
+                                            <FormDescription />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5 col-span-1">
+                                <FormField
+                                    control={form.control}
+                                    name="b_businessid_farm"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Kvk nummer</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="bv. 9102 1934" {...field} />
+                                            </FormControl>
+                                            <FormDescription >
+                                                Het Kamer van Koophandel nummer waarmee dit bedrijf is ingeschreven
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5 col-span-2">
+                                <FormField
+                                    control={form.control}
+                                    name="b_address_farm"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Adres</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder="bv. Nieuwe Kanaal 7 
 Wageningen"
-                                                className="resize-none"
-                                                autoComplete="address"
-                                                rows={3}
-                                                maxLength={300}
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormDescription >
+                                                    className="resize-none"
+                                                    autoComplete="address"
+                                                    rows={3}
+                                                    maxLength={300}
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormDescription >
 
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                        <div className="flex flex-col space-y-1.5 col-span-1">
-                            <FormField
-                                control={form.control}
-                                name="b_postalcode_farm"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Postcode</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="bv. 1234 AB" {...field} autoComplete="postal-code" maxLength={300} />
-                                        </FormControl>
-                                        <FormDescription />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-                    </div >
-                </fieldset>
-                <br />
-                <div className="ml-auto">
-                    <Button
-                        type="submit"
-                        disabled={form.formState.isSubmitting}
-                        className="m-auto"
-                    >
-                        {form.formState.isSubmitting && <LoadingSpinner />}
-                        Bijwerken
-                    </Button>
-                </div>
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5 col-span-1">
+                                <FormField
+                                    control={form.control}
+                                    name="b_postalcode_farm"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Postcode</FormLabel>
+                                            <FormControl>
+                                                <Input placeholder="bv. 1234 AB" {...field} autoComplete="postal-code" maxLength={300} />
+                                            </FormControl>
+                                            <FormDescription />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </div >
+                    </fieldset>
+                    <br />
+                    <div className="ml-auto">
+                        <Button
+                            type="submit"
+                            disabled={form.formState.isSubmitting}
+                            className="m-auto"
+                        >
+                            {form.formState.isSubmitting && <LoadingSpinner />}
+                            Bijwerken
+                        </Button>
+                    </div>
 
-            </Form>
-        </RemixFormProvider>
+                </Form>
+            </RemixFormProvider>
+        </div>
     )
 }
 
