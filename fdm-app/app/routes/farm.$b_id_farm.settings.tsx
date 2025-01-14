@@ -50,7 +50,16 @@ export async function loader({
     }
 
     // Get a list of possible farms of the user
-    const farms = await getFarms(fdm)
+    let farms;
+    try {
+        farms = await getFarms(fdm)
+    } catch (error) {
+        console.error("Failed to fetch farms list:", error);
+        throw data("Failed to fetch farms list", {
+            status: 500,
+            statusText: "Internal Server Error"
+        });
+    }
     const farmOptions = farms.map(farm => {
         return {
             b_id_farm: farm.b_id_farm,
