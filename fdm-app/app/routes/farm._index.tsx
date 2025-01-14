@@ -83,10 +83,10 @@ export default function AppIndex() {
                                     Gebruik onze wizard en maak snel je eigen bedrijf aan
                                 </p>
                             </div>
-                            <Button>
-                                <a href="./farm/create">
+                            <Button asChild>
+                                <NavLink to="./create">
                                     Maak een bedrijf
-                                </a>
+                                </NavLink>
                             </Button>
                             <p className="px-8 text-center text-sm text-muted-foreground">
                                 De meeste gebruikers lukt het binnen 6 minuten.
