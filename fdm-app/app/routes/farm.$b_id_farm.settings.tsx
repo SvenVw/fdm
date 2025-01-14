@@ -99,9 +99,10 @@ export default function FarmContentBlock() {
                     description={"Beheer de instellingen van je bedrijf"}
                 />
                 <FarmContent
-                    sidebarItems={loaderData.sidebarPageItems}       
-                    children={<Outlet/>}             
-                />
+                    sidebarItems={loaderData.sidebarPageItems}
+                >
+                    <Outlet/>
+                </FarmContent>
                 <Toaster/>
             </main>
         </SidebarInset>
