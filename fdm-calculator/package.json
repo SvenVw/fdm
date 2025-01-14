@@ -45,12 +45,12 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.20.0",
+    "@dotenvx/dotenvx": "catalog:",
     "@svenvw/fdm-core": "workspace:*",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.8",
-    "vite-plugin-dts": "^4.0.2",
-    "vitest": "^2.0.5"
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "@svenvw/fdm-core": "workspace:>=0.3.1"
