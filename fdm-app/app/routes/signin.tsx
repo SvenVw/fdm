@@ -106,7 +106,7 @@ export default function SignIn() {
                                 try {
                                     await signIn.social({
                                         provider: "google",
-                                        callbackURL: "/app"
+                                        callbackURL: "/farm"
                                     });
                                 } catch (error) {
                                     console.error('Social sign-in failed:', error);                                  
