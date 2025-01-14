@@ -12,6 +12,7 @@ import { FarmTitle } from "@/components/custom/farm/farm-title";
 import { auth } from "@/lib/auth.server";
 import { getFarms } from "@svenvw/fdm-core";
 import { fdm } from "@/lib/fdm.server";
+import { getTimeBasedGreeting } from "@/lib/greetings";
 
 export async function loader({
     request,
@@ -44,20 +45,7 @@ export async function loader({
 
 export default function AppIndex() {
     const loaderData = useLoaderData<typeof loader>()
-
-    // Check time of day and adjust greeting
-    let greeting = '';
-    const now = new Date();
-    const hours = now.getHours();
-    if (hours < 5) {
-        greeting = "Goedenacht";
-    } else if (hours >= 5 && hours < 12) {
-        greeting = "Goedemorgen";
-    } else if (hours >= 12 && hours < 18) {
-        greeting = "Goedemiddag";
-    } else if (hours >= 18) {
-        greeting = "Goedenavond";
-    }
+    const greeting = getTimeBasedGreeting();
 
     return (
 
