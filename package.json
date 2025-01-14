@@ -21,8 +21,8 @@
     "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish "
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.10",
-    "turbo": "^2.3.2"
+    "@changesets/cli": "^2.27.11",
+    "turbo": "^2.3.3"
   },
   "packageManager": "pnpm@9.14.2",
   "pnpm": {
