@@ -210,7 +210,9 @@ const FormSchema = z.object({
     }),
     b_businessid_farm: z.string().optional(),
     b_address_farm: z.string().optional(),
-    b_postalcode_farm: z.string().refine(value => isPostalCode(value, 'NL'), {
-        message: "Ongeldige postcode",
-    }).optional()
+    b_postalcode_farm: z.string()
+        .optional()
+        .refine(value => !value || isPostalCode(value, 'NL'), {
+            message: "Ongeldige postcode",
+        })
 })
