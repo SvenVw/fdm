@@ -206,8 +206,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 // Form Schema
 const FormSchema = z.object({
     b_name_farm: z.string().min(3, {
-        message: "Minimaal 3 karakters",
-    }).min(3, {
         message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
     }),
     b_businessid_farm: z.string().optional(),
