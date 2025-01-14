@@ -72,7 +72,7 @@ export async function loader({
     const sidebarPageItems = fields.map(field => {
         return {
             title: field.b_name,
-            to: `/app/addfarm/${b_id_farm}/fields/${field.b_id}`
+            to: `/farm/create/${b_id_farm}/fields/${field.b_id}`
         }
     })
 
@@ -82,7 +82,7 @@ export async function loader({
         mapboxToken: mapboxToken,
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
-        action: `/app/addfarm/${b_id_farm}/fields`
+        action: `/farm/create/${b_id_farm}/fields`
     }
 
 }
@@ -130,7 +130,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/app/addfarm/${loaderData.b_id_farm}/cultivations`}
+                                to={`/farm/create/${loaderData.b_id_farm}/cultivations`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none": loaderData.sidebarPageItems.length === 0
                                 })}

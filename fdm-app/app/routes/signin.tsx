@@ -21,7 +21,7 @@ export async function loader({
 
     // If user has an session redirect to app
     if (session?.session) {
-        return redirect("/app")
+        return redirect("/farm")
     }
 
     // Return user information from loader

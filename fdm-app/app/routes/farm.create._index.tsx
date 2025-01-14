@@ -73,7 +73,7 @@ export default function AddFarmPage() {
       <main>
         <Farm
           b_name_farm={loaderData.b_name_farm}
-          action={"/app/addfarm/new"}
+          action={"/farm/create"}
           FormSchema={FormSchema}
         />
       </main>
