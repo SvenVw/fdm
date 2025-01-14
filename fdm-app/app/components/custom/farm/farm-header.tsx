@@ -55,7 +55,7 @@ export function FarmHeader({farmOptions, b_id_farm, action}: FarmHeaderProps) {
                                 </DropdownMenu>
                             </BreadcrumbItem>
                         </>
-                        : <></>
+                        : null
                     }
                 </BreadcrumbList>
             </Breadcrumb>
