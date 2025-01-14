@@ -21,7 +21,7 @@ export async function loader({
     // Get details of farm
     let farm;
     try {
-        const farm = await getFarm(fdm, b_id_farm)
+        farm = await getFarm(fdm, b_id_farm)
         if (!farm) {
             throw data("Farm is not found", { status: 404, statusText: "Farm is not found" });
         }
