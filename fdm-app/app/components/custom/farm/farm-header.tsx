@@ -45,8 +45,7 @@ export function FarmHeader({farmOptions, b_id_farm, action}: FarmHeaderProps) {
                                                 checked={b_id_farm === option.b_id_farm}
                                                 key={option.b_id_farm}
                                             >
-                                                <NavLink
-                                                    key={option.b_id_farm}
+                                                <NavLink                                                    
                                                     to={`/farm/${option.b_id_farm}`}>
                                                     {option.b_name_farm}
                                                 </NavLink>
