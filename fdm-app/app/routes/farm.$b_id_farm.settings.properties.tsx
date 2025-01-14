@@ -1,6 +1,6 @@
 import { LoadingSpinner } from "@/components/custom/loadingspinner";
 import { Button } from "@/components/ui/button";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { fdm } from "@/lib/fdm.server";
@@ -206,13 +206,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
 // Form Schema
 const FormSchema = z.object({
     b_name_farm: z.string().min(3, {
-        message: "Minimaal 3 karakters",
-    }).min(3, {
         message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
     }),
     b_businessid_farm: z.string().optional(),
     b_address_farm: z.string().optional(),
-    b_postalcode_farm: z.string().refine(value => isPostalCode(value, 'NL'), {
-        message: "Ongeldige postcode",
-    }).optional()
+    b_postalcode_farm: z.string()
+        .optional()
+        .refine(value => !value || isPostalCode(value, 'NL'), {
+            message: "Ongeldige postcode",
+        })
 })
