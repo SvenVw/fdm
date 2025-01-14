@@ -56,7 +56,7 @@ export default function AppIndex() {
     } else if (hours >= 12 && hours < 18) {
         greeting = "Goedemiddag";
     } else if (hours >= 18) {
-        greeting = "Goedeavond";
+        greeting = "Goedenavond";
     }
 
     return (
