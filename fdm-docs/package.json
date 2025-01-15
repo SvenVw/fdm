@@ -1,5 +1,5 @@
 {
-  "name": "fdm-docs",
+  "name": "@svenvw/fdm-docs",
   "version": "0.2.0",
   "private": true,
   "scripts": {
