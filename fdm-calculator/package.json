@@ -41,11 +41,9 @@
     "prepare": "pnpm build",
     "preview": "vite preview",
     "test": "dotenvx run -- vitest run",
-    "watch": "dotenvx run -- vitest",
-    "lint": "biome check --fix --unsafe --organize-imports-enabled=true ./src && biome format --write ./src && biome lint --write --unsafe ./src"
+    "watch": "dotenvx run -- vitest"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:",
     "@dotenvx/dotenvx": "catalog:",
     "@svenvw/fdm-core": "workspace:*",
     "typescript": "catalog:",

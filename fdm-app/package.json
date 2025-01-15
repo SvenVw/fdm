@@ -9,7 +9,6 @@
     "db:generate": "npx @better-auth/cli generate --output ./db/schema.ts --config app/lib/auth.server.ts && npx drizzle-kit generate",
     "dev": "dotenvx run -- react-router dev",
     "dotenvx": "dotenvx",
-    "lint": "biome check --fix --unsafe --organize-imports-enabled=true ./app && biome format --write ./app && biome lint --write --unsafe ./app",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
@@ -61,7 +60,6 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:",
     "@dotenvx/dotenvx": "catalog:",
     "@react-router/dev": "^7.1.1",
     "@react-router/fs-routes": "^7.1.1",
