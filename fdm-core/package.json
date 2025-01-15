@@ -59,7 +59,7 @@
     "typedoc": "^0.26.11",
     "typedoc-plugin-missing-exports": "^3.1.0",
     "typescript": "catalog:",
-    "typescript-eslint": "catalog:",
+    "typescript-eslint": "^8.20.0",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "vitest": "catalog:"
