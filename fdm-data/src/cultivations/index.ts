@@ -1,5 +1,10 @@
-import { addCultivationToCatalogue, getCultivationsFromCatalogue, type FdmType, fdmSchema } from "@svenvw/fdm-core";
-import { getCatalogueBrp } from "./catalogues/brp";
+import {
+    type FdmType,
+    addCultivationToCatalogue,
+    type fdmSchema,
+    getCultivationsFromCatalogue,
+} from "@svenvw/fdm-core"
+import { getCatalogueBrp } from "./catalogues/brp"
 
 /**
  * Extends the cultivations catalogue in the Farm Data Model (FDM) with data from a specified source.
@@ -9,11 +14,13 @@ import { getCatalogueBrp } from "./catalogues/brp";
  *
  * @throws An error if the specified catalogue name is not recognized.
  */
-export async function extendCultivationsCatalogue(fdm: FdmType, catalogueName: string): Promise<void> {
-
+export async function extendCultivationsCatalogue(
+    fdm: FdmType,
+    catalogueName: string,
+): Promise<void> {
     // Get the specified catalogue
     let catalogue: fdmSchema.cultivationsCatalogueTypeInsert[] = []
-    if (catalogueName == 'brp') {
+    if (catalogueName == "brp") {
         catalogue = getCatalogueBrp()
     }
 
@@ -27,32 +34,31 @@ export async function extendCultivationsCatalogue(fdm: FdmType, catalogueName: s
 
     // Add cultivations to catalogue
     try {
-        await Promise.all(catalogue.map(async cultivation => {
+        await Promise.all(
+            catalogue.map(async (cultivation) => {
+                // Check if cultivation is already present in catalogue
+                const cultivationInCatalogue = cultivationsCatalogue.find(
+                    (x: fdmSchema.cultivationsCatalogueTypeSelect) =>
+                        x.b_lu_catalogue === cultivation.b_lu_catalogue,
+                )
 
-            // Check if cultivation is already present in catalogue
-            const cultivationInCatalogue = cultivationsCatalogue.find(
-                (x: fdmSchema.cultivationsCatalogueTypeSelect) =>
-                    x.b_lu_catalogue === cultivation.b_lu_catalogue
-            );
-
-            // If cultivation is not present in catalogue, add it to fdm instance
-            // TODO: Update values if they differ
-            if (!cultivationInCatalogue) {
-                await addCultivationToCatalogue(
-                    fdm,
-                    {
+                // If cultivation is not present in catalogue, add it to fdm instance
+                // TODO: Update values if they differ
+                if (!cultivationInCatalogue) {
+                    await addCultivationToCatalogue(fdm, {
                         b_lu_catalogue: cultivation.b_lu_catalogue,
                         b_lu_source: cultivation.b_lu_source,
                         b_lu_name: cultivation.b_lu_name,
                         b_lu_name_en: cultivation.b_lu_name_en,
                         b_lu_hcat3: cultivation.b_lu_hcat3,
-                        b_lu_hcat3_name: cultivation.b_lu_hcat3_name
-                    }
-                )
-            }
-        }))
+                        b_lu_hcat3_name: cultivation.b_lu_hcat3_name,
+                    })
+                }
+            }),
+        )
     } catch (error) {
-        throw new Error(`Failed to extend cultivations catalogue: ${(error as Error).message}`);
+        throw new Error(
+            `Failed to extend cultivations catalogue: ${(error as Error).message}`,
+        )
     }
 }
-

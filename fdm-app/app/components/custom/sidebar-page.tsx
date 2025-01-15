@@ -1,7 +1,7 @@
-import { useLocation, NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router"
 
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 export interface SidebarPageProps extends React.HTMLAttributes<HTMLElement> {
     items: {
@@ -11,13 +11,13 @@ export interface SidebarPageProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
-    const { pathname } = useLocation();
+    const { pathname } = useLocation()
 
     return (
         <nav
             className={cn(
                 "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 truncate",
-                className
+                className,
             )}
             {...props}
         >
@@ -32,7 +32,7 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
                         pathname.startsWith(item.to)
                             ? "bg-muted hover:bg-muted"
                             : "hover:bg-transparent hover:underline",
-                        "justify-start"
+                        "justify-start",
                     )}
                 >
                     {item.title}

@@ -1,22 +1,19 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
+import { redirect } from "react-router"
 
 // Components
 import { Button } from "@/components/ui/button"
 import { Check, MoveDown } from "lucide-react"
 
+import { signIn } from "@/lib/auth-client"
+import { auth } from "@/lib/auth.server"
 // Services
-import { cn } from "@/lib/utils";
-import { signIn } from "@/lib/auth-client";
-import { auth } from "@/lib/auth.server";
+import { cn } from "@/lib/utils"
 
-export async function loader({
-    request,
-}: LoaderFunctionArgs) {
-
+export async function loader({ request }: LoaderFunctionArgs) {
     // Get the session
     const session = await auth.api.getSession({
-        headers: request.headers
+        headers: request.headers,
     })
 
     // If user has an session redirect to app
@@ -28,9 +25,7 @@ export async function loader({
     return {}
 }
 
-
 export default function SignIn() {
-
     return (
         <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
             <div className="flex h-screen items-center justify-center py-12">
@@ -47,13 +42,16 @@ export default function SignIn() {
                                     key="nutrientenbalans"
                                     className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
                                 >
-                                    <span><Check /> </span>
+                                    <span>
+                                        <Check />{" "}
+                                    </span>
                                     <div className="space-y-1">
                                         <p className="text-sm text-left font-medium leading-none">
                                             Nutriëntenbalans
                                         </p>
                                         <p className="text-sm text-left text-muted-foreground">
-                                            Aanvoer en afvoer van nutriënten op bedrijfsniveau
+                                            Aanvoer en afvoer van nutriënten op
+                                            bedrijfsniveau
                                         </p>
                                     </div>
                                 </div>
@@ -64,13 +62,16 @@ export default function SignIn() {
                                     key="osbalans"
                                     className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
                                 >
-                                    <span><Check /> </span>
+                                    <span>
+                                        <Check />{" "}
+                                    </span>
                                     <div className="space-y-1">
                                         <p className="text-sm text-left font-medium leading-none">
                                             OS Balans
                                         </p>
                                         <p className="text-sm text-left text-muted-foreground">
-                                            Opbouw van organische stof per perceel
+                                            Opbouw van organische stof per
+                                            perceel
                                         </p>
                                     </div>
                                 </div>
@@ -80,36 +81,43 @@ export default function SignIn() {
                                     key="baat"
                                     className="mb-4 grid grid-cols-[25px_1fr] space-x-2 items-start pb-4 last:mb-0 last:pb-0"
                                 >
-                                    <span><Check /> </span>
+                                    <span>
+                                        <Check />{" "}
+                                    </span>
                                     <div className="space-y-1">
                                         <p className="text-sm text-left font-medium leading-none">
                                             Meststofkeuzeadviestool
                                         </p>
                                         <p className="text-sm text-left text-muted-foreground">
-                                            Integraal bemestingsadvies dat rekening houdt met productie en milieu
+                                            Integraal bemestingsadvies dat
+                                            rekening houdt met productie en
+                                            milieu
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div className={cn(
-                        "w-full gap-2 flex items-center",
-                        "justify-between flex-col"
-                    )}>
+                    <div
+                        className={cn(
+                            "w-full gap-2 flex items-center",
+                            "justify-between flex-col",
+                        )}
+                    >
                         <Button
                             variant={"default"}
-                            className={cn(
-                                "w-full gap-2"
-                            )}
+                            className={cn("w-full gap-2")}
                             onClick={async () => {
                                 try {
                                     await signIn.social({
                                         provider: "google",
-                                        callbackURL: "/farm"
-                                    });
+                                        callbackURL: "/farm",
+                                    })
                                 } catch (error) {
-                                    console.error('Social sign-in failed:', error);                                  
+                                    console.error(
+                                        "Social sign-in failed:",
+                                        error,
+                                    )
                                 }
                             }}
                         >
@@ -128,25 +136,27 @@ export default function SignIn() {
                         </Button>
                     </div>
                     <div className="mt-4 text-center text-sm">
-                    Door verder te gaan, gaat u akkoord met het <a href="/privacy" className="underline">
+                        Door verder te gaan, gaat u akkoord met het{" "}
+                        <a href="/privacy" className="underline">
                             Privacybeleid
-                        </a>                       
+                        </a>
                     </div>
                     <div className="mb-4 text-center text-sm">
-                      <Button
-                      variant={"outline"}>
-                        Lees meer over FDM <MoveDown />
-                      </Button>
+                        <Button variant={"outline"}>
+                            Lees meer over FDM <MoveDown />
+                        </Button>
                     </div>
                 </div>
             </div>
             <div className="hidden bg-muted lg:block">
-                <img src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                <img
+                    src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                     alt=""
                     width="1920"
                     height="1080"
-                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale" />
+                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                />
             </div>
-        </div >
+        </div>
     )
 }

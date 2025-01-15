@@ -1,5 +1,11 @@
-import { type MetaFunction, type LoaderFunctionArgs, data, useLocation, Outlet } from "react-router";
-import { useLoaderData } from "react-router";
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    Outlet,
+    data,
+    useLocation,
+} from "react-router"
+import { useLoaderData } from "react-router"
 
 // Components
 import {
@@ -9,104 +15,117 @@ import {
     PaginationLink,
 } from "@/components/ui/pagination"
 
+import {
+    getCultivationPlan,
+    getCultivationsFromCatalogue,
+} from "@svenvw/fdm-core"
 // FDM
-import { fdm } from "../lib/fdm.server";
-import { getCultivationPlan, getCultivationsFromCatalogue } from "@svenvw/fdm-core";
+import { fdm } from "../lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
         { title: "FDM App" },
         { name: "description", content: "Welcome to FDM!" },
-    ];
-};
+    ]
+}
 
 // Loader
-export async function loader({
-    request, params
-}: LoaderFunctionArgs) {
-
+export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
+        })
     }
 
     // Get the cultivation
     const b_lu_catalogue = params.b_lu_catalogue
     if (!b_lu_catalogue) {
-        throw data("Cultivation catalogue ID is required", { status: 400, statusText: "Cultivation catalogue ID is required" });
+        throw data("Cultivation catalogue ID is required", {
+            status: 400,
+            statusText: "Cultivation catalogue ID is required",
+        })
     }
 
     // Get the cultivation details for this cultivation
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(error => {
-        throw data("Failed to fetch cultivation plan", { status: 500, statusText: error.message });
-    });
+    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
+        (error) => {
+            throw data("Failed to fetch cultivation plan", {
+                status: 500,
+                statusText: error.message,
+            })
+        },
+    )
 
-    const cultivation = cultivationPlan.find(cultivation => cultivation.b_lu_catalogue === b_lu_catalogue);
+    const cultivation = cultivationPlan.find(
+        (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+    )
     if (!cultivation) {
-        throw data("Cultivation not found", { status: 404, statusText: "Cultivation not found" });
+        throw data("Cultivation not found", {
+            status: 404,
+            statusText: "Cultivation not found",
+        })
     }
 
     // Cultivation options
     const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    const cultivationOptions = cultivationsCatalogue.map(cultivation => {
+    const cultivationOptions = cultivationsCatalogue.map((cultivation) => {
         return {
             value: cultivation.b_lu_catalogue,
-            label: cultivation.b_lu_name
+            label: cultivation.b_lu_name,
         }
     })
 
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        cultivation: cultivation
+        cultivation: cultivation,
     }
 }
 
 // Main
 export default function Index() {
-    const loaderData = useLoaderData<typeof loader>();
-    const { pathname } = useLocation();
+    const loaderData = useLoaderData<typeof loader>()
+    const { pathname } = useLocation()
 
     // Get field names
-    let fieldNames = loaderData.cultivation.fields.map(field => field.b_name)
+    let fieldNames = loaderData.cultivation.fields.map((field) => field.b_name)
     if (fieldNames.length > 1) {
         fieldNames = fieldNames.join(", ")
-        fieldNames = fieldNames.replace(/,(?=[^,]+$)/, ', en') //Replace last comma with and        
+        fieldNames = fieldNames.replace(/,(?=[^,]+$)/, ", en") //Replace last comma with and
     }
 
     const items = [
         {
-            title: 'Gewas',
-            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`
+            title: "Gewas",
+            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`,
         },
         {
-            title: 'Bemesting',
-            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`
+            title: "Bemesting",
+            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`,
         },
         {
-            title: 'Vanggewas',
-            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`
-        }
+            title: "Vanggewas",
+            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`,
+        },
     ]
 
     return (
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-medium">{loaderData.cultivation.b_lu_name}</h3>
-                <p className="text-sm text-muted-foreground">
-                    {fieldNames}
-                </p>
+                <h3 className="text-lg font-medium">
+                    {loaderData.cultivation.b_lu_name}
+                </h3>
+                <p className="text-sm text-muted-foreground">{fieldNames}</p>
             </div>
 
             <Pagination>
                 <PaginationContent className="">
-
                     {items.map((item) => (
-                        <PaginationItem
-                            key={item.href}
-                        >
+                        <PaginationItem key={item.href}>
                             <PaginationLink
                                 href={item.href}
                                 size="default"
@@ -120,5 +139,5 @@ export default function Index() {
             </Pagination>
             <Outlet />
         </div>
-    );
+    )
 }

@@ -1,15 +1,11 @@
-import { Form, useFetcher } from "react-router"
-import { format } from "date-fns"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRemixForm, RemixFormProvider } from "remix-hook-form"
+import { format } from "date-fns"
+import { Form, useFetcher } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 
-// Components
-import { CalendarIcon } from "lucide-react"
+import { Combobox } from "@/components/custom/combobox"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import {
     FormControl,
@@ -19,54 +15,69 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { Combobox } from "@/components/custom/combobox"
+import { Input } from "@/components/ui/input"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Separator } from "@/components/ui/separator"
+// Components
+import { CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { LoadingSpinner } from "./loadingspinner"
 import { useEffect } from "react"
+import { LoadingSpinner } from "./loadingspinner"
 
 export const FormSchema = z.object({
-    p_app_amount: z.coerce.number({
-        required_error: "Hoeveelheid is verplicht",
-        invalid_type_error: "Hoeveelheid moet een getal zijn",
-    }).positive({
-        message: "Hoeveelheid moet positief zijn",
-    }).finite({
-        message: "Hoeveelheid moet een geheel getal zijn",
-    }).safe({
-        message: "Hoeveelheid moet een safe getal zijn",
-    }),
+    p_app_amount: z.coerce
+        .number({
+            required_error: "Hoeveelheid is verplicht",
+            invalid_type_error: "Hoeveelheid moet een getal zijn",
+        })
+        .positive({
+            message: "Hoeveelheid moet positief zijn",
+        })
+        .finite({
+            message: "Hoeveelheid moet een geheel getal zijn",
+        })
+        .safe({
+            message: "Hoeveelheid moet een safe getal zijn",
+        }),
     p_app_date: z.coerce.date({
         required_error: "Datum is verplicht",
         invalid_type_error: "Datum is ongeldig",
     }),
-    p_id: z.coerce.string({ // TODO: Validate against the options that are available
+    p_id: z.coerce.string({
+        // TODO: Validate against the options that are available
         required_error: "Keuze van meststof is verplicht",
         invalid_type_error: "Meststof is ongeldig",
-    })
+    }),
 })
 interface FertilizerApplication {
-    p_app_id: string;
-    p_app_ids: string[];
-    p_name_nl: string;
-    p_app_amount: number;
-    p_app_date: Date;
-  }
-  
-  interface FertilizerOption {
-    value: string;
-    label: string;
-  }
-  
-  interface FertilizerApplicationsFormProps {
-    fertilizerApplications: FertilizerApplication[];
-    options: FertilizerOption[];
-    defaultValue?: string;
-    action: string;
-  }
+    p_app_id: string
+    p_app_ids: string[]
+    p_name_nl: string
+    p_app_amount: number
+    p_app_date: Date
+}
 
-export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProps) {
-    const fetcher = useFetcher();
+interface FertilizerOption {
+    value: string
+    label: string
+}
+
+interface FertilizerApplicationsFormProps {
+    fertilizerApplications: FertilizerApplication[]
+    options: FertilizerOption[]
+    defaultValue?: string
+    action: string
+}
+
+export function FertilizerApplicationsForm(
+    props: FertilizerApplicationsFormProps,
+) {
+    const fetcher = useFetcher()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -74,7 +85,7 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
         defaultValues: {
             p_app_amount: undefined,
             p_app_date: new Date(),
-        }
+        },
     })
 
     useEffect(() => {
@@ -84,21 +95,24 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
     }, [form.formState])
 
     const handleDelete = (p_app_ids: string[]) => {
-        if (fetcher.state === 'submitting') return;
+        if (fetcher.state === "submitting") return
 
         fetcher.submit(
             { p_app_ids },
-            { method: "delete", action: props.action }
-        );
-    };
+            { method: "delete", action: props.action },
+        )
+    }
 
     return (
         <div>
             <RemixFormProvider {...form}>
-                <Form id="formAddFertilizerApplication" action={props.action} onSubmit={form.handleSubmit} method="POST">
-                    <fieldset
-                        disabled={form.formState.isSubmitting}
-                    >
+                <Form
+                    id="formAddFertilizerApplication"
+                    action={props.action}
+                    onSubmit={form.handleSubmit}
+                    method="POST"
+                >
+                    <fieldset disabled={form.formState.isSubmitting}>
                         <div className="grid grid-cols-5 items-end gap-x-3 justify-between">
                             <div className="col-span-2">
                                 {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
@@ -106,7 +120,14 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                                     options={props.options}
                                     form={form}
                                     name="p_id"
-                                    label={<span>Meststof<span className="text-red-500">*</span></span>}
+                                    label={
+                                        <span>
+                                            Meststof
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </span>
+                                    }
                                 />
                             </div>
                             <div>
@@ -115,9 +136,25 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                                     name="p_app_amount"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Hoeveelheid<span className="text-red-500">*</span></FormLabel>
+                                            <FormLabel>
+                                                Hoeveelheid
+                                                <span className="text-red-500">
+                                                    *
+                                                </span>
+                                            </FormLabel>
                                             <FormControl>
-                                                <Input {...field} type="number" value={field.value === 0 ? '' : field.value} placeholder="12 ton/ha" aria-required="true" required />
+                                                <Input
+                                                    {...field}
+                                                    type="number"
+                                                    value={
+                                                        field.value === 0
+                                                            ? ""
+                                                            : field.value
+                                                    }
+                                                    placeholder="12 ton/ha"
+                                                    aria-required="true"
+                                                    required
+                                                />
                                             </FormControl>
                                             <FormDescription />
                                             <FormMessage />
@@ -140,23 +177,35 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                                                             variant={"outline"}
                                                             className={cn(
                                                                 "w-full text-left font-normal",
-                                                                !field.value && "text-muted-foreground"
+                                                                !field.value &&
+                                                                    "text-muted-foreground",
                                                             )}
                                                         >
                                                             {field.value ? (
-                                                                format(field.value, "yyyy-MM-dd")
+                                                                format(
+                                                                    field.value,
+                                                                    "yyyy-MM-dd",
+                                                                )
                                                             ) : (
-                                                                <span>Kies een datum</span>
+                                                                <span>
+                                                                    Kies een
+                                                                    datum
+                                                                </span>
                                                             )}
                                                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                         </Button>
                                                     </FormControl>
                                                 </PopoverTrigger>
-                                                <PopoverContent className="w-auto p-0" align="start">
+                                                <PopoverContent
+                                                    className="w-auto p-0"
+                                                    align="start"
+                                                >
                                                     <Calendar
                                                         mode="single"
                                                         selected={field.value}
-                                                        onSelect={field.onChange}
+                                                        onSelect={
+                                                            field.onChange
+                                                        }
                                                         // disabled={(date) =>
                                                         //     date > new Date() || date < new Date("1900-01-01")
                                                         // }
@@ -172,12 +221,14 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                             </div>
                             <div className="justify-self-end">
                                 <Button type="submit">
-                                    {form.formState.isSubmitting
-                                        ? <div className="flex items-center space-x-2">
+                                    {form.formState.isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
                                             <LoadingSpinner />
                                             <span>Opslaan...</span>
                                         </div>
-                                        : "Voeg toe"}
+                                    ) : (
+                                        "Voeg toe"
+                                    )}
                                 </Button>
                             </div>
                         </div>
@@ -190,7 +241,10 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                     {/* <div className="text-sm font-medium">Meststoffen</div> */}
                     <div className="grid gap-6">
                         {props.fertilizerApplications.map((application) => (
-                            <div className="grid grid-cols-5 gap-x-3 items-center" key={application.p_app_id}>
+                            <div
+                                className="grid grid-cols-5 gap-x-3 items-center"
+                                key={application.p_app_id}
+                            >
                                 <div className="col-span-2">
                                     <p className="text-sm font-medium leading-none">
                                         {application.p_name_nl}
@@ -204,15 +258,23 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                                 </div>
                                 <div>
                                     <p className="text-sm font-light leading-none">
-                                        {format(application.p_app_date, "yyyy-MM-dd")}
+                                        {format(
+                                            application.p_app_date,
+                                            "yyyy-MM-dd",
+                                        )}
                                     </p>
                                 </div>
                                 <div className="justify-self-end">
                                     <Button
                                         variant="destructive"
-                                        disabled={fetcher.state === 'submitting'}
-                                        onClick={() => handleDelete(application.p_app_ids)}>
-                                        {fetcher.state === 'submitting' ? (
+                                        disabled={
+                                            fetcher.state === "submitting"
+                                        }
+                                        onClick={() =>
+                                            handleDelete(application.p_app_ids)
+                                        }
+                                    >
+                                        {fetcher.state === "submitting" ? (
                                             <div className="flex items-center space-x-2">
                                                 <LoadingSpinner />
                                                 <span>Verwijderen...</span>
@@ -222,12 +284,11 @@ export function FertilizerApplicationsForm(props: FertilizerApplicationsFormProp
                                         )}
                                     </Button>
                                 </div>
-
                             </div>
                         ))}
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     )
 }

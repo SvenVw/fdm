@@ -1,7 +1,6 @@
-import {  redirect } from "react-router";
+import { redirect } from "react-router"
 
 export async function loader() {
-
     // Redirect to properties page
-    return redirect('./properties')
+    return redirect("./properties")
 }

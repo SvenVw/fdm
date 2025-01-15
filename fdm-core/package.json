@@ -1,76 +1,74 @@
 {
-  "name": "@svenvw/fdm-core",
-  "private": false,
-  "version": "0.10.1",
-  "description": "Interface for the Farm Data Model",
-  "license": "MIT",
-  "homepage": "https://svenvw.github.io/fdm/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SvenVw/fdm.git"
-  },
-  "bugs": "https://github.com/SvenVw/fdm/issues/new",
-  "author": {
-    "name": "Sven Verweij",
-    "email": "37927107+SvenVw@users.noreply.github.com",
-    "url": "https://github.com/SvenVw"
-  },
-  "type": "module",
-  "main": "./dist/fdm-core.umd.cjs",
-  "module": "./dist/fdm-core.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/fdm-core.js"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/fdm-core.umd.cjs"
-      }
+    "name": "@svenvw/fdm-core",
+    "private": false,
+    "version": "0.10.1",
+    "description": "Interface for the Farm Data Model",
+    "license": "MIT",
+    "homepage": "https://svenvw.github.io/fdm/",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SvenVw/fdm.git"
+    },
+    "bugs": "https://github.com/SvenVw/fdm/issues/new",
+    "author": {
+        "name": "Sven Verweij",
+        "email": "37927107+SvenVw@users.noreply.github.com",
+        "url": "https://github.com/SvenVw"
+    },
+    "type": "module",
+    "main": "./dist/fdm-core.umd.cjs",
+    "module": "./dist/fdm-core.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/fdm-core.js"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/fdm-core.umd.cjs"
+            }
+        }
+    },
+    "files": ["dist"],
+    "scripts": {
+        "dev": "dotenvx run -- vite",
+        "db:generate": "npx drizzle-kit generate",
+        "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
+        "dotenvx": "dotenvx",
+        "build": "vite build",
+        "check-types": "tsc --noEmit",
+        "preinstall": "npx only-allow pnpm",
+        "prepare": "pnpm build",
+        "preview": "vite preview",
+        "test": "dotenvx run -- vitest run",
+        "watch": "dotenvx run -- vitest"
+    },
+    "devDependencies": {
+        "@dotenvx/dotenvx": "catalog:",
+        "@types/node": "^22.10.6",
+        "drizzle-kit": "catalog:",
+        "fs-extra": "^11.2.0",
+        "globals": "^15.14.0",
+        "typedoc": "^0.26.11",
+        "typedoc-plugin-missing-exports": "^3.1.0",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vite-plugin-dts": "catalog:",
+        "vitest": "catalog:"
+    },
+    "dependencies": {
+        "@electric-sql/pglite": "^0.2.15",
+        "drizzle-graphql": "^0.8.5",
+        "drizzle-orm": "catalog:",
+        "graphql": "^16.10.0",
+        "nanoid": "^5.0.9",
+        "postgres": "^3.4.5",
+        "wkx": "^0.5.0"
+    },
+    "packageManager": "pnpm@9.15.4",
+    "publishConfig": {
+        "registry": "https://npm.pkg.github.com"
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dev": "dotenvx run -- vite",
-    "db:generate": "npx drizzle-kit generate",
-    "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
-    "dotenvx": "dotenvx",
-    "build": "vite build",
-    "check-types": "tsc --noEmit",
-    "preinstall": "npx only-allow pnpm",
-    "prepare": "pnpm build",
-    "preview": "vite preview",
-    "test": "dotenvx run -- vitest run",
-    "watch": "dotenvx run -- vitest"
-  },
-  "devDependencies": {
-    "@dotenvx/dotenvx": "catalog:",
-    "@types/node": "^22.10.6",
-    "drizzle-kit": "catalog:",
-    "fs-extra": "^11.2.0",
-    "globals": "^15.14.0",
-    "typedoc": "^0.26.11",
-    "typedoc-plugin-missing-exports": "^3.1.0",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vite-plugin-dts": "catalog:",
-    "vitest": "catalog:"
-  },
-  "dependencies": {
-    "@electric-sql/pglite": "^0.2.15",
-    "drizzle-graphql": "^0.8.5",
-    "drizzle-orm": "catalog:",
-    "graphql": "^16.10.0",
-    "nanoid": "^5.0.9",
-    "postgres": "^3.4.5",
-    "wkx": "^0.5.0"
-  },
-  "packageManager": "pnpm@9.15.4",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  }
 }

@@ -1,11 +1,18 @@
-import { addFertilizerToCatalogue, getFertilizersFromCatalogue, type FdmType, fdmSchema } from "@svenvw/fdm-core";
-import { getCatalogueSrm } from "./catalogues/srm";
+import {
+    type FdmType,
+    addFertilizerToCatalogue,
+    type fdmSchema,
+    getFertilizersFromCatalogue,
+} from "@svenvw/fdm-core"
+import { getCatalogueSrm } from "./catalogues/srm"
 
-export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: string): Promise<void> {
-
+export async function extendFertilizersCatalogue(
+    fdm: FdmType,
+    catalogueName: string,
+): Promise<void> {
     // Get the specified catalogue
     let catalogue: fdmSchema.fertilizersCatalogueTypeInsert[] = []
-    if (catalogueName == 'srm') {
+    if (catalogueName == "srm") {
         catalogue = getCatalogueSrm()
     }
 
@@ -18,16 +25,17 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
     const fertilizersCatalogue = await getFertilizersFromCatalogue(fdm)
 
     // Add fertilizers to catalogue
-    await Promise.all(catalogue.map(async fertilizer => {
+    await Promise.all(
+        catalogue.map(async (fertilizer) => {
+            // Check if fertilizer is already present in catalogue
+            const fertilizerInCatalogue = fertilizersCatalogue.find(
+                (x: fdmSchema.fertilizersCatalogueTypeSelect): any =>
+                    x.p_id_catalogue === fertilizer.p_id_catalogue,
+            )
 
-        // Check if fertilizer is already present in catalogue
-        const fertilizerInCatalogue = fertilizersCatalogue.find((x: fdmSchema.fertilizersCatalogueTypeSelect): any => x.p_id_catalogue === fertilizer.p_id_catalogue)
-
-        // If fertilizer is not present in catalogue, add it to fdm instance
-        if (!fertilizerInCatalogue) {
-            await addFertilizerToCatalogue(
-                fdm,
-                {
+            // If fertilizer is not present in catalogue, add it to fdm instance
+            if (!fertilizerInCatalogue) {
+                await addFertilizerToCatalogue(fdm, {
                     p_id_catalogue: fertilizer.p_id_catalogue,
                     p_source: fertilizer.p_source,
                     p_name_nl: fertilizer.p_name_nl,
@@ -74,9 +82,9 @@ export async function extendFertilizersCatalogue(fdm: FdmType, catalogueName: st
                     p_hg_rt: fertilizer.p_hg_rt,
                     p_type_manure: fertilizer.p_type_manure,
                     p_type_mineral: fertilizer.p_type_mineral,
-                    p_type_compost: fertilizer.p_type_compost
-                }
-            )
-        }
-    }))
+                    p_type_compost: fertilizer.p_type_compost,
+                })
+            }
+        }),
+    )
 }

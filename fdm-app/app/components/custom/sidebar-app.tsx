@@ -1,3 +1,14 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
     Sidebar,
     SidebarContent,
@@ -11,14 +22,29 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRightLeft, BadgeCheck, ChevronsUpDown, GitPullRequestArrow, House, Languages, LifeBuoy, LogOut, Map as MapIcon, PawPrint, Scale, Send, Settings, Shapes, Sparkles, Sprout, Square } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+    ArrowRightLeft,
+    BadgeCheck,
+    ChevronsUpDown,
+    GitPullRequestArrow,
+    House,
+    Languages,
+    LifeBuoy,
+    LogOut,
+    Map as MapIcon,
+    PawPrint,
+    Scale,
+    Send,
+    Settings,
+    Shapes,
+    Sparkles,
+    Sprout,
+    Square,
+} from "lucide-react"
 
-import { useIsMobile } from '@/hooks/use-mobile'
 import { Button } from "@/components/ui/button"
-import { Form, NavLink} from "react-router";
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Form, NavLink } from "react-router"
 
 interface SideBarAppType {
     user: {
@@ -31,14 +57,15 @@ interface SideBarAppType {
 }
 
 export function SidebarApp(props: SideBarAppType) {
-
     const user = props.user
-    const avatarInitials = props.user.firstname.slice(0, 1).toUpperCase() + props.user.surname.slice(0, 1).toUpperCase()
+    const avatarInitials =
+        props.user.firstname.slice(0, 1).toUpperCase() +
+        props.user.surname.slice(0, 1).toUpperCase()
     const isMobile = useIsMobile()
 
     return (
         <Sidebar>
-            <SidebarHeader >
+            <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
@@ -184,12 +211,23 @@ export function SidebarApp(props: SideBarAppType) {
                                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
-                                        <AvatarImage src={user.image} alt={user.name} />
-                                        <AvatarFallback className="rounded-lg">{avatarInitials}</AvatarFallback>
+                                        <AvatarImage
+                                            src={user.image}
+                                            alt={user.name}
+                                        />
+                                        <AvatarFallback className="rounded-lg">
+                                            {avatarInitials}
+                                        </AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-semibold">{user.firstname + " " + user.surname}</span>
-                                        <span className="truncate text-xs">{user.email}</span>
+                                        <span className="truncate font-semibold">
+                                            {user.firstname +
+                                                " " +
+                                                user.surname}
+                                        </span>
+                                        <span className="truncate text-xs">
+                                            {user.email}
+                                        </span>
                                     </div>
                                     <ChevronsUpDown className="ml-auto size-4" />
                                 </SidebarMenuButton>
@@ -204,11 +242,19 @@ export function SidebarApp(props: SideBarAppType) {
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="h-8 w-8 rounded-lg">
                                             {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
-                                            <AvatarFallback className="rounded-lg">{avatarInitials}</AvatarFallback>
+                                            <AvatarFallback className="rounded-lg">
+                                                {avatarInitials}
+                                            </AvatarFallback>
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-semibold">{user.firstname + " " + user.surname}</span>
-                                            <span className="truncate text-xs">{user.email}</span>
+                                            <span className="truncate font-semibold">
+                                                {user.firstname +
+                                                    " " +
+                                                    user.surname}
+                                            </span>
+                                            <span className="truncate text-xs">
+                                                {user.email}
+                                            </span>
                                         </div>
                                     </div>
                                 </DropdownMenuLabel>
@@ -236,16 +282,18 @@ export function SidebarApp(props: SideBarAppType) {
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>
-                                <LogOut />
-                                    <Form method="post" action="../app">                                        
-                                        <Button type="submit" variant="link">Uitloggen</Button>
-                                    </Form>                                    
+                                    <LogOut />
+                                    <Form method="post" action="../app">
+                                        <Button type="submit" variant="link">
+                                            Uitloggen
+                                        </Button>
+                                    </Form>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar >
+        </Sidebar>
     )
 }
