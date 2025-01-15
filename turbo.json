@@ -26,6 +26,9 @@
         "//#format-and-lint:fix": {
           "cache": false
         },
+        "//#format-and-lint:fix-usnafe": {
+            "cache": false
+        },
         "test": {
             "outputs": [],
             "persistent": false,

@@ -20,7 +20,8 @@
     "changeset": "changeset",
     "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish ",
     "format-and-lint": "biome check .",
-    "format-and-lint:fix": "biome check . --write"
+    "format-and-lint:fix": "biome check . --write",
+    "format-and-lint:fix-unsafe": "biome check . --write --unsafe"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
