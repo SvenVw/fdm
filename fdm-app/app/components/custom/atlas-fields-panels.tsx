@@ -1,5 +1,5 @@
 import type { FeatureCollection } from "geojson"
-import * as React from "react"
+import type * as React from "react"
 import { useMap } from "react-map-gl"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -23,7 +23,7 @@ export function FieldsPanelZoom({
     zoomLevelFields,
 }: { zoomLevelFields: number }) {
     const { current: map } = useMap()
-    const [panel, setPanel] = useState(<></>)
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     useEffect(() => {
         function updatePanel() {
@@ -41,7 +41,7 @@ export function FieldsPanelZoom({
                         </Alert>,
                     )
                 } else {
-                    setPanel(<></>)
+                    setPanel(null)
                 }
             }
         }
@@ -59,7 +59,7 @@ export function FieldsPanelZoom({
                 map.off("zoom", throttledUpdatePanel)
             }
         }
-    }, [map])
+    }, [map, zoomLevelFields])
 
     return panel
 }
@@ -69,7 +69,7 @@ export function FieldsPanelSelection({
 }: { fields: FeatureCollection }) {
     const fetcher = useFetcher()
     const { current: map } = useMap()
-    const [panel, setPanel] = useState(<></>)
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     const isSubmitting = fetcher.state === "submitting"
 
@@ -141,7 +141,7 @@ export function FieldsPanelSelection({
                                         // let cultivationCountText = `${cultivation.count + 1} percelen`
 
                                         <div
-                                            key={index}
+                                            key={cultivation.b_lu_name}
                                             className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
                                         >
                                             <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
@@ -202,7 +202,7 @@ export function FieldsPanelSelection({
             }
         }
         updatePanel()
-    }, [fields])
+    }, [fields, isSubmitting, map])
 
     return panel
 }
@@ -211,7 +211,7 @@ export function FieldsPanelHover({
     zoomLevelFields,
 }: { zoomLevelFields: number }) {
     const { current: map } = useMap()
-    const [panel, setPanel] = useState(<></>)
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     useEffect(() => {
         function updatePanel(evt) {
@@ -267,11 +267,11 @@ export function FieldsPanelHover({
                                 </Card>,
                             )
                         } else {
-                            setPanel(<></>)
+                            setPanel(null)
                         }
                     }
                 } else {
-                    setPanel(<></>)
+                    setPanel(null)
                 }
             }
         }
@@ -283,12 +283,13 @@ export function FieldsPanelHover({
         if (map) {
             map.on("mousemove", throttledUpdatePanel)
             map.once("click", updatePanel)
+            map.on("zoom", throttledUpdatePanel)
             map.once("load", updatePanel)
             return () => {
                 map.off("mousemove", throttledUpdatePanel)
             }
         }
-    }, [map])
+    }, [map, zoomLevelFields])
 
     return panel
 }

@@ -92,7 +92,7 @@ export function FertilizerApplicationsForm(
         if (form.formState.isSubmitSuccessful) {
             form.reset()
         }
-    }, [form.formState])
+    }, [form.formState, form.reset])
 
     const handleDelete = (p_app_ids: string[]) => {
         if (fetcher.state === "submitting") return
