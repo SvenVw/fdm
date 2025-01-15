@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- Use same version for `vite`, `typescript` and `dotenvx` across packages and update those to latest version
+- Use the same version for `vite`, `typescript` and `dotenvx` across packages and update those to the latest version
 
 ## 0.10.0
 
