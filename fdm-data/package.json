@@ -49,6 +49,7 @@
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:",
     "@dotenvx/dotenvx": "catalog:",
     "@svenvw/fdm-core": "workspace:*",
     "drizzle-orm": "catalog:",
