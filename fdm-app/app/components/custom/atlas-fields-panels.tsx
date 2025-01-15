@@ -287,6 +287,7 @@ export function FieldsPanelHover({
             map.once("load", updatePanel)
             return () => {
                 map.off("mousemove", throttledUpdatePanel)
+                map.off("zoom", throttledUpdatePanel)
             }
         }
     }, [map, zoomLevelFields])
