@@ -73,7 +73,7 @@
     "postgres": "^3.4.5",
     "wkx": "^0.5.0"
   },
-  "packageManager": "pnpm@9.14.2",
+  "packageManager": "pnpm@9.15.4",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   }

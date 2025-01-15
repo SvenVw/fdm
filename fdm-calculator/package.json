@@ -55,5 +55,5 @@
   "peerDependencies": {
     "@svenvw/fdm-core": "workspace:>=0.3.1"
   },
-  "packageManager": "pnpm@9.14.2"
+  "packageManager": "pnpm@9.15.4"
 }
