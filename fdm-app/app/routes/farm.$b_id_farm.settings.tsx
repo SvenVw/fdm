@@ -10,6 +10,7 @@ import {
     type LoaderFunctionArgs,
     Outlet,
     data,
+    redirect,
     useLoaderData,
 } from "react-router"
 
@@ -58,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get a list of possible farms of the user
-    let farms
+    let farms: Awaited<ReturnType<typeof getFarms>>
     try {
         farms = await getFarms(fdm)
     } catch (error) {
@@ -68,6 +69,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Internal Server Error",
         })
     }
+    
+    // Redirect to farms overview if user has no farm
+    if (farms.length === 0) {
+        return redirect("./farm")
+    }
+
     const farmOptions = farms.map((farm) => {
         return {
             b_id_farm: farm.b_id_farm,

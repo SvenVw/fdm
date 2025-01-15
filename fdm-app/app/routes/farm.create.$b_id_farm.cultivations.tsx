@@ -18,14 +18,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
 
 // Blocks
 
 import { cn } from "@/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
 // FDM
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
