@@ -21,7 +21,7 @@ export async function loader({
 
     // If user has an session redirect to app
     if (session?.session) {
-        return redirect("/app")
+        return redirect("/farm")
     }
 
     // Return user information from loader
@@ -106,7 +106,7 @@ export default function SignIn() {
                                 try {
                                     await signIn.social({
                                         provider: "google",
-                                        callbackURL: "/app"
+                                        callbackURL: "/farm"
                                     });
                                 } catch (error) {
                                     console.error('Social sign-in failed:', error);                                  

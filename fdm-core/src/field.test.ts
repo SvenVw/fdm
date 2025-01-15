@@ -28,10 +28,12 @@ describe('Farm Data Model', () => {
 
   describe('Field CRUD', () => {
     it('should add a new field', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
-
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345';
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
+      
       const fieldName = 'Test Field'
       const fieldIDSource = 'test-field-id'
       const fieldGeometry = 'POLYGON((30 10,40 40,20 40,10 20,30 10))'
@@ -53,9 +55,11 @@ describe('Farm Data Model', () => {
     })
 
     it('should get a field by ID', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345';
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       const fieldName = 'Test Field'
       const fieldIDSource = 'test-field-id'
@@ -77,9 +81,11 @@ describe('Farm Data Model', () => {
     })
 
     it('should get fields by farm ID', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345';
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       const fieldName1 = 'Test Field 1'
       const fieldIDSource1 = 'test-field-id-1'
@@ -122,9 +128,11 @@ describe('Farm Data Model', () => {
     })
 
     it('should update a field', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345';
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       const fieldName = 'Test Field'
       const fieldIDSource = 'test-field-id'
@@ -150,9 +158,11 @@ describe('Farm Data Model', () => {
     })
 
     it('should update a field partially', async () => {
-      const farmName = 'Test Farm'
-      const farmSector = 'diary'
-      const b_id_farm = await addFarm(fdm, farmName, farmSector)
+      const farmName = 'Test Farm';
+      const farmBusinessId = '123456';
+      const farmAddress = '123 Farm Lane';
+      const farmPostalCode = '12345';
+      const b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
 
       const fieldName = 'Test Field'
       const fieldIDSource = 'test-field-id'

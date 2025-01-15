@@ -104,7 +104,7 @@ export default function Index() {
             </div>
 
             <div className="ml-auto">
-              {/* <a href={`/app/addfarm/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
+              {/* <a href={`/farm/create/${loaderData.b_id_farm}/cultivations`} className="ml-auto">
                 <Button>Doorgaan</Button>
               </a> */}
             </div>

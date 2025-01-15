@@ -3,7 +3,7 @@ import { useLocation, NavLink } from "react-router";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
-interface SidebarPageProps extends React.HTMLAttributes<HTMLElement> {
+export interface SidebarPageProps extends React.HTMLAttributes<HTMLElement> {
     items: {
         to: string
         title: string

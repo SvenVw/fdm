@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import * as authSchema from "db/schema";
+import * as authSchema from "../../db/schema";
 
 // Initialize fdmAuth instance
 // Get credentials to connect to db
@@ -54,6 +54,11 @@ export const auth = betterAuth({
         type: "string",
         required: true,
         defaultValue: "nl-NL",
+      },
+      farm_active: {
+        type: "string",
+        required: false,
+        defaultValue: null,
       }
     }
   },

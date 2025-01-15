@@ -30,7 +30,7 @@ export interface fertilizersListType {
 
 export interface farmType {
     b_name_farm: string | null
-    action: "/app/addfarm/new"
+    action: "/farm/create"
     FormSchema: z.Schema<any>
 }
 

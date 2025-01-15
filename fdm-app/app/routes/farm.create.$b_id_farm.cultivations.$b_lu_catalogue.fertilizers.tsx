@@ -92,7 +92,7 @@ export default function Index() {
             </p>
             <FertilizerApplicationsForm
                 fertilizerApplications={loaderData.fertilizerApplications}
-                action={`/app/addfarm/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
+                action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
                 options={loaderData.fertilizerOptions}
             />
         </div>
