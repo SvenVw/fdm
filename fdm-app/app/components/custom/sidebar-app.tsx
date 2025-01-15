@@ -66,16 +66,16 @@ export function SidebarApp(props: SideBarAppType) {
 
     let farmLink: string
     if (user.farm_active) {
-        farmLink = `./farm/${user.farm_active}`
+        farmLink = `/farm/${user.farm_active}`
     } else {
-        farmLink = "./farm"
+        farmLink = "/farm"
     }
 
     let fieldsLink: string
     if (user.farm_active) {
-        fieldsLink = `./farm/${user.farm_active}/field`
+        fieldsLink = `/farm/${user.farm_active}/field`
     } else {
-        fieldsLink = "./field"
+        fieldsLink = "/field"
     }
 
     return (
