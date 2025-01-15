@@ -1,4 +1,4 @@
-import { describe, expect, it, afterAll, beforeEach} from 'vitest'
+import { describe, expect, it, afterAll, beforeEach } from 'vitest'
 import { createFdmServer, migrateFdmServer } from './fdm-server'
 import { type FdmServerType } from './fdm-server.d'
 import { addCultivationToCatalogue, getCultivationsFromCatalogue, addCultivation, removeCultivation, getCultivation, getCultivations, getCultivationPlan, updateCultivation } from './cultivation'
@@ -35,7 +35,12 @@ describe('Cultivation Data Model', () => {
         await migrateFdmServer(fdm, migrationsFolderPath)
 
         b_lu_catalogue = createId()
-        b_id_farm = await addFarm(fdm, 'test farm', 'arable')
+        const farmName = 'Test Farm';
+        const farmBusinessId = '123456';
+        const farmAddress = '123 Farm Lane';
+        const farmPostalCode = '12345';
+        b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
+
         b_id = await addField(
             fdm,
             b_id_farm,
@@ -256,11 +261,15 @@ describe('Cultivation Data Model', () => {
         let b_id_farm: string;
         let b_id: string;
         let b_lu_catalogue: string;
-        let b_lu: string;
         let p_id: string;
 
         beforeEach(async () => {
-            b_id_farm = await addFarm(fdm, 'test farm', 'arable');
+            const farmName = 'Test Farm';
+            const farmBusinessId = '123456';
+            const farmAddress = '123 Farm Lane';
+            const farmPostalCode = '12345';
+            b_id_farm = await addFarm(fdm, farmName, farmBusinessId, farmAddress, farmPostalCode);
+
             b_id = await addField(
                 fdm,
                 b_id_farm,
@@ -282,7 +291,7 @@ describe('Cultivation Data Model', () => {
                 b_lu_hcat3_name: "test"
             })
 
-            b_lu = await addCultivation(fdm, b_lu_catalogue, b_id, new Date('2024-03-01'))
+            await addCultivation(fdm, b_lu_catalogue, b_id, new Date('2024-03-01'))
 
             // Add fertilizer to catalogue (needed for fertilizer application)
             const p_id_catalogue = createId();
