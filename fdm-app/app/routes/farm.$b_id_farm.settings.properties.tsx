@@ -196,7 +196,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         console.error("Failed to update farm:", error);
         return dataWithError(
             null,
-            `Er is iets misgegaan bij het bijwerken van de bedriijfgegevens: ${error instanceof Error ? error.message : 'Onbekende fout'}`
+            `Er is iets misgegaan bij het bijwerken van de bedrijfgegevens: ${error instanceof Error ? error.message : 'Onbekende fout'}`
         );
     }
 }
