@@ -20,7 +20,7 @@ export async function extendCultivationsCatalogue(
 ): Promise<void> {
     // Get the specified catalogue
     let catalogue: fdmSchema.cultivationsCatalogueTypeInsert[] = []
-    if (catalogueName == "brp") {
+    if (catalogueName === "brp") {
         catalogue = getCatalogueBrp()
     }
 

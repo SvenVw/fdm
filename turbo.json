@@ -16,7 +16,7 @@
         "//#format-and-lint:fix": {
             "cache": false
         },
-        "//#format-and-lint:fix-usnafe": {
+        "//#format-and-lint:fix-unsafe": {
             "cache": false
         },
         "test": {

@@ -30,7 +30,7 @@ export const geometryPolygon = customType<{
     driverData: string
 }>({
     dataType: () => {
-        return `geometry(polygon)`
+        return "geometry(polygon)"
     },
     fromDriver: (value: string) => {
         const wkbBuffer = Buffer.from(value, "hex")

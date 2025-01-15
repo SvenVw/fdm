@@ -164,9 +164,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     // Add fields to farm
     const b_ids = await Promise.all(
         selectedFields.features.map(async (field, index) => {
-            const b_id_name = "Perceel " + (index + 1)
+            const b_id_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
-            const b_lu_catalogue = "nl_" + field.properties.b_lu_catalogue //TEMPORARY
+            const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
             const currentYear = new Date().getFullYear()
             const defaultDate = new Date(currentYear, 0, 1)
             const b_manage_start = defaultDate.toISOString().split("T")[0]
@@ -214,11 +214,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     const a_lat = fieldCentroid.geometry.coordinates[1]
 
                     const responseApi = await fetch(
-                        "https://api.nmi-agro.nl/estimates?" +
-                            new URLSearchParams({
+                        `https://api.nmi-agro.nl/estimates?${new URLSearchParams(
+                            {
                                 a_lat: a_lat.toString(),
                                 a_lon: a_lon.toString(),
-                            }),
+                            },
+                        )}`,
                         {
                             method: "GET",
                             headers: {

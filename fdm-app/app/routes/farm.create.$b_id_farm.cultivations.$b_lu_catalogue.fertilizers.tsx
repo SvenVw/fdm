@@ -141,7 +141,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         })
     }
 
-    if (request.method == "POST") {
+    if (request.method === "POST") {
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -180,7 +180,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
             { result: "Data saved successfully" },
             { message: "Bemesting is toegevoegd! 🎉" },
         )
-    } else if (request.method == "DELETE") {
+    }
+    if (request.method === "DELETE") {
         const formData = await request.formData()
         const rawAppIds = formData.get("p_app_ids")
 

@@ -12,7 +12,7 @@ export async function extendFertilizersCatalogue(
 ): Promise<void> {
     // Get the specified catalogue
     let catalogue: fdmSchema.fertilizersCatalogueTypeInsert[] = []
-    if (catalogueName == "srm") {
+    if (catalogueName === "srm") {
         catalogue = getCatalogueSrm()
     }
 

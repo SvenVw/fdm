@@ -113,11 +113,11 @@ describe("Cultivations Catalogue", () => {
                     item.b_lu_catalogue === expectedItem.b_lu_catalogue,
             )
             expect(dbItem).toBeDefined()
-            expect(dbItem!.b_lu_source).toBe(expectedItem.b_lu_source)
-            expect(dbItem!.b_lu_name).toBe(expectedItem.b_lu_name)
-            expect(dbItem!.b_lu_name_en).toBe(expectedItem.b_lu_name_en)
-            expect(dbItem!.b_lu_hcat3).toBe(expectedItem.b_lu_hcat3)
-            expect(dbItem!.b_lu_hcat3_name).toBe(expectedItem.b_lu_hcat3_name)
+            expect(dbItem?.b_lu_source).toBe(expectedItem.b_lu_source)
+            expect(dbItem?.b_lu_name).toBe(expectedItem.b_lu_name)
+            expect(dbItem?.b_lu_name_en).toBe(expectedItem.b_lu_name_en)
+            expect(dbItem?.b_lu_hcat3).toBe(expectedItem.b_lu_hcat3)
+            expect(dbItem?.b_lu_hcat3_name).toBe(expectedItem.b_lu_hcat3_name)
         }
     })
 

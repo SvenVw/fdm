@@ -213,7 +213,7 @@ export async function updateField(
                 .limit(1)
             return field[0]
         } catch (error) {
-            throw new Error("Update of field failed with error " + error)
+            throw new Error(`Update of field failed with error ${error}`)
         }
     })
 

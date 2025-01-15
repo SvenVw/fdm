@@ -221,9 +221,7 @@ export function SidebarApp(props: SideBarAppType) {
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">
-                                            {user.firstname +
-                                                " " +
-                                                user.surname}
+                                            {`${user.firstname} ${user.surname}`}
                                         </span>
                                         <span className="truncate text-xs">
                                             {user.email}
@@ -248,9 +246,7 @@ export function SidebarApp(props: SideBarAppType) {
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
                                             <span className="truncate font-semibold">
-                                                {user.firstname +
-                                                    " " +
-                                                    user.surname}
+                                                {`${user.firstname} ${user.surname}`}
                                             </span>
                                             <span className="truncate text-xs">
                                                 {user.email}

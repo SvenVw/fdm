@@ -235,7 +235,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues.b_postalcode_farm,
         )
 
-        return dataWithSuccess(`farm is updated`, {
+        return dataWithSuccess("farm is updated", {
             message: `${formValues.b_name_farm} is bijgewerkt! 🎉`,
         })
     } catch (error) {

@@ -3,7 +3,7 @@
 /// <reference types="vitest" />
 // Configure Vitest (https://vitest.dev/config/)
 
-import { resolve } from "path"
+import { resolve } from "node:path"
 import { copy } from "fs-extra"
 import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"

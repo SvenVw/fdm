@@ -32,15 +32,13 @@ export function FieldsPanelZoom({
                 const zoom = map.getZoom()
                 if (zoom && zoom <= zoomLevelFields) {
                     setPanel(
-                        <>
-                            <Alert>
-                                <Info className="h-4 w-4" />
-                                <AlertTitle>Let op!</AlertTitle>
-                                <AlertDescription>
-                                    Zoom in om percelen te kunnen selecteren.
-                                </AlertDescription>
-                            </Alert>
-                        </>,
+                        <Alert>
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>Let op!</AlertTitle>
+                            <AlertDescription>
+                                Zoom in om percelen te kunnen selecteren.
+                            </AlertDescription>
+                        </Alert>,
                     )
                 } else {
                     setPanel(<></>)
@@ -103,7 +101,7 @@ export function FieldsPanelSelection({
                     const fieldCount = fields.features.length
                     let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
                     if (fieldCount === 1) {
-                        fieldCountText = `Je hebt 1 perceel geselecteerd`
+                        fieldCountText = "Je hebt 1 perceel geselecteerd"
                     }
 
                     const cultivations = fields.features.reduce(
@@ -130,87 +128,75 @@ export function FieldsPanelSelection({
                     )
 
                     setPanel(
-                        <>
-                            <Card className={cn("w-full")}>
-                                <CardHeader>
-                                    <CardTitle>Percelen</CardTitle>
-                                    <CardDescription>
-                                        {fieldCountText}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="grid gap-4">
-                                    <div>
-                                        {cultivations.map(
-                                            (cultivation, index) => (
-                                                // let cultivationCountText = `${cultivation.count + 1} percelen`
+                        <Card className={cn("w-full")}>
+                            <CardHeader>
+                                <CardTitle>Percelen</CardTitle>
+                                <CardDescription>
+                                    {fieldCountText}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                <div>
+                                    {cultivations.map((cultivation, index) => (
+                                        // let cultivationCountText = `${cultivation.count + 1} percelen`
 
-                                                <div
-                                                    key={index}
-                                                    className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
-                                                >
-                                                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
-                                                    <div className="space-y-1">
-                                                        <p className="text-sm font-medium leading-none">
-                                                            {
-                                                                cultivation.b_lu_name
-                                                            }
-                                                        </p>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            {`${cultivation.count} percelen`}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button
-                                        onClick={() =>
-                                            submitSelectedFields(fields)
-                                        }
-                                        disabled={isSubmitting}
-                                    >
-                                        {isSubmitting ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                                <span>
-                                                    Sla geselecteerde percelen
-                                                    op
-                                                </span>
+                                        <div
+                                            key={index}
+                                            className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
+                                        >
+                                            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-medium leading-none">
+                                                    {cultivation.b_lu_name}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {`${cultivation.count} percelen`}
+                                                </p>
                                             </div>
-                                        ) : (
-                                            <div className="flex items-center space-x-2">
-                                                <Check />
-                                                <span>
-                                                    Sla geselecteerde percelen
-                                                    op
-                                                </span>
-                                            </div>
-                                        )}
-                                    </Button>
-                                </CardFooter>
-                            </Card>
-                        </>,
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button
+                                    onClick={() => submitSelectedFields(fields)}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>
+                                                Sla geselecteerde percelen op
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
+                                            <Check />
+                                            <span>
+                                                Sla geselecteerde percelen op
+                                            </span>
+                                        </div>
+                                    )}
+                                </Button>
+                            </CardFooter>
+                        </Card>,
                     )
                 } else {
                     setPanel(
-                        <>
-                            <Card className={cn("w-[380px]")}>
-                                <CardHeader>
-                                    <CardTitle>Percelen</CardTitle>
-                                    <CardDescription>
-                                        Je hebt geen percelen geselecteerd
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="grid gap-4"></CardContent>
-                                <CardFooter>
-                                    <Button className="w-full" disabled>
-                                        <Check /> Sla geselecteerde percelen op
-                                    </Button>
-                                </CardFooter>
-                            </Card>
-                        </>,
+                        <Card className={cn("w-[380px]")}>
+                            <CardHeader>
+                                <CardTitle>Percelen</CardTitle>
+                                <CardDescription>
+                                    Je hebt geen percelen geselecteerd
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4" />
+                            <CardFooter>
+                                <Button className="w-full" disabled>
+                                    <Check /> Sla geselecteerde percelen op
+                                </Button>
+                            </CardFooter>
+                        </Card>,
                     )
                 }
             }
@@ -242,21 +228,19 @@ export function FieldsPanelHover({
 
                     if (featuresSelected.length > 0) {
                         setPanel(
-                            <>
-                                <Card className={cn("w-full")}>
-                                    <CardHeader>
-                                        <CardTitle>
-                                            {
-                                                featuresSelected[0].properties
-                                                    .b_lu_name
-                                            }
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Klik om te verwijderen
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>
-                            </>,
+                            <Card className={cn("w-full")}>
+                                <CardHeader>
+                                    <CardTitle>
+                                        {
+                                            featuresSelected[0].properties
+                                                .b_lu_name
+                                        }
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Klik om te verwijderen
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>,
                         )
                     } else {
                         const featuresAvailable = map.queryRenderedFeatures(
@@ -268,21 +252,19 @@ export function FieldsPanelHover({
 
                         if (featuresAvailable.length > 0) {
                             setPanel(
-                                <>
-                                    <Card className={cn("w-ful")}>
-                                        <CardHeader>
-                                            <CardTitle>
-                                                {
-                                                    featuresAvailable[0]
-                                                        .properties.b_lu_name
-                                                }
-                                            </CardTitle>
-                                            <CardDescription>
-                                                Klik om te selecteren
-                                            </CardDescription>
-                                        </CardHeader>
-                                    </Card>
-                                </>,
+                                <Card className={cn("w-ful")}>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            {
+                                                featuresAvailable[0].properties
+                                                    .b_lu_name
+                                            }
+                                        </CardTitle>
+                                        <CardDescription>
+                                            Klik om te selecteren
+                                        </CardDescription>
+                                    </CardHeader>
+                                </Card>,
                             )
                         } else {
                             setPanel(<></>)

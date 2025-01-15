@@ -52,7 +52,7 @@ export function FarmHeader({
                                                       option.b_id_farm ===
                                                       b_id_farm,
                                               )?.b_name_farm ?? "Unknown farm")
-                                            : `Kies een bedrijf`}
+                                            : "Kies een bedrijf"}
                                         <ChevronDown />
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="start">

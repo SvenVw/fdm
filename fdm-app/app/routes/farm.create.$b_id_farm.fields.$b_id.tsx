@@ -612,7 +612,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        return dataWithSuccess(`fields have been updated`, {
+        return dataWithSuccess("fields have been updated", {
             message: `${formValues.b_name} is bijgewerkt! 🎉`,
         })
     } catch (error) {

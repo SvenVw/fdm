@@ -488,21 +488,21 @@ describe("Cultivation Data Model", () => {
 
             expect(fieldInPlan?.fertilizer_applications.length).toEqual(2)
 
-            const fertilizerApp1 = fieldInPlan!.fertilizer_applications.find(
+            const fertilizerApp1 = fieldInPlan?.fertilizer_applications.find(
                 (fa) => fa.p_app_id === p_app_id1,
             )
 
             //Check for some key fertilizer application details (adapt as needed based on your data)
-            expect(fertilizerApp1!.p_app_amount).toEqual(100)
-            expect(fertilizerApp1!.p_app_method).toEqual("broadcasting")
+            expect(fertilizerApp1?.p_app_amount).toEqual(100)
+            expect(fertilizerApp1?.p_app_method).toEqual("broadcasting")
 
-            const fertilizerApp2 = fieldInPlan!.fertilizer_applications.find(
+            const fertilizerApp2 = fieldInPlan?.fertilizer_applications.find(
                 (fa) => fa.p_app_id === p_app_id2,
             )
 
             //Check for some key fertilizer application details (adapt as needed based on your data)
-            expect(fertilizerApp2!.p_app_amount).toEqual(200)
-            expect(fertilizerApp2!.p_app_method).toEqual("broadcasting")
+            expect(fertilizerApp2?.p_app_amount).toEqual(200)
+            expect(fertilizerApp2?.p_app_method).toEqual("broadcasting")
         })
 
         it("should return an empty array if no cultivations are found for the farm", async () => {

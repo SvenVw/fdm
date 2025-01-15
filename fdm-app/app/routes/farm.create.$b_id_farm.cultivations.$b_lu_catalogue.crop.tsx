@@ -25,9 +25,7 @@ export default function Index(props: { action: string | undefined }) {
                 </p>
             </div>
             <Form method="post" action={props.action}>
-                <fieldset
-                    disabled={navigation.state === "submitting"}
-                ></fieldset>
+                <fieldset disabled={navigation.state === "submitting"} />
                 <div className="grid w-full items-center gap-4">
                     <div className="flex flex-col space-y-1.5">
                         <Label htmlFor="b_name_farm">
