@@ -1,5 +1,35 @@
 # Changelog fdm-app
 
+## 0.8.0
+
+### Minor Changes
+
+- fe29385: Rename path `app` to `farm` and `app/addfarm` to `farm/create`
+- fe29385: Add a page `farm` to select from list of farms
+
+  Changes include:
+
+  - Restructured routing: renamed paths from `app/addfarm` to `farm/create`
+  - Updated farms table schema:
+    - Added: business ID, address, and postal code fields
+    - Removed: sector field
+  - Added new `getFarms` function for farm management
+
+- fe29385: Add farm settings page and restructure routes
+
+  - Add new farm settings page for managing farm configurations
+  - Restructure routes: rename 'app' to 'farm' and 'app/addfarm' to 'farm/create'
+  - Add new farm fields: business ID, address, and postal code
+  - Improve farm selection interface with time-based greetings
+
+### Patch Changes
+
+- Updated dependencies [520a074]
+- Updated dependencies [2171b68]
+- Updated dependencies [2171b68]
+  - @svenvw/fdm-core@0.10.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.7.0
 
 ### Minor Changes
