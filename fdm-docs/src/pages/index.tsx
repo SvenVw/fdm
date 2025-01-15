@@ -8,7 +8,7 @@ import Heading from '@theme/Heading';
 import styles from './index.module.css';
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
@@ -19,17 +19,26 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/intro">
-          FDM Tutorial - 5min ⏱️
-          </Link>
+            to="http://localhost:3000/fdm/docs/">
+            Learn more
+          </Link>          
+        
         </div>
+        <br/>
+        <div className={styles.buttons}>
+        <Link
+            className="button button--secondary button--lg"
+            to="docs/Getting started/Prerequisites">
+            Get started
+          </Link>          
+        </div>  
       </div>
     </header>
   );
 }
 
 export default function Home(): JSX.Element {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
       title={`${siteConfig.title} | ${siteConfig.tagline}`}

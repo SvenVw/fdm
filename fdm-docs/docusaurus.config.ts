@@ -77,7 +77,7 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Docs',
         },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
@@ -94,8 +94,24 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
-              to: '/docs/intro',
+              label: 'Introduction',
+              to: '/docs/',
+            },
+            {
+              label: 'Installation',
+              to: '/docs/Installation',
+            },
+            {
+              label: 'Core concepts',
+              to: '/docs/Core concepts/Asset Action Model',
+            },
+            {
+              label: 'Getting started',
+              to: '/docs/Getting started/Prerequisites',
+            },
+            {
+              label: 'Contributing',
+              to: '/docs/Contributing',
             },
           ],
         },
@@ -137,6 +153,9 @@ const config: Config = {
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
+  future: {
+    experimental_faster: true,
+  }
 };
 
 export default config;

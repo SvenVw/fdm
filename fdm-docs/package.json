@@ -1,6 +1,6 @@
 {
   "name": "fdm-docs",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -18,20 +18,21 @@
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
-    "@docusaurus/core": "3.5.2",
-    "@docusaurus/preset-classic": "3.5.2",
-    "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.0.0",
-    "lucide-react": "^0.453.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "@docusaurus/core": "3.7.0",
+    "@docusaurus/faster": "^3.7.0",
+    "@docusaurus/preset-classic": "3.7.0",
+    "@mdx-js/react": "^3.1.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.5.2",
-    "@docusaurus/tsconfig": "3.5.2",
-    "@docusaurus/types": "3.5.2",
-    "typescript": "~5.5.2"
+    "@docusaurus/module-type-aliases": "3.7.0",
+    "@docusaurus/tsconfig": "3.7.0",
+    "@docusaurus/types": "3.7.0",
+    "typescript": "^5.7.2"
   },
   "browserslist": {
     "production": [
@@ -48,5 +49,5 @@
   "engines": {
     "node": ">=18.0"
   },
-  "packageManager": "pnpm@9.12.2"
+  "packageManager": "pnpm@9.14.2"
 }

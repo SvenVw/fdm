@@ -1,5 +1,10 @@
 packages:
   - 'fdm-core'
   - 'fdm-data'
-  - 'fdm-calculator'
+  # - 'fdm-calculator'
   - 'fdm-docs'
+  - 'fdm-app'
+
+catalog:
+  drizzle-orm: ^0.38.3
+  drizzle-kit: ^0.30.1

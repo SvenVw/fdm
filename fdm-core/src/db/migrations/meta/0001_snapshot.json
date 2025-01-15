@@ -1,0 +1,1354 @@
+{
+  "id": "860723f2-524c-4638-9c5f-34ac5cffc435",
+  "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "fdm-dev.cultivations": {
+      "name": "cultivations",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_lu": {
+          "name": "b_lu",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_lu_catalogue": {
+          "name": "b_lu_catalogue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "b_lu_idx": {
+          "name": "b_lu_idx",
+          "columns": [
+            {
+              "expression": "b_lu",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "cultivations_b_lu_catalogue_cultivations_catalogue_b_lu_catalogue_fk": {
+          "name": "cultivations_b_lu_catalogue_cultivations_catalogue_b_lu_catalogue_fk",
+          "tableFrom": "cultivations",
+          "tableTo": "cultivations_catalogue",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_lu_catalogue"
+          ],
+          "columnsTo": [
+            "b_lu_catalogue"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.cultivations_catalogue": {
+      "name": "cultivations_catalogue",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_lu_catalogue": {
+          "name": "b_lu_catalogue",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_lu_source": {
+          "name": "b_lu_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_lu_name": {
+          "name": "b_lu_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_lu_name_en": {
+          "name": "b_lu_name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_hcat3": {
+          "name": "b_lu_hcat3",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_hcat3_name": {
+          "name": "b_lu_hcat3_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "b_lu_catalogue_idx": {
+          "name": "b_lu_catalogue_idx",
+          "columns": [
+            {
+              "expression": "b_lu_catalogue",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.farm_managing": {
+      "name": "farm_managing",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_id_farm": {
+          "name": "b_id_farm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_manage_start": {
+          "name": "b_manage_start",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_manage_end": {
+          "name": "b_manage_end",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_manage_type": {
+          "name": "b_manage_type",
+          "type": "b_manage_type",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "farm_managing_b_id_fields_b_id_fk": {
+          "name": "farm_managing_b_id_fields_b_id_fk",
+          "tableFrom": "farm_managing",
+          "tableTo": "fields",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "b_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "farm_managing_b_id_farm_farms_b_id_farm_fk": {
+          "name": "farm_managing_b_id_farm_farms_b_id_farm_fk",
+          "tableFrom": "farm_managing",
+          "tableTo": "farms",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id_farm"
+          ],
+          "columnsTo": [
+            "b_id_farm"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.farms": {
+      "name": "farms",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id_farm": {
+          "name": "b_id_farm",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_name_farm": {
+          "name": "b_name_farm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_sector": {
+          "name": "b_sector",
+          "type": "b_sector",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "b_id_farm_idx": {
+          "name": "b_id_farm_idx",
+          "columns": [
+            {
+              "expression": "b_id_farm",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.fertilizer_acquiring": {
+      "name": "fertilizer_acquiring",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id_farm": {
+          "name": "b_id_farm",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_acquiring_amount": {
+          "name": "p_acquiring_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_acquiring_date": {
+          "name": "p_acquiring_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk": {
+          "name": "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk",
+          "tableFrom": "fertilizer_acquiring",
+          "tableTo": "farms",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id_farm"
+          ],
+          "columnsTo": [
+            "b_id_farm"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fertilizer_acquiring_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_acquiring_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_acquiring",
+          "tableTo": "fertilizers",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id"
+          ],
+          "columnsTo": [
+            "p_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.fertilizer_applying": {
+      "name": "fertilizer_applying",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_app_id": {
+          "name": "p_app_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_app_amount": {
+          "name": "p_app_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_app_method": {
+          "name": "p_app_method",
+          "type": "p_app_method",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_app_date": {
+          "name": "p_app_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_app_idx": {
+          "name": "p_app_idx",
+          "columns": [
+            {
+              "expression": "p_app_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "fertilizer_applying_b_id_fields_b_id_fk": {
+          "name": "fertilizer_applying_b_id_fields_b_id_fk",
+          "tableFrom": "fertilizer_applying",
+          "tableTo": "fields",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "b_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fertilizer_applying_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_applying_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_applying",
+          "tableTo": "fertilizers",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id"
+          ],
+          "columnsTo": [
+            "p_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.fertilizer_picking": {
+      "name": "fertilizer_picking",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_id_catalogue": {
+          "name": "p_id_catalogue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_picking_date": {
+          "name": "p_picking_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fertilizer_picking_p_id_fertilizers_p_id_fk": {
+          "name": "fertilizer_picking_p_id_fertilizers_p_id_fk",
+          "tableFrom": "fertilizer_picking",
+          "tableTo": "fertilizers",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id"
+          ],
+          "columnsTo": [
+            "p_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk": {
+          "name": "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk",
+          "tableFrom": "fertilizer_picking",
+          "tableTo": "fertilizers_catalogue",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "p_id_catalogue"
+          ],
+          "columnsTo": [
+            "p_id_catalogue"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.fertilizers": {
+      "name": "fertilizers",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id": {
+          "name": "p_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_id_idx": {
+          "name": "p_id_idx",
+          "columns": [
+            {
+              "expression": "p_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.fertilizers_catalogue": {
+      "name": "fertilizers_catalogue",
+      "schema": "fdm-dev",
+      "columns": {
+        "p_id_catalogue": {
+          "name": "p_id_catalogue",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "p_source": {
+          "name": "p_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "p_name_nl": {
+          "name": "p_name_nl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_name_en": {
+          "name": "p_name_en",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_description": {
+          "name": "p_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_dm": {
+          "name": "p_dm",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_density": {
+          "name": "p_density",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_om": {
+          "name": "p_om",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_a": {
+          "name": "p_a",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_hc": {
+          "name": "p_hc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_eom": {
+          "name": "p_eom",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_eoc": {
+          "name": "p_eoc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_rt": {
+          "name": "p_c_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_of": {
+          "name": "p_c_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_if": {
+          "name": "p_c_if",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_c_fr": {
+          "name": "p_c_fr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cn_of": {
+          "name": "p_cn_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_rt": {
+          "name": "p_n_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_if": {
+          "name": "p_n_if",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_of": {
+          "name": "p_n_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_n_wc": {
+          "name": "p_n_wc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_p_rt": {
+          "name": "p_p_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_k_rt": {
+          "name": "p_k_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_mg_rt": {
+          "name": "p_mg_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ca_rt": {
+          "name": "p_ca_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ne": {
+          "name": "p_ne",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_s_rt": {
+          "name": "p_s_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_s_wc": {
+          "name": "p_s_wc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cu_rt": {
+          "name": "p_cu_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_zn_rt": {
+          "name": "p_zn_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_na_rt": {
+          "name": "p_na_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_si_rt": {
+          "name": "p_si_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_b_rt": {
+          "name": "p_b_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_mn_rt": {
+          "name": "p_mn_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ni_rt": {
+          "name": "p_ni_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_fe_rt": {
+          "name": "p_fe_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_mo_rt": {
+          "name": "p_mo_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_co_rt": {
+          "name": "p_co_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_as_rt": {
+          "name": "p_as_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cd_rt": {
+          "name": "p_cd_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cr_rt": {
+          "name": "p_cr_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cr_vi": {
+          "name": "p_cr_vi",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_pb_rt": {
+          "name": "p_pb_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_hg_rt": {
+          "name": "p_hg_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_cl_cr": {
+          "name": "p_cl_cr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_type_manure": {
+          "name": "p_type_manure",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_type_mineral": {
+          "name": "p_type_mineral",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_type_compost": {
+          "name": "p_type_compost",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "p_id_catalogue_idx": {
+          "name": "p_id_catalogue_idx",
+          "columns": [
+            {
+              "expression": "p_id_catalogue",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.field_sowing": {
+      "name": "field_sowing",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_lu": {
+          "name": "b_lu",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_sowing_date": {
+          "name": "b_sowing_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_sowing_amount": {
+          "name": "b_sowing_amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_sowing_method": {
+          "name": "b_sowing_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "field_sowing_b_id_fields_b_id_fk": {
+          "name": "field_sowing_b_id_fields_b_id_fk",
+          "tableFrom": "field_sowing",
+          "tableTo": "fields",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "b_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "field_sowing_b_lu_cultivations_b_lu_fk": {
+          "name": "field_sowing_b_lu_cultivations_b_lu_fk",
+          "tableFrom": "field_sowing",
+          "tableTo": "cultivations",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_lu"
+          ],
+          "columnsTo": [
+            "b_lu"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.fields": {
+      "name": "fields",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_name": {
+          "name": "b_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_geometry": {
+          "name": "b_geometry",
+          "type": "geometry(polygon)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_id_source": {
+          "name": "b_id_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "b_id_idx": {
+          "name": "b_id_idx",
+          "columns": [
+            {
+              "expression": "b_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "b_geom_idx": {
+          "name": "b_geom_idx",
+          "columns": [
+            {
+              "expression": "b_geometry",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.soil_analysis": {
+      "name": "soil_analysis",
+      "schema": "fdm-dev",
+      "columns": {
+        "a_id": {
+          "name": "a_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "a_date": {
+          "name": "a_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_source": {
+          "name": "a_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_p_al": {
+          "name": "a_p_al",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_p_cc": {
+          "name": "a_p_cc",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_som_loi": {
+          "name": "a_som_loi",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_gwl_class": {
+          "name": "b_gwl_class",
+          "type": "b_gwl_class",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_soiltype_agr": {
+          "name": "b_soiltype_agr",
+          "type": "b_soiltype_agr",
+          "typeSchema": "fdm-dev",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-dev.soil_sampling": {
+      "name": "soil_sampling",
+      "schema": "fdm-dev",
+      "columns": {
+        "b_id_sampling": {
+          "name": "b_id_sampling",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "a_id": {
+          "name": "a_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_depth": {
+          "name": "b_depth",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_sampling_date": {
+          "name": "b_sampling_date",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created": {
+          "name": "created",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated": {
+          "name": "updated",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "soil_sampling_b_id_fields_b_id_fk": {
+          "name": "soil_sampling_b_id_fields_b_id_fk",
+          "tableFrom": "soil_sampling",
+          "tableTo": "fields",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "b_id"
+          ],
+          "columnsTo": [
+            "b_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "soil_sampling_a_id_soil_analysis_a_id_fk": {
+          "name": "soil_sampling_a_id_soil_analysis_a_id_fk",
+          "tableFrom": "soil_sampling",
+          "tableTo": "soil_analysis",
+          "schemaTo": "fdm-dev",
+          "columnsFrom": [
+            "a_id"
+          ],
+          "columnsTo": [
+            "a_id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "fdm-dev.p_app_method": {
+      "name": "p_app_method",
+      "schema": "fdm-dev",
+      "values": [
+        "slotted coulter",
+        "incorporation",
+        "injection",
+        "spraying",
+        "broadcasting",
+        "spoke wheel",
+        "pocket placement"
+      ]
+    },
+    "fdm-dev.b_gwl_class": {
+      "name": "b_gwl_class",
+      "schema": "fdm-dev",
+      "values": [
+        "II",
+        "IV",
+        "IIIb",
+        "V",
+        "VI",
+        "VII",
+        "Vb",
+        "-|",
+        "Va",
+        "III",
+        "VIII",
+        "sVI",
+        "I",
+        "IIb",
+        "sVII",
+        "IVu",
+        "bVII",
+        "sV",
+        "sVb",
+        "bVI",
+        "IIIa"
+      ]
+    },
+    "fdm-dev.b_manage_type": {
+      "name": "b_manage_type",
+      "schema": "fdm-dev",
+      "values": [
+        "owner",
+        "lease"
+      ]
+    },
+    "fdm-dev.b_sector": {
+      "name": "b_sector",
+      "schema": "fdm-dev",
+      "values": [
+        "diary",
+        "arable",
+        "tree_nursery",
+        "bulbs"
+      ]
+    },
+    "fdm-dev.b_soiltype_agr": {
+      "name": "b_soiltype_agr",
+      "schema": "fdm-dev",
+      "values": [
+        "moerige_klei",
+        "rivierklei",
+        "dekzand",
+        "zeeklei",
+        "dalgrond",
+        "veen",
+        "loess",
+        "duinzand",
+        "maasklei"
+      ]
+    }
+  },
+  "schemas": {
+    "fdm-dev": "fdm-dev"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

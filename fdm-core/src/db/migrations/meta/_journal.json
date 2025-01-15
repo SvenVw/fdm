@@ -5,8 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1729004382718,
-      "tag": "0000_pale_jean_grey",
+      "when": 1731414293847,
+      "tag": "0000_crazy_slyde",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1735564069319,
+      "tag": "0001_complete_the_watchers",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1736333854591,
+      "tag": "0002_mighty_major_mapleleaf",
       "breakpoints": true
     }
   ]
