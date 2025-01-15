@@ -9,7 +9,7 @@
         "db:generate": "npx @better-auth/cli generate --output ./db/schema.ts --config app/lib/auth.server.ts && npx drizzle-kit generate",
         "dev": "dotenvx run -- react-router dev",
         "dotenvx": "dotenvx",
-        "start": "react-router-serve ./build/server/index.js",
+        "start": "dotenvx run -- react-router-serve ./build/server/index.js",
         "typecheck": "react-router typegen && tsc"
     },
     "dependencies": {
