@@ -53,6 +53,7 @@ interface SideBarAppType {
         name: string
         email: string
         image: string | undefined
+        farm_active: string | undefined
     }
 }
 
@@ -62,6 +63,20 @@ export function SidebarApp(props: SideBarAppType) {
         props.user.firstname.slice(0, 1).toUpperCase() +
         props.user.surname.slice(0, 1).toUpperCase()
     const isMobile = useIsMobile()
+
+    let farmLink: string
+    if (user.farm_active) {
+        farmLink = `./farm/${user.farm_active}`
+    } else {
+        farmLink = "./farm"
+    }
+
+    let fieldsLink: string
+    if (user.farm_active) {
+        fieldsLink = `./farm/${user.farm_active}/field`
+    } else {
+        fieldsLink = "./field"
+    }
 
     return (
         <Sidebar>
@@ -89,7 +104,7 @@ export function SidebarApp(props: SideBarAppType) {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./farm">
+                                    <NavLink to={farmLink}>
                                         <House />
                                         <span>Bedrijf</span>
                                     </NavLink>
@@ -105,7 +120,7 @@ export function SidebarApp(props: SideBarAppType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./fields">
+                                    <NavLink to={fieldsLink}>
                                         <Square />
                                         <span>Percelen</span>
                                     </NavLink>
