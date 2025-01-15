@@ -1,6 +1,6 @@
 {
   "name": "@svenvw/fdm-app",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -86,8 +86,8 @@
     "vite-tsconfig-paths": "catalog:"
   },
   "peerDependencies": {
-    "@svenvw/fdm-core": "workspace:>=0.10.0",
-    "@svenvw/fdm-data": "workspace:>=0.8.0"
+    "@svenvw/fdm-core": "workspace:>=0.10.1",
+    "@svenvw/fdm-data": "workspace:>=0.8.1"
   },
   "engines": {
     "node": ">=20.0.0"

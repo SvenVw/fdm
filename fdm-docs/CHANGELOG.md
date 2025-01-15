@@ -1,5 +1,12 @@
 # fdm-docs
 
+## 0.2.1
+
+### Patch Changes
+
+- Rename to `@svenvw/fdm-docs` to be consistent in naming with the other packages
+- Use same version for `vite`, `typescript` and `dotenvx` across packages and update those to latest version
+
 ## 0.2.0
 
 ### Minor Changes

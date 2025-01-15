@@ -1,5 +1,13 @@
 # fdm-data
 
+## 0.8.1
+
+### Patch Changes
+
+- Use same version for `vite`, `typescript` and `dotenvx` across packages and update those to latest version
+- Updated dependencies
+  - @svenvw/fdm-core@0.10.1
+
 ## 0.8.0
 
 ### Patch Changes
