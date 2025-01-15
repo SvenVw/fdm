@@ -252,7 +252,7 @@ export function FieldsPanelHover({
 
                         if (featuresAvailable.length > 0) {
                             setPanel(
-                                <Card className={cn("w-ful")}>
+                                <Card className={cn("w-full")}>
                                     <CardHeader>
                                         <CardTitle>
                                             {
