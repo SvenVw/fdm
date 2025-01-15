@@ -18,9 +18,12 @@
     "build-docs": "turbo run build-docs",
     "watch": "turbo run watch",
     "changeset": "changeset",
-    "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish "
+    "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish ",
+    "format-and-lint": "biome check .",
+    "format-and-lint:fix": "biome check . --write"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@changesets/cli": "^2.27.11",
     "turbo": "^2.3.3"
   },
