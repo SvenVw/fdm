@@ -1,5 +1,13 @@
 # fdm-data
 
+## 0.8.2
+
+### Patch Changes
+
+- Replace ESLint with Biome and format the code accordingly
+- Updated dependencies
+  - @svenvw/fdm-core@0.10.2
+
 ## 0.8.1
 
 ### Patch Changes

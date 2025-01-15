@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.2.2
+
+### Patch Changes
+
+- Replace ESLint with Biome and format the code accordingly
+
 ## 0.2.1
 
 ### Patch Changes
