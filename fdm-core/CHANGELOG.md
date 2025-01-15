@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.10.1
+
+### Patch Changes
+
+- Use the same version for `vite`, `typescript` and `dotenvx` across packages and update those to the latest version
+
 ## 0.10.0
 
 ### Minor Changes

@@ -1,7 +1,7 @@
 {
   "name": "@svenvw/fdm-core",
   "private": false,
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Interface for the Farm Data Model",
   "license": "MIT",
   "homepage": "https://svenvw.github.io/fdm/",
@@ -49,21 +49,20 @@
     "lint": "eslint ."
   },
   "devDependencies": {
-    "@dotenvx/dotenvx": "^1.33.0",
+    "@dotenvx/dotenvx": "catalog:",
     "@eslint/js": "^9.18.0",
     "@types/node": "^22.10.6",
-    "dotenv": "^16.4.7",
     "drizzle-kit": "catalog:",
     "eslint": "^9.18.0",
     "fs-extra": "^11.2.0",
     "globals": "^15.14.0",
     "typedoc": "^0.26.11",
     "typedoc-plugin-missing-exports": "^3.1.0",
-    "typescript": "^5.7.3",
+    "typescript": "catalog:",
     "typescript-eslint": "^8.20.0",
-    "vite": "^5.4.11",
-    "vite-plugin-dts": "^4.5.0",
-    "vitest": "^2.1.8"
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.2.15",
@@ -74,7 +73,7 @@
     "postgres": "^3.4.5",
     "wkx": "^0.5.0"
   },
-  "packageManager": "pnpm@9.14.2",
+  "packageManager": "pnpm@9.15.4",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   }
