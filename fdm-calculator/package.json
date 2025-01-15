@@ -42,7 +42,7 @@
     "preview": "vite preview",
     "test": "dotenvx run -- vitest run",
     "watch": "dotenvx run -- vitest",
-    "lint": "eslint ."
+    "lint": "biome check --fix --unsafe --organize-imports-enabled=true ./src && biome format --write ./src && biome lint --write --unsafe ./src"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",

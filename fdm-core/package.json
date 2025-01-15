@@ -46,21 +46,18 @@
     "preview": "vite preview",
     "test": "dotenvx run -- vitest run",
     "watch": "dotenvx run -- vitest",
-    "lint": "eslint ."
+    "lint": "biome check --fix --unsafe --organize-imports-enabled=true ./src && biome format --write ./src && biome lint --write --unsafe ./src"
   },
   "devDependencies": {
     "@biomejs/biome": "catalog:",
     "@dotenvx/dotenvx": "catalog:",
-    "@eslint/js": "^9.18.0",
     "@types/node": "^22.10.6",
     "drizzle-kit": "catalog:",
-    "eslint": "^9.18.0",
     "fs-extra": "^11.2.0",
     "globals": "^15.14.0",
     "typedoc": "^0.26.11",
     "typedoc-plugin-missing-exports": "^3.1.0",
     "typescript": "catalog:",
-    "typescript-eslint": "^8.20.0",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "vitest": "catalog:"
