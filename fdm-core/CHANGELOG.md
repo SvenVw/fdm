@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.10.2
+
+### Patch Changes
+
+- Replace ESLint with Biome and format the code accordingly
+
 ## 0.10.1
 
 ### Patch Changes
