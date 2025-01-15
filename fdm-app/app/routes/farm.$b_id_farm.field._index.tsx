@@ -36,9 +36,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm)
-        if (!Array.isArray(farms)) {
-            throw new Error("Invalid farms data received")
-        }
 
         // Redirect to farms overview if user has no farm
         if (farms.length === 0) {
@@ -57,16 +54,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Get the fields to be selected
-        const fields = getFields(fdm, b_id_farm)
+        const fields = await getFields(fdm, b_id_farm)
         const fieldOptions = fields.map((field) => {
-            if (!field?.b_id_field || !field?.b_name_field) {
+            if (!field?.b_id || !field?.b_name || !field?.b_area) {
                 throw new Error("Invalid field data structure")
             }
             return {
-                b_id_field: field.b_id_field,
-                b_name_field: field.b_name_field,
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
             }
         })
+
+        // Sort fields by name alphabetically
+        fieldOptions.sort((a, b) => a.b_name.localeCompare(b.b_name))
 
         // Return user information from loader
         return {
@@ -76,6 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             user: session.user,
         }
     } catch (error) {
+        console.error(error)
         throw new Response(
             error instanceof Error ? error.message : "Internal Server Error",
             {
@@ -165,7 +167,7 @@ export default function FarmFieldIndex() {
                                                                 aria-label={`Selecteer ${option.b_name}`}
                                                             >
                                                                 <NavLink
-                                                                    to={`/field/${option.b_id}`}
+                                                                    to={`./${option.b_id}`}
                                                                 >
                                                                     Selecteer
                                                                 </NavLink>
@@ -182,7 +184,7 @@ export default function FarmFieldIndex() {
                                     <p className="text-muted-foreground text-sm">
                                         Of maak een nieuw perceel aan:
                                     </p>
-                                    <NavLink to={`./farm/${loaderData.b_id_farm}/field/create`}>
+                                    <NavLink to={"./create"}>
                                         <Button className="w-full">
                                             Nieuw perceel
                                         </Button>
