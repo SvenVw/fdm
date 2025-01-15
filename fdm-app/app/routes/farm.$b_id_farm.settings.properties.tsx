@@ -141,7 +141,7 @@ Wageningen"
                                         <FormItem>
                                             <FormLabel>Postcode</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="bv. 1234 AB" {...field} autoComplete="postal-code" maxLength={300} />
+                                                <Input placeholder="bv. 1234 AB" {...field} autoComplete="postal-code" maxLength={7} />
                                             </FormControl>
                                             <FormDescription />
                                             <FormMessage />
