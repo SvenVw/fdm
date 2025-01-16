@@ -13,7 +13,6 @@ import { auth } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import { FarmContent } from "@/components/custom/farm/farm-content"
-import { Toaster } from "@/components/ui/sonner"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -52,7 +51,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the fields to be selected
         const fields = await getFields(fdm, b_id_farm)
         const fieldOptions = fields.map((field) => {
-            if (!field?.b_id || !field?.b_name || !field?.b_area) {
+            if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
             }
             return {
@@ -150,7 +149,6 @@ export default function FarmFieldIndex() {
                     </>
                 </main>
             </SidebarInset>
-            <Toaster />
         </>
     )
 }
