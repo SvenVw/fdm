@@ -1,23 +1,16 @@
-import { data, type LoaderFunctionArgs, NavLink, Outlet, redirect, useLoaderData } from "react-router"
+import {
+    data,
+    type LoaderFunctionArgs,
+    Outlet,
+    redirect,
+    useLoaderData,
+} from "react-router"
 
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-} from "@/components/ui/card"
-// Components
-import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
-
-// Utils
 import { auth } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
-import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import { FarmContent } from "@/components/custom/farm/farm-content"
 import { Toaster } from "@/components/ui/sonner"
@@ -118,10 +111,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     } catch (error) {
         console.error(error)
         throw data(
-            error instanceof Error ? error.message : "Internal Server Error", {
-            status: 500,
-            statusText: "Internal Server Error",
-        }
+            error instanceof Error ? error.message : "Internal Server Error",
+            {
+                status: 500,
+                statusText: "Internal Server Error",
+            },
         )
     }
 }
@@ -130,28 +124,33 @@ export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-                fieldOptions={loaderData.fieldOptions}
-                b_id={loaderData.b_id}
-                action={{to: `/farm/${loaderData.b_id_farm}/field/`, label: "Terug naar percelen"}}
-            />
-            <main>
-                <>
-                    <FarmTitle
-                        title={loaderData.field?.b_name}
-                        description={
-                            "Beheer hier de gegevens van dit perceel"
-                        }
-                    />
-                    <FarmContent sidebarItems={loaderData.sidebarPageItems}>
-                        <Outlet />
-                    </FarmContent>
-                    <Toaster />
-                </>
-            </main>
-        </SidebarInset>
+        <>
+            <SidebarInset>
+                <FarmHeader
+                    farmOptions={loaderData.farmOptions}
+                    b_id_farm={loaderData.b_id_farm}
+                    fieldOptions={loaderData.fieldOptions}
+                    b_id={loaderData.b_id}
+                    action={{
+                        to: `/farm/${loaderData.b_id_farm}/field/`,
+                        label: "Terug naar percelen",
+                    }}
+                />
+                <main>
+                    <>
+                        <FarmTitle
+                            title={loaderData.field?.b_name}
+                            description={
+                                "Beheer hier de gegevens van dit perceel"
+                            }
+                        />
+                        <FarmContent sidebarItems={loaderData.sidebarPageItems}>
+                            <Outlet />
+                        </FarmContent>
+                    </>
+                </main>
+            </SidebarInset>
+            <Toaster />
+        </>
     )
 }
