@@ -1,1 +1,0 @@
-ALTER TYPE "fdm-dev"."b_manage_type" ADD VALUE 'unknown';
