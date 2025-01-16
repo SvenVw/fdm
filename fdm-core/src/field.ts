@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { asc, eq, sql } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
@@ -130,6 +130,7 @@ export async function getFields(
             eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm),
         )
         .where(eq(schema.farms.b_id_farm, b_id_farm))
+        .orderBy(asc(schema.fields.b_name))
 
     return fields
 }

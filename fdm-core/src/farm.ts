@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { asc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
@@ -66,7 +66,7 @@ export async function getFarm(
 export async function getFarms(
     fdm: FdmType,
 ): Promise<schema.farmsTypeSelect[]> {
-    const farm = await fdm.select().from(schema.farms)
+    const farm = await fdm.select().from(schema.farms).orderBy(asc(schema.farms.b_name_farm))
 
     return farm
 }

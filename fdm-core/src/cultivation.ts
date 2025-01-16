@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, or } from "drizzle-orm"
+import { and, asc, desc, eq, isNotNull, or } from "drizzle-orm"
 
 import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
 import * as schema from "./db/schema"
@@ -253,6 +253,7 @@ export async function getCultivations(
             ),
         )
         .where(eq(schema.fieldSowing.b_id, b_id))
+        .orderBy(desc(schema.fieldSowing.b_sowing_date), asc(schema.cultivationsCatalogue.b_lu_name))
 
     return cultivations
 }

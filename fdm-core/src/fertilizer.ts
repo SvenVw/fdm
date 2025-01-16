@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm"
+import { asc, desc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
@@ -18,6 +18,7 @@ export async function getFertilizersFromCatalogue(
     const fertilizersCatalogue = await fdm
         .select()
         .from(schema.fertilizersCatalogue)
+        .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
     return fertilizersCatalogue
 }
@@ -286,6 +287,7 @@ export async function getFertilizers(
             ),
         )
         .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
+        .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
     return fertilizers
 }
@@ -479,6 +481,7 @@ export async function getFertilizerApplications(
             .select()
             .from(schema.fertilizerApplication)
             .where(eq(schema.fertilizerApplication.b_id, b_id))
+            .orderBy(desc(schema.fertilizerApplication.p_app_date))
         return fertilizerApplications
     } catch (error) {
         throw new Error(`Failed to get fertilizer applications: ${error}`)
