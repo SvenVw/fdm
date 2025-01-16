@@ -31,24 +31,28 @@ export async function addField(
     // Generate an ID for the field
     const b_id = createId()
 
-    // Insert field
-    const fieldData = {
-        b_id: b_id,
-        b_name: b_name,
-        b_id_source: b_id_source,
-        b_geometry: sql`${b_geometry}::geometry(polygon)`,
-    }
-    await fdm.insert(schema.fields).values(fieldData)
+    try {
+        // Insert field
+        const fieldData = {
+            b_id: b_id,
+            b_name: b_name,
+            b_id_source: b_id_source,
+            b_geometry: sql`${b_geometry}::geometry(polygon)`,
+        }
+        await fdm.insert(schema.fields).values(fieldData)
 
-    // Insert relation between farm and field
-    const farmManagingData = {
-        b_id,
-        b_id_farm,
-        b_manage_start,
-        b_manage_end,
-        b_manage_type,
+        // Insert relation between farm and field
+        const farmManagingData = {
+            b_id,
+            b_id_farm,
+            b_manage_start,
+            b_manage_end,
+            b_manage_type,
+        }
+        await fdm.insert(schema.farmManaging).values(farmManagingData)
+    } catch (error) {
+        throw new Error(`Addition of field failed with error ${error}`)
     }
-    await fdm.insert(schema.farmManaging).values(farmManagingData)
 
     return b_id
 }
