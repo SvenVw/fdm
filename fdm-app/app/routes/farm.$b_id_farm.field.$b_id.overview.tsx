@@ -1,5 +1,6 @@
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -9,12 +10,28 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getField, updateField } from "@svenvw/fdm-core"
-import { useEffect } from "react"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { useEffect, useState } from "react"
 import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
@@ -59,12 +76,18 @@ export default function FarmFieldsOverviewBlock() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.field.b_name,
+            b_manage_type: loaderData.field.b_manage_type,
+            b_manage_start: loaderData.field.b_manage_start,
+            b_manage_end: loaderData.field.b_manage_end,
         },
     })
 
     useEffect(() => {
         form.reset({
             b_name: loaderData.field.b_name,
+            b_manage_type: loaderData.field.b_manage_type,
+            b_manage_start: loaderData.field.b_manage_start,
+            b_manage_end: loaderData.field.b_manage_end,
         })
     }, [loaderData, form.reset])
 
@@ -105,6 +128,172 @@ export default function FarmFieldsOverviewBlock() {
                                     )}
                                 />
                             </div>
+                            <div className="flex flex-col space-y-1.5 col-span-2">
+                                <FormField
+                                    control={form.control}
+                                    name="b_manage_type"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>
+                                                Is perceel in eigendom of pacht?
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Select
+                                                    onValueChange={
+                                                        field.onChange
+                                                    }
+                                                    defaultValue={field.value}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Selecteer of het perceel in eigendom is of gepacht" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        <SelectItem value="owner">
+                                                            Eigendom
+                                                        </SelectItem>
+                                                        <SelectItem value="lease">
+                                                            Pacht
+                                                        </SelectItem>
+                                                        <SelectItem value="unknown">
+                                                            Onbekend
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormControl>
+                                            <FormDescription />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <FormField
+                                    control={form.control}
+                                    name="b_manage_start"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>
+                                                Vanaf wanneer in gebruik?
+                                            </FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-[240px] pl-3 text-left font-normal",
+                                                                !field.value &&
+                                                                    "text-muted-foreground",
+                                                            )}
+                                                        >
+                                                            {field.value ? (
+                                                                format(
+                                                                    field.value,
+                                                                    "d MMM YYY",
+                                                                )
+                                                            ) : (
+                                                                <span>
+                                                                    Kies een
+                                                                    datum
+                                                                </span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    className="w-auto p-0"
+                                                    align="start"
+                                                >
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value}
+                                                        onSelect={
+                                                            field.onChange
+                                                        }
+                                                        disabled={(date) =>
+                                                            date <
+                                                            new Date(
+                                                                "1970-01-01",
+                                                            )
+                                                        }
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormDescription>
+                                                Optioneel
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <FormField
+                                    control={form.control}
+                                    name="b_manage_end"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>
+                                                Tot wanneer in gebruik?
+                                            </FormLabel>
+                                            <Popover>
+                                                <PopoverTrigger asChild>
+                                                    <FormControl>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-[240px] pl-3 text-left font-normal",
+                                                                !field.value &&
+                                                                    "text-muted-foreground",
+                                                            )}
+                                                        >
+                                                            {field.value ? (
+                                                                format(
+                                                                    field.value,
+                                                                    "d MMM YYY",
+                                                                )
+                                                            ) : (
+                                                                <span>
+                                                                    Kies een
+                                                                    datum
+                                                                </span>
+                                                            )}
+                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                        </Button>
+                                                    </FormControl>
+                                                </PopoverTrigger>
+                                                <PopoverContent
+                                                    className="w-auto p-0"
+                                                    align="start"
+                                                >
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={field.value}
+                                                        onSelect={
+                                                            field.onChange
+                                                        }
+                                                        disabled={(date) =>
+                                                            date <
+                                                            new Date(
+                                                                "1970-01-01",
+                                                            )
+                                                        }
+                                                        initialFocus
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                            <FormDescription>
+                                                Optioneel
+                                            </FormDescription>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
                         </div>
                     </fieldset>
                     <br />
@@ -137,17 +326,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        await updateField(fdm, b_id, formValues.b_name)
+        await updateField(
+            fdm,
+            b_id,
+            formValues.b_name,
+            null,
+            null,
+            formValues.b_manage_start,
+            formValues.b_manage_end,
+            formValues.b_manage_type,
+        )
 
-        return dataWithSuccess("fieldis updated", {
+        return dataWithSuccess("field is updated", {
             message: `${formValues.b_name} is bijgewerkt! 🎉`,
         })
     } catch (error) {
         console.error("Failed to update field:", error)
-        return dataWithError(
-            null,
-            `Er is iets misgegaan bij het bijwerken van de perceelgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
-        )
+        return dataWithError("Failed to update field", {
+            message: `Er is iets misgegaan bij het bijwerken van de perceelgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
+        })
     }
 }
 
@@ -156,4 +353,7 @@ const FormSchema = z.object({
     b_name: z.string().min(3, {
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
     }),
+    b_manage_type: z.enum(["owner", "lease", "unknown"]),
+    b_manage_start: z.coerce.date().optional(),
+    b_manage_end: z.coerce.date().optional(),
 })
