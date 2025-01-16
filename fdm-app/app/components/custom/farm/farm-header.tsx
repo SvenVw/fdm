@@ -18,17 +18,21 @@ import {
 import { cn } from "@/lib/utils"
 import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
-import type { FarmOptions, HeaderAction } from "./farm.d"
+import type { FarmOptions, FieldOptions, HeaderAction } from "./farm.d"
 
 interface FarmHeaderProps {
     farmOptions: FarmOptions
     b_id_farm: string | undefined
+    fieldOptions: FieldOptions
+    b_id: string | undefined
     action: HeaderAction
 }
 
 export function FarmHeader({
     farmOptions,
     b_id_farm,
+    fieldOptions,
+    b_id,
     action,
 }: FarmHeaderProps) {
     return (
@@ -38,7 +42,7 @@ export function FarmHeader({
             <Breadcrumb>
                 <BreadcrumbList>
                     <BreadcrumbItem className="hidden md:block">
-                        <BreadcrumbLink href="/">Bedrijf</BreadcrumbLink>
+                        <BreadcrumbLink href="/farm">Bedrijf</BreadcrumbLink>
                     </BreadcrumbItem>
                     {farmOptions && farmOptions.length > 0 ? (
                         <>
@@ -48,10 +52,10 @@ export function FarmHeader({
                                     <DropdownMenuTrigger className="flex items-center gap-1">
                                         {b_id_farm && farmOptions
                                             ? (farmOptions.find(
-                                                  (option) =>
-                                                      option.b_id_farm ===
-                                                      b_id_farm,
-                                              )?.b_name_farm ?? "Unknown farm")
+                                                (option) =>
+                                                    option.b_id_farm ===
+                                                    b_id_farm,
+                                            )?.b_name_farm ?? "Unknown farm")
                                             : "Kies een bedrijf"}
                                         <ChevronDown />
                                     </DropdownMenuTrigger>
@@ -74,6 +78,46 @@ export function FarmHeader({
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </BreadcrumbItem>
+                            {fieldOptions && fieldOptions.length > 0 ? (
+                                <>
+                                    <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbLink href={`/farm/${b_id_farm}/field/`}>Perceel</BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger className="flex items-center gap-1">
+                                                {b_id && fieldOptions
+                                                    ? (fieldOptions.find(
+                                                        (option) =>
+                                                            option.b_id ===
+                                                            b_id,
+                                                    )?.b_name ??
+                                                        "Unknown field")
+                                                    : "Kies een perceel"}
+                                                <ChevronDown />
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start">
+                                                {fieldOptions.map((option) => (
+                                                    <DropdownMenuCheckboxItem
+                                                        checked={
+                                                            b_id ===
+                                                            option.b_id
+                                                        }
+                                                        key={option.b_id}
+                                                    >
+                                                        <NavLink
+                                                            to={`/farm/${b_id_farm}/field/${option.b_id}`}
+                                                        >
+                                                            {option.b_name}
+                                                        </NavLink>
+                                                    </DropdownMenuCheckboxItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </BreadcrumbItem>
+                                </>
+                            ) : null}
                         </>
                     ) : null}
                 </BreadcrumbList>
