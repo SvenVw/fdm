@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, NavLink, redirect, useLoaderData } from "react-router"
+import { data, type LoaderFunctionArgs, NavLink, redirect, useLoaderData } from "react-router"
 
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
@@ -78,11 +78,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
     } catch (error) {
         console.error(error)
-        throw new Response(
-            error instanceof Error ? error.message : "Internal Server Error",
-            {
-                status: error instanceof Response ? error.status : 500,
-            },
+        throw data(
+            error instanceof Error ? error.message : "Internal Server Error", {
+                status: 500,
+                statusText: "Internal Server Error",
+            }
         )
     }
 }
