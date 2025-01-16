@@ -56,7 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the fields to be selected
         const fields = await getFields(fdm, b_id_farm)
         const fieldOptions = fields.map((field) => {
-            if (!field?.b_id || !field?.b_name || !field?.b_area) {
+            if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
             }
             return {
@@ -158,7 +158,9 @@ export default function FarmFieldIndex() {
                                                                     option.b_name
                                                                 }
                                                             </p>
-                                                            <p className="text-sm text-muted-foreground">{option.b_area} ha</p>
+                                                            {option.b_area && option.b_area > 0.1 ? (
+                                                                <p className="text-sm text-muted-foreground">{option.b_area} ha</p>
+                                                            ) : null }                                                            
                                                         </div>
 
                                                         <div className="">
