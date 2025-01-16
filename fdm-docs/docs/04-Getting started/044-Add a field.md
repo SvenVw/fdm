@@ -26,7 +26,7 @@ async function addField({
 
 * **b_id_source** The identifier of the field in the source dataset
 
-* **b_id_geometry** The field's geometry in WKT representation. The geometry must be a polygon and the CRS should be WGS84 (EPSG: 4326).
+* **b_geometry** The field's geometry in WKT representation. The geometry must be a polygon and the CRS should be WGS84 (EPSG: 4326).
 
 * **b_manage_start** The date on which this farm started managing this field.
 
