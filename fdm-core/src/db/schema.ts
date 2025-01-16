@@ -36,6 +36,7 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const manageTypeEnum = fdmSchema.enum("b_manage_type", [
     "owner",
     "lease",
+    "unknown"
 ])
 
 export const farmManaging = fdmSchema.table(
@@ -49,7 +50,7 @@ export const farmManaging = fdmSchema.table(
             .references(() => farms.b_id_farm),
         b_manage_start: date({ mode: "string" }),
         b_manage_end: date({ mode: "string" }),
-        b_manage_type: manageTypeEnum(),
+        b_manage_type: manageTypeEnum().notNull().default("unknown"),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
