@@ -115,7 +115,7 @@ export default function FarmContentBlock() {
             <FarmHeader
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}
-                action={undefined}
+                action={{to: `/farm/${loaderData.b_id_farm}/field`, label: "Naar percelen"}}
             />
             <main>
                 <FarmTitle

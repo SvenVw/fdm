@@ -74,7 +74,7 @@ export default function AppIndex() {
         <SidebarInset>
             <FarmHeader
                 farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
+                b_id_farm={undefined}
                 action={undefined}
             />
             <main>

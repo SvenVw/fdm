@@ -98,7 +98,7 @@ export default function FarmFieldIndex() {
                 b_id_farm={loaderData.b_id_farm}
                 fieldOptions={loaderData.fieldOptions}
                 b_id={undefined}
-                action={undefined}
+                action={{to: `/farm/${loaderData.b_id_farm}`, label: "Terug naar bedrijf"}}
             />
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
