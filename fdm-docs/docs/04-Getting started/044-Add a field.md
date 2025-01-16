@@ -15,10 +15,7 @@ async function addField({
     b_manage_start,
     b_manage_end, 
     b_manage_type
-    }): Promise<{ b_id_field: string }> {
-)
-
-```
+    }): Promise<string> {
 
 ## Parameters
 * **fdm:** Your initialized FDM instance. This is the primary interface for interacting with the FDM and is required for all database operations. It's the object you created when you [set up your FDM instance](./042-Setup%20the%20FDM%20instance.md)
