@@ -1,5 +1,18 @@
 # fdm-docs
 
+## 0.3.0
+
+### Added
+
+- Documentation for `getCultivationsFromCatalogue` function.
+- Example of using `addCultivationToCatalogue` with custom properties.
+- Explanation of the Cultivations Catalogue and its schema.
+- Added information about error handling for `addFarm` and `addField`.
+
+### Changed
+
+- Restructured documentation for improved clarity and organization.
+
 ## 0.2.0
 
 ### Minor Changes
