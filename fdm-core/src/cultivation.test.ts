@@ -74,8 +74,8 @@ describe("Cultivation Data Model", () => {
             "test field",
             "test source",
             "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-            "2023-01-01",
-            "2023-12-31",
+            new Date("2023-01-01"),
+            new Date("2023-12-31"),
             "owner",
         )
     })
@@ -361,8 +361,8 @@ describe("Cultivation Data Model", () => {
                 "test field",
                 "test source",
                 "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-                "2023-01-01",
-                "2024-01-01",
+                new Date("2023-01-01"),
+                new Date("2024-01-01"),
                 "owner",
             )
 
