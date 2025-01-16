@@ -18,3 +18,10 @@ export interface HeaderAction {
     to: string
     disabled?: boolean
 }
+
+export interface PaginationItem {
+    label: string;
+    to: string;
+}
+
+export type PaginationItems = PaginationItem[]

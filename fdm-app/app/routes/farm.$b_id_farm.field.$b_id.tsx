@@ -80,11 +80,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Overzicht",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/cultivations`,
+                to: `/farm/${b_id_farm}/field/${b_id}/cultivation`,
                 title: "Gewas",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/fertilizers`,
+                to: `/farm/${b_id_farm}/field/${b_id}/fertilizer`,
                 title: "Bemesting",
             },
             {
@@ -92,7 +92,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Bodem",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/norms`,
+                to: `/farm/${b_id_farm}/field/${b_id}/norm`,
                 title: "Gebruiksnormen",
             },
         ]
