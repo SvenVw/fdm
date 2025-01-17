@@ -27,7 +27,7 @@ extendCultivationsCatalogue(fdm = "MyFDM", catalogueName = "brp")
 To add data to the catalogue yourself, you can use the ``addCultivationToCatalogue`` function. The data you add must adhere to the [cultivationsCatalogue Schema](../03-Core%20concepts/032-Schema.md#cultivationscatalogue "Table of the cultivationsCatalogue").
 
 ```typescript title= "Example of extending your catalogue with a cultivation of your specifications"
-addCultivationsToCatalogue(
+addCultivationToCatalogue(
     fdm = "myFDM",
     properties = {
         b_lu_catalogue: "cultivationId123",
@@ -38,6 +38,5 @@ addCultivationsToCatalogue(
         b_lu_hcat3_name: "catnip"
     }
 )
-```
 
 )
