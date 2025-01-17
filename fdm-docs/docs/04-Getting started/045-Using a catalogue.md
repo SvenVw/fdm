@@ -3,7 +3,7 @@ title: "Using Catalogues"
 ---
 
 # Working With Catalogues
-The concept of catalogues in FDM is explained in detail in [Core Concepts > Catalogues](../03-Core%20concepts/033-Catalogues.md "Catalogues concept page"). Here we demonstrate how to access data from a catalogue and extend catalogues with your own data. On this page, we will work with the **cultivations** catalogue.
+The concept of catalogues in FDM is explained in detail in [Core Concepts > Catalogues](../03-Core%20concepts/033-Catalogues.md "Catalogues concept page"). Here, we demonstrate how to access data from a catalogue and extend catalogues with your own data. On this page, we will work with the **cultivations** catalogue.
 
 
 ## Accessing Catalogues
@@ -12,7 +12,7 @@ With the ``getCultivationsFromCatalogue`` function, an array of cultivations can
 ```typescript title="Example of using getCultivationsFromCatalogue"
 const cultivations = await getCultivationsFromCatalogue(fdm = "myFDM");
 console.log('Available cultivations:', cultivations);
-````
+```
 
 ## Extending Catalogues
 There are two methods to add cultivations to this catalogue.
