@@ -12,7 +12,7 @@ With the ``getCultivationsFromCatalogue`` function, an array of cultivations can
 ## Extending Catalogues
 There are two methods to add cultivations to this catalogue.
 
-1. Add data to your catalogue from an existing source catalogue using the ``extendCultivationsCatalogue`` function.	
+1. Add data to your catalogue from an existing source catalogue using the ``extendCultivationsCatalogue`` function.
 
 2. Add data to your own specifications using the ``addCultivationToCatalogue`` function.
 
