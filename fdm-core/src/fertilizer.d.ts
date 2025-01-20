@@ -35,3 +35,13 @@ export interface getFertilizerType {
     p_hg_rt: number | null
     p_cl_cr: number | null
 }
+
+export interface getFertilizerApplicationType {
+    p_id: string
+    p_id_catalogue: string
+    p_name_nl: string | null
+    p_app_amount: number | null
+    p_app_method: string | null
+    p_app_date: Date | null
+    p_app_id: string 
+}

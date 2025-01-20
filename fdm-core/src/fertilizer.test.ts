@@ -502,7 +502,6 @@ describe("Fertilizer Data Model", () => {
                 new_p_app_id,
             )
             expect(fertilizerApplication).toBeDefined()
-            expect(fertilizerApplication?.b_id).toBe(b_id)
             expect(fertilizerApplication?.p_id).toBe(p_id)
             expect(fertilizerApplication?.p_app_amount).toBe(100)
             expect(fertilizerApplication?.p_app_method).toBe("broadcasting")
