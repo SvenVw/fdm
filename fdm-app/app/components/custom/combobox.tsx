@@ -103,7 +103,7 @@ export function Combobox({
                                     <CommandGroup>
                                         {options.map((option: optionType) => (
                                             <CommandItem
-                                                value={option.value}
+                                                value={option.label}
                                                 key={option.value}
                                                 onSelect={() => {
                                                     form.setValue(
