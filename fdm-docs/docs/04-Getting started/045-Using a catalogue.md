@@ -10,7 +10,7 @@ The concept of catalogues in FDM is explained in detail in [Core Concepts > Cata
 With the ``getCultivationsFromCatalogue`` function, an array of cultivations can be accessed. One only needs to supply the correct FDM instance to the function. If you haven't previously added anything to the catalogue, the array is currently empty.
 
 ```typescript title="Example of using getCultivationsFromCatalogue"
-const cultivations = await getCultivationsFromCatalogue(fdm = "myFDM");
+const cultivations = await getCultivationsFromCatalogue(fdm = myFDM);
 console.log('Available cultivations:', cultivations);
 ```
 
@@ -25,7 +25,7 @@ There are two methods to add cultivations to this catalogue.
 The ``extendCultivationsCatalogue`` function requires one to specify the instance of FDM to modify and the name of a catalogue to add.
 
 ```typescript title="Example of extending your catalogue with the brp catalogue"
-extendCultivationsCatalogue(fdm = "MyFDM", catalogueName = "brp")
+extendCultivationsCatalogue(fdm = MyFDM, catalogueName = "brp")
 ```
 
 ### Extending with a novel cultivation
@@ -33,7 +33,7 @@ To add data to the catalogue yourself, you can use the ``addCultivationToCatalog
 
 ```typescript title="Example of extending your catalogue with a cultivation of your specifications"
 addCultivationToCatalogue(
-    fdm = "myFDM",
+    fdm = myFDM,
     properties = {
         b_lu_catalogue: "cultivationId123",
         b_lu_source: "myOwnCatalogue",
