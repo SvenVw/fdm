@@ -1,8 +1,8 @@
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils"
 
 export interface ISVGProps extends React.SVGProps<SVGSVGElement> {
-    size?: number;
-    className?: string;
+    size?: number
+    className?: string
 }
 
 /**
@@ -31,5 +31,5 @@ export const LoadingSpinner = ({
         >
             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
         </svg>
-    );
-};
+    )
+}

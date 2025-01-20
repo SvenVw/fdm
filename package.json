@@ -1,45 +1,44 @@
 {
-  "name": "@svenvw/fdm-source",
-  "version": "0.0.0",
-  "description": "Monorepo for fdm",
-  "homepage": "https://github.com/SvenVw/fdm",
-  "bugs": "https://github.com/SvenVw/fdm/issues/new",
-  "type": "module",
-  "private": true,
-  "workspaces": [
-    "fdm-core",
-    "fdm-data",
-    "fdm-docs",
-    "fdm-app"
-  ],
-  "scripts": {
-    "test": "turbo run test",
-    "build": "turbo run build",
-    "build-docs": "turbo run build-docs",
-    "watch": "turbo run watch",
-    "changeset": "changeset",
-    "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish "
-  },
-  "devDependencies": {
-    "@changesets/cli": "^2.27.11",
-    "turbo": "^2.3.3"
-  },
-  "packageManager": "pnpm@9.14.2",
-  "pnpm": {
-    "packageExtensions": {
-      "vite-plugin-dts": {
-        "dependenciesMeta": {
-          "@volar/typescript": {
-            "optional": true
-          },
-          "vue-tsc": {
-            "optional": true
-          },
-          "@vue/language-core": {
-            "optional": true
-          }
+    "name": "@svenvw/fdm-source",
+    "version": "0.0.0",
+    "description": "Monorepo for fdm",
+    "homepage": "https://github.com/SvenVw/fdm",
+    "bugs": "https://github.com/SvenVw/fdm/issues/new",
+    "type": "module",
+    "private": true,
+    "workspaces": ["fdm-core", "fdm-data", "fdm-docs", "fdm-app"],
+    "scripts": {
+        "test": "turbo run test",
+        "build": "turbo run build",
+        "build-docs": "turbo run build-docs",
+        "watch": "turbo run watch",
+        "changeset": "changeset",
+        "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish ",
+        "format-and-lint": "biome check .",
+        "format-and-lint:fix": "biome check . --write",
+        "format-and-lint:fix-unsafe": "biome check . --write --unsafe"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "1.9.4",
+        "@changesets/cli": "^2.27.11",
+        "turbo": "^2.3.3"
+    },
+    "packageManager": "pnpm@9.15.4",
+    "pnpm": {
+        "packageExtensions": {
+            "vite-plugin-dts": {
+                "dependenciesMeta": {
+                    "@volar/typescript": {
+                        "optional": true
+                    },
+                    "vue-tsc": {
+                        "optional": true
+                    },
+                    "@vue/language-core": {
+                        "optional": true
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }

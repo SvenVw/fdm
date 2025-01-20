@@ -1,60 +1,72 @@
-import { type MetaFunction, type LoaderFunctionArgs, data, NavLink } from "react-router";
-import { Outlet, useLoaderData } from "react-router";
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+} from "react-router"
+import { Outlet, useLoaderData } from "react-router"
 
+import { SidebarPage } from "@/components/custom/sidebar-page"
 // Components
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/toaster"
-import { Button } from "@/components/ui/button";
-import { SidebarPage } from "@/components/custom/sidebar-page";
 
 // Blocks
 
-
+import { cn } from "@/lib/utils"
+import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
 // FDM
-import { fdm } from "../lib/fdm.server";
-import { getCultivationPlan, getFarm } from "@svenvw/fdm-core";
-import { cn } from "@/lib/utils";
+import { fdm } from "../lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
         { title: "FDM App" },
         { name: "description", content: "Welcome to FDM!" },
-    ];
-};
+    ]
+}
 
 // Loader
-export async function loader({
-    request, params
-}: LoaderFunctionArgs) {
-
+export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the Id of the farm
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
+        })
     }
-    const farm = await getFarm(fdm, b_id_farm)
-        .catch(error => {
-            throw data(`Failed to fetch farm: ${error.message}`, {
-                status: 404,
-                statusText: "Farm not found"
-            });
-        });
+    const farm = await getFarm(fdm, b_id_farm).catch((error) => {
+        throw data(`Failed to fetch farm: ${error.message}`, {
+            status: 404,
+            statusText: "Farm not found",
+        })
+    })
 
     if (!farm) {
-        throw data("Farm not found", { status: 404, statusText: "Farm not found" });
+        throw data("Farm not found", {
+            status: 404,
+            statusText: "Farm not found",
+        })
     }
 
     // Get the cultivationPlan
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
 
     // Create the sidenav
-    const sidebarPageItems = cultivationPlan.map(cultivation => {
+    const sidebarPageItems = cultivationPlan.map((cultivation) => {
         return {
             title: cultivation.b_lu_name,
-            to: `/farm/create/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`
+            to: `/farm/create/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`,
         }
     })
 
@@ -64,12 +76,11 @@ export async function loader({
         b_id_farm: b_id_farm,
         b_name_farm: farm.b_name_farm,
     }
-
 }
 
 // Main
 export default function Index() {
-    const loaderData = useLoaderData<typeof loader>();
+    const loaderData = useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
@@ -79,9 +90,7 @@ export default function Index() {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                Maak een bedrijf
-                            </BreadcrumbLink>
+                            <BreadcrumbLink>Maak een bedrijf</BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator className="hidden md:block" />
                         <BreadcrumbItem className="hidden md:block">
@@ -102,9 +111,12 @@ export default function Index() {
                 <div className="space-y-6 p-10 pb-16">
                     <div className="flex items-center">
                         <div className="space-y-0.5">
-                            <h2 className="text-2xl font-bold tracking-tight">Bouwplan</h2>
+                            <h2 className="text-2xl font-bold tracking-tight">
+                                Bouwplan
+                            </h2>
                             <p className="text-muted-foreground">
-                                Werk de eigenschappen per gewas in je bouwplan bij.
+                                Werk de eigenschappen per gewas in je bouwplan
+                                bij.
                             </p>
                         </div>
 
@@ -112,10 +124,15 @@ export default function Index() {
                             <NavLink
                                 to={`/farm/create/${loaderData.b_id_farm}/cattle`}
                                 className={cn("ml-auto", {
-                                    "pointer-events-none": loaderData.cultivationPlan.length === 0
+                                    "pointer-events-none":
+                                        loaderData.cultivationPlan.length === 0,
                                 })}
                             >
-                                <Button disabled={loaderData.cultivationPlan.length === 0}>
+                                <Button
+                                    disabled={
+                                        loaderData.cultivationPlan.length === 0
+                                    }
+                                >
                                     Doorgaan
                                 </Button>
                             </NavLink>
@@ -126,12 +143,13 @@ export default function Index() {
                         <aside className="-mx-4 lg:w-1/5">
                             <SidebarPage items={loaderData.sidebarPageItems} />
                         </aside>
-                        <div className="flex-1 lg:max-w-2xl"><Outlet /></div>
+                        <div className="flex-1 lg:max-w-2xl">
+                            <Outlet />
+                        </div>
                     </div>
                 </div>
             </main>
             <Toaster />
-        </SidebarInset >
-    );
+        </SidebarInset>
+    )
 }
-

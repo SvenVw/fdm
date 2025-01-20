@@ -8,7 +8,7 @@ export interface getFieldType {
     b_area: number | null
     b_manage_start: Date | null
     b_manage_end: Date | null
-    b_manage_type: 'owner' | 'lease' | null
+    b_manage_type: "owner" | "lease" | null
     created: Date
     updated: Date | null
 }

@@ -13,6 +13,19 @@
 
 - Restructured documentation for improved clarity and organization.
 
+## 0.2.2
+
+### Patch Changes
+
+- Replace ESLint with Biome and format the code accordingly
+
+## 0.2.1
+
+### Patch Changes
+
+- Rename to `@svenvw/fdm-docs` to be consistent in naming with the other packages
+- Use the same version for `vite`, `typescript` and `dotenvx` across packages and update those to the latest version
+
 ## 0.2.0
 
 ### Minor Changes

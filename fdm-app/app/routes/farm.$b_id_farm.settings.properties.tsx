@@ -1,36 +1,51 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner";
-import { Button } from "@/components/ui/button";
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { fdm } from "@/lib/fdm.server";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { getFarm, updateFarm } from "@svenvw/fdm-core";
-import { useEffect } from "react";
-import { Form } from "react-hook-form";
-import { ActionFunctionArgs, data, LoaderFunctionArgs, useLoaderData } from "react-router";
-import { RemixFormProvider, useRemixForm } from "remix-hook-form";
-import { z } from "zod";
-import validator from 'validator';
-import { dataWithError, dataWithSuccess } from "remix-toast";
-import { extractFormValuesFromRequest } from "@/lib/form";
-import { Separator } from "@/components/ui/separator";
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import { Button } from "@/components/ui/button"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
+import { fdm } from "@/lib/fdm.server"
+import { extractFormValuesFromRequest } from "@/lib/form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { getFarm, updateFarm } from "@svenvw/fdm-core"
+import { useEffect } from "react"
+import { Form } from "react-hook-form"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    data,
+    useLoaderData,
+} from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { dataWithError, dataWithSuccess } from "remix-toast"
+import validator from "validator"
+import { z } from "zod"
 const { isPostalCode } = validator
 
-export async function loader({
-    request, params
-}: LoaderFunctionArgs) {
-
+export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw data("Farm ID is required", { status: 400, statusText: "Farm ID is required" });
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
+        })
     }
 
     // Get details of farm
     const farm = await getFarm(fdm, b_id_farm)
     if (!farm) {
-        throw data("Farm is not found", { status: 404, statusText: "Farm is not found" });
+        throw data("Farm is not found", {
+            status: 404,
+            statusText: "Farm is not found",
+        })
     }
 
     // Return user information from loader
@@ -47,19 +62,31 @@ export default function FarmSettingsPropertiesBlock() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name_farm: loaderData.farm.b_name_farm,
-            b_businessid_farm: loaderData.farm.b_businessid_farm ? loaderData.farm.b_businessid_farm : "",
-            b_address_farm: loaderData.farm.b_address_farm ? loaderData.farm.b_address_farm : "",
-            b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
+            b_businessid_farm: loaderData.farm.b_businessid_farm
+                ? loaderData.farm.b_businessid_farm
+                : "",
+            b_address_farm: loaderData.farm.b_address_farm
+                ? loaderData.farm.b_address_farm
+                : "",
+            b_postalcode_farm: loaderData.farm.b_postalcode_farm
+                ? loaderData.farm.b_postalcode_farm
+                : "",
         },
     })
 
     useEffect(() => {
         form.reset({
             b_name_farm: loaderData.farm.b_name_farm,
-            b_businessid_farm: loaderData.farm.b_businessid_farm ? loaderData.farm.b_businessid_farm : "",
-            b_address_farm: loaderData.farm.b_address_farm ? loaderData.farm.b_address_farm : "",
-            b_postalcode_farm: loaderData.farm.b_postalcode_farm ? loaderData.farm.b_postalcode_farm : "",
-        });
+            b_businessid_farm: loaderData.farm.b_businessid_farm
+                ? loaderData.farm.b_businessid_farm
+                : "",
+            b_address_farm: loaderData.farm.b_address_farm
+                ? loaderData.farm.b_address_farm
+                : "",
+            b_postalcode_farm: loaderData.farm.b_postalcode_farm
+                ? loaderData.farm.b_postalcode_farm
+                : "",
+        })
     }, [loaderData])
 
     return (
@@ -72,7 +99,11 @@ export default function FarmSettingsPropertiesBlock() {
             </div>
             <Separator />
             <RemixFormProvider {...form}>
-                <Form id="formFarmProperties" onSubmit={form.handleSubmit} method="POST">
+                <Form
+                    id="formFarmProperties"
+                    onSubmit={form.handleSubmit}
+                    method="POST"
+                >
                     <fieldset disabled={form.formState.isSubmitting}>
                         <div className="grid grid-cols-2 w-full items-center gap-4">
                             <div className="flex flex-col space-y-1.5 col-span-2">
@@ -83,7 +114,11 @@ export default function FarmSettingsPropertiesBlock() {
                                         <FormItem>
                                             <FormLabel>Bedrijfsnaam</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="bv. De Vries V.O.F." {...field} required />
+                                                <Input
+                                                    placeholder="bv. De Vries V.O.F."
+                                                    {...field}
+                                                    required
+                                                />
                                             </FormControl>
                                             <FormDescription />
                                             <FormMessage />
@@ -99,10 +134,15 @@ export default function FarmSettingsPropertiesBlock() {
                                         <FormItem>
                                             <FormLabel>Kvk nummer</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="bv. 9102 1934" {...field} />
+                                                <Input
+                                                    placeholder="bv. 9102 1934"
+                                                    {...field}
+                                                />
                                             </FormControl>
-                                            <FormDescription >
-                                                Het Kamer van Koophandel nummer waarmee dit bedrijf is ingeschreven
+                                            <FormDescription>
+                                                Het Kamer van Koophandel nummer
+                                                waarmee dit bedrijf is
+                                                ingeschreven
                                             </FormDescription>
                                             <FormMessage />
                                         </FormItem>
@@ -141,7 +181,12 @@ Wageningen"
                                         <FormItem>
                                             <FormLabel>Postcode</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="bv. 1234 AB" {...field} autoComplete="postal-code" maxLength={7} />
+                                                <Input
+                                                    placeholder="bv. 1234 AB"
+                                                    {...field}
+                                                    autoComplete="postal-code"
+                                                    maxLength={7}
+                                                />
                                             </FormControl>
                                             <FormDescription />
                                             <FormMessage />
@@ -149,7 +194,7 @@ Wageningen"
                                     )}
                                 />
                             </div>
-                        </div >
+                        </div>
                     </fieldset>
                     <br />
                     <div className="ml-auto">
@@ -162,7 +207,6 @@ Wageningen"
                             Bijwerken
                         </Button>
                     </div>
-
                 </Form>
             </RemixFormProvider>
         </div>
@@ -170,14 +214,17 @@ Wageningen"
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id_farm = params.b_id_farm;
+    const b_id_farm = params.b_id_farm
 
     if (!b_id_farm) {
-        return dataWithError(null, "Missing farm ID.");
+        return dataWithError(null, "Missing farm ID.")
     }
 
     try {
-        const formValues = await extractFormValuesFromRequest(request, FormSchema);
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
 
         await updateFarm(
             fdm,
@@ -185,19 +232,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues.b_name_farm,
             formValues.b_businessid_farm,
             formValues.b_address_farm,
-            formValues.b_postalcode_farm
-        );
+            formValues.b_postalcode_farm,
+        )
 
-        return dataWithSuccess(
-            `farm is updated`,
-            { message: `${formValues.b_name_farm} is bijgewerkt! 🎉` }
-        );
+        return dataWithSuccess("farm is updated", {
+            message: `${formValues.b_name_farm} is bijgewerkt! 🎉`,
+        })
     } catch (error) {
-        console.error("Failed to update farm:", error);
+        console.error("Failed to update farm:", error)
         return dataWithError(
             null,
-            `Er is iets misgegaan bij het bijwerken van de bedrijfgegevens: ${error instanceof Error ? error.message : 'Onbekende fout'}`
-        );
+            `Er is iets misgegaan bij het bijwerken van de bedrijfgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
+        )
     }
 }
 
@@ -208,9 +254,10 @@ const FormSchema = z.object({
     }),
     b_businessid_farm: z.string().optional(),
     b_address_farm: z.string().optional(),
-    b_postalcode_farm: z.string()
+    b_postalcode_farm: z
+        .string()
         .optional()
-        .refine(value => !value || isPostalCode(value, 'NL'), {
+        .refine((value) => !value || isPostalCode(value, "NL"), {
             message: "Ongeldige postcode",
-        })
+        }),
 })

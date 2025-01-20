@@ -2,25 +2,22 @@
     "$schema": "https://turbo.build/schema.json",
     "tasks": {
         "build": {
-            "outputs": [
-                "dist/**", "build/**"
-            ],
-            "dependsOn": [
-                "^build"
-            ]
+            "outputs": ["dist/**", "build/**"],
+            "dependsOn": ["^build"]
         },
         "build-docs": {
-            "outputs": [
-                "build/**"
-            ],
-            "dependsOn": [
-                "^build-docs"
-            ]
+            "outputs": ["build/**"],
+            "dependsOn": ["^build-docs"]
         },
         "check-types": {
-            "dependsOn": [
-                "^check-types"
-            ]
+            "dependsOn": ["^check-types"]
+        },
+        "//#format-and-lint": {},
+        "//#format-and-lint:fix": {
+            "cache": false
+        },
+        "//#format-and-lint:fix-unsafe": {
+            "cache": false
         },
         "test": {
             "outputs": [],

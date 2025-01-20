@@ -1,92 +1,99 @@
-import { FeatureCollection } from 'geojson';
-import * as React from 'react';
-import { useMap } from 'react-map-gl';
+import type { FeatureCollection } from "geojson"
+import type * as React from "react"
+import { useMap } from "react-map-gl"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Check, Info } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import throttle from 'lodash.throttle';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { data, useFetcher } from 'react-router';
-import { LoadingSpinner } from './loadingspinner';
+import { Button } from "@/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+import throttle from "lodash.throttle"
+import { Check, Info } from "lucide-react"
+import { useEffect, useState } from "react"
+import { data, useFetcher } from "react-router"
+import { LoadingSpinner } from "./loadingspinner"
 
-export function FieldsPanelZoom({ zoomLevelFields }: { zoomLevelFields: number }) {
-    const { current: map } = useMap();
-    const [panel, setPanel] = useState(<></>);
+export function FieldsPanelZoom({
+    zoomLevelFields,
+}: { zoomLevelFields: number }) {
+    const { current: map } = useMap()
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     useEffect(() => {
         function updatePanel() {
-
             if (map) {
-
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom <= zoomLevelFields) {
-                    setPanel(<>
+                    setPanel(
                         <Alert>
                             <Info className="h-4 w-4" />
                             <AlertTitle>Let op!</AlertTitle>
                             <AlertDescription>
                                 Zoom in om percelen te kunnen selecteren.
                             </AlertDescription>
-                        </Alert>
-                    </>)
+                        </Alert>,
+                    )
                 } else {
-                    setPanel(<></>)
-
+                    setPanel(null)
                 }
             }
         }
 
-        const throttledUpdatePanel = throttle(updatePanel, 250, { trailing: true });
+        const throttledUpdatePanel = throttle(updatePanel, 250, {
+            trailing: true,
+        })
 
         if (map) {
-            map.on("move", throttledUpdatePanel);
-            map.on("zoom", throttledUpdatePanel);
-            map.once("load", throttledUpdatePanel);
+            map.on("move", throttledUpdatePanel)
+            map.on("zoom", throttledUpdatePanel)
+            map.once("load", throttledUpdatePanel)
             return () => {
-                map.off("move", throttledUpdatePanel);
-                map.off("zoom", throttledUpdatePanel);
-            };
+                map.off("move", throttledUpdatePanel)
+                map.off("zoom", throttledUpdatePanel)
+            }
         }
-    }, [map]);
+    }, [map, zoomLevelFields])
 
-    return (
-        panel
-    );
+    return panel
 }
 
-export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) {
-
-    const fetcher = useFetcher();
-    const { current: map } = useMap();
-    const [panel, setPanel] = useState(<></>);
+export function FieldsPanelSelection({
+    fields,
+}: { fields: FeatureCollection }) {
+    const fetcher = useFetcher()
+    const { current: map } = useMap()
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     const isSubmitting = fetcher.state === "submitting"
 
     async function submitSelectedFields(fields: FeatureCollection) {
-
         try {
-            const formSelectedFields = new FormData();
+            const formSelectedFields = new FormData()
             formSelectedFields.append("selected_fields", JSON.stringify(fields))
 
             await fetcher.submit(formSelectedFields, {
-                method: "POST"
+                method: "POST",
             })
         } catch (error: unknown) {
-            console.error('Failed to submit fields: ', error);
-            throw data({ status: 500, statusText: `Failed to submit fields: ${error}` })
+            console.error("Failed to submit fields: ", error)
+            throw data({
+                status: 500,
+                statusText: `Failed to submit fields: ${error}`,
+            })
             // TODO: adding a toast notification with error
         }
     }
 
     useEffect(() => {
         function updatePanel() {
-
             if (map) {
-
                 // Set information about fields
                 if (fields.features.length > 0) {
                     console.log(fields.features)
@@ -94,25 +101,39 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                     const fieldCount = fields.features.length
                     let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
                     if (fieldCount === 1) {
-                        fieldCountText = `Je hebt 1 perceel geselecteerd`
+                        fieldCountText = "Je hebt 1 perceel geselecteerd"
                     }
 
-                    const cultivations = fields.features.reduce((acc: { b_lu_name: string; count: number; }[], feature) => {
-                        const existingCultivation = acc.find(c => c.b_lu_name === feature.properties.b_lu_name);
-                        if (existingCultivation) {
-                            existingCultivation.count++;
-                        } else {
-                            acc.push({ b_lu_name: feature.properties.b_lu_name, count: 1 });
-                        }
-                        return acc;
-                    }, []);
+                    const cultivations = fields.features.reduce(
+                        (
+                            acc: { b_lu_name: string; count: number }[],
+                            feature,
+                        ) => {
+                            const existingCultivation = acc.find(
+                                (c) =>
+                                    c.b_lu_name ===
+                                    feature.properties.b_lu_name,
+                            )
+                            if (existingCultivation) {
+                                existingCultivation.count++
+                            } else {
+                                acc.push({
+                                    b_lu_name: feature.properties.b_lu_name,
+                                    count: 1,
+                                })
+                            }
+                            return acc
+                        },
+                        [],
+                    )
 
-
-                    setPanel(<>
+                    setPanel(
                         <Card className={cn("w-full")}>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
-                                <CardDescription>{fieldCountText}</CardDescription>
+                                <CardDescription>
+                                    {fieldCountText}
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4">
                                 <div>
@@ -120,7 +141,7 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                                         // let cultivationCountText = `${cultivation.count + 1} percelen`
 
                                         <div
-                                            key={index}
+                                            key={cultivation.b_lu_name}
                                             className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
                                         >
                                             <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
@@ -137,117 +158,139 @@ export function FieldsPanelSelection({ fields }: { fields: FeatureCollection }) 
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button onClick={() => submitSelectedFields(fields)} disabled={isSubmitting}>
-                                    {isSubmitting ?
+                                <Button
+                                    onClick={() => submitSelectedFields(fields)}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? (
                                         <div className="flex items-center space-x-2">
                                             <LoadingSpinner />
-                                            <span>Sla geselecteerde percelen op</span>
+                                            <span>
+                                                Sla geselecteerde percelen op
+                                            </span>
                                         </div>
-                                        : <div className="flex items-center space-x-2">
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
                                             <Check />
-                                            <span>Sla geselecteerde percelen op</span>
+                                            <span>
+                                                Sla geselecteerde percelen op
+                                            </span>
                                         </div>
-                                    }
+                                    )}
                                 </Button>
                             </CardFooter>
-                        </Card>
-                    </>)
+                        </Card>,
+                    )
                 } else {
-                    setPanel(<>
+                    setPanel(
                         <Card className={cn("w-[380px]")}>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
-                                <CardDescription>Je hebt geen percelen geselecteerd</CardDescription>
+                                <CardDescription>
+                                    Je hebt geen percelen geselecteerd
+                                </CardDescription>
                             </CardHeader>
-                            <CardContent className="grid gap-4">
-
-                            </CardContent>
+                            <CardContent className="grid gap-4" />
                             <CardFooter>
                                 <Button className="w-full" disabled>
                                     <Check /> Sla geselecteerde percelen op
                                 </Button>
                             </CardFooter>
-                        </Card>
-                    </>)
+                        </Card>,
+                    )
                 }
             }
         }
         updatePanel()
-    }, [fields]);
+    }, [fields, isSubmitting, map])
 
-    return (
-        panel
-    );
+    return panel
 }
 
-export function FieldsPanelHover({ zoomLevelFields }: { zoomLevelFields: number }) {
-    const { current: map } = useMap();
-    const [panel, setPanel] = useState(<></>);
+export function FieldsPanelHover({
+    zoomLevelFields,
+}: { zoomLevelFields: number }) {
+    const { current: map } = useMap()
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     useEffect(() => {
         function updatePanel(evt) {
-
             if (map) {
-
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom > zoomLevelFields) {
-
-                    const featuresSelected = map.queryRenderedFeatures(evt.point, {
-                        layers: ['selected-fields-fill']
-                    });
+                    const featuresSelected = map.queryRenderedFeatures(
+                        evt.point,
+                        {
+                            layers: ["selected-fields-fill"],
+                        },
+                    )
 
                     if (featuresSelected.length > 0) {
-                        setPanel(<>
+                        setPanel(
                             <Card className={cn("w-full")}>
                                 <CardHeader>
-                                    <CardTitle>{featuresSelected[0].properties.b_lu_name}</CardTitle>
-                                    <CardDescription>Klik om te verwijderen</CardDescription>
+                                    <CardTitle>
+                                        {
+                                            featuresSelected[0].properties
+                                                .b_lu_name
+                                        }
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Klik om te verwijderen
+                                    </CardDescription>
                                 </CardHeader>
-                            </Card>
-                        </>)
+                            </Card>,
+                        )
                     } else {
-
-                        const featuresAvailable = map.queryRenderedFeatures(evt.point, {
-                            layers: ['available-fields-fill'] // Specify the layer ID
-                        });
+                        const featuresAvailable = map.queryRenderedFeatures(
+                            evt.point,
+                            {
+                                layers: ["available-fields-fill"], // Specify the layer ID
+                            },
+                        )
 
                         if (featuresAvailable.length > 0) {
-                            setPanel(<>
-                                <Card className={cn("w-ful")}>
+                            setPanel(
+                                <Card className={cn("w-full")}>
                                     <CardHeader>
                                         <CardTitle>
-                                            {featuresAvailable[0].properties.b_lu_name}
+                                            {
+                                                featuresAvailable[0].properties
+                                                    .b_lu_name
+                                            }
                                         </CardTitle>
                                         <CardDescription>
                                             Klik om te selecteren
                                         </CardDescription>
                                     </CardHeader>
-                                </Card>
-                            </>)
+                                </Card>,
+                            )
                         } else {
-                            setPanel(<></>)
+                            setPanel(null)
                         }
                     }
                 } else {
-                    setPanel(<></>)
+                    setPanel(null)
                 }
             }
         }
 
-        const throttledUpdatePanel = throttle(updatePanel, 250, { trailing: true });
+        const throttledUpdatePanel = throttle(updatePanel, 250, {
+            trailing: true,
+        })
 
         if (map) {
-            map.on("mousemove", throttledUpdatePanel);
-            map.once("click", updatePanel);
-            map.once("load", updatePanel);
+            map.on("mousemove", throttledUpdatePanel)
+            map.once("click", updatePanel)
+            map.on("zoom", throttledUpdatePanel)
+            map.once("load", updatePanel)
             return () => {
-                map.off("mousemove", throttledUpdatePanel);
-            };
+                map.off("mousemove", throttledUpdatePanel)
+                map.off("zoom", throttledUpdatePanel)
+            }
         }
-    }, [map]);
+    }, [map, zoomLevelFields])
 
-    return (
-        panel
-    );
+    return panel
 }

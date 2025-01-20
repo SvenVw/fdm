@@ -1,7 +1,7 @@
-import { Form } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRemixForm, RemixFormProvider } from "remix-hook-form"
-import { z } from "zod"
+import { Form } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +12,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import {
     FormControl,
     FormDescription,
@@ -21,7 +20,8 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import { LoadingSpinner } from "../custom/loadingspinner";
+import { Input } from "@/components/ui/input"
+import { LoadingSpinner } from "../custom/loadingspinner"
 
 export interface fertilizersListType {
     value: string
@@ -54,13 +54,17 @@ export function Farm(props: farmType) {
         <div className="flex h-screen items-center justify-center">
             <Card className="w-[350px]">
                 <RemixFormProvider {...form}>
-                    <Form id="formFarm" onSubmit={form.handleSubmit} method="POST">
-                        <fieldset
-                            disabled={form.formState.isSubmitting}
-                        >
+                    <Form
+                        id="formFarm"
+                        onSubmit={form.handleSubmit}
+                        method="POST"
+                    >
+                        <fieldset disabled={form.formState.isSubmitting}>
                             <CardHeader>
                                 <CardTitle>Bedrijf</CardTitle>
-                                <CardDescription>Wat voor soort bedrijf heb je?</CardDescription>
+                                <CardDescription>
+                                    Wat voor soort bedrijf heb je?
+                                </CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="grid w-full items-center gap-4">
@@ -70,9 +74,18 @@ export function Farm(props: farmType) {
                                             name="b_name_farm"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel>Bedrijfsnaam <span className="text-red-500">*</span></FormLabel>
+                                                    <FormLabel>
+                                                        Bedrijfsnaam{" "}
+                                                        <span className="text-red-500">
+                                                            *
+                                                        </span>
+                                                    </FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="Bv. Jansen V.O.F." aria-required="true" {...field} />
+                                                        <Input
+                                                            placeholder="Bv. Jansen V.O.F."
+                                                            aria-required="true"
+                                                            {...field}
+                                                        />
                                                     </FormControl>
                                                     <FormDescription />
                                                     <FormMessage />
@@ -83,14 +96,21 @@ export function Farm(props: farmType) {
                                 </div>
                             </CardContent>
                             <CardFooter className="flex justify-between">
-                                <Button variant="outline" onClick={() => window.history.back()}>Terug</Button>
+                                <Button
+                                    variant="outline"
+                                    onClick={() => window.history.back()}
+                                >
+                                    Terug
+                                </Button>
                                 <Button type="submit">
-                                    {form.formState.isSubmitting
-                                        ? <div className="flex items-center space-x-2">
+                                    {form.formState.isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
                                             <LoadingSpinner />
                                             <span>Opslaan...</span>
                                         </div>
-                                        : "Volgende"}
+                                    ) : (
+                                        "Volgende"
+                                    )}
                                 </Button>
                             </CardFooter>
                         </fieldset>
@@ -98,6 +118,5 @@ export function Farm(props: farmType) {
                 </RemixFormProvider>
             </Card>
         </div>
-
     )
 }
