@@ -37,8 +37,8 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = "2023-01-01"
-            const manageEnd = "2023-12-31"
+            const manageStart = new Date("2023-01-01")
+            const manageEnd = new Date("2023-12-31")
             const manageType = "owner"
             const b_id = await addField(
                 fdm,
@@ -79,8 +79,8 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = "2023-01-01"
-            const manageEnd = "2023-12-31"
+            const manageStart = new Date("2023-01-01")
+            const manageEnd = new Date("2023-12-31")
             const manageType = "owner"
             const b_id = await addField(
                 fdm,
@@ -120,8 +120,8 @@ describe("Farm Data Model", () => {
             const fieldName1 = "Test Field 1"
             const fieldIDSource1 = "test-field-id-1"
             const fieldGeometry1 = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart1 = "2023-01-01"
-            const manageEnd1 = "2023-12-31"
+            const manageStart1 = new Date("2023-01-01")
+            const manageEnd1 = new Date("2023-12-31")
             const manageType1 = "owner"
             const b_id1 = await addField(
                 fdm,
@@ -137,8 +137,8 @@ describe("Farm Data Model", () => {
             const fieldName2 = "Test Field 2"
             const fieldIDSource2 = "test-field-id-2"
             const fieldGeometry2 = "POLYGON((50 50,60 60,40 60,30 40,50 50))"
-            const manageStart2 = "2024-01-01"
-            const manageEnd2 = "2024-12-31"
+            const manageStart2 = new Date("2024-01-01")
+            const manageEnd2 = new Date("2024-12-31")
             const manageType2 = "lease"
             const b_id2 = await addField(
                 fdm,
@@ -191,8 +191,8 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = "2023-01-01"
-            const manageEnd = "2023-12-31"
+            const manageStart = new Date("2023-01-01")
+            const manageEnd = new Date("2023-12-31")
             const manageType = "owner"
             const b_id = await addField(
                 fdm,
@@ -209,8 +209,8 @@ describe("Farm Data Model", () => {
             const updatedFieldIDSource = "updated-test-field-id"
             const updatedFieldGeometry =
                 "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const updatedManageStart = "2024-01-01"
-            const updatedManageEnd = "2024-12-31"
+            const updatedManageStart = new Date("2024-01-01")
+            const updatedManageEnd = new Date("2024-12-31")
             const updatedManageType = "lease"
             const updatedField = await updateField(
                 fdm,
@@ -246,8 +246,8 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = "2023-01-01"
-            const manageEnd = "2023-12-31"
+            const manageStart = new Date("2023-01-01")
+            const manageEnd = new Date("2023-12-31")
             const manageType = "owner"
             const b_id = await addField(
                 fdm,
@@ -319,7 +319,7 @@ describe("Farm Data Model", () => {
             expect(updatedField3.b_manage_type).toBe(updatedManageType) // Should remain the same
 
             // Partial updates for `farmManaging` table
-            const updatedManageStart = "2024-01-01"
+            const updatedManageStart = new Date("2024-01-01")
             const updatedField4 = await updateField(
                 fdm,
                 b_id,

@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { asc, eq, sql } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
@@ -31,24 +31,28 @@ export async function addField(
     // Generate an ID for the field
     const b_id = createId()
 
-    // Insert field
-    const fieldData = {
-        b_id: b_id,
-        b_name: b_name,
-        b_id_source: b_id_source,
-        b_geometry: sql`${b_geometry}::geometry(polygon)`,
-    }
-    await fdm.insert(schema.fields).values(fieldData)
+    try {
+        // Insert field
+        const fieldData = {
+            b_id: b_id,
+            b_name: b_name,
+            b_id_source: b_id_source,
+            b_geometry: sql`${b_geometry}::geometry(polygon)`,
+        }
+        await fdm.insert(schema.fields).values(fieldData)
 
-    // Insert relation between farm and field
-    const farmManagingData = {
-        b_id,
-        b_id_farm,
-        b_manage_start,
-        b_manage_end,
-        b_manage_type,
+        // Insert relation between farm and field
+        const farmManagingData = {
+            b_id,
+            b_id_farm,
+            b_manage_start,
+            b_manage_end,
+            b_manage_type,
+        }
+        await fdm.insert(schema.farmManaging).values(farmManagingData)
+    } catch (error) {
+        throw new Error(`Addition of field failed with error ${error}`)
     }
-    await fdm.insert(schema.farmManaging).values(farmManagingData)
 
     return b_id
 }
@@ -126,6 +130,7 @@ export async function getFields(
             eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm),
         )
         .where(eq(schema.farms.b_id_farm, b_id_farm))
+        .orderBy(asc(schema.fields.b_name))
 
     return fields
 }

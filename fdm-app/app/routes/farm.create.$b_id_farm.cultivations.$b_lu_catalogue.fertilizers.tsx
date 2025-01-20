@@ -183,7 +183,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
     if (request.method === "DELETE") {
         const formData = await request.formData()
-        const rawAppIds = formData.get("p_app_ids")
+        const rawAppIds = formData.get("p_app_id")
 
         if (!rawAppIds || typeof rawAppIds !== "string") {
             return dataWithError(

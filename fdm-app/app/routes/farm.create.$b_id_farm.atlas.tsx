@@ -23,8 +23,6 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
 
 // Blocks
-import { FieldsMap } from "@/components/blocks/fields-map"
-
 import { AtlasFields } from "@/components/custom/atlas-fields"
 import {
     addCultivation,
@@ -159,7 +157,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         })
     }
     const selectedFields = JSON.parse(String(formData.get("selected_fields")))
-    console.log(selectedFields)
 
     // Add fields to farm
     const b_ids = await Promise.all(
@@ -171,6 +168,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const defaultDate = new Date(currentYear, 0, 1)
             const b_manage_start = defaultDate.toISOString().split("T")[0]
             const b_date_sowing = defaultDate
+            const b_manage_end = null
+            const b_manage_type = 'unknown'
 
             // Validate dates
             if (
@@ -203,8 +202,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_id_source,
                     b_geometry,
                     b_manage_start,
-                    null,
-                    null,
+                    b_manage_end,
+                    b_manage_type
                 )
                 await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
 
@@ -269,7 +268,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }),
     )
 
-    return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, {
+    return redirectWithSuccess(`../fields/${b_ids[0]}`, {
         message: "Percelen zijn toegevoegd! 🎉",
     })
 }

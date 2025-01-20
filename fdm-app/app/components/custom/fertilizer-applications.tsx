@@ -94,11 +94,11 @@ export function FertilizerApplicationsForm(
         }
     }, [form.formState, form.reset])
 
-    const handleDelete = (p_app_ids: string[]) => {
+    const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
 
         fetcher.submit(
-            { p_app_ids },
+            { p_app_id },
             { method: "delete", action: props.action },
         )
     }
@@ -122,7 +122,7 @@ export function FertilizerApplicationsForm(
                                     name="p_id"
                                     label={
                                         <span>
-                                            Meststof
+                                            Meststof 
                                             <span className="text-red-500">
                                                 *
                                             </span>
@@ -270,9 +270,17 @@ export function FertilizerApplicationsForm(
                                         disabled={
                                             fetcher.state === "submitting"
                                         }
-                                        onClick={() =>
-                                            handleDelete(application.p_app_ids)
-                                        }
+                                        onClick={() => {
+                                            if (application.p_app_ids) {
+                                                handleDelete(
+                                                    application.p_app_ids,
+                                                )
+                                            } else {
+                                                handleDelete([
+                                                    application.p_app_id,
+                                                ])
+                                            }                      
+                                        }}
                                     >
                                         {fetcher.state === "submitting" ? (
                                             <div className="flex items-center space-x-2">
