@@ -40,5 +40,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Return user information from loader
-    return redirect(`./${cultivations[0].b_lu}`)
+    return {
+        cultivations: cultivations,
+    }
+}
+
+export default function FarmFieldCultivationListBlock() {
+    return null
 }
