@@ -17,14 +17,16 @@ async function addField({
     b_manage_type
     }): Promise<string> {
 
+```
+
 ## Parameters
-* **fdm:** Your initialized FDM instance. This is the primary interface for interacting with the FDM and is required for all database operations. It's the object you created when you [set up your FDM instance](./042-Setup%20the%20FDM%20instance.md)
+* **fdm:** Your initialized FDM instance. This is the primary interface for interacting with the FDM and is required for all database operations. It's the object you created when you [set up your FDM instance](./042-Setup%20the%20FDM%20instance.md).
 
 * **b_id_farm** A unique identifier for a farm that this field belongs to.
 
 * **b_name** A string representing the name of the field.
 
-* **b_id_source** The identifier of the field in the source dataset
+* **b_id_source** The identifier of the field in the source dataset.
 
 * **b_geometry** The field's geometry in WKT representation. The geometry must be a polygon and the CRS should be WGS84 (EPSG: 4326).
 
@@ -44,6 +46,6 @@ Just like the ``addFarm`` function, ``addField`` includes robust error handling.
 
 :::tip
 
-Place your ``addField`` call in a ``try...catch block`` as illustrated on the previous page
+Place your ``addField`` call in a ``try...catch block`` as illustrated on the previous page.
 
 :::
