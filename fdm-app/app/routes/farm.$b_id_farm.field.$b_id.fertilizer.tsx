@@ -130,29 +130,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
             { message: "Bemesting is toegevoegd! 🎉" },
         )
     }
-    if (request.method === "DELETE") {
-        console.log("DELETE request")
-        const formData = await request.formData()
-        console.log(formData)
-        const rawAppIds = formData.get("p_app_ids")
 
-        if (!rawAppIds || typeof rawAppIds !== "string") {
+    if (request.method === "DELETE") {
+        const formData = await request.formData()
+        const p_app_id = formData.get("p_app_id")
+
+        if (!p_app_id || typeof p_app_id !== "string") {
             return dataWithError(
-                "Invalid or missing p_app_ids value",
+                "Invalid or missing p_app_id value",
                 "Oops! Something went wrong. Please try again later.",
             )
         }
 
         try {
-            console.log(rawAppIds)
-            const p_app_ids = rawAppIds.split(",")
-            await Promise.all(
-                p_app_ids.map((p_app_id: string) =>
-                    removeFertilizerApplication(fdm, p_app_id),
-                ),
-            )
+            await removeFertilizerApplication(fdm, p_app_id)
 
-            return dataWithSuccess({}, { message: "Bemesting is verwijderd" })
+            return dataWithSuccess("Date deleted successfully", {
+                message: "Bemesting is verwijderd",
+            })
         } catch (error) {
             // Handle errors appropriately. Log the error for debugging purposes.
             console.error("Error deleting fertilizer application:", error)
@@ -161,21 +156,5 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 "Er is een fout opgetreden bij het verwijderen van de bemesting. Probeer het later opnieuw.",
             )
         }
-    }
-
-    try {
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-
-        return dataWithSuccess("Fertilizer application is updated", {
-            message: `Bemesting is bijgewerkt! 🎉`,
-        })
-    } catch (error) {
-        console.error("Failed to update field:", error)
-        return dataWithError("Failed to update field", {
-            message: `Er is iets misgegaan bij het bijwerken van de perceelgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
-        })
     }
 }
