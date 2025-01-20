@@ -11,7 +11,7 @@ import type { getFieldType } from "./field.d"
  * @param b_id_farm - ID of the farm.
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset
- * @param b_geometry - Geometry of field in WKT format
+ * @param b_geometry - Geometry of field in WKT format. Must be a polygon with CRS WGS84 (EPSG:4326)
  * @param b_manage_start - Start date of managing field.
  * @param b_manage_end - End date of managing field.
  * @param b_manage_type - Type of managing field.

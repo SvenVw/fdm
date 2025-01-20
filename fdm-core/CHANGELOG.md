@@ -1,5 +1,10 @@
 # Changelog fdm-core
 
+## 0.10.3
+
+### Patch Changes
+- clarified geometry format in function documentation
+
 ## 0.10.2
 
 ### Patch Changes
