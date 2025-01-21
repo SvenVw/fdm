@@ -1,6 +1,5 @@
 import {
     boolean,
-    date,
     index,
     pgSchema,
     primaryKey,
@@ -9,7 +8,6 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometryPolygon, numericCasted } from "./schema-custom-types"
-import { a } from "vitest/dist/chunks/suite.B2jumIFP.js"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm-dev")
@@ -325,7 +323,7 @@ export const harvestableSampling = fdmSchema.table(
         b_id_harvestable_analysis: text()
             .notNull()
             .references(() => harvestableAnalyses.b_id_harvestable_analysis),
-        b_date_sampling: timestamp({ withTimezone: true }),
+        b_sampling_date: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -369,7 +367,7 @@ export const cultivationHarvesting = fdmSchema.table(
         b_lu: text()
             .notNull()
             .references(() => cultivations.b_lu),
-        b_date_harvest: timestamp({ withTimezone: true }),
+        b_harvest_date: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -392,7 +390,7 @@ export const cultivationTerminating = fdmSchema.table(
         b_lu: text()
             .notNull()
             .references(() => cultivations.b_lu),
-        b_date_terminate: timestamp({ withTimezone: true }),
+        b_terminate_date: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
