@@ -52,10 +52,10 @@ export function FarmHeader({
                                     <DropdownMenuTrigger className="flex items-center gap-1">
                                         {b_id_farm && farmOptions
                                             ? (farmOptions.find(
-                                                (option) =>
-                                                    option.b_id_farm ===
-                                                    b_id_farm,
-                                            )?.b_name_farm ?? "Unknown farm")
+                                                  (option) =>
+                                                      option.b_id_farm ===
+                                                      b_id_farm,
+                                              )?.b_name_farm ?? "Unknown farm")
                                             : "Kies een bedrijf"}
                                         <ChevronDown />
                                     </DropdownMenuTrigger>
@@ -80,8 +80,13 @@ export function FarmHeader({
                             </BreadcrumbItem>
                             {fieldOptions && fieldOptions.length > 0 ? (
                                 <>
+                                    <BreadcrumbSeparator />
                                     <BreadcrumbItem className="hidden md:block">
-                                        <BreadcrumbLink href={`/farm/${b_id_farm}/field/`}>Perceel</BreadcrumbLink>
+                                        <BreadcrumbLink
+                                            href={`/farm/${b_id_farm}/field/`}
+                                        >
+                                            Perceel
+                                        </BreadcrumbLink>
                                     </BreadcrumbItem>
                                     <BreadcrumbSeparator />
                                     <BreadcrumbItem>
@@ -89,11 +94,11 @@ export function FarmHeader({
                                             <DropdownMenuTrigger className="flex items-center gap-1">
                                                 {b_id && fieldOptions
                                                     ? (fieldOptions.find(
-                                                        (option) =>
-                                                            option.b_id ===
-                                                            b_id,
-                                                    )?.b_name ??
-                                                        "Unknown field")
+                                                          (option) =>
+                                                              option.b_id ===
+                                                              b_id,
+                                                      )?.b_name ??
+                                                      "Unknown field")
                                                     : "Kies een perceel"}
                                                 <ChevronDown />
                                             </DropdownMenuTrigger>
@@ -101,8 +106,7 @@ export function FarmHeader({
                                                 {fieldOptions.map((option) => (
                                                     <DropdownMenuCheckboxItem
                                                         checked={
-                                                            b_id ===
-                                                            option.b_id
+                                                            b_id === option.b_id
                                                         }
                                                         key={option.b_id}
                                                     >
