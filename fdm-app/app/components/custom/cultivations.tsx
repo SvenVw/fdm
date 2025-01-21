@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
-import { Form, useFetcher } from "react-router"
+import { Form, NavLink, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { Combobox } from "@/components/custom/combobox"
@@ -20,7 +20,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Pencil, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useEffect } from "react"
 import { LoadingSpinner } from "./loadingspinner"
@@ -253,14 +253,16 @@ export function CultivationsForm(props: CultivationsFormProps) {
                     <div className="grid gap-6">
                         {props.cultivations.map((cultivation) => (
                             <div
-                                className="grid grid-cols-5 gap-x-3 items-center"
+                                className="grid grid-cols-5 items-center"
                                 key={cultivation.b_lu}
                             >
                                 <div className="col-span-2">
                                     <p className="text-sm font-medium leading-none">
                                         {cultivation.b_lu_name}
                                     </p>
-                                    {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
+                                    <p className="text-sm text-muted-foreground">
+                                        2 oogsten
+                                    </p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-light leading-none">
@@ -277,32 +279,46 @@ export function CultivationsForm(props: CultivationsFormProps) {
                                                   cultivation.b_harvest_date,
                                                   "yyyy-MM-dd",
                                               )
-                                            : "Nog niet geoogst"}
+                                            : "Nog niet gestopt"}
                                     </p>
                                 </div>
-                                <div className="justify-self-end">
-                                    <Button
-                                        variant="destructive"
-                                        disabled={
-                                            fetcher.state === "submitting"
-                                        }
-                                        onClick={() => {
-                                            if (cultivation.b_lus) {
-                                                handleDelete(cultivation.b_lus)
-                                            } else {
-                                                handleDelete([cultivation.b_lu])
+                                <div className="grid grid-cols-2 justify-self-end gap-x-3">
+                                    <div className="">
+                                        <Button variant="default" asChild>
+                                            <NavLink
+                                                to={`./${cultivation.b_lu}`}
+                                            >
+                                                <Pencil />
+                                            </NavLink>
+                                        </Button>
+                                    </div>
+                                    <div className="">
+                                        <Button
+                                            variant="destructive"
+                                            disabled={
+                                                fetcher.state === "submitting"
                                             }
-                                        }}
-                                    >
-                                        {fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                                <span>Verwijderen...</span>
-                                            </div>
-                                        ) : (
-                                            "Verwijder"
-                                        )}
-                                    </Button>
+                                            onClick={() => {
+                                                if (cultivation.b_lus) {
+                                                    handleDelete(
+                                                        cultivation.b_lus,
+                                                    )
+                                                } else {
+                                                    handleDelete([
+                                                        cultivation.b_lu,
+                                                    ])
+                                                }
+                                            }}
+                                        >
+                                            {fetcher.state === "submitting" ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <LoadingSpinner />
+                                                </div>
+                                            ) : (
+                                                <Trash2 />
+                                            )}
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         ))}
