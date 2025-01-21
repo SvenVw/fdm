@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.4.0
+
+### Minor Changes
+
+- 3fc278b: Add getting started documents
+
 ## 0.3.0
 
 ### Added

@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.10.3",
+    "version": "0.10.4",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -31,7 +31,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
