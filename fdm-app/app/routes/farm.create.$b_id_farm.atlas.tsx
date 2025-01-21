@@ -166,10 +166,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
             const currentYear = new Date().getFullYear()
             const defaultDate = new Date(currentYear, 0, 1)
-            const b_manage_start = defaultDate.toISOString().split("T")[0]
+            const b_manage_start = defaultDate
             const b_date_sowing = defaultDate
             const b_manage_end = null
-            const b_manage_type = 'unknown'
+            const b_manage_type = "unknown"
 
             // Validate dates
             if (
@@ -203,7 +203,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_geometry,
                     b_manage_start,
                     b_manage_end,
-                    b_manage_type
+                    b_manage_type,
                 )
                 await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
 
