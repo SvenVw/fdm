@@ -284,7 +284,11 @@ export function CultivationsForm(props: CultivationsFormProps) {
                                 </div>
                                 <div className="grid grid-cols-2 justify-self-end gap-x-3">
                                     <div className="">
-                                        <Button variant="default" asChild>
+                                        <Button
+                                            variant="default"
+                                            aria-label="Bewerken"
+                                            asChild
+                                        >
                                             <NavLink
                                                 to={`./${cultivation.b_lu}`}
                                             >
@@ -309,6 +313,7 @@ export function CultivationsForm(props: CultivationsFormProps) {
                                                     ])
                                                 }
                                             }}
+                                            aria-label="Verwijderen"
                                         >
                                             {fetcher.state === "submitting" ? (
                                                 <div className="flex items-center space-x-2">
