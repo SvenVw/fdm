@@ -95,6 +95,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 to: `/farm/${b_id_farm}/field/${b_id}/norm`,
                 title: "Gebruiksnormen",
             },
+            {
+                to: `/farm/${b_id_farm}/field/${b_id}/atlas`,
+                title: "Kaart",
+            },
         ]
 
         // Return user information from loader

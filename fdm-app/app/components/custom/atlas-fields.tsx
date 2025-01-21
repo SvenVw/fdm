@@ -7,7 +7,7 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css"
 import geojsonExtent from "@mapbox/geojson-extent"
 import type { FeatureCollection } from "geojson"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import type { LayerProps } from "react-map-gl"
 
 import {
@@ -43,43 +43,45 @@ export function AtlasFields({
         }
     }, [fieldsSelected])
 
-    // Set controls
     let Controls = <></>
+    let Panels = null
     if (interactive === true) {
+        // Set controls
         Controls = (
             <div>
                 <GeolocateControl />
                 <NavigationControl />
             </div>
         )
+
+        // Set panels
+        Panels = (
+            <div className="fields-panel grid gap-4 w-[350px]">
+                <FieldsPanelSelection
+                    fields={selectedFieldsData}
+                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                />
+                <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                <FieldsPanelHover zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+            </div>
+        )
     }
 
     // Set viewState
     const initialBounds = [3.1, 50.7, 7.2, 53.6]
-    const [viewState, setViewState] = useState({
-        bounds: initialBounds,
-        fitBoundsOptions: {
-            padding: 0,
-        },
-    })
-    const bounds = useMemo(() => {
-        if (!fieldsSelected) {
-            return initialBounds
-        }
+    let bounds = initialBounds
+    if (fieldsSelected) {
         try {
-            return geojsonExtent(fieldsSelected)
+            bounds = geojsonExtent(fieldsSelected)
         } catch (error) {
             console.error("Failed to calculate bounds:", error)
-            return initialBounds
+            bounds = initialBounds
         }
-    }, [fieldsSelected])
-
-    useEffect(() => {
-        setViewState({
-            bounds: bounds,
-            fitBoundsOptions: { padding: 10 },
-        })
-    }, [bounds])
+    }
+    const viewState = {
+        bounds: bounds,
+        fitBoundsOptions: { padding: 100 },
+    }
 
     return (
         <>
@@ -108,14 +110,7 @@ export function AtlasFields({
                     <Layer {...availableFieldsFillStyle} />
                     {/* <Layer {...availableFieldsLineStyle} /> */}
                 </AvailableFieldsSource>
-                <div className="fields-panel grid gap-4 w-[350px]">
-                    <FieldsPanelSelection
-                        fields={selectedFieldsData}
-                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                    />
-                    <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
-                    <FieldsPanelHover zoomLevelFields={ZOOM_LEVEL_FIELDS} />
-                </div>
+                {Panels}
             </MapGL>
         </>
     )
@@ -171,6 +166,6 @@ interface MapFieldsProps {
     interactive: boolean
     mapboxToken: string
     mapStyle: "mapbox://styles/mapbox/satellite-streets-v12"
-    fieldsSelected: FeatureCollection | null
+    fieldsSelected: FeatureCollection
     fieldsAvailableUrl: fieldsAvailableUrlType
 }
