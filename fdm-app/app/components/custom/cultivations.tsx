@@ -261,7 +261,7 @@ export function CultivationsForm(props: CultivationsFormProps) {
                                         {cultivation.b_lu_name}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        2 oogsten
+                                        Geen oogst
                                     </p>
                                 </div>
                                 <div>
