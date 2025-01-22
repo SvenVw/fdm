@@ -47,7 +47,7 @@ export const fieldAcquiring = fdmSchema.table(
         b_id_farm: text()
             .notNull()
             .references(() => farms.b_id_farm),
-        b_acquiring_date: timestamp({ withTimezone: true }).notNull(),
+        b_acquiring_date: timestamp({ withTimezone: true }),
         b_acquiring_method: acquiringMethodEnum().notNull().default("unknown"),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -90,7 +90,7 @@ export const fieldDiscarding = fdmSchema.table(
         b_id: text()
             .notNull()
             .references(() => fields.b_id),
-        b_discarding_date: timestamp({ withTimezone: true }).notNull(),
+        b_discarding_date: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },

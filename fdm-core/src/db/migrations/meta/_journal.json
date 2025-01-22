@@ -15,6 +15,13 @@
       "when": 1737560036562,
       "tag": "0001_talented_malcolm_colcord",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737561964152,
+      "tag": "0002_clammy_kylun",
+      "breakpoints": true
     }
   ]
 }
