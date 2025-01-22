@@ -67,7 +67,7 @@ export default function FarmFieldAtlasBlock() {
                 >
                     {() => (
                         <AtlasFields
-                            height="calc(100vh - 64px - 123px)"
+                            height="calc(100vh - 64px - 123px - 131px)"
                             width="100%"
                             interactive={false}
                             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
