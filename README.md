@@ -1,10 +1,10 @@
-# FDM: Transforming Farm Data into Actionable Insights
+# MINAS2 Fork of FDM: Transforming Farm Data into Actionable Insights
 
-The Farm Data Model (FDM) is an open-source project designed to empower data-driven decision-making in agriculture.  By providing a standardized, flexible, and extensible schema for organizing and analyzing farm data, FDM enables seamless data integration, analysis, and ultimately, improved farm management practices and lowering environmental impact.
+This repository represents the MINAS2 fork of the Farm Data Model (FDM) project. The Farm Data Model (FDM) is an open-source project designed to empower data-driven decision-making in agriculture.  By providing a standardized, flexible, and extensible schema for organizing and analyzing farm data, FDM enables seamless data integration, analysis, and ultimately, improved farm management practices and lowering environmental impact.
 
 <img src="/fdm-docs/static/img/fdm-high-resolution-logo.png" alt="FDM Logo" height="250px">
 
-## Key Features & Benefits
+## Key Features & Benefits  (Inherited from FDM)
 
 * **Standardized Schema:** FDM's core strength lies in its robust, well-defined schema.  This structure ensures consistency and interoperability, allowing diverse agricultural data sources to seamlessly integrate and communicate. This structured approach facilitates easier data analysis and exchange between different farm management systems and platforms.
 * **Single Source of Truth:**  FDM adheres to the principle of a single source of truth, meaning that each piece of information is stored in only one place within the schema. This eliminates data conflicts and inconsistencies, ensuring data integrity and reliability.
@@ -13,6 +13,16 @@ The Farm Data Model (FDM) is an open-source project designed to empower data-dri
 * **Extensibility:**  While standardized, FDM is also highly extensible. Users can add custom attributes and actions to cater to specific needs without compromising the overall schema's integrity. This flexibility makes FDM adaptable to the diverse and evolving landscape of modern agriculture.
 * **Open-Source Collaboration:**  Developers, agronomists, and other interested individuals are encouraged to contribute, fostering innovation and ensuring the project remains relevant and robust.
 * **Data-Driven Decisions:**  Ultimately, FDM empowers farmers and agronomists to make data-driven decisions. By providing a clear framework for data analysis, FDM supports optimized resource allocation, improved crop management strategies, lower environmental impact and enhanced overall farm productivity.
+
+## MINAS2 Specific Adaptations
+
+This fork, developed specifically for the MINAS2 project, builds upon the foundation of FDM with key adaptations:
+
+* **Branding and User Interface:**  MINAS2 incorporates distinct branding, including a unique logo, color scheme, and other visual elements to differentiate it from the original FDM project.
+* **Telemetry and Usage Reporting:**  Enhanced telemetry features provide valuable insights into system usage and performance, enabling developers to optimize the platform for MINAS2's specific needs.  Error reporting mechanisms are also integrated to facilitate troubleshooting and improve stability.
+* **Planned Integrations:**  Future development plans include integrating MINAS2 with external systems such as RVO (Rijksdienst voor Ondernemend Nederland), streamlining data exchange and compliance reporting.  This will provide seamless access to crucial agricultural data and resources directly within the MINAS2 platform.
+
+This section will be updated as further MINAS2-specific features and functionalities are implemented.
 
 ## FDM Ecosystem: A Modular Approach
 
@@ -30,16 +40,18 @@ FDM comprises several interconnected packages, each serving a distinct purpose:
 
 ## Getting Involved
 
-We welcome contributions of all kinds! Whether you're a developer, agronomist, or simply an interested user, you can contribute by:
+We welcome contributions to the MINAS2 fork of FDM!  Please focus contributions here on MINAS2-specific changes, such as:
 
-* **Testing & Providing Feedback:** Your experiences and insights are invaluable. Share your thoughts and suggestions through our GitHub Discussions.
-* **Reporting Bugs:** Help us improve by reporting any issues you encounter. Detailed bug reports are greatly appreciated.
-* **Requesting Features:**  Have an idea for a new feature?  Submit your requests through GitHub Discussions.
-* **Contributing Code & Documentation:**  Join our development efforts by contributing code or improving our documentation.
+* **MINAS2 Integrations:**  Code related to integrating with RVO or other MINAS2-specific services.
+* **UI/UX Enhancements:** Improvements to the user interface and user experience specific to the MINAS2 branding and requirements.
+* **MINAS2-Specific Features:**  Implementation of new features exclusively for MINAS2.
+* **Bug Fixes and Performance Improvements:** Addressing issues and optimizing performance within the MINAS2 context.
+
+For general FDM enhancements or bug fixes that are not specific to MINAS2, please contribute directly to the upstream FDM repository.  This helps maintain a clear separation between the core FDM project and the MINAS2 customizations.  Clear and concise commit messages are appreciated.  If you have questions, open an issue on the repository and we are happy to assist you! 
 
 ## Made Possible By
 
-FDM is developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe projects: [NutriBudget](https://www.nutribudget.eu/) and [PPS BAAT](https://www.handboekbodemenbemesting.nl/nl/handboekbodemenbemesting/pps-baat.htm).
+This fork is based on FDM, developed by the [Nutriënten Management Instituut](https://www.nmi-agro.nl/) as part of the Horizon Europe projects: [NutriBudget](https://www.nutribudget.eu/) and [PPS BAAT](https://www.handboekbodemenbemesting.nl/nl/handboekbodemenbemesting/pps-baat.htm). 
 
 <img src="https://www.nutribudget.eu/wp-content/themes/nutribudget/images/logo-nutribudget.png" alt="NutriBudget Logo" height="250px">
 <img src="https://www.beterbodembeheer.nl/wp-content/uploads/2024/01/pps-baat-projectlogo.png" alt="PPS BAAT Logo" height="250px">
