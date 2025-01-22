@@ -104,7 +104,7 @@ export default function FarmFieldsOverviewBlock() {
                 <Form
                     id="formFieldOverview"
                     onSubmit={form.handleSubmit}
-                    method="POST"
+                    method="post"
                 >
                     <fieldset disabled={form.formState.isSubmitting}>
                         <div className="grid grid-cols-2 w-full items-center gap-4">
