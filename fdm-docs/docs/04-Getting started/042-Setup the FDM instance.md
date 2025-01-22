@@ -24,12 +24,15 @@ POSTGRES_USER=
 
 # The password used to authenticate with the PostgreSQL database server.  Ensure this is stored securely and not exposed in version control.
 POSTGRES_PASSWORD=
-
-# Security Note:
-# 1. Never commit this .env file to version control
-# 2. Consider using a secrets management service in production
-# 3. Rotate credentials regularly
 ```
+
+:::warning[Security note]
+
+1. Never commit this .env file to version control
+2. Consider using a secrets management service in production
+3. Rotate credentials regularly
+
+:::
 
 ## Intialize the FDM Instance
 Once the schema is in place, you can initialize an instance of fdm-core to start interacting with your FDM data.
