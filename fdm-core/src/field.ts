@@ -12,47 +12,64 @@ import type { getFieldType } from "./field.d"
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset
  * @param b_geometry - Geometry of field in WKT format
- * @param b_manage_start - Start date of managing field.
- * @param b_manage_end - End date of managing field.
- * @param b_manage_type - Type of managing field.
+ * @param b_acquiring_date - Start date of managing field.
+ * @param b_discarding_date - End date of managing field.
+ * @param b_acquiring_method - Type of managing field.
  * @returns A Promise that resolves when the field has been added and returns the value for b_id.
  * @alpha
  */
 export async function addField(
     fdm: FdmType,
-    b_id_farm: schema.farmManagingTypeInsert["b_id_farm"],
+    b_id_farm: schema.fieldAcquiringTypeInsert["b_id_farm"],
     b_name: schema.fieldsTypeInsert["b_name"],
     b_id_source: schema.fieldsTypeInsert["b_id_source"],
     b_geometry: schema.fieldsTypeInsert["b_geometry"],
-    b_manage_start: schema.farmManagingTypeInsert["b_manage_start"],
-    b_manage_end: schema.farmManagingTypeInsert["b_manage_end"],
-    b_manage_type: schema.farmManagingTypeInsert["b_manage_type"],
+    b_acquiring_date: schema.fieldAcquiringTypeInsert["b_acquiring_date"],
+    b_acquiring_method: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
+    b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
     // Generate an ID for the field
     const b_id = createId()
 
-    try {
-        // Insert field
-        const fieldData = {
-            b_id: b_id,
-            b_name: b_name,
-            b_id_source: b_id_source,
-            b_geometry: sql`${b_geometry}::geometry(polygon)`,
-        }
-        await fdm.insert(schema.fields).values(fieldData)
+    fdm.transaction(async (tx: FdmType) => {
+        try {
+            // Insert field
+            const fieldData = {
+                b_id: b_id,
+                b_name: b_name,
+                b_id_source: b_id_source,
+                b_geometry: sql`${b_geometry}::geometry(polygon)`,
+            }
+            await tx.insert(schema.fields).values(fieldData)
 
-        // Insert relation between farm and field
-        const farmManagingData = {
-            b_id,
-            b_id_farm,
-            b_manage_start,
-            b_manage_end,
-            b_manage_type,
+            // Insert relation between farm and field
+            const fieldAcquiringData = {
+                b_id,
+                b_id_farm,
+                b_acquiring_date,
+                b_acquiring_method,
+            }
+            await tx.insert(schema.fieldAcquiring).values(fieldAcquiringData)
+
+            // Check that acquire date is before discarding date
+            if (
+                b_discarding_date &&
+                b_acquiring_date &&
+                b_acquiring_date.getTime() >= b_discarding_date.getTime()
+            ) {
+                throw new Error("Acquiring date must be before discarding date")
+            }
+
+            // Insert relation between field and discarding
+            const fieldDiscardingData = {
+                b_id,
+                b_discarding_date,
+            }
+            await tx.insert(schema.fieldDiscarding).values(fieldDiscardingData)
+        } catch (error) {
+            throw new Error(`Addition of field failed with error ${error}`)
         }
-        await fdm.insert(schema.farmManaging).values(farmManagingData)
-    } catch (error) {
-        throw new Error(`Addition of field failed with error ${error}`)
-    }
+    })
 
     return b_id
 }
@@ -73,20 +90,24 @@ export async function getField(
         .select({
             b_id: schema.fields.b_id,
             b_name: schema.fields.b_name,
-            b_id_farm: schema.farmManaging.b_id_farm,
+            b_id_farm: schema.fieldAcquiring.b_id_farm,
             b_id_source: schema.fields.b_id_source,
             b_geometry: schema.fields.b_geometry,
             b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
-            b_manage_start: schema.farmManaging.b_manage_start,
-            b_manage_end: schema.farmManaging.b_manage_end,
-            b_manage_type: schema.farmManaging.b_manage_type,
+            b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+            b_discarding_date: schema.fieldDiscarding.b_discarding_date,
+            b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
             created: schema.fields.created,
             updated: schema.fields.updated,
         })
         .from(schema.fields)
         .innerJoin(
-            schema.farmManaging,
-            eq(schema.fields.b_id, schema.farmManaging.b_id),
+            schema.fieldAcquiring,
+            eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+        )
+        .leftJoin(
+            schema.fieldDiscarding,
+            eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
         )
         .where(eq(schema.fields.b_id, b_id))
         .limit(1)
@@ -114,20 +135,24 @@ export async function getFields(
             b_id_source: schema.fields.b_id_source,
             b_geometry: schema.fields.b_geometry,
             b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
-            b_manage_start: schema.farmManaging.b_manage_start,
-            b_manage_end: schema.farmManaging.b_manage_end,
-            b_manage_type: schema.farmManaging.b_manage_type,
+            b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+            b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
+            b_discarding_date: schema.fieldDiscarding.b_discarding_date,
             created: schema.fields.created,
             updated: schema.fields.updated,
         })
         .from(schema.fields)
         .innerJoin(
-            schema.farmManaging,
-            eq(schema.fields.b_id, schema.farmManaging.b_id),
+            schema.fieldAcquiring,
+            eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+        )
+        .leftJoin(
+            schema.fieldDiscarding,
+            eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
         )
         .innerJoin(
             schema.farms,
-            eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm),
+            eq(schema.farms.b_id_farm, schema.fieldAcquiring.b_id_farm),
         )
         .where(eq(schema.farms.b_id_farm, b_id_farm))
         .orderBy(asc(schema.fields.b_name))
@@ -142,21 +167,21 @@ export async function getFields(
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset.
  * @param b_geometry - Geometry of field in WKT format
- * @param b_manage_start - Start date of managing field.
- * @param b_manage_end - End date of managing field.
- * @param b_manage_type - Type of managing field.
+ * @param b_acquiring_date - Start date of managing field.
+ * @param b_acquiring_method - Type of managing field.
+ * @param b_discarding_date - End date of managing field.
  * @returns A Promise that resolves when the field has been added and returns the value for b_id.
  * @alpha
  */
 export async function updateField(
     fdm: FdmType,
     b_id: schema.fieldsTypeInsert["b_id"],
-    b_name: schema.fieldsTypeInsert["b_name"],
-    b_id_source: schema.fieldsTypeInsert["b_id_source"],
-    b_geometry: schema.fieldsTypeInsert["b_geometry"],
-    b_manage_start: schema.farmManagingTypeInsert["b_manage_start"],
-    b_manage_end: schema.farmManagingTypeInsert["b_manage_end"],
-    b_manage_type: schema.farmManagingTypeInsert["b_manage_type"],
+    b_name?: schema.fieldsTypeInsert["b_name"],
+    b_id_source?: schema.fieldsTypeInsert["b_id_source"],
+    b_geometry?: schema.fieldsTypeInsert["b_geometry"],
+    b_acquiring_date?: schema.fieldAcquiringTypeInsert["b_acquiring_date"],
+    b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
+    b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<getFieldType> {
     const updatedField = await fdm.transaction(async (tx: FdmType) => {
         try {
@@ -179,43 +204,60 @@ export async function updateField(
                 .set(setFields)
                 .where(eq(schema.fields.b_id, b_id))
 
-            const setFarmManaging: Partial<schema.farmManagingTypeInsert> = {}
-            if (b_manage_start !== undefined) {
-                setFarmManaging.b_manage_start = b_manage_start
+            const setfieldAcquiring: Partial<schema.fieldAcquiringTypeInsert> =
+                {}
+            if (b_acquiring_date !== undefined) {
+                setfieldAcquiring.b_acquiring_date = b_acquiring_date
             }
-            if (b_manage_end !== undefined) {
-                setFarmManaging.b_manage_end = b_manage_end
+            if (b_acquiring_method !== undefined) {
+                setfieldAcquiring.b_acquiring_method = b_acquiring_method
             }
-            if (b_manage_type !== undefined) {
-                setFarmManaging.b_manage_type = b_manage_type
+            setfieldAcquiring.updated = updated
+
+            const setfieldDiscarding: Partial<schema.fieldDiscardingTypeInsert> =
+                {}
+            if (b_discarding_date !== undefined) {
+                setfieldDiscarding.b_discarding_date = b_discarding_date
             }
-            setFarmManaging.updated = updated
 
             await tx
-                .update(schema.farmManaging)
-                .set(setFarmManaging)
-                .where(eq(schema.farmManaging.b_id, b_id))
+                .update(schema.fieldAcquiring)
+                .set(setfieldAcquiring)
+                .where(eq(schema.fieldAcquiring.b_id, b_id))
 
-            const field = await tx
+            await tx
+                .update(schema.fieldDiscarding)
+                .set(setfieldDiscarding)
+                .where(eq(schema.fieldDiscarding.b_id, b_id))
+
+            const result = await tx
                 .select({
                     b_id: schema.fields.b_id,
                     b_name: schema.fields.b_name,
-                    b_id_farm: schema.farmManaging.b_id_farm,
+                    b_id_farm: schema.fieldAcquiring.b_id_farm,
                     b_id_source: schema.fields.b_id_source,
                     b_geometry: schema.fields.b_geometry,
-                    b_manage_start: schema.farmManaging.b_manage_start,
-                    b_manage_end: schema.farmManaging.b_manage_end,
-                    b_manage_type: schema.farmManaging.b_manage_type,
+                    b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+                    b_acquiring_method:
+                    schema.fieldAcquiring.b_acquiring_method,
+                    b_discarding_date: schema.fieldDiscarding.b_discarding_date,
                     created: schema.fields.created,
                     updated: schema.fields.updated,
                 })
                 .from(schema.fields)
                 .innerJoin(
-                    schema.farmManaging,
-                    eq(schema.fields.b_id, schema.farmManaging.b_id),
+                    schema.fieldAcquiring,
+                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
                 )
                 .where(eq(schema.fields.b_id, b_id))
                 .limit(1)
+            const field = result[0]
+
+            // Check if acquiring date is before discarding date
+            if (field.b_discarding_date && field.b_acquiring_date.getTime() >= field.b_discarding_date.getTime()) {
+                throw new Error("Acquiring date must be before discarding date")
+            }
+
             return field[0]
         } catch (error) {
             throw new Error(`Update of field failed with error ${error}`)

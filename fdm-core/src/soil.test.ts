@@ -46,18 +46,18 @@ describe("Soil Analysis Functions", () => {
         const fieldName = "Test Field"
         const fieldIDSource = "test-field-id"
         const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-        const manageStart = new Date("2023-01-01")
-        const manageEnd = new Date("2023-12-31")
-        const manageType = "owner"
+        const AcquireDate = new Date("2023-01-01")
+        const DiscardingDate = new Date("2023-12-31")
+        const acquiringMethod = "owner"
         b_id = await addField(
             fdm,
             b_id_farm,
             fieldName,
             fieldIDSource,
             fieldGeometry,
-            manageStart,
-            manageEnd,
-            manageType,
+            AcquireDate,
+            acquiringMethod,
+            DiscardingDate,
         )
     })
 

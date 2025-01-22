@@ -357,12 +357,12 @@ export async function getCultivationPlan(
             })
             .from(schema.farms)
             .leftJoin(
-                schema.farmManaging,
-                eq(schema.farms.b_id_farm, schema.farmManaging.b_id_farm),
+                schema.fieldAcquiring,
+                eq(schema.farms.b_id_farm, schema.fieldAcquiring.b_id_farm),
             )
             .leftJoin(
                 schema.fields,
-                eq(schema.farmManaging.b_id, schema.fields.b_id),
+                eq(schema.fieldAcquiring.b_id, schema.fields.b_id),
             )
             .leftJoin(
                 schema.fieldSowing,

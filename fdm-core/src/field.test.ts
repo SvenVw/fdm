@@ -37,18 +37,18 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = new Date("2023-01-01")
-            const manageEnd = new Date("2023-12-31")
-            const manageType = "owner"
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                manageStart,
-                manageEnd,
-                manageType,
+                AcquireDate,                
+                AcquiringMethod,
+                discardingDate,
             )
             expect(b_id).toBeDefined()
 
@@ -58,9 +58,9 @@ describe("Farm Data Model", () => {
             expect(field.b_id_source).toBe(fieldIDSource)
             expect(field.b_geometry).toBe(fieldGeometry)
             expect(field.b_area).toBeGreaterThan(0)
-            expect(field.b_manage_start).toEqual(manageStart)
-            expect(field.b_manage_end).toEqual(manageEnd)
-            expect(field.b_manage_type).toBe(manageType)
+            expect(field.b_acquiring_date).toEqual(AcquireDate)
+            expect(field.b_discarding_date).toEqual(discardingDate)
+            expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
         it("should get a field by ID", async () => {
@@ -79,18 +79,18 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = new Date("2023-01-01")
-            const manageEnd = new Date("2023-12-31")
-            const manageType = "owner"
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                manageStart,
-                manageEnd,
-                manageType,
+                AcquireDate,
+                AcquiringMethod,
+                discardingDate,                
             )
 
             const field = await getField(fdm, b_id)
@@ -99,9 +99,9 @@ describe("Farm Data Model", () => {
             expect(field.b_id_source).toBe(fieldIDSource)
             expect(field.b_geometry).toBe(fieldGeometry)
             expect(field.b_area).toBeGreaterThan(0)
-            expect(field.b_manage_start).toEqual(manageStart)
-            expect(field.b_manage_end).toEqual(manageEnd)
-            expect(field.b_manage_type).toBe(manageType)
+            expect(field.b_acquiring_date).toEqual(AcquireDate)
+            expect(field.b_discarding_date).toEqual(discardingDate)
+            expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
         it("should get fields by farm ID", async () => {
@@ -120,35 +120,35 @@ describe("Farm Data Model", () => {
             const fieldName1 = "Test Field 1"
             const fieldIDSource1 = "test-field-id-1"
             const fieldGeometry1 = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart1 = new Date("2023-01-01")
-            const manageEnd1 = new Date("2023-12-31")
-            const manageType1 = "owner"
+            const AcquireDate1 = new Date("2023-01-01")
+            const discardingDate1 = new Date("2023-12-31")
+            const AcquiringMethod1 = "owner"
             const b_id1 = await addField(
                 fdm,
                 b_id_farm,
                 fieldName1,
                 fieldIDSource1,
                 fieldGeometry1,
-                manageStart1,
-                manageEnd1,
-                manageType1,
+                AcquireDate1,                
+                AcquiringMethod1,
+                discardingDate1,
             )
 
             const fieldName2 = "Test Field 2"
             const fieldIDSource2 = "test-field-id-2"
             const fieldGeometry2 = "POLYGON((50 50,60 60,40 60,30 40,50 50))"
-            const manageStart2 = new Date("2024-01-01")
-            const manageEnd2 = new Date("2024-12-31")
-            const manageType2 = "lease"
+            const AcquireDate2 = new Date("2024-01-01")
+            const discardingDate2 = new Date("2024-12-31")
+            const AcquiringMethod2 = "lease"
             const b_id2 = await addField(
                 fdm,
                 b_id_farm,
                 fieldName2,
                 fieldIDSource2,
                 fieldGeometry2,
-                manageStart2,
-                manageEnd2,
-                manageType2,
+                AcquireDate2,                
+                AcquiringMethod2,
+                discardingDate2,
             )
 
             const fields = await getFields(fdm, b_id_farm)
@@ -160,9 +160,9 @@ describe("Farm Data Model", () => {
             expect(field1?.b_id_source).toBe(fieldIDSource1)
             expect(field1?.b_geometry).toBe(fieldGeometry1)
             expect(field1?.b_area).toBeGreaterThan(0)
-            expect(field1?.b_manage_start).toEqual(manageStart1)
-            expect(field1?.b_manage_end).toEqual(manageEnd1)
-            expect(field1?.b_manage_type).toBe(manageType1)
+            expect(field1?.b_acquiring_date).toEqual(AcquireDate1)
+            expect(field1?.b_discarding_date).toEqual(discardingDate1)
+            expect(field1?.b_acquiring_method).toBe(AcquiringMethod1)
 
             const field2 = fields.find((field) => field.b_id === b_id2)
             expect(field2?.b_name).toBe(fieldName2)
@@ -170,9 +170,9 @@ describe("Farm Data Model", () => {
             expect(field2?.b_id_source).toBe(fieldIDSource2)
             expect(field2?.b_geometry).toBe(fieldGeometry2)
             expect(field2?.b_area).toBeGreaterThan(0)
-            expect(field2?.b_manage_start).toEqual(manageStart2)
-            expect(field2?.b_manage_end).toEqual(manageEnd2)
-            expect(field2?.b_manage_type).toBe(manageType2)
+            expect(field2?.b_acquiring_date).toEqual(AcquireDate2)
+            expect(field2?.b_discarding_date).toEqual(discardingDate2)
+            expect(field2?.b_acquiring_method).toBe(AcquiringMethod2)
         })
 
         it("should update a field", async () => {
@@ -191,43 +191,43 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = new Date("2023-01-01")
-            const manageEnd = new Date("2023-12-31")
-            const manageType = "owner"
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                manageStart,
-                manageEnd,
-                manageType,
+                AcquireDate,                
+                AcquiringMethod,
+                discardingDate,
             )
 
             const updatedFieldName = "Updated Test Field"
             const updatedFieldIDSource = "updated-test-field-id"
             const updatedFieldGeometry =
                 "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const updatedManageStart = new Date("2024-01-01")
-            const updatedManageEnd = new Date("2024-12-31")
-            const updatedManageType = "lease"
+            const updatedAcquireDate = new Date("2024-01-01")
+            const updateddiscardingDate = new Date("2024-12-31")
+            const updatedAcquiringMethod = "lease"
             const updatedField = await updateField(
                 fdm,
                 b_id,
                 updatedFieldName,
                 updatedFieldIDSource,
                 updatedFieldGeometry,
-                updatedManageStart,
-                updatedManageEnd,
-                updatedManageType,
+                updatedAcquireDate,                
+                updatedAcquiringMethod,
+                updateddiscardingDate,
             )
             expect(updatedField.b_name).toBe(updatedFieldName)
             expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
             expect(updatedField.b_geometry).toBe(fieldGeometry)
-            expect(updatedField.b_manage_start).toEqual(updatedManageStart)
-            expect(updatedField.b_manage_end).toEqual(updatedManageEnd)
-            expect(updatedField.b_manage_type).toBe(updatedManageType)
+            expect(updatedField.b_acquiring_date).toEqual(updatedAcquireDate)
+            expect(updatedField.b_discarding_date).toEqual(updateddiscardingDate)
+            expect(updatedField.b_acquiring_method).toBe(updatedAcquiringMethod)
         })
 
         it("should update a field partially", async () => {
@@ -246,18 +246,18 @@ describe("Farm Data Model", () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
-            const manageStart = new Date("2023-01-01")
-            const manageEnd = new Date("2023-12-31")
-            const manageType = "owner"
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                manageStart,
-                manageEnd,
-                manageType,
+                AcquireDate,                
+                AcquiringMethod,
+                discardingDate,
             )
 
             // Update only the name
@@ -276,12 +276,12 @@ describe("Farm Data Model", () => {
             expect(updatedField.b_name).toBe(updatedFieldName)
             expect(updatedField.b_id_source).toBe(fieldIDSource) // Should remain the same
             expect(updatedField.b_geometry).toBe(fieldGeometry) // Should remain the same
-            expect(updatedField.b_manage_start).toEqual(manageStart) // Should remain the same
-            expect(updatedField.b_manage_end).toEqual(manageEnd) // Should remain the same
-            expect(updatedField.b_manage_type).toBe(manageType) // Should remain the same
+            expect(updatedField.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
+            expect(updatedField.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField.b_acquiring_method).toBe(AcquiringMethod) // Should remain the same
 
             // Update only the manage type
-            const updatedManageType = "lease"
+            const updatedAcquiringMethod = "lease"
             const updatedField2 = await updateField(
                 fdm,
                 b_id,
@@ -289,15 +289,15 @@ describe("Farm Data Model", () => {
                 undefined,
                 undefined,
                 undefined,
-                undefined,
-                updatedManageType,
+                updatedAcquiringMethod,
+                undefined,                
             )
             expect(updatedField2.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField2.b_id_source).toBe(fieldIDSource) // Should remain the same
             expect(updatedField2.b_geometry).toBe(fieldGeometry) // Should remain the same
-            expect(updatedField2.b_manage_start).toEqual(manageStart) // Should remain the same
-            expect(updatedField2.b_manage_end).toEqual(manageEnd) // Should remain the same
-            expect(updatedField2.b_manage_type).toBe(updatedManageType) // Should be updated
+            expect(updatedField2.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
+            expect(updatedField2.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField2.b_acquiring_method).toBe(updatedAcquiringMethod) // Should be updated
 
             //Partial updates for `fields` table
             const updatedFieldIDSource = "updated-test-field-id"
@@ -314,28 +314,28 @@ describe("Farm Data Model", () => {
             expect(updatedField3.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField3.b_id_source).toBe(updatedFieldIDSource) // Should be updated
             expect(updatedField3.b_geometry).toBe(fieldGeometry) // Should remain the same
-            expect(updatedField3.b_manage_start).toEqual(manageStart) // Should remain the same
-            expect(updatedField3.b_manage_end).toEqual(manageEnd) // Should remain the same
-            expect(updatedField3.b_manage_type).toBe(updatedManageType) // Should remain the same
+            expect(updatedField3.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
+            expect(updatedField3.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField3.b_acquiring_method).toBe(updatedAcquiringMethod) // Should remain the same
 
             // Partial updates for `farmManaging` table
-            const updatedManageStart = new Date("2024-01-01")
+            const updatedAcquireDate = new Date("2024-01-01")
             const updatedField4 = await updateField(
                 fdm,
                 b_id,
                 undefined,
                 undefined,
                 undefined,
-                updatedManageStart,
+                updatedAcquireDate,
                 undefined,
                 undefined,
             )
             expect(updatedField4.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField4.b_id_source).toBe(updatedFieldIDSource) // Should remain the same
             expect(updatedField4.b_geometry).toBe(fieldGeometry) // Should remain the same
-            expect(updatedField4.b_manage_start).toEqual(updatedManageStart) // Should be updated
-            expect(updatedField4.b_manage_end).toEqual(manageEnd) // Should remain the same
-            expect(updatedField4.b_manage_type).toBe(updatedManageType) // Should remain the same
+            expect(updatedField4.b_acquiring_date).toEqual(updatedAcquireDate) // Should be updated
+            expect(updatedField4.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField4.b_acquiring_method).toBe(updatedAcquiringMethod) // Should remain the same
         })
     })
 })
