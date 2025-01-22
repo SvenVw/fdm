@@ -32,7 +32,7 @@ export default function SignIn() {
                 <div className="mx-auto grid w-[350px] gap-6">
                     <div className="grid gap-2 text-center">
                         {/* <img src="logo.png" alt="Logo FDM"/> */}
-                        <h1 className="text-3xl font-bold">FDM</h1>
+                        <h1 className="text-3xl font-bold">MINAS2</h1>
                         <p className="text-balance text-muted-foreground">
                             Maak een account aan en krijg toegang tot:
                         </p>
@@ -143,7 +143,7 @@ export default function SignIn() {
                     </div>
                     <div className="mb-4 text-center text-sm">
                         <Button variant={"outline"}>
-                            Lees meer over FDM <MoveDown />
+                            Lees meer over MINAS2 <MoveDown />
                         </Button>
                     </div>
                 </div>

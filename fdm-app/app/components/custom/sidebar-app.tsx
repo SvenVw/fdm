@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sidebar"
 import {
     ArrowRightLeft,
+    Award,
     BadgeCheck,
     ChevronsUpDown,
     GitPullRequestArrow,
@@ -71,10 +72,10 @@ export function SidebarApp(props: SideBarAppType) {
                         <SidebarMenuButton size="lg" asChild>
                             <NavLink to="/">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Sprout className="size-4" />
+                                    <Award className="size-4" />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">FDM</span>
+                                    <span className="font-semibold">MINAS2</span>
                                     {/* <span className="">2024</span> */}
                                 </div>
                             </NavLink>
@@ -164,7 +165,7 @@ export function SidebarApp(props: SideBarAppType) {
                                     <Badge>Binnenkort</Badge>
                                 </SidebarMenuBadge>
                             </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="#">
                                         <GitPullRequestArrow />
@@ -174,7 +175,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
                                 </SidebarMenuBadge>
-                            </SidebarMenuItem>
+                            </SidebarMenuItem> */}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
