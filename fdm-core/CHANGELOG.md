@@ -1,11 +1,5 @@
 # Changelog fdm-core
 
-## 0.10.4
-
-### Patch Changes
-
-- 3fc278b: Add getting started documents
-
 ## 0.10.3
 
 ### Patch Changes
