@@ -12,29 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1737026078029,
-      "tag": "0001_fresh_alex_power",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1737038392085,
-      "tag": "0002_good_zarek",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1737386986922,
-      "tag": "0003_omniscient_bullseye",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1737465157624,
-      "tag": "0004_outstanding_romulus",
+      "when": 1737560036562,
+      "tag": "0001_talented_malcolm_colcord",
       "breakpoints": true
     }
   ]
