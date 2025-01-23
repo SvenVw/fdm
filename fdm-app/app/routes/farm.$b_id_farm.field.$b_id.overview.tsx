@@ -76,18 +76,18 @@ export default function FarmFieldsOverviewBlock() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.field.b_name,
-            b_manage_type: loaderData.field.b_manage_type,
-            b_manage_start: loaderData.field.b_manage_start,
-            b_manage_end: loaderData.field.b_manage_end,
+            b_acquiring_method: loaderData.field.b_acquiring_method,
+            b_acquiring_date: loaderData.field.b_acquiring_date,
+            b_terminating_date: loaderData.field.b_terminating_date,
         },
     })
 
     useEffect(() => {
         form.reset({
             b_name: loaderData.field.b_name,
-            b_manage_type: loaderData.field.b_manage_type,
-            b_manage_start: loaderData.field.b_manage_start,
-            b_manage_end: loaderData.field.b_manage_end,
+            b_acquiring_method: loaderData.field.b_acquiring_method,
+            b_acquiring_date: loaderData.field.b_acquiring_date,
+            b_terminating_date: loaderData.field.b_terminating_date,
         })
     }, [loaderData, form.reset])
 
@@ -131,7 +131,7 @@ export default function FarmFieldsOverviewBlock() {
                             <div className="flex flex-col space-y-1.5 col-span-2">
                                 <FormField
                                     control={form.control}
-                                    name="b_manage_type"
+                                    name="b_acquiring_method"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>
@@ -171,7 +171,7 @@ export default function FarmFieldsOverviewBlock() {
                             <div className="flex flex-col space-y-1.5">
                                 <FormField
                                     control={form.control}
-                                    name="b_manage_start"
+                                    name="b_acquiring_date"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                             <FormLabel>
@@ -234,7 +234,7 @@ export default function FarmFieldsOverviewBlock() {
                             <div className="flex flex-col space-y-1.5">
                                 <FormField
                                     control={form.control}
-                                    name="b_manage_end"
+                                    name="b_terminating_date"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                             <FormLabel>
@@ -332,9 +332,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues.b_name,
             undefined,
             undefined,
-            formValues.b_manage_start,
-            formValues.b_manage_end,
-            formValues.b_manage_type,
+            formValues.b_acquiring_date,
+            formValues.b_acquiring_method,
+            formValues.b_terminating_date,
         )
 
         return dataWithSuccess("field is updated", {
@@ -353,7 +353,7 @@ const FormSchema = z.object({
     b_name: z.string().min(3, {
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
     }),
-    b_manage_type: z.enum(["owner", "lease", "unknown"]),
-    b_manage_start: z.coerce.date().optional(),
-    b_manage_end: z.coerce.date().optional(),
+    b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
+    b_acquiring_date: z.coerce.date().optional(),
+    b_terminating_date: z.coerce.date().optional(),
 })

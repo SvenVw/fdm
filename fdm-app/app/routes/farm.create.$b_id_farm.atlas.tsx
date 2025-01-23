@@ -166,14 +166,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
             const currentYear = new Date().getFullYear()
             const defaultDate = new Date(currentYear, 0, 1)
-            const b_manage_start = defaultDate
+            const b_acquiring_date = defaultDate
             const b_date_sowing = defaultDate
-            const b_manage_end = null
-            const b_manage_type = "unknown"
+            const b_terminating_date = undefined
+            const b_acquiring_method = "unknown"
 
             // Validate dates
             if (
-                new Date(b_manage_start) > new Date() ||
+                new Date(b_acquiring_date) > new Date() ||
                 new Date(b_date_sowing) > new Date()
             ) {
                 throw data("Future dates are not allowed", {
@@ -181,7 +181,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     statusText: "Future dates are not allowed",
                 })
             }
-            if (new Date(b_date_sowing) < new Date(b_manage_start)) {
+            if (new Date(b_date_sowing) < new Date(b_acquiring_date)) {
                 throw data(
                     "Sowing should happen after field started to be managed",
                     {
@@ -201,9 +201,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_id_name,
                     b_id_source,
                     b_geometry,
-                    b_manage_start,
-                    b_manage_end,
-                    b_manage_type,
+                    b_acquiring_date,
+                    b_acquiring_method,
+                    b_terminating_date,
                 )
                 await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
 

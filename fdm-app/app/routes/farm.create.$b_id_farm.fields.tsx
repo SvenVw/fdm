@@ -210,9 +210,9 @@ export async function action({ request, params }: LoaderFunctionArgs) {
             b_name,
             undefined, // b_id_source
             undefined, // b_geometry
-            undefined, // b_manage_start
-            undefined, // b_manage_end
-            undefined, // b_manage_type
+            undefined, // b_acquiring_date
+            undefined, // b_terminating_date
+            undefined, // b_acquiring_method
         )
         return { field: updatedField }
     } catch (error) {
