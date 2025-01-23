@@ -96,7 +96,9 @@ export async function addCultivation(
             if (b_terminate_date) {
                 // Validate if terminate date is a Date object
                 if (!(b_terminate_date instanceof Date)) {
-                    throw new Error("Invalid terminate date: Must be a Date object")
+                    throw new Error(
+                        "Invalid terminate date: Must be a Date object",
+                    )
                 }
 
                 // Validate if terminate date is after sowing date
@@ -282,7 +284,10 @@ export async function getCultivations(
             ),
         )
         .where(eq(schema.fieldSowing.b_id, b_id))
-        .orderBy(desc(schema.fieldSowing.b_sowing_date), asc(schema.cultivationsCatalogue.b_lu_name))
+        .orderBy(
+            desc(schema.fieldSowing.b_sowing_date),
+            asc(schema.cultivationsCatalogue.b_lu_name),
+        )
 
     return cultivations
 }
@@ -347,7 +352,8 @@ export async function getCultivationPlan(
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
                 b_sowing_date: schema.fieldSowing.b_sowing_date,
-                b_terminate_date: schema.cultivationTerminating.b_terminate_date,
+                b_terminate_date:
+                    schema.cultivationTerminating.b_terminate_date,
                 p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_app_amount: schema.fertilizerApplication.p_app_amount,
@@ -370,10 +376,7 @@ export async function getCultivationPlan(
             )
             .leftJoin(
                 schema.cultivationTerminating,
-                eq(
-                    schema.cultivationTerminating.b_lu,
-                    schema.fieldSowing.b_lu,
-                ),
+                eq(schema.cultivationTerminating.b_lu, schema.fieldSowing.b_lu),
             )
             .leftJoin(
                 schema.cultivations,
@@ -414,7 +417,12 @@ export async function getCultivationPlan(
         const cultivationPlan = cultivations.reduce(
             (acc: cultivationPlanType[], curr: any) => {
                 let existingCultivation = acc.find(
-                    (item) => item.b_lu_catalogue === curr.b_lu_catalogue && item.b_sowing_date?.getTime() === curr.b_sowing_date?.getTime() && item.b_terminate_date?.getTime() === curr.b_terminate_date?.getTime(),
+                    (item) =>
+                        item.b_lu_catalogue === curr.b_lu_catalogue &&
+                        item.b_sowing_date?.getTime() ===
+                            curr.b_sowing_date?.getTime() &&
+                        item.b_terminate_date?.getTime() ===
+                            curr.b_terminate_date?.getTime(),
                 )
 
                 if (!existingCultivation) {
@@ -492,8 +500,7 @@ export async function removeCultivation(
 
             await tx
                 .delete(schema.cultivationTerminating)
-                .where(eq(schema.cultivationTerminating.b_lu, b_lu),
-                )
+                .where(eq(schema.cultivationTerminating.b_lu, b_lu))
 
             await tx
                 .delete(schema.fieldSowing)
@@ -525,7 +532,7 @@ export async function updateCultivation(
     b_lu: schema.cultivationsTypeSelect["b_lu"],
     b_lu_catalogue?: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_sowing_date?: schema.fieldSowingTypeInsert["b_sowing_date"],
-    b_terminate_date?: schema.cultivationTerminatingTypeInsert["b_terminate_date"]
+    b_terminate_date?: schema.cultivationTerminatingTypeInsert["b_terminate_date"],
 ): Promise<void> {
     await fdm.transaction(async (tx: FdmType) => {
         try {
@@ -582,14 +589,26 @@ export async function updateCultivation(
                 } else {
                     const result = await tx
                         .select({
-                            b_terminate_date: schema.cultivationTerminating.b_terminate_date,
+                            b_terminate_date:
+                                schema.cultivationTerminating.b_terminate_date,
                         })
                         .from(schema.cultivationTerminating)
-                        .where(and(eq(schema.cultivationTerminating.b_lu, b_lu), isNotNull(schema.cultivationTerminating.b_terminate_date)))
+                        .where(
+                            and(
+                                eq(schema.cultivationTerminating.b_lu, b_lu),
+                                isNotNull(
+                                    schema.cultivationTerminating
+                                        .b_terminate_date,
+                                ),
+                            ),
+                        )
                         .limit(1)
-                   
+
                     if (result.length > 0) {
-                        if (b_sowing_date.getTime() >= result[0].b_terminate_date.getTime()) {
+                        if (
+                            b_sowing_date.getTime() >=
+                            result[0].b_terminate_date.getTime()
+                        ) {
                             throw new Error(
                                 "Sowing date must be before termination date",
                             )
@@ -624,11 +643,17 @@ export async function updateCultivation(
                             b_sowing_date: schema.fieldSowing.b_sowing_date,
                         })
                         .from(schema.fieldSowing)
-                        .where(and(eq(schema.fieldSowing.b_lu, b_lu)), isNotNull(schema.fieldSowing.b_sowing_date))
+                        .where(
+                            and(eq(schema.fieldSowing.b_lu, b_lu)),
+                            isNotNull(schema.fieldSowing.b_sowing_date),
+                        )
                         .limit(1)
 
                     if (result.length > 0) {
-                        if (result[0].b_sowing_date.getTime() >= b_terminate_date.getTime()) {
+                        if (
+                            result[0].b_sowing_date.getTime() >=
+                            b_terminate_date.getTime()
+                        ) {
                             throw new Error(
                                 "Terminate date must be after sowing date",
                             )
@@ -638,10 +663,12 @@ export async function updateCultivation(
 
                 await tx
                     .update(schema.cultivationTerminating)
-                    .set({ updated: updated, b_terminate_date: b_terminate_date })
+                    .set({
+                        updated: updated,
+                        b_terminate_date: b_terminate_date,
+                    })
                     .where(eq(schema.cultivationTerminating.b_lu, b_lu))
             }
-
         } catch (error) {
             throw new Error(
                 `updateCultivation failed: ${error instanceof Error ? error.message : String(error)}`,
