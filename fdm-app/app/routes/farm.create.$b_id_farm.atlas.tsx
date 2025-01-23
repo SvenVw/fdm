@@ -161,7 +161,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     // Add fields to farm
     const b_ids = await Promise.all(
         selectedFields.features.map(async (field, index) => {
-            const b_id_name = `Perceel ${index + 1}`
+            const b_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
             const currentYear = new Date().getFullYear()
@@ -198,7 +198,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const b_id = await addField(
                     fdm,
                     b_id_farm,
-                    b_id_name,
+                    b_name,
                     b_id_source,
                     b_geometry,
                     b_acquiring_date,
@@ -256,12 +256,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
                 return b_id
             } catch (error) {
-                console.error(`Failed to process field ${b_id_name}:`, error)
+                console.error(`Failed to process field ${b_name}:`, error)
                 throw data(
-                    `Failed to add field ${b_id_name}: ${error.message}`,
+                    `Failed to add field ${b_name}: ${error.message}`,
                     {
                         status: 500,
-                        statusText: `Failed to add field ${b_id_name}`,
+                        statusText: `Failed to add field ${b_name}`,
                     },
                 )
             }
