@@ -122,7 +122,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/create/${loaderData.b_id_farm}/cattle`}
+                                to={`/farm/${loaderData.b_id_farm}/field`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         loaderData.cultivationPlan.length === 0,
@@ -133,7 +133,7 @@ export default function Index() {
                                         loaderData.cultivationPlan.length === 0
                                     }
                                 >
-                                    Doorgaan
+                                    Voltooien
                                 </Button>
                             </NavLink>
                         </div>
