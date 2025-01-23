@@ -419,10 +419,10 @@ export async function getCultivationPlan(
                 let existingCultivation = acc.find(
                     (item) =>
                         item.b_lu_catalogue === curr.b_lu_catalogue &&
-                        item.b_sowing_date?.getTime() ===
-                            curr.b_sowing_date?.getTime() &&
-                        item.b_terminate_date?.getTime() ===
-                            curr.b_terminate_date?.getTime(),
+                        (item.b_sowing_date?.getTime() ?? 0) ===
+                            (curr.b_sowing_date?.getTime() ?? 0) &&
+                        (item.b_terminate_date?.getTime() ?? 0) ===
+                            (curr.b_terminate_date?.getTime() ?? 0),
                 )
 
                 if (!existingCultivation) {
