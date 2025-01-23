@@ -46,7 +46,7 @@ describe("Farm Data Model", () => {
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                AcquireDate,                
+                AcquireDate,
                 AcquiringMethod,
                 discardingDate,
             )
@@ -90,7 +90,7 @@ describe("Farm Data Model", () => {
                 fieldGeometry,
                 AcquireDate,
                 AcquiringMethod,
-                discardingDate,                
+                discardingDate,
             )
 
             const field = await getField(fdm, b_id)
@@ -129,7 +129,7 @@ describe("Farm Data Model", () => {
                 fieldName1,
                 fieldIDSource1,
                 fieldGeometry1,
-                AcquireDate1,                
+                AcquireDate1,
                 AcquiringMethod1,
                 discardingDate1,
             )
@@ -146,12 +146,13 @@ describe("Farm Data Model", () => {
                 fieldName2,
                 fieldIDSource2,
                 fieldGeometry2,
-                AcquireDate2,                
+                AcquireDate2,
                 AcquiringMethod2,
                 discardingDate2,
             )
 
             const fields = await getFields(fdm, b_id_farm)
+            console.log(fields)
             expect(fields.length).toBe(2)
 
             const field1 = fields.find((field) => field.b_id === b_id1)
@@ -210,7 +211,7 @@ describe("Farm Data Model", () => {
             const updatedFieldGeometry =
                 "POLYGON((30 10,40 40,20 40,10 20,30 10))"
             const updatedAcquireDate = new Date("2024-01-01")
-            const updateddiscardingDate = new Date("2024-12-31")
+            const updatedDiscardingDate = new Date("2024-12-31")
             const updatedAcquiringMethod = "lease"
             const updatedField = await updateField(
                 fdm,
@@ -255,7 +256,7 @@ describe("Farm Data Model", () => {
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                AcquireDate,                
+                AcquireDate,
                 AcquiringMethod,
                 discardingDate,
             )
@@ -290,14 +291,16 @@ describe("Farm Data Model", () => {
                 undefined,
                 undefined,
                 updatedAcquiringMethod,
-                undefined,                
+                undefined,
             )
             expect(updatedField2.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField2.b_id_source).toBe(fieldIDSource) // Should remain the same
             expect(updatedField2.b_geometry).toBe(fieldGeometry) // Should remain the same
             expect(updatedField2.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
             expect(updatedField2.b_discarding_date).toEqual(discardingDate) // Should remain the same
-            expect(updatedField2.b_acquiring_method).toBe(updatedAcquiringMethod) // Should be updated
+            expect(updatedField2.b_acquiring_method).toBe(
+                updatedAcquiringMethod,
+            ) // Should be updated
 
             //Partial updates for `fields` table
             const updatedFieldIDSource = "updated-test-field-id"
@@ -316,10 +319,12 @@ describe("Farm Data Model", () => {
             expect(updatedField3.b_geometry).toBe(fieldGeometry) // Should remain the same
             expect(updatedField3.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
             expect(updatedField3.b_discarding_date).toEqual(discardingDate) // Should remain the same
-            expect(updatedField3.b_acquiring_method).toBe(updatedAcquiringMethod) // Should remain the same
+            expect(updatedField3.b_acquiring_method).toBe(
+                updatedAcquiringMethod,
+            ) // Should remain the same
 
             // Partial updates for `farmManaging` table
-            const updatedAcquireDate = new Date("2024-01-01")
+            const updatedAcquireDate = new Date("2023-02-01")
             const updatedField4 = await updateField(
                 fdm,
                 b_id,
@@ -335,7 +340,9 @@ describe("Farm Data Model", () => {
             expect(updatedField4.b_geometry).toBe(fieldGeometry) // Should remain the same
             expect(updatedField4.b_acquiring_date).toEqual(updatedAcquireDate) // Should be updated
             expect(updatedField4.b_discarding_date).toEqual(discardingDate) // Should remain the same
-            expect(updatedField4.b_acquiring_method).toBe(updatedAcquiringMethod) // Should remain the same
+            expect(updatedField4.b_acquiring_method).toBe(
+                updatedAcquiringMethod,
+            ) // Should remain the same
         })
     })
 })
