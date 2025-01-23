@@ -31,7 +31,7 @@ export async function addField(
     // Generate an ID for the field
     const b_id = createId()
 
-    fdm.transaction(async (tx: FdmType) => {
+    await fdm.transaction(async (tx: FdmType) => {
         try {
             // Insert field
             const fieldData = {
@@ -131,7 +131,7 @@ export async function getFields(
         .select({
             b_id: schema.fields.b_id,
             b_name: schema.fields.b_name,
-            b_id_farm: schema.farms.b_id_farm,
+            b_id_farm: schema.fieldAcquiring.b_id_farm,
             b_id_source: schema.fields.b_id_source,
             b_geometry: schema.fields.b_geometry,
             b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
@@ -150,11 +150,7 @@ export async function getFields(
             schema.fieldDiscarding,
             eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
         )
-        .innerJoin(
-            schema.farms,
-            eq(schema.farms.b_id_farm, schema.fieldAcquiring.b_id_farm),
-        )
-        .where(eq(schema.farms.b_id_farm, b_id_farm))
+        .where(eq(schema.fieldAcquiring.b_id_farm, b_id_farm))
         .orderBy(asc(schema.fields.b_name))
 
     return fields
@@ -219,6 +215,7 @@ export async function updateField(
             if (b_discarding_date !== undefined) {
                 setfieldDiscarding.b_discarding_date = b_discarding_date
             }
+            setfieldDiscarding.updated = updated
 
             await tx
                 .update(schema.fieldAcquiring)

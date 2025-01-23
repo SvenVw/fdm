@@ -152,7 +152,6 @@ describe("Farm Data Model", () => {
             )
 
             const fields = await getFields(fdm, b_id_farm)
-            console.log(fields)
             expect(fields.length).toBe(2)
 
             const field1 = fields.find((field) => field.b_id === b_id1)
@@ -201,7 +200,7 @@ describe("Farm Data Model", () => {
                 fieldName,
                 fieldIDSource,
                 fieldGeometry,
-                AcquireDate,                
+                AcquireDate,
                 AcquiringMethod,
                 discardingDate,
             )
@@ -219,15 +218,17 @@ describe("Farm Data Model", () => {
                 updatedFieldName,
                 updatedFieldIDSource,
                 updatedFieldGeometry,
-                updatedAcquireDate,                
+                updatedAcquireDate,
                 updatedAcquiringMethod,
-                updateddiscardingDate,
+                updatedDiscardingDate,
             )
             expect(updatedField.b_name).toBe(updatedFieldName)
             expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
             expect(updatedField.b_geometry).toBe(fieldGeometry)
             expect(updatedField.b_acquiring_date).toEqual(updatedAcquireDate)
-            expect(updatedField.b_discarding_date).toEqual(updateddiscardingDate)
+            expect(updatedField.b_discarding_date).toEqual(
+                updatedDiscardingDate,
+            )
             expect(updatedField.b_acquiring_method).toBe(updatedAcquiringMethod)
         })
 
