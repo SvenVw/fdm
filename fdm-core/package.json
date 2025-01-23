@@ -31,9 +31,10 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
-        "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
@@ -47,9 +48,9 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
-        "@types/node": "^22.10.6",
+        "@types/node": "^22.10.9",
         "drizzle-kit": "catalog:",
-        "fs-extra": "^11.2.0",
+        "fs-extra": "^11.3.0",
         "globals": "^15.14.0",
         "typedoc": "^0.26.11",
         "typedoc-plugin-missing-exports": "^3.1.0",
@@ -59,7 +60,7 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.2.15",
+        "@electric-sql/pglite": "^0.2.16",
         "drizzle-graphql": "^0.8.5",
         "drizzle-orm": "catalog:",
         "graphql": "^16.10.0",
