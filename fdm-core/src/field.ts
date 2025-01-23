@@ -239,7 +239,7 @@ export async function updateField(
                     b_geometry: schema.fields.b_geometry,
                     b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
                     b_acquiring_method:
-                    schema.fieldAcquiring.b_acquiring_method,
+                        schema.fieldAcquiring.b_acquiring_method,
                     b_discarding_date: schema.fieldDiscarding.b_discarding_date,
                     created: schema.fields.created,
                     updated: schema.fields.updated,
@@ -249,16 +249,24 @@ export async function updateField(
                     schema.fieldAcquiring,
                     eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
                 )
+                .leftJoin(
+                    schema.fieldDiscarding,
+                    eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
+                )
                 .where(eq(schema.fields.b_id, b_id))
                 .limit(1)
             const field = result[0]
 
             // Check if acquiring date is before discarding date
-            if (field.b_discarding_date && field.b_acquiring_date.getTime() >= field.b_discarding_date.getTime()) {
+            if (
+                field.b_discarding_date &&
+                field.b_acquiring_date.getTime() >=
+                    field.b_discarding_date.getTime()
+            ) {
                 throw new Error("Acquiring date must be before discarding date")
             }
 
-            return field[0]
+            return field
         } catch (error) {
             throw new Error(`Update of field failed with error ${error}`)
         }
