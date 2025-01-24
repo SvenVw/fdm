@@ -356,6 +356,21 @@ const FormSchema = z.object({
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
     }),
     b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
+const FormSchema = z.object({
+    b_name: z.string().min(3, {
+        message: "Naam van perceel moet minimaal 3 karakters bevatten",
+    }),
+    b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
     b_acquiring_date: z.coerce.date().optional(),
-    b_terminating_date: z.coerce.date().optional(),
+    b_terminating_date: z.coerce.date().optional()
+        .refine(
+            (date, ctx) => {
+                if (date && ctx.parent.b_acquiring_date) {
+                    return date > ctx.parent.b_acquiring_date;
+                }
+                return true;
+            },
+            "Einddatum moet na de startdatum liggen"
+        ),
+})
 })
