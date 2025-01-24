@@ -114,7 +114,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     } catch (error) {
         console.error(error)
         throw data(
-            error instanceof Error ? error.message : "Internal Server Error",
+            "An unexpected error occurred.",
             {
                 status: 500,
                 statusText: "Internal Server Error",
