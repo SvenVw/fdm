@@ -11,6 +11,6 @@ export default defineConfig({
             format: "esm",
         },
     ],
-
     plugins: [resolve(), typescript()],
+    external: ["@svenvw/fdm-core"],
 })

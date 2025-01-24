@@ -14,4 +14,5 @@ export default defineConfig({
     ],
 
     plugins: [resolve(), typescript(), json()],
+    external: ['@svenvw/fdm-core']
 })
