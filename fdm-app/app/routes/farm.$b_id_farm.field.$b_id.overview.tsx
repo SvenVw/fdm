@@ -317,7 +317,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const b_id = params.b_id
 
     if (!b_id) {
-        return dataWithError(null, "Missing field ID.")
+        return dataWithError(null, "Perceel ID ontbreekt.")
     }
 
     try {
@@ -326,24 +326,28 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
+        // Note: undefined parameters are for backwards compatibility
+        // with the old field update interface
         await updateField(
             fdm,
             b_id,
             formValues.b_name,
-            undefined,
-            undefined,
+            undefined, // b_area
+            undefined, // b_crop_id
             formValues.b_acquiring_date,
             formValues.b_acquiring_method,
             formValues.b_terminating_date,
         )
 
         return dataWithSuccess("field is updated", {
-            message: `${formValues.b_name} is bijgewerkt! 🎉`,
+            message: `Perceel ${formValues.b_name} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        console.error("Failed to update field:", error)
+        console.error("Fout bij bijwerken perceel:", error)
         return dataWithError("Failed to update field", {
-            message: `Er is iets misgegaan bij het bijwerken van de perceelgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
+            message: error instanceof Error && error.message
+                ? `Fout bij bijwerken perceelgegevens: ${error.message}`
+                : "Er is een onbekende fout opgetreden bij het bijwerken van de perceelgegevens.",
         })
     }
 }
