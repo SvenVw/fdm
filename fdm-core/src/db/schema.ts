@@ -35,7 +35,7 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const acquiringMethodEnum = fdmSchema.enum("b_acquiring_method", [
     "owner",
     "lease",
-    "unknown"
+    "unknown",
 ])
 
 export const fieldAcquiring = fdmSchema.table(
@@ -326,9 +326,7 @@ export const harvestables = fdmSchema.table(
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
-    (table) => [
-        uniqueIndex("b_id_harvestable_idx").on(table.b_id_harvestable)
-    ],
+    (table) => [uniqueIndex("b_id_harvestable_idx").on(table.b_id_harvestable)],
 )
 
 export type harvestablesTypeSelect = typeof harvestables.$inferSelect
@@ -351,14 +349,21 @@ export const harvestableSampling = fdmSchema.table(
     (table) => {
         return [
             {
-                pk: primaryKey({ columns: [table.b_id_harvestable, table.b_id_harvestable_analysis] }),
+                pk: primaryKey({
+                    columns: [
+                        table.b_id_harvestable,
+                        table.b_id_harvestable_analysis,
+                    ],
+                }),
             },
         ]
     },
 )
 
-export type harvestableSamplingTypeSelect = typeof harvestableSampling.$inferSelect
-export type harvestableSamplingTypeInsert = typeof harvestableSampling.$inferInsert
+export type harvestableSamplingTypeSelect =
+    typeof harvestableSampling.$inferSelect
+export type harvestableSamplingTypeInsert =
+    typeof harvestableSampling.$inferInsert
 
 // Define harvestable analysis table
 export const harvestableAnalyses = fdmSchema.table(
@@ -371,12 +376,16 @@ export const harvestableAnalyses = fdmSchema.table(
         updated: timestamp({ withTimezone: true }),
     },
     (table) => [
-        uniqueIndex("b_id_harvestable_analyses_idx").on(table.b_id_harvestable_analysis)
+        uniqueIndex("b_id_harvestable_analyses_idx").on(
+            table.b_id_harvestable_analysis,
+        ),
     ],
 )
 
-export type harvestableAnalysesTypeSelect = typeof harvestableAnalyses.$inferSelect
-export type harvestableAnalysesTypeInsert = typeof harvestableAnalyses.$inferInsert
+export type harvestableAnalysesTypeSelect =
+    typeof harvestableAnalyses.$inferSelect
+export type harvestableAnalysesTypeInsert =
+    typeof harvestableAnalyses.$inferInsert
 
 // Define cultivation harvesting able
 export const cultivationHarvesting = fdmSchema.table(
@@ -395,14 +404,18 @@ export const cultivationHarvesting = fdmSchema.table(
     (table) => {
         return [
             {
-                pk: primaryKey({ columns: [table.b_id_harvestable, table.b_lu] }),
+                pk: primaryKey({
+                    columns: [table.b_id_harvestable, table.b_lu],
+                }),
             },
         ]
     },
 )
 
-export type cultivationHarvestingTypeSelect = typeof cultivationHarvesting.$inferSelect
-export type cultivationHarvestingTypeInsert = typeof cultivationHarvesting.$inferInsert
+export type cultivationHarvestingTypeSelect =
+    typeof cultivationHarvesting.$inferSelect
+export type cultivationHarvestingTypeInsert =
+    typeof cultivationHarvesting.$inferInsert
 
 // Define cultivation terminating able
 export const cultivationTerminating = fdmSchema.table(
@@ -424,8 +437,10 @@ export const cultivationTerminating = fdmSchema.table(
     },
 )
 
-export type cultivationTerminatingTypeSelect = typeof cultivationTerminating.$inferSelect
-export type cultivationTerminatingTypeInsert = typeof cultivationTerminating.$inferInsert
+export type cultivationTerminatingTypeSelect =
+    typeof cultivationTerminating.$inferSelect
+export type cultivationTerminatingTypeInsert =
+    typeof cultivationTerminating.$inferInsert
 
 // Define soil_analyis table
 export const soilTypes = [

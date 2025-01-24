@@ -66,7 +66,10 @@ export async function getFarm(
 export async function getFarms(
     fdm: FdmType,
 ): Promise<schema.farmsTypeSelect[]> {
-    const farm = await fdm.select().from(schema.farms).orderBy(asc(schema.farms.b_name_farm))
+    const farm = await fdm
+        .select()
+        .from(schema.farms)
+        .orderBy(asc(schema.farms.b_name_farm))
 
     return farm
 }

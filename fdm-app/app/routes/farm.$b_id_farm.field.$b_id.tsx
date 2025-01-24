@@ -1,18 +1,18 @@
 import {
-    data,
     type LoaderFunctionArgs,
     Outlet,
+    data,
     redirect,
     useLoaderData,
 } from "react-router"
 
+import { FarmContent } from "@/components/custom/farm/farm-content"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { auth } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
-import { FarmContent } from "@/components/custom/farm/farm-content"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -113,13 +113,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
     } catch (error) {
         console.error(error)
-        throw data(
-            "An unexpected error occurred.",
-            {
-                status: 500,
-                statusText: "Internal Server Error",
-            },
-        )
+        throw data("An unexpected error occurred.", {
+            status: 500,
+            statusText: "Internal Server Error",
+        })
     }
 }
 

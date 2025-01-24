@@ -1,13 +1,7 @@
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
-import {
-    getField,
-} from "@svenvw/fdm-core"
-import {
-    type LoaderFunctionArgs,
-    data,
-    useLoaderData,
-} from "react-router"
+import { getField } from "@svenvw/fdm-core"
+import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id

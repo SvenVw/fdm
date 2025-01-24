@@ -258,13 +258,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 return b_id
             } catch (error) {
                 console.error(`Failed to process field ${b_name}:`, error)
-                throw data(
-                    `Failed to add field ${b_name}: ${error.message}`,
-                    {
-                        status: 500,
-                        statusText: `Failed to add field ${b_name}`,
-                    },
-                )
+                throw data(`Failed to add field ${b_name}: ${error.message}`, {
+                    status: 500,
+                    statusText: `Failed to add field ${b_name}`,
+                })
             }
         }),
     )

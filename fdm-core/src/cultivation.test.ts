@@ -76,7 +76,7 @@ describe("Cultivation Data Model", () => {
             "test field",
             "test source",
             "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-            new Date("2023-01-01"),            
+            new Date("2023-01-01"),
             "owner",
             new Date("2023-12-31"),
         )
@@ -87,7 +87,6 @@ describe("Cultivation Data Model", () => {
     })
 
     describe("Cultivation CRUD", () => {
-
         beforeEach(async () => {
             // Ensure catalogue entry exists before each test
             await addCultivationToCatalogue(fdm, {
@@ -107,7 +106,6 @@ describe("Cultivation Data Model", () => {
                 b_sowing_date,
             )
         })
-
 
         it("should get cultivations from catalogue", async () => {
             const cultivations = await getCultivationsFromCatalogue(fdm)
@@ -160,7 +158,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should add a new cultivation", async () => {
-
             const b_sowing_date = new Date("2024-02-01")
             const new_b_lu = await addCultivation(
                 fdm,
@@ -176,7 +173,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should handle duplicate cultivation gracefully", async () => {
-
             // Attempt to add the same cultivation again
             await expect(
                 addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date),
@@ -184,7 +180,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should throw an error when adding a cultivation with an invalid field ID", async () => {
-
             const invalid_b_id = "invalid-field-id"
 
             await expect(
@@ -198,7 +193,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should get cultivations by field ID", async () => {
-
             await addCultivation(
                 fdm,
                 b_lu_catalogue,
@@ -211,7 +205,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should remove a cultivation", async () => {
-
             await removeCultivation(fdm, b_lu)
 
             await expect(getCultivation(fdm, b_lu)).rejects.toThrowError(
@@ -220,7 +213,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should update an existing cultivation", async () => {
-
             const newSowingDate = new Date("2024-03-01")
             const newCatalogueId = createId()
 
@@ -239,7 +231,6 @@ describe("Cultivation Data Model", () => {
             const updatedCultivation = await getCultivation(fdm, b_lu)
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-
         })
 
         it("should throw an error when updating a non-existent cultivation", async () => {
@@ -255,7 +246,6 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should throw an error when updating with invalid catalogue id", async () => {
-
             const nonExistentCatalogueId = createId()
 
             await expect(
@@ -269,9 +259,9 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should get a cultivation by ID", async () => {
-            const cultivation = await getCultivation(fdm, b_lu);
-            expect(cultivation.b_lu).toBe(b_lu);
-            expect(cultivation.b_lu_catalogue).toBe(b_lu_catalogue);
+            const cultivation = await getCultivation(fdm, b_lu)
+            expect(cultivation.b_lu).toBe(b_lu)
+            expect(cultivation.b_lu_catalogue).toBe(b_lu_catalogue)
         })
 
         it("should update a cultivation with all fields", async () => {
@@ -288,13 +278,20 @@ describe("Cultivation Data Model", () => {
             const newSowingDate = new Date("2024-02-01")
             const newTerminateDate = new Date("2024-03-01")
 
-            await updateCultivation(fdm, b_lu, newCatalogueId, newSowingDate, newTerminateDate)
+            await updateCultivation(
+                fdm,
+                b_lu,
+                newCatalogueId,
+                newSowingDate,
+                newTerminateDate,
+            )
 
             const updatedCultivation = await getCultivation(fdm, b_lu)
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-            expect(updatedCultivation.b_terminate_date).toEqual(newTerminateDate)
-
+            expect(updatedCultivation.b_terminate_date).toEqual(
+                newTerminateDate,
+            )
         })
 
         it("should update a cultivation with only the catalogue ID", async () => {
@@ -315,39 +312,63 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should update a cultivation with only the sowing date", async () => {
-
             const newSowingDate = new Date("2024-02-01")
 
             await updateCultivation(fdm, b_lu, undefined, newSowingDate)
 
             const updatedCultivation = await getCultivation(fdm, b_lu)
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
-
         })
 
         it("should update a cultivation with only the terminate date", async () => {
-
             const newTerminateDate = new Date("2024-12-01")
 
-            await updateCultivation(fdm, b_lu, undefined, undefined, newTerminateDate)
+            await updateCultivation(
+                fdm,
+                b_lu,
+                undefined,
+                undefined,
+                newTerminateDate,
+            )
 
             const updatedCultivation = await getCultivation(fdm, b_lu)
-            expect(updatedCultivation.b_terminate_date).toEqual(newTerminateDate)
-
+            expect(updatedCultivation.b_terminate_date).toEqual(
+                newTerminateDate,
+            )
         })
 
         it("should throw an error when updating with invalid sowing date - before termination date", async () => {
-            const newSowingDate = new Date("2024-04-01"); //Invalid date - after termination
-            const newTerminationDate = new Date("2024-03-01");
+            const newSowingDate = new Date("2024-04-01") //Invalid date - after termination
+            const newTerminationDate = new Date("2024-03-01")
 
-            await expect(updateCultivation(fdm, b_lu, undefined, newSowingDate, newTerminationDate)).rejects.toThrowError("Sowing date must be before termination date")
+            await expect(
+                updateCultivation(
+                    fdm,
+                    b_lu,
+                    undefined,
+                    newSowingDate,
+                    newTerminationDate,
+                ),
+            ).rejects.toThrowError(
+                "Sowing date must be before termination date",
+            )
         })
 
         it("should throw an error when updating with invalid termination date - before sowing date", async () => {
-            const newSowingDate = new Date("2024-03-01");
-            const newTerminationDate = new Date("2024-02-01"); //Invalid date - before termination
+            const newSowingDate = new Date("2024-03-01")
+            const newTerminationDate = new Date("2024-02-01") //Invalid date - before termination
 
-            await expect(updateCultivation(fdm, b_lu, undefined, newSowingDate, newTerminationDate)).rejects.toThrowError("updateCultivation failed: Sowing date must be before termination date")
+            await expect(
+                updateCultivation(
+                    fdm,
+                    b_lu,
+                    undefined,
+                    newSowingDate,
+                    newTerminationDate,
+                ),
+            ).rejects.toThrowError(
+                "updateCultivation failed: Sowing date must be before termination date",
+            )
         })
     })
 
@@ -376,7 +397,7 @@ describe("Cultivation Data Model", () => {
                 "test field",
                 "test source",
                 "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-                new Date("2023-01-01"),                
+                new Date("2023-01-01"),
                 "owner",
                 new Date("2024-01-01"),
             )

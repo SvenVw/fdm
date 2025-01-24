@@ -43,5 +43,5 @@ export interface getFertilizerApplicationType {
     p_app_amount: number | null
     p_app_method: string | null
     p_app_date: Date | null
-    p_app_id: string 
+    p_app_id: string
 }

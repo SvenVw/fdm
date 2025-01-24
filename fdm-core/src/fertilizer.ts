@@ -3,7 +3,10 @@ import { createId } from "./id"
 
 import * as schema from "./db/schema"
 import type { FdmType } from "./fdm"
-import type { getFertilizerType, getFertilizerApplicationType } from "./fertilizer.d"
+import type {
+    getFertilizerApplicationType,
+    getFertilizerType,
+} from "./fertilizer.d"
 
 /**
  * Retrieves all fertilizers from the catalogue.

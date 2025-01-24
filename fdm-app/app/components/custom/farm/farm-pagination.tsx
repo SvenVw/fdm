@@ -30,9 +30,7 @@ export function FarmPagination({
                                 size="default"
                                 isActive={currentPath === item.to}
                                 aria-current={
-                                    currentPath === item.to
-                                        ? "page"
-                                        : undefined
+                                    currentPath === item.to ? "page" : undefined
                                 }
                             >
                                 {item.label}

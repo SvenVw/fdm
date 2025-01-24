@@ -1,4 +1,10 @@
-import { data, type LoaderFunctionArgs, NavLink, redirect, useLoaderData } from "react-router"
+import {
+    type LoaderFunctionArgs,
+    NavLink,
+    data,
+    redirect,
+    useLoaderData,
+} from "react-router"
 
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
@@ -31,7 +37,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw new Response("Unauthorized", { status: 401 })
         }
 
-        // Get the active farm 
+        // Get the active farm
         const b_id_farm = params.b_id_farm
 
         // Get a list of possible farms of the user
@@ -79,10 +85,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     } catch (error) {
         console.error(error)
         throw data(
-            error instanceof Error ? error.message : "Internal Server Error", {
+            error instanceof Error ? error.message : "Internal Server Error",
+            {
                 status: 500,
                 statusText: "Internal Server Error",
-            }
+            },
         )
     }
 }
@@ -98,7 +105,10 @@ export default function FarmFieldIndex() {
                 b_id_farm={loaderData.b_id_farm}
                 fieldOptions={loaderData.fieldOptions}
                 b_id={undefined}
-                action={{to: `/farm/${loaderData.b_id_farm}`, label: "Terug naar bedrijf"}}
+                action={{
+                    to: `/farm/${loaderData.b_id_farm}`,
+                    label: "Terug naar bedrijf",
+                }}
             />
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
@@ -118,7 +128,9 @@ export default function FarmFieldIndex() {
                                 </p>
                             </div>
                             <Button asChild>
-                                <NavLink to={`./farm/${loaderData.b_id_farm}/field/create`}>
+                                <NavLink
+                                    to={`./farm/${loaderData.b_id_farm}/field/create`}
+                                >
                                     Maak een perceel
                                 </NavLink>
                             </Button>
@@ -154,13 +166,18 @@ export default function FarmFieldIndex() {
                                                     >
                                                         <div className="col-span-2">
                                                             <p className="text-sm font-medium leading-none">
-                                                                {
-                                                                    option.b_name
-                                                                }
+                                                                {option.b_name}
                                                             </p>
-                                                            {option.b_area && option.b_area > 0.1 ? (
-                                                                <p className="text-sm text-muted-foreground">{option.b_area} ha</p>
-                                                            ) : null }                                                            
+                                                            {option.b_area &&
+                                                            option.b_area >
+                                                                0.1 ? (
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {
+                                                                        option.b_area
+                                                                    }{" "}
+                                                                    ha
+                                                                </p>
+                                                            ) : null}
                                                         </div>
 
                                                         <div className="">

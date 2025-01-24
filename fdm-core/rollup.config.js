@@ -1,5 +1,5 @@
-import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs"
+import resolve from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
 import { copy } from "fs-extra" // For copying migrations
 

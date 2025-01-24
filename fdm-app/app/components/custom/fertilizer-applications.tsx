@@ -97,10 +97,7 @@ export function FertilizerApplicationsForm(
     const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
 
-        fetcher.submit(
-            { p_app_id },
-            { method: "delete", action: props.action },
-        )
+        fetcher.submit({ p_app_id }, { method: "delete", action: props.action })
     }
 
     return (
@@ -122,7 +119,7 @@ export function FertilizerApplicationsForm(
                                     name="p_id"
                                     label={
                                         <span>
-                                            Meststof 
+                                            Meststof
                                             <span className="text-red-500">
                                                 *
                                             </span>
@@ -279,7 +276,7 @@ export function FertilizerApplicationsForm(
                                                 handleDelete([
                                                     application.p_app_id,
                                                 ])
-                                            }                      
+                                            }
                                         }}
                                     >
                                         {fetcher.state === "submitting" ? (

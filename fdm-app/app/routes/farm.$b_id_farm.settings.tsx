@@ -69,7 +69,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Internal Server Error",
         })
     }
-    
+
     // Redirect to farms overview if user has no farm
     if (farms.length === 0) {
         return redirect("./farm")
@@ -115,7 +115,10 @@ export default function FarmContentBlock() {
             <FarmHeader
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}
-                action={{to: `/farm/${loaderData.b_id_farm}/field`, label: "Naar percelen"}}
+                action={{
+                    to: `/farm/${loaderData.b_id_farm}/field`,
+                    label: "Naar percelen",
+                }}
             />
             <main>
                 <FarmTitle

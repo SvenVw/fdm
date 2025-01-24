@@ -20,8 +20,8 @@ export interface HeaderAction {
 }
 
 export interface PaginationItem {
-    label: string;
-    to: string;
+    label: string
+    to: string
 }
 
 export type PaginationItems = PaginationItem[]
