@@ -89,7 +89,7 @@ export default function FarmFieldsOverviewBlock() {
             b_acquiring_date: loaderData.field.b_acquiring_date,
             b_terminating_date: loaderData.field.b_terminating_date,
         })
-    }, [loaderData])
+    }, [loaderData, form.reset])
 
     return (
         <div className="space-y-6">
