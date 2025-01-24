@@ -191,7 +191,7 @@ export default function FarmFieldsOverviewBlock() {
                                                             {field.value ? (
                                                                 format(
                                                                     field.value,
-                                                                    "d MMM YYY",
+                                                                    "d MMM yyyy",
                                                                 )
                                                             ) : (
                                                                 <span>
