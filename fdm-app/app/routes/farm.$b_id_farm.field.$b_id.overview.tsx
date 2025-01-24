@@ -348,12 +348,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `Perceel ${formValues.b_name} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        console.error("Fout bij bijwerken perceel:", error)
-        return dataWithError("Failed to update field", {
-            message: error instanceof Error && error.message
-                ? `Fout bij bijwerken perceelgegevens: ${error.message}`
-                : "Er is een onbekende fout opgetreden bij het bijwerken van de perceelgegevens.",
-        })
+        console.error("Fout bij bijwerken perceel: ", error)
+        return dataWithError(
+            null,
+            "Er is een onbekende fout opgetreden bij het bijwerken van de perceelgegevens.",
+        )
     }
 }
 
@@ -363,21 +362,6 @@ const FormSchema = z.object({
         message: "Naam van perceel moet minimaal 3 karakters bevatten",
     }),
     b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
-const FormSchema = z.object({
-    b_name: z.string().min(3, {
-        message: "Naam van perceel moet minimaal 3 karakters bevatten",
-    }),
-    b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
     b_acquiring_date: z.coerce.date().optional(),
-    b_terminating_date: z.coerce.date().optional()
-        .refine(
-            (date, ctx) => {
-                if (date && ctx.parent.b_acquiring_date) {
-                    return date > ctx.parent.b_acquiring_date;
-                }
-                return true;
-            },
-            "Einddatum moet na de startdatum liggen"
-        ),
-})
+    b_terminating_date: z.coerce.date().optional(),
 })
