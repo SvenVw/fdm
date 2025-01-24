@@ -1,5 +1,18 @@
 # Changelog fdm-core
 
+## 0.11.0
+
+### Minor Changes
+
+- 341b0a3: Changed type of `b_manage_start` and `b_manage_end` to `timestamptz`
+- 0d97679: Add to output of `getFertilizerApplication` and `getFertilizerApplications` the parameters `p_id_catalogue` and `p_name_nl`
+- f7d7a50: Rename `b_manage_start` to `b_acquiring_date` and `b_manage_end` to `b_discarding_date`
+- 899b99c: Add tables `cultivation_harvesting`, `cultivation_terminating`, `harvestable_analyses`, `harvestable_sampling` and `harvestables`
+- f7d7a50: Renamed table `farm_managing` into `field_acquiring`
+- c584d5a: Switch from Vite to Rollup to fix building errors (and Rollup is better suited for server-only modules)
+- f7d7a50: Add table `field_discarding`
+- 073b92e: Add the value `unknown` to `b_manage_type` and set to default
+
 ## 0.10.2
 
 ### Patch Changes
