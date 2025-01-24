@@ -644,9 +644,10 @@ export async function updateCultivation(
                         })
                         .from(schema.fieldSowing)
                         .where(
-                            and(eq(schema.fieldSowing.b_lu, b_lu)),
-                            isNotNull(schema.fieldSowing.b_sowing_date),
-                        )
+                            and(
+                                eq(schema.fieldSowing.b_lu, b_lu),
+                                isNotNull(schema.fieldSowing.b_sowing_date)
+                            )
                         .limit(1)
 
                     if (result.length > 0) {
