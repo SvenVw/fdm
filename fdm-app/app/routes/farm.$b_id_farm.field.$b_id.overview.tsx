@@ -89,7 +89,7 @@ export default function FarmFieldsOverviewBlock() {
             b_acquiring_date: loaderData.field.b_acquiring_date,
             b_terminating_date: loaderData.field.b_terminating_date,
         })
-    }, [loaderData, form.reset])
+    }, [loaderData])
 
     return (
         <div className="space-y-6">
@@ -254,7 +254,7 @@ export default function FarmFieldsOverviewBlock() {
                                                             {field.value ? (
                                                                 format(
                                                                     field.value,
-                                                                    "d MMM YYY",
+                                                                    "d MMM yyyy",
                                                                 )
                                                             ) : (
                                                                 <span>
@@ -278,9 +278,16 @@ export default function FarmFieldsOverviewBlock() {
                                                         }
                                                         disabled={(date) =>
                                                             date <
-                                                            new Date(
-                                                                "1970-01-01",
-                                                            )
+                                                                new Date(
+                                                                    "1970-01-01",
+                                                                ) ||
+                                                            date >
+                                                                new Date(
+                                                                    new Date().getFullYear() +
+                                                                        10,
+                                                                    11,
+                                                                    31,
+                                                                )
                                                         }
                                                         initialFocus
                                                     />
