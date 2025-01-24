@@ -33,7 +33,7 @@
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
-        "build": "vite build",
+        "build": "rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "prepare": "pnpm build",
