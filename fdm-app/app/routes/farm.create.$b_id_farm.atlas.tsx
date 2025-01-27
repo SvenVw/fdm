@@ -23,8 +23,6 @@ import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
 
 // Blocks
-import { FieldsMap } from "@/components/blocks/fields-map"
-
 import { AtlasFields } from "@/components/custom/atlas-fields"
 import {
     addCultivation,
@@ -159,22 +157,23 @@ export async function action({ request, params }: ActionFunctionArgs) {
         })
     }
     const selectedFields = JSON.parse(String(formData.get("selected_fields")))
-    console.log(selectedFields)
 
     // Add fields to farm
     const b_ids = await Promise.all(
         selectedFields.features.map(async (field, index) => {
-            const b_id_name = `Perceel ${index + 1}`
+            const b_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
             const currentYear = new Date().getFullYear()
             const defaultDate = new Date(currentYear, 0, 1)
-            const b_manage_start = defaultDate.toISOString().split("T")[0]
+            const b_acquiring_date = defaultDate
             const b_date_sowing = defaultDate
+            const b_terminating_date = undefined
+            const b_acquiring_method = "unknown"
 
             // Validate dates
             if (
-                new Date(b_manage_start) > new Date() ||
+                new Date(b_acquiring_date) > new Date() ||
                 new Date(b_date_sowing) > new Date()
             ) {
                 throw data("Future dates are not allowed", {
@@ -182,7 +181,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     statusText: "Future dates are not allowed",
                 })
             }
-            if (new Date(b_date_sowing) < new Date(b_manage_start)) {
+            if (new Date(b_date_sowing) < new Date(b_acquiring_date)) {
                 throw data(
                     "Sowing should happen after field started to be managed",
                     {
@@ -199,13 +198,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const b_id = await addField(
                     fdm,
                     b_id_farm,
-                    b_id_name,
+                    b_name,
                     b_id_source,
                     b_geometry,
-                    b_manage_start,
-                    null,
-                    null,
+                    b_acquiring_date,
+                    b_acquiring_method,
+                    b_terminating_date,
                 )
+                await sleep(1000) // WORKAROUND: add a sleep to prevent that the field is not yet available at addCultivation
                 await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
 
                 if (process.env.NMI_API_KEY) {
@@ -257,19 +257,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
                 return b_id
             } catch (error) {
-                console.error(`Failed to process field ${b_id_name}:`, error)
-                throw data(
-                    `Failed to add field ${b_id_name}: ${error.message}`,
-                    {
-                        status: 500,
-                        statusText: `Failed to add field ${b_id_name}`,
-                    },
-                )
+                console.error(`Failed to process field ${b_name}:`, error)
+                throw data(`Failed to add field ${b_name}: ${error.message}`, {
+                    status: 500,
+                    statusText: `Failed to add field ${b_name}`,
+                })
             }
         }),
     )
 
-    return redirectWithSuccess(`../addfarm/${b_id_farm}/fields/${b_ids[0]}`, {
+    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields/${b_ids[0]}`, {
         message: "Percelen zijn toegevoegd! 🎉",
     })
+}
+
+function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
 }

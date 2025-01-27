@@ -109,7 +109,7 @@ export async function action({ request }: ActionFunctionArgs) {
                 addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm),
             ),
         )
-        return redirectWithSuccess(`../addfarm/${b_id_farm}/atlas`, {
+        return redirectWithSuccess(`./${b_id_farm}/atlas`, {
             message: "Bedrijf is toegevoegd! 🎉",
         })
     } catch (error) {

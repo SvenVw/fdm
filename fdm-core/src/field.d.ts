@@ -6,9 +6,9 @@ export interface getFieldType {
     b_id_source: string | null
     b_geometry: string | null
     b_area: number | null
-    b_manage_start: Date | null
-    b_manage_end: Date | null
-    b_manage_type: "owner" | "lease" | null
+    b_acquiring_date: Date | null
+    b_discarding_date: Date | null
+    b_acquiring_method: "owner" | "lease" | null
     created: Date
     updated: Date | null
 }

@@ -1,10 +1,24 @@
 CREATE SCHEMA "fdm-dev";
 --> statement-breakpoint
+CREATE TYPE "fdm-dev"."b_acquiring_method" AS ENUM('owner', 'lease', 'unknown');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."p_app_method" AS ENUM('slotted coulter', 'incorporation', 'injection', 'spraying', 'broadcasting', 'spoke wheel', 'pocket placement');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_gwl_class" AS ENUM('II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa');--> statement-breakpoint
-CREATE TYPE "fdm-dev"."b_manage_type" AS ENUM('owner', 'lease');--> statement-breakpoint
-CREATE TYPE "fdm-dev"."b_sector" AS ENUM('diary', 'arable', 'tree_nursery', 'bulbs');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_soiltype_agr" AS ENUM('moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei');--> statement-breakpoint
+CREATE TABLE "fdm-dev"."cultivation_harvesting" (
+	"b_id_harvestable" text NOT NULL,
+	"b_lu" text NOT NULL,
+	"b_harvest_date" timestamp with time zone,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-dev"."cultivation_terminating" (
+	"b_lu" text NOT NULL,
+	"b_terminate_date" timestamp with time zone,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
 CREATE TABLE "fdm-dev"."cultivations" (
 	"b_lu" text PRIMARY KEY NOT NULL,
 	"b_lu_catalogue" text NOT NULL,
@@ -23,20 +37,12 @@ CREATE TABLE "fdm-dev"."cultivations_catalogue" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "fdm-dev"."farm_managing" (
-	"b_id" text NOT NULL,
-	"b_id_farm" text NOT NULL,
-	"b_manage_start" date,
-	"b_manage_end" date,
-	"b_manage_type" "fdm-dev"."b_manage_type",
-	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated" timestamp with time zone
-);
---> statement-breakpoint
 CREATE TABLE "fdm-dev"."farms" (
 	"b_id_farm" text PRIMARY KEY NOT NULL,
 	"b_name_farm" text,
-	"b_sector" "fdm-dev"."b_sector",
+	"b_businessid_farm" text,
+	"b_address_farm" text,
+	"b_postalcode_farm" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -128,6 +134,22 @@ CREATE TABLE "fdm-dev"."fertilizers_catalogue" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
+CREATE TABLE "fdm-dev"."field_acquiring" (
+	"b_id" text NOT NULL,
+	"b_id_farm" text NOT NULL,
+	"b_acquiring_date" timestamp with time zone NOT NULL,
+	"b_acquiring_method" "fdm-dev"."b_acquiring_method" DEFAULT 'unknown' NOT NULL,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-dev"."field_discarding" (
+	"b_id" text NOT NULL,
+	"b_discarding_date" timestamp with time zone NOT NULL,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
 CREATE TABLE "fdm-dev"."field_sowing" (
 	"b_id" text NOT NULL,
 	"b_lu" text NOT NULL,
@@ -140,9 +162,31 @@ CREATE TABLE "fdm-dev"."field_sowing" (
 --> statement-breakpoint
 CREATE TABLE "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
-	"b_name" text,
+	"b_name" text NOT NULL,
 	"b_geometry" geometry(polygon),
 	"b_id_source" text,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-dev"."harvestable_analyses" (
+	"b_id_harvestable_analysis" text PRIMARY KEY NOT NULL,
+	"b_lu_yield" numeric,
+	"b_lu_n_harvestable" numeric,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-dev"."harvestable_sampling" (
+	"b_id_harvestable" text NOT NULL,
+	"b_id_harvestable_analysis" text NOT NULL,
+	"b_sampling_date" timestamp with time zone,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-dev"."harvestables" (
+	"b_id_harvestable" text PRIMARY KEY NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -170,17 +214,23 @@ CREATE TABLE "fdm-dev"."soil_sampling" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
+ALTER TABLE "fdm-dev"."cultivation_harvesting" ADD CONSTRAINT "cultivation_harvesting_b_id_harvestable_harvestables_b_id_harvestable_fk" FOREIGN KEY ("b_id_harvestable") REFERENCES "fdm-dev"."harvestables"("b_id_harvestable") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."cultivation_harvesting" ADD CONSTRAINT "cultivation_harvesting_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm-dev"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."cultivation_terminating" ADD CONSTRAINT "cultivation_terminating_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm-dev"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."cultivations" ADD CONSTRAINT "cultivations_b_lu_catalogue_cultivations_catalogue_b_lu_catalogue_fk" FOREIGN KEY ("b_lu_catalogue") REFERENCES "fdm-dev"."cultivations_catalogue"("b_lu_catalogue") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm-dev"."farm_managing" ADD CONSTRAINT "farm_managing_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm-dev"."farm_managing" ADD CONSTRAINT "farm_managing_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm-dev"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."fertilizer_acquiring" ADD CONSTRAINT "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm-dev"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."fertilizer_acquiring" ADD CONSTRAINT "fertilizer_acquiring_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."fertilizer_applying" ADD CONSTRAINT "fertilizer_applying_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."fertilizer_applying" ADD CONSTRAINT "fertilizer_applying_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."fertilizer_picking" ADD CONSTRAINT "fertilizer_picking_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm-dev"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."fertilizer_picking" ADD CONSTRAINT "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk" FOREIGN KEY ("p_id_catalogue") REFERENCES "fdm-dev"."fertilizers_catalogue"("p_id_catalogue") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."field_acquiring" ADD CONSTRAINT "field_acquiring_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."field_acquiring" ADD CONSTRAINT "field_acquiring_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm-dev"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."field_discarding" ADD CONSTRAINT "field_discarding_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."field_sowing" ADD CONSTRAINT "field_sowing_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."field_sowing" ADD CONSTRAINT "field_sowing_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm-dev"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."harvestable_sampling" ADD CONSTRAINT "harvestable_sampling_b_id_harvestable_harvestables_b_id_harvestable_fk" FOREIGN KEY ("b_id_harvestable") REFERENCES "fdm-dev"."harvestables"("b_id_harvestable") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-dev"."harvestable_sampling" ADD CONSTRAINT "harvestable_sampling_b_id_harvestable_analysis_harvestable_analyses_b_id_harvestable_analysis_fk" FOREIGN KEY ("b_id_harvestable_analysis") REFERENCES "fdm-dev"."harvestable_analyses"("b_id_harvestable_analysis") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."soil_sampling" ADD CONSTRAINT "soil_sampling_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm-dev"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm-dev"."soil_sampling" ADD CONSTRAINT "soil_sampling_a_id_soil_analysis_a_id_fk" FOREIGN KEY ("a_id") REFERENCES "fdm-dev"."soil_analysis"("a_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "b_lu_idx" ON "fdm-dev"."cultivations" USING btree ("b_lu");--> statement-breakpoint
@@ -190,4 +240,6 @@ CREATE UNIQUE INDEX "p_app_idx" ON "fdm-dev"."fertilizer_applying" USING btree (
 CREATE UNIQUE INDEX "p_id_idx" ON "fdm-dev"."fertilizers" USING btree ("p_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "p_id_catalogue_idx" ON "fdm-dev"."fertilizers_catalogue" USING btree ("p_id_catalogue");--> statement-breakpoint
 CREATE UNIQUE INDEX "b_id_idx" ON "fdm-dev"."fields" USING btree ("b_id");--> statement-breakpoint
-CREATE INDEX "b_geom_idx" ON "fdm-dev"."fields" USING gist ("b_geometry");
+CREATE INDEX "b_geom_idx" ON "fdm-dev"."fields" USING gist ("b_geometry");--> statement-breakpoint
+CREATE UNIQUE INDEX "b_id_harvestable_analyses_idx" ON "fdm-dev"."harvestable_analyses" USING btree ("b_id_harvestable_analysis");--> statement-breakpoint
+CREATE UNIQUE INDEX "b_id_harvestable_idx" ON "fdm-dev"."harvestables" USING btree ("b_id_harvestable");

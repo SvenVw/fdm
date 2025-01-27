@@ -13,7 +13,7 @@ export function AvailableFieldsSource({
     zoomLevelFields: number
     children: JSX.Element
 }) {
-    if (!url) throw new Error("url is required")
+    if (!url) return null
 
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())

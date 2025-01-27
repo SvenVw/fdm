@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.10.2",
+    "version": "0.11.0",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -16,28 +16,23 @@
         "url": "https://github.com/SvenVw"
     },
     "type": "module",
-    "main": "./dist/fdm-core.umd.cjs",
+    "main": "./dist/fdm-core.esm.js",
     "module": "./dist/fdm-core.js",
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "import": {
                 "types": "./dist/index.d.ts",
-                "default": "./dist/fdm-core.js"
-            },
-            "require": {
-                "types": "./dist/index.d.ts",
-                "default": "./dist/fdm-core.umd.cjs"
+                "default": "./dist/fdm-core.esm.js"
             }
         }
     },
     "files": ["dist"],
     "scripts": {
-        "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
-        "build": "vite build",
+        "build": "rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "prepare": "pnpm build",
@@ -47,19 +42,22 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
-        "@types/node": "^22.10.6",
+        "@rollup/plugin-commonjs": "^28.0.2",
+        "@rollup/plugin-node-resolve": "^16.0.0",
+        "@rollup/plugin-typescript": "^12.1.2",
+        "@types/node": "^22.10.9",
         "drizzle-kit": "catalog:",
-        "fs-extra": "^11.2.0",
+        "fs-extra": "^11.3.0",
         "globals": "^15.14.0",
+        "rollup": "^4.31.0",
+        "rollup-plugin-polyfill-node": "^0.13.0",
         "typedoc": "^0.26.11",
         "typedoc-plugin-missing-exports": "^3.1.0",
         "typescript": "catalog:",
-        "vite": "catalog:",
-        "vite-plugin-dts": "catalog:",
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.2.15",
+        "@electric-sql/pglite": "^0.2.16",
         "drizzle-graphql": "^0.8.5",
         "drizzle-orm": "catalog:",
         "graphql": "^16.10.0",

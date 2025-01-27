@@ -1,5 +1,26 @@
 # Changelog fdm-app
 
+## 0.9.0
+
+### Minor Changes
+
+- Add fields overview page of farm
+- Add page with details of a field
+
+### Patch Changes
+
+- 72af577: Fixes build of `fdm-app` by targetting ES2022
+- Updated dependencies [341b0a3]
+- Updated dependencies [0d97679]
+- Updated dependencies [f7d7a50]
+- Updated dependencies [899b99c]
+- Updated dependencies [f7d7a50]
+- Updated dependencies [c584d5a]
+- Updated dependencies [f7d7a50]
+- Updated dependencies [073b92e]
+  - @svenvw/fdm-core@0.11.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.8.2
 
 ### Patch Changes

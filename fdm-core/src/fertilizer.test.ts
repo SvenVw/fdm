@@ -407,9 +407,9 @@ describe("Fertilizer Data Model", () => {
                 "test field",
                 "test source",
                 "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
-                "2023-01-01",
-                "2024-01-01",
+                new Date("2023-01-01"),
                 "owner",
+                new Date("2024-01-01"),
             )
 
             // Add fertilizer to catalogue
@@ -502,7 +502,6 @@ describe("Fertilizer Data Model", () => {
                 new_p_app_id,
             )
             expect(fertilizerApplication).toBeDefined()
-            expect(fertilizerApplication?.b_id).toBe(b_id)
             expect(fertilizerApplication?.p_id).toBe(p_id)
             expect(fertilizerApplication?.p_app_amount).toBe(100)
             expect(fertilizerApplication?.p_app_method).toBe("broadcasting")

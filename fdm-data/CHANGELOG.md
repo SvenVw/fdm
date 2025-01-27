@@ -1,5 +1,23 @@
 # fdm-data
 
+## 0.9.0
+
+### Minor Changes
+
+- c584d5a: Switch from Vite to Rollup to fix building errors (and Rollup is better suited for server-only modules)
+
+### Patch Changes
+
+- Updated dependencies [341b0a3]
+- Updated dependencies [0d97679]
+- Updated dependencies [f7d7a50]
+- Updated dependencies [899b99c]
+- Updated dependencies [f7d7a50]
+- Updated dependencies [c584d5a]
+- Updated dependencies [f7d7a50]
+- Updated dependencies [073b92e]
+  - @svenvw/fdm-core@0.11.0
+
 ## 0.8.2
 
 ### Patch Changes

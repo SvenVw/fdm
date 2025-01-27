@@ -95,16 +95,17 @@ export function FieldsPanelSelection({
         function updatePanel() {
             if (map) {
                 // Set information about fields
-                if (fields.features.length > 0) {
+                const features = fields?.features || []
+                if (features.length > 0) {
                     console.log(fields.features)
 
-                    const fieldCount = fields.features.length
+                    const fieldCount = features.length
                     let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
                     if (fieldCount === 1) {
                         fieldCountText = "Je hebt 1 perceel geselecteerd"
                     }
 
-                    const cultivations = fields.features.reduce(
+                    const cultivations = features.reduce(
                         (
                             acc: { b_lu_name: string; count: number }[],
                             feature,

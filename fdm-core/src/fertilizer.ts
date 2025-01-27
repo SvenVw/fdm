@@ -1,9 +1,12 @@
-import { eq } from "drizzle-orm"
+import { asc, desc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
 import type { FdmType } from "./fdm"
-import type { getFertilizerType } from "./fertilizer.d"
+import type {
+    getFertilizerApplicationType,
+    getFertilizerType,
+} from "./fertilizer.d"
 
 /**
  * Retrieves all fertilizers from the catalogue.
@@ -18,6 +21,7 @@ export async function getFertilizersFromCatalogue(
     const fertilizersCatalogue = await fdm
         .select()
         .from(schema.fertilizersCatalogue)
+        .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
     return fertilizersCatalogue
 }
@@ -286,6 +290,7 @@ export async function getFertilizers(
             ),
         )
         .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
+        .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
     return fertilizers
 }
@@ -321,8 +326,6 @@ export async function removeFertilizer(
         }
     })
 }
-
-export type FertilizerApplicationType = schema.fertilizerApplicationTypeSelect
 
 /**
  * Adds a fertilizer application record.
@@ -449,11 +452,33 @@ export async function removeFertilizerApplication(
 export async function getFertilizerApplication(
     fdm: FdmType,
     p_app_id: schema.fertilizerApplicationTypeSelect["p_app_id"],
-): Promise<FertilizerApplicationType | null> {
+): Promise<getFertilizerApplicationType | null> {
     try {
         const result = await fdm
-            .select()
+            .select({
+                p_id: schema.fertilizerApplication.p_id,
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                p_name_nl: schema.fertilizersCatalogue.p_name_nl,
+                p_app_amount: schema.fertilizerApplication.p_app_amount,
+                p_app_method: schema.fertilizerApplication.p_app_method,
+                p_app_date: schema.fertilizerApplication.p_app_date,
+                p_app_id: schema.fertilizerApplication.p_app_id,
+            })
             .from(schema.fertilizerApplication)
+            .leftJoin(
+                schema.fertilizerPicking,
+                eq(
+                    schema.fertilizerPicking.p_id,
+                    schema.fertilizerApplication.p_id,
+                ),
+            )
+            .leftJoin(
+                schema.fertilizersCatalogue,
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    schema.fertilizerPicking.p_id_catalogue,
+                ),
+            )
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
 
         return result[0] || null
@@ -473,12 +498,35 @@ export async function getFertilizerApplication(
 export async function getFertilizerApplications(
     fdm: FdmType,
     b_id: schema.fertilizerApplicationTypeSelect["b_id"],
-): Promise<FertilizerApplicationType[]> {
+): Promise<getFertilizerApplicationType[]> {
     try {
         const fertilizerApplications = await fdm
-            .select()
+            .select({
+                p_id: schema.fertilizerApplication.p_id,
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                p_name_nl: schema.fertilizersCatalogue.p_name_nl,
+                p_app_amount: schema.fertilizerApplication.p_app_amount,
+                p_app_method: schema.fertilizerApplication.p_app_method,
+                p_app_date: schema.fertilizerApplication.p_app_date,
+                p_app_id: schema.fertilizerApplication.p_app_id,
+            })
             .from(schema.fertilizerApplication)
+            .leftJoin(
+                schema.fertilizerPicking,
+                eq(
+                    schema.fertilizerPicking.p_id,
+                    schema.fertilizerApplication.p_id,
+                ),
+            )
+            .leftJoin(
+                schema.fertilizersCatalogue,
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    schema.fertilizerPicking.p_id_catalogue,
+                ),
+            )
             .where(eq(schema.fertilizerApplication.b_id, b_id))
+            .orderBy(desc(schema.fertilizerApplication.p_app_date))
         return fertilizerApplications
     } catch (error) {
         throw new Error(`Failed to get fertilizer applications: ${error}`)

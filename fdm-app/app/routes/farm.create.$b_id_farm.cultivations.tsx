@@ -18,14 +18,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/sonner"
 
 // Blocks
 
+// FDM
+import { fdm } from "@/lib/fdm.server"
 import { cn } from "@/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
-// FDM
-import { fdm } from "../lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -122,7 +122,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/create/${loaderData.b_id_farm}/cattle`}
+                                to={`/farm/${loaderData.b_id_farm}/field`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         loaderData.cultivationPlan.length === 0,
@@ -133,7 +133,7 @@ export default function Index() {
                                         loaderData.cultivationPlan.length === 0
                                     }
                                 >
-                                    Doorgaan
+                                    Voltooien
                                 </Button>
                             </NavLink>
                         </div>
