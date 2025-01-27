@@ -13,6 +13,15 @@ export interface FieldOption {
 
 export type FieldOptions = FieldOption[] | undefined
 
+export type LayerKey = "fields" | "soil" | "elevation"
+
+export interface LayerOption {
+    layerKey: LayerKey
+    layerName: "Percelen" | "Bodem" | "Hoogte"
+}
+
+export type LayerOptions = LayerOption[]
+
 export interface HeaderAction {
     label: string
     to: string
