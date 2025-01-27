@@ -1,3 +1,4 @@
+import { AtlasFields } from "@/components/custom/atlas-fields"
 import { FarmContent } from "@/components/custom/farm/farm-content"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
@@ -13,7 +14,6 @@ import {
     data,
     redirect,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
 
@@ -73,67 +73,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    // Redirect to farms overview if user has no farm
-    if (farms.length === 0) {
-        return redirect("./farm")
-    }
-
-    const farmOptions = farms.map((farm) => {
-        return {
-            b_id_farm: farm.b_id_farm,
-            b_name_farm: farm.b_name_farm,
-        }
-    })
-
-    const layerOptions = [
-        { layerKey: "fields", layerName: "Percelen" },
-        { layerKey: "soil", layerName: "Bodem" },
-    ]
+    // Get the Mapbox token
+    const mapboxToken = String(process.env.MAPBOX_TOKEN)
 
     // Return user information from loader
     return {
-        farm: farm,
-        b_id_farm: b_id_farm,
-        farmOptions: farmOptions,
-        layerOptions: layerOptions,
-        layerSelected: "fields",
+        mapboxToken: mapboxToken,
     }
 }
 
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const location = useLocation()
-
-    // Get the current layer
-    const pathname = location.pathname
-    const pathSegments = pathname.split("/")
-    const layerSelected = pathSegments[pathSegments.length - 1]
 
     return (
-        <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-                layerOptions={loaderData.layerOptions}
-                layerSelected={layerSelected}
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}/field`,
-                    label: "Naar percelen",
-                }}
-            />
-            <main>
-                <FarmTitle
-                    title={"Kaarten"}
-                    description={
-                        "Bekijk verschillende kaartlagen van je bedrijf"
-                    }
-                />
-                <ClientOnly
-                    fallback={<Skeleton className="h-full w-full rounded-xl" />}
-                >
-                    {() => <Outlet />}
-                </ClientOnly>
-            </main>
-        </SidebarInset>
+        <AtlasFields
+            height="calc(100vh - 64px - 123px)"
+            width="100%"
+            interactive={false}
+            mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
+            mapboxToken={loaderData.mapboxToken}
+            fieldsSelected={null}
+            fieldsAvailableUrl={undefined}
+        />
     )
 }
