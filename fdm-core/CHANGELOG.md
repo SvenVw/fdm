@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.11.1
+
+### Patch Changes
+
+- 0d80fcb: Fix updateCultivation bug due to missing {
+
 ## 0.11.0
 
 ### Minor Changes
