@@ -82,7 +82,7 @@
         "vite-tsconfig-paths": "catalog:"
     },
     "peerDependencies": {
-        "@svenvw/fdm-core": "workspace:>=0.11.0",
+        "@svenvw/fdm-core": "workspace:>=0.11.1",
         "@svenvw/fdm-data": "workspace:>=0.9.0"
     },
     "engines": {

@@ -50,7 +50,9 @@ jobs:
         run: pnpm i
 
       - name: Bump snapshot
-        run: pnpm changeset version --snapshot ${{ github.head_ref }} --ignore fdm-docs
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: pnpm changeset version --snapshot "$HEAD_REF"
 
       - name: Build packages
         run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data
