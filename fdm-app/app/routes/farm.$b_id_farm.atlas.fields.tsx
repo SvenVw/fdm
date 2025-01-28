@@ -17,13 +17,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Get the fields of the farm
     const fields = await getFields(fdm, b_id_farm)
-    // console.log(fields)
     const features = fields.map((field) => {
         const feature = {
             type: "Feature",
             properties: {
-                id: field.b_id,
-                name: field.b_name,
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
             },
             geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
         }

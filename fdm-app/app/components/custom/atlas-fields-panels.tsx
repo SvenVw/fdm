@@ -220,14 +220,39 @@ export function FieldsPanelHover({
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom > zoomLevelFields) {
+                    const featuresSaved = map.queryRenderedFeatures(evt.point, {
+                        layers: ["saved-fields-fill"],
+                    })
                     const featuresSelected = map.queryRenderedFeatures(
                         evt.point,
                         {
                             layers: ["selected-fields-fill"],
                         },
                     )
+                    const featuresAvailable = map.queryRenderedFeatures(
+                        evt.point,
+                        {
+                            layers: ["available-fields-fill"],
+                        },
+                    )
 
-                    if (featuresSelected.length > 0) {
+                    if (featuresSaved && featuresSaved.length > 0) {
+                        setPanel(
+                            <Card className={cn("w-full")}>
+                                <CardHeader>
+                                    <CardTitle>
+                                        {featuresSaved[0].properties.b_name}
+                                    </CardTitle>
+                                    <CardDescription>
+                                        {featuresSaved[0].properties.b_area} ha
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>,
+                        )
+                    } else if (
+                        featuresSelected &&
+                        featuresSelected.length > 0
+                    ) {
                         setPanel(
                             <Card className={cn("w-full")}>
                                 <CardHeader>
@@ -243,36 +268,28 @@ export function FieldsPanelHover({
                                 </CardHeader>
                             </Card>,
                         )
-                    } else {
-                        const featuresAvailable = map.queryRenderedFeatures(
-                            evt.point,
-                            {
-                                layers: ["available-fields-fill"], // Specify the layer ID
-                            },
+                    } else if (
+                        featuresAvailable &&
+                        featuresAvailable.length > 0
+                    ) {
+                        setPanel(
+                            <Card className={cn("w-full")}>
+                                <CardHeader>
+                                    <CardTitle>
+                                        {
+                                            featuresAvailable[0].properties
+                                                .b_lu_name
+                                        }
+                                    </CardTitle>
+                                    <CardDescription>
+                                        Klik om te selecteren
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>,
                         )
-
-                        if (featuresAvailable.length > 0) {
-                            setPanel(
-                                <Card className={cn("w-full")}>
-                                    <CardHeader>
-                                        <CardTitle>
-                                            {
-                                                featuresAvailable[0].properties
-                                                    .b_lu_name
-                                            }
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Klik om te selecteren
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>,
-                            )
-                        } else {
-                            setPanel(null)
-                        }
+                    } else {
+                        setPanel(null)
                     }
-                } else {
-                    setPanel(null)
                 }
             }
         }
