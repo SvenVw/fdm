@@ -1,7 +1,6 @@
 import { AtlasFields } from "@/components/custom/atlas-fields"
-import { auth } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
-import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
+import { getFields } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import wkx from "wkx"
 
