@@ -81,55 +81,59 @@ export function AvailableFieldsSource({
     )
 }
 
-export function SelectedFieldsSource({
-    selectedFieldsData,
-    setSelectedFieldsData,
+export function FieldsSource({
+    id,
+    fieldsData,
+    setFieldsData,
     children,
 }: {
-    selectedFieldsData: FeatureCollection
-    setSelectedFieldsData: React.Dispatch<
+    id: string
+    fieldsData: FeatureCollection
+    setFieldsData: React.Dispatch<
         React.SetStateAction<FeatureCollection>
-    >
+    > | null
     children: JSX.Element
 }) {
     const { current: map } = useMap()
 
-    useEffect(() => {
-        function clickOnMap(evt) {
-            if (!map) return
+    if (!setFieldsData) {
+        useEffect(() => {
+            function clickOnMap(evt) {
+                if (!map) return
 
-            const features = map.queryRenderedFeatures(evt.point, {
-                layers: ["available-fields-fill"],
-            })
+                const features = map.queryRenderedFeatures(evt.point, {
+                    layers: ["available-fields-fill"],
+                })
 
-            if (features.length > 0) {
-                handleFieldClick(features[0], setSelectedFieldsData)
+                if (features.length > 0) {
+                    handleFieldClick(features[0], setFieldsData)
+                }
             }
-        }
 
-        if (map) {
-            map.on("click", clickOnMap)
-            return () => {
-                map.off("click", clickOnMap)
+            if (map) {
+                map.once("click", clickOnMap)
+                return () => {
+                    map.off("click", clickOnMap)
+                }
             }
-        }
-    }, [])
+        }, [map, setFieldsData])
+    }
 
     return (
-        <Source id="selectedFields" type="geojson" data={selectedFieldsData}>
+        <Source id={id} type="geojson" data={fieldsData}>
             {children}
         </Source>
     )
 }
 
-function handleFieldClick(feature, setSelectedFieldsData) {
+function handleFieldClick(feature, setFieldsData) {
     const fieldData = {
         type: feature.type,
         geometry: feature.geometry,
         properties: feature.properties,
     }
 
-    setSelectedFieldsData((prevFieldsData) => {
+    setFieldsData((prevFieldsData) => {
         const isAlreadySelected = prevFieldsData.features.some(
             (f) =>
                 f.properties.b_id_source === fieldData.properties.b_id_source,

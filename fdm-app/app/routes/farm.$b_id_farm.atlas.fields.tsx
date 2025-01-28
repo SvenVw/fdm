@@ -40,7 +40,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Return user information from loader
     return {
-        fieldsSelected: featureCollection,
+        savedFields: featureCollection,
         mapboxToken: mapboxToken,
     }
 }
@@ -55,8 +55,9 @@ export default function FarmContentBlock() {
             interactive={true}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
             mapboxToken={loaderData.mapboxToken}
-            fieldsSelected={loaderData.fieldsSelected}
+            fieldsSelected={null}
             fieldsAvailableUrl={undefined}
+            fieldsSaved={loaderData.savedFields}
         />
     )
 }
