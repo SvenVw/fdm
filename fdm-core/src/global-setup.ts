@@ -33,7 +33,7 @@ export default async function setup(project: TestProject) {
     const migrationsFolderPath = "src/db/migrations"
 
     try {
-        fdm = await createFdmServer(host, port, user, password, database)
+        fdm = createFdmServer(host, port, user, password, database)
     } catch (error) {
         throw new Error(`Failed to connect to database: ${error.message}`)
     }
