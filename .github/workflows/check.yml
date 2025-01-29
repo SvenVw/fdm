@@ -70,5 +70,7 @@ jobs:
           POSTGRES_PORT: 5432
           # the default usernam
           POSTGRES_USER: postgres
-          #the default password
-          POSTGRES_PASSWORD: postgres
+          # the default password
+          POSTGRES_PASSWORD: postgres.
+          # the default database
+          POSTGRES_DB: postgres
