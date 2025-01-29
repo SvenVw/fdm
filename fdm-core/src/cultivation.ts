@@ -503,7 +503,7 @@ export async function removeCultivation(
                 .limit(1)
 
             if (existing.length === 0) {
-                throw new Error(`Cultivation with b_lu ${b_lu} does not exist`)
+                throw new Error("Cultivation does not exist")
             }
 
             await tx
