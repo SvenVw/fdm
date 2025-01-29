@@ -8,8 +8,7 @@
     "private": true,
     "workspaces": ["fdm-core", "fdm-data", "fdm-docs", "fdm-app"],
     "scripts": {
-        "coverage": "turbo run coverage --filter=@svenvw/fdm-core",
-        "test": "turbo run test --filter=@svenvw/fdm-core",
+        "test": "turbo run test-coverage --filter=@svenvw/fdm-core",
         "build": "turbo run build",
         "build-docs": "turbo run build-docs",
         "watch": "turbo run watch",

@@ -31,18 +31,6 @@
                 "POSTGRES_PASSWORD"
             ]
         },
-        "coverage": {
-            "outputs": [],
-            "persistent": false,
-            "cache": true,
-            "env": [
-                "POSTGRES_HOST",
-                "POSTGRES_PORT",
-                "POSTGRES_DB",
-                "POSTGRES_USER",
-                "POSTGRES_PASSWORD"
-            ]
-        },
         "watch": {
             "persistent": true,
             "cache": false,
