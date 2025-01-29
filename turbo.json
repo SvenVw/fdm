@@ -19,7 +19,7 @@
         "//#format-and-lint:fix-unsafe": {
             "cache": false
         },
-        "test": {
+        "test-coverage": {
             "outputs": [],
             "persistent": false,
             "cache": true,
