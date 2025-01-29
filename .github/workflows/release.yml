@@ -1,7 +1,7 @@
 name: Prerelease
 
 on:
-  pull_request:
+  push:
     paths:
       - 'fdm-core/**'
       - 'fdm-data/**'
@@ -13,8 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prerelease:
-    name: Prerelease
+  Release:
+    name: Release
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -50,12 +50,12 @@ jobs:
         run: pnpm i
 
       - name: Bump snapshot
-        run: pnpm changeset version --snapshot $(git rev-parse --short HEAD)
+        run: pnpm changeset version
 
       - name: Build packages
         run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data
       
       - name: Publish snapshot
-        run: pnpm changeset publish --tag ${{ github.head_ref }}
+        run: pnpm changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
