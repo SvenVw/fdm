@@ -1,0 +1,58 @@
+name: Run tests and upload coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run tests and collect coverage
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with: 
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Setup pnpm 9
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://npm.pkg.github.com'
+          cache: 'pnpm'
+
+      - name: fdm-core - Install Dependencies
+        working-directory: fdm-core
+        run: pnpm i
+
+      - name: fdm-core- Run tests
+        working-directory: fdm-core
+        run: pnpm dlx vitest run --coverage
+
+      - name: fdm-core - Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./fdm-core/coverage/coverage-final.json
+          flags: fdm-core
+          token: ${{ secrets.CODECOV_TOKEN }}

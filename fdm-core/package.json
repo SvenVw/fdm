@@ -29,6 +29,7 @@
     },
     "files": ["dist"],
     "scripts": {
+        "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
@@ -46,6 +47,7 @@
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-typescript": "^12.1.2",
         "@types/node": "^22.10.9",
+        "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.0",
         "globals": "^15.14.0",
