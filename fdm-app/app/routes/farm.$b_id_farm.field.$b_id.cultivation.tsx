@@ -108,9 +108,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_lu_catalogue, b_id, b_sowing_date } = formValues
+        const { b_lu_catalogue, b_sowing_date, b_terminating_date } = formValues
 
-        await addCultivation(b_lu_catalogue, b_id, b_sowing_date)
+
+        await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date, b_terminating_date)
 
         return dataWithSuccess(
             { result: "Data saved successfully" },

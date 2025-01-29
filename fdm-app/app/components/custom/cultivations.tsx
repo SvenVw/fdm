@@ -25,34 +25,34 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { LoadingSpinner } from "./loadingspinner"
 
-export const FormSchema = z
-    .object({
-        b_lu_catalogue: z.string({
-            required_error: "Gewas is verplicht",
-        }),
-        b_sowing_date: z.coerce.date({
-            required_error: "Datum is verplicht",
+export const FormSchema = z.object({
+    b_lu_catalogue: z.string({
+        required_error: "Gewas is verplicht",
+    }),
+    b_sowing_date: z.coerce.date({
+        required_error: "Datum is verplicht",
+        invalid_type_error: "Datum is ongeldig",
+    }),
+    b_terminating_date: z.coerce
+        .date({
             invalid_type_error: "Datum is ongeldig",
-        }),
-        b_harvest_date: z.coerce
-            .date({
-                required_error: "Datum is verplicht",
-            })
-            .optional(),
-    })
-    .refine((data) => {
-        if (data.b_harvest_date) {
-            return data.b_harvest_date >= data.b_sowing_date
-        }
-        return true
-    }, "Oogstdatum moet na zaaidatum zijn")
+        })
+        .optional(),
+})
+// TODO: the comparison of b_terminating_date and b_swoing_date results in not responding button, so for now switched off
+// .refine(
+//     (data) =>
+//         !data.b_terminating_date ||
+//         data.b_terminating_date > data.b_sowing_date,
+//     "Einddatum moet na zaaidatum zijn",
+// )
 interface Cultivation {
     b_lu: string
     b_lus: string[] | null
     b_lu_catalogue: string
     b_lu_name: string
     b_sowing_date: Date
-    b_harvest_date: Date | null
+    b_terminating_date: Date | null
 }
 
 interface cultivationOption {
@@ -75,7 +75,7 @@ export function CultivationsForm(props: CultivationsFormProps) {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_sowing_date: new Date(new Date().getFullYear(), 0, 1),
-            b_harvest_date: undefined,
+            b_terminating_date: undefined,
         },
     })
 
@@ -176,7 +176,7 @@ export function CultivationsForm(props: CultivationsFormProps) {
                             <div>
                                 <FormField
                                     control={form.control}
-                                    name="b_harvest_date"
+                                    name="b_terminating_date"
                                     render={({ field }) => (
                                         <FormItem className="">
                                             <FormLabel>Einddatum</FormLabel>
@@ -274,9 +274,9 @@ export function CultivationsForm(props: CultivationsFormProps) {
                                 </div>
                                 <div>
                                     <p className="text-sm font-light leading-none">
-                                        {cultivation.b_harvest_date
+                                        {cultivation.b_terminating_date
                                             ? format(
-                                                  cultivation.b_harvest_date,
+                                                  cultivation.b_terminating_date,
                                                   "yyyy-MM-dd",
                                               )
                                             : "Nog niet gestopt"}
