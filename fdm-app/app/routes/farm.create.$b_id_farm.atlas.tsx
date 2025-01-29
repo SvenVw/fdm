@@ -205,8 +205,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_acquiring_method,
                     b_terminating_date,
                 )
-                await sleep(1000) // WORKAROUND: add a sleep to prevent that the field is not yet available at addCultivation
-                await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing)
+                await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing, b_terminating_date)
 
                 if (process.env.NMI_API_KEY) {
                     const fieldCentroid = centroid(field.geometry)
@@ -269,8 +268,4 @@ export async function action({ request, params }: ActionFunctionArgs) {
     return redirectWithSuccess(`/farm/create/${b_id_farm}/fields/${b_ids[0]}`, {
         message: "Percelen zijn toegevoegd! 🎉",
     })
-}
-
-function sleep(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
 }
