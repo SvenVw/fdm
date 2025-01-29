@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, inject } from "vitest"
 import { addFarm } from "./farm"
-import { createFdmServer, migrateFdmServer } from "./fdm-server"
+import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
 
@@ -8,16 +8,13 @@ describe("Farm Data Model", () => {
     let fdm: FdmServerType
 
     beforeEach(async () => {
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath = "src/db/migrations"
+        const host  = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
 
-        fdm = await createFdmServer(host, port, user, password, database)
-
-        await migrateFdmServer(fdm, migrationsFolderPath)
     })
 
     describe("Field CRUD", () => {
