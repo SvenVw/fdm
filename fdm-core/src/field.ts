@@ -2,9 +2,9 @@ import { asc, eq, sql } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
+import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { getFieldType } from "./field.d"
-import { handleError } from "./error"
 
 /**
  * Add a new field

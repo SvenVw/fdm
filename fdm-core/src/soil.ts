@@ -2,9 +2,9 @@ import { desc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
+import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { getSoilAnalysisType } from "./soil.d"
-import { handleError } from "./error"
 
 /**
  * Adds a new soil analysis record, including soil sampling details.

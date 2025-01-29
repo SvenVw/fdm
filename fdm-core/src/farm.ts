@@ -2,8 +2,8 @@ import { asc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
-import type { FdmType } from "./fdm"
 import { handleError } from "./error"
+import type { FdmType } from "./fdm"
 
 /**
  * Add a new farm.

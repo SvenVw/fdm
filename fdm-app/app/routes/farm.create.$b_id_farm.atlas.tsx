@@ -205,7 +205,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_acquiring_method,
                     b_terminating_date,
                 )
-                await addCultivation(fdm, b_lu_catalogue, b_id, b_date_sowing, b_terminating_date)
+                await addCultivation(
+                    fdm,
+                    b_lu_catalogue,
+                    b_id,
+                    b_date_sowing,
+                    b_terminating_date,
+                )
 
                 if (process.env.NMI_API_KEY) {
                     const fieldCentroid = centroid(field.geometry)

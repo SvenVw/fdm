@@ -2,12 +2,12 @@ import { asc, desc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
+import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "./fertilizer.d"
-import { handleError } from "./error"
 
 /**
  * Retrieves all fertilizers from the catalogue.
