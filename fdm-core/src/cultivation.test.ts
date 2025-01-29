@@ -289,7 +289,7 @@ describe("Cultivation Data Model", () => {
             const updatedCultivation = await getCultivation(fdm, b_lu)
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-            expect(updatedCultivation.b_terminate_date).toEqual(
+            expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
         })
@@ -332,7 +332,7 @@ describe("Cultivation Data Model", () => {
             )
 
             const updatedCultivation = await getCultivation(fdm, b_lu)
-            expect(updatedCultivation.b_terminate_date).toEqual(
+            expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
         })
