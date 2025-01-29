@@ -32,7 +32,11 @@ export default async function setup(project: TestProject) {
     const database = String(process.env.POSTGRES_DB)
     const migrationsFolderPath = "src/db/migrations"
 
-    fdm = await createFdmServer(host, port, user, password, database)
+    try {
+        fdm = await createFdmServer(host, port, user, password, database)
+    } catch (error) {
+        throw new Error(`Failed to connect to database: ${error.message}`)
+    }
 
     if (!migrationsRun) {
         await migrateFdmServer(fdm, migrationsFolderPath)
