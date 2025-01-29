@@ -1,3 +1,5 @@
+import type { Jsonable } from "./error.d"
+
 export function handleError(err: unknown, base: string, context?: Jsonable) {
     const error = ensureError(err)
 
@@ -20,16 +22,6 @@ function ensureError(value: unknown): Error {
     )
     return error
 }
-
-type Jsonable =
-    | string
-    | number
-    | boolean
-    | null
-    | undefined
-    | readonly Jsonable[]
-    | { readonly [key: string]: Jsonable }
-    | { toJSON(): Jsonable }
 
 class BaseError extends Error {
     public readonly context?: Jsonable
