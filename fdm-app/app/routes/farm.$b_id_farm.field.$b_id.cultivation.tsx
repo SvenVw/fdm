@@ -48,10 +48,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get available cultivations for the farm
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(
-        fdm,
-        b_id_farm,
-    )
+    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
     // Map cultivations to options for the combobox
     const cultivationsCatalogueOptions = cultivationsCatalogue.map(
         (cultivation) => {
@@ -110,8 +107,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
         const { b_lu_catalogue, b_sowing_date, b_terminating_date } = formValues
 
-
-        await addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date, b_terminating_date)
+        await addCultivation(
+            fdm,
+            b_lu_catalogue,
+            b_id,
+            b_sowing_date,
+            b_terminating_date,
+        )
 
         return dataWithSuccess(
             { result: "Data saved successfully" },
