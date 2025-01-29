@@ -34,9 +34,9 @@ jobs:
           --health-retries 5
 
     steps:
-      # Include git for codecov
-      - name: Install Git
-        run: apt-get update && apt-get install -y git
+      # Include dependencies for codecov
+      - name: Install system dependencies
+        run: apt-get update && apt-get install -y git curl gpg
 
       # Downloads a copy of the code in your repository before running CI tests
       - name: Check out repository code
