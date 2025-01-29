@@ -7,8 +7,10 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Run tests and collect coverage
+  coverage:
+    # Label of the container job
+    name: Coverage
+    # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -16,6 +18,26 @@ jobs:
     permissions:
       contents: read
       packages: write
+    # Docker Hub image that `container-job` executes in
+    container: node:${{ matrix.node-version }}-bookworm-slim
+
+    # Service containers to run with `container-job`
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image with postgis extension
+        image: postgis/postgis:15-3.5
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
