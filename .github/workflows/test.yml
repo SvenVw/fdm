@@ -34,6 +34,10 @@ jobs:
           --health-retries 5
 
     steps:
+      # Include git for codecov
+      - name: Install Git
+        run: apt-get update && apt-get install -y git
+
       # Downloads a copy of the code in your repository before running CI tests
       - name: Check out repository code
         uses: actions/checkout@v4
