@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest"
+import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     addCultivation,
     addCultivationToCatalogue,
@@ -10,7 +10,6 @@ import {
     updateCultivation,
 } from "./cultivation"
 import { addFarm } from "./farm"
-import { createFdmServer, migrateFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
     addFertilizer,
@@ -19,6 +18,7 @@ import {
 } from "./fertilizer"
 import { addField } from "./field"
 import { createId } from "./id"
+import { createFdmServer } from "./fdm-server"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -29,33 +29,12 @@ describe("Cultivation Data Model", () => {
     let b_sowing_date: Date
 
     beforeEach(async () => {
-        const requiredEnvVars = [
-            "POSTGRES_HOST",
-            "POSTGRES_PORT",
-            "POSTGRES_USER",
-            "POSTGRES_PASSWORD",
-            "POSTGRES_DB",
-        ]
-        for (const envVar of requiredEnvVars) {
-            if (!process.env[envVar]) {
-                throw new Error(
-                    `Missing required environment variable: ${envVar}`,
-                )
-            }
-        }
-
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        if (Number.isNaN(port)) {
-            throw new Error("POSTGRES_PORT must be a valid number")
-        }
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath = "src/db/migrations"
-
-        fdm = await createFdmServer(host, port, user, password, database)
-        await migrateFdmServer(fdm, migrationsFolderPath)
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
 
         b_lu_catalogue = createId()
         const farmName = "Test Farm"

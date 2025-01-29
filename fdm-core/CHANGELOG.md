@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.11.2
+
+### Patch Changes
+
+- 444bff1: Use global setup for fdm-core unit tests to prevent concurrent migration errors
+- 444bff1: Add Github Action for unit test and coverage
+
 ## 0.11.1
 
 ### Patch Changes

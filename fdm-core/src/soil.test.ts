@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, inject, it } from "vitest"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
 import { createFdmServer, migrateFdmServer } from "./fdm-server"
@@ -19,16 +19,13 @@ describe("Soil Analysis Functions", () => {
     let test_a_id: string
 
     beforeEach(async () => {
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath = "src/db/migrations"
 
-        fdm = await createFdmServer(host, port, user, password, database)
-
-        await migrateFdmServer(fdm, migrationsFolderPath)
+        const host  = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
 
         // Create test field and analyses before each test
         const farmName = "Test Farm"

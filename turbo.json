@@ -19,10 +19,10 @@
         "//#format-and-lint:fix-unsafe": {
             "cache": false
         },
-        "test": {
+        "test-coverage": {
             "outputs": [],
             "persistent": false,
-            "cache": true,
+            "cache": false,
             "env": [
                 "POSTGRES_HOST",
                 "POSTGRES_PORT",

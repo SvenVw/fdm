@@ -20,7 +20,7 @@ export function createFdmLocal(
 
 export async function migrateFdmLocal(
     fdm: FdmLocalType,
-    migrationsFolderPath = "node_modules/@nmi/fdm/dist/db/migrations",
+    migrationsFolderPath = "node_modules/@svenvw/fdm-core/dist/db/migrations",
 ): Promise<void> {
     // Run migration
     await migrate(fdm, {

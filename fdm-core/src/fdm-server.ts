@@ -28,7 +28,7 @@ export function createFdmServer(
 
 export async function migrateFdmServer(
     fdm: FdmServerType,
-    migrationsFolderPath = "node_modules/@nmi/fdm/dist/db/migrations",
+    migrationsFolderPath = "node_modules/@svenvw/fdm-core/dist/db/migrations",
 ): Promise<void> {
     // Run migration
     await migrate(fdm, {
