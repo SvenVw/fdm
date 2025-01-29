@@ -1,10 +1,10 @@
-name: Packages unit tests
+name: CI
 on: push
 
 jobs:
   # Label of the container job
-  unit-tests:
-    name: Unit tests
+  tests:
+    name: Tests
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
     strategy:
