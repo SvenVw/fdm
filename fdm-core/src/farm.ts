@@ -3,6 +3,7 @@ import { createId } from "./id"
 
 import * as schema from "./db/schema"
 import type { FdmType } from "./fdm"
+import { handleError } from "./error"
 
 /**
  * Add a new farm.
@@ -21,20 +22,30 @@ export async function addFarm(
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
 ): Promise<schema.farmsTypeInsert["b_id_farm"]> {
-    // Generate an ID for the farm
-    const b_id_farm = createId()
+    return await fdm.transaction(async (tx: FdmType) => {
+        // Generate an ID for the farm
+        const b_id_farm = createId()
+        try {
+            // Insert the farm in the db
+            const farmData = {
+                b_id_farm,
+                b_name_farm,
+                b_businessid_farm,
+                b_address_farm,
+                b_postalcode_farm,
+            }
+            await tx.insert(schema.farms).values(farmData)
+        } catch (err) {
+            handleError(err, "Exception for addField", {
+                b_name_farm,
+                b_businessid_farm,
+                b_address_farm,
+                b_postalcode_farm,
+            })
+        }
 
-    // Insert the farm in the db
-    const farmData = {
-        b_id_farm,
-        b_name_farm,
-        b_businessid_farm,
-        b_address_farm,
-        b_postalcode_farm,
-    }
-    await fdm.insert(schema.farms).values(farmData)
-
-    return b_id_farm
+        return b_id_farm
+    })
 }
 
 /**

@@ -4,6 +4,7 @@ import { createId } from "./id"
 import * as schema from "./db/schema"
 import type { FdmType } from "./fdm"
 import type { getFieldType } from "./field.d"
+import { handleError } from "./error"
 
 /**
  * Add a new field
@@ -28,10 +29,9 @@ export async function addField(
     b_acquiring_method: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
-    // Generate an ID for the field
-    const b_id = createId()
-
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
+        // Generate an ID for the field
+        const b_id = createId()
         try {
             // Insert field
             const fieldData = {
@@ -66,12 +66,19 @@ export async function addField(
                 b_discarding_date,
             }
             await tx.insert(schema.fieldDiscarding).values(fieldDiscardingData)
-        } catch (error) {
-            throw new Error(`Addition of field failed with error ${error}`)
+        } catch (err) {
+            handleError(err, "Exception for addField", {
+                b_id_farm,
+                b_name,
+                b_id_source,
+                b_geometry,
+                b_acquiring_date,
+                b_acquiring_method,
+                b_discarding_date,
+            })
         }
+        return b_id
     })
-
-    return b_id
 }
 
 /**
@@ -264,8 +271,16 @@ export async function updateField(
             }
 
             return field
-        } catch (error) {
-            throw new Error(`Update of field failed with error ${error}`)
+        } catch (err) {
+            handleError(err, "Exception for updateField", {
+                b_id,
+                b_name,
+                b_id_source,
+                b_geometry,
+                b_acquiring_date,
+                b_acquiring_method,
+                b_discarding_date,
+            })
         }
     })
 

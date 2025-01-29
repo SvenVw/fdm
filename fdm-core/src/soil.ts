@@ -4,6 +4,7 @@ import { createId } from "./id"
 import * as schema from "./db/schema"
 import type { FdmType } from "./fdm"
 import type { getSoilAnalysisType } from "./soil.d"
+import { handleError } from "./error"
 
 /**
  * Adds a new soil analysis record, including soil sampling details.
@@ -29,10 +30,9 @@ export async function addSoilAnalysis(
     // b_sampling_geometry: schema.soilSamplingTypeInsert['b_sampling_geometry'],
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<schema.soilAnalysisTypeSelect["a_id"]> {
-    const a_id = createId()
-    const b_id_sampling = createId()
-
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
+        const a_id = createId()
+        const b_id_sampling = createId()
         try {
             // Insert soil analysis data
             await tx.insert(schema.soilAnalysis).values({
@@ -51,14 +51,18 @@ export async function addSoilAnalysis(
                 b_sampling_date: b_sampling_date,
                 // b_sampling_geometry: b_sampling_geometry,
             })
-        } catch (error) {
-            throw new Error(
-                `Failed to add soil analysis: ${error instanceof Error ? error.stack : error}`,
-            )
+        } catch (err) {
+            handleError(err, "Exception for addSoilAnalysis", {
+                a_date,
+                a_source,
+                b_id,
+                b_depth,
+                b_sampling_date,
+                // b_sampling_geometry
+            })
         }
+        return a_id
     })
-
-    return a_id
 }
 
 /**
@@ -75,7 +79,7 @@ export async function updateSoilAnalysis(
     soilAnalysisData: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<void> {
     const updated = new Date()
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
         try {
             await tx
                 .update(schema.soilAnalysis)
@@ -86,10 +90,11 @@ export async function updateSoilAnalysis(
                 .update(schema.soilSampling)
                 .set({ updated: updated })
                 .where(eq(schema.soilSampling.a_id, a_id))
-        } catch (error) {
-            throw new Error(
-                `Failed to update soil analysis: ${error instanceof Error ? error.stack : error}`,
-            )
+        } catch (err) {
+            handleError(err, "Exception for updateSoilAnalysis", {
+                a_id,
+                ...soilAnalysisData,
+            })
         }
     })
 }
@@ -114,10 +119,8 @@ export async function removeSoilAnalysis(
             await tx
                 .delete(schema.soilAnalysis)
                 .where(eq(schema.soilAnalysis.a_id, a_id))
-        } catch (error) {
-            throw new Error(
-                `Failed to remove soil analysis: ${error instanceof Error ? error.stack : error}`,
-            )
+        } catch (err) {
+            handleError(err, "Exception for removeSoilAnalysis", { a_id })
         }
     })
 }

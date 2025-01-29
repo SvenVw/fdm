@@ -4,6 +4,7 @@ import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
 import * as schema from "./db/schema"
 import type { FdmType } from "./fdm"
 import { createId } from "./id"
+import { handleError } from "./error"
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -42,7 +43,7 @@ export async function addCultivationToCatalogue(
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3_name"]
     },
 ): Promise<void> {
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
         // Check for existing cultivation
         const existing = await tx
             .select()
@@ -83,10 +84,10 @@ export async function addCultivation(
     b_sowing_date: schema.fieldSowingTypeInsert["b_sowing_date"],
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
-    // Generate an ID for the cultivation
-    const b_lu = createId()
+    return await fdm.transaction(async (tx: FdmType) => {
+        // Generate an ID for the cultivation
+        const b_lu = createId()
 
-    await fdm.transaction(async (tx: FdmType) => {
         try {
             // Validate b_sowing_date is a Date object
             if (!(b_sowing_date instanceof Date)) {
@@ -105,7 +106,7 @@ export async function addCultivation(
                 if (b_terminating_date <= b_sowing_date) {
                     throw new Error("Terminate date must be after sowing date")
                 }
-            } 
+            }
 
             // Validate if field exists
             const field = await tx
@@ -179,14 +180,17 @@ export async function addCultivation(
                 b_lu: b_lu,
                 b_terminating_date: b_terminating_date,
             })
-        } catch (error) {
-            throw new Error(
-                `addCultivation failed: ${error instanceof Error ? error.message : String(error)}`,
-            )
+        } catch (err) {
+            handleError(err, "Exception for addCultivation", {
+                b_lu_catalogue,
+                b_id,
+                b_sowing_date,
+                b_terminating_date,
+            })
         }
-    })
 
-    return b_lu
+        return b_lu
+    })
 }
 
 /**
@@ -212,7 +216,8 @@ export async function getCultivation(
             b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
             b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
             b_sowing_date: schema.fieldSowing.b_sowing_date,
-            b_terminating_date: schema.cultivationTerminating.b_terminating_date,
+            b_terminating_date:
+                schema.cultivationTerminating.b_terminating_date,
             b_id: schema.fieldSowing.b_id,
         })
         .from(schema.cultivations)
@@ -264,7 +269,8 @@ export async function getCultivations(
             b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
             b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
             b_sowing_date: schema.fieldSowing.b_sowing_date,
-            b_terminating_date: schema.cultivationTerminating.b_terminating_date,
+            b_terminating_date:
+                schema.cultivationTerminating.b_terminating_date,
             b_id: schema.fieldSowing.b_id,
         })
         .from(schema.cultivations)
@@ -468,8 +474,10 @@ export async function getCultivationPlan(
         )
 
         return cultivationPlan
-    } catch (error) {
-        throw new Error(`Failed to get cultivation plan: ${error}`)
+    } catch (err) {
+        handleError(err, "Exception for getCultivationPlan", {
+            b_id_farm,
+        })
     }
 }
 
@@ -486,7 +494,7 @@ export async function removeCultivation(
     fdm: FdmType,
     b_lu: schema.cultivationsTypeInsert["b_lu"],
 ): Promise<void> {
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
         try {
             const existing = await tx
                 .select()
@@ -509,8 +517,8 @@ export async function removeCultivation(
             await tx
                 .delete(schema.cultivations)
                 .where(eq(schema.cultivations.b_lu, b_lu))
-        } catch (error) {
-            throw new Error(`Failed to remove cultivation: ${error}`)
+        } catch (err) {
+            handleError(err, "Exception for removeCultivation", { b_lu })
         }
     })
 }
@@ -534,7 +542,7 @@ export async function updateCultivation(
     b_sowing_date?: schema.fieldSowingTypeInsert["b_sowing_date"],
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<void> {
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
         try {
             // Validate if cultivation exists
             const cultivation = await tx
@@ -581,7 +589,9 @@ export async function updateCultivation(
 
                 // Validate if sowing date is before termination date
                 if (b_terminating_date) {
-                    if (b_sowing_date.getTime() >= b_terminating_date.getTime()) {
+                    if (
+                        b_sowing_date.getTime() >= b_terminating_date.getTime()
+                    ) {
                         throw new Error(
                             "Sowing date must be before termination date",
                         )
@@ -590,7 +600,8 @@ export async function updateCultivation(
                     const result = await tx
                         .select({
                             b_terminating_date:
-                                schema.cultivationTerminating.b_terminating_date,
+                                schema.cultivationTerminating
+                                    .b_terminating_date,
                         })
                         .from(schema.cultivationTerminating)
                         .where(
@@ -632,7 +643,9 @@ export async function updateCultivation(
 
                 // Validate if termiante date is after sowing date
                 if (b_sowing_date) {
-                    if (b_sowing_date.getTime() >= b_terminating_date.getTime()) {
+                    if (
+                        b_sowing_date.getTime() >= b_terminating_date.getTime()
+                    ) {
                         throw new Error(
                             "Terminate date must be after sowing date",
                         )
@@ -671,10 +684,13 @@ export async function updateCultivation(
                     })
                     .where(eq(schema.cultivationTerminating.b_lu, b_lu))
             }
-        } catch (error) {
-            throw new Error(
-                `updateCultivation failed: ${error instanceof Error ? error.message : String(error)}`,
-            )
+        } catch (err) {
+            handleError(err, "Exception for updateCultivation", {
+                b_lu,
+                b_lu_catalogue,
+                b_sowing_date,
+                b_terminating_date,
+            })
         }
     })
 }

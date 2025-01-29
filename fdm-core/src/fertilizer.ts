@@ -7,6 +7,7 @@ import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "./fertilizer.d"
+import { handleError } from "./error"
 
 /**
  * Retrieves all fertilizers from the catalogue.
@@ -111,24 +112,24 @@ export async function addFertilizer(
     p_acquiring_amount: schema.fertilizerAcquiringTypeInsert["p_acquiring_amount"],
     p_acquiring_date: schema.fertilizerAcquiringTypeInsert["p_acquiring_date"],
 ): Promise<schema.fertilizerAcquiringTypeInsert["p_id"]> {
-    // Generate an ID for the fertilizer
-    const p_id = createId()
+    return await fdm.transaction(async (tx: FdmType) => {
+        // Generate an ID for the fertilizer
+        const p_id = createId()
 
-    // Insert the fertilizer in the db
-    const fertilizerAcquiringData = {
-        b_id_farm: b_id_farm,
-        p_id: p_id,
-        p_acquiring_amount: p_acquiring_amount,
-        p_acquiring_date: p_acquiring_date,
-    }
+        // Insert the fertilizer in the db
+        const fertilizerAcquiringData = {
+            b_id_farm: b_id_farm,
+            p_id: p_id,
+            p_acquiring_amount: p_acquiring_amount,
+            p_acquiring_date: p_acquiring_date,
+        }
 
-    const fertilizerPickingData = {
-        p_id: p_id,
-        p_id_catalogue: p_id_catalogue,
-        p_picking_date: new Date(),
-    }
+        const fertilizerPickingData = {
+            p_id: p_id,
+            p_id_catalogue: p_id_catalogue,
+            p_picking_date: new Date(),
+        }
 
-    await fdm.transaction(async (tx: FdmType) => {
         try {
             await tx.insert(schema.fertilizers).values({
                 p_id: p_id,
@@ -141,12 +142,16 @@ export async function addFertilizer(
             await tx
                 .insert(schema.fertilizerPicking)
                 .values(fertilizerPickingData)
-        } catch (error) {
-            throw new Error(`Add fertilizer failed with error ${error}`)
+        } catch (err) {
+            handleError(err, "Exception for addFertilizer", {
+                p_id_catalogue,
+                b_id_farm,
+                p_acquiring_amount,
+                p_acquiring_date,
+            })
         }
+        return p_id
     })
-
-    return p_id
 }
 
 /**
@@ -308,7 +313,7 @@ export async function removeFertilizer(
     fdm: FdmType,
     p_id: schema.fertilizerAcquiringTypeInsert["p_id"],
 ): Promise<void> {
-    await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
         try {
             await tx
                 .delete(schema.fertilizerAcquiring)
@@ -321,8 +326,10 @@ export async function removeFertilizer(
             await tx
                 .delete(schema.fertilizers)
                 .where(eq(schema.fertilizers.p_id, p_id))
-        } catch (error) {
-            throw new Error(`Remove fertilizer failed with error ${error}`)
+        } catch (err) {
+            handleError(err, "Exception for removeFertilizer", {
+                p_id,
+            })
         }
     })
 }
@@ -378,11 +385,14 @@ export async function addFertilizerApplication(
             p_app_method,
             p_app_date,
         })
-    } catch (error) {
-        throw new Error(
-            `Failed to add fertilizer application: ${error instanceof Error ? error.message : String(error)}`,
-            { cause: error },
-        )
+    } catch (err) {
+        handleError(err, "Exception for addFertilizerApplication", {
+            b_id,
+            p_id,
+            p_app_amount,
+            p_app_method,
+            p_app_date,
+        })
     }
 
     return p_app_id
@@ -415,8 +425,15 @@ export async function updateFertilizerApplication(
             .update(schema.fertilizerApplication)
             .set({ b_id, p_id, p_app_amount, p_app_method, p_app_date })
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
-    } catch (error) {
-        throw new Error(`Failed to update fertilizer application: ${error}`)
+    } catch (err) {
+        handleError(err, "Exception for updateFertilizerApplication", {
+            p_app_id,
+            b_id,
+            p_id,
+            p_app_amount,
+            p_app_method,
+            p_app_date,
+        })
     }
 }
 
@@ -436,8 +453,10 @@ export async function removeFertilizerApplication(
         await fdm
             .delete(schema.fertilizerApplication)
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
-    } catch (error) {
-        throw new Error(`Failed to remove fertilizer application: ${error}`)
+    } catch (err) {
+        handleError(err, "Exception for removeFertilizerApplication", {
+            p_app_id,
+        })
     }
 }
 
@@ -453,38 +472,34 @@ export async function getFertilizerApplication(
     fdm: FdmType,
     p_app_id: schema.fertilizerApplicationTypeSelect["p_app_id"],
 ): Promise<getFertilizerApplicationType | null> {
-    try {
-        const result = await fdm
-            .select({
-                p_id: schema.fertilizerApplication.p_id,
-                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
-                p_name_nl: schema.fertilizersCatalogue.p_name_nl,
-                p_app_amount: schema.fertilizerApplication.p_app_amount,
-                p_app_method: schema.fertilizerApplication.p_app_method,
-                p_app_date: schema.fertilizerApplication.p_app_date,
-                p_app_id: schema.fertilizerApplication.p_app_id,
-            })
-            .from(schema.fertilizerApplication)
-            .leftJoin(
-                schema.fertilizerPicking,
-                eq(
-                    schema.fertilizerPicking.p_id,
-                    schema.fertilizerApplication.p_id,
-                ),
-            )
-            .leftJoin(
-                schema.fertilizersCatalogue,
-                eq(
-                    schema.fertilizersCatalogue.p_id_catalogue,
-                    schema.fertilizerPicking.p_id_catalogue,
-                ),
-            )
-            .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
+    const result = await fdm
+        .select({
+            p_id: schema.fertilizerApplication.p_id,
+            p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+            p_name_nl: schema.fertilizersCatalogue.p_name_nl,
+            p_app_amount: schema.fertilizerApplication.p_app_amount,
+            p_app_method: schema.fertilizerApplication.p_app_method,
+            p_app_date: schema.fertilizerApplication.p_app_date,
+            p_app_id: schema.fertilizerApplication.p_app_id,
+        })
+        .from(schema.fertilizerApplication)
+        .leftJoin(
+            schema.fertilizerPicking,
+            eq(
+                schema.fertilizerPicking.p_id,
+                schema.fertilizerApplication.p_id,
+            ),
+        )
+        .leftJoin(
+            schema.fertilizersCatalogue,
+            eq(
+                schema.fertilizersCatalogue.p_id_catalogue,
+                schema.fertilizerPicking.p_id_catalogue,
+            ),
+        )
+        .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
 
-        return result[0] || null
-    } catch (error) {
-        throw new Error(`Failed to get fertilizer application: ${error}`)
-    }
+    return result[0] || null
 }
 
 /**
@@ -499,36 +514,32 @@ export async function getFertilizerApplications(
     fdm: FdmType,
     b_id: schema.fertilizerApplicationTypeSelect["b_id"],
 ): Promise<getFertilizerApplicationType[]> {
-    try {
-        const fertilizerApplications = await fdm
-            .select({
-                p_id: schema.fertilizerApplication.p_id,
-                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
-                p_name_nl: schema.fertilizersCatalogue.p_name_nl,
-                p_app_amount: schema.fertilizerApplication.p_app_amount,
-                p_app_method: schema.fertilizerApplication.p_app_method,
-                p_app_date: schema.fertilizerApplication.p_app_date,
-                p_app_id: schema.fertilizerApplication.p_app_id,
-            })
-            .from(schema.fertilizerApplication)
-            .leftJoin(
-                schema.fertilizerPicking,
-                eq(
-                    schema.fertilizerPicking.p_id,
-                    schema.fertilizerApplication.p_id,
-                ),
-            )
-            .leftJoin(
-                schema.fertilizersCatalogue,
-                eq(
-                    schema.fertilizersCatalogue.p_id_catalogue,
-                    schema.fertilizerPicking.p_id_catalogue,
-                ),
-            )
-            .where(eq(schema.fertilizerApplication.b_id, b_id))
-            .orderBy(desc(schema.fertilizerApplication.p_app_date))
-        return fertilizerApplications
-    } catch (error) {
-        throw new Error(`Failed to get fertilizer applications: ${error}`)
-    }
+    const fertilizerApplications = await fdm
+        .select({
+            p_id: schema.fertilizerApplication.p_id,
+            p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+            p_name_nl: schema.fertilizersCatalogue.p_name_nl,
+            p_app_amount: schema.fertilizerApplication.p_app_amount,
+            p_app_method: schema.fertilizerApplication.p_app_method,
+            p_app_date: schema.fertilizerApplication.p_app_date,
+            p_app_id: schema.fertilizerApplication.p_app_id,
+        })
+        .from(schema.fertilizerApplication)
+        .leftJoin(
+            schema.fertilizerPicking,
+            eq(
+                schema.fertilizerPicking.p_id,
+                schema.fertilizerApplication.p_id,
+            ),
+        )
+        .leftJoin(
+            schema.fertilizersCatalogue,
+            eq(
+                schema.fertilizersCatalogue.p_id_catalogue,
+                schema.fertilizerPicking.p_id_catalogue,
+            ),
+        )
+        .where(eq(schema.fertilizerApplication.b_id, b_id))
+        .orderBy(desc(schema.fertilizerApplication.p_app_date))
+    return fertilizerApplications
 }
