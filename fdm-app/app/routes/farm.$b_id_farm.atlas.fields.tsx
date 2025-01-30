@@ -1,8 +1,19 @@
-import { AtlasFields } from "@/components/custom/atlas-fields"
+import { Layer, Map as MapGL } from "react-map-gl"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import wkx from "wkx"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+import type { FeatureCollection } from "geojson"
+import {
+    getMapboxStyle,
+    getMapboxToken,
+} from "@/components/custom/atlas/atlas-mapbox"
+import {
+    FieldsSavedLayer,
+    FieldsSourceNotClickable,
+} from "@/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -29,34 +40,45 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return feature
     })
 
-    const featureCollection = {
+    const featureCollection: FeatureCollection = {
         type: "FeatureCollection",
         features: features,
     }
 
-    // Get the Mapbox token
-    const mapboxToken = String(process.env.MAPBOX_TOKEN)
+    // Get the Mapbox token and style
+    const mapboxToken = getMapboxToken()
+    const mapboxStyle = getMapboxStyle()
 
     // Return user information from loader
     return {
         savedFields: featureCollection,
         mapboxToken: mapboxToken,
+        mapboxStyle: mapboxStyle,
     }
 }
 
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
+    const id = "fieldsSaved"
+    const fields = loaderData.savedFields
+    const viewState = getViewState(fields)
+    const fieldsSavedStyle = getFieldsStyle(id)
+
     return (
-        <AtlasFields
-            height="calc(100vh - 64px - 123px)"
-            width="100%"
-            interactive={true}
-            mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
-            mapboxToken={loaderData.mapboxToken}
-            fieldsSelected={null}
-            fieldsAvailableUrl={undefined}
-            fieldsSaved={loaderData.savedFields}
-        />
+        <>
+            <MapGL
+                {...viewState}
+                style={{ height: "calc(100vh - 64px - 123px)", width: "100%" }}
+                interactive={true}
+                mapStyle={loaderData.mapboxStyle}
+                mapboxAccessToken={loaderData.mapboxToken}
+                interactiveLayerIds={[id]}
+            >
+                <FieldsSourceNotClickable id={id} fieldsData={fields}>
+                    <Layer {...fieldsSavedStyle} />
+                </FieldsSourceNotClickable>
+            </MapGL>
+        </>
     )
 }

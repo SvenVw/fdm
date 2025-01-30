@@ -28,7 +28,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get details of farm
-    let farm
+    let farm = null
     try {
         farm = await getFarm(fdm, b_id_farm)
         if (!farm) {

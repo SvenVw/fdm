@@ -136,6 +136,7 @@ export default function Index() {
                                 fieldsAvailableUrl={
                                     loaderData.fieldsAvailableUrl
                                 }
+                                fieldsSaved={null}
                             />
                         )}
                     </ClientOnly>
