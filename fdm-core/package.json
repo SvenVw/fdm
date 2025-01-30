@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.11.1",
+    "version": "0.11.3",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -29,6 +29,7 @@
     },
     "files": ["dist"],
     "scripts": {
+        "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
@@ -38,6 +39,7 @@
         "prepare": "pnpm build",
         "preview": "vite preview",
         "test": "dotenvx run -- vitest run",
+        "test-coverage": "dotenvx run -- vitest run --coverage",
         "watch": "dotenvx run -- vitest"
     },
     "devDependencies": {
@@ -46,6 +48,7 @@
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-typescript": "^12.1.2",
         "@types/node": "^22.10.9",
+        "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.0",
         "globals": "^15.14.0",

@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest"
+import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     addCultivation,
     addCultivationToCatalogue,
@@ -10,7 +10,7 @@ import {
     updateCultivation,
 } from "./cultivation"
 import { addFarm } from "./farm"
-import { createFdmServer, migrateFdmServer } from "./fdm-server"
+import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
     addFertilizer,
@@ -29,33 +29,12 @@ describe("Cultivation Data Model", () => {
     let b_sowing_date: Date
 
     beforeEach(async () => {
-        const requiredEnvVars = [
-            "POSTGRES_HOST",
-            "POSTGRES_PORT",
-            "POSTGRES_USER",
-            "POSTGRES_PASSWORD",
-            "POSTGRES_DB",
-        ]
-        for (const envVar of requiredEnvVars) {
-            if (!process.env[envVar]) {
-                throw new Error(
-                    `Missing required environment variable: ${envVar}`,
-                )
-            }
-        }
-
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        if (Number.isNaN(port)) {
-            throw new Error("POSTGRES_PORT must be a valid number")
-        }
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath = "src/db/migrations"
-
-        fdm = await createFdmServer(host, port, user, password, database)
-        await migrateFdmServer(fdm, migrationsFolderPath)
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
 
         b_lu_catalogue = createId()
         const farmName = "Test Farm"
@@ -154,7 +133,7 @@ describe("Cultivation Data Model", () => {
                     b_id,
                     b_sowing_date,
                 ),
-            ).rejects.toThrow("Cultivation in catalogue does not exist")
+            ).rejects.toThrow("Exception for addCultivation")
         })
 
         it("should add a new cultivation", async () => {
@@ -176,7 +155,7 @@ describe("Cultivation Data Model", () => {
             // Attempt to add the same cultivation again
             await expect(
                 addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date),
-            ).rejects.toThrow("Cultivation already exists")
+            ).rejects.toThrow("Exception for addCultivation")
         })
 
         it("should throw an error when adding a cultivation with an invalid field ID", async () => {
@@ -189,7 +168,7 @@ describe("Cultivation Data Model", () => {
                     invalid_b_id,
                     b_sowing_date,
                 ),
-            ).rejects.toThrow("Field does not exist")
+            ).rejects.toThrow("Exception for addCultivation")
         })
 
         it("should get cultivations by field ID", async () => {
@@ -208,7 +187,7 @@ describe("Cultivation Data Model", () => {
             await removeCultivation(fdm, b_lu)
 
             await expect(getCultivation(fdm, b_lu)).rejects.toThrowError(
-                "Cultivation does not exist",
+                "Exception for getCultivation",
             )
         })
 
@@ -242,7 +221,7 @@ describe("Cultivation Data Model", () => {
                     b_lu_catalogue,
                     new Date(),
                 ),
-            ).rejects.toThrowError("Cultivation does not exist")
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
 
         it("should throw an error when updating with invalid catalogue id", async () => {
@@ -255,7 +234,7 @@ describe("Cultivation Data Model", () => {
                     nonExistentCatalogueId,
                     new Date(),
                 ),
-            ).rejects.toThrowError("Cultivation in catalogue does not exist")
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
 
         it("should get a cultivation by ID", async () => {
@@ -289,7 +268,7 @@ describe("Cultivation Data Model", () => {
             const updatedCultivation = await getCultivation(fdm, b_lu)
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-            expect(updatedCultivation.b_terminate_date).toEqual(
+            expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
         })
@@ -332,7 +311,7 @@ describe("Cultivation Data Model", () => {
             )
 
             const updatedCultivation = await getCultivation(fdm, b_lu)
-            expect(updatedCultivation.b_terminate_date).toEqual(
+            expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
         })
@@ -349,9 +328,7 @@ describe("Cultivation Data Model", () => {
                     newSowingDate,
                     newTerminationDate,
                 ),
-            ).rejects.toThrowError(
-                "Sowing date must be before termination date",
-            )
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
 
         it("should throw an error when updating with invalid termination date - before sowing date", async () => {
@@ -366,9 +343,7 @@ describe("Cultivation Data Model", () => {
                     newSowingDate,
                     newTerminationDate,
                 ),
-            ).rejects.toThrowError(
-                "updateCultivation failed: Sowing date must be before termination date",
-            )
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
     })
 

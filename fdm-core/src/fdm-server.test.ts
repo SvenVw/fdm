@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm"
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, inject, it } from "vitest"
 import { createFdmServer, migrateFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 
@@ -7,13 +7,12 @@ describe("Farm Data Model", () => {
     let fdm: FdmServerType
 
     beforeEach(async () => {
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-
-        fdm = await createFdmServer(host, port, user, password, database)
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
     })
 
     describe("Database Connection", () => {

@@ -1,5 +1,16 @@
 # Changelog fdm-app
 
+## 0.9.1
+
+### Patch Changes
+
+- 638b34e: Fix adding a new cultivation to a field
+- 15a52e1: Fix clicking in log out button
+- Updated dependencies [bc52f62]
+- Updated dependencies [9b53632]
+  - @svenvw/fdm-core@0.11.3
+  - @svenvw/fdm-data@0.9.0
+
 ## 0.9.0
 
 ### Minor Changes
