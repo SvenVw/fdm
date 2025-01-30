@@ -28,7 +28,7 @@ export class BaseError extends Error {
 
     constructor(
         message: string,
-        options: { error?: Error; context?: Jsonable } = {},
+        options: { cause?: Error; context?: Jsonable } = {},
     ) {
         const { cause, context } = options
 
