@@ -88,6 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const layerOptions = [
         { layerKey: "fields", layerName: "Percelen" },
         { layerKey: "soil", layerName: "Bodem" },
+        { layerKey: "elevation", layerName: "Hoogtekaart" },
     ]
 
     // Return user information from loader
