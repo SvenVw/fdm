@@ -2,6 +2,7 @@ import { asc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
+import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 
 /**
@@ -21,20 +22,30 @@ export async function addFarm(
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
 ): Promise<schema.farmsTypeInsert["b_id_farm"]> {
-    // Generate an ID for the farm
-    const b_id_farm = createId()
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Generate an ID for the farm
+            const b_id_farm = createId()
+            // Insert the farm in the db
+            const farmData = {
+                b_id_farm,
+                b_name_farm,
+                b_businessid_farm,
+                b_address_farm,
+                b_postalcode_farm,
+            }
+            await tx.insert(schema.farms).values(farmData)
 
-    // Insert the farm in the db
-    const farmData = {
-        b_id_farm,
-        b_name_farm,
-        b_businessid_farm,
-        b_address_farm,
-        b_postalcode_farm,
+            return b_id_farm
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for addFarm", {
+            b_name_farm,
+            b_businessid_farm,
+            b_address_farm,
+            b_postalcode_farm,
+        })
     }
-    await fdm.insert(schema.farms).values(farmData)
-
-    return b_id_farm
 }
 
 /**
@@ -48,13 +59,17 @@ export async function getFarm(
     fdm: FdmType,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
 ): Promise<schema.farmsTypeSelect> {
-    const farm = await fdm
-        .select()
-        .from(schema.farms)
-        .where(eq(schema.farms.b_id_farm, b_id_farm))
-        .limit(1)
+    try {
+        const farm = await fdm
+            .select()
+            .from(schema.farms)
+            .where(eq(schema.farms.b_id_farm, b_id_farm))
+            .limit(1)
 
-    return farm[0]
+        return farm[0]
+    } catch (err) {
+        throw handleError(err, "Exception for getFarm", { b_id_farm })
+    }
 }
 
 /**
@@ -66,12 +81,16 @@ export async function getFarm(
 export async function getFarms(
     fdm: FdmType,
 ): Promise<schema.farmsTypeSelect[]> {
-    const farm = await fdm
-        .select()
-        .from(schema.farms)
-        .orderBy(asc(schema.farms.b_name_farm))
+    try {
+        const farm = await fdm
+            .select()
+            .from(schema.farms)
+            .orderBy(asc(schema.farms.b_name_farm))
 
-    return farm
+        return farm
+    } catch (err) {
+        throw handleError(err, "Exception for getFarms")
+    }
 }
 
 /**
@@ -93,25 +112,35 @@ export async function updateFarm(
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
 ): Promise<schema.farmsTypeSelect> {
-    const updatedFarm = await fdm
-        .update(schema.farms)
-        .set({
+    try {
+        const updatedFarm = await fdm
+            .update(schema.farms)
+            .set({
+                b_name_farm,
+                b_businessid_farm,
+                b_address_farm,
+                b_postalcode_farm,
+                updated: new Date(),
+            })
+            .where(eq(schema.farms.b_id_farm, b_id_farm))
+            .returning({
+                b_id_farm: schema.farms.b_id_farm,
+                b_name_farm: schema.farms.b_name_farm,
+                b_businessid_farm: schema.farms.b_businessid_farm,
+                b_address_farm: schema.farms.b_address_farm,
+                b_postalcode_farm: schema.farms.b_postalcode_farm,
+                created: schema.farms.created,
+                updated: schema.farms.updated,
+            })
+
+        return updatedFarm[0]
+    } catch (err) {
+        throw handleError(err, "Exception for updateFarm", {
+            b_id_farm,
             b_name_farm,
             b_businessid_farm,
             b_address_farm,
             b_postalcode_farm,
-            updated: new Date(),
         })
-        .where(eq(schema.farms.b_id_farm, b_id_farm))
-        .returning({
-            b_id_farm: schema.farms.b_id_farm,
-            b_name_farm: schema.farms.b_name_farm,
-            b_businessid_farm: schema.farms.b_businessid_farm,
-            b_address_farm: schema.farms.b_address_farm,
-            b_postalcode_farm: schema.farms.b_postalcode_farm,
-            created: schema.farms.created,
-            updated: schema.farms.updated,
-        })
-
-    return updatedFarm[0]
+    }
 }

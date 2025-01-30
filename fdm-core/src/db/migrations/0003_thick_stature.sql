@@ -1,0 +1,1 @@
+ALTER TABLE "fdm-dev"."cultivation_terminating" RENAME COLUMN "b_terminate_date" TO "b_terminating_date";

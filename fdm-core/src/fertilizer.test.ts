@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
+import {
+    afterAll,
+    beforeAll,
+    beforeEach,
+    describe,
+    expect,
+    inject,
+    it,
+} from "vitest"
 import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
@@ -23,7 +31,7 @@ describe("Fertilizer Data Model", () => {
     let p_id_catalogue: string
 
     beforeEach(async () => {
-        const host  = inject("host")
+        const host = inject("host")
         const port = inject("port")
         const user = inject("user")
         const password = inject("password")
@@ -33,8 +41,7 @@ describe("Fertilizer Data Model", () => {
         p_id_catalogue = createId()
     })
 
-    afterAll(async () => {
-    })
+    afterAll(async () => {})
 
     describe("Fertilizer CRUD", () => {
         it("should get fertilizers from catalogue", async () => {

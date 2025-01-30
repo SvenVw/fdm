@@ -13,7 +13,7 @@ export default defineConfig({
                 "**/global-setup.ts",
                 "**.d.ts",
                 "*.config.ts",
-                "*.config.js"
+                "*.config.js",
             ],
         },
         testTimeout: 10000,

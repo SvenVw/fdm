@@ -10,6 +10,7 @@ import {
     updateCultivation,
 } from "./cultivation"
 import { addFarm } from "./farm"
+import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
     addFertilizer,
@@ -18,7 +19,6 @@ import {
 } from "./fertilizer"
 import { addField } from "./field"
 import { createId } from "./id"
-import { createFdmServer } from "./fdm-server"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -133,7 +133,7 @@ describe("Cultivation Data Model", () => {
                     b_id,
                     b_sowing_date,
                 ),
-            ).rejects.toThrow("Cultivation in catalogue does not exist")
+            ).rejects.toThrow("Exception for addCultivation")
         })
 
         it("should add a new cultivation", async () => {
@@ -155,7 +155,7 @@ describe("Cultivation Data Model", () => {
             // Attempt to add the same cultivation again
             await expect(
                 addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date),
-            ).rejects.toThrow("Cultivation already exists")
+            ).rejects.toThrow("Exception for addCultivation")
         })
 
         it("should throw an error when adding a cultivation with an invalid field ID", async () => {
@@ -168,7 +168,7 @@ describe("Cultivation Data Model", () => {
                     invalid_b_id,
                     b_sowing_date,
                 ),
-            ).rejects.toThrow("Field does not exist")
+            ).rejects.toThrow("Exception for addCultivation")
         })
 
         it("should get cultivations by field ID", async () => {
@@ -187,7 +187,7 @@ describe("Cultivation Data Model", () => {
             await removeCultivation(fdm, b_lu)
 
             await expect(getCultivation(fdm, b_lu)).rejects.toThrowError(
-                "Cultivation does not exist",
+                "Exception for getCultivation",
             )
         })
 
@@ -221,7 +221,7 @@ describe("Cultivation Data Model", () => {
                     b_lu_catalogue,
                     new Date(),
                 ),
-            ).rejects.toThrowError("Cultivation does not exist")
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
 
         it("should throw an error when updating with invalid catalogue id", async () => {
@@ -234,7 +234,7 @@ describe("Cultivation Data Model", () => {
                     nonExistentCatalogueId,
                     new Date(),
                 ),
-            ).rejects.toThrowError("Cultivation in catalogue does not exist")
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
 
         it("should get a cultivation by ID", async () => {
@@ -268,7 +268,7 @@ describe("Cultivation Data Model", () => {
             const updatedCultivation = await getCultivation(fdm, b_lu)
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-            expect(updatedCultivation.b_terminate_date).toEqual(
+            expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
         })
@@ -311,7 +311,7 @@ describe("Cultivation Data Model", () => {
             )
 
             const updatedCultivation = await getCultivation(fdm, b_lu)
-            expect(updatedCultivation.b_terminate_date).toEqual(
+            expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
         })
@@ -328,9 +328,7 @@ describe("Cultivation Data Model", () => {
                     newSowingDate,
                     newTerminationDate,
                 ),
-            ).rejects.toThrowError(
-                "Sowing date must be before termination date",
-            )
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
 
         it("should throw an error when updating with invalid termination date - before sowing date", async () => {
@@ -345,9 +343,7 @@ describe("Cultivation Data Model", () => {
                     newSowingDate,
                     newTerminationDate,
                 ),
-            ).rejects.toThrowError(
-                "updateCultivation failed: Sowing date must be before termination date",
-            )
+            ).rejects.toThrowError("Exception for updateCultivation")
         })
     })
 

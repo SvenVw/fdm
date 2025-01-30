@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
 import { addFarm, getFarm, getFarms, updateFarm } from "./farm"
-import type { FdmServerType } from "./fdm-server.d"
 import { createFdmServer } from "./fdm-server"
+import type { FdmServerType } from "./fdm-server.d"
 
 describe("Farm Data Model", () => {
     let fdm: FdmServerType

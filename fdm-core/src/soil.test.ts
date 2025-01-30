@@ -19,8 +19,7 @@ describe("Soil Analysis Functions", () => {
     let test_a_id: string
 
     beforeEach(async () => {
-
-        const host  = inject("host")
+        const host = inject("host")
         const port = inject("port")
         const user = inject("user")
         const password = inject("password")
