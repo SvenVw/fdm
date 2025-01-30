@@ -58,13 +58,28 @@ export function AtlasFields({
         Panels = (
             <div className="fields-panel grid gap-4 w-[350px]">
                 {fieldsAvailableUrl && (
-                    <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                    <>
+                        <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                        <FieldsPanelHover
+                            zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                            layer={"available-fields-fill"}
+                        />
+                    </>
                 )}
                 {selectedFieldsData.features.length > 0 && (
-                    <FieldsPanelSelection fields={selectedFieldsData} />
+                    <>
+                        <FieldsPanelSelection fields={selectedFieldsData} />
+                        <FieldsPanelHover
+                            zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                            layer={"selected-fields-fill"}
+                        />
+                    </>
                 )}
                 {(fieldsAvailableUrl || fieldsSaved) && (
-                    <FieldsPanelHover zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                    <FieldsPanelHover
+                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                        layer={"saved-fields-fill"}
+                    />
                 )}
             </div>
         )

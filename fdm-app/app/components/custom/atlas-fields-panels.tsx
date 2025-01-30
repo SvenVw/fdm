@@ -209,80 +209,36 @@ export function FieldsPanelSelection({
 }
 
 export function FieldsPanelHover({
-    zoomLevelFields,
-}: { zoomLevelFields: number }) {
+    zoomLevelFields, layer,
+}: { zoomLevelFields: number, layer: string }) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
     useEffect(() => {
-        function updatePanel(evt) {
+        function updatePanel(evt: any) {
             if (map) {
                 // Set message about zoom level
                 const zoom = map.getZoom()
                 if (zoom && zoom > zoomLevelFields) {
-                    const featuresSaved = map.queryRenderedFeatures(evt.point, {
-                        layers: ["saved-fields-fill"],
+                    const features = map.queryRenderedFeatures(evt.point, {
+                        layers: [layer],
                     })
-                    const featuresSelected = map.queryRenderedFeatures(
-                        evt.point,
-                        {
-                            layers: ["selected-fields-fill"],
-                        },
-                    )
-                    const featuresAvailable = map.queryRenderedFeatures(
-                        evt.point,
-                        {
-                            layers: ["available-fields-fill"],
-                        },
-                    )
 
-                    if (featuresSaved && featuresSaved.length > 0) {
+                    if (features && features.length > 0) {
                         setPanel(
                             <Card className={cn("w-full")}>
                                 <CardHeader>
                                     <CardTitle>
-                                        {featuresSaved[0].properties.b_name}
+                                        {layer === "saved-fields-fill"
+                                            ? features[0].properties.b_name
+                                            : features[0].properties.b_lu_name}
                                     </CardTitle>
                                     <CardDescription>
-                                        {featuresSaved[0].properties.b_area} ha
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>,
-                        )
-                    } else if (
-                        featuresSelected &&
-                        featuresSelected.length > 0
-                    ) {
-                        setPanel(
-                            <Card className={cn("w-full")}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        {
-                                            featuresSelected[0].properties
-                                                .b_lu_name
-                                        }
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Klik om te verwijderen
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>,
-                        )
-                    } else if (
-                        featuresAvailable &&
-                        featuresAvailable.length > 0
-                    ) {
-                        setPanel(
-                            <Card className={cn("w-full")}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        {
-                                            featuresAvailable[0].properties
-                                                .b_lu_name
-                                        }
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Klik om te selecteren
+                                        {layer === "saved-fields-fill"
+                                            ? `${features[0].properties.b_area} ha`
+                                            : layer === 'available-fields-fill' ?
+                                                "Klik om te selecteren"
+                                                : "Klik om te verwijderen"}
                                     </CardDescription>
                                 </CardHeader>
                             </Card>,
@@ -299,16 +255,16 @@ export function FieldsPanelHover({
         })
 
         if (map) {
-            map.on("mousemove", throttledUpdatePanel)
-            map.once("click", updatePanel)
+            map.on("mousemove", (evt) => throttledUpdatePanel(evt))
+            map.on("click", updatePanel)
             map.on("zoom", throttledUpdatePanel)
-            map.once("load", updatePanel)
+            map.on("load", updatePanel)
             return () => {
                 map.off("mousemove", throttledUpdatePanel)
                 map.off("zoom", throttledUpdatePanel)
             }
         }
-    }, [map, zoomLevelFields])
+    }, [map, zoomLevelFields, layer])
 
     return panel
 }
