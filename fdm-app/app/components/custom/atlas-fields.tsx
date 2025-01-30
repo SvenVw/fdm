@@ -44,7 +44,7 @@ export function AtlasFields({
         }
     }, [fieldsSelected])
 
-    let Controls = <></>
+    let Controls = null
     let Panels = null
     if (interactive === true) {
         // Set controls
@@ -55,17 +55,63 @@ export function AtlasFields({
             </div>
         )
 
-        // Set panels
         Panels = (
             <div className="fields-panel grid gap-4 w-[350px]">
-                <FieldsPanelSelection
-                    fields={selectedFieldsData}
-                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                />
-                <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
-                <FieldsPanelHover zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                {fieldsAvailableUrl && (
+                    <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                )}
+                {selectedFieldsData.features.length > 0 && (
+                    <FieldsPanelSelection fields={selectedFieldsData} />
+                )}
+                {(fieldsAvailableUrl || fieldsSaved) && (
+                    <FieldsPanelHover zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+                )}
             </div>
         )
+    }
+
+    // Set layers
+    const interactiveLayerIds = []
+    let FieldsSelectedLayer = null
+    if (fieldsSelected) {
+        FieldsSelectedLayer = (
+            <FieldsSource
+                id="selectedFields"
+                fieldsData={selectedFieldsData}
+                setFieldsData={setSelectedFieldsData}
+            >
+                <Layer {...selectedFieldsStyle} />
+            </FieldsSource>
+        )
+        interactiveLayerIds.push("selected-fields-fill")
+    }
+    let FieldsAvailableLayer = null
+    if (fieldsAvailableUrl) {
+        FieldsAvailableLayer = (
+            <AvailableFieldsSource
+                url={fieldsAvailableUrl}
+                zoomLevelFields={ZOOM_LEVEL_FIELDS}
+            >
+                <Layer {...availableFieldsFillStyle} />
+                {/* <Layer {...availableFieldsLineStyle} /> */}
+            </AvailableFieldsSource>
+        )
+        interactiveLayerIds.push("available-fields-fill")
+        // Attach zoom to panels
+        Panels = <FieldsPanelZoom zoomLevelFields={ZOOM_LEVEL_FIELDS} />
+    }
+    let FieldsSavedLayer = null
+    if (fieldsSaved) {
+        FieldsSavedLayer = (
+            <FieldsSource
+                id="savedFields"
+                fieldsData={fieldsSaved}
+                setFieldsData={null}
+            >
+                <Layer {...savedFieldsStyle} />
+            </FieldsSource>
+        )
+        interactiveLayerIds.push("saved-fields-fill")
     }
 
     // Set viewState
@@ -74,8 +120,7 @@ export function AtlasFields({
     if (fieldsSaved) {
         try {
             bounds = geojsonExtent(fieldsSaved)
-        }
-        catch (error) {
+        } catch (error) {
             console.error("Failed to calculate bounds:", error)
             bounds = initialBounds
         }
@@ -101,34 +146,12 @@ export function AtlasFields({
                 interactive={interactive}
                 mapStyle={mapStyle}
                 mapboxAccessToken={mapboxToken}
-                interactiveLayerIds={[
-                    "available-fields-fill",
-                    "selected-fields-fill",
-                    "saved-fields-fill",
-                ]}
+                interactiveLayerIds={interactiveLayerIds}
             >
                 {Controls}
-                <FieldsSource
-                    id="selectedFields"
-                    fieldsData={selectedFieldsData}
-                    setFieldsData={setSelectedFieldsData}
-                >
-                    <Layer {...selectedFieldsStyle} />
-                </FieldsSource>
-                <AvailableFieldsSource
-                    url={fieldsAvailableUrl}
-                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                >
-                    <Layer {...availableFieldsFillStyle} />
-                    {/* <Layer {...availableFieldsLineStyle} /> */}
-                </AvailableFieldsSource>
-                <FieldsSource
-                    id="savedFields"
-                    fieldsData={fieldsSaved}
-                    setFieldsData={null}
-                >
-                    <Layer {...savedFieldsStyle} />
-                </FieldsSource>
+                {FieldsSelectedLayer}
+                {FieldsAvailableLayer}
+                {FieldsSavedLayer}
                 {Panels}
             </MapGL>
         </>
@@ -204,6 +227,6 @@ interface MapFieldsProps {
     mapboxToken: string
     mapStyle: "mapbox://styles/mapbox/satellite-streets-v12"
     fieldsSelected: FeatureCollection | null
-    fieldsAvailableUrl: fieldsAvailableUrlType,
+    fieldsAvailableUrl: fieldsAvailableUrlType
     fieldsSaved: FeatureCollection | null
 }
