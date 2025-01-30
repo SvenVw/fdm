@@ -27,9 +27,7 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate": "npx drizzle-kit generate",

@@ -1,8 +1,8 @@
+import type { TestProject } from "vitest/node"
 // globalSetup.ts
 import type { FdmServerType } from "./fdm-server"
 import { migrateFdmServer } from "./fdm-server" // Adjust path
 import { createFdmServer } from "./fdm-server"
-import type { TestProject } from "vitest/node"
 
 let fdm: FdmServerType
 
@@ -48,7 +48,6 @@ export default async function setup(project: TestProject) {
     project.provide("user", user)
     project.provide("password", password)
     project.provide("database", database)
-
 }
 
 declare module "vitest" {
@@ -57,6 +56,6 @@ declare module "vitest" {
         port: number
         user: string
         password: string
-        database: string        
+        database: string
     }
 }

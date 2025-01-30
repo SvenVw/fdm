@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, inject } from "vitest"
+import { beforeEach, describe, expect, inject, it } from "vitest"
 import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
@@ -8,13 +8,12 @@ describe("Farm Data Model", () => {
     let fdm: FdmServerType
 
     beforeEach(async () => {
-        const host  = inject("host")
+        const host = inject("host")
         const port = inject("port")
         const user = inject("user")
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
-
     })
 
     describe("Field CRUD", () => {
