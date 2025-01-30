@@ -9,7 +9,7 @@ export function handleError(err: unknown, base: string, context?: Jsonable) {
     })
 }
 
-function ensureError(value: unknown): Error {
+export function ensureError(value: unknown): Error {
     if (value instanceof Error) return value
 
     let stringified = "[Unable to stringify the thrown value]"
@@ -23,7 +23,7 @@ function ensureError(value: unknown): Error {
     return error
 }
 
-class BaseError extends Error {
+export class BaseError extends Error {
     public readonly context?: Jsonable
 
     constructor(
