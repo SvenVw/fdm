@@ -36,7 +36,7 @@ export async function addFarm(
             }
             await tx.insert(schema.farms).values(farmData)
         } catch (err) {
-            handleError(err, "Exception for addField", {
+            handleError(err, "Exception for addFarm", {
                 b_name_farm,
                 b_businessid_farm,
                 b_address_farm,
