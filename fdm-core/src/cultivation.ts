@@ -43,26 +43,32 @@ export async function addCultivationToCatalogue(
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3_name"]
     },
 ): Promise<void> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        // Check for existing cultivation
-        const existing = await tx
-            .select()
-            .from(schema.cultivationsCatalogue)
-            .where(
-                eq(
-                    schema.cultivationsCatalogue.b_lu_catalogue,
-                    properties.b_lu_catalogue,
-                ),
-            )
-            .limit(1)
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Check for existing cultivation
+            const existing = await tx
+                .select()
+                .from(schema.cultivationsCatalogue)
+                .where(
+                    eq(
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                        properties.b_lu_catalogue,
+                    ),
+                )
+                .limit(1)
 
-        if (existing.length > 0) {
-            throw new Error("Cultivation already exists in catalogue")
-        }
+            if (existing.length > 0) {
+                throw new Error("Cultivation already exists in catalogue")
+            }
 
-        // Insert the cultivation in the db
-        await tx.insert(schema.cultivationsCatalogue).values(properties)
-    })
+            // Insert the cultivation in the db
+            await tx.insert(schema.cultivationsCatalogue).values(properties)
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for addCultivationToCatalogue", {
+            properties,
+        })
+    }
 }
 
 /**
@@ -84,11 +90,11 @@ export async function addCultivation(
     b_sowing_date: schema.fieldSowingTypeInsert["b_sowing_date"],
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        // Generate an ID for the cultivation
-        const b_lu = createId()
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Generate an ID for the cultivation
+            const b_lu = createId()
 
-        try {
             // Validate b_sowing_date is a Date object
             if (!(b_sowing_date instanceof Date)) {
                 throw new Error("Invalid sowing date: Must be a Date object")
@@ -180,17 +186,16 @@ export async function addCultivation(
                 b_lu: b_lu,
                 b_terminating_date: b_terminating_date,
             })
-        } catch (err) {
-            handleError(err, "Exception for addCultivation", {
-                b_lu_catalogue,
-                b_id,
-                b_sowing_date,
-                b_terminating_date,
-            })
-        }
-
-        return b_lu
-    })
+            return b_lu
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for addCultivation", {
+            b_lu_catalogue,
+            b_id,
+            b_sowing_date,
+            b_terminating_date,
+        })
+    }
 }
 
 /**
@@ -205,46 +210,53 @@ export async function getCultivation(
     fdm: FdmType,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
 ): Promise<getCultivationType> {
-    // Get properties of the requested cultivation
-    const cultivation = await fdm
-        .select({
-            b_lu: schema.cultivations.b_lu,
-            b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
-            b_lu_source: schema.cultivationsCatalogue.b_lu_source,
-            b_lu_name: schema.cultivationsCatalogue.b_lu_name,
-            b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
-            b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
-            b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
-            b_sowing_date: schema.fieldSowing.b_sowing_date,
-            b_terminating_date:
-                schema.cultivationTerminating.b_terminating_date,
-            b_id: schema.fieldSowing.b_id,
-        })
-        .from(schema.cultivations)
-        .leftJoin(
-            schema.fieldSowing,
-            eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
-        )
-        .leftJoin(
-            schema.cultivationTerminating,
-            eq(schema.cultivationTerminating.b_lu, schema.cultivations.b_lu),
-        )
-        .leftJoin(
-            schema.cultivationsCatalogue,
-            eq(
-                schema.cultivations.b_lu_catalogue,
-                schema.cultivationsCatalogue.b_lu_catalogue,
-            ),
-        )
-        .where(eq(schema.cultivations.b_lu, b_lu))
-        .limit(1)
+    try {
+        // Get properties of the requested cultivation
+        const cultivation = await fdm
+            .select({
+                b_lu: schema.cultivations.b_lu,
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                b_lu_source: schema.cultivationsCatalogue.b_lu_source,
+                b_lu_name: schema.cultivationsCatalogue.b_lu_name,
+                b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
+                b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
+                b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
+                b_sowing_date: schema.fieldSowing.b_sowing_date,
+                b_terminating_date:
+                    schema.cultivationTerminating.b_terminating_date,
+                b_id: schema.fieldSowing.b_id,
+            })
+            .from(schema.cultivations)
+            .leftJoin(
+                schema.fieldSowing,
+                eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
+            )
+            .leftJoin(
+                schema.cultivationTerminating,
+                eq(
+                    schema.cultivationTerminating.b_lu,
+                    schema.cultivations.b_lu,
+                ),
+            )
+            .leftJoin(
+                schema.cultivationsCatalogue,
+                eq(
+                    schema.cultivations.b_lu_catalogue,
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                ),
+            )
+            .where(eq(schema.cultivations.b_lu, b_lu))
+            .limit(1)
 
-    // If no cultivation is found return an error
-    if (cultivation.length === 0) {
-        throw new Error("Cultivation does not exist")
+        // If no cultivation is found return an error
+        if (cultivation.length === 0) {
+            throw new Error("Cultivation does not exist")
+        }
+
+        return cultivation[0]
+    } catch (err) {
+        throw handleError(err, "Exception for getCultivation", { b_lu })
     }
-
-    return cultivation[0]
 }
 
 /**
@@ -259,43 +271,50 @@ export async function getCultivations(
     fdm: FdmType,
     b_id: schema.fieldSowingTypeSelect["b_id"],
 ): Promise<getCultivationType[]> {
-    const cultivations = await fdm
-        .select({
-            b_lu: schema.cultivations.b_lu,
-            b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
-            b_lu_source: schema.cultivationsCatalogue.b_lu_source,
-            b_lu_name: schema.cultivationsCatalogue.b_lu_name,
-            b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
-            b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
-            b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
-            b_sowing_date: schema.fieldSowing.b_sowing_date,
-            b_terminating_date:
-                schema.cultivationTerminating.b_terminating_date,
-            b_id: schema.fieldSowing.b_id,
-        })
-        .from(schema.cultivations)
-        .leftJoin(
-            schema.fieldSowing,
-            eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
-        )
-        .leftJoin(
-            schema.cultivationTerminating,
-            eq(schema.cultivationTerminating.b_lu, schema.cultivations.b_lu),
-        )
-        .leftJoin(
-            schema.cultivationsCatalogue,
-            eq(
-                schema.cultivations.b_lu_catalogue,
-                schema.cultivationsCatalogue.b_lu_catalogue,
-            ),
-        )
-        .where(eq(schema.fieldSowing.b_id, b_id))
-        .orderBy(
-            desc(schema.fieldSowing.b_sowing_date),
-            asc(schema.cultivationsCatalogue.b_lu_name),
-        )
+    try {
+        const cultivations = await fdm
+            .select({
+                b_lu: schema.cultivations.b_lu,
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                b_lu_source: schema.cultivationsCatalogue.b_lu_source,
+                b_lu_name: schema.cultivationsCatalogue.b_lu_name,
+                b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
+                b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
+                b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
+                b_sowing_date: schema.fieldSowing.b_sowing_date,
+                b_terminating_date:
+                    schema.cultivationTerminating.b_terminating_date,
+                b_id: schema.fieldSowing.b_id,
+            })
+            .from(schema.cultivations)
+            .leftJoin(
+                schema.fieldSowing,
+                eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
+            )
+            .leftJoin(
+                schema.cultivationTerminating,
+                eq(
+                    schema.cultivationTerminating.b_lu,
+                    schema.cultivations.b_lu,
+                ),
+            )
+            .leftJoin(
+                schema.cultivationsCatalogue,
+                eq(
+                    schema.cultivations.b_lu_catalogue,
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                ),
+            )
+            .where(eq(schema.fieldSowing.b_id, b_id))
+            .orderBy(
+                desc(schema.fieldSowing.b_sowing_date),
+                asc(schema.cultivationsCatalogue.b_lu_name),
+            )
 
-    return cultivations
+        return cultivations
+    } catch (err) {
+        throw handleError(err, "Exception for getCultivations", { b_id })
+    }
 }
 
 /**
@@ -345,11 +364,11 @@ export async function getCultivationPlan(
     fdm: FdmType,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<cultivationPlanType[]> {
-    if (!b_id_farm) {
-        throw new Error("Farm ID is required")
-    }
-
     try {
+        if (!b_id_farm) {
+            throw new Error("Farm ID is required")
+        }
+
         const cultivations = await fdm
             .select({
                 b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
@@ -475,7 +494,7 @@ export async function getCultivationPlan(
 
         return cultivationPlan
     } catch (err) {
-        handleError(err, "Exception for getCultivationPlan", {
+        throw handleError(err, "Exception for getCultivationPlan", {
             b_id_farm,
         })
     }
@@ -542,24 +561,31 @@ export async function updateCultivation(
     b_sowing_date?: schema.fieldSowingTypeInsert["b_sowing_date"],
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<void> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        try {
-            // Validate if cultivation exists
-            const cultivation = await tx
+    try {
+        const updated = new Date()
+
+        if (
+            b_sowing_date &&
+            b_terminating_date &&
+            b_terminating_date.getTime() <= b_sowing_date.getTime()
+        ) {
+            throw new Error("Terminate date must be after sowing date")
+        }
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Check if cultivation exists *before* attempting updates
+            const existingCultivation = await tx
                 .select()
                 .from(schema.cultivations)
                 .where(eq(schema.cultivations.b_lu, b_lu))
                 .limit(1)
 
-            if (cultivation.length === 0) {
+            if (existingCultivation.length === 0) {
                 throw new Error("Cultivation does not exist")
             }
 
-            const updated = new Date()
-
             if (b_lu_catalogue) {
-                // Validate if cultivation exists in catalogue
-                const cultivationCatalogue = await tx
+                //Validate if the cultivation exists in catalogue
+                const cultivation = await tx
                     .select()
                     .from(schema.cultivationsCatalogue)
                     .where(
@@ -569,34 +595,20 @@ export async function updateCultivation(
                         ),
                     )
                     .limit(1)
-                if (cultivationCatalogue.length === 0) {
-                    throw new Error("Cultivation in catalogue does not exist")
+
+                if (cultivation.length === 0) {
+                    throw new Error("Cultivation does not exist in catalogue")
                 }
 
                 await tx
                     .update(schema.cultivations)
-                    .set({ updated: updated, b_lu_catalogue: b_lu_catalogue })
+                    .set({ b_lu_catalogue: b_lu_catalogue, updated: updated })
                     .where(eq(schema.cultivations.b_lu, b_lu))
             }
 
             if (b_sowing_date) {
-                // Validate b_sowing_date is a Date object
-                if (!(b_sowing_date instanceof Date)) {
-                    throw new Error(
-                        "Invalid sowing date: Must be a Date object",
-                    )
-                }
-
                 // Validate if sowing date is before termination date
-                if (b_terminating_date) {
-                    if (
-                        b_sowing_date.getTime() >= b_terminating_date.getTime()
-                    ) {
-                        throw new Error(
-                            "Sowing date must be before termination date",
-                        )
-                    }
-                } else {
+                if (!b_terminating_date) {
                     const result = await tx
                         .select({
                             b_terminating_date:
@@ -634,23 +646,8 @@ export async function updateCultivation(
             }
 
             if (b_terminating_date) {
-                // Validate if terminate date is a Date object
-                if (!(b_terminating_date instanceof Date)) {
-                    throw new Error(
-                        "Invalid terminate date: Must be a Date object",
-                    )
-                }
-
-                // Validate if termiante date is after sowing date
-                if (b_sowing_date) {
-                    if (
-                        b_sowing_date.getTime() >= b_terminating_date.getTime()
-                    ) {
-                        throw new Error(
-                            "Terminate date must be after sowing date",
-                        )
-                    }
-                } else {
+                // Validate if terminatinge date is after sowing date
+                if (!b_sowing_date) {
                     const result = await tx
                         .select({
                             b_sowing_date: schema.fieldSowing.b_sowing_date,
@@ -684,13 +681,13 @@ export async function updateCultivation(
                     })
                     .where(eq(schema.cultivationTerminating.b_lu, b_lu))
             }
-        } catch (err) {
-            handleError(err, "Exception for updateCultivation", {
-                b_lu,
-                b_lu_catalogue,
-                b_sowing_date,
-                b_terminating_date,
-            })
-        }
-    })
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for updateCultivation", {
+            b_lu,
+            b_lu_catalogue,
+            b_sowing_date,
+            b_terminating_date,
+        })
+    }
 }

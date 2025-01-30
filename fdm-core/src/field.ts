@@ -29,10 +29,11 @@ export async function addField(
     b_acquiring_method: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        // Generate an ID for the field
-        const b_id = createId()
-        try {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Generate an ID for the field
+            const b_id = createId()
+
             // Insert field
             const fieldData = {
                 b_id: b_id,
@@ -66,19 +67,20 @@ export async function addField(
                 b_discarding_date,
             }
             await tx.insert(schema.fieldDiscarding).values(fieldDiscardingData)
-        } catch (err) {
-            handleError(err, "Exception for addField", {
-                b_id_farm,
-                b_name,
-                b_id_source,
-                b_geometry,
-                b_acquiring_date,
-                b_acquiring_method,
-                b_discarding_date,
-            })
-        }
-        return b_id
-    })
+
+            return b_id
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for addField", {
+            b_id_farm,
+            b_name,
+            b_id_source,
+            b_geometry,
+            b_acquiring_date,
+            b_acquiring_method,
+            b_discarding_date,
+        })
+    }
 }
 
 /**
@@ -92,34 +94,38 @@ export async function getField(
     fdm: FdmType,
     b_id: schema.fieldsTypeSelect["b_id"],
 ): Promise<getFieldType> {
-    // Get properties of the requested field
-    const field = await fdm
-        .select({
-            b_id: schema.fields.b_id,
-            b_name: schema.fields.b_name,
-            b_id_farm: schema.fieldAcquiring.b_id_farm,
-            b_id_source: schema.fields.b_id_source,
-            b_geometry: schema.fields.b_geometry,
-            b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
-            b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
-            b_discarding_date: schema.fieldDiscarding.b_discarding_date,
-            b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
-            created: schema.fields.created,
-            updated: schema.fields.updated,
-        })
-        .from(schema.fields)
-        .innerJoin(
-            schema.fieldAcquiring,
-            eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
-        )
-        .leftJoin(
-            schema.fieldDiscarding,
-            eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
-        )
-        .where(eq(schema.fields.b_id, b_id))
-        .limit(1)
+    try {
+        // Get properties of the requested field
+        const field = await fdm
+            .select({
+                b_id: schema.fields.b_id,
+                b_name: schema.fields.b_name,
+                b_id_farm: schema.fieldAcquiring.b_id_farm,
+                b_id_source: schema.fields.b_id_source,
+                b_geometry: schema.fields.b_geometry,
+                b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
+                b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+                b_discarding_date: schema.fieldDiscarding.b_discarding_date,
+                b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
+                created: schema.fields.created,
+                updated: schema.fields.updated,
+            })
+            .from(schema.fields)
+            .innerJoin(
+                schema.fieldAcquiring,
+                eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+            )
+            .leftJoin(
+                schema.fieldDiscarding,
+                eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
+            )
+            .where(eq(schema.fields.b_id, b_id))
+            .limit(1)
 
-    return field[0]
+        return field[0]
+    } catch (err) {
+        throw handleError(err, "Exception for getField", { b_id })
+    }
 }
 
 /**
@@ -133,34 +139,38 @@ export async function getFields(
     fdm: FdmType,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<getFieldType[]> {
-    // Get properties of the requested field
-    const fields = await fdm
-        .select({
-            b_id: schema.fields.b_id,
-            b_name: schema.fields.b_name,
-            b_id_farm: schema.fieldAcquiring.b_id_farm,
-            b_id_source: schema.fields.b_id_source,
-            b_geometry: schema.fields.b_geometry,
-            b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
-            b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
-            b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
-            b_discarding_date: schema.fieldDiscarding.b_discarding_date,
-            created: schema.fields.created,
-            updated: schema.fields.updated,
-        })
-        .from(schema.fields)
-        .innerJoin(
-            schema.fieldAcquiring,
-            eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
-        )
-        .leftJoin(
-            schema.fieldDiscarding,
-            eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
-        )
-        .where(eq(schema.fieldAcquiring.b_id_farm, b_id_farm))
-        .orderBy(asc(schema.fields.b_name))
+    try {
+        // Get properties of the requested field
+        const fields = await fdm
+            .select({
+                b_id: schema.fields.b_id,
+                b_name: schema.fields.b_name,
+                b_id_farm: schema.fieldAcquiring.b_id_farm,
+                b_id_source: schema.fields.b_id_source,
+                b_geometry: schema.fields.b_geometry,
+                b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
+                b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+                b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
+                b_discarding_date: schema.fieldDiscarding.b_discarding_date,
+                created: schema.fields.created,
+                updated: schema.fields.updated,
+            })
+            .from(schema.fields)
+            .innerJoin(
+                schema.fieldAcquiring,
+                eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+            )
+            .leftJoin(
+                schema.fieldDiscarding,
+                eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
+            )
+            .where(eq(schema.fieldAcquiring.b_id_farm, b_id_farm))
+            .orderBy(asc(schema.fields.b_name))
 
-    return fields
+        return fields
+    } catch (err) {
+        throw handleError(err, "Exception for getFields", { b_id_farm })
+    }
 }
 
 /**
@@ -186,8 +196,8 @@ export async function updateField(
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<getFieldType> {
-    const updatedField = await fdm.transaction(async (tx: FdmType) => {
-        try {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
             const updated = new Date()
 
             const setFields: Partial<schema.fieldsTypeInsert> = {}
@@ -271,18 +281,16 @@ export async function updateField(
             }
 
             return field
-        } catch (err) {
-            handleError(err, "Exception for updateField", {
-                b_id,
-                b_name,
-                b_id_source,
-                b_geometry,
-                b_acquiring_date,
-                b_acquiring_method,
-                b_discarding_date,
-            })
-        }
-    })
-
-    return updatedField
+        })
+    } catch (err) {
+        handleError(err, "Exception for updateField", {
+            b_id,
+            b_name,
+            b_id_source,
+            b_geometry,
+            b_acquiring_date,
+            b_acquiring_method,
+            b_discarding_date,
+        })
+    }
 }

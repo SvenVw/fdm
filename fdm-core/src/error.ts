@@ -3,7 +3,7 @@ import type { Jsonable } from "./error.d"
 export function handleError(err: unknown, base: string, context?: Jsonable) {
     const error = ensureError(err)
 
-    throw new BaseError(base, {
+    return new BaseError(base, {
         cause: error,
         context: context,
     })

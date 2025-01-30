@@ -30,10 +30,11 @@ export async function addSoilAnalysis(
     // b_sampling_geometry: schema.soilSamplingTypeInsert['b_sampling_geometry'],
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<schema.soilAnalysisTypeSelect["a_id"]> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        const a_id = createId()
-        const b_id_sampling = createId()
-        try {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            const a_id = createId()
+            const b_id_sampling = createId()
+
             // Insert soil analysis data
             await tx.insert(schema.soilAnalysis).values({
                 a_id: a_id,
@@ -51,18 +52,19 @@ export async function addSoilAnalysis(
                 b_sampling_date: b_sampling_date,
                 // b_sampling_geometry: b_sampling_geometry,
             })
-        } catch (err) {
-            handleError(err, "Exception for addSoilAnalysis", {
-                a_date,
-                a_source,
-                b_id,
-                b_depth,
-                b_sampling_date,
-                // b_sampling_geometry
-            })
-        }
-        return a_id
-    })
+
+            return a_id
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for addSoilAnalysis", {
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date,
+            // b_sampling_geometry
+        })
+    }
 }
 
 /**
@@ -78,9 +80,10 @@ export async function updateSoilAnalysis(
     a_id: schema.soilAnalysisTypeSelect["a_id"],
     soilAnalysisData: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<void> {
-    const updated = new Date()
-    return await fdm.transaction(async (tx: FdmType) => {
-        try {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            const updated = new Date()
+
             await tx
                 .update(schema.soilAnalysis)
                 .set({ updated: updated, ...soilAnalysisData })
@@ -90,13 +93,13 @@ export async function updateSoilAnalysis(
                 .update(schema.soilSampling)
                 .set({ updated: updated })
                 .where(eq(schema.soilSampling.a_id, a_id))
-        } catch (err) {
-            handleError(err, "Exception for updateSoilAnalysis", {
-                a_id,
-                ...soilAnalysisData,
-            })
-        }
-    })
+        })
+    } catch (err) {
+        handleError(err, "Exception for updateSoilAnalysis", {
+            a_id,
+            ...soilAnalysisData,
+        })
+    }
 }
 
 /**
@@ -110,8 +113,8 @@ export async function removeSoilAnalysis(
     fdm: FdmType,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
 ): Promise<void> {
-    await fdm.transaction(async (tx: FdmType) => {
-        try {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
             await tx
                 .delete(schema.soilSampling)
                 .where(eq(schema.soilSampling.a_id, a_id))
@@ -119,10 +122,10 @@ export async function removeSoilAnalysis(
             await tx
                 .delete(schema.soilAnalysis)
                 .where(eq(schema.soilAnalysis.a_id, a_id))
-        } catch (err) {
-            handleError(err, "Exception for removeSoilAnalysis", { a_id })
-        }
-    })
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for removeSoilAnalysis", { a_id })
+    }
 }
 
 /**
@@ -136,31 +139,35 @@ export async function getSoilAnalysis(
     fdm: FdmType,
     b_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType> {
-    const soilAnalysis = await fdm
-        .select({
-            a_id: schema.soilAnalysis.a_id,
-            a_date: schema.soilAnalysis.a_date,
-            a_source: schema.soilAnalysis.a_source,
-            a_p_al: schema.soilAnalysis.a_p_al,
-            a_p_cc: schema.soilAnalysis.a_p_cc,
-            a_som_loi: schema.soilAnalysis.a_som_loi,
-            b_gwl_class: schema.soilAnalysis.b_gwl_class,
-            b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
-            b_id_sampling: schema.soilSampling.b_id_sampling,
-            b_depth: schema.soilSampling.b_depth,
-            b_sampling_date: schema.soilSampling.b_sampling_date,
-            // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
-        })
-        .from(schema.soilAnalysis)
-        .innerJoin(
-            schema.soilSampling,
-            eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
-        )
-        .where(eq(schema.soilSampling.b_id, b_id))
-        .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
-        .limit(1)
+    try {
+        const soilAnalysis = await fdm
+            .select({
+                a_id: schema.soilAnalysis.a_id,
+                a_date: schema.soilAnalysis.a_date,
+                a_source: schema.soilAnalysis.a_source,
+                a_p_al: schema.soilAnalysis.a_p_al,
+                a_p_cc: schema.soilAnalysis.a_p_cc,
+                a_som_loi: schema.soilAnalysis.a_som_loi,
+                b_gwl_class: schema.soilAnalysis.b_gwl_class,
+                b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
+                b_id_sampling: schema.soilSampling.b_id_sampling,
+                b_depth: schema.soilSampling.b_depth,
+                b_sampling_date: schema.soilSampling.b_sampling_date,
+                // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
+            })
+            .from(schema.soilAnalysis)
+            .innerJoin(
+                schema.soilSampling,
+                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+            )
+            .where(eq(schema.soilSampling.b_id, b_id))
+            .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
+            .limit(1)
 
-    return soilAnalysis[0] || null
+        return soilAnalysis[0] || null
+    } catch (err) {
+        throw handleError(err, "Exception for getSoilAnalysis", { b_id })
+    }
 }
 
 /**
@@ -174,28 +181,32 @@ export async function getSoilAnalyses(
     fdm: FdmType,
     b_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType[]> {
-    const soilAnalyses = await fdm
-        .select({
-            a_id: schema.soilAnalysis.a_id,
-            a_date: schema.soilAnalysis.a_date,
-            a_source: schema.soilAnalysis.a_source,
-            a_p_al: schema.soilAnalysis.a_p_al,
-            a_p_cc: schema.soilAnalysis.a_p_cc,
-            a_som_loi: schema.soilAnalysis.a_som_loi,
-            b_gwl_class: schema.soilAnalysis.b_gwl_class,
-            b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
-            b_id_sampling: schema.soilSampling.b_id_sampling,
-            b_depth: schema.soilSampling.b_depth,
-            b_sampling_date: schema.soilSampling.b_sampling_date,
-            // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
-        })
-        .from(schema.soilAnalysis)
-        .innerJoin(
-            schema.soilSampling,
-            eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
-        )
-        .where(eq(schema.soilSampling.b_id, b_id))
-        .orderBy(desc(schema.soilSampling.b_sampling_date))
+    try {
+        const soilAnalyses = await fdm
+            .select({
+                a_id: schema.soilAnalysis.a_id,
+                a_date: schema.soilAnalysis.a_date,
+                a_source: schema.soilAnalysis.a_source,
+                a_p_al: schema.soilAnalysis.a_p_al,
+                a_p_cc: schema.soilAnalysis.a_p_cc,
+                a_som_loi: schema.soilAnalysis.a_som_loi,
+                b_gwl_class: schema.soilAnalysis.b_gwl_class,
+                b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
+                b_id_sampling: schema.soilSampling.b_id_sampling,
+                b_depth: schema.soilSampling.b_depth,
+                b_sampling_date: schema.soilSampling.b_sampling_date,
+                // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
+            })
+            .from(schema.soilAnalysis)
+            .innerJoin(
+                schema.soilSampling,
+                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+            )
+            .where(eq(schema.soilSampling.b_id, b_id))
+            .orderBy(desc(schema.soilSampling.b_sampling_date))
 
-    return soilAnalyses
+        return soilAnalyses
+    } catch (err) {
+        throw handleError(err, "Exception for getSoilAnalyses", { b_id })
+    }
 }

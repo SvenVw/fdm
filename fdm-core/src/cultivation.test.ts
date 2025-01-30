@@ -187,7 +187,7 @@ describe("Cultivation Data Model", () => {
             await removeCultivation(fdm, b_lu)
 
             await expect(getCultivation(fdm, b_lu)).rejects.toThrowError(
-                "Cultivation does not exist",
+                "Exception for getCultivation",
             )
         })
 
