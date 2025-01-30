@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.11.3
+
+### Patch Changes
+
+- bc52f62: Rename `b_terminate_date` to `b_terminating_date` to be consistent with other parameter names
+- 9b53632: Add function to standardize error handling across functions
+
 ## 0.11.2
 
 ### Patch Changes
