@@ -2,7 +2,6 @@ import { Layer, Map as MapGL } from "react-map-gl"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
-import wkx from "wkx"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import type { FeatureCollection } from "geojson"
 import {
@@ -13,6 +12,7 @@ import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-source
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
 import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
+import wkx from "wkx"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -33,6 +33,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_id: field.b_id,
                 b_name: field.b_name,
                 b_area: Math.round(field.b_area * 10) / 10,
+                b_lu_name: field.b_lu_name,
+                b_id_source: field.b_id_source,
             },
             geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
         }
