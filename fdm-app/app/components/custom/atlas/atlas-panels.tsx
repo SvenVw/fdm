@@ -7,8 +7,8 @@ import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl"
 
 export function FieldsPanelHover({
-    zoomLevelFields, layer,
-}: { zoomLevelFields: number, layer: string }) {
+    zoomLevelFields, layer, layerExclude
+}: { zoomLevelFields: number, layer: string, layerExclude?: string }) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
     useEffect(() => {
@@ -20,6 +20,16 @@ export function FieldsPanelHover({
                     const features = map.queryRenderedFeatures(evt.point, {
                         layers: [layer],
                     })
+
+                    if (layerExclude) {
+                        const featuresExclude = map.queryRenderedFeatures(evt.point, {
+                            layers: [layerExclude],
+                        })
+                        if (featuresExclude && featuresExclude.length > 0) {
+                            setPanel(null)
+                            return
+                        }
+                    }
 
                     if (features && features.length > 0 && features[0].properties) {
                         setPanel(

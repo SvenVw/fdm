@@ -105,7 +105,6 @@ export default function Index() {
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
 
-
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(
         generateFeatureClass(),
@@ -187,13 +186,23 @@ export default function Index() {
                                     id={fieldsSelectedId}
                                     availableLayerId={fieldsAvailableId}
                                     fieldsData={selectedFieldsData}
-                                    setFieldsData={setSelectedFieldsData}>
+                                    setFieldsData={setSelectedFieldsData}
+                                >
                                     <Layer {...fieldsSelectedStyle} />
                                 </FieldsSourceSelected>
-                                
+
                                 <div className="fields-panel grid gap-4 w-[350px]">
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                    />
+                                    <FieldsPanelHover
+                                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                        layer={fieldsAvailableId}
+                                        layerExclude={fieldsSelectedId}
+                                    />
+                                      <FieldsPanelHover
+                                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                        layer={fieldsSelectedId}
                                     />
                                 </div>
                             </MapGL>
