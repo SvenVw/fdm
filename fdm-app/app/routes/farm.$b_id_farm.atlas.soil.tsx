@@ -1,4 +1,5 @@
 import { AtlasFields } from "@/components/custom/atlas-fields"
+import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
 import { Button } from "@/components/ui/button"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
@@ -41,8 +42,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get the Mapbox token
-    const mapboxToken = String(process.env.MAPBOX_TOKEN)
-
+    const mapboxToken = getMapboxToken()
     // Return user information from loader
     return {
         mapboxToken: mapboxToken,
