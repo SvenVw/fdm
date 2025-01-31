@@ -1,4 +1,5 @@
 import type { FeatureCollection } from "geojson"
+import type { FeatureCollectionFdm, FeatureFdm } from "./atlas.d"
 
 export function generateFeatureClass(): FeatureCollection {
     return {
@@ -7,7 +8,23 @@ export function generateFeatureClass(): FeatureCollection {
     }
 }
 
-export function handleFieldClick(feature, setFieldsData) {
+type SetFieldsData = (
+    updater: (prevData: FeatureCollectionFdm) => FeatureCollectionFdm,
+) => void
+
+function isFeatureEqual(f1: FeatureFdm, f2: FeatureFdm): boolean {
+    return f1.properties.b_id_source === f2.properties.b_id_source
+}
+
+export function handleFieldClick(
+    feature: FeatureFdm,
+    setFieldsData: SetFieldsData,
+): void {
+    if (!feature?.properties?.b_id_source) {
+        console.error("Invalid feature data:", feature)
+        return
+    }
+
     const fieldData = {
         type: feature.type,
         geometry: feature.geometry,
@@ -15,18 +32,15 @@ export function handleFieldClick(feature, setFieldsData) {
     }
 
     setFieldsData((prevFieldsData) => {
-        const isAlreadySelected = prevFieldsData.features.some(
-            (f) =>
-                f.properties.b_id_source === fieldData.properties.b_id_source,
+        const isAlreadySelected = prevFieldsData.features.some((f) =>
+            isFeatureEqual(f, fieldData),
         )
 
         if (isAlreadySelected) {
             return {
                 ...prevFieldsData,
                 features: prevFieldsData.features.filter(
-                    (f) =>
-                        f.properties.b_id_source !==
-                        fieldData.properties.b_id_source,
+                    (f) => !isFeatureEqual(f, fieldData)
                 ),
             }
         }
