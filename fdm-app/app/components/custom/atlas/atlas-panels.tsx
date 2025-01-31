@@ -15,7 +15,8 @@ import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl"
 import { useFetcher } from "react-router"
-import { LoadingSpinner } from "../loadingspinner"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import type { MapMouseEvent, MapEvent, MapBoxZoomEvent } from "react-map-gl"
 
 export function FieldsPanelHover({
     zoomLevelFields,
@@ -25,7 +26,7 @@ export function FieldsPanelHover({
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
     useEffect(() => {
-        function updatePanel(evt: any) {
+        function updatePanel(evt: MapMouseEvent | MapBoxZoomEvent) {
             if (map) {
                 // Set message about zoom level
                 const zoom = map.getZoom()

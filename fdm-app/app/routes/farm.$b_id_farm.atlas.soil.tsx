@@ -65,7 +65,7 @@ export default function FarmAtlasSoilBlock() {
                         de website in de gaten.
                     </p>
                 </div>
-                <Button asChild>
+                <Button asChild aria-label="Naar perceelkaart">
                     <NavLink to="../fields">Naar perceelkaart</NavLink>
                 </Button>
             </div>
