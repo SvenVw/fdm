@@ -9,11 +9,10 @@ import {
     getMapboxStyle,
     getMapboxToken,
 } from "@/components/custom/atlas/atlas-mapbox"
-import {
-    FieldsSavedLayer,
-    FieldsSourceNotClickable,
-} from "@/components/custom/atlas/atlas-sources"
+import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
+import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
+import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -57,7 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export default function FarmContentBlock() {
+export default function FarmAtlasFieldsBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     const id = "fieldsSaved"
@@ -78,6 +77,12 @@ export default function FarmContentBlock() {
                 <FieldsSourceNotClickable id={id} fieldsData={fields}>
                     <Layer {...fieldsSavedStyle} />
                 </FieldsSourceNotClickable>
+                <div className="fields-panel grid gap-4 w-[350px]">
+                    <FieldsPanelHover
+                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                        layer={id}
+                    />
+                </div>
             </MapGL>
         </>
     )
