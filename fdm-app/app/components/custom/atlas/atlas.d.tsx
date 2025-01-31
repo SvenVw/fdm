@@ -11,7 +11,7 @@ export interface MapFieldsProps {
     fieldsSaved: FeatureCollection | null
 }
 
-export type fieldsAvailableUrlType = string | undefined
+export type FieldsAvailableUrlType = string | undefined
 
 export interface FeatureFdm {
     type: 'feature'

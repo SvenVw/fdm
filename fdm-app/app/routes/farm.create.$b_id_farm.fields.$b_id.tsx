@@ -152,7 +152,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Field not found",
         })
     }
-    const feature = {
+    const feature: GeoJSON.Feature = {
         type: "Feature",
         properties: {
             b_id: field.b_id,
