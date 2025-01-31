@@ -566,7 +566,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        await updateField(fdm, b_id, formValues.b_name)
+        await updateField(fdm, b_id, formValues.b_name, undefined, undefined, undefined, undefined, undefined)
 
         const cultivations = await getCultivations(fdm, b_id)
         if (cultivations && cultivations.length > 0) {
@@ -574,6 +574,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 cultivations[0].b_lu,
                 formValues.b_lu_catalogue,
+                undefined,
+                undefined
             )
         } else {
             // Handle the case where there are no cultivations found (although there should always be at least one)
