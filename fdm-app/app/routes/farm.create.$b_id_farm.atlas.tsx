@@ -42,6 +42,7 @@ import {
 } from "@/components/custom/atlas/atlas-sources"
 import {
     FieldsPanelHover,
+    FieldsPanelSelection,
     FieldsPanelZoom,
 } from "@/components/custom/atlas/atlas-panels"
 import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
@@ -192,6 +193,9 @@ export default function Index() {
                                 </FieldsSourceSelected>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
+                                    <FieldsPanelSelection
+                                        fields={selectedFieldsData}
+                                    />
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     />

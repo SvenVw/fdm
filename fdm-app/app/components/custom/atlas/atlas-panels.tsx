@@ -1,10 +1,14 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
-import { Info } from "lucide-react"
+import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl"
+import { useFetcher } from "react-router"
+import { LoadingSpinner } from "../loadingspinner"
 
 export function FieldsPanelHover({
     zoomLevelFields, layer, layerExclude
@@ -117,6 +121,150 @@ export function FieldsPanelZoom({
             }
         }
     }, [map, zoomLevelFields])
+
+    return panel
+}
+
+export function FieldsPanelSelection({
+    fields,
+}: { fields: FeatureCollection }) {
+    const fetcher = useFetcher()
+    const { current: map } = useMap()
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
+
+    const isSubmitting = fetcher.state === "submitting"
+
+    async function submitSelectedFields(fields: FeatureCollection) {
+        try {
+            const formSelectedFields = new FormData()
+            formSelectedFields.append("selected_fields", JSON.stringify(fields))
+
+            await fetcher.submit(formSelectedFields, {
+                method: "POST",
+            })
+        } catch (error: unknown) {
+            console.error("Failed to submit fields: ", error)
+            throw data({
+                status: 500,
+                statusText: `Failed to submit fields: ${error}`,
+            })
+            // TODO: adding a toast notification with error
+        }
+    }
+
+    useEffect(() => {
+        function updatePanel() {
+            if (map) {
+                // Set information about fields
+                const features = fields?.features || []
+                if (features.length > 0) {
+                    console.log(fields.features)
+
+                    const fieldCount = features.length
+                    let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
+                    if (fieldCount === 1) {
+                        fieldCountText = "Je hebt 1 perceel geselecteerd"
+                    }
+
+                    const cultivations = features.reduce(
+                        (
+                            acc: { b_lu_name: string; count: number }[],
+                            feature,
+                        ) => {
+                            const existingCultivation = acc.find(
+                                (c) =>
+                                    c.b_lu_name ===
+                                    feature.properties.b_lu_name,
+                            )
+                            if (existingCultivation) {
+                                existingCultivation.count++
+                            } else {
+                                acc.push({
+                                    b_lu_name: feature.properties.b_lu_name,
+                                    count: 1,
+                                })
+                            }
+                            return acc
+                        },
+                        [],
+                    )
+
+                    setPanel(
+                        <Card className={cn("w-full")}>
+                            <CardHeader>
+                                <CardTitle>Percelen</CardTitle>
+                                <CardDescription>
+                                    {fieldCountText}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                <div>
+                                    {cultivations.map((cultivation, index) => (
+                                        // let cultivationCountText = `${cultivation.count + 1} percelen`
+
+                                        <div
+                                            key={cultivation.b_lu_name}
+                                            className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
+                                        >
+                                            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-medium leading-none">
+                                                    {cultivation.b_lu_name}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {`${cultivation.count} percelen`}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button
+                                    onClick={() => submitSelectedFields(fields)}
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>
+                                                Opslaan van geselecteerde percelen...
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
+                                            <Check />
+                                            <span>
+                                                Sla geselecteerde percelen op
+                                            </span>
+                                        </div>
+                                    )}
+                                </Button>
+                            </CardFooter>
+                        </Card>,
+                    )
+                } else {
+                    setPanel(
+                        <Card className={cn("w-[380px]")}>
+                            <CardHeader>
+                                <CardTitle>Percelen</CardTitle>
+                                <CardDescription>
+                                    Je hebt geen percelen geselecteerd
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="grid gap-4" />
+                            <CardFooter>
+                                <Button className="w-full" disabled>
+                                    <Check /> Sla geselecteerde percelen op
+                                </Button>
+                            </CardFooter>
+                        </Card>,
+                    )
+                }
+            }
+        }
+        updatePanel()
+    }, [fields, isSubmitting, map])
 
     return panel
 }
