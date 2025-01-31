@@ -1,4 +1,10 @@
-import { Layer, Map as MapGL } from "react-map-gl"
+import {
+    GeolocateControl,
+    Layer,
+    Map as MapGL,
+    NavigationControl,
+} from "react-map-gl"
+import "mapbox-gl/dist/mapbox-gl.css"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
@@ -76,6 +82,8 @@ export default function FarmAtlasFieldsBlock() {
                 mapboxAccessToken={loaderData.mapboxToken}
                 interactiveLayerIds={[id]}
             >
+                <GeolocateControl />
+                <NavigationControl />
                 <FieldsSourceNotClickable id={id} fieldsData={fields}>
                     <Layer {...fieldsSavedStyle} />
                 </FieldsSourceNotClickable>

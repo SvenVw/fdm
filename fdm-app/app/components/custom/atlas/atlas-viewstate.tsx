@@ -4,13 +4,12 @@ import geojsonExtent from "@mapbox/geojson-extent"
 function getBounds(fields: FeatureCollection | null) {
     const initialBounds = [3.1, 50.7, 7.2, 53.6]
 
-    let bounds = null
+    let bounds = initialBounds
     if (fields) {
         try {
             bounds = geojsonExtent(fields)
         } catch (error) {
             console.error("Failed to calculate bounds:", error)
-            bounds = initialBounds
         }
     }
 

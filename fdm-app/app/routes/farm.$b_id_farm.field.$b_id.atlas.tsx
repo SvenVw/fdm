@@ -1,4 +1,5 @@
 import { Layer, Map as MapGL } from "react-map-gl"
+import "mapbox-gl/dist/mapbox-gl.css"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { fdm } from "@/lib/fdm.server"
@@ -19,9 +20,7 @@ import {
     getMapboxToken,
 } from "@/components/custom/atlas/atlas-mapbox"
 import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
-import { FeatureCollection } from "geojson"
-import { convertToFeatureCollection } from "@/components/custom/atlas/atlas-functions"
+import type { FeatureCollection } from "geojson"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the field id

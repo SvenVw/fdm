@@ -1,6 +1,8 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import throttle from "lodash.throttle"
+import { Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl"
 
@@ -60,6 +62,51 @@ export function FieldsPanelHover({
             }
         }
     }, [map, zoomLevelFields, layer])
+
+    return panel
+}
+
+export function FieldsPanelZoom({
+    zoomLevelFields,
+}: { zoomLevelFields: number }) {
+    const { current: map } = useMap()
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
+
+    useEffect(() => {
+        function updatePanel() {
+            if (map) {
+                // Set message about zoom level
+                const zoom = map.getZoom()
+                if (zoom && zoom <= zoomLevelFields) {
+                    setPanel(
+                        <Alert>
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>Let op!</AlertTitle>
+                            <AlertDescription>
+                                Zoom in om percelen te kunnen selecteren.
+                            </AlertDescription>
+                        </Alert>,
+                    )
+                } else {
+                    setPanel(null)
+                }
+            }
+        }
+
+        const throttledUpdatePanel = throttle(updatePanel, 250, {
+            trailing: true,
+        })
+
+        if (map) {
+            map.on("move", throttledUpdatePanel)
+            map.on("zoom", throttledUpdatePanel)
+            map.once("load", throttledUpdatePanel)
+            return () => {
+                map.off("move", throttledUpdatePanel)
+                map.off("zoom", throttledUpdatePanel)
+            }
+        }
+    }, [map, zoomLevelFields])
 
     return panel
 }

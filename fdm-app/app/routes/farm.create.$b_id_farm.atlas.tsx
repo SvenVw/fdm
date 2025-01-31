@@ -1,5 +1,11 @@
 import { centroid } from "@turf/centroid"
 import {
+    GeolocateControl,
+    Layer,
+    Map as MapGL,
+    NavigationControl,
+} from "react-map-gl"
+import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -21,9 +27,6 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-
-// Blocks
-import { AtlasFields } from "@/components/custom/atlas-fields"
 import {
     addCultivation,
     addField,
@@ -31,8 +34,25 @@ import {
     getFarm,
 } from "@svenvw/fdm-core"
 import { redirectWithSuccess } from "remix-toast"
-// FDM
 import { fdm } from "../lib/fdm.server"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceNotClickable,
+    FieldsSourceSelected,
+} from "@/components/custom/atlas/atlas-sources"
+import {
+    FieldsPanelHover,
+    FieldsPanelZoom,
+} from "@/components/custom/atlas/atlas-panels"
+import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
+import {
+    getMapboxStyle,
+    getMapboxToken,
+} from "@/components/custom/atlas/atlas-mapbox"
+import { useEffect, useState } from "react"
+import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -61,12 +81,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    // Get the Mapbox token
-    const mapboxToken = String(process.env.MAPBOX_TOKEN)
+    // Get the Mapbox token and style
+    const mapboxToken = getMapboxToken()
+    const mapboxStyle = getMapboxStyle()
 
     return {
         b_name_farm: farm.b_name_farm,
         mapboxToken: mapboxToken,
+        mapboxStyle: mapboxStyle,
         fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
     }
 }
@@ -74,7 +96,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    // const navigation = useNavigation();
+
+    const fieldsAvailableId = "fieldsAvailable"
+    // const fields = loaderData.savedFields
+    const viewState = getViewState(null)
+    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
+
+    const fieldsSelectedId = "fieldsSelected"
+    const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
+
+
+    // Set selected fields
+    const [selectedFieldsData, setSelectedFieldsData] = useState(
+        generateFeatureClass(),
+    )
 
     return (
         <SidebarInset>
@@ -126,18 +161,42 @@ export default function Index() {
                         }
                     >
                         {() => (
-                            <AtlasFields
-                                height="calc(100vh - 64px - 123px)"
-                                width="100%"
+                            <MapGL
+                                {...viewState}
+                                style={{
+                                    height: "calc(100vh - 64px - 123px)",
+                                    width: "100%",
+                                }}
                                 interactive={true}
-                                mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
-                                mapboxToken={loaderData.mapboxToken}
-                                fieldsSelected={null}
-                                fieldsAvailableUrl={
-                                    loaderData.fieldsAvailableUrl
-                                }
-                                fieldsSaved={null}
-                            />
+                                mapStyle={loaderData.mapboxStyle}
+                                mapboxAccessToken={loaderData.mapboxToken}
+                                interactiveLayerIds={[fieldsAvailableId]}
+                            >
+                                <GeolocateControl />
+                                <NavigationControl />
+
+                                <FieldsSourceAvailable
+                                    id={fieldsAvailableId}
+                                    url={loaderData.fieldsAvailableUrl}
+                                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                >
+                                    <Layer {...fieldsAvailableStyle} />
+                                </FieldsSourceAvailable>
+
+                                <FieldsSourceSelected
+                                    id={fieldsSelectedId}
+                                    availableLayerId={fieldsAvailableId}
+                                    fieldsData={selectedFieldsData}
+                                    setFieldsData={setSelectedFieldsData}>
+                                    <Layer {...fieldsSelectedStyle} />
+                                </FieldsSourceSelected>
+                                
+                                <div className="fields-panel grid gap-4 w-[350px]">
+                                    <FieldsPanelZoom
+                                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                    />
+                                </div>
+                            </MapGL>
                         )}
                     </ClientOnly>
                 </div>

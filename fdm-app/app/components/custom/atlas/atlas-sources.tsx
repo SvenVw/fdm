@@ -3,8 +3,14 @@ import { Source, useMap } from "react-map-gl"
 import { generateFeatureClass } from "./atlas-functions"
 import type { fieldsAvailableUrlType } from "./atlas.d"
 import type { FeatureCollection } from "geojson"
+import throttle from "lodash.throttle"
+import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 
-export function FieldsSourceNotClickable({id, fieldsData, children}: {id: string, fieldsData: FeatureCollection, children: JSX.Element}) {
+export function FieldsSourceNotClickable({
+    id,
+    fieldsData,
+    children,
+}: { id: string; fieldsData: FeatureCollection; children: JSX.Element }) {
     return (
         <Source id={id} type="geojson" data={fieldsData}>
             {children}
@@ -12,13 +18,15 @@ export function FieldsSourceNotClickable({id, fieldsData, children}: {id: string
     )
 }
 
-function FieldsSource({
+export function FieldsSourceSelected({
     id,
+    availableLayerId,
     fieldsData,
     setFieldsData,
     children,
 }: {
     id: string
+    availableLayerId: string
     fieldsData: FeatureCollection
     setFieldsData: React.Dispatch<
         React.SetStateAction<FeatureCollection>
@@ -33,11 +41,11 @@ function FieldsSource({
                 if (!map) return
 
                 const features = map.queryRenderedFeatures(evt.point, {
-                    layers: ["available-fields-fill"],
+                    layers: [availableLayerId],
                 })
 
                 if (features.length > 0) {
-                    handleFieldClick(features[0], setFieldsData)
+                    // handleFieldClick(features[0], setFieldsData)
                 }
             }
 
@@ -47,7 +55,7 @@ function FieldsSource({
                     map.off("click", clickOnMap)
                 }
             }
-        }, [map, setFieldsData])
+        }, [map, setFieldsData, availableLayerId])
     }
 
     return (
@@ -57,11 +65,13 @@ function FieldsSource({
     )
 }
 
-export function AvailableFieldsSource({
+export function FieldsSourceAvailable({
+    id,
     url,
     zoomLevelFields,
     children,
 }: {
+    id: string
     url: fieldsAvailableUrlType
     zoomLevelFields: number
     children: JSX.Element
@@ -128,7 +138,7 @@ export function AvailableFieldsSource({
     }, [map, url, zoomLevelFields])
 
     return (
-        <Source id="availableFields" type="geojson" data={data}>
+        <Source id={id} type="geojson" data={data}>
             {children}
         </Source>
     )

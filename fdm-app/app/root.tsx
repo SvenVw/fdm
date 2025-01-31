@@ -14,9 +14,11 @@ import { getToast } from "remix-toast"
 import { toast as notify } from "sonner"
 
 import styles from "~/tailwind.css?url"
+import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
+    { rel: "stylesheet", href: mapBoxStyle },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
         rel: "preconnect",
