@@ -35,17 +35,18 @@ export function FieldsSourceSelected({
 }) {
     const { current: map } = useMap()
 
-    if (!setFieldsData) {
         useEffect(() => {
             function clickOnMap(evt) {
+                console.log('jh')
                 if (!map) return
 
                 const features = map.queryRenderedFeatures(evt.point, {
                     layers: [availableLayerId],
                 })
+                console.log(features)
 
                 if (features.length > 0) {
-                    // handleFieldClick(features[0], setFieldsData)
+                    handleFieldClick(features[0], setFieldsData)
                 }
             }
 
@@ -55,14 +56,45 @@ export function FieldsSourceSelected({
                     map.off("click", clickOnMap)
                 }
             }
-        }, [map, setFieldsData, availableLayerId])
-    }
+        }, [map, fieldsData, availableLayerId, setFieldsData])
 
     return (
         <Source id={id} type="geojson" data={fieldsData}>
             {children}
         </Source>
     )
+}
+
+function handleFieldClick(feature, setSelectedFieldsData) {
+    console.log('hoi')
+    const fieldData = {
+        type: feature.type,
+        geometry: feature.geometry,
+        properties: feature.properties,
+    }
+
+    setSelectedFieldsData((prevFieldsData) => {
+        const isAlreadySelected = prevFieldsData.features.some(
+            (f) =>
+                f.properties.b_id_source === fieldData.properties.b_id_source,
+        )
+
+        if (isAlreadySelected) {
+            return {
+                ...prevFieldsData,
+                features: prevFieldsData.features.filter(
+                    (f) =>
+                        f.properties.b_id_source !==
+                        fieldData.properties.b_id_source,
+                ),
+            }
+        }
+
+        return {
+            ...prevFieldsData,
+            features: [...prevFieldsData.features, fieldData],
+        }
+    })
 }
 
 export function FieldsSourceAvailable({
