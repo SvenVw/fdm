@@ -50,7 +50,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export default function FarmAtlasElevationBlock() {
+export default function FarmAtlasSoilBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
