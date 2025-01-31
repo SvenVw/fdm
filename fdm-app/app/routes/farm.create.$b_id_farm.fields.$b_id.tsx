@@ -1,17 +1,13 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Layer, Map as MapGL } from "react-map-gl"
 import {
-    type ActionFunctionArgs,
-    Form,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    data,
-} from "react-router"
-import { useLoaderData } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import wkx from "wkx"
-import { z } from "zod"
+    getMapboxStyle,
+    getMapboxToken,
+} from "@/components/custom/atlas/atlas-mapbox"
+import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+import { Combobox } from "@/components/custom/combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import { Button } from "@/components/ui/button"
 import {
     FormControl,
     FormDescription,
@@ -28,9 +24,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Combobox } from "@/components/custom/combobox"
 import { Skeleton } from "@/components/ui/skeleton"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
     getCultivations,
@@ -40,19 +36,22 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
+import { Layer, Map as MapGL } from "react-map-gl"
+import {
+    type ActionFunctionArgs,
+    Form,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    data,
+} from "react-router"
+import { useLoaderData } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-// FDM
+import wkx from "wkx"
+import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { Button } from "@/components/ui/button"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { FeatureCollection } from "geojson"
 
 // Meta
 export const meta: MetaFunction = () => {

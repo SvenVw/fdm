@@ -1,8 +1,15 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { FeatureCollection } from "geojson"
+import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -11,8 +18,10 @@ import { useFetcher } from "react-router"
 import { LoadingSpinner } from "../loadingspinner"
 
 export function FieldsPanelHover({
-    zoomLevelFields, layer, layerExclude
-}: { zoomLevelFields: number, layer: string, layerExclude?: string }) {
+    zoomLevelFields,
+    layer,
+    layerExclude,
+}: { zoomLevelFields: number; layer: string; layerExclude?: string }) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
     useEffect(() => {
@@ -26,16 +35,23 @@ export function FieldsPanelHover({
                     })
 
                     if (layerExclude) {
-                        const featuresExclude = map.queryRenderedFeatures(evt.point, {
-                            layers: [layerExclude],
-                        })
+                        const featuresExclude = map.queryRenderedFeatures(
+                            evt.point,
+                            {
+                                layers: [layerExclude],
+                            },
+                        )
                         if (featuresExclude && featuresExclude.length > 0) {
                             setPanel(null)
                             return
                         }
                     }
 
-                    if (features && features.length > 0 && features[0].properties) {
+                    if (
+                        features &&
+                        features.length > 0 &&
+                        features[0].properties
+                    ) {
                         setPanel(
                             <Card className={cn("w-full")}>
                                 <CardHeader>
@@ -47,9 +63,9 @@ export function FieldsPanelHover({
                                     <CardDescription>
                                         {layer === "fieldsSaved"
                                             ? `${features[0].properties.b_area} ha`
-                                            : layer === 'fieldsAvailable' ?
-                                                "Klik om te selecteren"
-                                                : "Klik om te verwijderen"}
+                                            : layer === "fieldsAvailable"
+                                              ? "Klik om te selecteren"
+                                              : "Klik om te verwijderen"}
                                     </CardDescription>
                                 </CardHeader>
                             </Card>,
@@ -228,7 +244,8 @@ export function FieldsPanelSelection({
                                         <div className="flex items-center space-x-2">
                                             <LoadingSpinner />
                                             <span>
-                                                Opslaan van geselecteerde percelen...
+                                                Opslaan van geselecteerde
+                                                percelen...
                                             </span>
                                         </div>
                                     ) : (

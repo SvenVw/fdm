@@ -18,7 +18,13 @@ import {
 import { cn } from "@/lib/utils"
 import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
-import type { FarmOptions, FieldOptions, LayerOptions,  HeaderAction, LayerKey } from "./farm.d"
+import type {
+    FarmOptions,
+    FieldOptions,
+    HeaderAction,
+    LayerKey,
+    LayerOptions,
+} from "./farm.d"
 
 interface FarmHeaderProps {
     farmOptions: FarmOptions
@@ -39,7 +45,6 @@ export function FarmHeader({
     layerSelected,
     action,
 }: FarmHeaderProps) {
- 
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
@@ -141,7 +146,8 @@ export function FarmHeader({
                                     <BreadcrumbItem>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger className="flex items-center gap-1">
-                                                {layerSelected && layerOptions.length > 0
+                                                {layerSelected &&
+                                                layerOptions.length > 0
                                                     ? (layerOptions.find(
                                                           (option) =>
                                                               option.layerKey ===
@@ -155,7 +161,8 @@ export function FarmHeader({
                                                 {layerOptions.map((option) => (
                                                     <DropdownMenuCheckboxItem
                                                         checked={
-                                                            layerSelected === option.layerKey
+                                                            layerSelected ===
+                                                            option.layerKey
                                                         }
                                                         key={option.layerKey}
                                                     >

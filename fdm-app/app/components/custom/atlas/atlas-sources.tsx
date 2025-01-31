@@ -1,10 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
+import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
+import throttle from "lodash.throttle"
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl"
 import { generateFeatureClass } from "./atlas-functions"
 import type { fieldsAvailableUrlType } from "./atlas.d"
-import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
-import throttle from "lodash.throttle"
-import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 
 export function FieldsSourceNotClickable({
     id,
@@ -35,28 +35,28 @@ export function FieldsSourceSelected({
 }) {
     const { current: map } = useMap()
 
-        useEffect(() => {
-            function clickOnMap(evt) {
-                console.log('jh')
-                if (!map) return
+    useEffect(() => {
+        function clickOnMap(evt) {
+            console.log("jh")
+            if (!map) return
 
-                const features = map.queryRenderedFeatures(evt.point, {
-                    layers: [availableLayerId],
-                })
-                console.log(features)
+            const features = map.queryRenderedFeatures(evt.point, {
+                layers: [availableLayerId],
+            })
+            console.log(features)
 
-                if (features.length > 0) {
-                    handleFieldClick(features[0], setFieldsData)
-                }
+            if (features.length > 0) {
+                handleFieldClick(features[0], setFieldsData)
             }
+        }
 
-            if (map) {
-                map.once("click", clickOnMap)
-                return () => {
-                    map.off("click", clickOnMap)
-                }
+        if (map) {
+            map.once("click", clickOnMap)
+            return () => {
+                map.off("click", clickOnMap)
             }
-        }, [map, fieldsData, availableLayerId, setFieldsData])
+        }
+    }, [map, fieldsData, availableLayerId, setFieldsData])
 
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -71,7 +71,6 @@ function handleFieldClick(
         SetStateAction<FeatureCollection<Geometry, GeoJsonProperties>>
     >,
 ) {
-    
     const fieldData = {
         type: feature.type,
         geometry: feature.geometry,

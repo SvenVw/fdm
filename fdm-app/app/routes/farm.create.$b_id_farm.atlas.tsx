@@ -16,6 +16,24 @@ import {
 import { ClientOnly } from "remix-utils/client-only"
 import wkx from "wkx"
 
+import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
+import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
+import {
+    getMapboxStyle,
+    getMapboxToken,
+} from "@/components/custom/atlas/atlas-mapbox"
+import {
+    FieldsPanelHover,
+    FieldsPanelSelection,
+    FieldsPanelZoom,
+} from "@/components/custom/atlas/atlas-panels"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceNotClickable,
+    FieldsSourceSelected,
+} from "@/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 // Components
 import {
     Breadcrumb,
@@ -33,27 +51,9 @@ import {
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
+import { useEffect, useState } from "react"
 import { redirectWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceNotClickable,
-    FieldsSourceSelected,
-} from "@/components/custom/atlas/atlas-sources"
-import {
-    FieldsPanelHover,
-    FieldsPanelSelection,
-    FieldsPanelZoom,
-} from "@/components/custom/atlas/atlas-panels"
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { useEffect, useState } from "react"
-import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -204,7 +204,7 @@ export default function Index() {
                                         layer={fieldsAvailableId}
                                         layerExclude={fieldsSelectedId}
                                     />
-                                      <FieldsPanelHover
+                                    <FieldsPanelHover
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                         layer={fieldsSelectedId}
                                     />

@@ -5,19 +5,19 @@ import {
     NavigationControl,
 } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import { fdm } from "@/lib/fdm.server"
-import { getFields } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import type { FeatureCollection } from "geojson"
+import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
 import {
     getMapboxStyle,
     getMapboxToken,
 } from "@/components/custom/atlas/atlas-mapbox"
+import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
 import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+import { fdm } from "@/lib/fdm.server"
+import { getFields } from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
+import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import wkx from "wkx"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {

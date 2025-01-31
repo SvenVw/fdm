@@ -1,9 +1,17 @@
 import { Layer, Map as MapGL } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
+import {
+    getMapboxStyle,
+    getMapboxToken,
+} from "@/components/custom/atlas/atlas-mapbox"
+import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -13,14 +21,6 @@ import {
 import { dataWithError } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import wkx from "wkx"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import type { FeatureCollection } from "geojson"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the field id
