@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl"
 import { generateFeatureClass } from "./atlas-functions"
 import type { fieldsAvailableUrlType } from "./atlas.d"
-import type { FeatureCollection } from "geojson"
+import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 
@@ -65,8 +65,13 @@ export function FieldsSourceSelected({
     )
 }
 
-function handleFieldClick(feature, setSelectedFieldsData) {
-    console.log('hoi')
+function handleFieldClick(
+    feature: GeoJSON.Feature<Geometry, GeoJsonProperties>,
+    setSelectedFieldsData: Dispatch<
+        SetStateAction<FeatureCollection<Geometry, GeoJsonProperties>>
+    >,
+) {
+    
     const fieldData = {
         type: feature.type,
         geometry: feature.geometry,
@@ -124,10 +129,10 @@ export function FieldsSourceAvailable({
                     if (bounds) {
                         const [[minX, minY], [maxX, maxY]] = bounds.toArray()
                         const bbox = {
-                            minX,
-                            maxX,
-                            minY,
-                            maxY,
+                            minX: 0.9999 * minX,
+                            maxX: 1.0001 * maxX,
+                            minY: 0.9999 * minY,
+                            maxY: 1.0001 * maxY,
                         }
                         try {
                             const iter = deserialize(url, bbox)
