@@ -394,36 +394,25 @@ export type harvestableAnalysesTypeInsert =
     typeof harvestableAnalyses.$inferInsert
 
 // Define cultivation harvesting able
-export const cultivationHarvesting = fdmSchema.table(
-    "cultivation_harvesting",
-    {
-        b_id_harvestable: text()
-            .notNull()
-            .references(() => harvestables.b_id_harvestable),
-        b_lu: text()
-            .notNull()
-            .references(() => cultivations.b_lu),
-        b_harvest_date: timestamp({ withTimezone: true }),
-        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-        updated: timestamp({ withTimezone: true }),
-    },
-    (table) => {
-        return [
-            {
-                pk: primaryKey({
-                    columns: [table.b_id_harvestable, table.b_lu],
-                }),
-            },
-        ]
-    },
-)
+export const cultivationHarvesting = fdmSchema.table("cultivation_harvesting", {
+    b_id_harvesting: text().primaryKey(),
+    b_id_harvestable: text()
+        .notNull()
+        .references(() => harvestables.b_id_harvestable),
+    b_lu: text()
+        .notNull()
+        .references(() => cultivations.b_lu),
+    b_harvesting_date: timestamp({ withTimezone: true }),
+    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated: timestamp({ withTimezone: true }),
+})
 
 export type cultivationHarvestingTypeSelect =
     typeof cultivationHarvesting.$inferSelect
 export type cultivationHarvestingTypeInsert =
     typeof cultivationHarvesting.$inferInsert
 
-// Define cultivation terminating able
+// Define cultivation terminating table
 export const cultivationTerminating = fdmSchema.table(
     "cultivation_terminating",
     {
