@@ -1,7 +1,3 @@
-import type { FeatureCollection } from "geojson"
-import type * as React from "react"
-import { useMap } from "react-map-gl"
-
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,11 +9,93 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
-import { data, useFetcher } from "react-router"
-import { LoadingSpinner } from "./loadingspinner"
+import { useMap } from "react-map-gl"
+import { useFetcher } from "react-router"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import type { MapMouseEvent, MapEvent, MapBoxZoomEvent } from "react-map-gl"
+
+export function FieldsPanelHover({
+    zoomLevelFields,
+    layer,
+    layerExclude,
+}: { zoomLevelFields: number; layer: string; layerExclude?: string }) {
+    const { current: map } = useMap()
+    const [panel, setPanel] = useState<React.ReactNode | null>(null)
+    useEffect(() => {
+        function updatePanel(evt: MapMouseEvent | MapBoxZoomEvent) {
+            if (map) {
+                // Set message about zoom level
+                const zoom = map.getZoom()
+                if (zoom && zoom > zoomLevelFields) {
+                    const features = map.queryRenderedFeatures(evt.point, {
+                        layers: [layer],
+                    })
+
+                    if (layerExclude) {
+                        const featuresExclude = map.queryRenderedFeatures(
+                            evt.point,
+                            {
+                                layers: [layerExclude],
+                            },
+                        )
+                        if (featuresExclude && featuresExclude.length > 0) {
+                            setPanel(null)
+                            return
+                        }
+                    }
+
+                    if (
+                        features &&
+                        features.length > 0 &&
+                        features[0].properties
+                    ) {
+                        setPanel(
+                            <Card className={cn("w-full")}>
+                                <CardHeader>
+                                    <CardTitle>
+                                        {layer === "fieldsSaved"
+                                            ? features[0].properties.b_name
+                                            : features[0].properties.b_lu_name}
+                                    </CardTitle>
+                                    <CardDescription>
+                                        {layer === "fieldsSaved"
+                                            ? `${features[0].properties.b_area} ha`
+                                            : layer === "fieldsAvailable"
+                                              ? "Klik om te selecteren"
+                                              : "Klik om te verwijderen"}
+                                    </CardDescription>
+                                </CardHeader>
+                            </Card>,
+                        )
+                    } else {
+                        setPanel(null)
+                    }
+                }
+            }
+        }
+
+        const throttledUpdatePanel = throttle(updatePanel, 250, {
+            trailing: true,
+        })
+
+        if (map) {
+            map.on("mousemove", (evt) => throttledUpdatePanel(evt))
+            map.on("click", updatePanel)
+            map.on("zoom", throttledUpdatePanel)
+            map.on("load", updatePanel)
+            return () => {
+                map.off("mousemove", throttledUpdatePanel)
+                map.off("zoom", throttledUpdatePanel)
+            }
+        }
+    }, [map, zoomLevelFields, layer, layerExclude])
+
+    return panel
+}
 
 export function FieldsPanelZoom({
     zoomLevelFields,
@@ -167,7 +245,8 @@ export function FieldsPanelSelection({
                                         <div className="flex items-center space-x-2">
                                             <LoadingSpinner />
                                             <span>
-                                                Sla geselecteerde percelen op
+                                                Opslaan van geselecteerde
+                                                percelen...
                                             </span>
                                         </div>
                                     ) : (
@@ -204,94 +283,6 @@ export function FieldsPanelSelection({
         }
         updatePanel()
     }, [fields, isSubmitting, map])
-
-    return panel
-}
-
-export function FieldsPanelHover({
-    zoomLevelFields,
-}: { zoomLevelFields: number }) {
-    const { current: map } = useMap()
-    const [panel, setPanel] = useState<React.ReactNode | null>(null)
-
-    useEffect(() => {
-        function updatePanel(evt) {
-            if (map) {
-                // Set message about zoom level
-                const zoom = map.getZoom()
-                if (zoom && zoom > zoomLevelFields) {
-                    const featuresSelected = map.queryRenderedFeatures(
-                        evt.point,
-                        {
-                            layers: ["selected-fields-fill"],
-                        },
-                    )
-
-                    if (featuresSelected.length > 0) {
-                        setPanel(
-                            <Card className={cn("w-full")}>
-                                <CardHeader>
-                                    <CardTitle>
-                                        {
-                                            featuresSelected[0].properties
-                                                .b_lu_name
-                                        }
-                                    </CardTitle>
-                                    <CardDescription>
-                                        Klik om te verwijderen
-                                    </CardDescription>
-                                </CardHeader>
-                            </Card>,
-                        )
-                    } else {
-                        const featuresAvailable = map.queryRenderedFeatures(
-                            evt.point,
-                            {
-                                layers: ["available-fields-fill"], // Specify the layer ID
-                            },
-                        )
-
-                        if (featuresAvailable.length > 0) {
-                            setPanel(
-                                <Card className={cn("w-full")}>
-                                    <CardHeader>
-                                        <CardTitle>
-                                            {
-                                                featuresAvailable[0].properties
-                                                    .b_lu_name
-                                            }
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Klik om te selecteren
-                                        </CardDescription>
-                                    </CardHeader>
-                                </Card>,
-                            )
-                        } else {
-                            setPanel(null)
-                        }
-                    }
-                } else {
-                    setPanel(null)
-                }
-            }
-        }
-
-        const throttledUpdatePanel = throttle(updatePanel, 250, {
-            trailing: true,
-        })
-
-        if (map) {
-            map.on("mousemove", throttledUpdatePanel)
-            map.once("click", updatePanel)
-            map.on("zoom", throttledUpdatePanel)
-            map.once("load", updatePanel)
-            return () => {
-                map.off("mousemove", throttledUpdatePanel)
-                map.off("zoom", throttledUpdatePanel)
-            }
-        }
-    }, [map, zoomLevelFields])
 
     return panel
 }

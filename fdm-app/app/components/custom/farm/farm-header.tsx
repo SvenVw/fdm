@@ -18,13 +18,21 @@ import {
 import { cn } from "@/lib/utils"
 import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
-import type { FarmOptions, FieldOptions, HeaderAction } from "./farm.d"
+import type {
+    FarmOptions,
+    FieldOptions,
+    HeaderAction,
+    LayerKey,
+    LayerOptions,
+} from "./farm.d"
 
 interface FarmHeaderProps {
     farmOptions: FarmOptions
     b_id_farm: string | undefined
     fieldOptions: FieldOptions
     b_id: string | undefined
+    layerOptions: LayerOptions[]
+    layerSelected: LayerKey | undefined
     action: HeaderAction
 }
 
@@ -33,6 +41,8 @@ export function FarmHeader({
     b_id_farm,
     fieldOptions,
     b_id,
+    layerOptions,
+    layerSelected,
     action,
 }: FarmHeaderProps) {
     return (
@@ -114,6 +124,52 @@ export function FarmHeader({
                                                             to={`/farm/${b_id_farm}/field/${option.b_id}`}
                                                         >
                                                             {option.b_name}
+                                                        </NavLink>
+                                                    </DropdownMenuCheckboxItem>
+                                                ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </BreadcrumbItem>
+                                </>
+                            ) : null}
+                            {layerSelected && layerOptions.length > 0 ? (
+                                <>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbLink
+                                            href={`/farm/${b_id_farm}/atlas/`}
+                                        >
+                                            Kaarten
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger className="flex items-center gap-1">
+                                                {layerSelected &&
+                                                layerOptions.length > 0
+                                                    ? (layerOptions.find(
+                                                          (option) =>
+                                                              option.layerKey ===
+                                                              layerSelected,
+                                                      )?.layerName ??
+                                                      "Unknown layer")
+                                                    : "Kies een kaartlaag"}
+                                                <ChevronDown />
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start">
+                                                {layerOptions.map((option) => (
+                                                    <DropdownMenuCheckboxItem
+                                                        checked={
+                                                            layerSelected ===
+                                                            option.layerKey
+                                                        }
+                                                        key={option.layerKey}
+                                                    >
+                                                        <NavLink
+                                                            to={`/farm/${b_id_farm}/atlas/${option.layerKey}`}
+                                                        >
+                                                            {option.layerName}
                                                         </NavLink>
                                                     </DropdownMenuCheckboxItem>
                                                 ))}

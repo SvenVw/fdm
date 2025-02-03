@@ -1,19 +1,12 @@
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
-    type ActionFunctionArgs,
-    Form,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    data,
-} from "react-router"
-import { useLoaderData } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import wkx from "wkx"
-import { z } from "zod"
-
-import { FieldMap } from "@/components/blocks/field-map"
+    getMapboxStyle,
+    getMapboxToken,
+} from "@/components/custom/atlas/atlas-mapbox"
+import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
+import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+import { Combobox } from "@/components/custom/combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
-// Components
 import { Button } from "@/components/ui/button"
 import {
     FormControl,
@@ -31,14 +24,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-
-import { Combobox } from "@/components/custom/combobox"
 import { Skeleton } from "@/components/ui/skeleton"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
-    fdmSchema,
-    getCultivation,
     getCultivations,
     getCultivationsFromCatalogue,
     getField,
@@ -46,9 +36,21 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
+import { Layer, Map as MapGL } from "react-map-gl"
+import {
+    type ActionFunctionArgs,
+    Form,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    data,
+} from "react-router"
+import { useLoaderData } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-// FDM
+import wkx from "wkx"
+import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
 
 // Meta
@@ -150,6 +152,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Field not found",
         })
     }
+    const feature: GeoJSON.Feature = {
+        type: "Feature",
+        properties: {
+            b_id: field.b_id,
+            b_name: field.b_name,
+            b_area: Math.round(field.b_area * 10) / 10,
+            b_lu_name: field.b_lu_name,
+            b_id_source: field.b_id_source,
+        },
+        geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
+    }
+    const featureCollection: FeatureCollection = {
+        type: "FeatureCollection",
+        features: [feature],
+    }
 
     // Get the geojson
     if (!field.b_geometry) {
@@ -188,14 +205,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const cultivations = await getCultivations(fdm, b_id)
     const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
-    // Get Mapbox token
-    const mapboxToken = String(process.env.MAPBOX_TOKEN)
-    if (!mapboxToken) {
-        throw data("MAPBOX_TOKEN environment variable is not set", {
-            status: 500,
-            statusText: "MAPBOX_TOKEN environment variable is not set",
-        })
-    }
+    // Get Mapbox token and Style
+    const mapboxToken = getMapboxToken()
+    const mapboxStyle = getMapboxStyle()
 
     return {
         b_id: b_id,
@@ -208,9 +220,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         a_p_cc: soilAnalysis?.a_p_cc,
         a_som_loi: soilAnalysis?.a_som_loi,
         b_area: field.b_area,
-        b_geojson: b_geojson,
+        featureCollection: featureCollection,
         cultivationOptions: cultivationOptions,
         mapboxToken: mapboxToken,
+        mapboxStyle: mapboxStyle,
     }
 }
 
@@ -221,6 +234,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
+
+    const viewState = getViewState(loaderData.featureCollection)
+    const id = "fieldsSaved"
+    const fields = loaderData.featureCollection
+    const fieldsSavedStyle = getFieldsStyle(id)
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -532,10 +550,24 @@ export default function Index() {
                     fallback={<Skeleton className="h-full w-full rounded-xl" />}
                 >
                     {() => (
-                        <FieldMap
-                            b_geojson={loaderData.b_geojson}
-                            mapboxToken={loaderData.mapboxToken}
-                        />
+                        <MapGL
+                            {...viewState}
+                            style={{
+                                height: "100%",
+                                width: "100%",
+                            }}
+                            interactive={false}
+                            mapStyle={loaderData.mapboxStyle}
+                            mapboxAccessToken={loaderData.mapboxToken}
+                            interactiveLayerIds={[id]}
+                        >
+                            <FieldsSourceNotClickable
+                                id={id}
+                                fieldsData={fields}
+                            >
+                                <Layer {...fieldsSavedStyle} />
+                            </FieldsSourceNotClickable>
+                        </MapGL>
                     )}
                 </ClientOnly>
             </aside>
@@ -566,7 +598,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        await updateField(fdm, b_id, formValues.b_name)
+        await updateField(
+            fdm,
+            b_id,
+            formValues.b_name,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+        )
 
         const cultivations = await getCultivations(fdm, b_id)
         if (cultivations && cultivations.length > 0) {
@@ -574,6 +615,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 cultivations[0].b_lu,
                 formValues.b_lu_catalogue,
+                undefined,
+                undefined,
             )
         } else {
             // Handle the case where there are no cultivations found (although there should always be at least one)

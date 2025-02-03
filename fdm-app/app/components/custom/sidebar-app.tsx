@@ -78,6 +78,13 @@ export function SidebarApp(props: SideBarAppType) {
         fieldsLink = "/field"
     }
 
+    let atlasLink: string
+    if (user.farm_active) {
+        atlasLink = `/farm/${user.farm_active}/atlas`
+    } else {
+        atlasLink = "#"
+    }
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -112,7 +119,7 @@ export function SidebarApp(props: SideBarAppType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./map">
+                                    <NavLink to={atlasLink}>
                                         <MapIcon />
                                         <span>Kaart</span>
                                     </NavLink>
