@@ -11,11 +11,13 @@
         "isolatedModules": true,
         "moduleDetection": "force",
         "noEmit": true,
+        "declaration": true,
+        "outDir": "./dist",
 
         "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src"]
+    "include": ["./src/**/*"]
 }
