@@ -39,6 +39,7 @@ export async function addCultivationToCatalogue(
         b_lu_source: schema.cultivationsCatalogueTypeInsert["b_lu_source"]
         b_lu_name: schema.cultivationsCatalogueTypeInsert["b_lu_name"]
         b_lu_name_en: schema.cultivationsCatalogueTypeInsert["b_lu_name_en"]
+        b_lu_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_harvestable"]
         b_lu_hcat3: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3"]
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3_name"]
     },
