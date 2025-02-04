@@ -1,3 +1,8 @@
+// TODO: Support combining harvesting actions into a single harvestable with multiple analyses.
+// Currently, each harvesting action is treated as a separate harvestable with a single analysis.
+// The database schema supports combined harvests, but the functions here do not yet implement this feature.
+// The current join structure is: cultivations (1) => cultivation_harvesting (M) => harvestables (1) => harvestable_sampling (1) => harvestable_analyses (1)
+
 import { desc, eq } from "drizzle-orm"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
