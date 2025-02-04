@@ -157,13 +157,19 @@ export async function getHarvest(
         const harvestables = await fdm
             .select({
                 b_id_harvestable: schema.harvestables.b_id_harvestable,
-                b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
             })
             .from(schema.harvestables)
-            .where(
+            .leftJoin(
+                schema.cultivationHarvesting,
                 eq(
                     schema.harvestables.b_id_harvestable,
                     schema.cultivationHarvesting.b_id_harvestable,
+                ),
+            )
+            .where(
+                eq(
+                    schema.cultivationHarvesting.b_id_harvesting,
+                    result.b_id_harvesting,
                 ),
             )
             .limit(1)
@@ -190,8 +196,8 @@ export async function getHarvest(
             .leftJoin(
                 schema.harvestableSampling,
                 eq(
-                    schema.harvestableAnalyses.b_id_harvestable_analysis,
-                    schema.harvestableSampling.b_id_harvestable_analysis,
+                    schema.harvestables.b_id_harvestable,
+                    schema.harvestableSampling.b_id_harvestable,
                 ),
             )
             .leftJoin(
@@ -225,7 +231,7 @@ export async function getHarvests(
     try {
         const harvests = await fdm
             .select({
-                b_id_harvestable: schema.harvestables.b_id_harvestable,
+                b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
                 b_harvesting_date:
                     schema.cultivationHarvesting.b_harvesting_date,
                 b_lu: schema.cultivationHarvesting.b_lu,
@@ -282,70 +288,58 @@ export async function checkHarvestDateCompability(
     b_lu: schema.cultivationsTypeSelect["b_lu"],
     b_harvesting_date: schema.cultivationHarvestingTypeInsert["b_harvesting_date"],
 ) {
+    // console.log(b_harvesting_date)
+    if (!b_harvesting_date) {
+        // Handle undefined dates *before* anything else
+        throw new Error("Argument b_harvesting_date is missing")
+    }
+
     // Check if cultivation can be harvested
     const b_lu_harvestable = await getHarvestableTypeOfCultivation(tx, b_lu)
+    // console.log(b_lu_harvestable)
 
     if (b_lu_harvestable === "none") {
         throw new Error("Cultivation cannot be harvested")
     }
 
     // Check if harvest date is after sowing date
-    if (b_harvesting_date) {
-        const sowingDate = await tx
-            .select({
-                b_sowing_date: schema.fieldSowing.b_sowing_date,
-            })
-            .from(schema.fieldSowing)
-            .where(eq(schema.fieldSowing.b_lu, b_lu))
-            .limit(1)
+    const sowingDate = await tx
+        .select({
+            b_sowing_date: schema.fieldSowing.b_sowing_date,
+        })
+        .from(schema.fieldSowing)
+        .where(eq(schema.fieldSowing.b_lu, b_lu))
+        .limit(1)
 
-        if (sowingDate.length === 0) {
-            throw new Error("Sowing date does not exist")
-        }
+    if (sowingDate.length === 0) {
+        throw new Error("Sowing date does not exist")
+    }
+    // console.log(sowingDate[0].b_sowing_date)
 
-        if (
-            b_harvesting_date.getTime() <= sowingDate[0].b_sowing_date.getTime()
-        ) {
-            throw new Error("Harvest date must be after sowing date")
-        }
 
-        // If cultivation can only be harvested once, check if harvest is on the same date as terminating date
-        const terminatingDate = await tx
-            .select({
-                b_terminating_date:
-                    schema.cultivationTerminating.b_terminating_date,
-            })
-            .from(schema.cultivationTerminating)
-            .where(eq(schema.cultivationTerminating.b_lu, b_lu))
-            .limit(1)
-
-        if (terminatingDate.length === 0) {
-            throw new Error("Terminating date does not exist")
-        }
-
-        if (
-            b_harvesting_date.getTime() !==
-            terminatingDate[0].b_terminating_date.getTime()
-        ) {
-            throw new Error(
-                "Harvest date must be equal to terminating date for this cultivation",
-            )
-        }
-
-        // If cultivation can harvested multiple times, check if harvest is before termination date
-        if (
-            b_lu_harvestable === "multiple" &&
-            b_harvesting_date.getTime() >=
-                terminatingDate[0].b_terminating_date.getTime()
-        ) {
-            throw new Error(
-                "Harvest date must be before terminating date for this cultivation",
-            )
-        }
+    // If cultivation has harvest date before sowing date throw an error
+    if (b_harvesting_date.getTime() <= sowingDate[0].b_sowing_date.getTime()) {
+        throw new Error("Harvest date must be after sowing date")
     }
 
-    // If cultivation can only be harvested once, check if a harvest is already present
+    const terminatingDate = await tx
+        .select({
+            b_terminating_date:
+                schema.cultivationTerminating.b_terminating_date,
+        })
+        .from(schema.cultivationTerminating)
+        .where(eq(schema.cultivationTerminating.b_lu, b_lu))
+        .limit(1)
+
+    if (terminatingDate.length === 0) {
+        throw new Error("Terminating date does not exist")
+    }
+    // console.log(terminatingDate[0].b_terminating_date)
+
+
+
     if (b_lu_harvestable === "once") {
+        // If cultivation can only be harvested once, check if a harvest is already present
         const existingHarvest = await tx
             .select()
             .from(schema.cultivationHarvesting)
@@ -355,6 +349,28 @@ export async function checkHarvestDateCompability(
         if (existingHarvest.length > 0) {
             throw new Error("Cultivation can only be harvested once")
         }
+
+        // If cultivation can only be harvested once, check if harvest is on the same date as terminating date
+        if (
+            terminatingDate.length > 0 &&
+            b_harvesting_date.getTime() !==
+                terminatingDate[0].b_terminating_date.getTime()
+        ) {
+            throw new Error(
+                "Harvest date must be equal to terminating date for this cultivation",
+            )
+        }
+    }
+
+    // If cultivation can harvested multiple times, check if harvest is before termination date
+    if (
+        b_lu_harvestable === "multiple" &&
+        b_harvesting_date.getTime() >
+            terminatingDate[0].b_terminating_date.getTime()
+    ) {
+        throw new Error(
+            "Harvest date must be before terminating date for this cultivation",
+        )
     }
 
     return b_lu_harvestable
