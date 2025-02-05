@@ -212,6 +212,12 @@ export async function getHarvest(
                     schema.harvestableAnalyses.b_id_harvestable_analysis,
                 ),
             )
+            .where(
+                eq(
+                    schema.harvestableSampling.b_id_harvestable,
+                    result.harvestable[0].b_id_harvestable,
+                ),
+            )
             .limit(1)
 
         result.harvestable[0].harvestableAnalysis = harvestableAnalyses
@@ -259,6 +265,89 @@ export async function getHarvests(
         return result
     } catch (err) {
         throw handleError(err, "Exception for getHarvests", { b_lu })
+    }
+}
+
+/**
+ * Removes a harvest record and associated data.
+ *
+ * @param fdm The FDM database instance.
+ * @param b_id_harvesting The ID of the harvest record to remove.
+ * @throws If there's an error during the database transaction.
+ */
+export async function removeHarvest(
+    fdm: FdmType,
+    b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
+): Promise<void> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            const harvest = await getHarvest(tx, b_id_harvesting)
+
+            const b_id_harvestable = harvest.harvestable[0].b_id_harvestable
+            const b_id_harvestable_analysis =
+                harvest.harvestable[0].harvestableAnalysis[0]
+                    .b_id_harvestable_analysis
+            const b_lu = harvest.b_lu
+
+            console.log(b_id_harvesting)
+            console.log(b_id_harvestable)
+            console.log(b_id_harvestable_analysis)
+
+            // Delete related sampling entries
+            await tx
+                .delete(schema.harvestableSampling)
+                .where(
+                    eq(
+                        schema.harvestableSampling.b_id_harvestable,
+                        b_id_harvestable,
+                    ),
+                )
+
+            // Delete related analyses
+            await tx
+                .delete(schema.harvestableAnalyses)
+                .where(
+                    eq(
+                        schema.harvestableAnalyses.b_id_harvestable_analysis,
+                        b_id_harvestable_analysis,
+                    ),
+                )
+
+            // Delete the cultivationHarvesting entry
+            await tx
+                .delete(schema.cultivationHarvesting)
+                .where(
+                    eq(
+                        schema.cultivationHarvesting.b_id_harvesting,
+                        b_id_harvesting,
+                    ),
+                )
+
+            // Delete the harvestable entry
+            await tx
+                .delete(schema.harvestables)
+                .where(
+                    eq(schema.harvestables.b_id_harvestable, b_id_harvestable),
+                )
+
+            // Check if cultivation can be harvested
+            const b_lu_harvestable = await getHarvestableTypeOfCultivation(
+                tx,
+                b_lu,
+            )
+
+            if (b_lu_harvestable === "once") {
+                // Remove terminating date for once-harvestable crops, since the harvest is being removed
+                await tx
+                    .update(schema.cultivationTerminating)
+                    .set({ b_terminating_date: null, updated: new Date() })
+                    .where(eq(schema.cultivationTerminating.b_lu, b_lu))
+            }
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for removeHarvest", {
+            b_id_harvesting,
+        })
     }
 }
 
@@ -321,7 +410,6 @@ export async function checkHarvestDateCompability(
     }
     // console.log(sowingDate[0].b_sowing_date)
 
-
     // If cultivation has harvest date before sowing date throw an error
     if (b_harvesting_date.getTime() <= sowingDate[0].b_sowing_date.getTime()) {
         throw new Error("Harvest date must be after sowing date")
@@ -340,8 +428,6 @@ export async function checkHarvestDateCompability(
         throw new Error("Terminating date does not exist")
     }
     // console.log(terminatingDate[0].b_terminating_date)
-
-
 
     if (b_lu_harvestable === "once") {
         // If cultivation can only be harvested once, check if a harvest is already present

@@ -55,4 +55,5 @@ export {
     addHarvest,
     getHarvest,
     getHarvests,
+    removeHarvest,
 } from "./harvest"

@@ -6,6 +6,7 @@ import {
     getHarvest,
     getHarvestableTypeOfCultivation,
     getHarvests,
+    removeHarvest,
 } from "./harvest"
 import type * as schema from "./db/schema"
 import { beforeEach, describe, expect, inject, it } from "vitest"
@@ -151,6 +152,32 @@ describe("harvest", () => {
 
         const harvests = await getHarvests(fdm, b_lu_once)
         expect(harvests.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it("should remove a harvest", async () => {
+        const harvesting_date = terminating_date
+        const b_id_harvesting = await addHarvest(
+            fdm,
+            b_lu_once,
+            harvesting_date,
+            1000,
+        )
+
+        await removeHarvest(fdm, b_id_harvesting)
+
+        await expect(getHarvest(fdm, b_id_harvesting)).rejects.toThrowError(
+            "Exception for getHarvest",
+        )
+
+        const harvests = await getHarvests(fdm, b_lu_once)
+        expect(harvests.length).toEqual(0)
+    })
+
+    it("should throw error if harvest does not exist", async () => {
+        const nonExistingHarvestId = createId()
+        await expect(
+            removeHarvest(fdm, nonExistingHarvestId),
+        ).rejects.toThrowError("Exception for removeHarvest")
     })
 
     describe("getHarvestableTypeOfCultivation", () => {
