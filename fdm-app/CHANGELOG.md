@@ -1,5 +1,15 @@
 # Changelog fdm-app
 
+## 0.10.0
+
+### Minor Changes
+
+- 93dd8e7: Add `Atlas` for farm page to show maps at the farm level (currently only fields is supported)
+
+### Patch Changes
+
+- 93dd8e7: Refactored the Atlas components to make them more flexible and readable
+
 ## 0.9.1
 
 ### Patch Changes
