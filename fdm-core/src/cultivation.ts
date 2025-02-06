@@ -5,6 +5,12 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { createId } from "./id"
+import {
+    addHarvest,
+    getHarvest,
+    getHarvestableTypeOfCultivation,
+    getHarvests,
+} from "./harvest"
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -187,6 +193,28 @@ export async function addCultivation(
                 b_lu: b_lu,
                 b_terminating_date: b_terminating_date,
             })
+
+            if (b_terminating_date) {
+                const harvestableType = await getHarvestableTypeOfCultivation(
+                    tx,
+                    b_lu,
+                )
+
+                if (harvestableType === "once") {
+                    // If cultivation can only be harvested once, add harvest on terminate date
+                    await addHarvest(
+                        tx,
+                        b_lu,
+                        b_terminating_date,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                        undefined,
+                    )
+                }
+            }
             return b_lu
         })
     } catch (err) {
@@ -681,6 +709,41 @@ export async function updateCultivation(
                         b_terminating_date: b_terminating_date,
                     })
                     .where(eq(schema.cultivationTerminating.b_lu, b_lu))
+
+                const harvestableType = await getHarvestableTypeOfCultivation(
+                    tx,
+                    b_lu,
+                )
+                if (harvestableType === "once") {
+                    // If harvestable type is "once", add harvest on terminate date
+                    const harvests = await getHarvests(tx, b_lu)
+                    if (harvests.length > 0) {
+                        tx.update(schema.cultivationHarvesting)
+                            .set({
+                                updated: updated,
+                                b_harvesting_date: b_terminating_date,
+                            })
+                            .where(
+                                eq(
+                                    schema.cultivationHarvesting
+                                        .b_id_harvesting,
+                                    harvests[0].b_id_harvesting,
+                                ),
+                            )
+                    } else {
+                        await addHarvest(
+                            tx,
+                            b_lu,
+                            b_terminating_date,
+                            undefined,
+                            undefined,
+                            undefined,
+                            undefined,
+                            undefined,
+                            undefined,
+                        )
+                    }
+                }
             }
         })
     } catch (err) {

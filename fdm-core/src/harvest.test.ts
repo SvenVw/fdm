@@ -1,5 +1,9 @@
 import { addFarm, addField, createFdmServer, type FdmServerType } from "./index"
-import { addCultivation, addCultivationToCatalogue } from "./cultivation"
+import {
+    addCultivation,
+    addCultivationToCatalogue,
+    getCultivation,
+} from "./cultivation"
 import {
     addHarvest,
     checkHarvestDateCompability,
@@ -15,6 +19,7 @@ import { createId } from "./id"
 describe("harvest", () => {
     let fdm: FdmServerType
     let b_lu_once: schema.cultivationsTypeSelect["b_lu"]
+    let b_lu_once_nonexistent: schema.cultivationsTypeSelect["b_lu"]
     let b_lu_multiple: schema.cultivationsTypeSelect["b_lu"]
     let b_id_farm: string
     let b_id: string
@@ -76,6 +81,26 @@ describe("harvest", () => {
             terminating_date,
         )
 
+        const b_lu_catalogue_nonexistent = createId() // New catalogue entry
+        await addCultivationToCatalogue(fdm, {
+            b_lu_catalogue: b_lu_catalogue_nonexistent,
+            b_lu_source: "source_nonexistent", // Different source
+            b_lu_name: "test cultivation nonexistent", // Different name
+            b_lu_name_en: "test cultivation nonexistent",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "hcat",
+            b_lu_hcat3_name: "hcat name",
+        })
+
+        b_lu_once_nonexistent = await addCultivation(
+            // Assign new b_lu
+            fdm,
+            b_lu_catalogue_nonexistent, // Using the new catalogue entry
+            b_id,
+            sowing_date,
+            terminating_date,
+        )
+
         // Add a cultivation that can be harvested multiple times
         const b_lu_catalogue_multiple = createId()
         await addCultivationToCatalogue(fdm, {
@@ -101,7 +126,7 @@ describe("harvest", () => {
 
         const b_id_harvesting = await addHarvest(
             fdm,
-            b_lu_once,
+            b_lu_multiple,
             harvesting_date,
             1000,
             20,
@@ -125,7 +150,7 @@ describe("harvest", () => {
         const harvesting_date = terminating_date
         const b_id_harvesting = await addHarvest(
             fdm,
-            b_lu_once,
+            b_lu_multiple,
             harvesting_date,
             1000,
         )
@@ -139,6 +164,22 @@ describe("harvest", () => {
         ).toEqual(1000)
     })
 
+    it("should have same date for cultivation harvest as for terminate date when harvestable type is 'once'", async () => {
+        const harvesting_date = terminating_date
+
+        const cultivation = await getCultivation(fdm, b_lu_once)
+        const harvests = await getHarvests(fdm, b_lu_once)
+
+        expect(harvests.length).toEqual(1)
+        expect(cultivation.b_terminating_date?.getTime()).toEqual(
+            harvests[0].b_harvesting_date?.getTime(),
+        )
+        expect(harvests[0].b_harvesting_date).toEqual(harvesting_date)
+        expect(
+            harvests[0].harvestable[0].harvestableAnalysis[0].b_lu_yield,
+        ).toEqual(null)
+    })
+
     it("should throw error if harvest does not exist", async () => {
         await expect(
             getHarvest(fdm, "non_existing_harvest"),
@@ -148,7 +189,7 @@ describe("harvest", () => {
     it("should get harvests", async () => {
         const harvesting_date = terminating_date
 
-        await addHarvest(fdm, b_lu_once, harvesting_date, 1000)
+        await addHarvest(fdm, b_lu_multiple, harvesting_date, 1000)
 
         const harvests = await getHarvests(fdm, b_lu_once)
         expect(harvests.length).toBeGreaterThanOrEqual(1)
@@ -158,7 +199,7 @@ describe("harvest", () => {
         const harvesting_date = terminating_date
         const b_id_harvesting = await addHarvest(
             fdm,
-            b_lu_once,
+            b_lu_multiple,
             harvesting_date,
             1000,
         )
@@ -170,7 +211,7 @@ describe("harvest", () => {
         )
 
         const harvests = await getHarvests(fdm, b_lu_once)
-        expect(harvests.length).toEqual(0)
+        expect(harvests.length).toEqual(1)
     })
 
     it("should throw error if harvest does not exist", async () => {
@@ -293,8 +334,6 @@ describe("harvest", () => {
 
         it("should throw error if already harvested and only one harvest allowed", async () => {
             const harvesting_date = new Date(terminating_date)
-
-            await addHarvest(fdm, b_lu_once, harvesting_date, 1000)
 
             await expect(
                 checkHarvestDateCompability(fdm, b_lu_once, harvesting_date),
