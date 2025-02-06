@@ -405,10 +405,9 @@ export async function checkHarvestDateCompability(
         .where(eq(schema.fieldSowing.b_lu, b_lu))
         .limit(1)
 
-    if (sowingDate.length === 0) {
+    if (sowingDate.length === 0 || sowingDate[0].b_sowing_date === null) {
         throw new Error("Sowing date does not exist")
     }
-    // console.log(sowingDate[0].b_sowing_date)
 
     // If cultivation has harvest date before sowing date throw an error
     if (b_harvesting_date.getTime() <= sowingDate[0].b_sowing_date.getTime()) {
@@ -427,7 +426,6 @@ export async function checkHarvestDateCompability(
     if (terminatingDate.length === 0) {
         throw new Error("Terminating date does not exist")
     }
-    // console.log(terminatingDate[0].b_terminating_date)
 
     if (b_lu_harvestable === "once") {
         // If cultivation can only be harvested once, check if a harvest is already present
@@ -443,7 +441,7 @@ export async function checkHarvestDateCompability(
 
         // If cultivation can only be harvested once, check if harvest is on the same date as terminating date
         if (
-            terminatingDate.length > 0 &&
+            terminatingDate[0].b_terminating_date &&
             b_harvesting_date.getTime() !==
                 terminatingDate[0].b_terminating_date.getTime()
         ) {
@@ -453,9 +451,10 @@ export async function checkHarvestDateCompability(
         }
     }
 
-    // If cultivation can harvested multiple times, check if harvest is before termination date
+    // If cultivation can be harvested multiple times, check if harvest is before termination date
     if (
         b_lu_harvestable === "multiple" &&
+        terminatingDate[0].b_terminating_date &&
         b_harvesting_date.getTime() >
             terminatingDate[0].b_terminating_date.getTime()
     ) {
