@@ -10,14 +10,14 @@ catalogs:
       specifier: ^1.33.0
       version: 1.33.0
     '@vitest/coverage-v8':
-      specifier: 2.1.8
-      version: 2.1.8
+      specifier: 2.1.9
+      version: 2.1.9
     drizzle-kit:
-      specifier: ^0.30.2
-      version: 0.30.2
+      specifier: ^0.30.4
+      version: 0.30.4
     drizzle-orm:
-      specifier: ^0.38.4
-      version: 0.38.4
+      specifier: ^0.39.2
+      version: 0.39.2
     typescript:
       specifier: ^5.7.3
       version: 5.7.3
@@ -226,10 +226,10 @@ importers:
         version: 10.4.20(postcss@8.5.1)
       drizzle-kit:
         specifier: 'catalog:'
-        version: 0.30.2
+        version: 0.30.4
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
+        version: 0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
       postcss:
         specifier: ^8.5.1
         version: 8.5.1
@@ -253,10 +253,10 @@ importers:
         version: 0.2.16
       drizzle-graphql:
         specifier: ^0.8.5
-        version: 0.8.5(drizzle-orm@0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1))(graphql@16.10.0)
+        version: 0.8.5(drizzle-orm@0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1))(graphql@16.10.0)
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
+        version: 0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
       graphql:
         specifier: ^16.10.0
         version: 16.10.0
@@ -287,10 +287,10 @@ importers:
         version: 22.10.9
       '@vitest/coverage-v8':
         specifier: 'catalog:'
-        version: 2.1.8(vitest@2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0))
+        version: 2.1.9(vitest@2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0))
       drizzle-kit:
         specifier: 'catalog:'
-        version: 0.30.2
+        version: 0.30.4
       fs-extra:
         specifier: ^11.3.0
         version: 11.3.0
@@ -338,7 +338,7 @@ importers:
         version: link:../fdm-core
       drizzle-orm:
         specifier: 'catalog:'
-        version: 0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
+        version: 0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
       rollup:
         specifier: ^4.31.0
         version: 4.31.0
@@ -3708,11 +3708,11 @@ packages:
   '@ungap/structured-clone@1.2.1':
     resolution: {integrity: sha512-fEzPV3hSkSMltkw152tJKNARhOupqbH96MZWyRjNaYZOMIzbrTeQDG+MTc6Mr2pgzFQzFxAfmhGDNP5QK++2ZA==}
 
-  '@vitest/coverage-v8@2.1.8':
-    resolution: {integrity: sha512-2Y7BPlKH18mAZYAW1tYByudlCYrQyl5RGvnnDYJKW5tCiO5qg3KSAy3XAxcxKz900a0ZXxWtKrMuZLe3lKBpJw==}
+  '@vitest/coverage-v8@2.1.9':
+    resolution: {integrity: sha512-Z2cOr0ksM00MpEfyVE8KXIYPEcBFxdbLSs56L8PO0QQMxt/6bDj45uQfxoc96v05KW3clk7vvgP0qfDit9DmfQ==}
     peerDependencies:
-      '@vitest/browser': 2.1.8
-      vitest: 2.1.8
+      '@vitest/browser': 2.1.9
+      vitest: 2.1.9
     peerDependenciesMeta:
       '@vitest/browser':
         optional: true
@@ -4694,12 +4694,12 @@ packages:
       drizzle-orm: '>=0.30.9'
       graphql: '>=16.3.0'
 
-  drizzle-kit@0.30.2:
-    resolution: {integrity: sha512-vhdLrxWA32WNVF77NabpSnX7pQBornx64VDQDmKddRonOB2Xe/yY4glQ7rECoa+ogqcQNo7VblLUbeBK6Zn9Ow==}
+  drizzle-kit@0.30.4:
+    resolution: {integrity: sha512-B2oJN5UkvwwNHscPWXDG5KqAixu7AUzZ3qbe++KU9SsQ+cZWR4DXEPYcvWplyFAno0dhRJECNEhNxiDmFaPGyQ==}
     hasBin: true
 
-  drizzle-orm@0.38.4:
-    resolution: {integrity: sha512-s7/5BpLKO+WJRHspvpqTydxFob8i1vo2rEx4pY6TGY7QSMuUfWUuzaY0DIpXCkgHOo37BaFC+SJQb99dDUXT3Q==}
+  drizzle-orm@0.39.2:
+    resolution: {integrity: sha512-cuopo+udkKEGGpSxCML9ZRQ43R01zYCTsbqCrb9kJkabx1QEwFlPIFoQfx6E6tuawtiX930Gwyrkwj4inlpzDg==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
       '@cloudflare/workers-types': '>=4'
@@ -9851,7 +9851,7 @@ snapshots:
       outdent: 0.5.0
       prettier: 2.8.8
       resolve-from: 5.0.0
-      semver: 7.6.3
+      semver: 7.7.1
 
   '@changesets/assemble-release-plan@6.0.5':
     dependencies:
@@ -9860,7 +9860,7 @@ snapshots:
       '@changesets/should-skip-package': 0.1.1
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
-      semver: 7.6.3
+      semver: 7.7.1
 
   '@changesets/changelog-git@0.2.0':
     dependencies:
@@ -9916,7 +9916,7 @@ snapshots:
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
       picocolors: 1.1.1
-      semver: 7.6.3
+      semver: 7.7.1
 
   '@changesets/get-release-plan@4.0.6':
     dependencies:
@@ -10261,7 +10261,7 @@ snapshots:
       '@babel/preset-env': 7.26.0(@babel/core@7.26.7)
       '@babel/preset-react': 7.26.3(@babel/core@7.26.7)
       '@babel/preset-typescript': 7.26.0(@babel/core@7.26.7)
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       '@babel/runtime-corejs3': 7.26.0
       '@babel/traverse': 7.26.7
       '@docusaurus/logger': 3.7.0
@@ -11433,7 +11433,7 @@ snapshots:
 
   '@manypkg/find-root@1.1.0':
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       '@types/node': 12.20.55
       find-up: 4.1.0
       fs-extra: 8.1.0
@@ -12917,7 +12917,7 @@ snapshots:
 
   '@ungap/structured-clone@1.2.1': {}
 
-  '@vitest/coverage-v8@2.1.8(vitest@2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0))':
+  '@vitest/coverage-v8@2.1.9(vitest@2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -13733,7 +13733,7 @@ snapshots:
       postcss-modules-scope: 3.2.1(postcss@8.5.1)
       postcss-modules-values: 4.0.0(postcss@8.5.1)
       postcss-value-parser: 4.2.0
-      semver: 7.6.3
+      semver: 7.7.1
     optionalDependencies:
       webpack: 5.97.1(@swc/core@1.10.9)
 
@@ -14022,15 +14022,15 @@ snapshots:
 
   dotenv@16.4.7: {}
 
-  drizzle-graphql@0.8.5(drizzle-orm@0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1))(graphql@16.10.0):
+  drizzle-graphql@0.8.5(drizzle-orm@0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1))(graphql@16.10.0):
     dependencies:
-      drizzle-orm: 0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
+      drizzle-orm: 0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
       graphql: 16.10.0
       graphql-parse-resolve-info: 4.13.0(graphql@16.10.0)
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-kit@0.30.2:
+  drizzle-kit@0.30.4:
     dependencies:
       '@drizzle-team/brocli': 0.10.2
       '@esbuild-kit/esm-loader': 2.6.5
@@ -14039,7 +14039,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1):
+  drizzle-orm@0.39.2(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1):
     optionalDependencies:
       '@electric-sql/pglite': 0.2.16
       '@types/react': 18.3.18
@@ -14594,7 +14594,7 @@ snapshots:
       memfs: 3.5.3
       minimatch: 3.1.2
       schema-utils: 2.7.0
-      semver: 7.6.3
+      semver: 7.7.1
       tapable: 1.1.3
       typescript: 5.7.3
       webpack: 5.97.1(@swc/core@1.10.9)
@@ -14980,7 +14980,7 @@ snapshots:
 
   history@4.10.1:
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       loose-envify: 1.4.0
       resolve-pathname: 3.0.0
       tiny-invariant: 1.3.3
@@ -16476,7 +16476,7 @@ snapshots:
       got: 12.6.1
       registry-auth-token: 5.0.3
       registry-url: 6.0.1
-      semver: 7.6.3
+      semver: 7.7.1
 
   package-manager-detector@0.2.8: {}
 
@@ -16769,7 +16769,7 @@ snapshots:
       cosmiconfig: 8.3.6(typescript@5.7.3)
       jiti: 1.21.7
       postcss: 8.5.1
-      semver: 7.6.3
+      semver: 7.7.1
       webpack: 5.97.1(@swc/core@1.10.9)
     transitivePeerDependencies:
       - typescript
@@ -17244,7 +17244,7 @@ snapshots:
 
   react-loadable-ssr-addon-v5-slorber@1.0.1(@docusaurus/react-loadable@6.0.0(react@18.3.1))(webpack@5.97.1(@swc/core@1.10.9)):
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       react-loadable: '@docusaurus/react-loadable@6.0.0(react@18.3.1)'
       webpack: 5.97.1(@swc/core@1.10.9)
 
@@ -17280,13 +17280,13 @@ snapshots:
 
   react-router-config@5.1.1(react-router@5.3.4(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       react: 18.3.1
       react-router: 5.3.4(react@18.3.1)
 
   react-router-dom@5.3.4(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       history: 4.10.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -17303,7 +17303,7 @@ snapshots:
 
   react-router@5.3.4(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -17430,7 +17430,7 @@ snapshots:
 
   regenerator-transform@0.15.2:
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
 
   regex-recursion@5.1.1:
     dependencies:
@@ -17766,7 +17766,7 @@ snapshots:
 
   semver-diff@4.0.0:
     dependencies:
-      semver: 7.6.3
+      semver: 7.7.1
 
   semver@6.3.1: {}
 
@@ -18520,7 +18520,7 @@ snapshots:
       is-yarn-global: 0.4.1
       latest-version: 7.0.0
       pupa: 3.1.0
-      semver: 7.6.3
+      semver: 7.7.1
       semver-diff: 4.0.0
       xdg-basedir: 5.1.0
 
