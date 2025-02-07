@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-app",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "private": true,
     "sideEffects": false,
     "type": "module",
@@ -31,7 +31,7 @@
         "@react-router/node": "^7.1.3",
         "@react-router/serve": "^7.1.3",
         "@turf/centroid": "^7.2.0",
-        "better-auth": "^1.1.14",
+        "better-auth": "^1.1.16",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "1.0.4",
