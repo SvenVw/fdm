@@ -374,6 +374,17 @@ export async function getCultivations(
  *                      p_app_date: Date;     // Application date
  *                      p_app_id: string;      // Unique ID of the application
  *                  }[]
+ *                  harvests: { Array of harvests for this field
+ *                      b_id_harvesting: string; // Unique ID of the harvest
+ *                      b_harvesting_date: Date; // Harvest date
+ *                      b_lu_yield: number;      // Yield in kg/ha
+ *                      b_lu_n_harvestable: number; // N content in harvestable yield (g N/kg)
+ *                      b_lu_n_residue: number;   // N content in residue (g N/kg)
+ *                      b_lu_p_harvestable: number; // P content in harvestable yield (g P2O5/kg)
+ *                      b_lu_p_residue: number;   // P content in residue (g P2O5/kg)
+ *                      b_lu_k_harvestable: number; // K content in harvestable yield (g K2O/kg)
+ *                      b_lu_k_residue: number;   // K content in residue (g K2O/kg)
+ *                  }[] *
  *              }[];
  *          }
  *          ```
@@ -414,6 +425,19 @@ export async function getCultivationPlan(
                 p_app_method: schema.fertilizerApplication.p_app_method,
                 p_app_date: schema.fertilizerApplication.p_app_date,
                 p_app_id: schema.fertilizerApplication.p_app_id,
+                b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
+                b_harvesting_date:
+                    schema.cultivationHarvesting.b_harvesting_date,
+                b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
+                b_lu_n_harvestable:
+                    schema.harvestableAnalyses.b_lu_n_harvestable,
+                b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
+                b_lu_p_harvestable:
+                    schema.harvestableAnalyses.b_lu_p_harvestable,
+                b_lu_p_residue: schema.harvestableAnalyses.b_lu_p_residue,
+                b_lu_k_harvestable:
+                    schema.harvestableAnalyses.b_lu_k_harvestable,
+                b_lu_k_residue: schema.harvestableAnalyses.b_lu_k_residue,
             })
             .from(schema.farms)
             .leftJoin(
@@ -461,6 +485,31 @@ export async function getCultivationPlan(
                     schema.fertilizerPicking.p_id_catalogue,
                 ),
             )
+            .leftJoin(
+                schema.cultivationHarvesting,
+                eq(schema.cultivations.b_lu, schema.cultivationHarvesting.b_lu),
+            )
+            .leftJoin(
+                schema.harvestables,
+                eq(
+                    schema.cultivationHarvesting.b_id_harvestable,
+                    schema.harvestables.b_id_harvestable,
+                ),
+            )
+            .leftJoin(
+                schema.harvestableSampling,
+                eq(
+                    schema.harvestables.b_id_harvestable,
+                    schema.harvestableSampling.b_id_harvestable,
+                ),
+            )
+            .leftJoin(
+                schema.harvestableAnalyses,
+                eq(
+                    schema.harvestableSampling.b_id_harvestable_analysis,
+                    schema.harvestableAnalyses.b_id_harvestable_analysis,
+                ),
+            )
             .where(
                 and(
                     eq(schema.farms.b_id_farm, b_id_farm),
@@ -500,6 +549,7 @@ export async function getCultivationPlan(
                         b_id: curr.b_id,
                         b_name: curr.b_name,
                         fertilizer_applications: [],
+                        harvests: []
                     }
                     existingCultivation.fields.push(existingField)
                 }
@@ -513,6 +563,21 @@ export async function getCultivationPlan(
                         p_app_method: curr.p_app_method,
                         p_app_date: curr.p_app_date,
                         p_app_id: curr.p_app_id,
+                    })
+                }
+
+                if (curr.b_id_harvesting) {
+                    // Only add if it's a harvest
+                    existingField.harvests.push({
+                        b_id_harvesting: curr.b_id_harvesting,
+                        b_harvesting_date: curr.b_harvesting_date,
+                        b_lu_yield: curr.b_lu_yield,
+                        b_lu_n_harvestable: curr.b_lu_n_harvestable,
+                        b_lu_n_residue: curr.b_lu_n_residue,
+                        b_lu_p_harvestable: curr.b_lu_p_harvestable,
+                        b_lu_p_residue: curr.b_lu_p_residue,
+                        b_lu_k_harvestable: curr.b_lu_k_harvestable,
+                        b_lu_k_residue: curr.b_lu_k_residue,
                     })
                 }
 

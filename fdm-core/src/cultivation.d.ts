@@ -30,5 +30,16 @@ export interface cultivationPlanType {
             p_app_date: schema.fertilizerApplicationTypeSelect["p_app_date"]
             p_app_id: schema.fertilizerApplicationTypeSelect["p_app_id"]
         }>
+        harvests: Array<{
+            b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_"]
+            b_harvesting_date: schema.cultivationHarvestingTypeSelect["b_harvesting_date"]
+            b_lu_yield: schema.harvestableAnalysesTypeSelect["b_lu_yield"]
+            b_lu_n_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_n_harvestable"]
+            b_lu_n_residue: schema.harvestableAnalysesTypeSelect["b_lu_n_residue"]
+            b_lu_p_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_p_harvestable"]
+            b_lu_p_residue: schema.harvestableAnalysesTypeSelect["b_lu_p_residue"]
+            b_lu_k_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_k_harvestable"]
+            b_lu_k_residue: schema.harvestableAnalysesTypeSelect["b_lu_k_residue"]
+        }>
     }>
 }
