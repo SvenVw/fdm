@@ -1,34 +1,30 @@
+import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
+import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
+import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
+import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
 import {
-    FertilizerApplicationsForm,
-    FormSchema,
-} from "@/components/custom/fertilizer-applications"
+    FertilizerApplication,
+    FertilizerApplicationsCardProps,
+} from "@/components/custom/fertilizer-applications/types.d"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
-import { cn } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
     getFertilizers,
     getField,
     removeFertilizerApplication,
-    updateField,
 } from "@svenvw/fdm-core"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     data,
+    useFetcher,
     useLoaderData,
     useLocation,
 } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { z } from "zod"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -71,17 +67,55 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get fertilizer applications for the field
     const fertilizerApplications = await getFertilizerApplications(fdm, b_id)
 
+    // Get the fertilizer application cards
+    //
+    const cards: FertilizerApplicationsCardProps[] = [
+        {
+            title: "Stikstof, totaal",
+            shortname: "Ntot",
+            value: 120,
+            unit: "kg/ha",
+            limit: 230,
+            advice: 200,
+        },
+        {
+            title: "Fosfaat, totaal",
+            shortname: "P",
+            value: 80,
+            unit: "kg/ha",
+            limit: 100,
+            advice: 80,
+        },
+        {
+            title: "Kalium, totaal",
+            shortname: "K",
+            value: 100,
+            unit: "kg/ha",
+            limit: 120,
+            advice: 100,
+        },
+    ]
+
     // Return user information from loader
     return {
         field: field,
         fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
+        fertilizerApplicationsCards: cards,
     }
 }
 
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
+
+    const fetcher = useFetcher()
+
+    const handleDelete = (p_app_id: string | string[]) => {
+        if (fetcher.state === "submitting") return
+
+        fetcher.submit({ p_app_id }, { method: "delete", action: props.action })
+    }
 
     return (
         <div className="space-y-6">
@@ -92,11 +126,27 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <FertilizerApplicationsForm
-                fertilizerApplications={loaderData.fertilizerApplications}
-                action={location.pathname}
-                options={loaderData.fertilizerOptions}
-            />
+            <div className="grid md:grid-cols-2 gap-8 space-x-16">
+                <div>
+                    <FertilizerApplicationForm
+                        options={loaderData.fertilizerOptions}
+                        action={location.pathname}
+                    />
+                    <Separator className="my-4" />
+                    <FertilizerApplicationsList
+                        fertilizerApplications={
+                            loaderData.fertilizerApplications
+                        }
+                        handleDelete={handleDelete}
+                        state={fetcher.state}
+                    />
+                </div>
+                <div>
+                    <FertilizerApplicationsCards
+                        cards={loaderData.fertilizerApplicationsCards}
+                    />
+                </div>
+            </div>
         </div>
     )
 }
