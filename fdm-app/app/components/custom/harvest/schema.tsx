@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 export const FormSchema = z.object({
     b_lu_yield: z.coerce
@@ -36,5 +36,8 @@ export const FormSchema = z.object({
         })
         .optional(),
     // b_sowing_date: z.coerce.date().optional(),
-    b_harvesting_date: z.coerce.date().optional(),
+    b_harvesting_date: z.coerce.date({
+        required_error: "Oogstdatum is verplicht",
+        invalid_type_error: "Oogstdatum moet een datum zijn",
+    }),
 })

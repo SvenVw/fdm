@@ -13,8 +13,8 @@ export function HarvestsList({
             {/* <div className="text-sm font-medium">Meststoffen</div> */}
             <div className="grid gap-6">
                 {harvests && harvests.length > 0 ? (
-                    <div className="space-y-8">
-                        <div className="space-y-4">
+                    <div className="space-y-6">
+                        <div className="space-y-3">
                             {harvests.map((harvest) => (
                                 <div
                                     className="grid grid-cols-4 gap-x-3 items-center"
@@ -42,7 +42,7 @@ export function HarvestsList({
                                                 asChild
                                             >
                                                 <NavLink
-                                                    to={`./${harvest.b_id_harvesting}`}
+                                                    to={`./harvest/${harvest.b_id_harvesting}`}
                                                 >
                                                     <Pencil />
                                                 </NavLink>

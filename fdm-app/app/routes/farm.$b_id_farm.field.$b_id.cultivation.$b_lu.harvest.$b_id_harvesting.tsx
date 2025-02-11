@@ -1,4 +1,5 @@
-import { FormSchema } from "@/components/custom/cultivations"
+import { FormSchema } from "@/components/custom/harvest/schema"
+import { HarvestForm } from "@/components/custom/harvest/form"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -9,7 +10,7 @@ import {
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
-    getHarvests,
+    getHarvest,
     removeHarvest,
 } from "@svenvw/fdm-core"
 import {
@@ -21,7 +22,11 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import {
+    dataWithError,
+    dataWithSuccess,
+    redirectWithSuccess,
+} from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -51,39 +56,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    // Get details of field
-    const field = await getField(fdm, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
+    // Get the harvest id
+    const b_id_harvesting = params.b_id_harvesting
+    if (!b_id_harvesting) {
+        throw data("Harvest ID is required", {
+            status: 400,
+            statusText: "Harvest ID is required",
         })
     }
 
-    // Get available cultivations for the farm
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    // Map cultivations to options for the combobox
-    const cultivationsCatalogueOptions = cultivationsCatalogue.map(
-        (cultivation) => {
-            return {
-                value: cultivation.b_lu_catalogue,
-                label: cultivation.b_lu_name,
-            }
-        },
-    )
-
-    // Get cultivation
+    // Get details of cultivation
     const cultivation = await getCultivation(fdm, b_lu)
+    if (!cultivation) {
+        throw data("Cultivation is not found", {
+            status: 404,
+            statusText: "Cultivation is not found",
+        })
+    }
 
-    // Get harvests
-    const harvests = await getHarvests(fdm, b_lu)
+    // Get selected harvest
+    const harvest = await getHarvest(fdm, b_id_harvesting)
 
     // Return user information from loader
     return {
-        field: field,
-        cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivation: cultivation,
-        harvests: harvests
+        harvest: harvest,
     }
 }
 
@@ -103,16 +100,26 @@ export default function FarmFieldsOverviewBlock() {
                     </p>
                 </div>
                 <div className="flex justify-end">
-                    <NavLink to={"../cultivation"} className={"ml-auto"}>
+                    <NavLink to={`/farm/${loaderData.cultivation.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`} className={"ml-auto"}>
                         <Button>{"Terug"}</Button>
                     </NavLink>
                 </div>
             </div>
             <Separator />
             <div className="space-y-6">
-                <HarvestsList
-                    harvests={loaderData.harvests}
-                    state={fetcher.state}
+                <HarvestForm
+                    b_lu_yield={
+                        loaderData.harvest.harvestable[0].harvestableAnalysis[0]
+                            .b_lu_yield
+                    }
+                    b_lu_n_harvestable={
+                        loaderData.harvest.harvestable[0].harvestableAnalysis[0]
+                            .b_lu_n_harvestable
+                    }
+                    b_harvesting_date={
+                        loaderData.harvest.harvestable[0].harvestableAnalysis[0]
+                            .b_harvesting_date
+                    }
                 />
             </div>
         </div>
@@ -120,10 +127,22 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
+    // Get the farm ID
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        return dataWithError(null, "Missing farm ID.")
+    }
+
     // Get the field ID
     const b_id = params.b_id
     if (!b_id) {
         return dataWithError(null, "Missing field ID.")
+    }
+
+    // Get cultivation id
+    const b_lu = params.b_lu
+    if (!b_lu) {
+        return dataWithError(null, "Missing b_lu value.")
     }
 
     if (request.method === "POST") {
@@ -132,16 +151,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        // const {  } = formValues
+        const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
 
-        // await addHarvest(
-        //     fdm,
+        await addHarvest(
+            fdm,
+            b_lu,
+            b_harvesting_date,
+            b_lu_yield,
+            b_lu_n_harvestable,
+        )
 
-        // )
-
-        return dataWithSuccess(
-            { result: "Data saved successfully" },
-            { message: "Oogst is toegevoegd! 🎉" },
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
+            {
+                message: "Oogst is toegevoegd! 🎉",
+            },
         )
     }
 

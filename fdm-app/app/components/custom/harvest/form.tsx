@@ -65,7 +65,7 @@ export function HarvestForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Opbrengst (droge stof)
+                                            Opbrengst
                                         </FormLabel>
                                         <FormControl>
                                             <Input
