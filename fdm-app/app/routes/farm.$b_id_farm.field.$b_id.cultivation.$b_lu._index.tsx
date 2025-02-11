@@ -9,6 +9,7 @@ import {
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
+    getHarvests,
     removeHarvest,
 } from "@svenvw/fdm-core"
 import {
@@ -71,14 +72,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         },
     )
 
-    // Get selected cultivation
+    // Get cultivation
     const cultivation = await getCultivation(fdm, b_lu)
+
+    // Get harvests
+    const harvests = await getHarvests(fdm, b_lu)
+    console.log(harvests)
 
     // Return user information from loader
     return {
         field: field,
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivation: cultivation,
+        harvests: harvests
     }
 }
 
@@ -106,7 +112,7 @@ export default function FarmFieldsOverviewBlock() {
             <Separator />
             <div className="space-y-6">
                 <HarvestsList
-                    harvests={loaderData.cultivation.harvests}
+                    harvests={loaderData.harvests}
                     state={fetcher.state}
                 />
             </div>

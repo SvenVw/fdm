@@ -2,54 +2,74 @@ import { Button } from "@/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
 import { NavLink } from "react-router"
+import { Pencil, Trash2 } from "lucide-react"
 
 export function HarvestsList({
     harvests,
     state,
 }: { harvests: any[]; state: string }) {
     return (
-        <div className="space-y-4">
+        <div>
             {/* <div className="text-sm font-medium">Meststoffen</div> */}
             <div className="grid gap-6">
                 {harvests && harvests.length > 0 ? (
-                    <div>
-                        <div>
+                    <div className="space-y-8">
+                        <div className="space-y-4">
                             {harvests.map((harvest) => (
                                 <div
-                                    className="grid grid-cols-5 gap-x-3 items-center"
+                                    className="grid grid-cols-4 gap-x-3 items-center"
                                     key={harvest.b_id_harvestable}
                                 >
                                     <div>
-                                        <p className="text-sm font-light leading-none">
+                                        <p className="text-sm font-medium leading-none">
                                             {format(
-                                                harvest.b_date_harvesting,
+                                                harvest.b_harvesting_date,
                                                 "yyyy-MM-dd",
                                             )}
                                         </p>
                                     </div>
                                     <div className="col-span-2">
-                                        <p className="text-sm font-medium leading-none">
-                                            {harvest.b_lu_yield}
+                                        <p className="text-sm font-light leading-none">
+                                            {`${harvest.harvestable[0].harvestableAnalysis[0].b_lu_yield} ton DS/ha`}
                                         </p>
                                         {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
                                     </div>
-                                    <div className="justify-self-end">
-                                        <Button
-                                            variant="destructive"
-                                            disabled={state === "submitting"}
-                                            onClick={() => {
-                                                // handleDelete(harvest.b_id_harvestable)
-                                            }}
-                                        >
-                                            {state === "submitting" ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
-                                                    <span>Verwijderen...</span>
-                                                </div>
-                                            ) : (
-                                                "Verwijder"
-                                            )}
-                                        </Button>
+                                    <div className="grid grid-cols-2 justify-self-end gap-x-3">
+                                        <div className="">
+                                            <Button
+                                                variant="default"
+                                                aria-label="Bewerken"
+                                                asChild
+                                            >
+                                                <NavLink
+                                                    to={`./${harvest.b_id_harvesting}`}
+                                                >
+                                                    <Pencil />
+                                                </NavLink>
+                                            </Button>
+                                        </div>
+                                        <div className="">
+                                            <Button
+                                                variant="destructive"
+                                                disabled={
+                                                    state === "submitting"
+                                                }
+                                                onClick={() => {
+                                                    // handleDelete(
+                                                    //     harvest.b_id_harvesting,
+                                                    // )
+                                                }}
+                                                aria-label="Verwijderen"
+                                            >
+                                                {state === "submitting" ? (
+                                                    <div className="flex items-center space-x-2">
+                                                        <LoadingSpinner />
+                                                    </div>
+                                                ) : (
+                                                    <Trash2 />
+                                                )}
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
