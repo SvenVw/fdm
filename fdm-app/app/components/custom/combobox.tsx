@@ -36,6 +36,7 @@ interface ComboboxProps {
     name: string
     label: ReactNode
     defaultValue?: optionType["value"]
+    disabled?: boolean
 }
 
 export function Combobox({
@@ -44,6 +45,7 @@ export function Combobox({
     name,
     label,
     defaultValue,
+    disabled,
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
 
@@ -63,6 +65,7 @@ export function Combobox({
         <FormField
             control={form.control}
             name={name}
+            disabled={disabled}
             render={({ field }) => (
                 <FormItem>
                     <FormLabel>{label}</FormLabel>
@@ -74,6 +77,7 @@ export function Combobox({
                                     role="combobox"
                                     aria-expanded={open}
                                     name={name}
+                                    disabled={disabled}
                                     className="w-full justify-between truncate focus-visible:ring-2"
                                     aria-label={`Selecteer ${options.find((option) => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
                                     aria-controls="combobox-options"
@@ -105,6 +109,7 @@ export function Combobox({
                                             <CommandItem
                                                 value={option.label}
                                                 key={option.value}
+                                                disabled={disabled}
                                                 onSelect={() => {
                                                     form.setValue(
                                                         name,
