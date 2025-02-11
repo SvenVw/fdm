@@ -1,4 +1,5 @@
 import { FormSchema } from "@/components/custom/cultivations"
+import { HarvestsList } from "@/components/custom/harvest/list"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
@@ -15,6 +16,7 @@ import {
     type LoaderFunctionArgs,
     NavLink,
     data,
+    useFetcher,
     useLoaderData,
     useLocation,
 } from "react-router"
@@ -82,6 +84,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
@@ -101,6 +104,12 @@ export default function FarmFieldsOverviewBlock() {
                 </div>
             </div>
             <Separator />
+            <div className="space-y-6">
+                <HarvestsList
+                    harvests={loaderData.cultivation.harvests}
+                    state={fetcher.state}
+                />
+            </div>
         </div>
     )
 }
@@ -118,12 +127,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const {  } = formValues
+        // const {  } = formValues
 
-        await addHarvest(
-            fdm,
-           
-        )
+        // await addHarvest(
+        //     fdm,
+
+        // )
 
         return dataWithSuccess(
             { result: "Data saved successfully" },
@@ -143,7 +152,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            await removeHarvest(fdm)
+            // await removeHarvest(fdm)
 
             return dataWithSuccess("Harvest deleted successfully", {
                 message: "GOogst is verwijderd",
