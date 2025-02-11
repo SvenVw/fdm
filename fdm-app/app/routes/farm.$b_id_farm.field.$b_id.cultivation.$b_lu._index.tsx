@@ -1,16 +1,17 @@
-import { FormSchema } from "@/components/custom/cultivations"
+import { CultivationsForm } from "@/components/custom/cultivation/form"
+import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
-    addHarvest,
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
     removeHarvest,
+    updateCultivation,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -19,7 +20,6 @@ import {
     data,
     useFetcher,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 
@@ -84,6 +84,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivation: cultivation,
         harvests: harvests,
+        b_id_farm: b_id_farm,
     }
 }
 
@@ -110,6 +111,16 @@ export default function FarmFieldsOverviewBlock() {
             </div>
             <Separator />
             <div className="space-y-6">
+                <CultivationsForm
+                    b_lu_catalogue={loaderData.cultivation.b_lu_catalogue}
+                    b_sowing_date={loaderData.cultivation.b_sowing_date}
+                    b_terminating_date={
+                        loaderData.cultivation.b_terminating_date
+                    }
+                    options={loaderData.cultivationsCatalogueOptions}
+                    action={`/farm/${loaderData.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
+                />
+                <Separator />
                 <HarvestsList
                     harvests={loaderData.harvests}
                     state={fetcher.state}
@@ -126,18 +137,27 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing field ID.")
     }
 
+    // Get the cultivation ID
+    const b_lu = params.b_lu
+    if (!b_lu) {
+        return dataWithError(null, "Missing b_lu value.")
+    }
+
     if (request.method === "POST") {
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
-        // const {  } = formValues
+        const { b_lu_catalogue, b_sowing_date, b_terminating_date } = formValues
 
-        // await addHarvest(
-        //     fdm,
-
-        // )
+        await updateCultivation(
+            fdm,
+            b_lu,
+            b_lu_catalogue,
+            b_sowing_date,
+            b_terminating_date,
+        )
 
         return dataWithSuccess(
             { result: "Data saved successfully" },
