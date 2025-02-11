@@ -233,7 +233,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     // Add fields to farm
     const b_ids = await Promise.all(
-        selectedFields.features.map(async (field, index) => {
+        selectedFields.features.map(async (field, index: number) => {
             const b_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY

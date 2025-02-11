@@ -3,21 +3,18 @@ import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
 import { NavLink, useFetcher } from "react-router"
 import { Pencil, Trash2 } from "lucide-react"
+import type { Harvest } from "./types"
 
 export function HarvestsList({
     harvests,
     state,
-    action,
-}: { harvests: any[]; state: string }) {
+}: { harvests: Harvest[]; state: string }) {
     const fetcher = useFetcher()
 
     const handleDelete = (b_id_harvesting: string | string[]) => {
         if (fetcher.state === "submitting") return
 
-        fetcher.submit(
-            { b_id_harvesting },
-            { method: "delete", action: action },
-        )
+        fetcher.submit({ b_id_harvesting }, { method: "delete" })
     }
 
     return (

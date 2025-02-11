@@ -55,7 +55,7 @@ export function HarvestForm({
                 <Form
                     id="formCultivation"
                     onSubmit={form.handleSubmit}
-                    method="POST"
+                    method="post"
                 >
                     <fieldset disabled={form.formState.isSubmitting || isHarvestUpdate} className="space-y-8">
                         <div className="grid w-4/5 lg:grid-cols-2 items-center gap-y-6 gap-x-8">

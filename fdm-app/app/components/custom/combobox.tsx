@@ -51,7 +51,7 @@ export function Combobox({
 
     /** Map of option values to their labels for efficient lookup */
     const optionsMap = useMemo(
-        () => new Map(options.map((option) => [option.value, option.label])),
+        () => new Map(options.map((option: { value: string; label: string }) => [option.value, option.label])),
         [options],
     )
 

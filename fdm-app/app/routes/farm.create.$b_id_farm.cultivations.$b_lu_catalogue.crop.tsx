@@ -305,13 +305,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const cultivation = cultivationPlan.find(
         (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
     )
-    const b_lu = cultivation.fields.map((field) => field.b_lu)
+    const b_lu = cultivation.fields.map((field: { b_lu: string }) => field.b_lu)
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     console.log(formValues)
 
     // Add cultivation details for each cultivation
     await Promise.all(
-        b_lu.map(async (item) => {
+        b_lu.map(async (item: string) => {
             try {
                 if (formValues.b_sowing_date) {
                     await updateCultivation(

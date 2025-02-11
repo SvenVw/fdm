@@ -8,7 +8,7 @@
         "**/.client/**/*.tsx",
         ".react-router/types/**/*",
         "app/routes/*.tsx",
-        "app/components/**/*.tsx",
+        "app/components/**/*.tsx"
     ],
     "compilerOptions": {
         "lib": ["DOM", "DOM.Iterable", "ES2022"],
