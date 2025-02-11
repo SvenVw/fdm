@@ -140,6 +140,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
     if (!b_lu) {
         return dataWithError(null, "Missing b_lu value.")
     }
+    console.log(b_lu)
+
 
     if (request.method === "POST") {
         // Collect form entry
@@ -163,32 +165,5 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 message: "Oogst is toegevoegd! 🎉",
             },
         )
-    }
-
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const b_lu = formData.get("b_lu")
-
-        if (!b_lu || typeof b_lu !== "string") {
-            return dataWithError(
-                "Invalid or missing b_lu value",
-                "Oops! Something went wrong. Please try again later.",
-            )
-        }
-
-        try {
-            // await removeHarvest(fdm)
-
-            return dataWithSuccess("Harvest deleted successfully", {
-                message: "GOogst is verwijderd",
-            })
-        } catch (error) {
-            // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting harvest:", error)
-            return dataWithError(
-                error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van het oogst. Probeer het later opnieuw.",
-            )
-        }
     }
 }

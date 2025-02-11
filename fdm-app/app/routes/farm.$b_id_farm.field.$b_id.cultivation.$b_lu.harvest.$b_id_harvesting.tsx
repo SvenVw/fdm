@@ -81,6 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
         cultivation: cultivation,
         harvest: harvest,
+        b_id_farm: b_id_farm,
     }
 }
 
@@ -100,7 +101,10 @@ export default function FarmFieldsOverviewBlock() {
                     </p>
                 </div>
                 <div className="flex justify-end">
-                    <NavLink to={`/farm/${loaderData.cultivation.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`} className={"ml-auto"}>
+                    <NavLink
+                        to={`/farm/${loaderData.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
+                        className={"ml-auto"}
+                    >
                         <Button>{"Terug"}</Button>
                     </NavLink>
                 </div>
@@ -171,17 +175,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     if (request.method === "DELETE") {
         const formData = await request.formData()
-        const b_lu = formData.get("b_lu")
+        const b_id_harvesting = formData.get("b_id_harvesting")
 
-        if (!b_lu || typeof b_lu !== "string") {
+        if (!b_id_harvesting || typeof b_id_harvesting !== "string") {
             return dataWithError(
-                "Invalid or missing b_lu value",
+                "Invalid or missing b_id_harvesting value",
                 "Oops! Something went wrong. Please try again later.",
             )
         }
 
         try {
-            // await removeHarvest(fdm)
+            await removeHarvest(fdm, b_id_harvesting)
 
             return dataWithSuccess("Harvest deleted successfully", {
                 message: "GOogst is verwijderd",

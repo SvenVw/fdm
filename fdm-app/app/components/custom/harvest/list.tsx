@@ -1,13 +1,25 @@
 import { Button } from "@/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
-import { NavLink } from "react-router"
+import { NavLink, useFetcher } from "react-router"
 import { Pencil, Trash2 } from "lucide-react"
 
 export function HarvestsList({
     harvests,
     state,
+    action,
 }: { harvests: any[]; state: string }) {
+    const fetcher = useFetcher()
+
+    const handleDelete = (b_id_harvesting: string | string[]) => {
+        if (fetcher.state === "submitting") return
+
+        fetcher.submit(
+            { b_id_harvesting },
+            { method: "delete", action: action },
+        )
+    }
+
     return (
         <div>
             {/* <div className="text-sm font-medium">Meststoffen</div> */}
@@ -18,7 +30,7 @@ export function HarvestsList({
                             {harvests.map((harvest) => (
                                 <div
                                     className="grid grid-cols-4 gap-x-3 items-center"
-                                    key={harvest.b_id_harvestable}
+                                    key={harvest.b_id_harvesting}
                                 >
                                     <div>
                                         <p className="text-sm font-medium leading-none">
@@ -55,9 +67,9 @@ export function HarvestsList({
                                                     state === "submitting"
                                                 }
                                                 onClick={() => {
-                                                    // handleDelete(
-                                                    //     harvest.b_id_harvesting,
-                                                    // )
+                                                    handleDelete(
+                                                        harvest.b_id_harvesting,
+                                                    )
                                                 }}
                                                 aria-label="Verwijderen"
                                             >

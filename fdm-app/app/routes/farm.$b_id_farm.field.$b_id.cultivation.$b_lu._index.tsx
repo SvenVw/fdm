@@ -83,7 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         field: field,
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivation: cultivation,
-        harvests: harvests
+        harvests: harvests,
     }
 }
 
@@ -147,20 +147,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
     if (request.method === "DELETE") {
         const formData = await request.formData()
-        const b_lu = formData.get("b_lu")
+        const b_id_harvesting = formData.get("b_id_harvesting")
+        console.log(b_id_harvesting)
 
-        if (!b_lu || typeof b_lu !== "string") {
+        if (!b_id_harvesting || typeof b_id_harvesting !== "string") {
             return dataWithError(
-                "Invalid or missing b_lu value",
+                "Invalid or missing b_id_harvesting value",
                 "Oops! Something went wrong. Please try again later.",
             )
         }
 
         try {
-            // await removeHarvest(fdm)
+            await removeHarvest(fdm, b_id_harvesting)
 
             return dataWithSuccess("Harvest deleted successfully", {
-                message: "GOogst is verwijderd",
+                message: "Oogst is verwijderd",
             })
         } catch (error) {
             // Handle errors appropriately. Log the error for debugging purposes.
