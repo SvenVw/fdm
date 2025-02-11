@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.10.1
+
+### Patch Changes
+
+- Patch for GHSA-9x4v-xfq5-m8x5
+
 ## 0.10.0
 
 ### Minor Changes
