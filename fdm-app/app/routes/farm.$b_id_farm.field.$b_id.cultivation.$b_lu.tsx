@@ -1,18 +1,19 @@
-import { CultivationsForm, FormSchema } from "@/components/custom/cultivations"
+import { FormSchema } from "@/components/custom/cultivations"
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
-    addCultivation,
-    getCultivations,
+    addHarvest,
+    getCultivation,
     getCultivationsFromCatalogue,
     getField,
-    removeCultivation,
+    removeHarvest,
 } from "@svenvw/fdm-core"
-
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    NavLink,
     data,
     useLoaderData,
     useLocation,
@@ -38,6 +39,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the cultivation id
+    const b_lu = params.b_lu
+    if (!b_lu) {
+        throw data("Cultivation ID is required", {
+            status: 400,
+            statusText: "Cultivation ID is required",
+        })
+    }
+
     // Get details of field
     const field = await getField(fdm, b_id)
     if (!field) {
@@ -59,35 +69,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         },
     )
 
-    // Get cultivations for the field
-    const cultivations = await getCultivations(fdm, b_id)
+    // Get selected cultivation
+    const cultivation = await getCultivation(fdm, b_lu)
 
     // Return user information from loader
     return {
         field: field,
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
-        cultivations: cultivations,
+        cultivation: cultivation,
     }
 }
 
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const location = useLocation()
 
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">Gewassen</h3>
-                <p className="text-sm text-muted-foreground">
-                    Vul de gewassen in voor dit perceel.
-                </p>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <h3 className="text-lg font-medium">
+                        {loaderData.cultivation.b_lu_name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        Vul de oogsten in voor dit gewas.
+                    </p>
+                </div>
+                <div className="flex justify-end">
+                    <NavLink to={"../cultivation"} className={"ml-auto"}>
+                        <Button>{"Terug"}</Button>
+                    </NavLink>
+                </div>
             </div>
             <Separator />
-            <CultivationsForm
-                cultivations={loaderData.cultivations}
-                action={location.pathname}
-                options={loaderData.cultivationsCatalogueOptions}
-            />
         </div>
     )
 }
@@ -105,19 +118,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_lu_catalogue, b_sowing_date, b_terminating_date } = formValues
+        const {  } = formValues
 
-        await addCultivation(
+        await addHarvest(
             fdm,
-            b_lu_catalogue,
-            b_id,
-            b_sowing_date,
-            b_terminating_date,
+           
         )
 
         return dataWithSuccess(
             { result: "Data saved successfully" },
-            { message: "Gewas is toegevoegd! 🎉" },
+            { message: "Oogst is toegevoegd! 🎉" },
         )
     }
 
@@ -133,17 +143,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            await removeCultivation(fdm, b_lu)
+            await removeHarvest(fdm)
 
-            return dataWithSuccess("Date deleted successfully", {
-                message: "Gewas is verwijderd",
+            return dataWithSuccess("Harvest deleted successfully", {
+                message: "GOogst is verwijderd",
             })
         } catch (error) {
             // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting cultivation:", error)
+            console.error("Error deleting harvest:", error)
             return dataWithError(
                 error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van het gewas. Probeer het later opnieuw.",
+                "Er is een fout opgetreden bij het verwijderen van het oogst. Probeer het later opnieuw.",
             )
         }
     }
