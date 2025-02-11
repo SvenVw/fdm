@@ -21,20 +21,12 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { CalendarIcon, Check, Cross, Lightbulb, Scale, X } from "lucide-react"
+import { CalendarIcon} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useEffect } from "react"
 import { LoadingSpinner } from "./loadingspinner"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "../ui/tooltip"
 import type { FertilizerApplicationsFormProps } from "./fertilizer-applications/types.d"
 import { FormSchema } from "./fertilizer-applications/formschema"
-import { FertilizerApplicationsCards } from "./fertilizer-applications/cards"
 
 export function FertilizerApplicationsForm(
     props: FertilizerApplicationsFormProps,
