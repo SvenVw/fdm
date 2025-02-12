@@ -718,7 +718,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 cultivations[0].b_lu,
                 formValues.b_lu_catalogue,
-                undefined,
+                formValues.b_sowing_date,
                 undefined,
             )
         } else {
