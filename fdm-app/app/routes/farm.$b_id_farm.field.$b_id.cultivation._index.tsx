@@ -1,4 +1,6 @@
-import { CultivationsForm, FormSchema } from "@/components/custom/cultivations"
+import { CultivationForm } from "@/components/custom/cultivation/form"
+import { CultivationList } from "@/components/custom/cultivation/list"
+import { FormSchema } from "@/components/custom/cultivation/schema"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -7,6 +9,7 @@ import {
     getCultivations,
     getCultivationsFromCatalogue,
     getField,
+    getHarvests,
     removeCultivation,
 } from "@svenvw/fdm-core"
 import {
@@ -61,11 +64,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get cultivations for the field
     const cultivations = await getCultivations(fdm, b_id)
 
+    // Get the harvests of the cultivations
+    const harvests = await Promise.all(
+        cultivations.map(async (cultivation) => {
+            return await getHarvests(fdm, cultivation.b_lu)
+        }),
+    )
+
     // Return user information from loader
     return {
         field: field,
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivations: cultivations,
+        harvests: harvests[0],
     }
 }
 
@@ -82,11 +93,15 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <CultivationsForm
-                cultivations={loaderData.cultivations}
+            <CultivationForm
+                b_lu_catalogue={undefined}
+                b_sowing_date={undefined}
+                b_terminating_date={undefined}
                 action={location.pathname}
                 options={loaderData.cultivationsCatalogueOptions}
             />
+            <Separator />
+            <CultivationList cultivations={loaderData.cultivations} harvests={loaderData.harvests}/>
         </div>
     )
 }
