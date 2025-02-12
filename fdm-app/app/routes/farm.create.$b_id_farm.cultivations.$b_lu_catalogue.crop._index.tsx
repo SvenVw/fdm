@@ -8,6 +8,8 @@ import {
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
+    getHarvestableTypeOfCultivation,
+    removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -17,6 +19,7 @@ import { HarvestsList } from "@/components/custom/harvest/list"
 import { CultivationForm } from "@/components/custom/cultivation/form"
 import { Separator } from "@/components/ui/separator"
 import { FormSchema } from "@/components/custom/cultivation/schema"
+import { cultivationsCatalogue } from "node_modules/@svenvw/fdm-core/dist/db/schema"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const b_lu_catalogue = params.b_lu_catalogue
@@ -31,6 +34,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Get the available cultivations
     let cultivationOptions = []
+    let b_lu_harvestable = "none"
     try {
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
@@ -42,6 +46,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
+
+        const cultivationCatalogueItem = cultivationsCatalogue.find(
+            (cultivation) => {
+                cultivation.b_lu_catalogue === b_lu_catalogue
+            },
+        )
+        if (cultivationCatalogueItem) {
+            b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
+        }
     } catch (error) {
         console.error("Failed to fetch cultivations:", error)
         throw data("Failed to load cultivation options", {
@@ -63,6 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         b_id_farm: b_id_farm,
         b_sowing_date: b_sowing_date,
         b_terminating_date: b_terminating_date,
+        b_lu_harvestable: b_lu_harvestable,
         harvests: harvests,
         cultivationOptions: cultivationOptions,
     }
@@ -90,6 +104,7 @@ export default function FarmAFieldCultivationBlock() {
             <Separator />
             <HarvestsList
                 harvests={loaderData.harvests}
+                harvestableType="multiple"
                 state={fetcher.state}
             />
         </div>

@@ -72,6 +72,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         },
     )
 
+    let b_lu_harvestable = "none"
+    try {
+        const cultivationCatalogueItem = cultivationsCatalogue.find(
+            (cultivation) => cultivation.b_lu_catalogue === b_lu,
+        )
+        if (cultivationCatalogueItem) {
+            b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
+        }
+    } catch (error) {
+        console.error("Failed to fetch b_lu_harvestable:", error)
+        throw data("Failed to load b_lu_harvestable", {
+            status: 500,
+            statusText: "Failed to load b_lu_harvestable",
+        })
+    }
+
     // Get cultivation
     const cultivation = await getCultivation(fdm, b_lu)
 
@@ -84,6 +100,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivation: cultivation,
         harvests: harvests,
+        b_lu_harvestable: b_lu_harvestable,
         b_id_farm: b_id_farm,
     }
 }
@@ -123,6 +140,7 @@ export default function FarmFieldsOverviewBlock() {
                 <Separator />
                 <HarvestsList
                     harvests={loaderData.harvests}
+                    b_lu_harvestable={loaderData.b_lu_harvestable}
                     state={fetcher.state}
                 />
             </div>

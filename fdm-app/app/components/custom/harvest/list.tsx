@@ -3,18 +3,27 @@ import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
 import { NavLink, useFetcher } from "react-router"
 import { Pencil, Trash2 } from "lucide-react"
-import type { Harvest } from "./types"
+import type { HarverstableType, Harvest } from "./types"
 
 export function HarvestsList({
     harvests,
+    b_lu_harvestable,
     state,
-}: { harvests: Harvest[]; state: string }) {
+}: { harvests: Harvest[]; b_lu_harvestable: HarverstableType; state: string }) {
     const fetcher = useFetcher()
 
     const handleDelete = (b_id_harvesting: string | string[]) => {
         if (fetcher.state === "submitting") return
 
         fetcher.submit({ b_id_harvesting }, { method: "delete" })
+    }
+
+    let canAddHarvest = false
+    if (b_lu_harvestable === "once" && harvests.length === 0) {
+        canAddHarvest = true
+    }
+    if (b_lu_harvestable === "multiple") {
+        canAddHarvest = true
     }
 
     return (
@@ -64,9 +73,17 @@ export function HarvestsList({
                                                     state === "submitting"
                                                 }
                                                 onClick={() => {
-                                                    handleDelete(
-                                                        harvest.b_id_harvesting,
-                                                    )
+                                                    if (
+                                                        harvest.b_id_harvestings
+                                                    ) {
+                                                        handleDelete(
+                                                            harvest.b_id_harvestings,
+                                                        )
+                                                    } else {
+                                                        handleDelete([
+                                                            harvest.b_id_harvesting,
+                                                        ])
+                                                    }
                                                 }}
                                                 aria-label="Verwijderen"
                                             >
@@ -84,11 +101,34 @@ export function HarvestsList({
                             ))}
                         </div>
                         <div>
-                            <Button asChild>
-                                <NavLink to="./harvest">
+                            <Button
+                                aria-label="Voeg oogst toe"
+                                disabled={!canAddHarvest}
+                                asChild
+                            >
+                                <NavLink
+                                    to="./harvest"
+                                    className={
+                                        !canAddHarvest
+                                            ? "pointer-events-none opacity-50"
+                                            : ""
+                                    }
+                                >
                                     Oogst toevoegen
                                 </NavLink>
                             </Button>
+                        </div>
+                    </div>
+                ) : canAddHarvest ? (
+                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                        <div className="flex flex-col space-y-2 text-center">
+                            <h1 className="text-2xl font-semibold tracking-tight">
+                                Dit gewas is niet oogstbaar
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Kies een einddatum om aan te geven wanneer dit
+                                gewas is beëindigd.
+                            </p>
                         </div>
                     </div>
                 ) : (
