@@ -25,6 +25,7 @@ import { format } from "date-fns/format"
 import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { LoadingSpinner } from "../loadingspinner"
+import { nl } from "date-fns/locale/nl"
 
 export function CultivationForm({
     b_lu_catalogue,
@@ -113,9 +114,10 @@ export function CultivationForm({
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
-                                                    // disabled={(date) =>
-                                                    //     date > new Date() || date < new Date("1900-01-01")
-                                                    // }
+                                                    locale={nl}
+                                                    disabled={(date) =>
+                                                        date < new Date("1900-01-01")
+                                                    }
                                                     initialFocus
                                                 />
                                             </PopoverContent>
@@ -166,9 +168,10 @@ export function CultivationForm({
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
-                                                    // disabled={(date) =>
-                                                    //     date > new Date() || date < new Date("1900-01-01")
-                                                    // }
+                                                    locale={nl}
+                                                    disabled={(date) =>
+                                                        date < new Date("1970-01-01")
+                                                    }
                                                     initialFocus
                                                 />
                                             </PopoverContent>
