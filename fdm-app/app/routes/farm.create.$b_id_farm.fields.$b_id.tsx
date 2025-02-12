@@ -656,7 +656,7 @@ export default function Index() {
                         <MapGL
                             {...viewState}
                             style={{
-                                height: "100%",
+                                height: "75%",
                                 width: "100%",
                                 position: "absolute",
                             }}
