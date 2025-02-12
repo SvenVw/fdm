@@ -167,7 +167,10 @@ export default function Index() {
                                 interactive={true}
                                 mapStyle={loaderData.mapboxStyle}
                                 mapboxAccessToken={loaderData.mapboxToken}
-                                interactiveLayerIds={[fieldsAvailableId, fieldsSelectedId]}
+                                interactiveLayerIds={[
+                                    fieldsAvailableId,
+                                    fieldsSelectedId,
+                                ]}
                             >
                                 <GeolocateControl />
                                 <NavigationControl />
@@ -229,7 +232,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const selectedFields = JSON.parse(String(formData.get("selected_fields")))
 
     // Add fields to farm
-    const b_ids = await Promise.all(
+    await Promise.all(
         selectedFields.features.map(async (field, index: number) => {
             const b_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
@@ -341,7 +344,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }),
     )
 
-    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields/${b_ids[0]}`, {
+    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields}`, {
         message: "Percelen zijn toegevoegd! 🎉",
     })
 }
