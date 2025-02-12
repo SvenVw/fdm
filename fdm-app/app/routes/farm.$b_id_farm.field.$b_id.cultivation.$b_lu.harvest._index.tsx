@@ -111,11 +111,9 @@ export default function FarmFieldsOverviewBlock() {
             <Separator />
             <div className="space-y-6">
                 <HarvestForm
-                    b_lu_yield={loaderData.cultivation.b_lu_yield}
-                    b_lu_n_harvestable={
-                        loaderData.cultivation.b_lu_n_harvestable
-                    }
-                    b_harvesting_date={loaderData.cultivation.b_harvesting_date}
+                    b_lu_yield={undefined}
+                    b_lu_n_harvestable={undefined}
+                    b_harvesting_date={undefined}
                 />
             </div>
         </div>
@@ -141,7 +139,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing b_lu value.")
     }
     console.log(b_lu)
-
 
     if (request.method === "POST") {
         // Collect form entry

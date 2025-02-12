@@ -39,7 +39,7 @@ export function HarvestsList({
                                     </div>
                                     <div className="col-span-2">
                                         <p className="text-sm font-light leading-none">
-                                            {`${harvest.harvestable[0].harvestableAnalysis[0].b_lu_yield} ton DS/ha`}
+                                            {`${harvest.harvestables[0].harvestable_analyses[0].b_lu_yield} ton DS/ha`}
                                         </p>
                                         {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
                                     </div>

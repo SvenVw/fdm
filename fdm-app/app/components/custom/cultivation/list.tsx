@@ -17,7 +17,6 @@ export function CultivationList({
         fetcher.submit({ b_lu }, { method: "delete" })
     }
 
-    console.log(harvests)
     return (
         <div className="space-y-4">
             {/* <div className="text-sm font-medium">Meststoffen</div> */}

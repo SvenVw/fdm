@@ -4,9 +4,7 @@ import {
     type LoaderFunctionArgs,
     useFetcher,
     useLoaderData,
-    useNavigation,
 } from "react-router"
-import { z } from "zod"
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
@@ -72,7 +70,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmAFieldCultivationBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const navigation = useNavigation()
     const fetcher = useFetcher()
 
     return (

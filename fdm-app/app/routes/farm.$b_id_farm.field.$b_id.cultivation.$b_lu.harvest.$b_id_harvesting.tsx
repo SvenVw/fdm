@@ -113,17 +113,14 @@ export default function FarmFieldsOverviewBlock() {
             <div className="space-y-6">
                 <HarvestForm
                     b_lu_yield={
-                        loaderData.harvest.harvestable[0].harvestableAnalysis[0]
-                            .b_lu_yield
+                        loaderData.harvest.harvestables[0]
+                            .harvestable_analyses[0].b_lu_yield
                     }
                     b_lu_n_harvestable={
-                        loaderData.harvest.harvestable[0].harvestableAnalysis[0]
-                            .b_lu_n_harvestable
+                        loaderData.harvest.harvestables[0]
+                            .harvestable_analyses[0].b_lu_n_harvestable
                     }
-                    b_harvesting_date={
-                        loaderData.harvest.harvestable[0].harvestableAnalysis[0]
-                            .b_harvesting_date
-                    }
+                    b_harvesting_date={loaderData.harvest.b_harvesting_date}
                 />
             </div>
         </div>
