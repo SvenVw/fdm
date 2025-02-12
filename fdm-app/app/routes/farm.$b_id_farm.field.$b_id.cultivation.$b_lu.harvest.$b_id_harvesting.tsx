@@ -146,54 +146,22 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing b_lu value.")
     }
 
-    if (request.method === "POST") {
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
+    // Collect form entry
+    const formValues = await extractFormValuesFromRequest(request, FormSchema)
+    const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
 
-        await addHarvest(
-            fdm,
-            b_lu,
-            b_harvesting_date,
-            b_lu_yield,
-            b_lu_n_harvestable,
-        )
+    await addHarvest(
+        fdm,
+        b_lu,
+        b_harvesting_date,
+        b_lu_yield,
+        b_lu_n_harvestable,
+    )
 
-        return redirectWithSuccess(
-            `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
-            {
-                message: "Oogst is toegevoegd! 🎉",
-            },
-        )
-    }
-
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const b_id_harvesting = formData.get("b_id_harvesting")
-
-        if (!b_id_harvesting || typeof b_id_harvesting !== "string") {
-            return dataWithError(
-                "Invalid or missing b_id_harvesting value",
-                "Oops! Something went wrong. Please try again later.",
-            )
-        }
-
-        try {
-            await removeHarvest(fdm, b_id_harvesting)
-
-            return dataWithSuccess("Harvest deleted successfully", {
-                message: "GOogst is verwijderd",
-            })
-        } catch (error) {
-            // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting harvest:", error)
-            return dataWithError(
-                error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van het oogst. Probeer het later opnieuw.",
-            )
-        }
-    }
+    return redirectWithSuccess(
+        `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
+        {
+            message: "Oogst is toegevoegd! 🎉",
+        },
+    )
 }

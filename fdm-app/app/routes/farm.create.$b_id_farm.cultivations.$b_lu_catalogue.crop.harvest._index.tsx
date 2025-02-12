@@ -66,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export default function FarmAFieldCultivationBlock() {
+export default function CultivationPlanAddHarvestBlock() {
     return (
         <div className="space-y-6">
             <div>

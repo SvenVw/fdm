@@ -1,6 +1,5 @@
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { HarvestForm } from "@/components/custom/harvest/form"
-import { HarvestsList } from "@/components/custom/harvest/list"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
@@ -10,7 +9,6 @@ import {
     getCultivation,
     getCultivationsFromCatalogue,
     getField,
-    removeHarvest,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -19,11 +17,9 @@ import {
     data,
     useFetcher,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import {
     dataWithError,
-    dataWithSuccess,
     redirectWithSuccess,
 } from "remix-toast"
 
