@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
 import { NavLink, useFetcher } from "react-router"
-import { Eye, Pencil, Trash2 } from "lucide-react"
+import { Eye, Trash2 } from "lucide-react"
 import type { HarverstableType, Harvest } from "./types"
 
 export function HarvestsList({
@@ -74,10 +74,10 @@ export function HarvestsList({
                                                 }
                                                 onClick={() => {
                                                     if (
-                                                        harvest.b_id_harvestings
+                                                        harvest.b_ids_harvesting
                                                     ) {
                                                         handleDelete(
-                                                            harvest.b_id_harvestings,
+                                                            harvest.b_ids_harvesting,
                                                         )
                                                     } else {
                                                         handleDelete([
