@@ -40,18 +40,29 @@ import type { FeatureCollection } from "geojson"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {
     type ActionFunctionArgs,
-    Form,
     type LoaderFunctionArgs,
     type MetaFunction,
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { RemixFormProvider, useRemixForm} from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import wkx from "wkx"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns/format"
+import { cn } from "@/lib/utils"
+import { nl } from "date-fns/locale/nl"
+import { useEffect, useRef } from "react"
+import { Form } from "react-hook-form"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -72,6 +83,9 @@ const FormSchema = z.object({
         }),
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
+    }),
+    b_sowing_date: z.coerce.date({
+        required_error: "Zaaidatum is verplicht",
     }),
     // b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
     //     errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
@@ -214,6 +228,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         b_id_farm: b_id_farm,
         b_name: field.b_name,
         b_lu_catalogue: b_lu_catalogue,
+        b_sowing_date: cultivations[0]?.b_sowing_date,
         b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
         b_gwl_class: soilAnalysis?.b_gwl_class,
         a_p_al: soilAnalysis?.a_p_al,
@@ -234,6 +249,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
+    const formRef = useRef<ReturnType<typeof useRemixForm<z.infer<typeof FormSchema>>>>(null);  // Create a ref
 
     const viewState = getViewState(loaderData.featureCollection)
     const id = "fieldsSaved"
@@ -246,6 +262,7 @@ export default function Index() {
         defaultValues: {
             b_name: loaderData.b_name ?? "",
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_sowing_date: loaderData.b_sowing_date ?? undefined,
             b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
             b_gwl_class: loaderData.b_gwl_class ?? undefined,
             a_p_al: loaderData.a_p_al ?? undefined,
@@ -261,7 +278,7 @@ export default function Index() {
                     <Form
                         id="formField"
                         onSubmit={form.handleSubmit}
-                        method="POST"
+                        method="post"
                     >
                         <div className="space-y-6">
                             <div>
@@ -274,30 +291,33 @@ export default function Index() {
                             </div>
 
                             <fieldset disabled={form.formState.isSubmitting}>
-                                <div className="grid grid-cols-2 w-full items-center gap-4">
-                                    <div className="flex flex-col space-y-1.5 col-span-2">
-                                        <FormField
-                                            control={form.control}
-                                            name="b_name"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Perceelsnaam
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="text"
-                                                            required
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
+                                <div className="flex flex-col gap-y-4">
+                                    {/* <h3>Perceel</h3> */}
+
+                                    <FormField
+                                        control={form.control}
+                                        name="b_name"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>
+                                                    Perceelsnaam
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        {...field}
+                                                        type="text"
+                                                        required
+                                                    />
+                                                </FormControl>
+                                                <FormDescription />
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <h3 className="text-lg font-medium">
+                                        Gewas
+                                    </h3>
+                                    <div className="grid grid-cols-2 items-center gap-4">
                                         <Combobox
                                             options={
                                                 loaderData.cultivationOptions
@@ -309,8 +329,82 @@ export default function Index() {
                                                 loaderData.b_lu_catalogue
                                             }
                                         />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="b_sowing_date"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-col">
+                                                    <FormLabel>
+                                                        Zaaidatum
+                                                    </FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                    className={cn(
+                                                                        "w-[240px] pl-3 text-left font-normal",
+                                                                        !field.value &&
+                                                                            "text-muted-foreground",
+                                                                    )}
+                                                                >
+                                                                    {field.value ? (
+                                                                        format(
+                                                                            field.value,
+                                                                            "yyyy-MM-dd",
+                                                                        )
+                                                                    ) : (
+                                                                        <span>
+                                                                            Kies
+                                                                            een
+                                                                            datum
+                                                                        </span>
+                                                                    )}
+                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent
+                                                            className="w-auto p-0"
+                                                            align="start"
+                                                        >
+                                                            <Calendar
+                                                                locale={nl}
+                                                                mode="single"
+                                                                selected={
+                                                                    field.value
+                                                                }
+                                                                onSelect={
+                                                                    field.onChange
+                                                                }
+                                                                disabled={(
+                                                                    date,
+                                                                ) =>
+                                                                    date <
+                                                                    new Date(
+                                                                        "1970-01-01",
+                                                                    )
+                                                                }
+                                                                initialFocus
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    {/* <FormDescription>
+                                                        Kan ook poot- of
+                                                        aanplantdatum zijn
+                                                    </FormDescription> */}
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
                                     </div>
-                                    <div className="flex flex-col space-y-1.5">
+                                    <h3 className="text-lg font-medium">
+                                        Bodem
+                                    </h3>
+                                    <div className="grid grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
                                             name="b_soiltype_agr"
@@ -365,8 +459,7 @@ export default function Index() {
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
+
                                         <FormField
                                             control={form.control}
                                             name="b_gwl_class"
@@ -457,8 +550,7 @@ export default function Index() {
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
+
                                         <FormField
                                             control={form.control}
                                             name="a_p_al"
@@ -480,8 +572,7 @@ export default function Index() {
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
+
                                         <FormField
                                             control={form.control}
                                             name="a_p_cc"
@@ -503,8 +594,7 @@ export default function Index() {
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                    <div className="flex flex-col space-y-1.5">
+
                                         <FormField
                                             control={form.control}
                                             name="a_som_loi"
