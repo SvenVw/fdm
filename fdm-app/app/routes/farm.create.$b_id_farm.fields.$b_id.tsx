@@ -84,9 +84,6 @@ const FormSchema = z.object({
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
-    b_sowing_date: z.coerce.date({
-        required_error: "Zaaidatum is verplicht",
-    }),
     // b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
     //     errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
     // }),
@@ -189,7 +186,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Field geometry is required",
         })
     }
-    const b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
 
     // Get soil analysis data
     const soilAnalysis = await getSoilAnalysis(fdm, b_id)
@@ -260,7 +256,6 @@ export default function Index() {
         defaultValues: {
             b_name: loaderData.b_name ?? "",
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
-            b_sowing_date: loaderData.b_sowing_date ?? undefined,
             b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
             b_gwl_class: loaderData.b_gwl_class ?? undefined,
             a_p_al: loaderData.a_p_al ?? undefined,
@@ -316,7 +311,7 @@ export default function Index() {
 
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Hoofdgewas</CardTitle>
+                                        <CardTitle>Gewas</CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                         <div className="grid grid-cols-2 items-center gap-4">
@@ -326,83 +321,10 @@ export default function Index() {
                                                 }
                                                 form={form}
                                                 name={"b_lu_catalogue"}
-                                                label={"Gewasnaam"}
+                                                label={"Hoofdgewas"}
                                                 defaultValue={
                                                     loaderData.b_lu_catalogue
                                                 }
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="b_sowing_date"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex flex-col">
-                                                        <FormLabel>
-                                                            Zaaidatum
-                                                        </FormLabel>
-                                                        <Popover>
-                                                            <PopoverTrigger
-                                                                asChild
-                                                            >
-                                                                <FormControl>
-                                                                    <Button
-                                                                        variant={
-                                                                            "outline"
-                                                                        }
-                                                                        className={cn(
-                                                                            "w-[240px] pl-3 text-left font-normal",
-                                                                            !field.value &&
-                                                                                "text-muted-foreground",
-                                                                        )}
-                                                                    >
-                                                                        {field.value ? (
-                                                                            format(
-                                                                                field.value,
-                                                                                "yyyy-MM-dd",
-                                                                            )
-                                                                        ) : (
-                                                                            <span>
-                                                                                Kies
-                                                                                een
-                                                                                datum
-                                                                            </span>
-                                                                        )}
-                                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                                    </Button>
-                                                                </FormControl>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent
-                                                                className="w-auto p-0"
-                                                                align="start"
-                                                            >
-                                                                <Calendar
-                                                                    locale={nl}
-                                                                    mode="single"
-                                                                    selected={
-                                                                        field.value
-                                                                    }
-                                                                    onSelect={
-                                                                        field.onChange
-                                                                    }
-                                                                    disabled={(
-                                                                        date,
-                                                                    ) =>
-                                                                        date <
-                                                                        new Date(
-                                                                            "1970-01-01",
-                                                                        )
-                                                                    }
-                                                                    initialFocus
-                                                                />
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        {/* <FormDescription>
-                                                        Kan ook poot- of
-                                                        aanplantdatum zijn
-                                                    </FormDescription> */}
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
                                             />
                                         </div>
                                     </CardContent>
@@ -718,7 +640,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 cultivations[0].b_lu,
                 formValues.b_lu_catalogue,
-                formValues.b_sowing_date,
+                undefined,
                 undefined,
             )
         } else {
