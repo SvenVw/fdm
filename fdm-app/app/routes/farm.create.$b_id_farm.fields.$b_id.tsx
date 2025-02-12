@@ -658,6 +658,7 @@ export default function Index() {
                             style={{
                                 height: "100%",
                                 width: "100%",
+                                position: "absolute",
                             }}
                             interactive={false}
                             mapStyle={loaderData.mapboxStyle}
