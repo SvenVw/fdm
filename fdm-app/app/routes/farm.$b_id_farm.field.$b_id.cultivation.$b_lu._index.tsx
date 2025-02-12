@@ -1,7 +1,7 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
-import { HarverstableType } from "@/components/custom/harvest/types"
+import type { HarverstableType } from "@/components/custom/harvest/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"

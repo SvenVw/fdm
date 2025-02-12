@@ -1,11 +1,5 @@
-import { useEffect } from "react"
-import { Form } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { FormSchema } from "./schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import type { CultivationsFormProps } from "./types"
-import { Combobox } from "../combobox"
-import type { z } from "zod"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -19,13 +13,19 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns/format"
-import { CalendarIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { LoadingSpinner } from "../loadingspinner"
 import { nl } from "date-fns/locale/nl"
+import { CalendarIcon } from "lucide-react"
+import { useEffect } from "react"
+import { Form } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
+import { Combobox } from "../combobox"
+import { LoadingSpinner } from "../loadingspinner"
+import { FormSchema } from "./schema"
+import type { CultivationsFormProps } from "./types"
 
 export function CultivationForm({
     b_lu_catalogue,
@@ -116,7 +116,8 @@ export function CultivationForm({
                                                     onSelect={field.onChange}
                                                     locale={nl}
                                                     disabled={(date) =>
-                                                        date < new Date("1900-01-01")
+                                                        date <
+                                                        new Date("1900-01-01")
                                                     }
                                                     initialFocus
                                                 />
@@ -170,7 +171,8 @@ export function CultivationForm({
                                                     onSelect={field.onChange}
                                                     locale={nl}
                                                     disabled={(date) =>
-                                                        date < new Date("1970-01-01")
+                                                        date <
+                                                        new Date("1970-01-01")
                                                     }
                                                     initialFocus
                                                 />

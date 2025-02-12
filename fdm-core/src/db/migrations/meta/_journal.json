@@ -1,55 +1,55 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1731414293847,
-      "tag": "0000_crazy_slyde",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1737560036562,
-      "tag": "0001_talented_malcolm_colcord",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1737561964152,
-      "tag": "0002_clammy_kylun",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1738146516727,
-      "tag": "0003_thick_stature",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1738586371193,
-      "tag": "0004_clammy_exodus",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1738594850196,
-      "tag": "0005_shallow_zuras",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1738599529979,
-      "tag": "0006_fearless_mac_gargan",
-      "breakpoints": true
-    }
-  ]
+    "version": "7",
+    "dialect": "postgresql",
+    "entries": [
+        {
+            "idx": 0,
+            "version": "7",
+            "when": 1731414293847,
+            "tag": "0000_crazy_slyde",
+            "breakpoints": true
+        },
+        {
+            "idx": 1,
+            "version": "7",
+            "when": 1737560036562,
+            "tag": "0001_talented_malcolm_colcord",
+            "breakpoints": true
+        },
+        {
+            "idx": 2,
+            "version": "7",
+            "when": 1737561964152,
+            "tag": "0002_clammy_kylun",
+            "breakpoints": true
+        },
+        {
+            "idx": 3,
+            "version": "7",
+            "when": 1738146516727,
+            "tag": "0003_thick_stature",
+            "breakpoints": true
+        },
+        {
+            "idx": 4,
+            "version": "7",
+            "when": 1738586371193,
+            "tag": "0004_clammy_exodus",
+            "breakpoints": true
+        },
+        {
+            "idx": 5,
+            "version": "7",
+            "when": 1738594850196,
+            "tag": "0005_shallow_zuras",
+            "breakpoints": true
+        },
+        {
+            "idx": 6,
+            "version": "7",
+            "when": 1738599529979,
+            "tag": "0006_fearless_mac_gargan",
+            "breakpoints": true
+        }
+    ]
 }

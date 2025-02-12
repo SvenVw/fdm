@@ -1,24 +1,24 @@
-import {
-    type ActionFunctionArgs,
-    data,
-    type LoaderFunctionArgs,
-    useFetcher,
-    useLoaderData,
-} from "react-router"
+import { CultivationForm } from "@/components/custom/cultivation/form"
+import { FormSchema } from "@/components/custom/cultivation/schema"
+import { HarvestsList } from "@/components/custom/harvest/list"
+import type { HarverstableType } from "@/components/custom/harvest/types"
+import { Separator } from "@/components/ui/separator"
+import { fdm } from "@/lib/fdm.server"
+import { extractFormValuesFromRequest } from "@/lib/form"
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
-import { extractFormValuesFromRequest } from "@/lib/form"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    data,
+    useFetcher,
+    useLoaderData,
+} from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { fdm } from "@/lib/fdm.server"
-import { HarvestsList } from "@/components/custom/harvest/list"
-import { CultivationForm } from "@/components/custom/cultivation/form"
-import { Separator } from "@/components/ui/separator"
-import { FormSchema } from "@/components/custom/cultivation/schema"
-import { HarverstableType } from "@/components/custom/harvest/types"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const b_lu_catalogue = params.b_lu_catalogue
@@ -83,15 +83,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         for (const harvest of field.harvests) {
             // Create a key based on harvest properties to identify similar harvests
             const isSimilarHarvest = (h1: any, h2: any) =>
-                h1.b_harvesting_date.getTime() === h2.b_harvesting_date.getTime() &&
+                h1.b_harvesting_date.getTime() ===
+                    h2.b_harvesting_date.getTime() &&
                 h1.harvestables[0].harvestable_analyses[0].b_lu_yield ===
                     h2.harvestables[0].harvestable_analyses[0].b_lu_yield &&
-                h1.harvestables[0].harvestable_analyses[0].b_lu_n_harvestable ===
+                h1.harvestables[0].harvestable_analyses[0]
+                    .b_lu_n_harvestable ===
                     h2.harvestables[0].harvestable_analyses[0]
                         .b_lu_n_harvestable
 
-            const existingHarvestIndex = accumulator.findIndex((existingHarvest) =>
-                isSimilarHarvest(existingHarvest, harvest),
+            const existingHarvestIndex = accumulator.findIndex(
+                (existingHarvest) => isSimilarHarvest(existingHarvest, harvest),
             )
 
             if (existingHarvestIndex !== -1) {
@@ -101,7 +103,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 )
             } else {
                 // If it's a new harvest, add it to the accumulator with a new b_ids_harvesting array
-                accumulator.push({ ...harvest, b_ids_harvesting: [harvest.b_id_harvesting] })
+                accumulator.push({
+                    ...harvest,
+                    b_ids_harvesting: [harvest.b_id_harvesting],
+                })
             }
         }
 

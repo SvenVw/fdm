@@ -1,8 +1,5 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
-import { FormSchema } from "./schema"
-import { Form } from "react-hook-form"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -17,19 +14,26 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns/format"
-import { CalendarIcon } from "lucide-react"
-import { Calendar } from "@/components/ui/calendar"
-import { LoadingSpinner } from "../loadingspinner"
 import { nl } from "date-fns/locale/nl"
+import { CalendarIcon } from "lucide-react"
+import { Form } from "react-hook-form"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
+import { LoadingSpinner } from "../loadingspinner"
+import { FormSchema } from "./schema"
 
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
     b_harvesting_date,
-}: {b_lu_yield: number | undefined, b_lu_n_harvestable: number | undefined, b_harvesting_date: Date | undefined}) {
+}: {
+    b_lu_yield: number | undefined
+    b_lu_n_harvestable: number | undefined
+    b_harvesting_date: Date | undefined
+}) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -41,7 +45,10 @@ export function HarvestForm({
     })
 
     // Currently updateHarvest function is not available, therefore check if this is a new harvest or is has already values
-    const isHarvestUpdate = b_lu_yield !== undefined || b_lu_n_harvestable !== undefined || b_harvesting_date !== undefined
+    const isHarvestUpdate =
+        b_lu_yield !== undefined ||
+        b_lu_n_harvestable !== undefined ||
+        b_harvesting_date !== undefined
 
     return (
         <div className="space-y-6">
@@ -57,16 +64,19 @@ export function HarvestForm({
                     onSubmit={form.handleSubmit}
                     method="post"
                 >
-                    <fieldset disabled={form.formState.isSubmitting || isHarvestUpdate} className="space-y-8">
+                    <fieldset
+                        disabled={
+                            form.formState.isSubmitting || isHarvestUpdate
+                        }
+                        className="space-y-8"
+                    >
                         <div className="grid w-4/5 lg:grid-cols-2 items-center gap-y-6 gap-x-8">
                             <FormField
                                 control={form.control}
                                 name="b_lu_yield"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>
-                                            Opbrengst
-                                        </FormLabel>
+                                        <FormLabel>Opbrengst</FormLabel>
                                         <FormControl>
                                             <Input
                                                 placeholder="Bv. 37 ton ds / ha"

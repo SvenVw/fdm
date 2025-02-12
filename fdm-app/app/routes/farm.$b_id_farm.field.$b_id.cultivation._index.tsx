@@ -101,7 +101,10 @@ export default function FarmFieldsOverviewBlock() {
                 options={loaderData.cultivationsCatalogueOptions}
             />
             <Separator />
-            <CultivationList cultivations={loaderData.cultivations} harvests={loaderData.harvests}/>
+            <CultivationList
+                cultivations={loaderData.cultivations}
+                harvests={loaderData.harvests}
+            />
         </div>
     )
 }

@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button"
-import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
-import { NavLink, useFetcher } from "react-router"
 import { Eye, Trash2 } from "lucide-react"
+import { NavLink, useFetcher } from "react-router"
+import { LoadingSpinner } from "../loadingspinner"
 import type { HarverstableType, Harvest } from "./types"
 
 export function HarvestsList({

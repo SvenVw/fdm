@@ -8,6 +8,8 @@ import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { Combobox } from "@/components/custom/combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     FormControl,
     FormDescription,
@@ -18,6 +20,11 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -26,6 +33,7 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
@@ -36,7 +44,11 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
+import { format } from "date-fns/format"
+import { nl } from "date-fns/locale/nl"
 import type { FeatureCollection } from "geojson"
+import { CalendarIcon } from "lucide-react"
+import { Form } from "react-hook-form"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {
     type ActionFunctionArgs,
@@ -51,18 +63,6 @@ import { ClientOnly } from "remix-utils/client-only"
 import wkx from "wkx"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon } from "lucide-react"
-import { format } from "date-fns/format"
-import { cn } from "@/lib/utils"
-import { nl } from "date-fns/locale/nl"
-import { Form } from "react-hook-form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 // Meta
 export const meta: MetaFunction = () => {
