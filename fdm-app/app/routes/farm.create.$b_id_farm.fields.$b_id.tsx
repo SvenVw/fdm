@@ -81,6 +81,9 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van perceel moet minimaal 3 karakters bevatten",
         }),
+    b_area: z.string({
+        required_error: "Oppervlakte van perceel is verplicht",
+    }),
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
@@ -255,6 +258,7 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
+            b_area: `${Math.round(loaderData.b_area * 10) / 10} ha`,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
             b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
             b_gwl_class: loaderData.b_gwl_class ?? undefined,
@@ -277,35 +281,52 @@ export default function Index() {
                             <div className="space-y-6">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>
-                                            Perceel
-                                            <p className="text-sm text-muted-foreground">
-                                                {Math.round(
-                                                    loaderData.b_area * 10,
-                                                ) / 10}{" "}
-                                                ha
-                                            </p>
-                                        </CardTitle>
+                                        <CardTitle>Perceel</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <FormField
-                                            control={form.control}
-                                            name="b_name"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Naam</FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="text"
-                                                            required
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <div className="grid grid-cols-2 items-center gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="b_name"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Naam
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                type="text"
+                                                                required
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <FormField
+                                                control={form.control}
+                                                name="b_area"
+                                                disabled={true}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Oppervlak
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                type="text"
+                                                                required
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
                                     </CardContent>
                                 </Card>
 
