@@ -179,7 +179,7 @@ export async function getHarvest(
             )
             .limit(1)
 
-        result.harvestable = harvestables
+        result.harvestables = harvestables
 
         // Get properties of harvestable analyses for this harvesting
         const harvestableAnalyses = await fdm
@@ -215,12 +215,12 @@ export async function getHarvest(
             .where(
                 eq(
                     schema.harvestableSampling.b_id_harvestable,
-                    result.harvestable[0].b_id_harvestable,
+                    result.harvestables[0].b_id_harvestable,
                 ),
             )
             .limit(1)
 
-        result.harvestable[0].harvestableAnalysis = harvestableAnalyses
+        result.harvestables[0].harvestable_analyses = harvestableAnalyses
 
         return result
     } catch (err) {
@@ -283,15 +283,11 @@ export async function removeHarvest(
         return await fdm.transaction(async (tx: FdmType) => {
             const harvest = await getHarvest(tx, b_id_harvesting)
 
-            const b_id_harvestable = harvest.harvestable[0].b_id_harvestable
+            const b_id_harvestable = harvest.harvestables[0].b_id_harvestable
             const b_id_harvestable_analysis =
-                harvest.harvestable[0].harvestableAnalysis[0]
+                harvest.harvestables[0].harvestable_analyses[0]
                     .b_id_harvestable_analysis
             const b_lu = harvest.b_lu
-
-            console.log(b_id_harvesting)
-            console.log(b_id_harvestable)
-            console.log(b_id_harvestable_analysis)
 
             // Delete related sampling entries
             await tx

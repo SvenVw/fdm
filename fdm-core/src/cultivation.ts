@@ -11,6 +11,7 @@ import {
     getHarvestableTypeOfCultivation,
     getHarvests,
 } from "./harvest"
+import { b } from "vitest/dist/chunks/suite.B2jumIFP.js"
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -377,14 +378,18 @@ export async function getCultivations(
  *                  harvests: { Array of harvests for this field
  *                      b_id_harvesting: string; // Unique ID of the harvest
  *                      b_harvesting_date: Date; // Harvest date
- *                      b_lu_yield: number;      // Yield in kg/ha
- *                      b_lu_n_harvestable: number; // N content in harvestable yield (g N/kg)
- *                      b_lu_n_residue: number;   // N content in residue (g N/kg)
- *                      b_lu_p_harvestable: number; // P content in harvestable yield (g P2O5/kg)
- *                      b_lu_p_residue: number;   // P content in residue (g P2O5/kg)
- *                      b_lu_k_harvestable: number; // K content in harvestable yield (g K2O/kg)
- *                      b_lu_k_residue: number;   // K content in residue (g K2O/kg)
- *                  }[] *
+ *                      harvestables: {        // Array of harvestables associated with this harvest.  Currently, only one harvestable per harvest is supported.
+ *                          b_id_harvestable: string; // Unique ID of the harvestable
+ *                          harvestable_analyses: {  // Analyses of the harvestable. Currently, only one analysis per harvestable is supported.
+ *                              b_lu_yield: number;      // Yield in kg/ha
+ *                              b_lu_n_harvestable: number; // N content in harvestable yield (g N/kg)
+ *                              b_lu_n_residue: number;   // N content in residue (g N/kg)
+ *                              b_lu_p_harvestable: number; // P content in harvestable yield (g P2O5/kg)
+ *                              b_lu_p_residue: number;   // P content in residue (g P2O5/kg)
+ *                              b_lu_k_harvestable: number; // K content in harvestable yield (g K2O/kg)
+ *                              b_lu_k_residue: number;   // K content in residue (g K2O/kg)
+ *                          }[];
+ *                  }[]
  *              }[];
  *          }
  *          ```
@@ -549,7 +554,7 @@ export async function getCultivationPlan(
                         b_id: curr.b_id,
                         b_name: curr.b_name,
                         fertilizer_applications: [],
-                        harvests: []
+                        harvests: [],
                     }
                     existingCultivation.fields.push(existingField)
                 }
@@ -571,13 +576,25 @@ export async function getCultivationPlan(
                     existingField.harvests.push({
                         b_id_harvesting: curr.b_id_harvesting,
                         b_harvesting_date: curr.b_harvesting_date,
-                        b_lu_yield: curr.b_lu_yield,
-                        b_lu_n_harvestable: curr.b_lu_n_harvestable,
-                        b_lu_n_residue: curr.b_lu_n_residue,
-                        b_lu_p_harvestable: curr.b_lu_p_harvestable,
-                        b_lu_p_residue: curr.b_lu_p_residue,
-                        b_lu_k_harvestable: curr.b_lu_k_harvestable,
-                        b_lu_k_residue: curr.b_lu_k_residue,
+                        harvestables: [
+                            {
+                                b_id_harvestable: curr.b_id_harvestable,
+                                harvestable_analyses: [
+                                    {
+                                        b_lu_yield: curr.b_lu_yield,
+                                        b_lu_n_harvestable:
+                                            curr.b_lu_n_harvestable,
+                                        b_lu_n_residue: curr.b_lu_n_residue,
+                                        b_lu_p_harvestable:
+                                            curr.b_lu_p_harvestable,
+                                        b_lu_p_residue: curr.b_lu_p_residue,
+                                        b_lu_k_harvestable:
+                                            curr.b_lu_k_harvestable,
+                                        b_lu_k_residue: curr.b_lu_k_residue,
+                                    },
+                                ],
+                            },
+                        ],
                     })
                 }
 
