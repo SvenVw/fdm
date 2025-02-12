@@ -123,18 +123,6 @@ export function HarvestsList({
                     <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                         <div className="flex flex-col space-y-2 text-center">
                             <h1 className="text-2xl font-semibold tracking-tight">
-                                Dit gewas is niet oogstbaar
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Kies een einddatum om aan te geven wanneer dit
-                                gewas is beëindigd.
-                            </p>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
-                        <div className="flex flex-col space-y-2 text-center">
-                            <h1 className="text-2xl font-semibold tracking-tight">
                                 Dit gewas heeft nog geen oogst
                             </h1>
                             <p className="text-sm text-muted-foreground">
@@ -145,6 +133,18 @@ export function HarvestsList({
                         <Button asChild>
                             <NavLink to="./harvest">Oogst toevoegen</NavLink>
                         </Button>
+                    </div>
+                ) : (
+                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                        <div className="flex flex-col space-y-2 text-center">
+                            <h1 className="text-2xl font-semibold tracking-tight">
+                                Dit gewas is niet oogstbaar
+                            </h1>
+                            <p className="text-sm text-muted-foreground">
+                                Kies een einddatum om aan te geven wanneer dit
+                                gewas is beëindigd.
+                            </p>
+                        </div>
                     </div>
                 )}
             </div>
