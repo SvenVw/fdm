@@ -61,7 +61,6 @@ import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns/format"
 import { cn } from "@/lib/utils"
 import { nl } from "date-fns/locale/nl"
-import { useEffect, useRef } from "react"
 import { Form } from "react-hook-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
