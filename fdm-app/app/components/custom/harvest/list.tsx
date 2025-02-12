@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
 import { format } from "date-fns/format"
 import { NavLink, useFetcher } from "react-router"
-import { Pencil, Trash2 } from "lucide-react"
+import { Eye, Pencil, Trash2 } from "lucide-react"
 import type { HarverstableType, Harvest } from "./types"
 
 export function HarvestsList({
@@ -56,13 +56,13 @@ export function HarvestsList({
                                         <div className="">
                                             <Button
                                                 variant="default"
-                                                aria-label="Bewerken"
+                                                aria-label="Beijken"
                                                 asChild
                                             >
                                                 <NavLink
                                                     to={`./harvest/${harvest.b_id_harvesting}`}
                                                 >
-                                                    <Pencil />
+                                                    <Eye />
                                                 </NavLink>
                                             </Button>
                                         </div>
