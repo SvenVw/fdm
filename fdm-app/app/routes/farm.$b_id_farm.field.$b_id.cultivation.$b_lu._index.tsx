@@ -1,4 +1,4 @@
-import { CultivationsForm } from "@/components/custom/cultivation/form"
+import { CultivationForm } from "@/components/custom/cultivation/form"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import { Button } from "@/components/ui/button"
@@ -111,7 +111,7 @@ export default function FarmFieldsOverviewBlock() {
             </div>
             <Separator />
             <div className="space-y-6">
-                <CultivationsForm
+                <CultivationForm
                     b_lu_catalogue={loaderData.cultivation.b_lu_catalogue}
                     b_sowing_date={loaderData.cultivation.b_sowing_date}
                     b_terminating_date={

@@ -26,7 +26,7 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { LoadingSpinner } from "../loadingspinner"
 
-export function CultivationsForm({
+export function CultivationForm({
     b_lu_catalogue,
     b_sowing_date,
     b_terminating_date,
