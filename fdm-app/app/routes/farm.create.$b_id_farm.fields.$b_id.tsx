@@ -45,7 +45,7 @@ import {
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { RemixFormProvider, useRemixForm} from "remix-hook-form"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import wkx from "wkx"
@@ -63,6 +63,7 @@ import { cn } from "@/lib/utils"
 import { nl } from "date-fns/locale/nl"
 import { useEffect, useRef } from "react"
 import { Form } from "react-hook-form"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -249,8 +250,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const formRef = useRef<ReturnType<typeof useRemixForm<z.infer<typeof FormSchema>>>>(null);  // Create a ref
-
     const viewState = getViewState(loaderData.featureCollection)
     const id = "fieldsSaved"
     const fields = loaderData.featureCollection
@@ -280,358 +279,372 @@ export default function Index() {
                         onSubmit={form.handleSubmit}
                         method="post"
                     >
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-lg font-medium">
-                                    {loaderData.b_name}
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {Math.round(loaderData.b_area * 10) / 10} ha
-                                </p>
-                            </div>
-
-                            <fieldset disabled={form.formState.isSubmitting}>
-                                <div className="flex flex-col gap-y-4">
-                                    {/* <h3>Perceel</h3> */}
-
-                                    <FormField
-                                        control={form.control}
-                                        name="b_name"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Perceelsnaam
-                                                </FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        {...field}
-                                                        type="text"
-                                                        required
-                                                    />
-                                                </FormControl>
-                                                <FormDescription />
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <h3 className="text-lg font-medium">
-                                        Gewas
-                                    </h3>
-                                    <div className="grid grid-cols-2 items-center gap-4">
-                                        <Combobox
-                                            options={
-                                                loaderData.cultivationOptions
-                                            }
-                                            form={form}
-                                            name={"b_lu_catalogue"}
-                                            label={"Hoofdgewas"}
-                                            defaultValue={
-                                                loaderData.b_lu_catalogue
-                                            }
-                                        />
-
+                        <fieldset disabled={form.formState.isSubmitting}>
+                            <div className="space-y-6">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>
+                                            Perceel
+                                            <p className="text-sm text-muted-foreground">
+                                                {Math.round(
+                                                    loaderData.b_area * 10,
+                                                ) / 10}{" "}
+                                                ha
+                                            </p>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
                                         <FormField
                                             control={form.control}
-                                            name="b_sowing_date"
+                                            name="b_name"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-col">
-                                                    <FormLabel>
-                                                        Zaaidatum
-                                                    </FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button
-                                                                    variant={
-                                                                        "outline"
+                                                <FormItem>
+                                                    <FormLabel>Naam</FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            type="text"
+                                                            required
+                                                        />
+                                                    </FormControl>
+                                                    <FormDescription />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Hoofdgewas</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-2 items-center gap-4">
+                                            <Combobox
+                                                options={
+                                                    loaderData.cultivationOptions
+                                                }
+                                                form={form}
+                                                name={"b_lu_catalogue"}
+                                                label={"Gewasnaam"}
+                                                defaultValue={
+                                                    loaderData.b_lu_catalogue
+                                                }
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="b_sowing_date"
+                                                render={({ field }) => (
+                                                    <FormItem className="flex flex-col">
+                                                        <FormLabel>
+                                                            Zaaidatum
+                                                        </FormLabel>
+                                                        <Popover>
+                                                            <PopoverTrigger
+                                                                asChild
+                                                            >
+                                                                <FormControl>
+                                                                    <Button
+                                                                        variant={
+                                                                            "outline"
+                                                                        }
+                                                                        className={cn(
+                                                                            "w-[240px] pl-3 text-left font-normal",
+                                                                            !field.value &&
+                                                                                "text-muted-foreground",
+                                                                        )}
+                                                                    >
+                                                                        {field.value ? (
+                                                                            format(
+                                                                                field.value,
+                                                                                "yyyy-MM-dd",
+                                                                            )
+                                                                        ) : (
+                                                                            <span>
+                                                                                Kies
+                                                                                een
+                                                                                datum
+                                                                            </span>
+                                                                        )}
+                                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                    </Button>
+                                                                </FormControl>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="w-auto p-0"
+                                                                align="start"
+                                                            >
+                                                                <Calendar
+                                                                    locale={nl}
+                                                                    mode="single"
+                                                                    selected={
+                                                                        field.value
                                                                     }
-                                                                    className={cn(
-                                                                        "w-[240px] pl-3 text-left font-normal",
-                                                                        !field.value &&
-                                                                            "text-muted-foreground",
-                                                                    )}
-                                                                >
-                                                                    {field.value ? (
-                                                                        format(
-                                                                            field.value,
-                                                                            "yyyy-MM-dd",
+                                                                    onSelect={
+                                                                        field.onChange
+                                                                    }
+                                                                    disabled={(
+                                                                        date,
+                                                                    ) =>
+                                                                        date <
+                                                                        new Date(
+                                                                            "1970-01-01",
                                                                         )
-                                                                    ) : (
-                                                                        <span>
-                                                                            Kies
-                                                                            een
-                                                                            datum
-                                                                        </span>
-                                                                    )}
-                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent
-                                                            className="w-auto p-0"
-                                                            align="start"
-                                                        >
-                                                            <Calendar
-                                                                locale={nl}
-                                                                mode="single"
-                                                                selected={
-                                                                    field.value
-                                                                }
-                                                                onSelect={
-                                                                    field.onChange
-                                                                }
-                                                                disabled={(
-                                                                    date,
-                                                                ) =>
-                                                                    date <
-                                                                    new Date(
-                                                                        "1970-01-01",
-                                                                    )
-                                                                }
-                                                                initialFocus
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    {/* <FormDescription>
+                                                                    }
+                                                                    initialFocus
+                                                                />
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        {/* <FormDescription>
                                                         Kan ook poot- of
                                                         aanplantdatum zijn
                                                     </FormDescription> */}
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                    <h3 className="text-lg font-medium">
-                                        Bodem
-                                    </h3>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <FormField
-                                            control={form.control}
-                                            name="b_soiltype_agr"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Grondsoort
-                                                    </FormLabel>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle>Bodem</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField
+                                                control={form.control}
+                                                name="b_soiltype_agr"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Grondsoort
+                                                        </FormLabel>
+                                                        <Select
+                                                            onValueChange={
+                                                                field.onChange
+                                                            }
+                                                            value={field.value}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Selecteer een grondsoort" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="moerige_klei">
+                                                                    Moerige klei
+                                                                </SelectItem>
+                                                                <SelectItem value="rivierklei">
+                                                                    Rivierklei
+                                                                </SelectItem>
+                                                                <SelectItem value="dekzand">
+                                                                    Dekzand
+                                                                </SelectItem>
+                                                                <SelectItem value="zeeklei">
+                                                                    Zeeklei
+                                                                </SelectItem>
+                                                                <SelectItem value="dalgrond">
+                                                                    Dalgrond
+                                                                </SelectItem>
+                                                                <SelectItem value="veen">
+                                                                    Veen
+                                                                </SelectItem>
+                                                                <SelectItem value="loess">
+                                                                    Löss
+                                                                </SelectItem>
+                                                                <SelectItem value="duinzand">
+                                                                    Duinzand
+                                                                </SelectItem>
+                                                                <SelectItem value="maasklei">
+                                                                    Maasklei
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="b_gwl_class"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Grondwatertrap
+                                                        </FormLabel>
+                                                        <Select
+                                                            onValueChange={
+                                                                field.onChange
+                                                            }
+                                                            value={field.value}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Selecteer een grondwatrap" />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                <SelectItem value="-">
+                                                                    -
+                                                                </SelectItem>
+                                                                <SelectItem value="I">
+                                                                    Gt I
+                                                                </SelectItem>
+                                                                <SelectItem value="II">
+                                                                    Gt II
+                                                                </SelectItem>
+                                                                <SelectItem value="IIb">
+                                                                    Gt IIb
+                                                                </SelectItem>
+                                                                <SelectItem value="III">
+                                                                    Gt III
+                                                                </SelectItem>
+                                                                <SelectItem value="IIIa">
+                                                                    Gt IIIa
+                                                                </SelectItem>
+                                                                <SelectItem value="IIIb">
+                                                                    Gt IIIb
+                                                                </SelectItem>
+                                                                <SelectItem value="IV">
+                                                                    Gt IV
+                                                                </SelectItem>
+                                                                <SelectItem value="IVu">
+                                                                    Gt IVu
+                                                                </SelectItem>
+                                                                <SelectItem value="sV">
+                                                                    Gt sV
+                                                                </SelectItem>
+                                                                <SelectItem value="sVb">
+                                                                    Gt sVb
+                                                                </SelectItem>
+                                                                <SelectItem value="V">
+                                                                    Gt V
+                                                                </SelectItem>
+                                                                <SelectItem value="Va">
+                                                                    Gt Va
+                                                                </SelectItem>
+                                                                <SelectItem value="Vb">
+                                                                    Gt Vb
+                                                                </SelectItem>
+                                                                <SelectItem value="sVI">
+                                                                    Gt sVI
+                                                                </SelectItem>
+                                                                <SelectItem value="bVI">
+                                                                    Gt bVI
+                                                                </SelectItem>
+                                                                <SelectItem value="VI">
+                                                                    Gt VI
+                                                                </SelectItem>
+                                                                <SelectItem value="sVII">
+                                                                    Gt sVII
+                                                                </SelectItem>
+                                                                <SelectItem value="bVII">
+                                                                    Gt bVII
+                                                                </SelectItem>
+                                                                <SelectItem value="VII">
+                                                                    Gt VII
+                                                                </SelectItem>
+                                                                <SelectItem value="VIII">
+                                                                    Gt VIII
+                                                                </SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name="a_p_al"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Fosfaat PAL{" "}
+                                                        </FormLabel>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Selecteer een grondsoort" />
-                                                            </SelectTrigger>
+                                                            <Input
+                                                                {...field}
+                                                                type="number"
+                                                                step="0.01"
+                                                                required
+                                                            />
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="moerige_klei">
-                                                                Moerige klei
-                                                            </SelectItem>
-                                                            <SelectItem value="rivierklei">
-                                                                Rivierklei
-                                                            </SelectItem>
-                                                            <SelectItem value="dekzand">
-                                                                Dekzand
-                                                            </SelectItem>
-                                                            <SelectItem value="zeeklei">
-                                                                Zeeklei
-                                                            </SelectItem>
-                                                            <SelectItem value="dalgrond">
-                                                                Dalgrond
-                                                            </SelectItem>
-                                                            <SelectItem value="veen">
-                                                                Veen
-                                                            </SelectItem>
-                                                            <SelectItem value="loess">
-                                                                Löss
-                                                            </SelectItem>
-                                                            <SelectItem value="duinzand">
-                                                                Duinzand
-                                                            </SelectItem>
-                                                            <SelectItem value="maasklei">
-                                                                Maasklei
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                        <FormField
-                                            control={form.control}
-                                            name="b_gwl_class"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Grondwatertrap
-                                                    </FormLabel>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
+                                            <FormField
+                                                control={form.control}
+                                                name="a_p_cc"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Fosfaat PAE{" "}
+                                                        </FormLabel>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Selecteer een grondwatrap" />
-                                                            </SelectTrigger>
+                                                            <Input
+                                                                {...field}
+                                                                type="number"
+                                                                step="0.01"
+                                                                required
+                                                            />
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="-">
-                                                                -
-                                                            </SelectItem>
-                                                            <SelectItem value="I">
-                                                                Gt I
-                                                            </SelectItem>
-                                                            <SelectItem value="II">
-                                                                Gt II
-                                                            </SelectItem>
-                                                            <SelectItem value="IIb">
-                                                                Gt IIb
-                                                            </SelectItem>
-                                                            <SelectItem value="III">
-                                                                Gt III
-                                                            </SelectItem>
-                                                            <SelectItem value="IIIa">
-                                                                Gt IIIa
-                                                            </SelectItem>
-                                                            <SelectItem value="IIIb">
-                                                                Gt IIIb
-                                                            </SelectItem>
-                                                            <SelectItem value="IV">
-                                                                Gt IV
-                                                            </SelectItem>
-                                                            <SelectItem value="IVu">
-                                                                Gt IVu
-                                                            </SelectItem>
-                                                            <SelectItem value="sV">
-                                                                Gt sV
-                                                            </SelectItem>
-                                                            <SelectItem value="sVb">
-                                                                Gt sVb
-                                                            </SelectItem>
-                                                            <SelectItem value="V">
-                                                                Gt V
-                                                            </SelectItem>
-                                                            <SelectItem value="Va">
-                                                                Gt Va
-                                                            </SelectItem>
-                                                            <SelectItem value="Vb">
-                                                                Gt Vb
-                                                            </SelectItem>
-                                                            <SelectItem value="sVI">
-                                                                Gt sVI
-                                                            </SelectItem>
-                                                            <SelectItem value="bVI">
-                                                                Gt bVI
-                                                            </SelectItem>
-                                                            <SelectItem value="VI">
-                                                                Gt VI
-                                                            </SelectItem>
-                                                            <SelectItem value="sVII">
-                                                                Gt sVII
-                                                            </SelectItem>
-                                                            <SelectItem value="bVII">
-                                                                Gt bVII
-                                                            </SelectItem>
-                                                            <SelectItem value="VII">
-                                                                Gt VII
-                                                            </SelectItem>
-                                                            <SelectItem value="VIII">
-                                                                Gt VIII
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
 
-                                        <FormField
-                                            control={form.control}
-                                            name="a_p_al"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Fosfaat PAL{" "}
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="number"
-                                                            step="0.01"
-                                                            required
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                            <FormField
+                                                control={form.control}
+                                                name="a_som_loi"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>
+                                                            Organische
+                                                            stofgehalte{" "}
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input
+                                                                {...field}
+                                                                type="number"
+                                                                step="0.01"
+                                                                required
+                                                            />
+                                                        </FormControl>
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                    </CardContent>
+                                </Card>
 
-                                        <FormField
-                                            control={form.control}
-                                            name="a_p_cc"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Fosfaat PAE{" "}
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="number"
-                                                            step="0.01"
-                                                            required
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="a_som_loi"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Organische stofgehalte{" "}
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="number"
-                                                            step="0.01"
-                                                            required
-                                                        />
-                                                    </FormControl>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
+                                <div className="ml-auto">
+                                    <Button
+                                        type="submit"
+                                        disabled={form.formState.isSubmitting}
+                                        className="m-auto"
+                                    >
+                                        {form.formState.isSubmitting && (
+                                            <LoadingSpinner />
+                                        )}
+                                        Bijwerken
+                                    </Button>
                                 </div>
-                            </fieldset>
-                            <div className="ml-auto">
-                                <Button
-                                    type="submit"
-                                    disabled={form.formState.isSubmitting}
-                                    className="m-auto"
-                                >
-                                    {form.formState.isSubmitting && (
-                                        <LoadingSpinner />
-                                    )}
-                                    Bijwerken
-                                </Button>
                             </div>
-                        </div>
+                        </fieldset>
                     </Form>
                 </RemixFormProvider>
             </div>
