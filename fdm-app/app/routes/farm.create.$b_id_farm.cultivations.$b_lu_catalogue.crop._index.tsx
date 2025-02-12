@@ -8,7 +8,6 @@ import {
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
-    getHarvestableTypeOfCultivation,
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -19,7 +18,7 @@ import { HarvestsList } from "@/components/custom/harvest/list"
 import { CultivationForm } from "@/components/custom/cultivation/form"
 import { Separator } from "@/components/ui/separator"
 import { FormSchema } from "@/components/custom/cultivation/schema"
-import { cultivationsCatalogue } from "node_modules/@svenvw/fdm-core/dist/db/schema"
+import { HarverstableType } from "@/components/custom/harvest/types"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const b_lu_catalogue = params.b_lu_catalogue
@@ -34,7 +33,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Get the available cultivations
     let cultivationOptions = []
-    let b_lu_harvestable = "none"
+    let b_lu_harvestable: HarverstableType = "none"
     try {
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
@@ -49,9 +48,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const cultivationCatalogueItem = cultivationsCatalogue.find(
             (cultivation) => {
-                cultivation.b_lu_catalogue === b_lu_catalogue
+                return cultivation.b_lu_catalogue === b_lu_catalogue
             },
         )
+
         if (cultivationCatalogueItem) {
             b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
         }
@@ -104,7 +104,7 @@ export default function FarmAFieldCultivationBlock() {
             <Separator />
             <HarvestsList
                 harvests={loaderData.harvests}
-                harvestableType="multiple"
+                b_lu_harvestable={loaderData.b_lu_harvestable}
                 state={fetcher.state}
             />
         </div>

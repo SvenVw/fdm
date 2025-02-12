@@ -1,6 +1,7 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
+import { HarverstableType } from "@/components/custom/harvest/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
@@ -72,11 +73,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         },
     )
 
-    let b_lu_harvestable = "none"
+    // Get cultivation
+    const cultivation = await getCultivation(fdm, b_lu)
+
+    // Get harvests
+    const harvests = await getHarvests(fdm, b_lu)
+
+    let b_lu_harvestable: HarverstableType = "none"
     try {
-        const cultivationCatalogueItem = cultivationsCatalogue.find(
-            (cultivation) => cultivation.b_lu_catalogue === b_lu,
-        )
+        const cultivationCatalogueItem = cultivationsCatalogue.find((item) => {
+            return item.b_lu_catalogue === cultivation.b_lu_catalogue
+        })
         if (cultivationCatalogueItem) {
             b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
         }
@@ -87,12 +94,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Failed to load b_lu_harvestable",
         })
     }
-
-    // Get cultivation
-    const cultivation = await getCultivation(fdm, b_lu)
-
-    // Get harvests
-    const harvests = await getHarvests(fdm, b_lu)
 
     // Return user information from loader
     return {
