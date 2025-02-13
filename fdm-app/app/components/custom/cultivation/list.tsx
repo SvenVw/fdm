@@ -5,10 +5,17 @@ import { NavLink, useFetcher } from "react-router"
 import { LoadingSpinner } from "../loadingspinner"
 import type { Cultivation } from "./types"
 
+interface Harvest {
+    b_lu: string;
+    b_harvesting_date: Date;
+    b_lu_yield: number;
+    b_lu_n_harvestable: number;
+}
+
 export function CultivationList({
     cultivations,
     harvests,
-}: { cultivations: Cultivation[]; harvests: any[] }) {
+}: { cultivations: Cultivation[]; harvests: Harvest[] }) {
     const fetcher = useFetcher()
 
     const handleDelete = (b_lu: string | string[]) => {
