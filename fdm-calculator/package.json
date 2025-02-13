@@ -35,6 +35,7 @@
         "prepare": "pnpm build",
         "preview": "vite preview",
         "test": "dotenvx run -- vitest run",
+        "test-coverage": "dotenvx run -- vitest run --coverage",
         "watch": "dotenvx run -- vitest"
     },
     "devDependencies": {
