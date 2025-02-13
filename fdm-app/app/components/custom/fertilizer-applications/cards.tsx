@@ -8,6 +8,7 @@ import {
 import { Lightbulb, Scale } from "lucide-react"
 import type { FertilizerApplicationsCardProps } from "./types.d"
 import { cn } from "@/lib/utils"
+import type { Dose } from "@svenvw/fdm-calculator"
 
 function FertilizerApplicationsCard({
     title,
@@ -72,9 +73,9 @@ function FertilizerApplicationsCard({
     )
 }
 
-export function FertilizerApplicationsCards({
-    cards,
-}: { cards: FertilizerApplicationsCardProps[] }) {
+export function FertilizerApplicationsCards({ dose }: { dose: Dose }) {
+    const cards = constructCards(dose)
+
     return (
         <div className="grid gap-4 xl:grid-cols-2">
             {cards.map((card: FertilizerApplicationsCardProps) => (
@@ -90,4 +91,36 @@ export function FertilizerApplicationsCards({
             ))}
         </div>
     )
+}
+
+function constructCards(dose: Dose) {
+    // Construct the fertilizer application cards
+    const cards: FertilizerApplicationsCardProps[] = [
+        {
+            title: "Stikstof, totaal",
+            shortname: "Ntot",
+            value: dose.p_dose_n,
+            unit: "kg/ha",
+            limit: 250,
+            advice: 200,
+        },
+        {
+            title: "Fosfaat, totaal",
+            shortname: "P2O5",
+            value: dose.p_dose_p2o5,
+            unit: "kg/ha",
+            limit: 75,
+            advice: 40,
+        },
+        {
+            title: "Kalium, totaal",
+            shortname: "K2O",
+            value: dose.p_dose_k2o,
+            unit: "kg/ha",
+            limit: undefined,
+            advice: 90,
+        },
+    ]
+
+    return cards
 }

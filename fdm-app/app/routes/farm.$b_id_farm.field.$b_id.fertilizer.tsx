@@ -65,45 +65,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get fertilizer applications for the field
     const fertilizerApplications = await getFertilizerApplications(fdm, b_id)
 
-    const doses = calculateDose({
+    const dose = calculateDose({
         applications: fertilizerApplications,
         fertilizers,
     })
-
-    // Get the fertilizer application cards
-    const cards: FertilizerApplicationsCardProps[] = [
-        {
-            title: "Stikstof, totaal",
-            shortname: "Ntot",
-            value: doses.p_dose_n,
-            unit: "kg/ha",
-            limit: 250,
-            advice: 200,
-        },
-        {
-            title: "Fosfaat, totaal",
-            shortname: "P2O5",
-            value: doses.p_dose_p,
-            unit: "kg/ha",
-            limit: 75,
-            advice: 40,
-        },
-        {
-            title: "Kalium, totaal",
-            shortname: "K2O",
-            value: doses.p_dose_k,
-            unit: "kg/ha",
-            limit: undefined,
-            advice: 90,
-        },
-    ]
 
     // Return user information from loader
     return {
         field: field,
         fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
-        fertilizerApplicationsCards: cards,
+        dose: dose
     }
 }
 
@@ -138,7 +110,7 @@ export default function FarmFieldsOverviewBlock() {
                 </div>
                 <div>
                     <FertilizerApplicationsCards
-                        cards={loaderData.fertilizerApplicationsCards}
+                        dose={loaderData.dose}
                     />
                 </div>
             </div>
