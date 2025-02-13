@@ -36,7 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Get the available cultivations
     let cultivationOptions = []
-    let b_lu_harvestable: HarverstableType = "none"
+    let b_lu_harvestable: HarvestableType = "none"
     try {
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue

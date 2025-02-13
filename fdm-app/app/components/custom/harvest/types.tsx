@@ -5,4 +5,4 @@ export interface Harvest {
     harvestables: { harvestable_analyses: { b_lu_yield: number }[] }[]
 }
 
-export type HarverstableType = "none" | "once" | "multiple"
+export type HarvestableType = "none" | "once" | "multiple"

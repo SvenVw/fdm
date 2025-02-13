@@ -1,7 +1,7 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
-import type { HarverstableType } from "@/components/custom/harvest/types"
+import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
@@ -79,7 +79,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get harvests
     const harvests = await getHarvests(fdm, b_lu)
 
-    let b_lu_harvestable: HarverstableType = "none"
+    let b_lu_harvestable: HarvestableType = "none"
     try {
         const cultivationCatalogueItem = cultivationsCatalogue.find((item) => {
             return item.b_lu_catalogue === cultivation.b_lu_catalogue
