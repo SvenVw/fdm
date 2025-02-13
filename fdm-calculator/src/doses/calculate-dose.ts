@@ -23,12 +23,16 @@ export function calculateDose({
         const p_dose_n = application.p_app_amount * (fertilizer.p_n_rt ?? 0)
 
         // Calculate phosphate dose
-        const p_dose_p = application.p_app_amount * (fertilizer.p_p_rt ?? 0)
+        const p_dose_p2o5 = application.p_app_amount * (fertilizer.p_p_rt ?? 0)
 
         // Calculate potassium dose
-        const p_dose_k = application.p_app_amount * (fertilizer.p_k_rt ?? 0)
+        const p_dose_k2o = application.p_app_amount * (fertilizer.p_k_rt ?? 0)
 
-        return { p_dose_n: p_dose_n, p_dose_p: p_dose_p, p_dose_k: p_dose_k }
+        return {
+            p_dose_n: p_dose_n,
+            p_dose_p2o5: p_dose_p2o5,
+            p_dose_k2o: p_dose_k2o,
+        }
     })
 
     // Reduce the doses from the applications into a single dose
@@ -36,11 +40,11 @@ export function calculateDose({
         (acc, curr) => {
             return {
                 p_dose_n: acc.p_dose_n + curr.p_dose_n,
-                p_dose_p: acc.p_dose_p + curr.p_dose_p,
-                p_dose_k: acc.p_dose_k + curr.p_dose_k,
+                p_dose_p: acc.p_dose_p2o5 + curr.p_dose_p2o5,
+                p_dose_k: acc.p_dose_k2o + curr.p_dose_k2o,
             }
         },
-        { p_dose_n: 0, p_dose_p: 0, p_dose_k: 0 },
+        { p_dose_n: 0, p_dose_p2o5: 0, p_dose_k2o: 0 },
     )
 
     return totalDose
