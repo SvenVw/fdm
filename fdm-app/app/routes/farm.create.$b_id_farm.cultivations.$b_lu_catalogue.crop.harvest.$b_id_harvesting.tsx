@@ -53,16 +53,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )
-    const harvest = cultivation.fields[0].harvests.find((harvest) => {
+    const harvest = cultivation?.fields[0]?.harvests?.find((harvest) => {
         return harvest.b_id_harvesting === b_id_harvesting
     })
 
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        b_lu_yield: harvest?.harvestables?.[0].harvestable_analyses?.[0].b_lu_yield,
+        b_lu_yield:
+            harvest?.harvestables?.[0].harvestable_analyses?.[0].b_lu_yield,
         b_lu_n_harvestable:
-            harvest?.harvestables?.[0].harvestable_analyses?.[0].b_lu_n_harvestable,
+            harvest?.harvestables?.[0].harvestable_analyses?.[0]
+                .b_lu_n_harvestable,
         b_harvesting_date: harvest?.b_harvesting_date,
     }
 }
