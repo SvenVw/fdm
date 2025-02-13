@@ -798,7 +798,8 @@ export async function updateCultivation(
                     // If harvestable type is "once", add harvest on terminate date
                     const harvests = await getHarvests(tx, b_lu)
                     if (harvests.length > 0) {
-                        tx.update(schema.cultivationHarvesting)
+                        await tx
+                            .update(schema.cultivationHarvesting)
                             .set({
                                 updated: updated,
                                 b_harvesting_date: b_terminating_date,
