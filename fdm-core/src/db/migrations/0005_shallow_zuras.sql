@@ -1,0 +1,2 @@
+ALTER TABLE "fdm-dev"."cultivation_harvesting" RENAME COLUMN "b_harvest_date" TO "b_harvesting_date";--> statement-breakpoint
+ALTER TABLE "fdm-dev"."cultivation_harvesting" ADD COLUMN "b_id_harvesting" text PRIMARY KEY NOT NULL;

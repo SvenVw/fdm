@@ -40,7 +40,7 @@ export function handleFieldClick(
             return {
                 ...prevFieldsData,
                 features: prevFieldsData.features.filter(
-                    (f) => !isFeatureEqual(f, fieldData)
+                    (f) => !isFeatureEqual(f, fieldData),
                 ),
             }
         }

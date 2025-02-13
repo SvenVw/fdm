@@ -10,12 +10,14 @@
         "allowImportingTsExtensions": true,
         "isolatedModules": true,
         "moduleDetection": "force",
-        "noEmit": true,
+        "declaration": true,
+        "outDir": "./dist",
+        "emitDeclarationOnly": true,
 
         "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true
     },
-    "include": ["src"]
+    "include": ["./src/**/*"]
 }

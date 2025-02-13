@@ -70,15 +70,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    // Cultivation options
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    const cultivationOptions = cultivationsCatalogue.map((cultivation) => {
-        return {
-            value: cultivation.b_lu_catalogue,
-            label: cultivation.b_lu_name,
-        }
-    })
-
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,

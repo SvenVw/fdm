@@ -13,6 +13,12 @@ export default defineConfig({
         },
     ],
 
-    plugins: [resolve(), typescript(), json()],
+    plugins: [
+        resolve(),
+        typescript({
+            tsconfig: "./tsconfig.json",
+        }),
+        json(),
+    ],
     external: ["@svenvw/fdm-core"],
 })
