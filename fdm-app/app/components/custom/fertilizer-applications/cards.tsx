@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Lightbulb, Scale } from "lucide-react"
 import type { FertilizerApplicationsCardProps } from "./types.d"
+import { cn } from "@/lib/utils"
 
 function FertilizerApplicationsCard({
     title,
@@ -28,7 +29,12 @@ function FertilizerApplicationsCard({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div className="flex items-center space-x-2 text-muted-foreground justify-start">
+                                <div
+                                    className={cn(
+                                        "flex items-center space-x-2 text-muted-foreground justify-start",
+                                        !limit ? "invisible" : "",
+                                    )}
+                                >
                                     <Scale />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${limit} ${unit}`}</span>
@@ -43,7 +49,12 @@ function FertilizerApplicationsCard({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <div className="flex items-center space-x-2 text-muted-foreground justify-end">
+                                <div
+                                    className={cn(
+                                        "flex items-center space-x-2 text-muted-foreground justify-end",
+                                        !advice ? "invisible" : "",
+                                    )}
+                                >
                                     <Lightbulb />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${advice} ${unit}`}</span>

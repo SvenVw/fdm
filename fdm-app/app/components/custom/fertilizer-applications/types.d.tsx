@@ -23,6 +23,6 @@ export interface FertilizerApplicationsCardProps {
     shortname: string
     value: number
     unit: string
-    limit: number
-    advice: number
+    limit: number | undefined
+    advice: number | undefined
 }
