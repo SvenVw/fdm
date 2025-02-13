@@ -53,9 +53,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )
-    const harvest = cultivation.fields[0].harvests.find((harvest) => {
+    const harvest = cultivation?.fields[0]?.harvests?.find((harvest) => {
         return harvest.b_id_harvesting === b_id_harvesting
     })
+    if (!harvest) {
+        throw data("Harvest not found", {
+            status: 404,
+            statusText: "Harvest not found",
+        })
+    }
 
     return {
         b_lu_catalogue: b_lu_catalogue,
