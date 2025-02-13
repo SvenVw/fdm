@@ -139,6 +139,22 @@ describe("Cultivation Data Model", () => {
             ).rejects.toThrow("Exception for addCultivation")
         })
 
+        it("should throw an error when adding a cultivation with invalid b_lu_harvestable", async () => {
+            const b_lu_catalogue = createId()
+
+            await expect(
+                addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue,
+                    b_lu_source: "test-source",
+                    b_lu_name: "test-name",
+                    b_lu_name_en: "test-name-en",
+                    b_lu_harvestable: "invalid-value",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                }),
+            ).rejects.toThrow()
+        })
+
         it("should add a new cultivation", async () => {
             const b_sowing_date = new Date("2024-02-01")
             const new_b_lu = await addCultivation(
