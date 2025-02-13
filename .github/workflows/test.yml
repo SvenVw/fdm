@@ -85,3 +85,11 @@ jobs:
           files: ./fdm-core/coverage/coverage-final.json
           flags: fdm-core
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: fdm-calculator - Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./fdm-calculator/coverage/coverage-final.json
+          flags: fdm-calculator
+          token: ${{ secrets.CODECOV_TOKEN }}
+
