@@ -30,7 +30,8 @@ import type { FertilizerOption } from "./types.d"
 export function FertilizerApplicationForm({
     options,
     action,
-}: { options: FertilizerOption[]; action: string }) {
+    fetcher,
+}: { options: FertilizerOption[]; action: string; fetcher: any }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -54,7 +55,12 @@ export function FertilizerApplicationForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
+                <fieldset
+                    disabled={
+                        form.formState.isSubmitting ||
+                        fetcher.state === "submitting"
+                    }
+                >
                     <div className="grid grid-cols-5 items-end gap-x-3 justify-between">
                         <div className="col-span-2">
                             {/* <Label htmlFor="b_name_farm">Meststof</Label> */}

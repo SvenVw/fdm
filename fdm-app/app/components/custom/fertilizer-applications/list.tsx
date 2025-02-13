@@ -5,13 +5,17 @@ import type { FertilizerApplication } from "./types.d"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,
-    handleDelete,
-    state,
+    fetcher
 }: {
     fertilizerApplications: FertilizerApplication[]
-    handleDelete: (p_app_id: string | string[]) => void
-    state: string
+    fetcher: any
 }) {
+
+    const handleDelete = (p_app_id: string | string[]) => {
+        if (fetcher.state === "submitting") return
+
+        fetcher.submit({ p_app_id }, { method: "DELETE" })
+    }
     return (
         <div className="space-y-4">
             {/* <div className="text-sm font-medium">Meststoffen</div> */}
@@ -40,7 +44,7 @@ export function FertilizerApplicationsList({
                         <div className="justify-self-end">
                             <Button
                                 variant="destructive"
-                                disabled={state === "submitting"}
+                                disabled={fetcher.state === "submitting"}
                                 onClick={() => {
                                     if (application.p_app_ids) {
                                         handleDelete(application.p_app_ids)
@@ -49,7 +53,7 @@ export function FertilizerApplicationsList({
                                     }
                                 }}
                             >
-                                {state === "submitting" ? (
+                                {fetcher.state === "submitting" ? (
                                     <div className="flex items-center space-x-2">
                                         <LoadingSpinner />
                                         <span>Verwijderen...</span>

@@ -77,7 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             shortname: "Ntot",
             value: doses.p_dose_n,
             unit: "kg/ha",
-            limit: 230,
+            limit: 250,
             advice: 200,
         },
         {
@@ -85,16 +85,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             shortname: "P2O5",
             value: doses.p_dose_p,
             unit: "kg/ha",
-            limit: 100,
-            advice: 80,
+            limit: 75,
+            advice: 40,
         },
         {
             title: "Kalium, totaal",
             shortname: "K2O",
             value: doses.p_dose_k,
             unit: "kg/ha",
-            limit: 120,
-            advice: 100,
+            limit: undefined,
+            advice: 90,
         },
     ]
 
@@ -110,14 +110,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
-
     const fetcher = useFetcher()
-
-    const handleDelete = (p_app_id: string | string[]) => {
-        if (fetcher.state === "submitting") return
-
-        fetcher.submit({ p_app_id }, { method: "delete", action: props.action })
-    }
 
     return (
         <div className="space-y-6">
@@ -133,14 +126,14 @@ export default function FarmFieldsOverviewBlock() {
                     <FertilizerApplicationForm
                         options={loaderData.fertilizerOptions}
                         action={location.pathname}
+                        fetcher={fetcher}
                     />
                     <Separator className="my-4" />
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
-                        }
-                        handleDelete={handleDelete}
-                        state={fetcher.state}
+                        }                
+                        fetcher={fetcher}
                     />
                 </div>
                 <div>
