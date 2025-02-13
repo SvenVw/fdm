@@ -298,7 +298,7 @@ export type fieldSowingTypeSelect = typeof fieldSowing.$inferSelect
 export type fieldSowingTypeInsert = typeof fieldSowing.$inferInsert
 
 // Define cultivations_catalogue table
-export const harvestalbeEnum = fdmSchema.enum("b_lu_harvestable", [
+export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [
     "none",
     "once",
     "multiple",
@@ -310,7 +310,7 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_source: text().notNull(),
         b_lu_name: text().notNull(),
         b_lu_name_en: text(),
-        b_lu_harvestable: harvestalbeEnum().notNull(),
+        b_lu_harvestable: harvestableEnum().notNull(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
