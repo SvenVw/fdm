@@ -344,7 +344,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }),
     )
 
-    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields}`, {
+    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
         message: "Percelen zijn toegevoegd! 🎉",
     })
 }
