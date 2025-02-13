@@ -37,12 +37,12 @@ function FertilizerApplicationsCard({
                                 >
                                     <Scale />
                                     <p className="flex text-xs text-muted-foreground">
-                                        <span>{`${limit} ${unit}`}</span>
+                                        <span>{`${limit}`}</span>
                                     </p>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {`Gebruiksnorm voor ${title}`}
+                                {`Gebruiksnorm voor ${title} [${unit}]`}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -57,12 +57,12 @@ function FertilizerApplicationsCard({
                                 >
                                     <Lightbulb />
                                     <p className="flex text-xs text-muted-foreground">
-                                        <span>{`${advice} ${unit}`}</span>
+                                        <span>{`${advice}`}</span>
                                     </p>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {`Bemestingsadvies voor ${title}`}
+                                {`Bemestingsadvies voor ${title} [${unit}]`}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
