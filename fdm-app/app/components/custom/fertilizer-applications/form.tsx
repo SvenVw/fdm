@@ -61,7 +61,7 @@ export function FertilizerApplicationForm({
                         fetcher.state === "submitting"
                     }
                 >
-                    <div className="grid grid-cols-5 items-end gap-x-3 justify-between">
+                    <div className="grid grid-cols-1 xl2:grid-cols-5 items-end gap-x-3 justify-between">
                         <div className="col-span-2">
                             {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
                             <Combobox
@@ -162,7 +162,7 @@ export function FertilizerApplicationForm({
                                 )}
                             />
                         </div>
-                        <div className="justify-self-end">
+                        <div className="justify-end items-end">
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">

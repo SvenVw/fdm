@@ -76,7 +76,7 @@ export function FertilizerApplicationsCards({
     cards,
 }: { cards: FertilizerApplicationsCardProps[] }) {
     return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        <div className="grid gap-4 xl:grid-cols-2">
             {cards.map((card: FertilizerApplicationsCardProps) => (
                 <FertilizerApplicationsCard
                     key={card.title}

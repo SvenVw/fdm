@@ -121,7 +121,7 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <div className="grid md:grid-cols-2 gap-8 space-x-16">
+            <div className="grid md:grid-cols-2 gap-8">
                 <div>
                     <FertilizerApplicationForm
                         options={loaderData.fertilizerOptions}
