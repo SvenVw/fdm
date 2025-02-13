@@ -76,7 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         field: field,
         cultivationsCatalogueOptions: cultivationsCatalogueOptions,
         cultivations: cultivations,
-        harvests: harvests[0],
+        harvests: harvests?.[0] ?? [],
     }
 }
 
