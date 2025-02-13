@@ -9,5 +9,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         throw new Error("b_id_farm is required")
     }
     const fields = await getFields(fdm, b_id_farm)
-    return redirect(`${fields[0].b_id}`)
+    if (!fields.length) {
+        throw new Error("No fields found for this farm")
+    }
+    return redirect(`/${fields[0].b_id}`)
 }
