@@ -23,6 +23,11 @@ export function calculateDose({
             (fertilizer) => fertilizer.p_id === application.p_id,
         )
 
+        // Check if fertilizer exists before accessing properties
+        if (!fertilizer) {
+            return { p_dose_n: 0, p_dose_p2o5: 0, p_dose_k2o: 0 }
+        }
+
         // Calculate total nitrogen dose
         const p_dose_n = application.p_app_amount * (fertilizer.p_n_rt ?? 0)
 
@@ -44,8 +49,8 @@ export function calculateDose({
         (acc, curr) => {
             return {
                 p_dose_n: acc.p_dose_n + curr.p_dose_n,
-                p_dose_p: acc.p_dose_p2o5 + curr.p_dose_p2o5,
-                p_dose_k: acc.p_dose_k2o + curr.p_dose_k2o,
+                p_dose_p2o5: acc.p_dose_p2o5 + curr.p_dose_p2o5,
+                p_dose_k2o: acc.p_dose_k2o + curr.p_dose_k2o,
             }
         },
         { p_dose_n: 0, p_dose_p2o5: 0, p_dose_k2o: 0 },
