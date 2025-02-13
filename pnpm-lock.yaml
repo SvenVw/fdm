@@ -266,6 +266,9 @@ importers:
       '@svenvw/fdm-core':
         specifier: workspace:*
         version: link:../fdm-core
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.8(vitest@2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0))
       rollup:
         specifier: ^4.31.0
         version: 4.31.0

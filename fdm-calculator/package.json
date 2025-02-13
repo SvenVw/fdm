@@ -44,6 +44,7 @@
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-typescript": "^12.1.2",
         "@svenvw/fdm-core": "workspace:*",
+        "@vitest/coverage-v8": "catalog:",
         "rollup": "^4.31.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
