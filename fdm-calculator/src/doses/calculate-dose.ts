@@ -1,4 +1,8 @@
 import type { Dose } from "./d"
+import type {
+    getFertilizerApplicationType,
+    getFertilizerType,
+} from "@svenvw/fdm-core"
 
 /**
  * Calculates the total dose of N, P, and K applied to a field based on a list of fertilizer applications.
@@ -11,8 +15,8 @@ export function calculateDose({
     applications,
     fertilizers,
 }: {
-    applications: any[]
-    fertilizers: any[]
+    applications: getFertilizerApplicationType[]
+    fertilizers: getFertilizerType[]
 }): Dose {
     const doses = applications.map((application) => {
         const fertilizer = fertilizers.find(
