@@ -9,5 +9,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         throw new Error("b_id_farm is required")
     }
     const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
-    return redirect(`${cultivationPlan[0].b_lu_catalogue}/crop`)
+    if (!cultivationPlan.length) {
+        throw new Error("No cultivations found for this farm")
+    }
+    return redirect(`/${cultivationPlan[0].b_lu_catalogue}/crop`)
 }
