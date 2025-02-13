@@ -66,10 +66,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
+    if (!harvest.harvestables?.[0]?.harvestable_analyses?.[0]) {
+        throw data("Harvest analysis data not found", {
+            status: 404,
+            statusText: "Harvest analysis data not found",
+        })
+    }
+    return {
+        b_lu_catalogue: b_lu_catalogue,
+        b_id_farm: b_id_farm,
         b_lu_yield: harvest.harvestables[0].harvestable_analyses[0].b_lu_yield,
-        b_lu_n_harvestable:
-            harvest.harvestables[0].harvestable_analyses[0].b_lu_n_harvestable,
+        b_lu_n_harvestable: harvest.harvestables[0].harvestable_analyses[0].b_lu_n_harvestable,
         b_harvesting_date: harvest.b_harvesting_date,
+    }
     }
 }
 
