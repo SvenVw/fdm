@@ -2,10 +2,7 @@ import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applic
 import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
 import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import {
-    FertilizerApplication,
-    FertilizerApplicationsCardProps,
-} from "@/components/custom/fertilizer-applications/types.d"
+import type { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -25,6 +22,7 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+import { calculateDose } from "@svenvw/fdm-calculator"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -67,29 +65,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get fertilizer applications for the field
     const fertilizerApplications = await getFertilizerApplications(fdm, b_id)
 
+    const doses = calculateDose({
+        applications: fertilizerApplications,
+        fertilizers,
+    })
+
     // Get the fertilizer application cards
-    //
     const cards: FertilizerApplicationsCardProps[] = [
         {
             title: "Stikstof, totaal",
             shortname: "Ntot",
-            value: 120,
+            value: doses.p_dose_n,
             unit: "kg/ha",
             limit: 230,
             advice: 200,
         },
         {
             title: "Fosfaat, totaal",
-            shortname: "P",
-            value: 80,
+            shortname: "P2O5",
+            value: doses.p_dose_p,
             unit: "kg/ha",
             limit: 100,
             advice: 80,
         },
         {
             title: "Kalium, totaal",
-            shortname: "K",
-            value: 100,
+            shortname: "K2O",
+            value: doses.p_dose_k,
             unit: "kg/ha",
             limit: 120,
             advice: 100,
