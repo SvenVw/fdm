@@ -7,6 +7,13 @@ import {
 import { calculateDose } from "./calculate-dose"
 import type { Dose } from "./d"
 
+/**
+ * Calculates the total NPK dose applied to a specific field.
+ *
+ * @param fdm The FDM data object.
+ * @param b_id The ID of the field.
+ * @returns A Promise resolving to the total NPK dose applied to the field.
+ */
 export async function getDoseForField({
     fdm,
     b_id,
