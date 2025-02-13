@@ -1,7 +1,10 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
-import type { HarverstableType } from "@/components/custom/harvest/types"
+import type {
+    HarverstableType,
+    Harvest,
+} from "@/components/custom/harvest/types"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -79,10 +82,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Combine similar harvests across all fields of the target cultivation.
+    interface HarvestInfo {
+        b_harvesting_date: Date
+        harvestables: {
+            harvestable_analyses: {
+                b_lu_yield?: number
+                b_lu_n_harvestable?: number
+            }[]
+        }[]
+    }
     const harvests = targetCultivation.fields.reduce((accumulator, field) => {
         for (const harvest of field.harvests) {
             // Create a key based on harvest properties to identify similar harvests
-            const isSimilarHarvest = (h1: any, h2: any) =>
+            const isSimilarHarvest = (h1: HarvestInfo, h2: HarvestInfo) =>
                 h1.b_harvesting_date.getTime() ===
                     h2.b_harvesting_date.getTime() &&
                 h1.harvestables[0].harvestable_analyses[0].b_lu_yield ===
@@ -93,7 +105,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         .b_lu_n_harvestable
 
             const existingHarvestIndex = accumulator.findIndex(
-                (existingHarvest) => isSimilarHarvest(existingHarvest, harvest),
+                (existingHarvest: HarvestInfo) =>
+                    isSimilarHarvest(existingHarvest, harvest),
             )
 
             if (existingHarvestIndex !== -1) {
@@ -111,7 +124,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         return accumulator
-    }, [] as any[])
+    }, [] as HarvestInfo[])
 
     return {
         b_lu_catalogue: b_lu_catalogue,
