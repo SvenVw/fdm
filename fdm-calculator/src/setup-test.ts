@@ -6,7 +6,7 @@ import { createFdmServer } from "@svenvw/fdm-core"
 
 let fdm: FdmServerType
 
-export let migrationsRun = false
+export let migrationsRun = true
 
 export default async function setup(project: TestProject) {
     const requiredEnvVars = [
@@ -35,10 +35,7 @@ export default async function setup(project: TestProject) {
         fdm = createFdmServer(host, port, user, password, database)
 
         if (!migrationsRun) {
-            await migrateFdmServer(
-                fdm,
-                "node_modules/@svenvw/fdm-core/dist/db/migrations",
-            )
+            await migrateFdmServer(fdm)
             migrationsRun = true
         }
     } catch (error) {
