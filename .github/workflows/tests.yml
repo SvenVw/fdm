@@ -87,7 +87,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
   
   # Label of the container job for fdm-calculator
-  test-calculor:
+  test-calculator:
     name: calculator
     # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
