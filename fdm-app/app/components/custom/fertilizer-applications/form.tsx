@@ -31,7 +31,11 @@ export function FertilizerApplicationForm({
     options,
     action,
     fetcher,
-}: { options: FertilizerOption[]; action: string; fetcher: any }) {
+}: { 
+    options: FertilizerOption[]; 
+    action: string; 
+    fetcher: { state: string; Form: typeof Form; submit: (data: FormData, options?: { method: string }) => void }
+}) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
