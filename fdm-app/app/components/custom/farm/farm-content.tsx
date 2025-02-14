@@ -20,9 +20,7 @@ export function FarmContent({ sidebarItems, children }: FarmContentProps) {
                     </aside>
                 )}
 
-                <div className="flex-2">
-                    {children || <Outlet />}
-                </div>
+                <div className="flex-2">{children || <Outlet />}</div>
             </div>
         </div>
     )

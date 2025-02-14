@@ -5,10 +5,10 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Lightbulb, Scale } from "lucide-react"
-import type { FertilizerApplicationsCardProps } from "./types.d"
 import { cn } from "@/lib/utils"
 import type { Dose } from "@svenvw/fdm-calculator"
+import { Lightbulb, Scale } from "lucide-react"
+import type { FertilizerApplicationsCardProps } from "./types.d"
 
 function FertilizerApplicationsCard({
     title,

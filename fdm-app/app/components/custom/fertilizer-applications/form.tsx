@@ -1,8 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Form } from "react-hook-form"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { LoadingSpinner } from "../loadingspinner"
-import { CalendarIcon } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -11,22 +8,25 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { zodResolver } from "@hookform/resolvers/zod"
-import type { z } from "zod"
-import { useEffect } from "react"
-import { FormSchema } from "./formschema"
-import { Combobox } from "../combobox"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
-import type { FertilizerOption } from "./types.d"
 import { nl } from "date-fns/locale/nl"
+import { CalendarIcon } from "lucide-react"
+import { useEffect } from "react"
+import { Form } from "react-hook-form"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
+import { Combobox } from "../combobox"
+import { LoadingSpinner } from "../loadingspinner"
+import { FormSchema } from "./formschema"
+import type { FertilizerOption } from "./types.d"
 
 export function FertilizerApplicationForm({
     options,

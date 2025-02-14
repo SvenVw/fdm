@@ -1,7 +1,7 @@
+import type { getFertilizerType } from "@svenvw/fdm-core"
 import { describe, expect, it } from "vitest"
 import { calculateDose } from "./calculate-dose"
 import type { Dose } from "./d"
-import type { getFertilizerType } from "@svenvw/fdm-core"
 
 describe("calculateDose", () => {
     it("should calculate the correct dose for a single application", () => {

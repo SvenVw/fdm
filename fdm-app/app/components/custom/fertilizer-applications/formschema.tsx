@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 export const FormSchema = z.object({
     p_app_amount: z.coerce

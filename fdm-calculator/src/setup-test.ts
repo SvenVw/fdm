@@ -1,8 +1,8 @@
-import type { TestProject } from "vitest/node"
 // globalSetup.ts
 import type { FdmServerType } from "@svenvw/fdm-core"
 import { migrateFdmServer } from "@svenvw/fdm-core"
 import { createFdmServer } from "@svenvw/fdm-core"
+import type { TestProject } from "vitest/node"
 
 let fdm: FdmServerType
 

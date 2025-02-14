@@ -5,15 +5,17 @@ import type { FertilizerApplication } from "./types.d"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,
-    fetcher
+    fetcher,
 }: {
     fertilizerApplications: FertilizerApplication[]
     fetcher: {
-        state: string;
-        submit: (data: { p_app_id: string | string[] }, options: { method: string }) => void;
+        state: string
+        submit: (
+            data: { p_app_id: string | string[] },
+            options: { method: string },
+        ) => void
     }
 }) {
-
     const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
 

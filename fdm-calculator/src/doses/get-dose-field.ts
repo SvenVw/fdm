@@ -36,7 +36,8 @@ export async function getDoseForField({
         // Calculate the dose per nutrient for this field
         return calculateDose({ applications, fertilizers })
     } catch (error) {
-        throw new Error(`Failed to calculate dose for field ${b_id}: ${error.message}`)
+        throw new Error(
+            `Failed to calculate dose for field ${b_id}: ${error.message}`,
+        )
     }
-
 }

@@ -1,11 +1,12 @@
-import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
 import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
 import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
 import type { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
@@ -22,7 +23,6 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { calculateDose } from "@svenvw/fdm-calculator"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -75,7 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         field: field,
         fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
-        dose: dose
+        dose: dose,
     }
 }
 
@@ -104,14 +104,12 @@ export default function FarmFieldsOverviewBlock() {
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
-                        }                
+                        }
                         fetcher={fetcher}
                     />
                 </div>
                 <div>
-                    <FertilizerApplicationsCards
-                        dose={loaderData.dose}
-                    />
+                    <FertilizerApplicationsCards dose={loaderData.dose} />
                 </div>
             </div>
         </div>

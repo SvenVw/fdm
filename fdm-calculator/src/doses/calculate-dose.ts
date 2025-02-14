@@ -1,8 +1,8 @@
-import type { Dose } from "./d"
 import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "@svenvw/fdm-core"
+import type { Dose } from "./d"
 
 /**
  * Calculates the total dose of N, P, and K applied to a field based on a list of fertilizer applications.

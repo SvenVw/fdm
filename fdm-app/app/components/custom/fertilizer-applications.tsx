@@ -1,8 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { Form, useFetcher } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
 import { Combobox } from "@/components/custom/combobox"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -21,12 +16,17 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { CalendarIcon} from "lucide-react"
 import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
 import { useEffect } from "react"
-import { LoadingSpinner } from "./loadingspinner"
-import type { FertilizerApplicationsFormProps } from "./fertilizer-applications/types.d"
+import { Form, useFetcher } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
 import { FormSchema } from "./fertilizer-applications/formschema"
+import type { FertilizerApplicationsFormProps } from "./fertilizer-applications/types.d"
+import { LoadingSpinner } from "./loadingspinner"
 
 export function FertilizerApplicationsForm(
     props: FertilizerApplicationsFormProps,
@@ -254,8 +254,7 @@ export function FertilizerApplicationsForm(
                     </div>
                 </div>
             </div>
-            <div className="space-y-4">
-            </div>
+            <div className="space-y-4"></div>
         </div>
     )
 }

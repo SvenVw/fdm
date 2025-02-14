@@ -170,7 +170,10 @@ export default function Index() {
                                 interactive={true}
                                 mapStyle={loaderData.mapboxStyle}
                                 mapboxAccessToken={loaderData.mapboxToken}
-                                interactiveLayerIds={[fieldsAvailableId, fieldsSelectedId]}
+                                interactiveLayerIds={[
+                                    fieldsAvailableId,
+                                    fieldsSelectedId,
+                                ]}
                             >
                                 <GeolocateControl />
                                 <NavigationControl />

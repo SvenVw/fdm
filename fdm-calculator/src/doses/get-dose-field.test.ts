@@ -1,15 +1,15 @@
-import { beforeEach, describe, expect, inject, it } from "vitest"
-import { getDoseForField } from "./get-dose-field"
 import { createFdmServer } from "@svenvw/fdm-core"
 import type { FdmServerType } from "@svenvw/fdm-core"
 import {
     addFarm,
-    addField,
     addFertilizer,
     addFertilizerApplication,
     addFertilizerToCatalogue,
+    addField,
 } from "@svenvw/fdm-core"
+import { beforeEach, describe, expect, inject, it } from "vitest"
 import type { Dose } from "./d"
+import { getDoseForField } from "./get-dose-field"
 
 describe("getDoseForField", () => {
     let fdm: FdmServerType
