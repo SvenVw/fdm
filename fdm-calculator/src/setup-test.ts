@@ -37,7 +37,7 @@ export default async function setup(project: TestProject) {
         if (!migrationsRun) {
             await migrateFdmServer(
                 fdm,
-                "node_modules/@svenvw/fdm-core/db/migrations",
+                "node_modules/@svenvw/fdm-core/dist/db/migrations",
             )
             migrationsRun = true
         }
