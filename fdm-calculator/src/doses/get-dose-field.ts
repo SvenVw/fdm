@@ -22,17 +22,22 @@ export async function getDoseForField({
     b_id: string
 }): Promise<Dose> {
     // Get the fertilizer applications for this field
-    const applications = await getFertilizerApplications(fdm, b_id)
+    try {
+        // Get the fertilizer applications for this field
+        const applications = await getFertilizerApplications(fdm, b_id)
 
-    // Get the id of the farm
-    const field = await getField(fdm, b_id)
-    const b_id_farm = field.b_id_farm
+        // Get the id of the farm
+        const field = await getField(fdm, b_id)
+        const farmId = field.b_id_farm
 
-    // Get the properties of the fertilizers that are used for the applications
-    const fertilizers = await getFertilizers(fdm, b_id_farm)
+        // Get the properties of the fertilizers that are used for the applications
+        const fertilizers = await getFertilizers(fdm, farmId)
 
-    // Calculate the dose per nutrient for this fields
-    const doses = calculateDose({ applications, fertilizers })
+        // Calculate the dose per nutrient for this field
+        return calculateDose({ applications, fertilizers })
+    } catch (error) {
+        throw new Error(`Failed to calculate dose for field ${b_id}: ${error.message}`)
+    }
 
     return doses
 }
