@@ -33,13 +33,15 @@ export default async function setup(project: TestProject) {
 
     try {
         fdm = createFdmServer(host, port, user, password, database)
-    } catch (error) {
-        throw new Error(`Failed to connect to database: ${error.message}`)
-    }
 
-    if (!migrationsRun) {
-        await migrateFdmServer(fdm)
-        migrationsRun = true
+        if (!migrationsRun) {
+            await migrateFdmServer(fdm)
+            migrationsRun = true
+        }
+    } catch (error) {
+        throw new Error(
+            `Failed to connect/migrate to database: ${error.message}`,
+        )
     }
 
     project.provide("host", host)
