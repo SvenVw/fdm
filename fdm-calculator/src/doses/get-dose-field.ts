@@ -39,5 +39,4 @@ export async function getDoseForField({
         throw new Error(`Failed to calculate dose for field ${b_id}: ${error.message}`)
     }
 
-    return doses
 }
