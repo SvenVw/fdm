@@ -83,11 +83,13 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <CultivationsForm
-                cultivations={loaderData.cultivations}
-                action={location.pathname}
-                options={loaderData.cultivationsCatalogueOptions}
-            />
+            <div className="grid md:grid-cols-2 gap-8">
+                <CultivationsForm
+                    cultivations={loaderData.cultivations}
+                    action={location.pathname}
+                    options={loaderData.cultivationsCatalogueOptions}
+                />
+            </div>
         </div>
     )
 }

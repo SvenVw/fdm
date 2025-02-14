@@ -6,14 +6,20 @@
     "bugs": "https://github.com/SvenVw/fdm/issues/new",
     "type": "module",
     "private": true,
-    "workspaces": ["fdm-core", "fdm-data", "fdm-docs", "fdm-app"],
+    "workspaces": [
+        "fdm-core",
+        "fdm-data",
+        "fdm-docs",
+        "fdm-app",
+        "fdm-calculator"
+    ],
     "scripts": {
-        "test": "turbo run test-coverage --filter=@svenvw/fdm-core",
+        "test": "turbo run test-coverage --filter=@svenvw/fdm-core --filter=@svenvw/fdm-calculator",
         "build": "turbo run build",
         "build-docs": "turbo run build-docs",
         "watch": "turbo run watch",
         "changeset": "changeset",
-        "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data && changeset publish ",
+        "prerelease": "turbo build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data --filter=@svenvw/fdm-calculator && changeset publish ",
         "format-and-lint": "biome check .",
         "format-and-lint:fix": "biome check . --write",
         "format-and-lint:fix-unsafe": "biome check . --write --unsafe"

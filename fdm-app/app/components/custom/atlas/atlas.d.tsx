@@ -14,7 +14,7 @@ export interface MapFieldsProps {
 export type FieldsAvailableUrlType = string | undefined
 
 export interface FeatureFdm {
-    type: 'feature'
+    type: "feature"
     geometry: FeatureCollection
     properties: {
         b_id_source: string
@@ -23,6 +23,6 @@ export interface FeatureFdm {
 }
 
 export interface FeatureCollectionFdm {
-    type: 'FeatureCollection'
+    type: "FeatureCollection"
     features: FeatureFdm[]
 }

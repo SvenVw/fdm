@@ -10,7 +10,10 @@
         "allowImportingTsExtensions": true,
         "isolatedModules": true,
         "moduleDetection": "force",
-        "noEmit": true,
+        "declaration": true,
+        "noEmit": false,
+        "emitDeclarationOnly": true,
+        "outDir": "./dist",
 
         "strict": true,
         "noUnusedLocals": true,
