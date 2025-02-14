@@ -31,10 +31,14 @@ export function FertilizerApplicationForm({
     options,
     action,
     fetcher,
-}: { 
-    options: FertilizerOption[]; 
-    action: string; 
-    fetcher: { state: string; Form: typeof Form; submit: (data: FormData, options?: { method: string }) => void }
+}: {
+    options: FertilizerOption[]
+    action: string
+    fetcher: {
+        state: string
+        Form: typeof Form
+        submit: (data: FormData, options?: { method: string }) => void
+    }
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -153,9 +157,10 @@ export function FertilizerApplicationForm({
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
-                                                    // disabled={(date) =>
-                                                    //     date > new Date() || date < new Date("1900-01-01")
-                                                    // }
+                                                    disabled={(date) =>
+                                                        date <
+                                                        new Date("1970-01-01")
+                                                    }
                                                     initialFocus
                                                 />
                                             </PopoverContent>
