@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import type { FertilizerOption } from "./types.d"
+import { nl } from "date-fns/locale/nl"
 
 export function FertilizerApplicationForm({
     options,
@@ -157,6 +158,7 @@ export function FertilizerApplicationForm({
                                                     mode="single"
                                                     selected={field.value}
                                                     onSelect={field.onChange}
+                                                    locale={nl}
                                                     disabled={(date) =>
                                                         date <
                                                         new Date("1970-01-01")
