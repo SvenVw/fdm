@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { calculateDose } from "./calculate-dose"
 import type { Dose } from "./d"
+import type { getFertilizerType } from "@svenvw/fdm-core"
 
 describe("calculateDose", () => {
     it("should calculate the correct dose for a single application", () => {
@@ -41,7 +42,7 @@ describe("calculateDose", () => {
 
     it("should handle missing fertilizer data gracefully", () => {
         const applications = [{ p_id: "fertilizer1", p_app_amount: 100 }]
-        const fertilizers: any[] = [] // No matching fertilizer
+        const fertilizers: getFertilizerType[] = [] // No matching fertilizer
 
         const expectedDose: Dose = {
             p_dose_n: 0,
