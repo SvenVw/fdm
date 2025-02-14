@@ -18,6 +18,20 @@ export function calculateDose({
     applications: getFertilizerApplicationType[]
     fertilizers: getFertilizerType[]
 }): Dose {
+    // Validate non-negative values
+    if (applications.some(app => app.p_app_amount < 0)) {
+        throw new Error("Application amounts must be non-negative")
+    }
+    if (fertilizers.some(fert => 
+        (fert.p_n_rt && fert.p_n_rt < 0) || 
+        (fert.p_p_rt && fert.p_p_rt < 0) || 
+        (fert.p_k_rt && fert.p_k_rt < 0)
+    )) {
+        throw new Error("Nutrient rates must be non-negative")
+    }
+    
+    // ... rest of the function implementation ...
+}
     const doses = applications.map((application) => {
         const fertilizer = fertilizers.find(
             (fertilizer) => fertilizer.p_id === application.p_id,
