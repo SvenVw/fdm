@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
 import { getDoseForField } from "./get-dose-field"
-import { createFdmServer, migrateFdmServer } from "@svenvw/fdm-core"
+import { createFdmServer } from "@svenvw/fdm-core"
 import type { FdmServerType } from "@svenvw/fdm-core"
 import {
     addFarm,
@@ -44,7 +44,7 @@ describe("getDoseForField", () => {
             new Date(),
             "lease",
         )
-        p_id_catalogue = "p_test_fertilizer"
+        p_id_catalogue = `p_test_fertilizer_${Math.round(Math.random() * 1000)}`
         await addFertilizerToCatalogue(fdm, {
             p_id_catalogue: p_id_catalogue,
             p_source: "",
@@ -102,7 +102,14 @@ describe("getDoseForField", () => {
             1000,
             new Date(),
         )
-        await addFertilizerApplication(fdm, b_id, p_id, 100,undefined, new Date())
+        await addFertilizerApplication(
+            fdm,
+            b_id,
+            p_id,
+            100,
+            undefined,
+            new Date(),
+        )
 
         const expectedDose: Dose = {
             p_dose_n: 2000,
