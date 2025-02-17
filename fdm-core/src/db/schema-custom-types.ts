@@ -145,8 +145,10 @@ function readLineString(
     littleEndian: boolean,
     offset: number,
 ): GeoJSON.Position[] {
-    const numPoints = dataView.getUint32(1, littleEndian)
+    const numPoints = dataView.getUint32(offset, littleEndian)
+    offset += 4
     const points: GeoJSON.Position[] = []
+
     for (let i = 0; i < numPoints; i++) {
         const x = dataView.getFloat64(offset, littleEndian)
         const y = dataView.getFloat64(offset + 8, littleEndian)
