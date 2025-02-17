@@ -1,6 +1,4 @@
-import { sql } from "drizzle-orm"
 import { customType } from "drizzle-orm/pg-core"
-import wkx from "wkx"
 
 // Workaround for that `numeric` column type returns string instead of a number
 // https://github.com/drizzle-team/drizzle-orm/issues/1042#issuecomment-2224689025
@@ -26,18 +24,11 @@ export const numericCasted = customType<{
 
 // Workaround for geometry column with polygons
 export const geometryPolygon = customType<{
-    data: string
-    driverData: string
+    data: string // GeoJSON string
 }>({
-    dataType: () => {
-        return "geometry(polygon)"
+    dataType() {
+        return "geometry(Polygon, 4326)"
     },
-    fromDriver: (value: string) => {
-        const wkbBuffer = Buffer.from(value, "hex")
-        const geometry = wkx.Geometry.parse(wkbBuffer)
-        return geometry.toWkt()
-    },
-    toDriver: (value: string) => sql`ST_GeomFromText('${value}', 4326)`,
 })
 
 // Workaround for geometry column with multipoint
