@@ -49,7 +49,6 @@ import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import wkx from "wkx"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
 
@@ -161,7 +160,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_name: field.b_lu_name,
             b_id_source: field.b_id_source,
         },
-        geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
+        geometry: field.b_geometry
     }
     const featureCollection: FeatureCollection = {
         type: "FeatureCollection",
@@ -175,7 +174,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Field geometry is required",
         })
     }
-    const b_geojson = wkx.Geometry.parse(field.b_geometry).toGeoJSON()
 
     // Get soil analysis data
     const soilAnalysis = await getSoilAnalysis(fdm, b_id)
