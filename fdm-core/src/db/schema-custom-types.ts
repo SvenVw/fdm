@@ -63,7 +63,7 @@ export const geometry = <
 
                 return data as GeometryTypes[TType]
             } catch (e) {
-                throw new Error("Failed to parse geometry", {
+                throw new Error(`Failed to parse geometry: ${value}`, {
                     cause: e,
                 })
             }
@@ -126,7 +126,7 @@ export const parseHexToGeometry = (hex: string): GeoJSON.Geometry => {
 
         return geometry
     } catch (e) {
-        throw e
+        throw new Error(`Failed to parse hex geometry: ${hex}`, { cause: e })
     }
 }
 
@@ -141,6 +141,23 @@ function readPoint(
     const x = dataView.getFloat64(offset, littleEndian)
     const y = dataView.getFloat64(offset + 8, littleEndian)
     return [x, y]
+}
+
+function readMultiPoint(
+    dataView: DataView,
+    littleEndian: boolean,
+    offset: number,
+): GeoJSON.Position[] {
+    if (offset + 4 > dataView.byteLength) {
+        throw new Error("Buffer too small to read MultiPoint")
+    }
+    const numPoints = dataView.getUint32(offset, littleEndian)
+    offset += 4
+    const points: GeoJSON.Position[] = []
+    for (let i = 0; i < numPoints; i++) {
+        points.push(readPoint(dataView, littleEndian, offset + i * 16))
+    }
+    return points
 }
 
 function readLineString(
@@ -184,6 +201,45 @@ function readPolygon(
     return rings
 }
 
+function readMultiLineString(
+    dataView: DataView,
+    littleEndian: boolean,
+    offset: number,
+): GeoJSON.Position[][] {
+    const numLineStrings = dataView.getUint32(offset, littleEndian)
+    offset += 4
+    const lineStrings: GeoJSON.Position[][] = []
+
+    for (let i = 0; i < numLineStrings; i++) {
+        lineStrings.push(readLineString(dataView, littleEndian, offset))
+        offset += 4 + lineStrings[i].length * 16 // Advance offset based on the number of points in linestring
+    }
+
+    return lineStrings
+}
+
+function readMultiPolygon(
+    dataView: DataView,
+    littleEndian: boolean,
+    offset: number,
+): GeoJSON.Position[][][] {
+    const numPolygons = dataView.getUint32(offset, littleEndian)
+    offset += 4
+    const polygons: GeoJSON.Position[][][] = []
+
+    for (let i = 0; i < numPolygons; i++) {
+        polygons.push(readPolygon(dataView, littleEndian, offset))
+        // Calculate the size of the current polygon to advance the offset correctly
+        let polygonSize = 4 // Start with the size of numRings field
+        for (const ring of polygons[i]) {
+            polygonSize += 4 + ring.length * 16 // Add size of numPoints field and points
+        }
+        offset += polygonSize
+    }
+
+    return polygons
+}
+
 export const parseGeometry = (
     dataView: DataView,
     littleEndian: boolean,
@@ -221,7 +277,7 @@ export const parseGeometry = (
         case GeometryType.MultiPoint:
             return {
                 type: "MultiPoint",
-                coordinates: readLineString(
+                coordinates: readMultiPoint(
                     dataView,
                     littleEndian,
                     offset,
@@ -230,7 +286,7 @@ export const parseGeometry = (
         case GeometryType.MultiLineString:
             return {
                 type: "MultiLineString",
-                coordinates: readPolygon(
+                coordinates: readMultiLineString(
                     dataView,
                     littleEndian,
                     offset,
@@ -239,7 +295,7 @@ export const parseGeometry = (
         case GeometryType.MultiPolygon:
             return {
                 type: "MultiPolygon",
-                coordinates: readPolygon(
+                coordinates: readMultiPolygon(
                     dataView,
                     littleEndian,
                     offset,
