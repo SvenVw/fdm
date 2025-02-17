@@ -168,7 +168,8 @@ function readPolygon(
     littleEndian: boolean,
     offset: number,
 ): GeoJSON.Position[][] {
-    const numRings = dataView.getUint32(1, littleEndian)
+    const numRings = dataView.getUint32(offset, littleEndian)
+    offset += 4
     const rings: GeoJSON.Position[][] = []
     for (let i = 0; i < numRings; i++) {
         const numPoints = dataView.getUint32(offset, littleEndian)
