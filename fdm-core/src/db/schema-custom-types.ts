@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm"
 import { customType, type CustomTypeValues } from "drizzle-orm/pg-core"
+import type * as GeoJSON from "geojson"
 
 // Workaround for that `numeric` column type returns string instead of a number
 // https://github.com/drizzle-team/drizzle-orm/issues/1042#issuecomment-2224689025
@@ -81,7 +82,6 @@ export enum GeometryType {
 }
 
 export const parseHexToGeometry = (hex: string): GeoJSON.Geometry => {
-    const startMs = performance.now()
     try {
         const byteStr = hex
             .match(/.{1,2}/g)
@@ -233,6 +233,17 @@ export const parseGeometry = (
                     offset,
                 ) as GeoJSON.MultiLineString["coordinates"],
             }
+        case GeometryType.MultiPolygon:
+            return {
+                type: "MultiPolygon",
+                coordinates: readPolygon(
+                    dataView,
+                    littleEndian,
+                    offset,
+                ) as GeoJSON.MultiPolygon["coordinates"],
+            }
+        case GeometryType.GeometryCollection:
+            throw new Error("GeometryCollection is not supported yet")
         default:
             throw new Error("Unsupported geometry type")
     }
