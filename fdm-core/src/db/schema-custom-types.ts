@@ -160,23 +160,23 @@ function readMultiPoint(
     return points
 }
 
-function readLineString(
-    dataView: DataView,
-    littleEndian: boolean,
-    offset: number,
-): GeoJSON.Position[] {
-    const numPoints = dataView.getUint32(offset, littleEndian)
-    offset += 4
-    const points: GeoJSON.Position[] = []
+// function readLineString(
+//     dataView: DataView,
+//     littleEndian: boolean,
+//     offset: number,
+// ): GeoJSON.Position[] {
+//     const numPoints = dataView.getUint32(offset, littleEndian)
+//     offset += 4
+//     const points: GeoJSON.Position[] = []
 
-    for (let i = 0; i < numPoints; i++) {
-        const x = dataView.getFloat64(offset, littleEndian)
-        const y = dataView.getFloat64(offset + 8, littleEndian)
-        points.push([x, y])
-        offset += 16
-    }
-    return points
-}
+//     for (let i = 0; i < numPoints; i++) {
+//         const x = dataView.getFloat64(offset, littleEndian)
+//         const y = dataView.getFloat64(offset + 8, littleEndian)
+//         points.push([x, y])
+//         offset += 16
+//     }
+//     return points
+// }
 
 function readPolygon(
     dataView: DataView,
@@ -201,44 +201,44 @@ function readPolygon(
     return rings
 }
 
-function readMultiLineString(
-    dataView: DataView,
-    littleEndian: boolean,
-    offset: number,
-): GeoJSON.Position[][] {
-    const numLineStrings = dataView.getUint32(offset, littleEndian)
-    offset += 4
-    const lineStrings: GeoJSON.Position[][] = []
+// function readMultiLineString(
+//     dataView: DataView,
+//     littleEndian: boolean,
+//     offset: number,
+// ): GeoJSON.Position[][] {
+//     const numLineStrings = dataView.getUint32(offset, littleEndian)
+//     offset += 4
+//     const lineStrings: GeoJSON.Position[][] = []
 
-    for (let i = 0; i < numLineStrings; i++) {
-        lineStrings.push(readLineString(dataView, littleEndian, offset))
-        offset += 4 + lineStrings[i].length * 16 // Advance offset based on the number of points in linestring
-    }
+//     for (let i = 0; i < numLineStrings; i++) {
+//         lineStrings.push(readLineString(dataView, littleEndian, offset))
+//         offset += 4 + lineStrings[i].length * 16 // Advance offset based on the number of points in linestring
+//     }
 
-    return lineStrings
-}
+//     return lineStrings
+// }
 
-function readMultiPolygon(
-    dataView: DataView,
-    littleEndian: boolean,
-    offset: number,
-): GeoJSON.Position[][][] {
-    const numPolygons = dataView.getUint32(offset, littleEndian)
-    offset += 4
-    const polygons: GeoJSON.Position[][][] = []
+// function readMultiPolygon(
+//     dataView: DataView,
+//     littleEndian: boolean,
+//     offset: number,
+// ): GeoJSON.Position[][][] {
+//     const numPolygons = dataView.getUint32(offset, littleEndian)
+//     offset += 4
+//     const polygons: GeoJSON.Position[][][] = []
 
-    for (let i = 0; i < numPolygons; i++) {
-        polygons.push(readPolygon(dataView, littleEndian, offset))
-        // Calculate the size of the current polygon to advance the offset correctly
-        let polygonSize = 4 // Start with the size of numRings field
-        for (const ring of polygons[i]) {
-            polygonSize += 4 + ring.length * 16 // Add size of numPoints field and points
-        }
-        offset += polygonSize
-    }
+//     for (let i = 0; i < numPolygons; i++) {
+//         polygons.push(readPolygon(dataView, littleEndian, offset))
+//         // Calculate the size of the current polygon to advance the offset correctly
+//         let polygonSize = 4 // Start with the size of numRings field
+//         for (const ring of polygons[i]) {
+//             polygonSize += 4 + ring.length * 16 // Add size of numPoints field and points
+//         }
+//         offset += polygonSize
+//     }
 
-    return polygons
-}
+//     return polygons
+// }
 
 export const parseGeometry = (
     dataView: DataView,
@@ -247,24 +247,24 @@ export const parseGeometry = (
     offset: number,
 ): GeoJSON.Geometry => {
     switch (type) {
-        case GeometryType.Point:
-            return {
-                type: "Point",
-                coordinates: readPoint(
-                    dataView,
-                    littleEndian,
-                    offset,
-                ) as GeoJSON.Point["coordinates"],
-            }
-        case GeometryType.LineString:
-            return {
-                type: "LineString",
-                coordinates: readLineString(
-                    dataView,
-                    littleEndian,
-                    offset,
-                ) as GeoJSON.LineString["coordinates"],
-            }
+        // case GeometryType.Point:
+        //     return {
+        //         type: "Point",
+        //         coordinates: readPoint(
+        //             dataView,
+        //             littleEndian,
+        //             offset,
+        //         ) as GeoJSON.Point["coordinates"],
+        //     }
+        // case GeometryType.LineString:
+        //     return {
+        //         type: "LineString",
+        //         coordinates: readLineString(
+        //             dataView,
+        //             littleEndian,
+        //             offset,
+        //         ) as GeoJSON.LineString["coordinates"],
+        //     }
         case GeometryType.Polygon:
             return {
                 type: "Polygon",
@@ -283,37 +283,37 @@ export const parseGeometry = (
                     offset,
                 ) as GeoJSON.MultiPoint["coordinates"],
             }
-        case GeometryType.MultiLineString:
-            return {
-                type: "MultiLineString",
-                coordinates: readMultiLineString(
-                    dataView,
-                    littleEndian,
-                    offset,
-                ) as GeoJSON.MultiLineString["coordinates"],
-            }
-        case GeometryType.MultiPolygon:
-            return {
-                type: "MultiPolygon",
-                coordinates: readMultiPolygon(
-                    dataView,
-                    littleEndian,
-                    offset,
-                ) as GeoJSON.MultiPolygon["coordinates"],
-            }
-        case GeometryType.GeometryCollection:
-            throw new Error("GeometryCollection is not supported yet")
+        // case GeometryType.MultiLineString:
+        //     return {
+        //         type: "MultiLineString",
+        //         coordinates: readMultiLineString(
+        //             dataView,
+        //             littleEndian,
+        //             offset,
+        //         ) as GeoJSON.MultiLineString["coordinates"],
+        //     }
+        // case GeometryType.MultiPolygon:
+        //     return {
+        //         type: "MultiPolygon",
+        //         coordinates: readMultiPolygon(
+        //             dataView,
+        //             littleEndian,
+        //             offset,
+        //         ) as GeoJSON.MultiPolygon["coordinates"],
+        //     }
+        // case GeometryType.GeometryCollection:
+        //     throw new Error("GeometryCollection is not supported yet")
         default:
             throw new Error("Unsupported geometry type")
     }
 }
 
 export type GeometryTypes = {
-    Point: GeoJSON.Point
-    LineString: GeoJSON.LineString
+    // Point: GeoJSON.Point
+    // LineString: GeoJSON.LineString
     Polygon: GeoJSON.Polygon
     MultiPoint: GeoJSON.MultiPoint
-    MultiLineString: GeoJSON.MultiLineString
-    MultiPolygon: GeoJSON.MultiPolygon
-    GeometryCollection: GeoJSON.GeometryCollection
+    // MultiLineString: GeoJSON.MultiLineString
+    // MultiPolygon: GeoJSON.MultiPolygon
+    // GeometryCollection: GeoJSON.GeometryCollection
 }
