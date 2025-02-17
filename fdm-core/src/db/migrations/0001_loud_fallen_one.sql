@@ -163,7 +163,7 @@ CREATE TABLE "fdm-dev"."field_sowing" (
 CREATE TABLE "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
 	"b_name" text NOT NULL,
-	"b_geometry" geometry(3,4326),
+	"b_geometry" geometry(Polygon,4326),
 	"b_id_source" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
@@ -210,7 +210,7 @@ CREATE TABLE "fdm-dev"."soil_sampling" (
 	"a_id" text NOT NULL,
 	"b_depth" numeric,
 	"b_sampling_date" timestamp with time zone,
-	"b_sampling_geometry" geometry(1,4326),
+	"b_sampling_geometry" geometry(MultiPoint,4326),
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );

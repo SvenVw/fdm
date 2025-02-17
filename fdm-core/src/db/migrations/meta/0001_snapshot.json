@@ -1,5 +1,5 @@
 {
-  "id": "a9c0a94c-cfa5-43e4-977c-d93777f26589",
+  "id": "eef2d6ac-892a-47cb-a727-90b5f07fc41d",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -1224,7 +1224,7 @@
         },
         "b_geometry": {
           "name": "b_geometry",
-          "type": "geometry(3,4326)",
+          "type": "geometry(Polygon,4326)",
           "primaryKey": false,
           "notNull": false
         },
@@ -1580,7 +1580,7 @@
         },
         "b_sampling_geometry": {
           "name": "b_sampling_geometry",
-          "type": "geometry(1,4326)",
+          "type": "geometry(MultiPoint,4326)",
           "primaryKey": false,
           "notNull": false
         },
