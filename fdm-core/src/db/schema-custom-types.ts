@@ -135,6 +135,9 @@ function readPoint(
     littleEndian: boolean,
     offset: number,
 ): GeoJSON.Position {
+    if (offset + 16 > dataView.byteLength) {
+        throw new Error("Buffer too small to read Point coordinates")
+    }
     const x = dataView.getFloat64(offset, littleEndian)
     const y = dataView.getFloat64(offset + 8, littleEndian)
     return [x, y]
