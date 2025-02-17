@@ -248,6 +248,9 @@ importers:
       '@electric-sql/pglite':
         specifier: ^0.2.16
         version: 0.2.16
+      '@types/geojson':
+        specifier: ^7946.0.15
+        version: 7946.0.15
       drizzle-graphql:
         specifier: ^0.8.5
         version: 0.8.5(drizzle-orm@0.38.4(@electric-sql/pglite@0.2.16)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1))(graphql@16.10.0)

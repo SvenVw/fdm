@@ -63,6 +63,7 @@
     },
     "dependencies": {
         "@electric-sql/pglite": "^0.2.16",
+        "@types/geojson": "^7946.0.15",
         "drizzle-graphql": "^0.8.5",
         "drizzle-orm": "catalog:",
         "graphql": "^16.10.0",
