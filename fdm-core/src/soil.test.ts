@@ -41,7 +41,18 @@ describe("Soil Analysis Functions", () => {
 
         const fieldName = "Test Field"
         const fieldIDSource = "test-field-id"
-        const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+        const fieldGeometry = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            }
         const AcquireDate = new Date("2023-01-01")
         const DiscardingDate = new Date("2023-12-31")
         const acquiringMethod = "owner"
