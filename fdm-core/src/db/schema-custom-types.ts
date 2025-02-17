@@ -127,13 +127,6 @@ export const parseHexToGeometry = (hex: string): GeoJSON.Geometry => {
         return geometry
     } catch (e) {
         throw e
-    } finally {
-        const endMs = performance.now()
-        console.debug(
-            "[Postgis Geometry] parseHexToGeometry took",
-            endMs - startMs,
-            "ms",
-        )
     }
 }
 
