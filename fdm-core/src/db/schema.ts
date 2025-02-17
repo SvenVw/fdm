@@ -7,7 +7,11 @@ import {
     timestamp,
     uniqueIndex,
 } from "drizzle-orm/pg-core"
-import { geometryPolygon, numericCasted } from "./schema-custom-types"
+import {
+    geometryPolygon,
+    geometryMultiPoint,
+    numericCasted,
+} from "./schema-custom-types"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm-dev")
@@ -507,7 +511,7 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
         .references(() => soilAnalysis.a_id),
     b_depth: numericCasted(),
     b_sampling_date: timestamp({ withTimezone: true }),
-    // b_sampling_geometry: geometryMultipoint()
+    b_sampling_geometry: geometryMultiPoint(),
     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updated: timestamp({ withTimezone: true }),
 })
