@@ -1,7 +1,7 @@
 import { ArrowLeft, Copy, Home } from "lucide-react"
-import { Button } from "../ui/button"
-import { NavLink } from "react-router"
 import { useEffect, useState } from "react"
+import { NavLink } from "react-router"
+import { Button } from "../ui/button"
 
 export function ErrorBlock({
     status,

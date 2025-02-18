@@ -1,4 +1,6 @@
 import { Toaster } from "@/components/ui/sonner"
+import { ArrowLeft, Copy, Home } from "lucide-react"
+import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import { useEffect, useState } from "react"
 import {
     Links,
@@ -15,12 +17,10 @@ import {
 import type { LinksFunction, LoaderFunctionArgs } from "react-router"
 import { getToast } from "remix-toast"
 import { toast as notify } from "sonner"
-import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
-import { Button } from "./components/ui/button"
-import { ArrowLeft, Copy, Home } from "lucide-react"
 import { ErrorBlock } from "./components/custom/error"
+import { Button } from "./components/ui/button"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
