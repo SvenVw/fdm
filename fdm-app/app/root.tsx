@@ -81,7 +81,7 @@ export function Layout() {
 }
 
 export default function App() {
-    return <Outlet />
+    return <Layout />
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
