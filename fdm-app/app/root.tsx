@@ -94,15 +94,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const timestamp = new Date().toISOString()
 
     if (isRouteErrorResponse(error)) {
-        if (
-            error.status === 404 ||
-            error.status === 401 ||
-            error.status === 400 ||
-            error.status === 403
-        ) {
+        const clientErrors = [400, 401, 403, 404]
+        if (clientErrors.includes(error.status)) {
             return (
                 <ErrorBlock
-                    status={404}
+                    status={404} // Show 404 in case user is not authorized to access page
                     message={error.statusText}
                     stacktrace={error.data}
                     page={page}
