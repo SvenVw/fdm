@@ -1,11 +1,9 @@
 import { Toaster } from "@/components/ui/sonner"
-import { ArrowLeft, Copy, Home } from "lucide-react"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import {
     Links,
     Meta,
-    NavLink,
     Outlet,
     Scripts,
     ScrollRestoration,
@@ -20,7 +18,6 @@ import { toast as notify } from "sonner"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 import { ErrorBlock } from "./components/custom/error"
-import { Button } from "./components/ui/button"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
@@ -73,10 +70,9 @@ export function Layout() {
                 <Links />
             </head>
             <body>
-                <ErrorBoundary>
-                    <Outlet />
-                    <Toaster />
-                </ErrorBoundary>
+                <Outlet />
+                <Toaster />
+                <ErrorBoundary />
                 <ScrollRestoration />
                 <Scripts />
             </body>
