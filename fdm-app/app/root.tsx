@@ -123,6 +123,9 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             />
         )
     }
+    if (error === null) {
+        return null
+    }
     return (
         <ErrorBlock
             status={500}
