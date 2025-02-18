@@ -7,9 +7,9 @@
     "scripts": {
         "build": "react-router build",
         "db:generate": "npx @better-auth/cli generate --output ./db/schema.ts --config app/lib/auth.server.ts && npx drizzle-kit generate",
-        "dev": "dotenvx run -- react-router dev",
+        "dev": "dotenvx run -- NODE_OPTIONS='--import ./instrument.server.mjs' react-router dev",
         "dotenvx": "dotenvx",
-        "start": "dotenvx run -- react-router-serve ./build/server/index.js",
+        "start": "dotenvx run -- NODE_OPTIONS='--import ./instrument.server.mjs' react-router-serve ./build/server/index.js",
         "typecheck": "react-router typegen && tsc"
     },
     "dependencies": {
@@ -30,6 +30,9 @@
         "@radix-ui/react-tooltip": "^1.1.8",
         "@react-router/node": "^7.1.5",
         "@react-router/serve": "^7.1.5",
+        "@sentry/node": "^9.1.0",
+        "@sentry/profiling-node": "^9.1.0",
+        "@sentry/react": "^9.1.0",
         "@turf/centroid": "^7.2.0",
         "better-auth": "^1.1.18",
         "class-variance-authority": "^0.7.1",
