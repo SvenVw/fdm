@@ -98,9 +98,22 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     }, [isCopied])
 
     const copyStackTrace = () => {
-        navigator.clipboard.writeText(error?.data || "No stack trace available")
+        navigator.clipboard.writeText(
+            JSON.stringify(
+                {
+                    status: error?.status,
+                    statusText: error?.statusText,
+                    stacktrace: error?.data,
+                    page: window.location.href,
+                    timestamp: new Date().toISOString(),
+                },
+                null,
+                2,
+            ),
+        )
         setIsCopied(true)
     }
+
     console.error(error)
     if (isRouteErrorResponse(error)) {
         if (error.status === 500) {
@@ -118,8 +131,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                     </h1>
                     <p className="text-xl mb-8 text-center text-gray-600 dark:text-gray-400">
                         Er is onverwachts wat fout gegaan. Probeer eerst
-                        opnieuw. Als het niet opnieuw lukt, kopieer dan de foutmelding en
-                        neem contact op met Ondersteuning.
+                        opnieuw. Als het niet opnieuw lukt, kopieer dan de
+                        foutmelding en neem contact op met Ondersteuning.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Button asChild>
@@ -137,6 +150,33 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                             {isCopied ? "Gekopieerd!" : "Kopieer foutmelding"}
                         </Button>
                     </div>
+                    {error?.data ? (
+                        <div className="mt-8 w-full max-w-2xl">
+                            <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                                Foutmelding:
+                            </h2>
+                            <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
+                                {JSON.stringify(
+                                    {
+                                        status: error?.status,
+                                        statusText: error?.statusText,
+                                        stacktrace: error?.data,
+                                        page: window.location.href,
+                                        timestamp: new Date().toISOString(),
+                                    },
+                                    null,
+                                    2,
+                                )}
+                            </pre>
+                        </div>
+                    ) : (
+                        <p className="mt-8 text-gray-600 dark:text-gray-400">
+                            Er zijn helaas geen details over de fout
+                            beschikbaar.
+                        </p>
+                    )}
+                </div>
+            )
                     {error?.data ? (
                         <div className="mt-8 w-full max-w-2xl">
                             <h2 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">
