@@ -33,6 +33,7 @@
         "@sentry/node": "^9.1.0",
         "@sentry/profiling-node": "^9.1.0",
         "@sentry/react": "^9.1.0",
+        "@sentry/vite-plugin": "^3.1.2",
         "@turf/centroid": "^7.2.0",
         "better-auth": "^1.1.18",
         "class-variance-authority": "^0.7.1",
