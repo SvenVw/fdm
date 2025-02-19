@@ -87,11 +87,15 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = "#"
     }
 
-    const [feedback, setFeedback] = useState()
+    const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
+    const [isLoading, setIsLoading] = useState(true)
+
     useEffect(() => {
         setFeedback(Sentry.getFeedback())
+        setIsLoading(false)
     }, [])
-    if (!feedback) {
+
+    if (isLoading) {
         return null
     }
 
