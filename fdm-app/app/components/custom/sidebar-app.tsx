@@ -96,9 +96,14 @@ export function SidebarApp(props: SideBarAppType) {
     }
 
     const openFeedbackForm = async () => {
-        const form = await feedback.createForm()
-        form.appendToDom()
-        form.open()
+        try {
+            const form = await feedback.createForm()
+            form.appendToDom()
+            form.open()
+        } catch (error) {
+            console.error('Failed to open feedback form:', error)
+            // Consider showing a user-friendly error message
+        }
     }
 
     return (
