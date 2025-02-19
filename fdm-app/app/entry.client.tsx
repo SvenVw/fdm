@@ -10,7 +10,8 @@ import { hydrateRoot } from "react-dom/client"
 import { HydratedRouter } from "react-router/dom"
 
 Sentry.init({
-    dsn: "https://b5651581a95af60620e34f9830be9d63@o4508840388001793.ingest.de.sentry.io/4508840410284112",
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.NODE_ENV,
     integrations: [
         Sentry.browserTracingIntegration(),
         Sentry.replayIntegration(),
@@ -46,12 +47,13 @@ Sentry.init({
         return event
     },
 
-    tracesSampleRate: 1,
+    tracesSampleRate: import.meta.env.VITE_SENTRY_TRACE_SAMPLE_RATE,
 
     tracePropagationTargets: ["localhost"],
 
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 1,
+    replaysSessionSampleRate: import.meta.env.VITE_SENTRY_REPLAY_SAMPLE_RATE,
+    replaysOnErrorSampleRate: import.meta.env
+        .VITE_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR,
 })
 
 startTransition(() => {
