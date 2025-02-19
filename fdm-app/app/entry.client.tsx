@@ -39,6 +39,12 @@ Sentry.init({
             successMessageText: "Bedankt voor uw feedback!",
         }),
     ],
+    beforeSend(event, hint) {
+        if (event.exception && event.event_id) {
+            Sentry.showReportDialog({ eventId: event.event_id, lang: "nl" })
+        }
+        return event
+    },
 
     tracesSampleRate: 1,
 
