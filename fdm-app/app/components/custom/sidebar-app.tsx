@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -45,6 +46,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Form, NavLink } from "react-router"
+import { useEffect, useState } from "react"
 
 interface SideBarAppType {
     user: {
@@ -83,6 +85,20 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = `/farm/${user.farm_active}/atlas`
     } else {
         atlasLink = "#"
+    }
+
+    const [feedback, setFeedback] = useState()
+    useEffect(() => {
+        setFeedback(Sentry.getFeedback())
+    }, [])
+    if (!feedback) {
+        return null
+    }
+
+    const openFeedbackForm = async () => {
+        const form = await feedback.createForm()
+        form.appendToDom()
+        form.open()
     }
 
     return (
@@ -212,7 +228,11 @@ export function SidebarApp(props: SideBarAppType) {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem key="feedback">
-                                <SidebarMenuButton asChild size="sm">
+                                <SidebarMenuButton
+                                    asChild
+                                    size="sm"
+                                    onClick={openFeedbackForm}
+                                >
                                     <NavLink to="#">
                                         <Send />
                                         <span>Feedback</span>
