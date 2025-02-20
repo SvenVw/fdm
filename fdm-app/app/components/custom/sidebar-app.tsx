@@ -87,6 +87,10 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = "#"
     }
 
+    Sentry.setUser({
+        fullName: user.name,
+        email: user.email,
+    })
     const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
     const [isLoading, setIsLoading] = useState(true)
 
@@ -105,7 +109,7 @@ export function SidebarApp(props: SideBarAppType) {
             form.appendToDom()
             form.open()
         } catch (error) {
-            console.error('Failed to open feedback form:', error)
+            console.error("Failed to open feedback form:", error)
             // Consider showing a user-friendly error message
         }
     }

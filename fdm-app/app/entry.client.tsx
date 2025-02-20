@@ -38,6 +38,10 @@ Sentry.init({
             messagePlaceholder:
                 "Wat is uw feedback? Gaat er iets mis of zou u iets toegevoegd willen zien?",
             successMessageText: "Bedankt voor uw feedback!",
+            useSentryUser: {
+                name: "fullName",
+                email: "email",
+            },
         }),
     ],
     beforeSend(event, hint) {
