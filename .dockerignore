@@ -5,7 +5,7 @@
 .git
 /archive
 /coverage
-*.env
+**/.env
 
 /fdm-app/build
 /fdm-app/.react-router
