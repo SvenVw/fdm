@@ -187,7 +187,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
     if (request.method === "DELETE") {
         const formData = await request.formData()
         const b_id_harvesting = formData.get("b_id_harvesting")
-        console.log(b_id_harvesting)
 
         if (!b_id_harvesting || typeof b_id_harvesting !== "string") {
             return dataWithError(
