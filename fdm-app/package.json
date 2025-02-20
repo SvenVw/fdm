@@ -8,7 +8,8 @@
         "build": "react-router build",
         "dev": "dotenvx run -- react-router dev",
         "dotenvx": "dotenvx",
-        "start": "dotenvx run -- react-router-serve ./build/server/index.js",
+        "start": "react-router-serve ./build/server/index.js",
+        "start-dev": "dotenvx run -- react-router-serve ./build/server/index.js",
         "typecheck": "react-router typegen && tsc"
     },
     "dependencies": {
