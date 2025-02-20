@@ -44,12 +44,12 @@ Sentry.init({
             },
         }),
     ],
-    beforeSend(event, hint) {
-        if (event.exception && event.event_id) {
-            Sentry.showReportDialog({ eventId: event.event_id, lang: "nl" })
-        }
-        return event
-    },
+    // beforeSend(event, hint) {
+    //     if (event.exception && event.event_id) {
+    //         Sentry.showReportDialog({ eventId: event.event_id, lang: "nl" })
+    //     }
+    //     return event
+    // },
 
     tracesSampleRate: import.meta.env.VITE_SENTRY_TRACE_SAMPLE_RATE,
 
