@@ -11,9 +11,6 @@ export const FormSchema = z.object({
         })
         .finite({
             message: "Hoeveelheid moet een geheel getal zijn",
-        })
-        .safe({
-            message: "Hoeveelheid moet een safe getal zijn",
         }),
     p_app_date: z.coerce.date({
         required_error: "Datum is verplicht",
