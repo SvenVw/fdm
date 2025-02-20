@@ -12,5 +12,5 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!fields.length) {
         throw new Error("No fields found for this farm")
     }
-    return redirect(`/${fields[0].b_id}`)
+    return redirect(`./${fields[0].b_id}`)
 }

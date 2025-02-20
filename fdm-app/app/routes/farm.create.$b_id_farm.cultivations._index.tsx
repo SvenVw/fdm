@@ -12,5 +12,5 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!cultivationPlan.length) {
         throw new Error("No cultivations found for this farm")
     }
-    return redirect(`/${cultivationPlan[0].b_lu_catalogue}/crop`)
+    return redirect(`./${cultivationPlan[0].b_lu_catalogue}/crop`)
 }
