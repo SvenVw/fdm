@@ -136,13 +136,14 @@ export default function SignIn() {
                                             }}
                                         >
                                             <svg
+                                                role="img"
+                                                aria-label="Microsoft logo"
                                                 width="1024"
                                                 height="1024"
                                                 viewBox="0 0 1024 1024"
                                                 fill="none"
                                                 xmlns="http://www.w3.org/2000/svg"
                                             >
-                                                <title>Microsoft logo</title>
                                                 <path
                                                     d="M44.522 44.5217H489.739V489.739H44.522V44.5217Z"
                                                     fill="#F35325"
@@ -182,12 +183,13 @@ export default function SignIn() {
                                             }}
                                         >
                                             <svg
+                                                role="img"
+                                                aria-label="Google logo"
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 width="0.98em"
                                                 height="1em"
                                                 viewBox="0 0 256 262"
-                                            >
-                                                <title>Google logo</title>
+                                            >                                                
                                                 <path
                                                     fill="#4285F4"
                                                     d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
