@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add Microsoft as sign in method
+Add Microsoft OAuth2 sign-in method alongside existing Google authentication

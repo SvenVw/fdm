@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-At sign-in page use a card to present various sign-in methods
+At the sign-in page, use a card to present sign-in methods including Microsoft and Google.
