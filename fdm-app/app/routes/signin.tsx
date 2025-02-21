@@ -224,7 +224,10 @@ export default function SignIn() {
                         <CardFooter className="flex justify-center">
                             <p className="text-sm font-medium text-muted-foreground text-center">
                                 Door verder te gaan, gaat u akkoord met het{" "}
-                                <a href="/privacy" className="underline">
+                                <a
+                                    href="/privacy"
+                                    className="underline hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                >
                                     Privacybeleid
                                 </a>
                             </p>
