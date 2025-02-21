@@ -226,6 +226,9 @@ export default function SignIn() {
                                 Door verder te gaan, gaat u akkoord met het{" "}
                                 <a
                                     href="/privacy"
+                                    aria-label="Lees ons privacybeleid"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="underline hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                 >
                                     Privacybeleid
