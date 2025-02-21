@@ -17,6 +17,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { toast } from "sonner"
 
 export async function loader({ request }: LoaderFunctionArgs) {
     // Get the session
@@ -128,6 +129,7 @@ export default function SignIn() {
                                                         callbackURL: "/farm",
                                                     })
                                                 } catch (error) {
+                                                    toast("Er is helaas iets misgegaan bij het aanmelden met Microsoft. Probeer het opnieuw.")
                                                     console.error(
                                                         "Social sign-in failed:",
                                                         error,
@@ -175,6 +177,7 @@ export default function SignIn() {
                                                         callbackURL: "/farm",
                                                     })
                                                 } catch (error) {
+                                                    toast("Er is helaas iets misgegaan bij het aanmelden met Google. Probeer het opnieuw.")
                                                     console.error(
                                                         "Social sign-in failed:",
                                                         error,
