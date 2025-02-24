@@ -52,6 +52,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )
+    if (!cultivation) {
+        throw data("Cultivation not found", {
+            status: 404,
+            statusText: "Cultivation not found",
+        })
+    }
     const b_sowing_date = cultivation.b_sowing_date
     const b_terminating_date = cultivation.b_terminating_date
     const harvests = cultivation?.fields?.[0]?.harvests
