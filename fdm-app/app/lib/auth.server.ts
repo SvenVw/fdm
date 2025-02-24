@@ -98,6 +98,19 @@ export const auth = betterAuth({
                 }
             },
         },
+        microsoft: {
+            clientId: process.env.MS_CLIENT_ID as string,
+            clientSecret: process.env.MS_CLIENT_SECRET as string,
+            tenantId: "common",
+            requireSelectAccount: true,
+            mapProfileToUser: (profile) => {
+                return {
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture
+                }
+            },
+        },
     },
     rateLimit: {
         storage: "database",
