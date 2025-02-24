@@ -73,6 +73,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_source: "test-source",
                 b_lu_name: "test-name",
                 b_lu_name_en: "test-name-en",
+                b_lu_harvestable: "once",
                 b_lu_hcat3: "test-hcat3",
                 b_lu_hcat3_name: "test-hcat3-name",
             })
@@ -96,6 +97,7 @@ describe("Cultivation Data Model", () => {
             const b_lu_source = "custom"
             const b_lu_name = "Test Cultivation"
             const b_lu_name_en = "Test Cultivation (EN)"
+            const b_lu_harvestable = "once"
             const b_lu_hcat3 = "test-hcat3"
             const b_lu_hcat3_name = "Test HCAT3 Name"
 
@@ -104,6 +106,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_source,
                 b_lu_name,
                 b_lu_name_en,
+                b_lu_harvestable,
                 b_lu_hcat3,
                 b_lu_hcat3_name,
             })
@@ -134,6 +137,22 @@ describe("Cultivation Data Model", () => {
                     b_sowing_date,
                 ),
             ).rejects.toThrow("Exception for addCultivation")
+        })
+
+        it("should throw an error when adding a cultivation with invalid b_lu_harvestable", async () => {
+            const b_lu_catalogue = createId()
+
+            await expect(
+                addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue,
+                    b_lu_source: "test-source",
+                    b_lu_name: "test-name",
+                    b_lu_name_en: "test-name-en",
+                    b_lu_harvestable: "invalid-value",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                }),
+            ).rejects.toThrow()
         })
 
         it("should add a new cultivation", async () => {
@@ -201,6 +220,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_source: "new-source",
                 b_lu_name: "new-name",
                 b_lu_name_en: "new-name-en",
+                b_lu_harvestable: "multiple",
                 b_lu_hcat3: "new-hcat3",
                 b_lu_hcat3_name: "new-hcat3-name",
             })
@@ -250,6 +270,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_source: "new-source",
                 b_lu_name: "new-name",
                 b_lu_name_en: "new-name-en",
+                b_lu_harvestable: "multiple",
                 b_lu_hcat3: "new-hcat3",
                 b_lu_hcat3_name: "new-hcat3-name",
             })
@@ -280,6 +301,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_source: "new-source",
                 b_lu_name: "new-name",
                 b_lu_name_en: "new-name-en",
+                b_lu_harvestable: "none",
                 b_lu_hcat3: "new-hcat3",
                 b_lu_hcat3_name: "new-hcat3-name",
             })
@@ -383,6 +405,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_source: "test",
                 b_lu_name: "Wheat",
                 b_lu_name_en: "Wheat",
+                b_lu_harvestable: "once",
                 b_lu_hcat3: "1",
                 b_lu_hcat3_name: "test",
             })
