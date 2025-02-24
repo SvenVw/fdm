@@ -80,7 +80,7 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van perceel moet minimaal 3 karakters bevatten",
         }),
-    b_area: z.string({
+    b_area: z.coerce.number({
         required_error: "Oppervlakte van perceel is verplicht",
     }),
     b_lu_catalogue: z.string({
