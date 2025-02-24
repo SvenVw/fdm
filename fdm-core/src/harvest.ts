@@ -40,7 +40,7 @@ export async function addHarvest(
     b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"],
     b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"],
     b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"],
-): Promise<schema.harvestablesTypeSelect["b_id_harvestable"]> {
+): Promise<schema.cultivationHarvestingTypeSelect["b_id_harvesting"]> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
             // Validate if cultivation exists
