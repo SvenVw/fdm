@@ -87,10 +87,14 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = "#"
     }
 
-    Sentry.setUser({
-        fullName: user.name,
-        email: user.email,
-    })
+    try {
+        Sentry.setUser({
+            fullName: user.name,
+            email: user.email,
+        })
+    } catch (error) {
+        Sentry.captureException(error)
+    }
     const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
     const [isLoading, setIsLoading] = useState(true)
 
