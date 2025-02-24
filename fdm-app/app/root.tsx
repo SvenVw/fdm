@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/react"
+
 import { Toaster } from "@/components/ui/sonner"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import { useEffect } from "react"
@@ -102,6 +104,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
                 />
             )
         }
+
+        Sentry.captureException(error)
         return (
             <ErrorBlock
                 status={error.status}
@@ -113,6 +117,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         )
     }
     if (error instanceof Error) {
+        Sentry.captureException(error)
         return (
             <ErrorBlock
                 status={500}
@@ -126,6 +131,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (error === null) {
         return null
     }
+
+    Sentry.captureException(error)
     return (
         <ErrorBlock
             status={500}
