@@ -117,7 +117,7 @@ export function CultivationForm({
                                                     locale={nl}
                                                     disabled={(date) =>
                                                         date <
-                                                        new Date("1900-01-01")
+                                                        new Date("1970-01-01")
                                                     }
                                                     initialFocus
                                                 />
