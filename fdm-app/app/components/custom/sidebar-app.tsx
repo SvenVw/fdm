@@ -109,8 +109,8 @@ export function SidebarApp(props: SideBarAppType) {
             form.appendToDom()
             form.open()
         } catch (error) {
-            console.error("Failed to open feedback form:", error)
-            // Consider showing a user-friendly error message
+            Sentry.captureException(error)
+            toast.error("Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.")
         }
     }
 
