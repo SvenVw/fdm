@@ -35,6 +35,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function SignIn() {
+    const handleSignInError = (provider: string, error: Error) => {
+        toast(
+            `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
+        )
+        console.error("Social sign-in failed:", error)
+    }
     return (
         <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
             <div className="flex h-screen items-center justify-center py-12">
@@ -128,11 +134,8 @@ export default function SignIn() {
                                                     callbackURL: "/farm",
                                                 })
                                             } catch (error) {
-                                                toast(
-                                                    "Er is helaas iets misgegaan bij het aanmelden met Microsoft. Probeer het opnieuw.",
-                                                )
-                                                console.error(
-                                                    "Social sign-in failed:",
+                                                handleSignInError(
+                                                    "Microsoft",
                                                     error,
                                                 )
                                             }
@@ -167,14 +170,6 @@ export default function SignIn() {
                                         Aanmelden met Microsoft
                                     </Button>
                                 </div>
-// Add the common error handling function (place this where it best fits your project structure)
-const handleSignInError = (provider: string, error: Error) => {
-    toast(
-        `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
-    )
-    console.error("Social sign-in failed:", error)
-}
-
                                 <div className="flex flex-col space-y-1.5">
                                     <Button
                                         variant={"outline"}
@@ -186,14 +181,10 @@ const handleSignInError = (provider: string, error: Error) => {
                                                     callbackURL: "/farm",
                                                 })
                                             } catch (error) {
--                                                toast(
--                                                    "Er is helaas iets misgegaan bij het aanmelden met Google. Probeer het opnieuw.",
--                                                )
--                                                console.error(
--                                                    "Social sign-in failed:",
--                                                    error,
--                                                )
-+                                                handleSignInError("Google", error)
+                                                handleSignInError(
+                                                    "Google",
+                                                    error,
+                                                )
                                             }
                                         }}
                                     >
@@ -227,7 +218,6 @@ const handleSignInError = (provider: string, error: Error) => {
                                         </svg>
                                         Aanmelden met Google
                                     </Button>
-                                </div>
                                 </div>
                             </div>
                         </CardContent>
