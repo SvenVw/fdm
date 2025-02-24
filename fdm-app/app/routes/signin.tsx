@@ -167,6 +167,14 @@ export default function SignIn() {
                                         Aanmelden met Microsoft
                                     </Button>
                                 </div>
+// Add the common error handling function (place this where it best fits your project structure)
+const handleSignInError = (provider: string, error: Error) => {
+    toast(
+        `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
+    )
+    console.error("Social sign-in failed:", error)
+}
+
                                 <div className="flex flex-col space-y-1.5">
                                     <Button
                                         variant={"outline"}
@@ -178,13 +186,14 @@ export default function SignIn() {
                                                     callbackURL: "/farm",
                                                 })
                                             } catch (error) {
-                                                toast(
-                                                    "Er is helaas iets misgegaan bij het aanmelden met Google. Probeer het opnieuw.",
-                                                )
-                                                console.error(
-                                                    "Social sign-in failed:",
-                                                    error,
-                                                )
+-                                                toast(
+-                                                    "Er is helaas iets misgegaan bij het aanmelden met Google. Probeer het opnieuw.",
+-                                                )
+-                                                console.error(
+-                                                    "Social sign-in failed:",
+-                                                    error,
+-                                                )
++                                                handleSignInError("Google", error)
                                             }
                                         }}
                                     >
@@ -218,6 +227,7 @@ export default function SignIn() {
                                         </svg>
                                         Aanmelden met Google
                                     </Button>
+                                </div>
                                 </div>
                             </div>
                         </CardContent>
