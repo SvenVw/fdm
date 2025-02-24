@@ -14,7 +14,7 @@ CREATE TABLE "fdm-dev"."cultivation_harvesting" (
 --> statement-breakpoint
 CREATE TABLE "fdm-dev"."cultivation_terminating" (
 	"b_lu" text NOT NULL,
-	"b_terminate_date" timestamp with time zone,
+	"b_terminating_date" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -137,7 +137,7 @@ CREATE TABLE "fdm-dev"."fertilizers_catalogue" (
 CREATE TABLE "fdm-dev"."field_acquiring" (
 	"b_id" text NOT NULL,
 	"b_id_farm" text NOT NULL,
-	"b_acquiring_date" timestamp with time zone NOT NULL,
+	"b_acquiring_date" timestamp with time zone,
 	"b_acquiring_method" "fdm-dev"."b_acquiring_method" DEFAULT 'unknown' NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
@@ -145,7 +145,7 @@ CREATE TABLE "fdm-dev"."field_acquiring" (
 --> statement-breakpoint
 CREATE TABLE "fdm-dev"."field_discarding" (
 	"b_id" text NOT NULL,
-	"b_discarding_date" timestamp with time zone NOT NULL,
+	"b_discarding_date" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -163,7 +163,7 @@ CREATE TABLE "fdm-dev"."field_sowing" (
 CREATE TABLE "fdm-dev"."fields" (
 	"b_id" text PRIMARY KEY NOT NULL,
 	"b_name" text NOT NULL,
-	"b_geometry" geometry(polygon),
+	"b_geometry" geometry(Polygon,4326),
 	"b_id_source" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
@@ -210,6 +210,7 @@ CREATE TABLE "fdm-dev"."soil_sampling" (
 	"a_id" text NOT NULL,
 	"b_depth" numeric,
 	"b_sampling_date" timestamp with time zone,
+	"b_sampling_geometry" geometry(MultiPoint,4326),
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );

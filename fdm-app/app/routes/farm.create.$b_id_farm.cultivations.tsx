@@ -5,9 +5,7 @@ import {
     data,
 } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
-
 import { SidebarPage } from "@/components/custom/sidebar-page"
-// Components
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -19,10 +17,6 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
-
-// Blocks
-
-// FDM
 import { fdm } from "@/lib/fdm.server"
 import { cn } from "@/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"

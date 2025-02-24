@@ -1,34 +1,20 @@
 {
-    "version": "7",
-    "dialect": "postgresql",
-    "entries": [
-        {
-            "idx": 0,
-            "version": "7",
-            "when": 1731414293847,
-            "tag": "0000_crazy_slyde",
-            "breakpoints": true
-        },
-        {
-            "idx": 1,
-            "version": "7",
-            "when": 1737560036562,
-            "tag": "0001_talented_malcolm_colcord",
-            "breakpoints": true
-        },
-        {
-            "idx": 2,
-            "version": "7",
-            "when": 1737561964152,
-            "tag": "0002_clammy_kylun",
-            "breakpoints": true
-        },
-        {
-            "idx": 3,
-            "version": "7",
-            "when": 1738146516727,
-            "tag": "0003_thick_stature",
-            "breakpoints": true
-        }
-    ]
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1731414293847,
+      "tag": "0000_crazy_slyde",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1739797518456,
+      "tag": "0001_loud_fallen_one",
+      "breakpoints": true
+    }
+  ]
 }

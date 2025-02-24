@@ -1,6 +1,6 @@
 {
-    "id": "6790af1a-0d32-4f9f-9d8c-b49e359dc03d",
-    "prevId": "590fcaf4-ac49-421c-9a76-e6993d62c4b6",
+    "id": "62e97ddc-5c5e-480e-93aa-dd6a2aacf8af",
+    "prevId": "027a7a7e-c16d-4b2b-ac3b-7cf6101fb354",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
@@ -8,6 +8,12 @@
             "name": "cultivation_harvesting",
             "schema": "fdm-dev",
             "columns": {
+                "b_id_harvesting": {
+                    "name": "b_id_harvesting",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
                 "b_id_harvestable": {
                     "name": "b_id_harvestable",
                     "type": "text",
@@ -20,8 +26,8 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "b_harvest_date": {
-                    "name": "b_harvest_date",
+                "b_harvesting_date": {
+                    "name": "b_harvesting_date",
                     "type": "timestamp with time zone",
                     "primaryKey": false,
                     "notNull": false
@@ -210,6 +216,13 @@
                     "type": "text",
                     "primaryKey": false,
                     "notNull": false
+                },
+                "b_lu_harvestable": {
+                    "name": "b_lu_harvestable",
+                    "type": "b_lu_harvestable",
+                    "typeSchema": "fdm-dev",
+                    "primaryKey": false,
+                    "notNull": true
                 },
                 "b_lu_hcat3": {
                     "name": "b_lu_hcat3",
@@ -1249,6 +1262,36 @@
                     "primaryKey": false,
                     "notNull": false
                 },
+                "b_lu_n_residue": {
+                    "name": "b_lu_n_residue",
+                    "type": "numeric",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "b_lu_p_harvestable": {
+                    "name": "b_lu_p_harvestable",
+                    "type": "numeric",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "b_lu_p_residue": {
+                    "name": "b_lu_p_residue",
+                    "type": "numeric",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "b_lu_k_harvestable": {
+                    "name": "b_lu_k_harvestable",
+                    "type": "numeric",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "b_lu_k_residue": {
+                    "name": "b_lu_k_residue",
+                    "type": "numeric",
+                    "primaryKey": false,
+                    "notNull": false
+                },
                 "created": {
                     "name": "created",
                     "type": "timestamp with time zone",
@@ -1599,6 +1642,11 @@
                 "bVI",
                 "IIIa"
             ]
+        },
+        "fdm-dev.b_lu_harvestable": {
+            "name": "b_lu_harvestable",
+            "schema": "fdm-dev",
+            "values": ["none", "once", "multiple"]
         },
         "fdm-dev.b_soiltype_agr": {
             "name": "b_soiltype_agr",

@@ -20,7 +20,6 @@ import {
 } from "react-router"
 import { dataWithError } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import wkx from "wkx"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the field id
@@ -49,7 +48,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_name: field.b_lu_name,
             b_id_source: field.b_id_source,
         },
-        geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
+        geometry: field.b_geometry,
     }
     const featureCollection: FeatureCollection = {
         type: "FeatureCollection",
@@ -93,8 +92,9 @@ export default function FarmFieldAtlasBlock() {
                         <MapGL
                             {...viewState}
                             style={{
-                                height: "calc(100vh - 64px - 123px)",
-                                width: "100%",
+                                height: "60%",
+                                width: "70%",
+                                position: "absolute",
                             }}
                             interactive={false}
                             mapStyle={loaderData.mapboxStyle}
