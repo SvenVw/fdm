@@ -63,7 +63,6 @@ export async function addHarvest(
             const b_id_harvestable = createId()
             await tx.insert(schema.harvestables).values({
                 b_id_harvestable: b_id_harvestable,
-                b_lu_yield: b_lu_yield,
             })
 
             // Insert the harvest in the db
