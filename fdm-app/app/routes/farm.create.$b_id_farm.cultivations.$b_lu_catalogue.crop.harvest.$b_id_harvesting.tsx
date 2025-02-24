@@ -53,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )
-    const harvest = cultivation?.fields[0]?.harvests?.find((harvest) => {
+    const harvest = cultivation?.fields?.[0]?.harvests?.find((harvest) => {
         return harvest.b_id_harvesting === b_id_harvesting
     })
 

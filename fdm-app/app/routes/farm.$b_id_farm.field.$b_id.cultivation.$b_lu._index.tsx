@@ -75,6 +75,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     // Get cultivation
     const cultivation = await getCultivation(fdm, b_lu)
+    if (!cultivation) {
+        throw data("Cultivation is not found", { status: 404 })
+    }
 
     // Get harvests
     const harvests = await getHarvests(fdm, b_lu)
