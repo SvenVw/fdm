@@ -13,7 +13,9 @@ export default {
     plugins: [
         resolve({ preferBuiltins: true }),
         commonjs(), // Handles CommonJS modules
-        typescript(), // Compiles TypeScript
+        typescript({
+            tsconfig: "./tsconfig.json",
+        }), // Compiles TypeScript
         {
             name: "copy-migrations-folder",
             closeBundle: () => {

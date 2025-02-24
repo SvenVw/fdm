@@ -10,7 +10,6 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     data,
-    redirect,
     useLoaderData,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
@@ -29,12 +28,10 @@ import {
 } from "@/components/custom/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
-    FieldsSourceNotClickable,
     FieldsSourceSelected,
 } from "@/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-// Components
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -51,7 +48,7 @@ import {
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { redirectWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
 
@@ -235,8 +232,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const selectedFields = JSON.parse(String(formData.get("selected_fields")))
 
     // Add fields to farm
-    const b_ids = await Promise.all(
-        selectedFields.features.map(async (field, index) => {
+    await Promise.all(
+        selectedFields.features.map(async (field, index: number) => {
             const b_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
@@ -347,7 +344,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }),
     )
 
-    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields/${b_ids[0]}`, {
+    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
         message: "Percelen zijn toegevoegd! 🎉",
     })
 }

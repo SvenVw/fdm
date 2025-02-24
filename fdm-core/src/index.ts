@@ -55,3 +55,9 @@ export {
     getSoilAnalysis,
     getSoilAnalyses,
 } from "./soil"
+export {
+    addHarvest,
+    getHarvest,
+    getHarvests,
+    removeHarvest,
+} from "./harvest"
