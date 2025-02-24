@@ -7,7 +7,7 @@ import {
     timestamp,
     uniqueIndex,
 } from "drizzle-orm/pg-core"
-import { geometryPolygon, numericCasted } from "./schema-custom-types"
+import { geometry, numericCasted } from "./schema-custom-types"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm-dev")
@@ -70,7 +70,9 @@ export const fields = fdmSchema.table(
     {
         b_id: text().primaryKey(),
         b_name: text().notNull(),
-        b_geometry: geometryPolygon(), // PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
+        b_geometry: geometry("b_geometry", {
+            type: "Polygon",
+        }), // PGLite does not support PostGIS yet; I expect to be supported in Q4 2024: https://github.com/electric-sql/pglite/issues/11
         b_id_source: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -507,7 +509,9 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
         .references(() => soilAnalysis.a_id),
     b_depth: numericCasted(),
     b_sampling_date: timestamp({ withTimezone: true }),
-    // b_sampling_geometry: geometryMultipoint()
+    b_sampling_geometry: geometry("b_sampling_geometry", {
+        type: "MultiPoint",
+    }),
     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updated: timestamp({ withTimezone: true }),
 })

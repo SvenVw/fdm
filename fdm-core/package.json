@@ -27,7 +27,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate": "npx drizzle-kit generate",
@@ -61,12 +63,12 @@
     },
     "dependencies": {
         "@electric-sql/pglite": "^0.2.16",
+        "@types/geojson": "^7946.0.15",
         "drizzle-graphql": "^0.8.5",
         "drizzle-orm": "catalog:",
         "graphql": "^16.10.0",
         "nanoid": "^5.0.9",
-        "postgres": "^3.4.5",
-        "wkx": "^0.5.0"
+        "postgres": "^3.4.5"
     },
     "packageManager": "pnpm@9.15.4",
     "publishConfig": {

@@ -13,8 +13,6 @@ import {
     useLoaderData,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import wkx from "wkx"
-
 import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
 import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
 import {
@@ -237,6 +235,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const b_name = `Perceel ${index + 1}`
             const b_id_source = field.properties.b_id_source
             const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
+            const b_geometry = field.geometry
             const currentYear = new Date().getFullYear()
             const defaultDate = new Date(currentYear, 0, 1)
             const b_acquiring_date = defaultDate
@@ -264,8 +263,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     },
                 )
             }
-            const fieldGeometry = wkx.Geometry.parseGeoJSON(field.geometry)
-            const b_geometry = fieldGeometry.toWkt()
 
             try {
                 const b_id = await addField(
