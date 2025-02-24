@@ -94,18 +94,18 @@ export default function FarmFieldsOverviewBlock() {
             </div>
             <Separator />
             <div className="grid md:grid-cols-2 gap-8">
-            <CultivationForm
-                b_lu_catalogue={undefined}
-                b_sowing_date={undefined}
-                b_terminating_date={undefined}
-                action={location.pathname}
-                options={loaderData.cultivationsCatalogueOptions}
-            />
-            <Separator />
-            <CultivationList
-                cultivations={loaderData.cultivations}
-                harvests={loaderData.harvests}
-            />
+                <CultivationForm
+                    b_lu_catalogue={undefined}
+                    b_sowing_date={undefined}
+                    b_terminating_date={undefined}
+                    action={location.pathname}
+                    options={loaderData.cultivationsCatalogueOptions}
+                />
+                <Separator />
+                <CultivationList
+                    cultivations={loaderData.cultivations}
+                    harvests={loaderData.harvests}
+                />
             </div>
         </div>
     )

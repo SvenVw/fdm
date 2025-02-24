@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm"
-import { customType, type CustomTypeValues } from "drizzle-orm/pg-core"
+import { type CustomTypeValues, customType } from "drizzle-orm/pg-core"
 import type * as GeoJSON from "geojson"
 
 // Workaround for that `numeric` column type returns string instead of a number

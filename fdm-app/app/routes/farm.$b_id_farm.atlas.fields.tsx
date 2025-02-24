@@ -41,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_lu_name: field.b_lu_name,
                 b_id_source: field.b_id_source,
             },
-            geometry: field.b_geometry
+            geometry: field.b_geometry,
         }
         return feature
     })

@@ -1,10 +1,3 @@
-import {
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    NavLink,
-    data,
-} from "react-router"
-import { Outlet, useLoaderData } from "react-router"
 import { SidebarPage } from "@/components/custom/sidebar-page"
 import {
     Breadcrumb,
@@ -20,6 +13,13 @@ import { Toaster } from "@/components/ui/sonner"
 import { fdm } from "@/lib/fdm.server"
 import { cn } from "@/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+} from "react-router"
+import { Outlet, useLoaderData } from "react-router"
 
 // Meta
 export const meta: MetaFunction = () => {

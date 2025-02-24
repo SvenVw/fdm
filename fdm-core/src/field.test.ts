@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
+import type * as schema from "./db/schema"
 import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
-import type * as schema from "./db/schema"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
@@ -35,7 +35,7 @@ describe("Farm Data Model", () => {
 
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
-            const fieldGeometry: Polygon  = {
+            const fieldGeometry: Polygon = {
                 type: "Polygon",
                 coordinates: [
                     [

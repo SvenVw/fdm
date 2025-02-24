@@ -1,18 +1,3 @@
-import { centroid } from "@turf/centroid"
-import {
-    GeolocateControl,
-    Layer,
-    Map as MapGL,
-    NavigationControl,
-} from "react-map-gl"
-import {
-    type ActionFunctionArgs,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    data,
-    useLoaderData,
-} from "react-router"
-import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
 import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
 import {
@@ -46,8 +31,23 @@ import {
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
+import { centroid } from "@turf/centroid"
 import { useState } from "react"
+import {
+    GeolocateControl,
+    Layer,
+    Map as MapGL,
+    NavigationControl,
+} from "react-map-gl"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    data,
+    useLoaderData,
+} from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 
 // Meta

@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -23,6 +22,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
     BadgeCheck,
@@ -45,8 +45,8 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { Form, NavLink } from "react-router"
 import { useEffect, useState } from "react"
+import { Form, NavLink } from "react-router"
 
 interface SideBarAppType {
     user: {
