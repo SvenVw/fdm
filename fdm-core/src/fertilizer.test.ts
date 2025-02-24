@@ -404,7 +404,18 @@ describe("Fertilizer Data Model", () => {
                 b_id_farm,
                 "test field",
                 "test source",
-                "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                },
                 new Date("2023-01-01"),
                 "owner",
                 new Date("2024-01-01"),

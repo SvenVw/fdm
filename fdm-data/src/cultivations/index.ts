@@ -50,6 +50,7 @@ export async function extendCultivationsCatalogue(
                         b_lu_source: cultivation.b_lu_source,
                         b_lu_name: cultivation.b_lu_name,
                         b_lu_name_en: cultivation.b_lu_name_en,
+                        b_lu_harvestable: cultivation.b_lu_harvestable,
                         b_lu_hcat3: cultivation.b_lu_hcat3,
                         b_lu_hcat3_name: cultivation.b_lu_hcat3_name,
                     })

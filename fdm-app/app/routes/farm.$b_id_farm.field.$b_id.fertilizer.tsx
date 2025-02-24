@@ -1,34 +1,28 @@
-import {
-    FertilizerApplicationsForm,
-    FormSchema,
-} from "@/components/custom/fertilizer-applications"
+import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
+import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
+import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
+import type { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
-import { cn } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
     getFertilizers,
     getField,
     removeFertilizerApplication,
-    updateField,
 } from "@svenvw/fdm-core"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { useEffect, useState } from "react"
-import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     data,
+    useFetcher,
     useLoaderData,
     useLocation,
 } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { z } from "zod"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -71,17 +65,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get fertilizer applications for the field
     const fertilizerApplications = await getFertilizerApplications(fdm, b_id)
 
+    const dose = calculateDose({
+        applications: fertilizerApplications,
+        fertilizers,
+    })
+
     // Return user information from loader
     return {
         field: field,
         fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
+        dose: dose,
     }
 }
 
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
+    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
@@ -92,11 +93,25 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <FertilizerApplicationsForm
-                fertilizerApplications={loaderData.fertilizerApplications}
-                action={location.pathname}
-                options={loaderData.fertilizerOptions}
-            />
+            <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                    <FertilizerApplicationForm
+                        options={loaderData.fertilizerOptions}
+                        action={location.pathname}
+                        fetcher={fetcher}
+                    />
+                    <Separator className="my-4" />
+                    <FertilizerApplicationsList
+                        fertilizerApplications={
+                            loaderData.fertilizerApplications
+                        }
+                        fetcher={fetcher}
+                    />
+                </div>
+                <div>
+                    <FertilizerApplicationsCards dose={loaderData.dose} />
+                </div>
+            </div>
         </div>
     )
 }

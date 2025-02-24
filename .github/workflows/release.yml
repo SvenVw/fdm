@@ -53,7 +53,7 @@ jobs:
         run: pnpm changeset version
 
       - name: Build packages
-        run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data
+        run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data --filter=@svenvw/fdm-calculator
       
       - name: Publish snapshot
         run: pnpm changeset publish
