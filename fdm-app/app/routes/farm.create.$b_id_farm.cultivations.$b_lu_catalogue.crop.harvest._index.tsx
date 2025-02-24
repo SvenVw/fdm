@@ -41,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
     } catch (error) {
-        console.error("Failed to fetch cultivations:", error)
+        Sentry.captureException(error)
         throw data("Failed to load cultivation options", {
             status: 500,
             statusText: "Failed to load cultivation options",
