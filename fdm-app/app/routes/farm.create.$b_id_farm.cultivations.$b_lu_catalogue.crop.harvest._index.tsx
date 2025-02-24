@@ -54,7 +54,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     )
     const b_sowing_date = cultivation.b_sowing_date
     const b_terminating_date = cultivation.b_terminating_date
-    const harvests = cultivation.fields[0].harvests
+    const harvests = cultivation?.fields?.[0]?.harvests
 
     return {
         b_lu_catalogue: b_lu_catalogue,
