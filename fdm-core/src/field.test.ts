@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
+import type * as schema from "./db/schema"
 import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
+
+type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
 describe("Farm Data Model", () => {
     let fdm: FdmServerType
@@ -32,7 +35,18 @@ describe("Farm Data Model", () => {
 
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
-            const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
             const AcquiringMethod = "owner"
@@ -52,7 +66,7 @@ describe("Farm Data Model", () => {
             expect(field.b_name).toBe(fieldName)
             expect(field.b_id_farm).toBe(b_id_farm)
             expect(field.b_id_source).toBe(fieldIDSource)
-            expect(field.b_geometry).toBe(fieldGeometry)
+            expect(field.b_geometry).toStrictEqual(fieldGeometry)
             expect(field.b_area).toBeGreaterThan(0)
             expect(field.b_acquiring_date).toEqual(AcquireDate)
             expect(field.b_discarding_date).toEqual(discardingDate)
@@ -74,7 +88,18 @@ describe("Farm Data Model", () => {
 
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
-            const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
             const AcquiringMethod = "owner"
@@ -93,7 +118,7 @@ describe("Farm Data Model", () => {
             expect(field.b_name).toBe(fieldName)
             expect(field.b_id_farm).toBe(b_id_farm)
             expect(field.b_id_source).toBe(fieldIDSource)
-            expect(field.b_geometry).toBe(fieldGeometry)
+            expect(field.b_geometry).toStrictEqual(fieldGeometry)
             expect(field.b_area).toBeGreaterThan(0)
             expect(field.b_acquiring_date).toEqual(AcquireDate)
             expect(field.b_discarding_date).toEqual(discardingDate)
@@ -115,7 +140,19 @@ describe("Farm Data Model", () => {
 
             const fieldName1 = "Test Field 1"
             const fieldIDSource1 = "test-field-id-1"
-            const fieldGeometry1 = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+            const fieldGeometry1: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            }
+
             const AcquireDate1 = new Date("2023-01-01")
             const discardingDate1 = new Date("2023-12-31")
             const AcquiringMethod1 = "owner"
@@ -132,7 +169,18 @@ describe("Farm Data Model", () => {
 
             const fieldName2 = "Test Field 2"
             const fieldIDSource2 = "test-field-id-2"
-            const fieldGeometry2 = "POLYGON((50 50,60 60,40 60,30 40,50 50))"
+            const fieldGeometry2: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [50, 50],
+                        [60, 60],
+                        [40, 60],
+                        [30, 40],
+                        [50, 50],
+                    ],
+                ],
+            }
             const AcquireDate2 = new Date("2024-01-01")
             const discardingDate2 = new Date("2024-12-31")
             const AcquiringMethod2 = "lease"
@@ -154,7 +202,7 @@ describe("Farm Data Model", () => {
             expect(field1?.b_name).toBe(fieldName1)
             expect(field1?.b_id_farm).toBe(b_id_farm)
             expect(field1?.b_id_source).toBe(fieldIDSource1)
-            expect(field1?.b_geometry).toBe(fieldGeometry1)
+            expect(field1?.b_geometry).toStrictEqual(fieldGeometry1)
             expect(field1?.b_area).toBeGreaterThan(0)
             expect(field1?.b_acquiring_date).toEqual(AcquireDate1)
             expect(field1?.b_discarding_date).toEqual(discardingDate1)
@@ -164,7 +212,7 @@ describe("Farm Data Model", () => {
             expect(field2?.b_name).toBe(fieldName2)
             expect(field2?.b_id_farm).toBe(b_id_farm)
             expect(field2?.b_id_source).toBe(fieldIDSource2)
-            expect(field2?.b_geometry).toBe(fieldGeometry2)
+            expect(field2?.b_geometry).toStrictEqual(fieldGeometry2)
             expect(field2?.b_area).toBeGreaterThan(0)
             expect(field2?.b_acquiring_date).toEqual(AcquireDate2)
             expect(field2?.b_discarding_date).toEqual(discardingDate2)
@@ -186,7 +234,18 @@ describe("Farm Data Model", () => {
 
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
-            const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
             const AcquiringMethod = "owner"
@@ -203,8 +262,18 @@ describe("Farm Data Model", () => {
 
             const updatedFieldName = "Updated Test Field"
             const updatedFieldIDSource = "updated-test-field-id"
-            const updatedFieldGeometry =
-                "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+            const updatedFieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [35, 10],
+                    ],
+                ],
+            }
             const updatedAcquireDate = new Date("2024-01-01")
             const updatedDiscardingDate = new Date("2024-12-31")
             const updatedAcquiringMethod = "lease"
@@ -220,7 +289,7 @@ describe("Farm Data Model", () => {
             )
             expect(updatedField.b_name).toBe(updatedFieldName)
             expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
-            expect(updatedField.b_geometry).toBe(fieldGeometry)
+            expect(updatedField.b_geometry).toStrictEqual(updatedFieldGeometry)
             expect(updatedField.b_acquiring_date).toEqual(updatedAcquireDate)
             expect(updatedField.b_discarding_date).toEqual(
                 updatedDiscardingDate,
@@ -243,7 +312,18 @@ describe("Farm Data Model", () => {
 
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
-            const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
             const AcquiringMethod = "owner"
@@ -273,7 +353,7 @@ describe("Farm Data Model", () => {
 
             expect(updatedField.b_name).toBe(updatedFieldName)
             expect(updatedField.b_id_source).toBe(fieldIDSource) // Should remain the same
-            expect(updatedField.b_geometry).toBe(fieldGeometry) // Should remain the same
+            expect(updatedField.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
             expect(updatedField.b_discarding_date).toEqual(discardingDate) // Should remain the same
             expect(updatedField.b_acquiring_method).toBe(AcquiringMethod) // Should remain the same
@@ -292,7 +372,7 @@ describe("Farm Data Model", () => {
             )
             expect(updatedField2.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField2.b_id_source).toBe(fieldIDSource) // Should remain the same
-            expect(updatedField2.b_geometry).toBe(fieldGeometry) // Should remain the same
+            expect(updatedField2.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField2.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
             expect(updatedField2.b_discarding_date).toEqual(discardingDate) // Should remain the same
             expect(updatedField2.b_acquiring_method).toBe(
@@ -313,7 +393,7 @@ describe("Farm Data Model", () => {
             )
             expect(updatedField3.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField3.b_id_source).toBe(updatedFieldIDSource) // Should be updated
-            expect(updatedField3.b_geometry).toBe(fieldGeometry) // Should remain the same
+            expect(updatedField3.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField3.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
             expect(updatedField3.b_discarding_date).toEqual(discardingDate) // Should remain the same
             expect(updatedField3.b_acquiring_method).toBe(
@@ -334,7 +414,7 @@ describe("Farm Data Model", () => {
             )
             expect(updatedField4.b_name).toBe(updatedFieldName) // Should remain the same
             expect(updatedField4.b_id_source).toBe(updatedFieldIDSource) // Should remain the same
-            expect(updatedField4.b_geometry).toBe(fieldGeometry) // Should remain the same
+            expect(updatedField4.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField4.b_acquiring_date).toEqual(updatedAcquireDate) // Should be updated
             expect(updatedField4.b_discarding_date).toEqual(discardingDate) // Should remain the same
             expect(updatedField4.b_acquiring_method).toBe(

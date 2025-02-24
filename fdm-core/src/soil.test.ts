@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm"
 import { beforeEach, describe, expect, inject, it } from "vitest"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
-import { createFdmServer, migrateFdmServer } from "./fdm-server"
+import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
 import {
@@ -41,7 +41,18 @@ describe("Soil Analysis Functions", () => {
 
         const fieldName = "Test Field"
         const fieldIDSource = "test-field-id"
-        const fieldGeometry = "POLYGON((30 10,40 40,20 40,10 20,30 10))"
+        const fieldGeometry = {
+            type: "Polygon",
+            coordinates: [
+                [
+                    [30, 10],
+                    [40, 40],
+                    [20, 40],
+                    [10, 20],
+                    [30, 10],
+                ],
+            ],
+        }
         const AcquireDate = new Date("2023-01-01")
         const DiscardingDate = new Date("2023-12-31")
         const acquiringMethod = "owner"

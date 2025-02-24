@@ -1,5 +1,25 @@
 # Changelog fdm-core
 
+## 0.12.0
+
+### Minor Changes
+
+- 5d2871e: Add `b_lu_harvestable` to the table `cultivations_catalogue`
+- 644a159: Switch format of `b_geometry` from WKT to GeoJSON
+- e518d78: Export the interfaces `getFertilizerType` and `getFertilizerApplicationType`
+- 9e05058: Add properties of harvestable analysis: b*lu*[n/p/l]\_[harveable/residue]
+- d2a2ab7: Renamed column `b_harvest_date` to `b_harvesting_date`
+- 488f898: For `addCultivation` and `updateCultivation` automatically add harvest if `b_terminating_date` is set and `b_lu_harvestable_type` is `once`
+- aede4a7: Add `harvests` to output of `getCultivationPlan`
+- 9e6f2d7: Add the functions `addHarvest`, `getHarvest`, `getHarvests`, `removeHarvest`
+
+### Patch Changes
+
+- 1b435a3: Drop `drizzle-graphql` as dependency while it is not used
+- ed82ff6: Fix that typescript declarations are included in the build
+- d2a2ab7: Add `b_harvesting_id` to table `cultivation_harvesting`
+- 644a159: Remove `wkx` as a dependency
+
 ## 0.11.3
 
 ### Patch Changes

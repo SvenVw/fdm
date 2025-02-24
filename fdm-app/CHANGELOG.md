@@ -1,5 +1,41 @@
 # Changelog fdm-app
 
+## 0.11.0
+
+### Minor Changes
+
+- e1fef45: Add Microsoft OAuth2 sign-in method alongside existing Google authentication
+- 33b8b59: Show at fertilizer application form the nutrient doses
+- e1fef45: At the sign-in page, use a card to present sign-in methods including Microsoft and Google.
+- 0bbf9c2: Add redirect to first field at fields page in create farm wizard
+- d61a487: Redirect to first cultivation at the transition from fields to cultivationplan at the create farm wizard
+- 1eef110: Add a feedback form
+- 1ebb30c: Add ErrorBoundary to catch errors and redirect user to error page
+- 1eef110: Add telemetry to Sentry
+- 1ebb30c: Add styled error pages to provide users an informative message about what happened
+
+### Patch Changes
+
+- 920f166: Drop use of `wkx`
+- ac07a8b: Improve layout of fieds page with cards at create farm wizard
+- Updated dependencies [475986f]
+- Updated dependencies [5d2871e]
+- Updated dependencies [644a159]
+- Updated dependencies [2508042]
+- Updated dependencies [e518d78]
+- Updated dependencies [9e05058]
+- Updated dependencies [d2a2ab7]
+- Updated dependencies [1b435a3]
+- Updated dependencies [488f898]
+- Updated dependencies [ed82ff6]
+- Updated dependencies [d2a2ab7]
+- Updated dependencies [aede4a7]
+- Updated dependencies [9e6f2d7]
+- Updated dependencies [644a159]
+  - @svenvw/fdm-calculator@1.0.0
+  - @svenvw/fdm-core@0.12.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.10.1
 
 ### Patch Changes

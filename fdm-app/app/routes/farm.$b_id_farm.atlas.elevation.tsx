@@ -1,4 +1,3 @@
-import { AtlasFields } from "@/components/custom/atlas-fields"
 import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
 import { Button } from "@/components/ui/button"
 import { fdm } from "@/lib/fdm.server"
@@ -9,7 +8,6 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import wkx from "wkx"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id

@@ -34,10 +34,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Setup pnpm 9
+      - name: Setup pnpm 10
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.4
+          version: 10.4.1
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -53,7 +53,7 @@ jobs:
         run: pnpm changeset version
 
       - name: Build packages
-        run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data
+        run: pnpm build --filter=@svenvw/fdm-core --filter=@svenvw/fdm-data --filter=@svenvw/fdm-calculator
       
       - name: Publish snapshot
         run: pnpm changeset publish

@@ -12,7 +12,7 @@ import type { getFieldType } from "./field.d"
  * @param b_id_farm - ID of the farm.
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset
- * @param b_geometry - Geometry of field in WKT format
+ * @param b_geometry - Geometry of field as GeoJSON
  * @param b_acquiring_date - Start date of managing field.
  * @param b_discarding_date - End date of managing field.
  * @param b_acquiring_method - Type of managing field.
@@ -39,7 +39,7 @@ export async function addField(
                 b_id: b_id,
                 b_name: b_name,
                 b_id_source: b_id_source,
-                b_geometry: sql`${b_geometry}::geometry(polygon)`,
+                b_geometry: b_geometry,
             }
             await tx.insert(schema.fields).values(fieldData)
 
@@ -75,7 +75,7 @@ export async function addField(
             b_id_farm,
             b_name,
             b_id_source,
-            b_geometry,
+            // b_geometry,
             b_acquiring_date,
             b_acquiring_method,
             b_discarding_date,
@@ -179,7 +179,7 @@ export async function getFields(
  * @param b_id - ID of the field.
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset.
- * @param b_geometry - Geometry of field in WKT format
+ * @param b_geometry - Geometry of field as GeoJSON
  * @param b_acquiring_date - Start date of managing field.
  * @param b_acquiring_method - Type of managing field.
  * @param b_discarding_date - End date of managing field.
@@ -196,8 +196,8 @@ export async function updateField(
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<getFieldType> {
-    try {
-        return await fdm.transaction(async (tx: FdmType) => {
+    return await fdm.transaction(async (tx: FdmType) => {
+        try {
             const updated = new Date()
 
             const setFields: Partial<schema.fieldsTypeInsert> = {}
@@ -208,7 +208,7 @@ export async function updateField(
                 setFields.b_id_source = b_id_source
             }
             if (b_geometry !== undefined) {
-                setFields.b_geometry = sql`${b_geometry}::geometry(polygon)`
+                setFields.b_geometry = b_geometry
             }
             setFields.updated = updated
 
@@ -281,16 +281,16 @@ export async function updateField(
             }
 
             return field
-        })
-    } catch (err) {
-        handleError(err, "Exception for updateField", {
-            b_id,
-            b_name,
-            b_id_source,
-            b_geometry,
-            b_acquiring_date,
-            b_acquiring_method,
-            b_discarding_date,
-        })
-    }
+        } catch (err) {
+            handleError(err, "Exception for updateField", {
+                b_id,
+                b_name,
+                b_id_source,
+                // b_geometry,
+                b_acquiring_date,
+                b_acquiring_method,
+                b_discarding_date,
+            })
+        }
+    })
 }

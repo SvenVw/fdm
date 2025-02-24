@@ -18,7 +18,6 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
-import wkx from "wkx"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -42,7 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 b_lu_name: field.b_lu_name,
                 b_id_source: field.b_id_source,
             },
-            geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
+            geometry: field.b_geometry,
         }
         return feature
     })

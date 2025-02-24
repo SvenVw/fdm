@@ -22,6 +22,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
     BadgeCheck,
@@ -44,6 +45,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 
 interface SideBarAppType {
@@ -83,6 +85,37 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = `/farm/${user.farm_active}/atlas`
     } else {
         atlasLink = "#"
+    }
+
+    try {
+        Sentry.setUser({
+            fullName: user.name,
+            email: user.email,
+        })
+    } catch (error) {
+        Sentry.captureException(error)
+    }
+    const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        setFeedback(Sentry.getFeedback())
+        setIsLoading(false)
+    }, [])
+
+    if (isLoading) {
+        return null
+    }
+
+    const openFeedbackForm = async () => {
+        try {
+            const form = await feedback.createForm()
+            form.appendToDom()
+            form.open()
+        } catch (error) {
+            Sentry.captureException(error)
+            toast.error("Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.")
+        }
     }
 
     return (
@@ -212,7 +245,11 @@ export function SidebarApp(props: SideBarAppType) {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem key="feedback">
-                                <SidebarMenuButton asChild size="sm">
+                                <SidebarMenuButton
+                                    asChild
+                                    size="sm"
+                                    onClick={openFeedbackForm}
+                                >
                                     <NavLink to="#">
                                         <Send />
                                         <span>Feedback</span>
