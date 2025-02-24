@@ -23,7 +23,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
@@ -45,7 +47,7 @@
         "@rollup/plugin-typescript": "^12.1.2",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.31.0",
+        "rollup": "^4.34.8",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
