@@ -34,6 +34,10 @@ export {
     getFertilizerApplication,
     getFertilizerApplications,
 } from "./fertilizer"
+export type {
+    getFertilizerType,
+    getFertilizerApplicationType,
+} from "./fertilizer.d"
 export {
     addCultivationToCatalogue,
     getCultivationsFromCatalogue,
@@ -51,3 +55,9 @@ export {
     getSoilAnalysis,
     getSoilAnalyses,
 } from "./soil"
+export {
+    addHarvest,
+    getHarvest,
+    getHarvests,
+    removeHarvest,
+} from "./harvest"

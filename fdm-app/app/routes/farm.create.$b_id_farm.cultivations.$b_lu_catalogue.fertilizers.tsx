@@ -2,7 +2,9 @@ import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     data,
+    useFetcher,
     useLoaderData,
+    useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 
@@ -11,6 +13,12 @@ import { FertilizerApplicationsForm } from "@/components/custom/fertilizer-appli
 import { FormSchema } from "@/components/custom/fertilizer-applications"
 import { extractFormValuesFromRequest } from "@/lib/form"
 
+import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
+import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
+import { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
+import { Separator } from "@/components/ui/separator"
+import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getCultivationPlan,
@@ -97,27 +105,49 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         [],
     )
 
+    const dose = calculateDose({
+        applications: fertilizerApplications,
+        fertilizers,
+    })
+
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
         fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
+        dose: dose,
     }
 }
 
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
+    const location = useLocation()
+    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
             <p className="text-sm text-muted-foreground">
                 Vul de bemesting op bouwplanniveau in voor dit gewas.
             </p>
-            <FertilizerApplicationsForm
-                fertilizerApplications={loaderData.fertilizerApplications}
-                action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`}
-                options={loaderData.fertilizerOptions}
-            />
+            <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                    <FertilizerApplicationForm
+                        options={loaderData.fertilizerOptions}
+                        action={location.pathname}
+                        fetcher={fetcher}
+                    />
+                    <Separator className="my-4" />
+                    <FertilizerApplicationsList
+                        fertilizerApplications={
+                            loaderData.fertilizerApplications
+                        }
+                        fetcher={fetcher}
+                    />
+                </div>
+                <div>
+                    <FertilizerApplicationsCards dose={loaderData.dose} />
+                </div>
+            </div>
         </div>
     )
 }

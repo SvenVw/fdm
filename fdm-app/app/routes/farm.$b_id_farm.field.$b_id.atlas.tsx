@@ -93,8 +93,9 @@ export default function FarmFieldAtlasBlock() {
                         <MapGL
                             {...viewState}
                             style={{
-                                height: "calc(100vh - 64px - 123px)",
-                                width: "100%",
+                                height: "60%",
+                                width: "70%",
+                                position: "absolute",
                             }}
                             interactive={false}
                             mapStyle={loaderData.mapboxStyle}
