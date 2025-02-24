@@ -40,7 +40,18 @@ describe("getDoseForField", () => {
             b_id_farm,
             "test field",
             "1",
-            "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
+            {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            },
             new Date(),
             "lease",
         )
@@ -132,7 +143,18 @@ describe("getDoseForField", () => {
             b_id_farm,
             "test field",
             "1",
-            "POLYGON((0 0, 1 0, 1 1, 0 1, 0 0))",
+            {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            },
             new Date(),
             "lease",
         )
