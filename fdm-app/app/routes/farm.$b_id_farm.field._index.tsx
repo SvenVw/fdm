@@ -39,6 +39,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the active farm
         const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Response("Farm ID is required", { status: 400 })
+        }
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm)

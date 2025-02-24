@@ -194,6 +194,9 @@ importers:
       '@react-router/fs-routes':
         specifier: ^7.1.5
         version: 7.1.5(@react-router/dev@7.1.5(@react-router/serve@7.1.5(react-router@7.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.7.3))(@types/node@22.13.1)(jiti@1.21.7)(lightningcss@1.29.1)(react-router@7.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.37.0)(typescript@5.7.3)(vite@6.0.11(@types/node@22.13.1)(jiti@1.21.7)(lightningcss@1.29.1)(terser@5.37.0)(yaml@2.7.0))(yaml@2.7.0))(typescript@5.7.3)
+      '@svenvw/fdm-calculator':
+        specifier: workspace:*
+        version: link:../fdm-calculator
       '@svenvw/fdm-core':
         specifier: workspace:*
         version: link:../fdm-core
@@ -245,6 +248,39 @@ importers:
       vite-tsconfig-paths:
         specifier: 'catalog:'
         version: 4.3.2(typescript@5.7.3)(vite@6.0.11(@types/node@22.13.1)(jiti@1.21.7)(lightningcss@1.29.1)(terser@5.37.0)(yaml@2.7.0))
+
+  fdm-calculator:
+    devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: 'catalog:'
+        version: 1.33.0
+      '@rollup/plugin-commonjs':
+        specifier: ^28.0.2
+        version: 28.0.2(rollup@4.31.0)
+      '@rollup/plugin-node-resolve':
+        specifier: ^16.0.0
+        version: 16.0.0(rollup@4.31.0)
+      '@rollup/plugin-typescript':
+        specifier: ^12.1.2
+        version: 12.1.2(rollup@4.31.0)(tslib@2.8.1)(typescript@5.7.3)
+      '@svenvw/fdm-core':
+        specifier: workspace:*
+        version: link:../fdm-core
+      '@vitest/coverage-v8':
+        specifier: 'catalog:'
+        version: 2.1.8(vitest@2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0))
+      rollup:
+        specifier: ^4.31.0
+        version: 4.31.0
+      rollup-plugin-polyfill-node:
+        specifier: ^0.13.0
+        version: 0.13.0(rollup@4.31.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
+      vitest:
+        specifier: 'catalog:'
+        version: 2.1.9(@types/node@22.10.9)(lightningcss@1.29.1)(terser@5.37.0)
 
   fdm-core:
     dependencies:

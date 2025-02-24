@@ -34,7 +34,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Redirect to farms overview if user has no farm
         if (farms.length === 0) {
-            return redirect("./farm")
+            return redirect("farm")
         }
 
         // Get farms to be selected
