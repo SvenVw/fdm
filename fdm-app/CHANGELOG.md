@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.11.1
+
+### Patch Changes
+
+- 286adf6: Fix error handling at sign-in page
+
 ## 0.11.0
 
 ### Minor Changes
