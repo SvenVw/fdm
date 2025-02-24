@@ -7,7 +7,7 @@ export interface Cultivation {
     b_terminating_date: Date | null
 }
 
-export interface cultivationOption {
+export interface CultivationOption {
     value: string
     label: string
 }
@@ -16,6 +16,6 @@ export interface CultivationsFormProps {
     b_lu_catalogue: string | undefined
     b_sowing_date: Date | undefined
     b_terminating_date: Date | undefined
-    options: cultivationOption[]
+    options: CultivationOption[]
     action: string
 }
