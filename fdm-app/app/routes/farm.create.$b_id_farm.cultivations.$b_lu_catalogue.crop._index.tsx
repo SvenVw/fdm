@@ -2,8 +2,7 @@ import { CultivationForm } from "@/components/custom/cultivation/form"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import type {
-    HarverstableType,
-    Harvest,
+    HarvestableType,
 } from "@/components/custom/harvest/types"
 import { Separator } from "@/components/ui/separator"
 import { fdm } from "@/lib/fdm.server"
@@ -169,11 +168,11 @@ export default function FarmAFieldCultivationBlock() {
 export async function action({ request, params }: ActionFunctionArgs) {
     const b_lu_catalogue = params.b_lu_catalogue
     if (!b_lu_catalogue) {
-        throw new Error("b_lu_catalogue is required")
+        throw data("b_lu_catalogue is required", {status: 400, statusText: "b_lu_catalogue is required"})
     }
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
-        throw new Error("b_id_farm is required")
+        throw data("b_id_farm is required", {status: 400, statusText: "b_id_farm is required"})
     }
 
     if (request.method === "POST") {
