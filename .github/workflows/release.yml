@@ -34,10 +34,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
-      - name: Setup pnpm 9
+      - name: Setup pnpm 10
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.4
+          version: 10.4.1
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
