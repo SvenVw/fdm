@@ -3,11 +3,13 @@ CREATE SCHEMA "fdm-dev";
 CREATE TYPE "fdm-dev"."b_acquiring_method" AS ENUM('owner', 'lease', 'unknown');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."p_app_method" AS ENUM('slotted coulter', 'incorporation', 'injection', 'spraying', 'broadcasting', 'spoke wheel', 'pocket placement');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_gwl_class" AS ENUM('II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa');--> statement-breakpoint
+CREATE TYPE "fdm-dev"."b_lu_harvestable" AS ENUM('none', 'once', 'multiple');--> statement-breakpoint
 CREATE TYPE "fdm-dev"."b_soiltype_agr" AS ENUM('moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei');--> statement-breakpoint
 CREATE TABLE "fdm-dev"."cultivation_harvesting" (
+	"b_id_harvesting" text PRIMARY KEY NOT NULL,
 	"b_id_harvestable" text NOT NULL,
 	"b_lu" text NOT NULL,
-	"b_harvest_date" timestamp with time zone,
+	"b_harvesting_date" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -31,6 +33,7 @@ CREATE TABLE "fdm-dev"."cultivations_catalogue" (
 	"b_lu_source" text NOT NULL,
 	"b_lu_name" text NOT NULL,
 	"b_lu_name_en" text,
+	"b_lu_harvestable" "fdm-dev"."b_lu_harvestable" NOT NULL,
 	"b_lu_hcat3" text,
 	"b_lu_hcat3_name" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
@@ -173,6 +176,11 @@ CREATE TABLE "fdm-dev"."harvestable_analyses" (
 	"b_id_harvestable_analysis" text PRIMARY KEY NOT NULL,
 	"b_lu_yield" numeric,
 	"b_lu_n_harvestable" numeric,
+	"b_lu_n_residue" numeric,
+	"b_lu_p_harvestable" numeric,
+	"b_lu_p_residue" numeric,
+	"b_lu_k_harvestable" numeric,
+	"b_lu_k_residue" numeric,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );

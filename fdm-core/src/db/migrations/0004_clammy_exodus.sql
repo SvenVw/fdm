@@ -1,2 +1,0 @@
-CREATE TYPE "fdm-dev"."b_lu_harvestable" AS ENUM('none', 'once', 'multiple');--> statement-breakpoint
-ALTER TABLE "fdm-dev"."cultivations_catalogue" ADD COLUMN "b_lu_harvestable" "fdm-dev"."b_lu_harvestable" NOT NULL;
