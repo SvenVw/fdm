@@ -11,7 +11,7 @@ catalogs:
       version: 1.33.0
     '@vitest/coverage-v8':
       specifier: 3.0.6
-      version: 2.1.9
+      version: 3.0.6
     drizzle-kit:
       specifier: ^0.30.4
       version: 0.30.4
@@ -116,8 +116,8 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
       better-auth:
-        specifier: ^1.1.19
-        version: 1.1.19
+        specifier: ^1.1.21
+        version: 1.1.21
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -4348,8 +4348,8 @@ packages:
   batch@0.6.1:
     resolution: {integrity: sha512-x+VAiMRL6UPkx+kudNvxTl6hB2XNNCG2r+7wixVfIYwu/2HKRXimwQyaumLjMveWvT2Hkd/cAJw+QBMfJ/EKVw==}
 
-  better-auth@1.1.19:
-    resolution: {integrity: sha512-OYf2oysca2+ASJ9hpGVkoLsz8b7bo65hHsVGpnIs9H5ORUnHJ7rKc6Wur4ZDCxuewBGUJMJyTAtXuo/cdAirjA==}
+  better-auth@1.1.21:
+    resolution: {integrity: sha512-scyrQn8O9XL4oKmTt7nnA50P0v0RnI39yKevlMa0mI3646hXq/QOThjUrYy+cYCoq4tNLVsctQa9yUUMN9ZzhA==}
 
   better-call@0.3.3:
     resolution: {integrity: sha512-N4lDVm0NGmFfDJ0XMQ4O83Zm/3dPlvIQdxvwvgSLSkjFX5PM4GUYSVAuxNzXN27QZMHDkrJTWUqxBrm4tPC3eA==}
@@ -11289,7 +11289,7 @@ snapshots:
 
   '@docusaurus/react-loadable@6.0.0(react@18.3.1)':
     dependencies:
-      '@types/react': 19.0.10
+      '@types/react': 18.3.18
       react: 18.3.1
 
   '@docusaurus/theme-classic@3.7.0(@docusaurus/faster@3.7.0(@docusaurus/types@3.7.0(@swc/core@1.10.18)(acorn@8.14.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)))(@swc/core@1.10.18)(@types/react@19.0.10)(acorn@8.14.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)':
@@ -14228,7 +14228,7 @@ snapshots:
 
   batch@0.6.1: {}
 
-  better-auth@1.1.19:
+  better-auth@1.1.21:
     dependencies:
       '@better-auth/utils': 0.2.3
       '@better-fetch/fetch': 1.1.12

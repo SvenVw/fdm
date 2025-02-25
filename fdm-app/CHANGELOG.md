@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.11.2
+
+### Patch Changes
+
+- Patches for GHSA-vp58-j275-797x and GHSA-hjpm-7mrm-26w8
+
 ## 0.11.1
 
 ### Patch Changes
