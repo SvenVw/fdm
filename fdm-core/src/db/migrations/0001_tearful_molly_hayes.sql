@@ -1,6 +1,8 @@
 CREATE SCHEMA "fdm";
 --> statement-breakpoint
-CREATE SCHEMA "fdm-auth";
+CREATE SCHEMA "fdm-authn";
+--> statement-breakpoint
+CREATE SCHEMA "fdm-authz";
 --> statement-breakpoint
 CREATE TYPE "fdm"."b_acquiring_method" AS ENUM('owner', 'lease', 'unknown');--> statement-breakpoint
 CREATE TYPE "fdm"."p_app_method" AS ENUM('slotted coulter', 'incorporation', 'injection', 'spraying', 'broadcasting', 'spoke wheel', 'pocket placement');--> statement-breakpoint
@@ -225,7 +227,7 @@ CREATE TABLE "fdm"."soil_sampling" (
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "fdm-auth"."account" (
+CREATE TABLE "fdm-authn"."account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
@@ -241,14 +243,14 @@ CREATE TABLE "fdm-auth"."account" (
 	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "fdm-auth"."rate_limit" (
+CREATE TABLE "fdm-authn"."rate_limit" (
 	"id" text PRIMARY KEY NOT NULL,
 	"key" text,
 	"count" integer,
 	"last_request" bigint
 );
 --> statement-breakpoint
-CREATE TABLE "fdm-auth"."session" (
+CREATE TABLE "fdm-authn"."session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"token" text NOT NULL,
@@ -260,7 +262,7 @@ CREATE TABLE "fdm-auth"."session" (
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "fdm-auth"."user" (
+CREATE TABLE "fdm-authn"."user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -275,13 +277,32 @@ CREATE TABLE "fdm-auth"."user" (
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE "fdm-auth"."verification" (
+CREATE TABLE "fdm-authn"."verification" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"created_at" timestamp,
 	"updated_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-authz"."audit" (
+	"audit_id" text PRIMARY KEY NOT NULL,
+	"audit_timestamp" timestamp with time zone DEFAULT now() NOT NULL,
+	"principal_id" text,
+	"resource" text,
+	"resource_id" text,
+	"action" text,
+	"allowed" boolean
+);
+--> statement-breakpoint
+CREATE TABLE "fdm-authz"."role" (
+	"resource" text,
+	"resource_id" text,
+	"principal_id" text,
+	"role" text,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"deleted" timestamp with time zone
 );
 --> statement-breakpoint
 ALTER TABLE "fdm"."cultivation_harvesting" ADD CONSTRAINT "cultivation_harvesting_b_id_harvestable_harvestables_b_id_harvestable_fk" FOREIGN KEY ("b_id_harvestable") REFERENCES "fdm"."harvestables"("b_id_harvestable") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -303,8 +324,8 @@ ALTER TABLE "fdm"."harvestable_sampling" ADD CONSTRAINT "harvestable_sampling_b_
 ALTER TABLE "fdm"."harvestable_sampling" ADD CONSTRAINT "harvestable_sampling_b_id_harvestable_analysis_harvestable_analyses_b_id_harvestable_analysis_fk" FOREIGN KEY ("b_id_harvestable_analysis") REFERENCES "fdm"."harvestable_analyses"("b_id_harvestable_analysis") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_sampling" ADD CONSTRAINT "soil_sampling_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_sampling" ADD CONSTRAINT "soil_sampling_a_id_soil_analysis_a_id_fk" FOREIGN KEY ("a_id") REFERENCES "fdm"."soil_analysis"("a_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm-auth"."account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "fdm-auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm-auth"."session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "fdm-auth"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-authn"."account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "fdm-authn"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm-authn"."session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "fdm-authn"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "b_lu_idx" ON "fdm"."cultivations" USING btree ("b_lu");--> statement-breakpoint
 CREATE UNIQUE INDEX "b_lu_catalogue_idx" ON "fdm"."cultivations_catalogue" USING btree ("b_lu_catalogue");--> statement-breakpoint
 CREATE UNIQUE INDEX "b_id_farm_idx" ON "fdm"."farms" USING btree ("b_id_farm");--> statement-breakpoint
