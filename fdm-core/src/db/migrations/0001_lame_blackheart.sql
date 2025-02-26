@@ -7,16 +7,6 @@ CREATE TYPE "fdm"."p_app_method" AS ENUM('slotted coulter', 'incorporation', 'in
 CREATE TYPE "fdm"."b_gwl_class" AS ENUM('II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa');--> statement-breakpoint
 CREATE TYPE "fdm"."b_lu_harvestable" AS ENUM('none', 'once', 'multiple');--> statement-breakpoint
 CREATE TYPE "fdm"."b_soiltype_agr" AS ENUM('moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei');--> statement-breakpoint
-CREATE TABLE "fdm"."audit" (
-	"audit_id" text PRIMARY KEY NOT NULL,
-	"audit_timestamp" timestamp with time zone DEFAULT now() NOT NULL,
-	"principal_id" text,
-	"resource" "fdm"."resource",
-	"resource_id" text,
-	"action" text,
-	"allowed" boolean
-);
---> statement-breakpoint
 CREATE TABLE "fdm"."cultivation_harvesting" (
 	"b_id_harvesting" text PRIMARY KEY NOT NULL,
 	"b_id_harvestable" text NOT NULL,
@@ -209,15 +199,6 @@ CREATE TABLE "fdm"."harvestables" (
 	"b_id_harvestable" text PRIMARY KEY NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
-);
---> statement-breakpoint
-CREATE TABLE "fdm"."role" (
-	"resource" "fdm"."resource",
-	"resource_id" text,
-	"principal_id" text,
-	"role" "fdm"."role",
-	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"deleted" timestamp with time zone
 );
 --> statement-breakpoint
 CREATE TABLE "fdm"."soil_analysis" (

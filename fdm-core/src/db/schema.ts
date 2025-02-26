@@ -8,7 +8,6 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometry, numericCasted } from "./schema-custom-types"
-import { resources, roles } from "../authorization"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm")
@@ -457,8 +456,8 @@ export const soilTypes = [
     "duinzand",
     "maasklei",
 ]
-export const gwlClasses = [
-    "II",
+export const gwlClasses: [string, ...string[]] = [
+    "II", 
     "IV",
     "IIIb",
     "V",
@@ -480,8 +479,8 @@ export const gwlClasses = [
     "bVI",
     "IIIa",
 ]
-export const soiltypeEnum = fdmSchema.enum("b_soiltype_agr", soilTypes)
-export const gwlClassEnum = fdmSchema.enum("b_gwl_class", gwlClasses)
+export const soiltypeEnum = fdmSchema.enum("b_soiltype_agr", soilTypes as [string, ...string[]])
+export const gwlClassEnum = fdmSchema.enum("b_gwl_class", gwlClasses as [string, ...string[]])
 
 export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_id: text().primaryKey(),
@@ -521,30 +520,29 @@ export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
 export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
 
 // Authorization
-const rolesEnum = fdmSchema.enum("role", roles as [string, ...string[]])
-const resourceEnum = fdmSchema.enum("resource", resources)
-export const role = fdmSchema.table("role", {
-    resource: resourceEnum(),
-    resource_id: text(),
-    principal_id: text(),
-    role: rolesEnum(),
-    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    deleted: timestamp({ withTimezone: true }),
-})
+// const rolesEnum = fdmSchema.enum("role", roles as [string, ...string[]])
+// const resourceEnum = fdmSchema.enum("resource", resources)
+// export const role = fdmSchema.table("role", {
+//     resource: resourceEnum(),
+//     resource_id: text(),
+//     principal_id: text(),
+//     role: rolesEnum(),
+//     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+//     deleted: timestamp({ withTimezone: true }),
+// })
 
-export type roleTypeSelect = typeof role.$inferSelect
-export type roleTypeInsert = typeof role.$inferInsert
+// export type roleTypeSelect = typeof role.$inferSelect
+// export type roleTypeInsert = typeof role.$inferInsert
 
+// export const audit = fdmSchema.table("audit", {
+//     audit_id: text().primaryKey(),
+//     audit_timestamp: timestamp({ withTimezone: true }).notNull().defaultNow(),
+//     principal_id: text(),
+//     resource: resourceEnum(),
+//     resource_id: text(),
+//     action: text(),
+//     allowed: boolean(),
+// })
 
-export const audit = fdmSchema.table("audit", {
-    audit_id: text().primaryKey(),
-    audit_timestamp: timestamp({ withTimezone: true }).notNull().defaultNow(),
-    principal_id: text(),
-    resource: resourceEnum(),
-    resource_id: text(),
-    action: text(),
-    allowed: boolean(),
-})
-
-export type auditTypeSelect = typeof audit.$inferSelect
-export type auditTypeInsert = typeof audit.$inferInsert
+// export type auditTypeSelect = typeof audit.$inferSelect
+// export type auditTypeInsert = typeof audit.$inferInsert
