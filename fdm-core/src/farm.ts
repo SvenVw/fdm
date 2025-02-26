@@ -5,7 +5,7 @@ import * as schema from "./db/schema"
 import type * as authZSchema from "./db/schema-authz"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { grantRole, listResources } from "./authorization"
+import { checkPermission, grantRole, listResources } from "./authorization"
 
 /**
  * Add a new farm.
@@ -40,9 +40,7 @@ export async function addFarm(
             await tx.insert(schema.farms).values(farmData)
 
             // Grant owner role to farm
-            if (principal_id) {
-                await grantRole(tx, "farm", "owner", b_id_farm, principal_id)
-            }
+            await grantRole(tx, "farm", "owner", b_id_farm, principal_id)
 
             return b_id_farm
         })
@@ -66,8 +64,11 @@ export async function addFarm(
 export async function getFarm(
     fdm: FdmType,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+    pricipal_id: authZSchema.roleTypeSelect["principal_id"],
 ): Promise<schema.farmsTypeSelect> {
     try {
+        await checkPermission(fdm, "farm", "read", b_id_farm, pricipal_id)
+
         const farm = await fdm
             .select()
             .from(schema.farms)

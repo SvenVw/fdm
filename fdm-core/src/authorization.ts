@@ -3,6 +3,7 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import * as authZSchema from "./db/schema-authz"
 import { and, eq, inArray, isNull } from "drizzle-orm"
+import { createId } from "./id"
 
 export const resources: Resource[] = [
     "user",
@@ -49,6 +50,59 @@ export const permissions: Permission[] = [
         action: ["read"],
     },
 ]
+
+export async function checkPermission(
+    fdm: FdmType,
+    resource: Resource,
+    action: Action,
+    resource_id: string,
+    principal_id: string,
+): Promise<void> {
+    let isAllowed = false
+    try {  
+        const roles = getRolesForAction(action, resource)
+        await fdm.transaction(async (tx: FdmType) => {
+            const check = await tx
+                .select({
+                    resource_id: authZSchema.role.resource_id,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(eq(authZSchema.role.resource, resource)),
+                    eq(authZSchema.role.resource_id, resource_id),
+                    eq(authZSchema.role.principal_id, principal_id),
+                    inArray(authZSchema.role.role, roles),
+                    isNull(authZSchema.role.deleted),
+                )
+                .limit(1)
+
+            if (check.length > 0) {
+                isAllowed = true
+            }
+
+            // Store check in audit
+            tx.insert(authZSchema.audit).values({
+                audit_id: createId(),
+                principal_id: principal_id,
+                resource: resource,
+                resource_id: resource_id,
+                action: action,
+                allowed: isAllowed,
+            })
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for isAllowed", {
+            resource: resource,
+            action: action,
+            resource_id: resource_id,
+            principal_id: principal_id,
+        })
+    }
+
+    if (!isAllowed) {
+        throw new Error("Principal does not have permission to perform this action")
+    }
+}
 
 export async function grantRole(
     fdm: FdmType,
@@ -115,7 +169,9 @@ export async function listResources(
                 )
         })
 
-        return resources.map((resource: { resource_id: string }) => resource.resource_id)
+        return resources.map(
+            (resource: { resource_id: string }) => resource.resource_id,
+        )
     } catch (err) {
         throw handleError(err, "Exception for listing resources", {
             resource: resource,
