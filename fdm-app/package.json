@@ -35,7 +35,7 @@
         "@sentry/react": "^9.1.0",
         "@sentry/vite-plugin": "^3.2.0",
         "@turf/centroid": "^7.2.0",
-        "better-auth": "^1.1.21",
+        "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "1.0.4",

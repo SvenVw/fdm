@@ -11,7 +11,10 @@ catalogs:
       version: 1.33.0
     '@vitest/coverage-v8':
       specifier: 3.0.6
-      version: 2.1.9
+      version: 3.0.6
+    better-auth:
+      specifier: ^1.1.21
+      version: 1.1.21
     drizzle-kit:
       specifier: ^0.30.4
       version: 0.30.4
@@ -116,7 +119,7 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
       better-auth:
-        specifier: ^1.1.21
+        specifier: 'catalog:'
         version: 1.1.21
       class-variance-authority:
         specifier: ^0.7.1
@@ -300,7 +303,7 @@ importers:
         specifier: ^7946.0.16
         version: 7946.0.16
       better-auth:
-        specifier: ^1.1.21
+        specifier: 'catalog:'
         version: 1.1.21
       drizzle-orm:
         specifier: 'catalog:'
@@ -13735,7 +13738,7 @@ snapshots:
   '@types/react-router@5.1.20':
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 19.0.10
+      '@types/react': 18.3.18
 
   '@types/react@18.3.18':
     dependencies:
