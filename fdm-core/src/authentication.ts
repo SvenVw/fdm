@@ -1,15 +1,17 @@
 import type { FdmType } from "./fdm"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import * as authSchema from "./db/schema-authn"
+import * as authNSchema from "./db/schema-authn"
+import * as authZSchema from "./db/schema-authz"
+import { handleError } from "./error"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
 export function createFdmAuth(fdm: FdmType): BetterAuth {
     const auth: BetterAuth = betterAuth({
         database: drizzleAdapter(fdm, {
-            provider: "pg",        
-            schema: authSchema,
+            provider: "pg",
+            schema: authNSchema,
         }),
         user: {
             additionalFields: {
@@ -67,6 +69,35 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
                 },
             },
         },
+        databaseHooks: {
+            user: {
+                create: {
+                    after: async (user) => {
+                        // Grant user owner role after account creation
+                        const userId = user.id
+                        try {
+                            return await fdm.transaction(
+                                async (tx: FdmType) => {                                
+                                    const roleData = {
+                                        resource: "user",
+                                        resource_id: userId,
+                                        principal_id: userId,
+                                        role: "owner"
+                                    }
+                                    await tx
+                                        .insert(authZSchema.role)
+                                        .values(roleData)
+                                },
+                            )
+                        } catch (err) {
+                            throw handleError(err, "Exception for granting user owner role", {
+                                userId                             
+                            })
+                        }
+                    },
+                },
+            },
+        },
         rateLimit: {
             storage: "database",
         },
@@ -74,5 +105,3 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
 
     return auth
 }
-
-
