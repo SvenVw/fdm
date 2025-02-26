@@ -7,7 +7,7 @@ import {
     boolean,
 } from "drizzle-orm/pg-core"
 
-export const fdmAuthSchema = pgSchema("fdm-auth")
+export const fdmAuthSchema = pgSchema("fdm-authn")
 
 export const user = fdmAuthSchema.table("user", {
     id: text("id").primaryKey(),
