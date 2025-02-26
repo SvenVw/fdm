@@ -239,9 +239,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.3)
-      drizzle-kit:
-        specifier: 'catalog:'
-        version: 0.30.4
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.39.2(@electric-sql/pglite@0.2.17)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
