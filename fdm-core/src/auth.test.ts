@@ -1,12 +1,11 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
-import { type BetterAuth, createFdmAuthServer } from "./auth"
+import { type BetterAuth, createFdmAuth } from "./auth"
 import { createFdmServer } from "./fdm-server"
 import type { FdmType } from "./fdm.d"
-import * as authSchema from "./db/schema-auth"
 
-describe("createFdmAuthServer", () => {
+describe("createFdmAuth", () => {
     let fdm: FdmType
-    let auth: BetterAuth
+    let fdmAuth: BetterAuth
 
     beforeEach(() => {
         // Mock environment variables
@@ -26,7 +25,7 @@ describe("createFdmAuthServer", () => {
 
     it("should create an auth instance with the correct database adapter", () => {
         // Create the auth server using the mock FdmServer instance
-        auth = createFdmAuthServer(fdm)
-        expect(auth).toBeDefined()
+        fdmAuth = createFdmAuth(fdm)
+        expect(fdmAuth).toBeDefined()
     })
 })

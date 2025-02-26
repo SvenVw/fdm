@@ -5,7 +5,7 @@ import * as authSchema from "../src/db/schema-auth"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
-export function createFdmAuthServer(fdm: FdmType): BetterAuth {
+export function createFdmAuth(fdm: FdmType): BetterAuth {
     const auth: BetterAuth = betterAuth({
         database: drizzleAdapter(fdm, {
             provider: "pg",        
