@@ -518,31 +518,3 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
 
 export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
 export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
-
-// Authorization
-// const rolesEnum = fdmSchema.enum("role", roles as [string, ...string[]])
-// const resourceEnum = fdmSchema.enum("resource", resources)
-// export const role = fdmSchema.table("role", {
-//     resource: resourceEnum(),
-//     resource_id: text(),
-//     principal_id: text(),
-//     role: rolesEnum(),
-//     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-//     deleted: timestamp({ withTimezone: true }),
-// })
-
-// export type roleTypeSelect = typeof role.$inferSelect
-// export type roleTypeInsert = typeof role.$inferInsert
-
-// export const audit = fdmSchema.table("audit", {
-//     audit_id: text().primaryKey(),
-//     audit_timestamp: timestamp({ withTimezone: true }).notNull().defaultNow(),
-//     principal_id: text(),
-//     resource: resourceEnum(),
-//     resource_id: text(),
-//     action: text(),
-//     allowed: boolean(),
-// })
-
-// export type auditTypeSelect = typeof audit.$inferSelect
-// export type auditTypeInsert = typeof audit.$inferInsert

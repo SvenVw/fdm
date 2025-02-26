@@ -1,6 +1,8 @@
 import type { Permission, Resource, Role, Action } from "./authorization.d"
 
 export const resources: Resource[] = [
+    "user",
+    "organization",
     "farm",
     "field",
     "cultivation",
@@ -25,6 +27,21 @@ export const permissions: Permission[] = [
     {
         resource: "farm",
         role: "researcher",
+        action: ["read"],
+    },
+    {
+        resource: "user",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "organization",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "organization",
+        role: "advisor",
         action: ["read"],
     },
 ]

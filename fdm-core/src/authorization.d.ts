@@ -1,4 +1,4 @@
-export type Resource =   "farm" | "field" | "cultivation" | "fertilizer" | "soil" | "harvest"
+export type Resource =  "user" | "organization" |  "farm" | "field" | "cultivation" | "fertilizer" | "soil" | "harvest"
 export type Role = "owner" | "advisor" | "researcher"
 export type Action = "read" | "write" | "list" | "share"
 
