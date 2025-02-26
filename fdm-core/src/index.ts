@@ -19,6 +19,7 @@ export type { FdmType } from "./fdm.d"
 export type { FdmServerType } from "./fdm-server.d"
 export { createFdmServer, migrateFdmServer } from "./fdm-server"
 // export { createFdmLocal, migrateFdmLocal } from './fdm-local'
+export { createFdmAuthServer } from "./auth"
 export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
 export {
