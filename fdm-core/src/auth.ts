@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import * as authSchema from "../src/db/schema-auth"
 
-type BetterAuth = ReturnType<typeof betterAuth>
+export type BetterAuth = ReturnType<typeof betterAuth>
 
 export function createFdmAuthServer(fdm: FdmType): BetterAuth {
     const auth: BetterAuth = betterAuth({
