@@ -11,7 +11,7 @@ import { geometry, numericCasted } from "./schema-custom-types"
 import { resources, roles } from "../authorization"
 
 // Define postgres schema
-export const fdmSchema = pgSchema("fdm-dev")
+export const fdmSchema = pgSchema("fdm")
 export type fdmSchemaTypeSelect = typeof fdmSchema
 
 // Define farms table
