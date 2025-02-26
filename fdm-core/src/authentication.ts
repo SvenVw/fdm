@@ -4,6 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import * as authNSchema from "./db/schema-authn"
 import * as authZSchema from "./db/schema-authz"
 import { handleError } from "./error"
+import { grantRole } from "./authorization"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
@@ -76,23 +77,21 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
                         // Grant user owner role after account creation
                         const userId = user.id
                         try {
-                            return await fdm.transaction(
-                                async (tx: FdmType) => {                                
-                                    const roleData = {
-                                        resource: "user",
-                                        resource_id: userId,
-                                        principal_id: userId,
-                                        role: "owner"
-                                    }
-                                    await tx
-                                        .insert(authZSchema.role)
-                                        .values(roleData)
-                                },
+                            await grantRole(
+                                fdm,
+                                "farm",
+                                "owner",
+                                userId,
+                                userId,
                             )
                         } catch (err) {
-                            throw handleError(err, "Exception for granting user owner role", {
-                                userId                             
-                            })
+                            throw handleError(
+                                err,
+                                "Exception for granting user owner role",
+                                {
+                                    userId,
+                                },
+                            )
                         }
                     },
                 },
