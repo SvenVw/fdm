@@ -59,7 +59,7 @@ export async function checkPermission(
     principal_id: string,
 ): Promise<void> {
     let isAllowed = false
-    try {  
+    try {
         const roles = getRolesForAction(action, resource)
         await fdm.transaction(async (tx: FdmType) => {
             const check = await tx
@@ -100,7 +100,9 @@ export async function checkPermission(
     }
 
     if (!isAllowed) {
-        throw new Error("Principal does not have permission to perform this action")
+        throw new Error(
+            "Principal does not have permission to perform this action",
+        )
     }
 }
 
@@ -129,21 +131,6 @@ export async function grantRole(
             principal_id: principal_id,
         })
     }
-}
-
-function getRolesForAction(action: Action, resource: Resource): Role[] {
-    const roles = permissions.filter((permission) => {
-        return (
-            permission.resource === resource &&
-            permission.action.includes(action)
-        )
-    })
-
-    const rolesFlat = roles.flatMap((role) => {
-        return role.role
-    })
-
-    return rolesFlat
 }
 
 export async function listResources(
@@ -178,4 +165,19 @@ export async function listResources(
             principal_id: principal_id,
         })
     }
+}
+
+function getRolesForAction(action: Action, resource: Resource): Role[] {
+    const roles = permissions.filter((permission) => {
+        return (
+            permission.resource === resource &&
+            permission.action.includes(action)
+        )
+    })
+
+    const rolesFlat = roles.flatMap((role) => {
+        return role.role
+    })
+
+    return rolesFlat
 }
