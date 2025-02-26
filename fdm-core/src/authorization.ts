@@ -1,4 +1,7 @@
 import type { Permission, Resource, Role, Action } from "./authorization.d"
+import { handleError } from "./error"
+import type { FdmType } from "./fdm"
+import * as authZSchema from "./db/schema-authz"
 
 export const resources: Resource[] = [
     "user",
@@ -45,3 +48,30 @@ export const permissions: Permission[] = [
         action: ["read"],
     },
 ]
+
+export async function grantRole(
+    fdm: FdmType,
+    resource: Resource,
+    role: Role,
+    resource_id: string,
+    principal_id: string,
+) {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            const roleData = {
+                resource: resource,
+                resource_id: resource_id,
+                principal_id: principal_id,
+                role: role,
+            }
+            await tx.insert(authZSchema.role).values(roleData)
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for granting role", {
+            resource: resource,
+            role: role,
+            resource_id: resource_id,
+            principal_id: principal_id,
+        })
+    }
+}

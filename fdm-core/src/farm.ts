@@ -2,8 +2,10 @@ import { asc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
+import * as authZSchema from "./db/schema-authz"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import { grantRole } from "./authorization"
 
 /**
  * Add a new farm.
@@ -21,6 +23,7 @@ export async function addFarm(
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
+    principal_id: authZSchema.roleTypeInsert["principal_id"],
 ): Promise<schema.farmsTypeInsert["b_id_farm"]> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -35,6 +38,11 @@ export async function addFarm(
                 b_postalcode_farm,
             }
             await tx.insert(schema.farms).values(farmData)
+
+            // Grant owner role to farm
+            if (principal_id) {
+                await grantRole(tx, "farm", "owner", b_id_farm, principal_id)
+            }
 
             return b_id_farm
         })
