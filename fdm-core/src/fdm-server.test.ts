@@ -33,7 +33,7 @@ describe("Farm Data Model", () => {
             const statement = sql`
         SELECT table_name
         FROM information_schema.tables
-        WHERE table_schema = 'fdm-dev'
+        WHERE table_schema = 'fdm'
       `
             const tables = await fdm.execute(statement)
             const tableNames = tables.map((row) => row.table_name)
