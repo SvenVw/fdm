@@ -1,3 +1,4 @@
+// Authentication
 import {
     pgSchema,
     text,
