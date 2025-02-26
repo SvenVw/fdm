@@ -1,11 +1,11 @@
-import { asc, eq } from "drizzle-orm"
+import { asc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
-import * as authZSchema from "./db/schema-authz"
+import type * as authZSchema from "./db/schema-authz"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { grantRole } from "./authorization"
+import { grantRole, listResources } from "./authorization"
 
 /**
  * Add a new farm.
@@ -88,11 +88,15 @@ export async function getFarm(
  */
 export async function getFarms(
     fdm: FdmType,
+    principal_id: authZSchema.roleTypeSelect["principal_id"],
 ): Promise<schema.farmsTypeSelect[]> {
     try {
+        const resources = await listResources(fdm, "farm", "read", principal_id)
+
         const farm = await fdm
             .select()
             .from(schema.farms)
+            .where(inArray(schema.farms.b_id_farm, resources))
             .orderBy(asc(schema.farms.b_name_farm))
 
         return farm
