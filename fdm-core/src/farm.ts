@@ -23,7 +23,7 @@ export async function addFarm(
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
-    principal_id: PrincipalId,
+    principal_id: string,
 ): Promise<schema.farmsTypeInsert["b_id_farm"]> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {

@@ -79,7 +79,6 @@ export async function checkPermission(
 
         await fdm.transaction(async (tx: FdmType) => {
             for (const bead of chain) {
-
                 const check = await tx
                     .select({
                         resource_id: authZSchema.role.resource_id,
@@ -99,7 +98,7 @@ export async function checkPermission(
                 if (check.length > 0) {
                     isAllowed = true
                     granting_resource = bead.resource
-                    granting_resource_id = bead.resource_id              
+                    granting_resource_id = bead.resource_id
                     break
                 }
             }
@@ -138,10 +137,10 @@ export async function grantRole(
     resource: Resource,
     role: Role,
     resource_id: ResourceId,
-    principal_id: PrincipalId,
-) {
+    principal_id: string,
+): Promise<void> {
     try {
-        return await fdm.transaction(async (tx: FdmType) => {
+        await fdm.transaction(async (tx: FdmType) => {
             const roleData = {
                 resource: resource,
                 resource_id: resource_id,
@@ -152,6 +151,38 @@ export async function grantRole(
         })
     } catch (err) {
         throw handleError(err, "Exception for granting role", {
+            resource: resource,
+            role: role,
+            resource_id: resource_id,
+            principal_id: principal_id,
+        })
+    }
+}
+
+export async function revokeRole(
+    fdm: FdmType,
+    resource: Resource,
+    role: Role,
+    resource_id: ResourceId,
+    principal_id: string,
+): Promise<void> {
+    try {
+        await fdm.transaction(async (tx: FdmType) => {
+            await tx
+                .update(authZSchema.role)
+                .set({ deleted: new Date() })
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, role),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for revoking role", {
             resource: resource,
             role: role,
             resource_id: resource_id,
