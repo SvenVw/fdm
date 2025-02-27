@@ -77,6 +77,11 @@ export async function checkPermission(
 
         const chain = await getResourceChain(fdm, resource, resource_id)
 
+        // Convert principal_id to array
+        const principal_ids = Array.isArray(principal_id)
+            ? principal_id
+            : [principal_id]
+
         return await fdm.transaction(async (tx: FdmType) => {
             for (const bead of chain) {
                 const check = await tx
@@ -88,9 +93,7 @@ export async function checkPermission(
                         and(
                             eq(authZSchema.role.resource, bead.resource),
                             eq(authZSchema.role.resource_id, bead.resource_id),
-                            inArray(authZSchema.role.principal_id, [
-                                ...principal_id,
-                            ]),
+                            inArray(authZSchema.role.principal_id, principal_ids),
                             inArray(authZSchema.role.role, roles),
                             isNull(authZSchema.role.deleted),
                         ),
