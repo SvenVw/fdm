@@ -67,43 +67,58 @@ export async function checkPermission(
     resource_id: string,
     principal_id: PrincipalId,
 ): Promise<void> {
+    const start = performance.now()
+
     let isAllowed = false
+    let granting_resource = ""
+    let granting_resource_id = ""
     try {
         const roles = getRolesForAction(action, resource)
 
-        const chain = getResourceChain(fdm, resource, resource_id)
+        const chain = await getResourceChain(fdm, resource, resource_id)
 
         await fdm.transaction(async (tx: FdmType) => {
-            const check = await tx
-                .select({
-                    resource_id: authZSchema.role.resource_id,
-                })
-                .from(authZSchema.role)
-                .where(
-                    and(eq(authZSchema.role.resource, resource)),
-                    eq(authZSchema.role.resource_id, resource_id),
-                    inArray(authZSchema.role.principal_id, [...principal_id]),
-                    inArray(authZSchema.role.role, roles),
-                    isNull(authZSchema.role.deleted),
-                )
-                .limit(1)
+            for (const bead of chain) {
 
-            if (check.length > 0) {
-                isAllowed = true
+                const check = await tx
+                    .select({
+                        resource_id: authZSchema.role.resource_id,
+                    })
+                    .from(authZSchema.role)
+                    .where(
+                        and(eq(authZSchema.role.resource, bead.resource)),
+                        eq(authZSchema.role.resource_id, bead.resource_id),
+                        inArray(authZSchema.role.principal_id, [
+                            ...principal_id,
+                        ]),
+                        inArray(authZSchema.role.role, roles),
+                        isNull(authZSchema.role.deleted),
+                    )
+                    .limit(1)
+
+                if (check.length > 0) {
+                    isAllowed = true
+                    granting_resource = bead.resource
+                    granting_resource_id = bead.resource_id              
+                    break
+                }
             }
 
             // Store check in audit
             tx.insert(authZSchema.audit).values({
                 audit_id: createId(),
                 principal_id: principal_id,
-                resource: resource,
-                resource_id: resource_id,
+                target_resource: resource,
+                target_resource_id: resource_id,
+                granting_resource: granting_resource,
+                granting_resource_id: granting_resource_id,
                 action: action,
                 allowed: isAllowed,
+                duration: performance.now() - start,
             })
         })
     } catch (err) {
-        throw handleError(err, "Exception for isAllowed", {
+        throw handleError(err, "Exception for checkPermission", {
             resource: resource,
             action: action,
             resource_id: resource_id,

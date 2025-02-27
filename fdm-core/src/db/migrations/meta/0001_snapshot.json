@@ -1,5 +1,5 @@
 {
-  "id": "bf517f42-89e8-4001-b455-da4228e4a81b",
+  "id": "5cdd33e7-67eb-4587-bd52-4534eb800a5d",
   "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
   "version": "7",
   "dialect": "postgresql",
@@ -2062,31 +2062,49 @@
           "name": "principal_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "resource": {
-          "name": "resource",
+        "target_resource": {
+          "name": "target_resource",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "resource_id": {
-          "name": "resource_id",
+        "target_resource_id": {
+          "name": "target_resource_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "granting_resource": {
+          "name": "granting_resource",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "granting_resource_id": {
+          "name": "granting_resource_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         },
         "action": {
           "name": "action",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "allowed": {
           "name": "allowed",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
+        },
+        "duration": {
+          "name": "duration",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -2101,29 +2119,35 @@
       "name": "role",
       "schema": "fdm-authz",
       "columns": {
+        "role_id": {
+          "name": "role_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
         "resource": {
           "name": "resource",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "resource_id": {
           "name": "resource_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "principal_id": {
           "name": "principal_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "role": {
           "name": "role",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created": {
           "name": "created",
@@ -2139,7 +2163,47 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "role_idx": {
+          "name": "role_idx",
+          "columns": [
+            {
+              "expression": "resource",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "resource_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "principal_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "deleted",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

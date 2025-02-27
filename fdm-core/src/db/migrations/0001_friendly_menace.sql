@@ -289,18 +289,22 @@ CREATE TABLE "fdm-authn"."verification" (
 CREATE TABLE "fdm-authz"."audit" (
 	"audit_id" text PRIMARY KEY NOT NULL,
 	"audit_timestamp" timestamp with time zone DEFAULT now() NOT NULL,
-	"principal_id" text,
-	"resource" text,
-	"resource_id" text,
-	"action" text,
-	"allowed" boolean
+	"principal_id" text NOT NULL,
+	"target_resource" text NOT NULL,
+	"target_resource_id" text NOT NULL,
+	"granting_resource" text NOT NULL,
+	"granting_resource_id" text NOT NULL,
+	"action" text NOT NULL,
+	"allowed" boolean NOT NULL,
+	"duration" numeric NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "fdm-authz"."role" (
-	"resource" text,
-	"resource_id" text,
-	"principal_id" text,
-	"role" text,
+	"role_id" text PRIMARY KEY NOT NULL,
+	"resource" text NOT NULL,
+	"resource_id" text NOT NULL,
+	"principal_id" text NOT NULL,
+	"role" text NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"deleted" timestamp with time zone
 );
@@ -335,4 +339,5 @@ CREATE UNIQUE INDEX "p_id_catalogue_idx" ON "fdm"."fertilizers_catalogue" USING 
 CREATE UNIQUE INDEX "b_id_idx" ON "fdm"."fields" USING btree ("b_id");--> statement-breakpoint
 CREATE INDEX "b_geom_idx" ON "fdm"."fields" USING gist ("b_geometry");--> statement-breakpoint
 CREATE UNIQUE INDEX "b_id_harvestable_analyses_idx" ON "fdm"."harvestable_analyses" USING btree ("b_id_harvestable_analysis");--> statement-breakpoint
-CREATE UNIQUE INDEX "b_id_harvestable_idx" ON "fdm"."harvestables" USING btree ("b_id_harvestable");
+CREATE UNIQUE INDEX "b_id_harvestable_idx" ON "fdm"."harvestables" USING btree ("b_id_harvestable");--> statement-breakpoint
+CREATE INDEX "role_idx" ON "fdm-authz"."role" USING btree ("resource","resource_id","principal_id","role","deleted");
