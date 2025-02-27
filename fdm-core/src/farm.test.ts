@@ -7,6 +7,7 @@ import { createId } from "./id"
 describe("Farm Data Model", () => {
     let fdm: FdmServerType
     let principal_id: string
+    let b_id_farm: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -17,6 +18,18 @@ describe("Farm Data Model", () => {
         fdm = createFdmServer(host, port, user, password, database)
 
         principal_id = createId()
+        const farmName = "Test Farm"
+        const farmBusinessId = "123456"
+        const farmAddress = "123 Farm Lane"
+        const farmPostalCode = "12345"
+        b_id_farm = await addFarm(
+            fdm,
+            farmName,
+            farmBusinessId,
+            farmAddress,
+            farmPostalCode,
+            principal_id,
+        )
     })
 
     describe("Farm CRUD", () => {
@@ -25,7 +38,7 @@ describe("Farm Data Model", () => {
             const farmBusinessId = "123456"
             const farmAddress = "123 Farm Lane"
             const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
+            const b_id_farmAdded = await addFarm(
                 fdm,
                 farmName,
                 farmBusinessId,
@@ -33,9 +46,9 @@ describe("Farm Data Model", () => {
                 farmPostalCode,
                 principal_id,
             )
-            expect(b_id_farm).toBeDefined()
+            expect(b_id_farmAdded).toBeDefined()
 
-            const farm = await getFarm(fdm, b_id_farm, principal_id)
+            const farm = await getFarm(fdm, b_id_farmAdded, principal_id)
             expect(farm.b_name_farm).toBe(farmName)
             expect(farm.b_businessid_farm).toBe(farmBusinessId)
             expect(farm.b_address_farm).toBe(farmAddress)
@@ -43,38 +56,12 @@ describe("Farm Data Model", () => {
         })
 
         it("should get a farm by ID", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-                principal_id,
-            )
-
             const farm = await getFarm(fdm, b_id_farm, principal_id)
             expect(farm).toBeDefined()
             expect(farm.b_id_farm).toBe(b_id_farm)
         })
 
         it("should get a list of farms", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            await addFarm(
-                fdm,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-                principal_id,
-            )
-
             const farmName2 = "Test Farm 2"
             const farmBusinessId2 = "6543231"
             const farmAddress2 = "321 Farm Lane"
@@ -95,19 +82,6 @@ describe("Farm Data Model", () => {
         })
 
         it("should update a farm", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-                principal_id,
-            )
-
             const updatedFarmName = "Updated Test Farm"
             const updatedFarmBusinessId = "654321"
             const updatedFarmAddress = "456 Farm Road"
