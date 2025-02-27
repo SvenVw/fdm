@@ -1,4 +1,10 @@
-import type { Permission, Resource, Role, Action } from "./authorization.d"
+import type {
+    Permission,
+    Resource,
+    Role,
+    Action,
+    PrincipalId,
+} from "./authorization.d"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import * as authZSchema from "./db/schema-authz"
@@ -56,7 +62,7 @@ export async function checkPermission(
     resource: Resource,
     action: Action,
     resource_id: string,
-    principal_id: string,
+    principal_id: PrincipalId,
 ): Promise<void> {
     let isAllowed = false
     try {
@@ -70,7 +76,7 @@ export async function checkPermission(
                 .where(
                     and(eq(authZSchema.role.resource, resource)),
                     eq(authZSchema.role.resource_id, resource_id),
-                    eq(authZSchema.role.principal_id, principal_id),
+                    inArray(authZSchema.role.principal_id, [...principal_id]),
                     inArray(authZSchema.role.role, roles),
                     isNull(authZSchema.role.deleted),
                 )
@@ -111,7 +117,7 @@ export async function grantRole(
     resource: Resource,
     role: Role,
     resource_id: string,
-    principal_id: string,
+    principal_id: PrincipalId,
 ) {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -137,7 +143,7 @@ export async function listResources(
     fdm: FdmType,
     resource: Resource,
     action: Action,
-    principal_id: string,
+    principal_id: PrincipalId,
 ): Promise<string[]> {
     try {
         const roles = getRolesForAction(action, resource)
@@ -150,7 +156,7 @@ export async function listResources(
                 .from(authZSchema.role)
                 .where(
                     and(eq(authZSchema.role.resource, resource)),
-                    eq(authZSchema.role.principal_id, principal_id),
+                    inArray(authZSchema.role.principal_id, [...principal_id]),
                     inArray(authZSchema.role.role, roles),
                     isNull(authZSchema.role.deleted),
                 )

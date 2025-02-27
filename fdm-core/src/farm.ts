@@ -2,10 +2,10 @@ import { asc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
 import * as schema from "./db/schema"
-import type * as authZSchema from "./db/schema-authz"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { checkPermission, grantRole, listResources } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
 
 /**
  * Add a new farm.
@@ -23,7 +23,7 @@ export async function addFarm(
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
-    principal_id: authZSchema.roleTypeInsert["principal_id"],
+    principal_id: PrincipalId,
 ): Promise<schema.farmsTypeInsert["b_id_farm"]> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -64,7 +64,7 @@ export async function addFarm(
 export async function getFarm(
     fdm: FdmType,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
-    pricipal_id: authZSchema.roleTypeSelect["principal_id"],
+    pricipal_id: PrincipalId,
 ): Promise<schema.farmsTypeSelect> {
     try {
         await checkPermission(fdm, "farm", "read", b_id_farm, pricipal_id)
@@ -89,7 +89,7 @@ export async function getFarm(
  */
 export async function getFarms(
     fdm: FdmType,
-    principal_id: authZSchema.roleTypeSelect["principal_id"],
+    principal_id: PrincipalId,
 ): Promise<schema.farmsTypeSelect[]> {
     try {
         const resources = await listResources(fdm, "farm", "read", principal_id)
