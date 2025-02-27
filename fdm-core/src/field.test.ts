@@ -4,11 +4,13 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
+import { createId } from "./id"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
 describe("Farm Data Model", () => {
     let fdm: FdmServerType
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -17,6 +19,7 @@ describe("Farm Data Model", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+        principal_id = createId()
     })
 
     describe("Field CRUD", () => {
@@ -31,6 +34,7 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             const fieldName = "Test Field"
@@ -84,6 +88,7 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             const fieldName = "Test Field"
@@ -136,6 +141,7 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id
             )
 
             const fieldName1 = "Test Field 1"
@@ -230,6 +236,7 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id
             )
 
             const fieldName = "Test Field"
@@ -308,6 +315,7 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id
             )
 
             const fieldName = "Test Field"

@@ -12,11 +12,13 @@ import {
     removeSoilAnalysis,
     updateSoilAnalysis,
 } from "./soil"
+import { createId } from "./id"
 
 describe("Soil Analysis Functions", () => {
     let fdm: FdmServerType
     let b_id: string
     let test_a_id: string
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -31,12 +33,14 @@ describe("Soil Analysis Functions", () => {
         const farmBusinessId = "123456"
         const farmAddress = "123 Farm Lane"
         const farmPostalCode = "12345"
+        principal_id = createId()
         const b_id_farm = await addFarm(
             fdm,
             farmName,
             farmBusinessId,
             farmAddress,
             farmPostalCode,
+            principal_id,
         )
 
         const fieldName = "Test Field"

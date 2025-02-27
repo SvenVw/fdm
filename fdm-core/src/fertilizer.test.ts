@@ -29,6 +29,7 @@ import { createId } from "./id"
 describe("Fertilizer Data Model", () => {
     let fdm: FdmServerType
     let p_id_catalogue: string
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -39,6 +40,7 @@ describe("Fertilizer Data Model", () => {
         fdm = createFdmServer(host, port, user, password, database)
 
         p_id_catalogue = createId()
+        principal_id = "test-principal-id"
     })
 
     afterAll(async () => {})
@@ -129,6 +131,7 @@ describe("Fertilizer Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             // Add fertilizer to catalogue
@@ -213,6 +216,7 @@ describe("Fertilizer Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             // Add fertilizer to catalogue
@@ -305,6 +309,7 @@ describe("Fertilizer Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             // Add fertilizer to catalogue
@@ -397,6 +402,7 @@ describe("Fertilizer Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             b_id = await addField(

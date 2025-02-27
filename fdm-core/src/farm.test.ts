@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, inject, it } from "vitest"
 import { addFarm, getFarm, getFarms, updateFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
+import { createId } from "./id"
 
 describe("Farm Data Model", () => {
     let fdm: FdmServerType
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -13,6 +15,8 @@ describe("Farm Data Model", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+
+        principal_id = createId()
     })
 
     describe("Farm CRUD", () => {
@@ -27,10 +31,11 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
             expect(b_id_farm).toBeDefined()
 
-            const farm = await getFarm(fdm, b_id_farm)
+            const farm = await getFarm(fdm, b_id_farm, principal_id)
             expect(farm.b_name_farm).toBe(farmName)
             expect(farm.b_businessid_farm).toBe(farmBusinessId)
             expect(farm.b_address_farm).toBe(farmAddress)
@@ -48,15 +53,16 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
-            const farm = await getFarm(fdm, b_id_farm)
+            const farm = await getFarm(fdm, b_id_farm, principal_id)
             expect(farm).toBeDefined()
             expect(farm.b_id_farm).toBe(b_id_farm)
         })
 
         it("should get a list of farms", async () => {
-            const farms = await getFarms(fdm)
+            const farms = await getFarms(fdm, principal_id)
             expect(farms).toBeDefined()
             expect(farms.length).toBeGreaterThanOrEqual(1) // At least 1 farm should exist
             expect(farms[0].b_id_farm).toBeDefined()
@@ -73,6 +79,7 @@ describe("Farm Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             const updatedFarmName = "Updated Test Farm"
@@ -86,6 +93,7 @@ describe("Farm Data Model", () => {
                 updatedFarmBusinessId,
                 updatedFarmAddress,
                 updatedFarmPostalCode,
+                principal_id,
             )
             expect(updatedFarm.b_name_farm).toBe(updatedFarmName)
             expect(updatedFarm.b_businessid_farm).toBe(updatedFarmBusinessId)

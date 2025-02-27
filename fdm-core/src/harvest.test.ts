@@ -25,6 +25,7 @@ describe("harvest", () => {
     let b_id: string
     let sowing_date: Date
     let terminating_date: Date
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -33,6 +34,7 @@ describe("harvest", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+        principal_id = createId()
 
         // Seed data: Add a cultivation to catalogue
         const b_lu_catalogue_once = createId()
@@ -57,6 +59,7 @@ describe("harvest", () => {
             farmBusinessId,
             farmAddress,
             farmPostalCode,
+            principal_id,
         )
 
         b_id = await addField(

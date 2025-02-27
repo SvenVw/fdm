@@ -27,6 +27,7 @@ describe("Cultivation Data Model", () => {
     let b_id: string
     let b_lu: string
     let b_sowing_date: Date
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -41,12 +42,14 @@ describe("Cultivation Data Model", () => {
         const farmBusinessId = "123456"
         const farmAddress = "123 Farm Lane"
         const farmPostalCode = "12345"
+        principal_id = createId()
         b_id_farm = await addFarm(
             fdm,
             farmName,
             farmBusinessId,
             farmAddress,
             farmPostalCode,
+            principal_id,
         )
 
         b_id = await addField(
@@ -397,6 +400,7 @@ describe("Cultivation Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+                principal_id,
             )
 
             b_id = await addField(
