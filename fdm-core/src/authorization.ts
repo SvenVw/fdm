@@ -4,9 +4,12 @@ import type {
     Role,
     Action,
     PrincipalId,
+    ResourceChain,
+    ResourceId,
 } from "./authorization.d"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import * as schema from "./db/schema"
 import * as authZSchema from "./db/schema-authz"
 import { and, eq, inArray, isNull } from "drizzle-orm"
 import { createId } from "./id"
@@ -67,6 +70,9 @@ export async function checkPermission(
     let isAllowed = false
     try {
         const roles = getRolesForAction(action, resource)
+
+        const chain = getResourceChain(fdm, resource, resource_id)
+
         await fdm.transaction(async (tx: FdmType) => {
             const check = await tx
                 .select({
@@ -116,7 +122,7 @@ export async function grantRole(
     fdm: FdmType,
     resource: Resource,
     role: Role,
-    resource_id: string,
+    resource_id: ResourceId,
     principal_id: PrincipalId,
 ) {
     try {
@@ -186,4 +192,54 @@ function getRolesForAction(action: Action, resource: Resource): Role[] {
     })
 
     return rolesFlat
+}
+
+async function getResourceChain(
+    fdm: FdmType,
+    resource: Resource,
+    resource_id: ResourceId,
+): Promise<ResourceChain> {
+    try {
+        const chainOrder = ["farm", "field"]
+        const chain = []
+        if (resource === "farm") {
+            const bead = {
+                resource: "farm",
+                resource_id: resource_id,
+            }
+            chain.push(bead)
+        } else if (resource === "field") {
+            const result = fdm
+                .select({
+                    farm: schema.fieldAcquiring.b_id_farm,
+                    field: schema.fieldAcquiring.b_id,
+                })
+                .from(schema.fieldAcquiring)
+                .where(eq(schema.fieldAcquiring.b_id, resource_id))
+                .limit(1)
+            const beads = Object.keys(result[0]).map((x) => {
+                return {
+                    resource: x,
+                    resource_id: result[0][x],
+                }
+            })
+            chain.push(...beads)
+        } else {
+            throw new Error("Resource is not known")
+        }
+
+        // Order the chain by the chainOrder
+        chain.sort((a, b) => {
+            const indexA = chainOrder.indexOf(a.resource)
+            const indexB = chainOrder.indexOf(b.resource)
+            return indexA - indexB
+        })
+
+        return chain
+    } catch (err) {
+        throw handleError(err, "Exception for getting resource chain", {
+            resource: resource,
+            resource_id: resource_id,
+        })
+    }
 }

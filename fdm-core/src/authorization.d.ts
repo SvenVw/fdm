@@ -21,3 +21,12 @@ export interface Permission {
 export type PrincipalId =
     | authZSchema.roleTypeSelect["principal_id"]
     | authZSchema.roleTypeSelect["principal_id"][]
+
+export type ResourceId = authZSchema.roleTypeSelect["resource_id"]
+
+export interface ResourceBead {
+    resource: Resource
+    resource_id: ResourceId
+}
+
+export type ResourceChain = ResourceBead[]
