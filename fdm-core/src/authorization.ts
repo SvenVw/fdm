@@ -240,7 +240,15 @@ export async function listResources(
             : [principal_id]
 
         // Query the resources available
-        const resources = await fdm.transaction(async (tx: FdmType) => {
+        const result = await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+            if (!actions.includes(action)) {
+                throw new Error("Invalid action")
+            }
+
             return await tx
                 .select({
                     resource_id: authZSchema.role.resource_id,
@@ -255,7 +263,7 @@ export async function listResources(
                     ),
                 )
         })
-        return resources.map(
+        return result.map(
             (resource: { resource_id: string }) => resource.resource_id,
         )
     } catch (err) {
