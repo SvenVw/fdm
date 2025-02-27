@@ -154,6 +154,14 @@ export async function grantRole(
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+            if (!roles.includes(role)) {
+                throw new Error("Invalid role")
+            }
+
             const role_id = createId()
             const roleData = {
                 role_id: role_id,
