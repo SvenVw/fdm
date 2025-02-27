@@ -192,7 +192,15 @@ export async function revokeRole(
     principal_id: string,
 ): Promise<void> {
     try {
-        await fdm.transaction(async (tx: FdmType) => {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+            if (!roles.includes(role)) {
+                throw new Error("Invalid role")
+            }
+
             await tx
                 .update(authZSchema.role)
                 .set({ deleted: new Date() })
