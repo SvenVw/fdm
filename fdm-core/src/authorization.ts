@@ -113,7 +113,7 @@ export async function checkPermission(
                 granting_resource_id: granting_resource_id,
                 action: action,
                 allowed: isAllowed,
-                duration: performance.now() - start,
+                duration: Math.round(performance.now() - start),
             })
         })
     } catch (err) {

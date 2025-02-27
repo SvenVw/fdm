@@ -296,7 +296,7 @@ CREATE TABLE "fdm-authz"."audit" (
 	"granting_resource_id" text NOT NULL,
 	"action" text NOT NULL,
 	"allowed" boolean NOT NULL,
-	"duration" numeric NOT NULL
+	"duration" integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "fdm-authz"."role" (

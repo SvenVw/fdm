@@ -1,6 +1,5 @@
 // Authorization
-import { boolean, index, pgSchema, text, timestamp } from "drizzle-orm/pg-core"
-import { numericCasted } from "./schema-custom-types"
+import { boolean, index, integer, pgSchema, text, timestamp } from "drizzle-orm/pg-core"
 
 // Define postgres schema
 export const fdmAuthZSchema = pgSchema("fdm-authz")
@@ -41,7 +40,7 @@ export const audit = fdmAuthZSchema.table("audit", {
     granting_resource_id: text().notNull(),
     action: text().notNull(),
     allowed: boolean().notNull(),
-    duration: numericCasted().notNull(),
+    duration: integer().notNull(),
 })
 
 export type auditTypeSelect = typeof audit.$inferSelect
