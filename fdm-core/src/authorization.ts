@@ -85,13 +85,15 @@ export async function checkPermission(
                     })
                     .from(authZSchema.role)
                     .where(
-                        and(eq(authZSchema.role.resource, bead.resource)),
-                        eq(authZSchema.role.resource_id, bead.resource_id),
-                        inArray(authZSchema.role.principal_id, [
-                            ...principal_id,
-                        ]),
-                        inArray(authZSchema.role.role, roles),
-                        isNull(authZSchema.role.deleted),
+                        and(
+                            eq(authZSchema.role.resource, bead.resource),
+                            eq(authZSchema.role.resource_id, bead.resource_id),
+                            inArray(authZSchema.role.principal_id, [
+                                ...principal_id,
+                            ]),
+                            inArray(authZSchema.role.role, roles),
+                            isNull(authZSchema.role.deleted),
+                        ),
                     )
                     .limit(1)
 
