@@ -17,6 +17,7 @@ describe("getDoseForField", () => {
     let b_id: string
     let p_id: string
     let p_id_catalogue: string
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -25,6 +26,7 @@ describe("getDoseForField", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+        principal_id = "test-user"
     })
 
     it("should calculate the correct dose for a field with a single application", async () => {
@@ -34,6 +36,7 @@ describe("getDoseForField", () => {
             "1234567890",
             "test address",
             "1234AB",
+            principal_id,
         )
         b_id = await addField(
             fdm,
@@ -137,6 +140,7 @@ describe("getDoseForField", () => {
             "1234567890",
             "test address",
             "1234AB",
+            principal_id,
         )
         b_id = await addField(
             fdm,
