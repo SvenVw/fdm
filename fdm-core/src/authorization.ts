@@ -82,7 +82,7 @@ export async function checkPermission(
             ? principal_id
             : [principal_id]
 
-        return await fdm.transaction(async (tx: FdmType) => {
+        await fdm.transaction(async (tx: FdmType) => {
             for (const bead of chain) {
                 const check = await tx
                     .select({
@@ -93,7 +93,10 @@ export async function checkPermission(
                         and(
                             eq(authZSchema.role.resource, bead.resource),
                             eq(authZSchema.role.resource_id, bead.resource_id),
-                            inArray(authZSchema.role.principal_id, principal_ids),
+                            inArray(
+                                authZSchema.role.principal_id,
+                                principal_ids,
+                            ),
                             inArray(authZSchema.role.role, roles),
                             isNull(authZSchema.role.deleted),
                         ),
@@ -107,26 +110,26 @@ export async function checkPermission(
                     break
                 }
             }
-
-            // Store check in audit
-            await tx.insert(authZSchema.audit).values({
-                audit_id: createId(),
-                principal_id: principal_id,
-                target_resource: resource,
-                target_resource_id: resource_id,
-                granting_resource: granting_resource,
-                granting_resource_id: granting_resource_id,
-                action: action,
-                allowed: isAllowed,
-                duration: Math.round(performance.now() - start),
-            })
-
-            if (!isAllowed) {
-                throw new Error("Permission denied")
-            }
-
-            return isAllowed
         })
+
+        // Store check in audit
+        await fdm.insert(authZSchema.audit).values({
+            audit_id: createId(),
+            principal_id: principal_id,
+            target_resource: resource,
+            target_resource_id: resource_id,
+            granting_resource: granting_resource,
+            granting_resource_id: granting_resource_id,
+            action: action,
+            allowed: isAllowed,
+            duration: Math.round(performance.now() - start),
+        })
+
+        if (!isAllowed) {
+            throw new Error("Permission denied")
+        }
+
+        return isAllowed
     } catch (err) {
         let message = "Exception for checkPermission"
         if (err.message === "Permission denied") {
