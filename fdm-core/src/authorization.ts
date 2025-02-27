@@ -66,7 +66,7 @@ export async function checkPermission(
     action: Action,
     resource_id: string,
     principal_id: PrincipalId,
-): Promise<void> {
+): Promise<boolean> {
     const start = performance.now()
 
     let isAllowed = false
@@ -77,7 +77,7 @@ export async function checkPermission(
 
         const chain = await getResourceChain(fdm, resource, resource_id)
 
-        await fdm.transaction(async (tx: FdmType) => {
+        return await fdm.transaction(async (tx: FdmType) => {
             for (const bead of chain) {
                 const check = await tx
                     .select({
@@ -117,20 +117,25 @@ export async function checkPermission(
                 allowed: isAllowed,
                 duration: Math.round(performance.now() - start),
             })
+
+            if (!isAllowed) {
+                throw new Error("Permission denied")
+            }
+
+            return isAllowed
         })
     } catch (err) {
-        throw handleError(err, "Exception for checkPermission", {
+        let message = "Exception for checkPermission"
+        if (err.message === "Permission denied") {
+            message =
+                "Principal does not have permission to perform this action"
+        }
+        throw handleError(err, message, {
             resource: resource,
             action: action,
             resource_id: resource_id,
             principal_id: principal_id,
         })
-    }
-
-    if (!isAllowed) {
-        throw new Error(
-            "Principal does not have permission to perform this action",
-        )
     }
 }
 
@@ -142,15 +147,18 @@ export async function grantRole(
     principal_id: string,
 ): Promise<void> {
     try {
-        await fdm.transaction(async (tx: FdmType) => {
+        return await fdm.transaction(async (tx: FdmType) => {
+            const role_id = createId()
             const roleData = {
-                role_id: createId(),
+                role_id: role_id,
                 resource: resource,
                 resource_id: resource_id,
                 principal_id: principal_id,
                 role: role,
             }
             await tx.insert(authZSchema.role).values(roleData)
+
+            return role_id
         })
     } catch (err) {
         throw handleError(err, "Exception for granting role", {
@@ -267,7 +275,7 @@ async function getResourceChain(
             }
             chain.push(bead)
         } else if (resource === "field") {
-            const result = fdm
+            const result = await fdm
                 .select({
                     farm: schema.fieldAcquiring.b_id_farm,
                     field: schema.fieldAcquiring.b_id,
