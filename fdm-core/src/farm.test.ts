@@ -62,9 +62,35 @@ describe("Farm Data Model", () => {
         })
 
         it("should get a list of farms", async () => {
+            const farmName = "Test Farm"
+            const farmBusinessId = "123456"
+            const farmAddress = "123 Farm Lane"
+            const farmPostalCode = "12345"
+            await addFarm(
+                fdm,
+                farmName,
+                farmBusinessId,
+                farmAddress,
+                farmPostalCode,
+                principal_id,
+            )
+
+            const farmName2 = "Test Farm 2"
+            const farmBusinessId2 = "6543231"
+            const farmAddress2 = "321 Farm Lane"
+            const farmPostalCode2 = "54321"
+            await addFarm(
+                fdm,
+                farmName2,
+                farmBusinessId2,
+                farmAddress2,
+                farmPostalCode2,
+                principal_id,
+            )
+
             const farms = await getFarms(fdm, principal_id)
             expect(farms).toBeDefined()
-            expect(farms.length).toBeGreaterThanOrEqual(1) // At least 1 farm should exist
+            expect(farms.length).toBeGreaterThanOrEqual(1) // At least 2 farms should exist
             expect(farms[0].b_id_farm).toBeDefined()
         })
 

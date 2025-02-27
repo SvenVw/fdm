@@ -131,7 +131,7 @@ export async function updateFarm(
     principal_id: PrincipalId,
 ): Promise<schema.farmsTypeSelect> {
     try {
-        checkPermission(fdm, "farm", "write", b_id_farm, principal_id)
+        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id)
         const updatedFarm = await fdm
             .update(schema.farms)
             .set({

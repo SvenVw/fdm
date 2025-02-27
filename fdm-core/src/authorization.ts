@@ -104,7 +104,7 @@ export async function checkPermission(
             }
 
             // Store check in audit
-            tx.insert(authZSchema.audit).values({
+            await tx.insert(authZSchema.audit).values({
                 audit_id: createId(),
                 principal_id: principal_id,
                 target_resource: resource,
@@ -142,6 +142,7 @@ export async function grantRole(
     try {
         await fdm.transaction(async (tx: FdmType) => {
             const roleData = {
+                role_id: createId(),
                 resource: resource,
                 resource_id: resource_id,
                 principal_id: principal_id,
@@ -198,28 +199,37 @@ export async function listResources(
     principal_id: PrincipalId,
 ): Promise<string[]> {
     try {
+        // Get the roles for the action
         const roles = getRolesForAction(action, resource)
 
+        // Convert principal_id to array
+        const principal_ids = Array.isArray(principal_id)
+            ? principal_id
+            : [principal_id]
+
+        // Query the resources available
         const resources = await fdm.transaction(async (tx: FdmType) => {
-            await tx
+            return await tx
                 .select({
                     resource_id: authZSchema.role.resource_id,
                 })
                 .from(authZSchema.role)
                 .where(
-                    and(eq(authZSchema.role.resource, resource)),
-                    inArray(authZSchema.role.principal_id, [...principal_id]),
-                    inArray(authZSchema.role.role, roles),
-                    isNull(authZSchema.role.deleted),
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        inArray(authZSchema.role.principal_id, principal_ids),
+                        inArray(authZSchema.role.role, roles),
+                        isNull(authZSchema.role.deleted),
+                    ),
                 )
         })
-
         return resources.map(
             (resource: { resource_id: string }) => resource.resource_id,
         )
     } catch (err) {
         throw handleError(err, "Exception for listing resources", {
             resource: resource,
+            action: action,
             principal_id: principal_id,
         })
     }
