@@ -59,6 +59,21 @@ export const permissions: Permission[] = [
         action: ["read"],
     },
     {
+        resource: "cultivation",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "cultivation",
+        role: "advisor",
+        action: ["read", "write", "list"],
+    },
+    {
+        resource: "cultivation",
+        role: "researcher",
+        action: ["read"],
+    },
+    {
         resource: "user",
         role: "owner",
         action: ["read", "write", "list", "share"],
@@ -327,6 +342,35 @@ async function getResourceChain(
                 })
                 .from(schema.fieldAcquiring)
                 .where(eq(schema.fieldAcquiring.b_id, resource_id))
+                .limit(1)
+            const beads = Object.keys(result[0]).map((x) => {
+                return {
+                    resource: x,
+                    resource_id: result[0][x],
+                }
+            })
+            chain.push(...beads)
+        } else if (resource === "cultivation") {
+            const result = await fdm
+                .select({
+                    farm: schema.fieldAcquiring.b_id_farm,
+                    field: schema.fieldSowing.b_id,
+                    cultivation: schema.cultivations.b_lu,
+                })
+                .from(schema.cultivations)
+                .leftJoin(
+                    schema.fieldSowing,
+                    eq(schema.cultivations.b_lu, schema.fieldSowing.b_lu),
+                )
+                .leftJoin(
+                    schema.fields,
+                    eq(schema.fieldSowing.b_id, schema.fields.b_id),
+                )
+                .leftJoin(
+                    schema.fieldAcquiring,
+                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+                )
+                .where(eq(schema.cultivations.b_lu, resource_id))
                 .limit(1)
             const beads = Object.keys(result[0]).map((x) => {
                 return {

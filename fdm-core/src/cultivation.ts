@@ -1,5 +1,4 @@
 import { and, asc, desc, eq, isNotNull, or } from "drizzle-orm"
-
 import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
@@ -10,6 +9,8 @@ import {
     getHarvests,
 } from "./harvest"
 import { createId } from "./id"
+import { checkPermission } from "./authorization"
+import type {PrincipalId} from "./authorization.d"
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -81,6 +82,7 @@ export async function addCultivationToCatalogue(
  * Adds a cultivation to a field.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is adding the cultivation
  * @param b_lu_catalogue The catalogue ID of the cultivation.
  * @param b_id The ID of the field.
  * @param b_sowing_date The sowing date of the cultivation.
@@ -91,12 +93,15 @@ export async function addCultivationToCatalogue(
  */
 export async function addCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu_catalogue: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_id: schema.fieldSowingTypeInsert["b_id"],
     b_sowing_date: schema.fieldSowingTypeInsert["b_sowing_date"],
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
+        await checkPermission(fdm, "field", "write", b_id, principal_id)
+
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the cultivation
             const b_lu = createId()
@@ -230,15 +235,19 @@ export async function addCultivation(
  * Retrieves the details of a specific cultivation.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is requesting the cultivation
  * @param b_lu The ID of the cultivation.
  * @returns A promise that resolves with the cultivation details.
  * @throws If the cultivation does not exist.
  */
 export async function getCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
 ): Promise<getCultivationType> {
     try {
+        await checkPermission(fdm, "cultivation", "read", b_lu, principal_id)
+
         // Get properties of the requested cultivation
         const cultivation = await fdm
             .select({
@@ -291,15 +300,18 @@ export async function getCultivation(
  * Retrieves all cultivations for a given field.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is requesting the cultivations
  * @param b_id The ID of the field.
  * @returns A Promise that resolves with an array of cultivation details.
  * @alpha
  */
 export async function getCultivations(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.fieldSowingTypeSelect["b_id"],
 ): Promise<getCultivationType[]> {
     try {
+        await checkPermission(fdm, "field", "read", b_id, principal_id)
         const cultivations = await fdm
             .select({
                 b_lu: schema.cultivations.b_lu,
@@ -354,6 +366,7 @@ export async function getCultivations(
  * a `fertilizer_applications` array detailing the fertilizers applied to that field.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is requesting the cultivation plan
  * @param b_id_farm The ID of the farm for which to retrieve the cultivation plan.
  * @returns A Promise that resolves with an array representing the cultivation plan.
  *          Each element in the array is an object with the following structure:
@@ -405,12 +418,14 @@ export async function getCultivations(
  */
 export async function getCultivationPlan(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<cultivationPlanType[]> {
     try {
         if (!b_id_farm) {
             throw new Error("Farm ID is required")
         }
+        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id)
 
         const cultivations = await fdm
             .select({
@@ -620,10 +635,12 @@ export async function getCultivationPlan(
  */
 export async function removeCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeInsert["b_lu"],
 ): Promise<void> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        try {
+    try {
+        await checkPermission(fdm, "cultivation", "write", b_lu, principal_id)
+        return await fdm.transaction(async (tx: FdmType) => {
             const existing = await tx
                 .select()
                 .from(schema.cultivations)
@@ -645,16 +662,17 @@ export async function removeCultivation(
             await tx
                 .delete(schema.cultivations)
                 .where(eq(schema.cultivations.b_lu, b_lu))
-        } catch (err) {
-            handleError(err, "Exception for removeCultivation", { b_lu })
-        }
-    })
+        })
+    } catch (err) {
+        handleError(err, "Exception for removeCultivation", { b_lu })
+    }
 }
 
 /**
  * Updates an existing cultivation.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is updating the cultivation
  * @param b_lu The ID of the cultivation to update.
  * @param b_lu_catalogue? The catalogue ID of the cultivation.
  * @param b_sowing_date? The sowing date of the cultivation.
@@ -665,6 +683,7 @@ export async function removeCultivation(
  */
 export async function updateCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
     b_lu_catalogue?: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_sowing_date?: schema.fieldSowingTypeInsert["b_sowing_date"],
@@ -672,6 +691,8 @@ export async function updateCultivation(
 ): Promise<void> {
     try {
         const updated = new Date()
+
+        await checkPermission(fdm, "cultivation", "write", b_lu, principal_id)
 
         if (
             b_sowing_date &&

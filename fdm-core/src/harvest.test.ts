@@ -60,7 +60,6 @@ describe("harvest", () => {
             farmBusinessId,
             farmAddress,
             farmPostalCode,
-    
         )
 
         b_id = await addField(
@@ -91,6 +90,7 @@ describe("harvest", () => {
         terminating_date = new Date("2024-10-10")
         b_lu_once = await addCultivation(
             fdm,
+            principal_id,
             b_lu_catalogue_once,
             b_id,
             sowing_date,
@@ -111,6 +111,7 @@ describe("harvest", () => {
         b_lu_once_nonexistent = await addCultivation(
             // Assign new b_lu
             fdm,
+            principal_id,
             b_lu_catalogue_nonexistent, // Using the new catalogue entry
             b_id,
             sowing_date,
@@ -130,6 +131,7 @@ describe("harvest", () => {
         })
         b_lu_multiple = await addCultivation(
             fdm,
+            principal_id,
             b_lu_catalogue_multiple,
             b_id,
             sowing_date,
@@ -183,7 +185,7 @@ describe("harvest", () => {
     it("should have same date for cultivation harvest as for terminate date when harvestable type is 'once'", async () => {
         const harvesting_date = terminating_date
 
-        const cultivation = await getCultivation(fdm, b_lu_once)
+        const cultivation = await getCultivation(fdm, principal_id, b_lu_once)
         const harvests = await getHarvests(fdm, b_lu_once)
 
         expect(harvests.length).toEqual(1)
@@ -270,6 +272,7 @@ describe("harvest", () => {
 
             const newCultivation = await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 sowing_date,
@@ -309,6 +312,7 @@ describe("harvest", () => {
             })
             const b_lu_none = await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 sowing_date,
