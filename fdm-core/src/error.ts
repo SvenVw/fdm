@@ -3,7 +3,16 @@ import type { Jsonable } from "./error.d"
 export function handleError(err: unknown, base: string, context?: Jsonable) {
     const error = ensureError(err)
 
-    return new BaseError(base, {
+    // Customize error in case of permission denied
+    let message = base
+    if (
+        error.message ===
+        "Principal does not have permission to perform this action"
+    ) {
+        message = "Principal does not have permission to perform this action"
+    }
+
+    return new BaseError(message, {
         cause: error,
         context: context,
     })
