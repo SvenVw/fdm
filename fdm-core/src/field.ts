@@ -5,10 +5,14 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { getFieldType } from "./field.d"
+import type { PrincipalId } from "./authorization.d"
+import { checkPermission } from "./authorization"
 
 /**
  * Add a new field
  *
+ * @param fdm - The fdm instance.
+ * @param principal_id - The id of the principal that is adding the field
  * @param b_id_farm - ID of the farm.
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset
@@ -21,6 +25,7 @@ import type { getFieldType } from "./field.d"
  */
 export async function addField(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.fieldAcquiringTypeInsert["b_id_farm"],
     b_name: schema.fieldsTypeInsert["b_name"],
     b_id_source: schema.fieldsTypeInsert["b_id_source"],
@@ -30,6 +35,8 @@ export async function addField(
     b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
     try {
+        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id)
+
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the field
             const b_id = createId()
@@ -92,9 +99,12 @@ export async function addField(
  */
 export async function getField(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.fieldsTypeSelect["b_id"],
 ): Promise<getFieldType> {
     try {
+        await checkPermission(fdm, "field", "read", b_id, principal_id)
+
         // Get properties of the requested field
         const field = await fdm
             .select({
@@ -131,15 +141,20 @@ export async function getField(
 /**
  * Get the details of the field for a specific farm
  *
+ * @param fdm - The fdm instance
+ * @param principal_id - The id of the principal that is requesting the fields
  * @param b_id_farm - The id of the farm to be requested.
  * @returns A Promise that resolves with an array of objects that contains the details of fields related to the farm
  * @alpha
  */
 export async function getFields(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<getFieldType[]> {
     try {
+        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id)
+
         // Get properties of the requested field
         const fields = await fdm
             .select({
@@ -176,6 +191,8 @@ export async function getFields(
 /**
  * Update the details of a field
  *
+ * @param fdm - The fdm instance.
+ * @param principal_id - The id of the principal that is updating the field
  * @param b_id - ID of the field.
  * @param b_name - Name of the field.
  * @param b_id_source - ID of the field in source dataset.
@@ -188,6 +205,7 @@ export async function getFields(
  */
 export async function updateField(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.fieldsTypeInsert["b_id"],
     b_name?: schema.fieldsTypeInsert["b_name"],
     b_id_source?: schema.fieldsTypeInsert["b_id_source"],
@@ -198,6 +216,8 @@ export async function updateField(
 ): Promise<getFieldType> {
     return await fdm.transaction(async (tx: FdmType) => {
         try {
+            await checkPermission(fdm, "field", "write", b_id, principal_id)
+
             const updated = new Date()
 
             const setFields: Partial<schema.fieldsTypeInsert> = {}

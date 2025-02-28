@@ -44,6 +44,21 @@ export const permissions: Permission[] = [
         action: ["read"],
     },
     {
+        resource: "field",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "field",
+        role: "advisor",
+        action: ["read", "write", "list"],
+    },
+    {
+        resource: "field",
+        role: "researcher",
+        action: ["read"],
+    },
+    {
         resource: "user",
         role: "owner",
         action: ["read", "write", "list", "share"],
