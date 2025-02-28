@@ -30,11 +30,11 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id,
+                farmPostalCode,   
             )
 
             const fieldName = "Test Field"
@@ -85,11 +85,11 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id,
+                farmPostalCode,         
             )
 
             const fieldName = "Test Field"
@@ -139,11 +139,11 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
-                principal_id
             )
 
             const fieldName1 = "Test Field 1"
@@ -236,11 +236,11 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id
+                farmPostalCode,             
             )
 
             const fieldName = "Test Field"
@@ -317,11 +317,11 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id
+                farmPostalCode,       
             )
 
             const fieldName = "Test Field"

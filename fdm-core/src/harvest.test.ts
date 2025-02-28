@@ -55,15 +55,17 @@ describe("harvest", () => {
         const farmPostalCode = "12345"
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             farmName,
             farmBusinessId,
             farmAddress,
             farmPostalCode,
-            principal_id,
+    
         )
 
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "test source",

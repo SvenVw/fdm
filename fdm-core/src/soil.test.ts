@@ -36,11 +36,11 @@ describe("Soil Analysis Functions", () => {
         principal_id = createId()
         const b_id_farm = await addFarm(
             fdm,
+            principal_id,
             farmName,
             farmBusinessId,
             farmAddress,
             farmPostalCode,
-            principal_id,
         )
 
         const fieldName = "Test Field"
@@ -62,6 +62,7 @@ describe("Soil Analysis Functions", () => {
         const acquiringMethod = "owner"
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             fieldName,
             fieldIDSource,

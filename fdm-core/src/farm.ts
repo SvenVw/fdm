@@ -10,21 +10,22 @@ import type { PrincipalId } from "./authorization.d"
 /**
  * Add a new farm.
  *
+ * @param fdm - The fdm instance.
+ * @param principal_id - The id of the principal that is adding the farm
  * @param b_name_farm - Name of the farm
  * @param b_businessid_farm - Business ID of the farm
  * @param b_address_farm - Address of the farm
  * @param b_postalcode_farm - Postal code of the farm
- * @param principal_id - The id of the principal that is adding the farm
  * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
  * @alpha
  */
 export async function addFarm(
     fdm: FdmType,
+    principal_id: string,
     b_name_farm: schema.farmsTypeInsert["b_name_farm"],
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
-    principal_id: string,
 ): Promise<schema.farmsTypeInsert["b_id_farm"]> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -58,15 +59,16 @@ export async function addFarm(
 /**
  * Get the details of a specific farm.
  *
- * @param b_id_farm - The id of the farm to be requested.
+ * @param fdm - The fdm instance.
  * @param principal_id - The id of the principal that is requesting the farm
+ * @param b_id_farm - The id of the farm to be requested.
  * @returns A Promise that resolves with an object that contains the details of a farm.
  * @alpha
  */
 export async function getFarm(
     fdm: FdmType,
-    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
         await checkPermission(fdm, "farm", "read", b_id_farm, principal_id)
@@ -86,6 +88,7 @@ export async function getFarm(
 /**
  * Get a list of farms and their details
  *
+ * @param fdm - The fdm instance.
  * @param principal_id - The id of the principal that is requesting the farms
  * @returns A Promise that resolves with a array of objecta that contain the details of the farms.
  * @alpha
@@ -112,23 +115,24 @@ export async function getFarms(
 /**
  * Update the details of a farm.
  *
+ * @param fdm - The fdm instance.
+ * @param principal_id - The id of the principal that is updating the farm
  * @param b_id_farm - The id of the farm to be updated.
  * @param b_name_farm - The new value for the name of the farm.
  * @param b_businessid_farm - The new value for the business ID of the farm.
  * @param b_address_farm - The new value for the address of the farm.
  * @param b_postalcode_farm - The new value for the postal code of the farm.
- * @param principal_id - The id of the principal that is updating the farm
  * @returns A Promise that resolves with an object that contains the details of a farm.
  * @alpha
  */
 export async function updateFarm(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     b_name_farm: schema.farmsTypeInsert["b_name_farm"],
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
-    principal_id: PrincipalId,
 ): Promise<schema.farmsTypeSelect> {
     try {
         await checkPermission(fdm, "farm", "write", b_id_farm, principal_id)

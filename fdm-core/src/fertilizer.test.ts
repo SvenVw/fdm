@@ -127,11 +127,11 @@ describe("Fertilizer Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id,
+                farmPostalCode,              
             )
 
             // Add fertilizer to catalogue
@@ -212,11 +212,11 @@ describe("Fertilizer Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
-                principal_id,
             )
 
             // Add fertilizer to catalogue
@@ -305,11 +305,11 @@ describe("Fertilizer Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id,
+                farmPostalCode,              
             )
 
             // Add fertilizer to catalogue
@@ -398,15 +398,16 @@ describe("Fertilizer Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,
-                principal_id,
+                farmPostalCode,            
             )
 
             b_id = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 "test field",
                 "test source",

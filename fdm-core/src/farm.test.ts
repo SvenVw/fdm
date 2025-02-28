@@ -24,11 +24,11 @@ describe("Farm Data Model", () => {
         const farmPostalCode = "12345"
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             farmName,
             farmBusinessId,
             farmAddress,
             farmPostalCode,
-            principal_id,
         )
     })
 
@@ -40,15 +40,15 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farmAdded = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
-                principal_id,
             )
             expect(b_id_farmAdded).toBeDefined()
 
-            const farm = await getFarm(fdm, b_id_farmAdded, principal_id)
+            const farm = await getFarm(fdm, principal_id, b_id_farmAdded)
             expect(farm.b_name_farm).toBe(farmName)
             expect(farm.b_businessid_farm).toBe(farmBusinessId)
             expect(farm.b_address_farm).toBe(farmAddress)
@@ -56,7 +56,7 @@ describe("Farm Data Model", () => {
         })
 
         it("should get a farm by ID", async () => {
-            const farm = await getFarm(fdm, b_id_farm, principal_id)
+            const farm = await getFarm(fdm,  principal_id, b_id_farm)
             expect(farm).toBeDefined()
             expect(farm.b_id_farm).toBe(b_id_farm)
         })
@@ -68,11 +68,11 @@ describe("Farm Data Model", () => {
             const farmPostalCode2 = "54321"
             await addFarm(
                 fdm,
+                principal_id,
                 farmName2,
                 farmBusinessId2,
                 farmAddress2,
                 farmPostalCode2,
-                principal_id,
             )
 
             const farms = await getFarms(fdm, principal_id)
@@ -88,12 +88,12 @@ describe("Farm Data Model", () => {
             const updatedFarmPostalCode = "54321"
             const updatedFarm = await updateFarm(
                 fdm,
+                principal_id,
                 b_id_farm,
                 updatedFarmName,
                 updatedFarmBusinessId,
                 updatedFarmAddress,
                 updatedFarmPostalCode,
-                principal_id,
             )
             expect(updatedFarm.b_name_farm).toBe(updatedFarmName)
             expect(updatedFarm.b_businessid_farm).toBe(updatedFarmBusinessId)
