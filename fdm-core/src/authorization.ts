@@ -164,7 +164,7 @@ export async function checkPermission(
         return isAllowed
     } catch (err) {
         let message = "Exception for checkPermission"
-        if (err.message === "Permission denied") {
+        if (err instanceof Error && err.message === "Permission denied") {
             message =
                 "Principal does not have permission to perform this action"
         }

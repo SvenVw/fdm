@@ -291,6 +291,7 @@ describe("Authorization Functions", () => {
             await expect(
                 listResources(
                     fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Checking validation with unit test
                     "unknown_resource" as any,
                     "read",
                     principal_id,
@@ -302,6 +303,7 @@ describe("Authorization Functions", () => {
                 listResources(
                     fdm,
                     "farm",
+                    // biome-ignore lint/suspicious/noExplicitAny: Checking validation with unit test
                     "unknown_action" as any,
                     principal_id,
                 ),
