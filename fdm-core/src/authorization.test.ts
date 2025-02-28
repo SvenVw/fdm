@@ -48,13 +48,27 @@ describe("Authorization Functions", () => {
     describe("checkPermission", () => {
         it("should allow access if principal has the required role", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await checkPermission(fdm, "farm", "read", farm_id, principal_id, 'test')
+            await checkPermission(
+                fdm,
+                "farm",
+                "read",
+                farm_id,
+                principal_id,
+                "test",
+            )
         })
 
         it("should throw an error if principal does not have the required role", async () => {
             console.log(farm_id)
             await expect(
-                checkPermission(fdm, "farm", "read", farm_id, createId(), 'test'),
+                checkPermission(
+                    fdm,
+                    "farm",
+                    "read",
+                    farm_id,
+                    createId(),
+                    "test",
+                ),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
             )
@@ -65,18 +79,26 @@ describe("Authorization Functions", () => {
             await expect(
                 checkPermission(
                     fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_resource" as any,
                     "read",
                     farm_id,
                     principal_id,
-                    'test'
+                    "test",
                 ),
             ).rejects.toThrowError("Exception for checkPermission")
         })
 
         it("should store the audit log when a permission check is performed and allowed", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await checkPermission(fdm, "farm", "read", farm_id, principal_id, 'test')
+            await checkPermission(
+                fdm,
+                "farm",
+                "read",
+                farm_id,
+                principal_id,
+                "test",
+            )
 
             const auditLogs = await fdm
                 .select()
@@ -96,7 +118,14 @@ describe("Authorization Functions", () => {
             console.log("principal_id: ", principal_id_new)
 
             await expect(
-                checkPermission(fdm, "farm", "read", farm_id, principal_id_new, 'test'),
+                checkPermission(
+                    fdm,
+                    "farm",
+                    "read",
+                    farm_id,
+                    principal_id_new,
+                    "test",
+                ),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
             )
@@ -158,6 +187,7 @@ describe("Authorization Functions", () => {
             await expect(
                 grantRole(
                     fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_resource" as any,
                     "owner",
                     farm_id,
@@ -171,6 +201,7 @@ describe("Authorization Functions", () => {
                 grantRole(
                     fdm,
                     "farm",
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_role" as any,
                     farm_id,
                     principal_id,
@@ -180,6 +211,7 @@ describe("Authorization Functions", () => {
 
         it("should throw an error for invalid principal_id", async () => {
             await expect(
+                // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                 grantRole(fdm, "farm", "owner", farm_id, null as any),
             ).rejects.toThrowError()
         })
@@ -226,6 +258,7 @@ describe("Authorization Functions", () => {
             await expect(
                 revokeRole(
                     fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_resource" as any,
                     "owner",
                     farm_id,
@@ -239,6 +272,7 @@ describe("Authorization Functions", () => {
                 revokeRole(
                     fdm,
                     "farm",
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_role" as any,
                     farm_id,
                     principal_id,
