@@ -144,6 +144,7 @@ describe("harvest", () => {
 
         const b_id_harvesting = await addHarvest(
             fdm,
+            principal_id,
             b_lu_multiple,
             harvesting_date,
             1000,
@@ -160,7 +161,7 @@ describe("harvest", () => {
     it("should throw error if cultivation does not exist", async () => {
         const harvesting_date = new Date(terminating_date)
         await expect(
-            addHarvest(fdm, "non_existing_cultivation", harvesting_date, 1000),
+            addHarvest(fdm, principal_id, "non_existing_cultivation", harvesting_date, 1000),
         ).rejects.toThrowError("Exception for addHarvest")
     })
 
@@ -168,12 +169,13 @@ describe("harvest", () => {
         const harvesting_date = terminating_date
         const b_id_harvesting = await addHarvest(
             fdm,
+            principal_id,
             b_lu_multiple,
             harvesting_date,
             1000,
         )
 
-        const harvest = await getHarvest(fdm, b_id_harvesting)
+        const harvest = await getHarvest(fdm, principal_id, b_id_harvesting)
 
         expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
         expect(harvest.b_harvesting_date).toEqual(harvesting_date)
@@ -186,7 +188,7 @@ describe("harvest", () => {
         const harvesting_date = terminating_date
 
         const cultivation = await getCultivation(fdm, principal_id, b_lu_once)
-        const harvests = await getHarvests(fdm, b_lu_once)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
 
         expect(harvests.length).toEqual(1)
         expect(cultivation.b_terminating_date?.getTime()).toEqual(
@@ -200,16 +202,16 @@ describe("harvest", () => {
 
     it("should throw error if harvest does not exist", async () => {
         await expect(
-            getHarvest(fdm, "non_existing_harvest"),
+            getHarvest(fdm, principal_id, "non_existing_harvest"),
         ).rejects.toThrowError("Exception for getHarvest")
     })
 
     it("should get harvests", async () => {
         const harvesting_date = terminating_date
 
-        await addHarvest(fdm, b_lu_multiple, harvesting_date, 1000)
+        await addHarvest(fdm, principal_id, b_lu_multiple, harvesting_date, 1000)
 
-        const harvests = await getHarvests(fdm, b_lu_once)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
         expect(harvests.length).toBeGreaterThanOrEqual(1)
     })
 
@@ -217,25 +219,26 @@ describe("harvest", () => {
         const harvesting_date = terminating_date
         const b_id_harvesting = await addHarvest(
             fdm,
+            principal_id,
             b_lu_multiple,
             harvesting_date,
             1000,
         )
 
-        await removeHarvest(fdm, b_id_harvesting)
+        await removeHarvest(fdm, principal_id, b_id_harvesting)
 
-        await expect(getHarvest(fdm, b_id_harvesting)).rejects.toThrowError(
+        await expect(getHarvest(fdm, principal_id, b_id_harvesting)).rejects.toThrowError(
             "Exception for getHarvest",
         )
 
-        const harvests = await getHarvests(fdm, b_lu_once)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
         expect(harvests.length).toEqual(1)
     })
 
     it("should throw error if harvest does not exist", async () => {
         const nonExistingHarvestId = createId()
         await expect(
-            removeHarvest(fdm, nonExistingHarvestId),
+            removeHarvest(fdm, principal_id, nonExistingHarvestId),
         ).rejects.toThrowError("Exception for removeHarvest")
     })
 

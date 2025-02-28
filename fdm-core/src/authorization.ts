@@ -22,7 +22,7 @@ export const resources: Resource[] = [
     "cultivation",
     "fertilizer",
     "soil",
-    "harvest",
+    "harvesting",
 ] as const
 export const roles: Role[] = ["owner", "advisor", "researcher"] as const
 export const actions: Action[] = ["read", "write", "list", "share"] as const
@@ -70,6 +70,21 @@ export const permissions: Permission[] = [
     },
     {
         resource: "cultivation",
+        role: "researcher",
+        action: ["read"],
+    },
+    {
+        resource: "harvesting",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "harvesting",
+        role: "advisor",
+        action: ["read", "write", "list"],
+    },
+    {
+        resource: "harvesting",
         role: "researcher",
         action: ["read"],
     },
@@ -343,7 +358,13 @@ async function getResourceChain(
     resource_id: ResourceId,
 ): Promise<ResourceChain> {
     try {
-        const chainOrder = ["farm", "field", "cultivation", "soil_analysis"]
+        const chainOrder = [
+            "farm",
+            "field",
+            "cultivation",
+            "harvesting",
+            "soil_analysis",
+        ]
         const chain = []
         if (resource === "farm") {
             const bead = {
@@ -398,33 +419,75 @@ async function getResourceChain(
             chain.push(...beads)
         } else if (resource === "soil_analysis") {
             const result = await fdm
-            .select({
-                farm: schema.fieldAcquiring.b_id_farm,
-                field: schema.soilSampling.b_id,
-                soil_analysis: schema.soilAnalysis.a_id,
+                .select({
+                    farm: schema.fieldAcquiring.b_id_farm,
+                    field: schema.soilSampling.b_id,
+                    soil_analysis: schema.soilAnalysis.a_id,
+                })
+                .from(schema.soilAnalysis)
+                .leftJoin(
+                    schema.soilSampling,
+                    eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+                )
+                .leftJoin(
+                    schema.fields,
+                    eq(schema.soilSampling.b_id, schema.fields.b_id),
+                )
+                .leftJoin(
+                    schema.fieldAcquiring,
+                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+                )
+                .where(eq(schema.soilAnalysis.a_id, resource_id))
+                .limit(1)
+            const beads = Object.keys(result[0]).map((x) => {
+                return {
+                    resource: x,
+                    resource_id: result[0][x],
+                }
             })
-            .from(schema.soilAnalysis)
-            .leftJoin(
-                schema.soilSampling,
-                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
-            )
-            .leftJoin(
-                schema.fields,
-                eq(schema.soilSampling.b_id, schema.fields.b_id),
-            )
-            .leftJoin(
-                schema.fieldAcquiring,
-                eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
-            )
-            .where(eq(schema.soilAnalysis.a_id, resource_id))
-            .limit(1)
-        const beads = Object.keys(result[0]).map((x) => {
-            return {
-                resource: x,
-                resource_id: result[0][x],
-            }
-        })
-        chain.push(...beads)
+            chain.push(...beads)
+        } else if (resource === "harvesting") {
+            const result = await fdm
+                .select({
+                    farm: schema.fieldAcquiring.b_id_farm,
+                    field: schema.fieldSowing.b_id,
+                    cultivation: schema.cultivationHarvesting.b_lu,
+                    harvesting: schema.cultivationHarvesting.b_id_harvesting,
+                })
+                .from(schema.cultivationHarvesting)
+                .leftJoin(
+                    schema.cultivations,
+                    eq(
+                        schema.cultivationHarvesting.b_lu,
+                        schema.cultivations.b_lu,
+                    ),
+                )
+                .leftJoin(
+                    schema.fieldSowing,
+                    eq(schema.cultivations.b_lu, schema.fieldSowing.b_lu),
+                )
+                .leftJoin(
+                    schema.fields,
+                    eq(schema.fieldSowing.b_id, schema.fields.b_id),
+                )
+                .leftJoin(
+                    schema.fieldAcquiring,
+                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+                )
+                .where(
+                    eq(
+                        schema.cultivationHarvesting.b_id_harvesting,
+                        resource_id,
+                    ),
+                )
+                .limit(1)
+            const beads = Object.keys(result[0]).map((x) => {
+                return {
+                    resource: x,
+                    resource_id: result[0][x],
+                }
+            })
+            chain.push(...beads)
         } else {
             throw new Error("Resource is not known")
         }

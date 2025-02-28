@@ -9,6 +9,8 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { HarvestType } from "./harvest.d"
 import { createId } from "./id"
+import type { PrincipalId } from "./authorization.d"
+import { checkPermission } from "./authorization"
 
 /**
  * Add a harvest to a cultivation.
@@ -16,6 +18,7 @@ import { createId } from "./id"
  * This function simplifies adding a harvest to a cultivation. It assumes that the harvest is not combined with another harvestable and that a same day analysis is performed on this harvest.
  *
  * @param fdm The FDM instance.
+ * @param principal_id  - The id of the principal that is adding the harvest
  * @param b_lu The ID of the cultivation.
  * @param b_harvesting_date The date of the harvest.
  * @param b_lu_yield The amount of yield as dry matter for this harvest, expressed as kg / ha
@@ -31,6 +34,7 @@ import { createId } from "./id"
  */
 export async function addHarvest(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeInsert["b_lu"],
     b_harvesting_date: schema.cultivationHarvestingTypeInsert["b_harvesting_date"],
     b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
@@ -42,6 +46,15 @@ export async function addHarvest(
     b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"],
 ): Promise<schema.cultivationHarvestingTypeSelect["b_id_harvesting"]> {
     try {
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            principal_id,
+            "addHarvest",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             // Validate if cultivation exists
             const cultivation = await tx
@@ -123,105 +136,28 @@ export async function addHarvest(
  * Retrieves the details of a specific harvest.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is requesting the harvest
  * @param b_id_harvesting The ID of the harvesting action.
  * @returns A promise that resolves with the harvest details.
  * @throws If the harvest does not exist.
  */
 export async function getHarvest(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
 ): Promise<HarvestType> {
     try {
-        // Get properties of the requested harvest action
-        const harvesting = await fdm
-            .select({
-                b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
-                b_harvesting_date:
-                    schema.cultivationHarvesting.b_harvesting_date,
-                b_lu: schema.cultivationHarvesting.b_lu,
-            })
-            .from(schema.cultivationHarvesting)
-            .where(
-                eq(
-                    schema.cultivationHarvesting.b_id_harvesting,
-                    b_id_harvesting,
-                ),
-            )
-            .limit(1)
+        await checkPermission(
+            fdm,
+            "harvesting",
+            "read",
+            b_id_harvesting,
+            principal_id,
+            "getHarvest",
+        )
 
-        // If no harvest is found return an error
-        if (harvesting.length === 0) {
-            throw new Error("Harvest does not exist")
-        }
-
-        const result = harvesting[0]
-
-        // Get properties of harvestables for this harvesting
-        // CAUTION: Currently only 1:1 joins for harvesting, harvestables and harvestable_analysis is supported. When 1:M joins is supported in these functions (db schema alreayd supports it) than the code below needs to be updated
-        const harvestables = await fdm
-            .select({
-                b_id_harvestable: schema.harvestables.b_id_harvestable,
-            })
-            .from(schema.harvestables)
-            .leftJoin(
-                schema.cultivationHarvesting,
-                eq(
-                    schema.harvestables.b_id_harvestable,
-                    schema.cultivationHarvesting.b_id_harvestable,
-                ),
-            )
-            .where(
-                eq(
-                    schema.cultivationHarvesting.b_id_harvesting,
-                    result.b_id_harvesting,
-                ),
-            )
-            .limit(1)
-
-        result.harvestables = harvestables
-
-        // Get properties of harvestable analyses for this harvesting
-        const harvestableAnalyses = await fdm
-            .select({
-                b_id_harvestable_analysis:
-                    schema.harvestableAnalyses.b_id_harvestable_analysis,
-                b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
-                b_lu_n_harvestable:
-                    schema.harvestableAnalyses.b_lu_n_harvestable,
-                b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
-                b_lu_p_harvestable:
-                    schema.harvestableAnalyses.b_lu_p_harvestable,
-                b_lu_p_residue: schema.harvestableAnalyses.b_lu_p_residue,
-                b_lu_k_harvestable:
-                    schema.harvestableAnalyses.b_lu_k_harvestable,
-                b_lu_k_residue: schema.harvestableAnalyses.b_lu_k_residue,
-            })
-            .from(schema.harvestables)
-            .leftJoin(
-                schema.harvestableSampling,
-                eq(
-                    schema.harvestables.b_id_harvestable,
-                    schema.harvestableSampling.b_id_harvestable,
-                ),
-            )
-            .leftJoin(
-                schema.harvestableAnalyses,
-                eq(
-                    schema.harvestableSampling.b_id_harvestable_analysis,
-                    schema.harvestableAnalyses.b_id_harvestable_analysis,
-                ),
-            )
-            .where(
-                eq(
-                    schema.harvestableSampling.b_id_harvestable,
-                    result.harvestables[0].b_id_harvestable,
-                ),
-            )
-            .limit(1)
-
-        result.harvestables[0].harvestable_analyses = harvestableAnalyses
-
-        return result
+        const harvest = getHarvestSimplified(fdm, b_id_harvesting)
+        return harvest
     } catch (err) {
         throw handleError(err, "Exception for getHarvest", { b_id_harvesting })
     }
@@ -231,14 +167,25 @@ export async function getHarvest(
  * Retrieves all harvests for a given cultivation.
  *
  * @param fdm The FDM instance.
+ * @param principal_id - The id of the principal that is requesting the harvests
  * @param b_lu The ID of the cultivation.
  * @returns A Promise that resolves with an array of harvest details.
  */
 export async function getHarvests(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"],
 ): Promise<HarvestType[]> {
     try {
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "read",
+            b_lu,
+            principal_id,
+            "getHarvests",
+        )
+
         const harvests = await fdm
             .select({
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
@@ -253,7 +200,7 @@ export async function getHarvests(
         // Get details of each harvest
         const result = await Promise.all(
             harvests.map(async (harvest: HarvestType) => {
-                const harvestDetails = await getHarvest(
+                const harvestDetails = getHarvestSimplified(
                     fdm,
                     harvest.b_id_harvesting,
                 )
@@ -271,16 +218,27 @@ export async function getHarvests(
  * Removes a harvest record and associated data.
  *
  * @param fdm The FDM database instance.
+ * @param principal_id - The id of the principal that is removing the harvest
  * @param b_id_harvesting The ID of the harvest record to remove.
  * @throws If there's an error during the database transaction.
  */
 export async function removeHarvest(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
 ): Promise<void> {
     try {
+        await checkPermission(
+            fdm,
+            "harvesting",
+            "write",
+            b_id_harvesting,
+            principal_id,
+            "removeHarvest",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
-            const harvest = await getHarvest(tx, b_id_harvesting)
+            const harvest = await getHarvest(tx, principal_id, b_id_harvesting)
 
             const b_id_harvestable = harvest.harvestables[0].b_id_harvestable
             const b_id_harvestable_analysis =
@@ -459,4 +417,93 @@ export async function checkHarvestDateCompability(
     }
 
     return b_lu_harvestable
+}
+
+async function getHarvestSimplified(
+    fdm: FdmType,
+    b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
+) {
+    // Get properties of the requested harvest action
+    const harvesting = await fdm
+        .select({
+            b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
+            b_harvesting_date: schema.cultivationHarvesting.b_harvesting_date,
+            b_lu: schema.cultivationHarvesting.b_lu,
+        })
+        .from(schema.cultivationHarvesting)
+        .where(
+            eq(schema.cultivationHarvesting.b_id_harvesting, b_id_harvesting),
+        )
+        .limit(1)
+
+    // If no harvest is found return an error
+    if (harvesting.length === 0) {
+        throw new Error("Harvest does not exist")
+    }
+
+    const harvest = harvesting[0]
+
+    // Get properties of harvestables for this harvesting
+    // CAUTION: Currently only 1:1 joins for harvesting, harvestables and harvestable_analysis is supported. When 1:M joins is supported in these functions (db schema alreayd supports it) than the code below needs to be updated
+    const harvestables = await fdm
+        .select({
+            b_id_harvestable: schema.harvestables.b_id_harvestable,
+        })
+        .from(schema.harvestables)
+        .leftJoin(
+            schema.cultivationHarvesting,
+            eq(
+                schema.harvestables.b_id_harvestable,
+                schema.cultivationHarvesting.b_id_harvestable,
+            ),
+        )
+        .where(
+            eq(
+                schema.cultivationHarvesting.b_id_harvesting,
+                harvest.b_id_harvesting,
+            ),
+        )
+        .limit(1)
+
+    harvest.harvestables = harvestables
+
+    // Get properties of harvestable analyses for this harvesting
+    const harvestableAnalyses = await fdm
+        .select({
+            b_id_harvestable_analysis:
+                schema.harvestableAnalyses.b_id_harvestable_analysis,
+            b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
+            b_lu_n_harvestable: schema.harvestableAnalyses.b_lu_n_harvestable,
+            b_lu_n_residue: schema.harvestableAnalyses.b_lu_n_residue,
+            b_lu_p_harvestable: schema.harvestableAnalyses.b_lu_p_harvestable,
+            b_lu_p_residue: schema.harvestableAnalyses.b_lu_p_residue,
+            b_lu_k_harvestable: schema.harvestableAnalyses.b_lu_k_harvestable,
+            b_lu_k_residue: schema.harvestableAnalyses.b_lu_k_residue,
+        })
+        .from(schema.harvestables)
+        .leftJoin(
+            schema.harvestableSampling,
+            eq(
+                schema.harvestables.b_id_harvestable,
+                schema.harvestableSampling.b_id_harvestable,
+            ),
+        )
+        .leftJoin(
+            schema.harvestableAnalyses,
+            eq(
+                schema.harvestableSampling.b_id_harvestable_analysis,
+                schema.harvestableAnalyses.b_id_harvestable_analysis,
+            ),
+        )
+        .where(
+            eq(
+                schema.harvestableSampling.b_id_harvestable,
+                harvest.harvestables[0].b_id_harvestable,
+            ),
+        )
+        .limit(1)
+
+    harvest.harvestables[0].harvestable_analyses = harvestableAnalyses
+
+    return harvest
 }

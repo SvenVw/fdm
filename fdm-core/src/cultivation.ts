@@ -208,6 +208,7 @@ export async function addCultivation(
                     // If cultivation can only be harvested once, add harvest on terminate date
                     await addHarvest(
                         tx,
+                        principal_id,
                         b_lu,
                         b_terminating_date,
                         undefined,
@@ -817,7 +818,7 @@ export async function updateCultivation(
                 )
                 if (harvestableType === "once") {
                     // If harvestable type is "once", add harvest on terminate date
-                    const harvests = await getHarvests(tx, b_lu)
+                    const harvests = await getHarvests(tx, principal_id, b_lu)
                     if (harvests.length > 0) {
                         await tx
                             .update(schema.cultivationHarvesting)
@@ -835,6 +836,7 @@ export async function updateCultivation(
                     } else {
                         await addHarvest(
                             tx,
+                            principal_id,
                             b_lu,
                             b_terminating_date,
                             undefined,

@@ -103,9 +103,9 @@ describe("Authorization Functions", () => {
             const auditLogs = await fdm
                 .select()
                 .from(authZSchema.audit)
+                .where(eq(authZSchema.audit.principal_id, principal_id))
                 .orderBy(desc(authZSchema.audit.audit_timestamp))
             expect(auditLogs.length).toBeGreaterThanOrEqual(1)
-            expect(auditLogs[0].principal_id).toBe(principal_id)
             expect(auditLogs[0].target_resource).toBe("farm")
             expect(auditLogs[0].target_resource_id).toBe(farm_id)
             expect(auditLogs[0].action).toBe("read")
@@ -355,7 +355,7 @@ describe("Authorization Functions", () => {
                 "cultivation",
                 "fertilizer",
                 "soil",
-                "harvest",
+                "harvesting",
             ])
         })
 
