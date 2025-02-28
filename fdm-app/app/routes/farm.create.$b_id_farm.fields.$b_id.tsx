@@ -20,11 +20,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import {
     Select,
     SelectContent,
     SelectItem,
@@ -33,7 +28,6 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { extractFormValuesFromRequest } from "@/lib/form"
-import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
@@ -44,10 +38,7 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
-import { format } from "date-fns/format"
-import { nl } from "date-fns/locale/nl"
 import type { FeatureCollection } from "geojson"
-import { CalendarIcon } from "lucide-react"
 import { Form } from "react-hook-form"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {
@@ -62,6 +53,7 @@ import { dataWithError, dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
+import { getSession } from "@/lib/auth.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -157,8 +149,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get the field data
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field not found", {
             status: 404,
@@ -190,7 +185,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get soil analysis data
-    const soilAnalysis = await getSoilAnalysis(fdm, b_id)
+    const soilAnalysis = await getSoilAnalysis(fdm, session.principal_id, b_id)
 
     // Get the available cultivations
     let cultivationOptions = []
@@ -214,7 +209,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get the cultivation
-    const cultivations = await getCultivations(fdm, b_id)
+    const cultivations = await getCultivations(fdm, session.principal_id, b_id)
     const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
     // Get Mapbox token and Style
@@ -637,6 +632,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing field or farm ID.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     try {
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -645,6 +643,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateField(
             fdm,
+            session.principal_id,
             b_id,
             formValues.b_name,
             undefined,
@@ -654,10 +653,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        const cultivations = await getCultivations(fdm, b_id)
+        const cultivations = await getCultivations(fdm, session.principal_id, b_id)
         if (cultivations && cultivations.length > 0) {
             await updateCultivation(
                 fdm,
+                session.principal_id,
                 cultivations[0].b_lu,
                 formValues.b_lu_catalogue,
                 undefined,
@@ -672,7 +672,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        const currentSoilAnalysis = await getSoilAnalysis(fdm, b_id)
+        const currentSoilAnalysis = await getSoilAnalysis(fdm, session.principal_id, b_id)
         const soilPropertiesChanged =
             currentSoilAnalysis?.b_soiltype_agr !== formValues.b_soiltype_agr ||
             currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
@@ -685,6 +685,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const defaultDate = new Date(currentYear, 0, 1)
             await addSoilAnalysis(
                 fdm,
+                session.principal_id,
                 defaultDate,
                 "user",
                 b_id,

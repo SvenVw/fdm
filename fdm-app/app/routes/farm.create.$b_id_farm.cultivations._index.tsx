@@ -1,3 +1,4 @@
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getCultivationPlan } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, redirect } from "react-router"
@@ -8,7 +9,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!b_id_farm) {
         throw new Error("b_id_farm is required")
     }
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+
+    // Get the session
+    const session = await getSession(request)
+    
+    const cultivationPlan = await getCultivationPlan(fdm, session.principal_id, b_id_farm)
     if (!cultivationPlan.length) {
         throw new Error("No cultivations found for this farm")
     }

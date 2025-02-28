@@ -2,6 +2,7 @@ import { CultivationForm } from "@/components/custom/cultivation/form"
 import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -40,8 +41,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,
@@ -62,12 +66,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     )
 
     // Get cultivations for the field
-    const cultivations = await getCultivations(fdm, b_id)
+    const cultivations = await getCultivations(fdm, session.principal_id, b_id)
 
     // Get the harvests of the cultivations
     const harvests = await Promise.all(
         cultivations.map(async (cultivation) => {
-            return await getHarvests(fdm, cultivation.b_lu)
+            return await getHarvests(
+                fdm,
+                session.principal_id,
+                cultivation.b_lu,
+            )
         }),
     )
 
@@ -118,6 +126,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing field ID.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     if (request.method === "POST") {
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
@@ -128,6 +139,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await addCultivation(
             fdm,
+            session.principal_id,
             b_lu_catalogue,
             b_id,
             b_sowing_date,
@@ -152,7 +164,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            await removeCultivation(fdm, b_lu)
+            await removeCultivation(fdm, session.principal_id, b_lu)
 
             return dataWithSuccess("Date deleted successfully", {
                 message: "Gewas is verwijderd",

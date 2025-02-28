@@ -3,6 +3,7 @@ import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -30,6 +31,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!b_id_farm) {
         throw new Error("b_id_farm is required")
     }
+
+    // Get the session
+    const session = await getSession(request)
 
     // Get the available cultivations
     let cultivationOptions = []
@@ -63,7 +67,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+    const cultivationPlan = await getCultivationPlan(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    )
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )
@@ -179,9 +187,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     if (request.method === "POST") {
         // Get cultivation id's for this cultivation code
-        const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         const cultivation = cultivationPlan.find(
             (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
         )
@@ -203,6 +218,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     ) {
                         await updateCultivation(
                             fdm,
+                            session.principal_id,
                             item,
                             undefined,
                             formValues.b_sowing_date,
@@ -246,7 +262,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
         await Promise.all(
             b_ids_harvesting.map(async (b_id_harvesting: string) => {
                 try {
-                    await removeHarvest(fdm, b_id_harvesting)
+                    await removeHarvest(
+                        fdm,
+                        session.principal_id,
+                        b_id_harvesting,
+                    )
                 } catch (error) {
                     console.error(
                         `Failed to remove harvest ${b_id_harvesting} for ${b_lu_catalogue} for farm ${b_id_farm}:`,

@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -39,8 +40,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of farm
-    const farm = await getFarm(fdm, b_id_farm)
+    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
     if (!farm) {
         throw data("Farm is not found", {
             status: 404,
@@ -220,6 +224,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing farm ID.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     try {
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -228,6 +235,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateFarm(
             fdm,
+            session.principal_id,
             b_id_farm,
             formValues.b_name_farm,
             formValues.b_businessid_farm,

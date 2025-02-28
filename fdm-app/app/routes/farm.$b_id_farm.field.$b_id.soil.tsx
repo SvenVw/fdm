@@ -1,4 +1,5 @@
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
@@ -22,8 +23,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,

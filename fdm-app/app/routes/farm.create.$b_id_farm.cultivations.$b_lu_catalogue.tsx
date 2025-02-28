@@ -6,21 +6,17 @@ import {
     useLocation,
 } from "react-router"
 import { useLoaderData } from "react-router"
-
-// Components
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
     PaginationLink,
 } from "@/components/ui/pagination"
-
 import {
     getCultivationPlan,
-    getCultivationsFromCatalogue,
 } from "@svenvw/fdm-core"
-// FDM
 import { fdm } from "../lib/fdm.server"
+import { getSession } from "@/lib/auth.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -49,9 +45,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Cultivation catalogue ID is required",
         })
     }
+    
+    // Get the session
+    const session = await getSession(request)
 
     // Get the cultivation details for this cultivation
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
+    const cultivationPlan = await getCultivationPlan(fdm, session.principal_id, b_id_farm).catch(
         (error) => {
             throw data("Failed to fetch cultivation plan", {
                 status: 500,

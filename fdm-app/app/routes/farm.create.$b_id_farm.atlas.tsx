@@ -49,6 +49,7 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
+import { getSession } from "@/lib/auth.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -68,7 +69,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Farm ID is required",
         })
     }
-    const farm = await getFarm(fdm, b_id_farm)
+
+    // Get the session
+    const session = await getSession(request)
+
+    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
     if (!farm) {
         throw data("Farm not found", {
@@ -227,6 +232,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             statusText: "Farm ID is required",
         })
     }
+
+    // Get the session
+    const session = await getSession(request)
+
     const selectedFields = JSON.parse(String(formData.get("selected_fields")))
 
     // Add fields to farm
@@ -267,6 +276,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             try {
                 const b_id = await addField(
                     fdm,
+                    session.principal_id,
                     b_id_farm,
                     b_name,
                     b_id_source,
@@ -277,6 +287,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 )
                 await addCultivation(
                     fdm,
+                    session.principal_id,
                     b_lu_catalogue,
                     b_id,
                     b_date_sowing,
@@ -315,6 +326,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
                     await addSoilAnalysis(
                         fdm,
+                        session.principal_id,
                         defaultDate,
                         "NMI",
                         b_id,

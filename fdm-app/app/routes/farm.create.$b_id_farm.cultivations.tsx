@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { cn } from "@/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
@@ -39,12 +40,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Farm ID is required",
         })
     }
-    const farm = await getFarm(fdm, b_id_farm).catch((error) => {
-        throw data(`Failed to fetch farm: ${error.message}`, {
-            status: 404,
-            statusText: "Farm not found",
-        })
-    })
+
+    // Get the session
+    const session = await getSession(request)
+
+    const farm = await getFarm(fdm, session.principal_id, b_id_farm).catch(
+        (error) => {
+            throw data(`Failed to fetch farm: ${error.message}`, {
+                status: 404,
+                statusText: "Farm not found",
+            })
+        },
+    )
 
     if (!farm) {
         throw data("Farm not found", {
@@ -54,7 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get the cultivationPlan
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+    const cultivationPlan = await getCultivationPlan(fdm, session.principal_id, b_id_farm)
 
     // Create the sidenav
     const sidebarPageItems = cultivationPlan.map((cultivation) => {

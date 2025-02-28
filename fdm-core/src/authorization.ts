@@ -150,7 +150,6 @@ export async function checkPermission(
     let granting_resource_id = ""
     try {
         const roles = getRolesForAction(action, resource)
-
         const chain = await getResourceChain(fdm, resource, resource_id)
 
         // Convert principal_id to array

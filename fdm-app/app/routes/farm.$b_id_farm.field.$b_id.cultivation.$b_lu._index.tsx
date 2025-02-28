@@ -4,6 +4,7 @@ import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -52,8 +53,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,
@@ -74,13 +78,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     )
 
     // Get cultivation
-    const cultivation = await getCultivation(fdm, b_lu)
+    const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
     if (!cultivation) {
         throw data("Cultivation is not found", { status: 404 })
     }
 
     // Get harvests
-    const harvests = await getHarvests(fdm, b_lu)
+    const harvests = await getHarvests(fdm, session.principal_id, b_lu)
 
     let b_lu_harvestable: HarvestableType = "none"
     try {
@@ -165,6 +169,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing b_lu value.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     if (request.method === "POST") {
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
@@ -175,6 +182,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateCultivation(
             fdm,
+            session.principal_id,
             b_lu,
             b_lu_catalogue,
             b_sowing_date,
@@ -199,7 +207,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            await removeHarvest(fdm, b_id_harvesting)
+            await removeHarvest(fdm, session.principal_id, b_id_harvesting)
 
             return dataWithSuccess("Harvest deleted successfully", {
                 message: "Oogst is verwijderd",

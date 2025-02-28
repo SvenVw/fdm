@@ -1,5 +1,4 @@
 import { type LoaderFunctionArgs, NavLink, useLoaderData } from "react-router"
-
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { Button } from "@/components/ui/button"
@@ -10,12 +9,9 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card"
-// Components
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
-
-// Utils
-import { auth } from "@/lib/auth.server"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms } from "@svenvw/fdm-core"
@@ -23,19 +19,10 @@ import { getFarms } from "@svenvw/fdm-core"
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
-        const session = await auth.api.getSession({
-            headers: request.headers,
-        })
-
-        if (!session?.user) {
-            throw new Response("Unauthorized", { status: 401 })
-        }
-
-        // Get the active farm and redirect to it
-        const b_id_farm = session?.user?.farm_active
+        const session = await getSession(request)
 
         // Get a list of possible farms of the user
-        const farms = await getFarms(fdm)
+        const farms = await getFarms(fdm, session.user.id)
         if (!Array.isArray(farms)) {
             throw new Error("Invalid farms data received")
         }
@@ -52,9 +39,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            b_id_farm: b_id_farm,
             farmOptions: farmOptions,
-            user: session.user,
+            username: session.userName
         }
     } catch (error) {
         throw new Response(
@@ -81,7 +67,7 @@ export default function AppIndex() {
                 {loaderData.farmOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Welkom, ${loaderData.user.firstname}! 👋`}
+                            title={`Welkom, ${loaderData.username}! 👋`}
                             description={""}
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
@@ -108,7 +94,7 @@ export default function AppIndex() {
                 ) : (
                     <>
                         <FarmTitle
-                            title={`${greeting}, ${loaderData.user.firstname}! 👋`}
+                            title={`${greeting}, ${loaderData.username}! 👋`}
                             description={
                                 "Kies een bedrijf uit de lijst om verder te gaan of maak een nieuw bedrijf aan"
                             }

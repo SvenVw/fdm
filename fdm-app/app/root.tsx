@@ -11,6 +11,7 @@ import {
     ScrollRestoration,
     data,
     isRouteErrorResponse,
+    redirect,
     useLoaderData,
     useLocation,
 } from "react-router"
@@ -92,7 +93,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const timestamp = new Date().toISOString()
 
     if (isRouteErrorResponse(error)) {
-        const clientErrors = [400, 401, 403, 404]
+        // Redirect to signin page if not authentication is provided
+        if (error.status === 401) {
+            redirect("./signin")
+        }
+
+        const clientErrors = [400, 403, 404]
         if (clientErrors.includes(error.status)) {
             return (
                 <ErrorBlock

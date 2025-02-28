@@ -100,7 +100,7 @@ export async function addCultivation(
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
-        await checkPermission(fdm, "field", "write", b_id, principal_id, 'addCultivation')
+        await checkPermission(fdm, "field", "", b_id, principal_id, 'addCultivation')
 
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the cultivation

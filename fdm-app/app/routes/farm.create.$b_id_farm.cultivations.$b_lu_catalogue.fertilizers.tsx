@@ -7,16 +7,11 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-
-// Components
-import { FertilizerApplicationsForm } from "@/components/custom/fertilizer-applications"
 import { FormSchema } from "@/components/custom/fertilizer-applications"
 import { extractFormValuesFromRequest } from "@/lib/form"
-
 import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
 import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
 import { Separator } from "@/components/ui/separator"
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
@@ -25,8 +20,8 @@ import {
     getFertilizers,
     removeFertilizerApplication,
 } from "@svenvw/fdm-core"
-// FDM
 import { fdm } from "../lib/fdm.server"
+import { getSession } from "@/lib/auth.server"
 
 // Loader
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -48,8 +43,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Fetch available fertilizers for the farm
-    const fertilizers = await getFertilizers(fdm, b_id_farm)
+    const fertilizers = await getFertilizers(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    )
     // Map fertilizers to options for the combobox
     const fertilizerOptions = fertilizers.map((fertilizer) => {
         return {
@@ -59,14 +61,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     })
 
     // Fetch the cultivation plan for the farm
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
-        (error) => {
-            throw data("Failed to fetch cultivation plan", {
-                status: 500,
-                statusText: error.message,
-            })
-        },
-    )
+    const cultivationPlan = await getCultivationPlan(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    ).catch((error) => {
+        throw data("Failed to fetch cultivation plan", {
+            status: 500,
+            statusText: error.message,
+        })
+    })
 
     // Find the target cultivation within the cultivation plan
     const targetCultivation = cultivationPlan.find(
@@ -171,6 +175,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     if (request.method === "POST") {
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
@@ -180,7 +187,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const { p_id, p_app_amount, p_app_date } = formValues
 
         // Get the cultivation details for this cultivation
-        const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
+        const cultivationPlan = await getCultivationPlan(fdm, session.principal_id, b_id_farm).catch(
             (error) => {
                 throw data("Failed to fetch cultivation plan", {
                     status: 500,
@@ -198,6 +205,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const b_id = field.b_id
             await addFertilizerApplication(
                 fdm,
+                session.principal_id,
                 b_id,
                 p_id,
                 p_app_amount,
@@ -226,7 +234,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const p_app_ids = rawAppIds.split(",")
             await Promise.all(
                 p_app_ids.map((p_app_id: string) =>
-                    removeFertilizerApplication(fdm, p_app_id),
+                    removeFertilizerApplication(fdm, session.principal_id, p_app_id),
                 ),
             )
 

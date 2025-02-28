@@ -10,27 +10,35 @@ import { FarmContent } from "@/components/custom/farm/farm-content"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
-import { auth } from "@/lib/auth.server"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
-        // Get the session
-        const session = await auth.api.getSession({
-            headers: request.headers,
-        })
-
-        if (!session?.user) {
-            throw new Response("Unauthorized", { status: 401 })
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
 
-        // Get the active farm and field
-        const b_id_farm = params.b_id_farm
+        // Get the field id
         const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
 
         // Get a list of possible farms of the user
-        const farms = await getFarms(fdm)
+        const farms = await getFarms(fdm, session.principal_id)
 
         // Redirect to farms overview if user has no farm
         if (farms.length === 0) {
@@ -49,7 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Get the fields to be selected
-        const fields = await getFields(fdm, b_id_farm)
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
         const fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
@@ -65,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         fieldOptions.sort((a, b) => a.b_name.localeCompare(b.b_name))
 
         // Get the generral information of the field
-        const field = await getField(fdm, b_id)
+        const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
             throw data("Unable to find field", {
                 status: 404,

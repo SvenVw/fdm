@@ -3,12 +3,6 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-
-// Components
-
-// Blocks
-
-// Services
 import { auth } from "@/lib/auth.server"
 
 export const meta: MetaFunction = () => {

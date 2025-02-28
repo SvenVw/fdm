@@ -3,7 +3,7 @@ import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
-import { auth } from "@/lib/auth.server"
+import { auth, getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
@@ -24,10 +24,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of farm
     let farm
     try {
-        farm = await getFarm(fdm, b_id_farm)
+        farm = await getFarm(fdm, session.principal_id, b_id_farm)
         if (!farm) {
             throw data("Farm is not found", {
                 status: 404,
@@ -42,33 +45,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    // Set farm to active
-    try {
-        await auth.api.updateUser({
-            body: {
-                farm_active: b_id_farm,
-            },
-            headers: request.headers,
-        })
-    } catch (error) {
-        console.error("Failed to update active farm:", error)
-        throw data("Failed to update active farm", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
-
     // Get a list of possible farms of the user
-    let farms: Awaited<ReturnType<typeof getFarms>>
-    try {
-        farms = await getFarms(fdm)
-    } catch (error) {
-        console.error("Failed to fetch farms list:", error)
-        throw data("Failed to fetch farms list", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
+    const farms = await getFarms(fdm, session.principal_id)
 
     // Redirect to farms overview if user has no farm
     if (farms.length === 0) {

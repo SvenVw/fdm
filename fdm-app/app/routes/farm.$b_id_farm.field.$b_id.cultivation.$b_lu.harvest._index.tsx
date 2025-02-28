@@ -2,6 +2,7 @@ import { HarvestForm } from "@/components/custom/harvest/form"
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -48,8 +49,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,
@@ -70,7 +74,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     )
 
     // Get selected cultivation
-    const cultivation = await getCultivation(fdm, b_lu)
+    const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
 
     // Return user information from loader
     return {
@@ -82,7 +86,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
@@ -131,7 +134,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
     if (!b_lu) {
         return dataWithError(null, "Missing b_lu value.")
     }
-    console.log(b_lu)
+
+    // Get the session
+    const session = await getSession(request)
 
     if (request.method === "POST") {
         // Collect form entry
@@ -143,6 +148,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await addHarvest(
             fdm,
+            session.principal_id,
             b_lu,
             b_harvesting_date,
             b_lu_yield,

@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth.server"
+import { getSession } from "@/lib/auth.server"
 import { type LoaderFunctionArgs, data } from "react-router"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -11,18 +11,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    // Set the farm id to active
-    try {
-        await auth.api.updateUser({
-            body: {
-                farm_active: b_id_farm,
-            },
-            headers: request.headers,
-        })
-    } catch (error) {
-        throw data("Failed to update active farm", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
+    // Get the session
+    const session = await getSession(request)
 }

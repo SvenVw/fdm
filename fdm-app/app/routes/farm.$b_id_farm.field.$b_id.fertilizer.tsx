@@ -2,8 +2,8 @@ import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-appl
 import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
 import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import type { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { calculateDose } from "@svenvw/fdm-calculator"
@@ -43,8 +43,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,
@@ -63,7 +66,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     })
 
     // Get fertilizer applications for the field
-    const fertilizerApplications = await getFertilizerApplications(fdm, b_id)
+    const fertilizerApplications = await getFertilizerApplications(
+        fdm,
+        session.principal_id,
+        b_id,
+    )
 
     const dose = calculateDose({
         applications: fertilizerApplications,
@@ -123,6 +130,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing field ID.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     if (request.method === "POST") {
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
@@ -133,6 +143,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await addFertilizerApplication(
             fdm,
+            session.principal_id,
             b_id,
             p_id,
             p_app_amount,
@@ -158,7 +169,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         try {
-            await removeFertilizerApplication(fdm, p_app_id)
+            await removeFertilizerApplication(fdm, session.principal_id, p_app_id)
 
             return dataWithSuccess("Date deleted successfully", {
                 message: "Bemesting is verwijderd",

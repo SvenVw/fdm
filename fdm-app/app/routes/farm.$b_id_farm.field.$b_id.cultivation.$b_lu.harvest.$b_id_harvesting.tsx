@@ -1,18 +1,11 @@
 import { HarvestForm } from "@/components/custom/harvest/form"
-import { HarvestsList } from "@/components/custom/harvest/list"
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
-import {
-    addHarvest,
-    getCultivation,
-    getCultivationsFromCatalogue,
-    getField,
-    getHarvest,
-    removeHarvest,
-} from "@svenvw/fdm-core"
+import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -20,13 +13,8 @@ import {
     data,
     useFetcher,
     useLoaderData,
-    useLocation,
 } from "react-router"
-import {
-    dataWithError,
-    dataWithSuccess,
-    redirectWithSuccess,
-} from "remix-toast"
+import { dataWithError, redirectWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -65,8 +53,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of cultivation
-    const cultivation = await getCultivation(fdm, b_lu)
+    const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
     if (!cultivation) {
         throw data("Cultivation is not found", {
             status: 404,
@@ -75,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get selected harvest
-    const harvest = await getHarvest(fdm, b_id_harvesting)
+    const harvest = await getHarvest(fdm, session.principal_id, b_id_harvesting)
 
     // Return user information from loader
     return {
@@ -87,7 +78,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
@@ -146,12 +136,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Missing b_lu value.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Collect form entry
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
 
     await addHarvest(
         fdm,
+        session.principal_id,
         b_lu,
         b_harvesting_date,
         b_lu_yield,

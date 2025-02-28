@@ -1,6 +1,7 @@
 import { HarvestForm } from "@/components/custom/harvest/form"
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -14,7 +15,7 @@ import {
     NavLink,
     data,
 } from "react-router"
-import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const b_lu_catalogue = params.b_lu_catalogue
@@ -26,6 +27,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!b_id_farm) {
         throw new Error("b_id_farm is required")
     }
+
+    // Get the session
+    const session = await getSession(request)
 
     // Get the available cultivations
     let cultivationOptions = []
@@ -41,14 +45,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
     } catch (error) {
-        Sentry.captureException(error)
         throw data("Failed to load cultivation options", {
             status: 500,
             statusText: "Failed to load cultivation options",
         })
     }
 
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+    const cultivationPlan = await getCultivationPlan(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    )
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )
@@ -105,8 +112,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
         throw new Error("b_id_farm is required")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get cultivation id's for this cultivation code
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+    const cultivationPlan = await getCultivationPlan(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    )
     const cultivation = cultivationPlan.find(
         (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
     )
@@ -119,6 +133,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             try {
                 await addHarvest(
                     fdm,
+                    session.principal_id,
                     item,
                     formValues.b_harvesting_date,
                     formValues.b_lu_yield,

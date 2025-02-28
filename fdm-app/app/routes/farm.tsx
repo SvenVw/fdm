@@ -5,15 +5,9 @@ import type {
 } from "react-router"
 import { redirect } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
-
 import { SidebarApp } from "@/components/custom/sidebar-app"
-// Components
 import { SidebarProvider } from "@/components/ui/sidebar"
-
-// Blocks
-
-// Services
-import { auth } from "@/lib/auth.server"
+import { auth, getSession } from "@/lib/auth.server"
 
 export const meta: MetaFunction = () => {
     return [
@@ -24,9 +18,7 @@ export const meta: MetaFunction = () => {
 
 export async function loader({ request }: LoaderFunctionArgs) {
     // Get the session
-    const session = await auth.api.getSession({
-        headers: request.headers,
-    })
+    const session = await getSession(request)
 
     if (!session?.user) {
         return redirect("/signin")
@@ -50,10 +42,8 @@ export default function App() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-    // Get the session token
-    const session = await auth.api.getSession({
-        headers: request.headers,
-    })
+    // Get the session
+    const session = await getSession(request)
 
     // Revoke the session
     await auth.api.revokeSession({

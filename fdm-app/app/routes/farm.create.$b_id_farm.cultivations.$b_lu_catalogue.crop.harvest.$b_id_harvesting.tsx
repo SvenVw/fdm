@@ -1,5 +1,6 @@
 import { HarvestForm } from "@/components/custom/harvest/form"
 import { Button } from "@/components/ui/button"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import {
     getCultivationPlan,
@@ -28,6 +29,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         throw new Error("b_id_harvesting is required")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get the available cultivations
     let cultivationOptions = []
     try {
@@ -49,7 +53,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+    const cultivationPlan = await getCultivationPlan(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    )
     const cultivation = cultivationPlan.find(
         (x) => x.b_lu_catalogue === b_lu_catalogue,
     )

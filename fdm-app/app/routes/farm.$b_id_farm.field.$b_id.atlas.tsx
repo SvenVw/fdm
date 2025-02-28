@@ -20,6 +20,7 @@ import {
 } from "react-router"
 import { dataWithError } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
+import { getSession } from "@/lib/auth.server"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the field id
@@ -30,9 +31,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Field ID is required",
         })
     }
-
+    // Get the session
+    const session = await getSession(request)
+    
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,

@@ -5,7 +5,6 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { Button } from "@/components/ui/button"
@@ -16,35 +15,26 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card"
-// Components
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
-
-// Utils
-import { auth } from "@/lib/auth.server"
+import { auth, getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms, getFields } from "@svenvw/fdm-core"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
-        // Get the session
-        const session = await auth.api.getSession({
-            headers: request.headers,
-        })
-
-        if (!session?.user) {
-            throw new Response("Unauthorized", { status: 401 })
-        }
-
         // Get the active farm
         const b_id_farm = params.b_id_farm
         if (!b_id_farm) {
             throw new Response("Farm ID is required", { status: 400 })
         }
 
+        // Get the session
+        const session = await getSession(request)
+
         // Get a list of possible farms of the user
-        const farms = await getFarms(fdm)
+        const farms = await getFarms(fdm, session.principal_id)
 
         // Redirect to farms overview if user has no farm
         if (farms.length === 0) {
@@ -63,7 +53,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Get the fields to be selected
-        const fields = await getFields(fdm, b_id_farm)
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
         const fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
@@ -83,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
-            user: session.user,
+            userName: session.userName
         }
     } catch (error) {
         console.error(error)
@@ -117,7 +107,7 @@ export default function FarmFieldIndex() {
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Welkom, ${loaderData.user.firstname}! 👋`}
+                            title={`Welkom, ${loaderData.userName}! 👋`}
                             description={""}
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
@@ -145,7 +135,7 @@ export default function FarmFieldIndex() {
                 ) : (
                     <>
                         <FarmTitle
-                            title={`${greeting}, ${loaderData.user.firstname}! 👋`}
+                            title={`${greeting}, ${loaderData.userName}! 👋`}
                             description={
                                 "Kies een perceel uit de lijst om verder te gaan of maak een nieuw perceel aan"
                             }

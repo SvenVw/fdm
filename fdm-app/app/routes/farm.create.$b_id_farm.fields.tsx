@@ -1,4 +1,3 @@
-import { Fields } from "@/components/blocks/fields"
 import { SidebarPage } from "@/components/custom/sidebar-page"
 import {
     Breadcrumb,
@@ -10,10 +9,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/toaster"
 import { cn } from "@/lib/utils"
 import {
-    getCultivations,
     getCultivationsFromCatalogue,
     getFarm,
     getFields,
@@ -28,6 +25,7 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
+import { getSession } from "@/lib/auth.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -47,10 +45,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             statusText: "Farm ID is required",
         })
     }
-    const farm = await getFarm(fdm, b_id_farm)
+
+    // Get the session
+    const session = await getSession(request)
+
+    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
     // Get the fields
-    const fields = await getFields(fdm, b_id_farm)
+    const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
     // Sort by name
     fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
@@ -196,9 +198,13 @@ export async function action({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     try {
         const updatedField = await updateField(
             fdm,
+            session.principal_id,
             b_id,
             b_name,
             undefined, // b_id_source

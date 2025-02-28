@@ -24,6 +24,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { cn } from "@/lib/utils"
@@ -53,8 +54,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get details of field
-    const field = await getField(fdm, b_id)
+    const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
         throw data("Field is not found", {
             status: 404,
@@ -327,6 +331,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Perceel ID ontbreekt.")
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     try {
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -335,6 +342,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateField(
             fdm,
+            session.principal_id,
             b_id,
             formValues.b_name,
             undefined,

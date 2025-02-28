@@ -29,6 +29,7 @@ import { extractFormValuesFromRequest } from "@/lib/form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 // Services
 import { fdm } from "../lib/fdm.server"
+import { getSession } from "@/lib/auth.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -97,16 +98,31 @@ export default function AddFarmPage() {
  * @returns A redirect response to the newly created farm's page.
  */
 export async function action({ request }: ActionFunctionArgs) {
+    // Get the session
+    const session = await getSession(request)
+
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     const { b_name_farm } = formValues
 
     // Create a farm
     try {
-        const b_id_farm = await addFarm(fdm, b_name_farm, null, null, null)
+        const b_id_farm = await addFarm(
+            fdm,
+            session.principal_id,
+            b_name_farm,
+            null,
+            null,
+            null,
+        )
         const fertilizers = await getFertilizersFromCatalogue(fdm)
         await Promise.all(
             fertilizers.map((fertilizer) =>
-                addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm),
+                addFertilizer(
+                    fdm,
+                    session.principal_id,
+                    fertilizer.p_id_catalogue,
+                    b_id_farm,
+                ),
             ),
         )
         return redirectWithSuccess(`./${b_id_farm}/atlas`, {

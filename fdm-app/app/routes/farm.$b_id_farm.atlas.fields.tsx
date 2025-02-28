@@ -18,6 +18,7 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
+import { getSession } from "@/lib/auth.server"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -29,8 +30,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get the session
+    const session = await getSession(request)
+
     // Get the fields of the farm
-    const fields = await getFields(fdm, b_id_farm)
+    const fields = await getFields(fdm, session.user.id, b_id_farm)
     const features = fields.map((field) => {
         const feature = {
             type: "Feature",
