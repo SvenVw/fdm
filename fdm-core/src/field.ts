@@ -35,7 +35,7 @@ export async function addField(
     b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
     try {
-        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id)
+        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id, 'addField')
 
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the field
@@ -103,7 +103,7 @@ export async function getField(
     b_id: schema.fieldsTypeSelect["b_id"],
 ): Promise<getFieldType> {
     try {
-        await checkPermission(fdm, "field", "read", b_id, principal_id)
+        await checkPermission(fdm, "field", "read", b_id, principal_id, 'getField')
 
         // Get properties of the requested field
         const field = await fdm
@@ -153,7 +153,7 @@ export async function getFields(
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<getFieldType[]> {
     try {
-        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id)
+        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id, 'getFields')
 
         // Get properties of the requested field
         const fields = await fdm
@@ -216,7 +216,7 @@ export async function updateField(
 ): Promise<getFieldType> {
     return await fdm.transaction(async (tx: FdmType) => {
         try {
-            await checkPermission(fdm, "field", "write", b_id, principal_id)
+            await checkPermission(fdm, "field", "write", b_id, principal_id, 'updateField')
 
             const updated = new Date()
 

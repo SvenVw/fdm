@@ -289,6 +289,7 @@ CREATE TABLE "fdm-authn"."verification" (
 CREATE TABLE "fdm-authz"."audit" (
 	"audit_id" text PRIMARY KEY NOT NULL,
 	"audit_timestamp" timestamp with time zone DEFAULT now() NOT NULL,
+	"audit_origin" text NOT NULL,
 	"principal_id" text NOT NULL,
 	"target_resource" text NOT NULL,
 	"target_resource_id" text NOT NULL,

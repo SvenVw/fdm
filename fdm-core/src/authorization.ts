@@ -96,6 +96,7 @@ export async function checkPermission(
     action: Action,
     resource_id: string,
     principal_id: PrincipalId,
+    origin: string,
 ): Promise<boolean> {
     const start = performance.now()
 
@@ -145,6 +146,7 @@ export async function checkPermission(
         // Store check in audit
         await fdm.insert(authZSchema.audit).values({
             audit_id: createId(),
+            audit_origin: origin,
             principal_id: principal_id,
             target_resource: resource,
             target_resource_id: resource_id,
@@ -326,7 +328,7 @@ async function getResourceChain(
     resource_id: ResourceId,
 ): Promise<ResourceChain> {
     try {
-        const chainOrder = ["farm", "field"]
+        const chainOrder = ["farm", "field", "cultivation"]
         const chain = []
         if (resource === "farm") {
             const bead = {

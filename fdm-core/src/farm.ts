@@ -71,7 +71,7 @@ export async function getFarm(
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
-        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id)
+        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id, 'getFarm')
 
         const farm = await fdm
             .select()
@@ -135,7 +135,7 @@ export async function updateFarm(
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
-        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id)
+        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id, 'updateFarm')
         const updatedFarm = await fdm
             .update(schema.farms)
             .set({

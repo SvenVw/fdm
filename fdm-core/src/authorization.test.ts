@@ -48,13 +48,13 @@ describe("Authorization Functions", () => {
     describe("checkPermission", () => {
         it("should allow access if principal has the required role", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await checkPermission(fdm, "farm", "read", farm_id, principal_id)
+            await checkPermission(fdm, "farm", "read", farm_id, principal_id, 'test')
         })
 
         it("should throw an error if principal does not have the required role", async () => {
             console.log(farm_id)
             await expect(
-                checkPermission(fdm, "farm", "read", farm_id, createId()),
+                checkPermission(fdm, "farm", "read", farm_id, createId(), 'test'),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
             )
@@ -69,13 +69,14 @@ describe("Authorization Functions", () => {
                     "read",
                     farm_id,
                     principal_id,
+                    'test'
                 ),
             ).rejects.toThrowError("Exception for checkPermission")
         })
 
         it("should store the audit log when a permission check is performed and allowed", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await checkPermission(fdm, "farm", "read", farm_id, principal_id)
+            await checkPermission(fdm, "farm", "read", farm_id, principal_id, 'test')
 
             const auditLogs = await fdm
                 .select()
@@ -95,7 +96,7 @@ describe("Authorization Functions", () => {
             console.log("principal_id: ", principal_id_new)
 
             await expect(
-                checkPermission(fdm, "farm", "read", farm_id, principal_id_new),
+                checkPermission(fdm, "farm", "read", farm_id, principal_id_new, 'test'),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
             )
