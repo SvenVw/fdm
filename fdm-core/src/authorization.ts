@@ -74,6 +74,21 @@ export const permissions: Permission[] = [
         action: ["read"],
     },
     {
+        resource: "soil_analysis",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "soil_analysis",
+        role: "advisor",
+        action: ["read", "write", "list"],
+    },
+    {
+        resource: "soil_analysis",
+        role: "researcher",
+        action: ["read"],
+    },
+    {
         resource: "user",
         role: "owner",
         action: ["read", "write", "list", "share"],
@@ -328,7 +343,7 @@ async function getResourceChain(
     resource_id: ResourceId,
 ): Promise<ResourceChain> {
     try {
-        const chainOrder = ["farm", "field", "cultivation"]
+        const chainOrder = ["farm", "field", "cultivation", "soil_analysis"]
         const chain = []
         if (resource === "farm") {
             const bead = {
@@ -381,6 +396,35 @@ async function getResourceChain(
                 }
             })
             chain.push(...beads)
+        } else if (resource === "soil_analysis") {
+            const result = await fdm
+            .select({
+                farm: schema.fieldAcquiring.b_id_farm,
+                field: schema.soilSampling.b_id,
+                soil_analysis: schema.soilAnalysis.a_id,
+            })
+            .from(schema.soilAnalysis)
+            .leftJoin(
+                schema.soilSampling,
+                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+            )
+            .leftJoin(
+                schema.fields,
+                eq(schema.soilSampling.b_id, schema.fields.b_id),
+            )
+            .leftJoin(
+                schema.fieldAcquiring,
+                eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+            )
+            .where(eq(schema.soilAnalysis.a_id, resource_id))
+            .limit(1)
+        const beads = Object.keys(result[0]).map((x) => {
+            return {
+                resource: x,
+                resource_id: result[0][x],
+            }
+        })
+        chain.push(...beads)
         } else {
             throw new Error("Resource is not known")
         }

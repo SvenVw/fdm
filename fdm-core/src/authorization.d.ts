@@ -6,6 +6,7 @@ export type Resource =
     | "farm"
     | "field"
     | "cultivation"
+    | "soil_analysis"
     | "fertilizer"
     | "soil"
     | "harvest"

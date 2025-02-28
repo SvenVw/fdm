@@ -5,11 +5,15 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { getSoilAnalysisType } from "./soil.d"
+import { checkPermission } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
+import { check } from "drizzle-orm/mysql-core"
 
 /**
  * Adds a new soil analysis record, including soil sampling details.
  *
  * @param fdm The FDM database instance.
+ * @param principal_id - The id of the principal that is adding the soil analysis
  * @param a_date The date of the soil analysis.
  * @param a_source The source of the soil analysis data.
  * @param b_id The ID of the field where the soil sample was taken.
@@ -22,6 +26,7 @@ import type { getSoilAnalysisType } from "./soil.d"
  */
 export async function addSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     a_date: schema.soilAnalysisTypeInsert["a_date"],
     a_source: schema.soilAnalysisTypeInsert["a_source"],
     b_id: schema.soilSamplingTypeInsert["b_id"],
@@ -31,6 +36,15 @@ export async function addSoilAnalysis(
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<schema.soilAnalysisTypeSelect["a_id"]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            principal_id,
+            "addSoilAnalysis",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             const a_id = createId()
             const b_id_sampling = createId()
@@ -71,16 +85,27 @@ export async function addSoilAnalysis(
  * Updates an existing soil analysis record.
  *
  * @param fdm The FDM database instance.
+ * @param principal_id - The id of the principal that is updating the soil analysis
  * @param a_id The ID of the soil analysis record to update.
  * @param soilAnalysisData The data to update.  Partial updates are supported.
  * @throws If there's an error during the database transaction.
  */
 export async function updateSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
     soilAnalysisData: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<void> {
     try {
+        await checkPermission(
+            fdm,
+            "soil_analysis",
+            "write",
+            a_id,
+            principal_id,
+            "updateSoilAnalysis",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             const updated = new Date()
 
@@ -106,14 +131,24 @@ export async function updateSoilAnalysis(
  * Removes a soil analysis record and associated sampling data.
  *
  * @param fdm The FDM database instance.
+ * @param principal_id - The id of the principal that is removing the soil analysis
  * @param a_id The ID of the soil analysis record to remove.
  * @throws If there's an error during the database transaction.
  */
 export async function removeSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
 ): Promise<void> {
     try {
+        await checkPermission(
+            fdm,
+            "soil_analysis",
+            "write",
+            a_id,
+            principal_id,
+            "removeSoilAnalysis",
+        )
         return await fdm.transaction(async (tx: FdmType) => {
             await tx
                 .delete(schema.soilSampling)
@@ -132,14 +167,24 @@ export async function removeSoilAnalysis(
  * Retrieves the latest soil analysis for a given field.
  *
  * @param fdm The FDM database instance.
+ * @param principal_id - The id of the principal that is requesting the soil analysis
  * @param b_id The ID of the field.
  * @returns The latest soil analysis data for the field, or null if no analysis is found.
  */
 export async function getSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getSoilAnalysis",
+        )
         const soilAnalysis = await fdm
             .select({
                 a_id: schema.soilAnalysis.a_id,
@@ -174,14 +219,25 @@ export async function getSoilAnalysis(
  * Retrieves all soil analyses for a given field, ordered by date (latest first).
  *
  * @param fdm The FDM database instance.
+ * @param principal_id - The id of the principal that is requesting the soil analyses
  * @param b_id The ID of the field.
  * @returns An array of soil analysis data for the field. The array will be empty if no analyses are found.
  */
 export async function getSoilAnalyses(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType[]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getSoilAnalyses",
+        )
+
         const soilAnalyses = await fdm
             .select({
                 a_id: schema.soilAnalysis.a_id,
