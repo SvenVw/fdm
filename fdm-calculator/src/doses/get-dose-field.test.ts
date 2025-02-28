@@ -32,14 +32,15 @@ describe("getDoseForField", () => {
     it("should calculate the correct dose for a field with a single application", async () => {
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             "test farm",
             "1234567890",
             "test address",
             "1234AB",
-            principal_id,
         )
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "1",
@@ -111,6 +112,7 @@ describe("getDoseForField", () => {
         })
         p_id = await addFertilizer(
             fdm,
+            principal_id,
             p_id_catalogue,
             b_id_farm,
             1000,
@@ -118,6 +120,7 @@ describe("getDoseForField", () => {
         )
         await addFertilizerApplication(
             fdm,
+            principal_id,
             b_id,
             p_id,
             100,
@@ -136,14 +139,15 @@ describe("getDoseForField", () => {
     it("should return 0 dose when no applications are found", async () => {
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             "test farm",
             "1234567890",
             "test address",
             "1234AB",
-            principal_id,
         )
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "1",

@@ -561,6 +561,7 @@ describe("Cultivation Data Model", () => {
 
             p_id = await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 p_acquiring_amount,
@@ -571,6 +572,7 @@ describe("Cultivation Data Model", () => {
         it("should get cultivation plan for a farm", async () => {
             const p_app_id1 = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -579,6 +581,7 @@ describe("Cultivation Data Model", () => {
             )
             const p_app_id2 = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 200,

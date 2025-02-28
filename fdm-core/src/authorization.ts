@@ -20,7 +20,7 @@ export const resources: Resource[] = [
     "farm",
     "field",
     "cultivation",
-    "fertilizer",
+    "fertilizer_application",
     "soil",
     "harvesting",
 ] as const
@@ -100,6 +100,21 @@ export const permissions: Permission[] = [
     },
     {
         resource: "soil_analysis",
+        role: "researcher",
+        action: ["read"],
+    },
+    {
+        resource: "fertilizer_application",
+        role: "owner",
+        action: ["read", "write", "list", "share"],
+    },
+    {
+        resource: "fertilizer_application",
+        role: "advisor",
+        action: ["read", "write", "list"],
+    },
+    {
+        resource: "fertilizer_application",
         role: "researcher",
         action: ["read"],
     },
@@ -363,6 +378,7 @@ async function getResourceChain(
             "field",
             "cultivation",
             "harvesting",
+            "fertilizer_application",
             "soil_analysis",
         ]
         const chain = []
@@ -381,6 +397,10 @@ async function getResourceChain(
                 .from(schema.fieldAcquiring)
                 .where(eq(schema.fieldAcquiring.b_id, resource_id))
                 .limit(1)
+            if (result.length === 0) {
+                // Resource not found, return empty chain
+                return []
+            }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
                     resource: x,
@@ -410,6 +430,10 @@ async function getResourceChain(
                 )
                 .where(eq(schema.cultivations.b_lu, resource_id))
                 .limit(1)
+            if (result.length === 0) {
+                // Resource not found, return empty chain
+                return []
+            }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
                     resource: x,
@@ -439,6 +463,10 @@ async function getResourceChain(
                 )
                 .where(eq(schema.soilAnalysis.a_id, resource_id))
                 .limit(1)
+            if (result.length === 0) {
+                // Resource not found, return empty chain
+                return []
+            }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
                     resource: x,
@@ -481,6 +509,40 @@ async function getResourceChain(
                     ),
                 )
                 .limit(1)
+            if (result.length === 0) {
+                // Resource not found, return empty chain
+                return []
+            }
+            const beads = Object.keys(result[0]).map((x) => {
+                return {
+                    resource: x,
+                    resource_id: result[0][x],
+                }
+            })
+            chain.push(...beads)
+        } else if (resource === "fertilizer_application") {
+            const result = await fdm
+                .select({
+                    farm: schema.fieldAcquiring.b_id_farm,
+                    field: schema.fertilizerApplication.b_id,
+                    fertilizer_application:
+                        schema.fertilizerApplication.p_app_id,
+                })
+                .from(schema.fertilizerApplication)
+                .leftJoin(
+                    schema.fields,
+                    eq(schema.fertilizerApplication.b_id, schema.fields.b_id),
+                )
+                .leftJoin(
+                    schema.fieldAcquiring,
+                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+                )
+                .where(eq(schema.fertilizerApplication.p_app_id, resource_id))
+                .limit(1)
+            if (result.length === 0) {
+                // Resource not found, return empty chain
+                return []
+            }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
                     resource: x,

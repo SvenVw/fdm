@@ -131,7 +131,7 @@ describe("Fertilizer Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,              
+                farmPostalCode,
             )
 
             // Add fertilizer to catalogue
@@ -194,6 +194,7 @@ describe("Fertilizer Data Model", () => {
             const p_acquiring_date = new Date()
             const p_id = await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 p_acquiring_amount,
@@ -281,6 +282,7 @@ describe("Fertilizer Data Model", () => {
             // Add two fertilizers to the farm
             await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 p_acquiring_amount,
@@ -288,13 +290,18 @@ describe("Fertilizer Data Model", () => {
             )
             await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 1500,
                 p_acquiring_date,
             )
 
-            const fertilizers = await getFertilizers(fdm, b_id_farm)
+            const fertilizers = await getFertilizers(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
             expect(fertilizers.length).toBe(2)
         })
 
@@ -309,7 +316,7 @@ describe("Fertilizer Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,              
+                farmPostalCode,
             )
 
             // Add fertilizer to catalogue
@@ -372,6 +379,7 @@ describe("Fertilizer Data Model", () => {
             const p_acquiring_date = new Date()
             const p_id = await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 p_acquiring_amount,
@@ -402,7 +410,7 @@ describe("Fertilizer Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,            
+                farmPostalCode,
             )
 
             b_id = await addField(
@@ -489,6 +497,7 @@ describe("Fertilizer Data Model", () => {
             const p_acquiring_date = new Date()
             p_id = await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 p_acquiring_amount,
@@ -505,6 +514,7 @@ describe("Fertilizer Data Model", () => {
 
             const new_p_app_id = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -515,6 +525,7 @@ describe("Fertilizer Data Model", () => {
 
             const fertilizerApplication = await getFertilizerApplication(
                 fdm,
+                principal_id,
                 new_p_app_id,
             )
             expect(fertilizerApplication).toBeDefined()
@@ -530,6 +541,7 @@ describe("Fertilizer Data Model", () => {
 
             const p_app_id = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -539,8 +551,8 @@ describe("Fertilizer Data Model", () => {
 
             await updateFertilizerApplication(
                 fdm,
+                principal_id,
                 p_app_id,
-                b_id,
                 p_id,
                 200,
                 "injection",
@@ -549,6 +561,7 @@ describe("Fertilizer Data Model", () => {
 
             const updatedApplication = await getFertilizerApplication(
                 fdm,
+                principal_id,
                 p_app_id,
             )
             expect(updatedApplication?.p_app_amount).toBe(200)
@@ -559,6 +572,7 @@ describe("Fertilizer Data Model", () => {
         it("should remove a fertilizer application", async () => {
             const new_p_app_id = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -566,18 +580,19 @@ describe("Fertilizer Data Model", () => {
                 new Date("2024-03-15"),
             )
 
-            await removeFertilizerApplication(fdm, new_p_app_id)
+            await removeFertilizerApplication(fdm, principal_id, new_p_app_id)
 
-            const deletedApplication = await getFertilizerApplication(
-                fdm,
-                new_p_app_id,
+            await expect(
+                getFertilizerApplication(fdm, principal_id, new_p_app_id),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
             )
-            expect(deletedApplication).toBeNull()
         })
 
         it("should get a fertilizer application", async () => {
             const p_app_id = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -586,6 +601,7 @@ describe("Fertilizer Data Model", () => {
             )
             const fertilizerApplication = await getFertilizerApplication(
                 fdm,
+                principal_id,
                 p_app_id,
             )
             expect(fertilizerApplication).toBeDefined()
@@ -595,6 +611,7 @@ describe("Fertilizer Data Model", () => {
         it("should get fertilizer applications for a field", async () => {
             await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -603,6 +620,7 @@ describe("Fertilizer Data Model", () => {
             )
             await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 150,
@@ -612,6 +630,7 @@ describe("Fertilizer Data Model", () => {
 
             const fertilizerApplications = await getFertilizerApplications(
                 fdm,
+                principal_id,
                 b_id,
             )
             expect(fertilizerApplications.length).toBeGreaterThanOrEqual(2)
