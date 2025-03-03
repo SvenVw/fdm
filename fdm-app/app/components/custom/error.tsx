@@ -98,7 +98,7 @@ export function ErrorBlock({
                         {errorDetails}
                     </pre>
                 </div>
-            ) : (
+            ) : status === 404 ? null : (
                 <p className="mt-8 text-gray-600 dark:text-gray-400">
                     Er zijn helaas geen details over de fout beschikbaar.
                 </p>
