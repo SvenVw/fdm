@@ -700,7 +700,7 @@ export async function removeCultivation(
                 .where(eq(schema.cultivations.b_lu, b_lu))
         })
     } catch (err) {
-        handleError(err, "Exception for removeCultivation", { b_lu })
+        throw handleError(err, "Exception for removeCultivation", { b_lu })
     }
 }
 
