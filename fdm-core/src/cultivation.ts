@@ -10,7 +10,7 @@ import {
 } from "./harvest"
 import { createId } from "./id"
 import { checkPermission } from "./authorization"
-import type {PrincipalId} from "./authorization.d"
+import type { PrincipalId } from "./authorization.d"
 
 /**
  * Retrieves cultivations available in the catalogue.
@@ -100,7 +100,14 @@ export async function addCultivation(
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
-        await checkPermission(fdm, "field", "", b_id, principal_id, 'addCultivation')
+        await checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            principal_id,
+            "addCultivation",
+        )
 
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the cultivation
@@ -247,7 +254,14 @@ export async function getCultivation(
     b_lu: schema.cultivationsTypeSelect["b_lu"],
 ): Promise<getCultivationType> {
     try {
-        await checkPermission(fdm, "cultivation", "read", b_lu, principal_id, 'getCultivation')
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "read",
+            b_lu,
+            principal_id,
+            "getCultivation",
+        )
 
         // Get properties of the requested cultivation
         const cultivation = await fdm
@@ -312,7 +326,14 @@ export async function getCultivations(
     b_id: schema.fieldSowingTypeSelect["b_id"],
 ): Promise<getCultivationType[]> {
     try {
-        await checkPermission(fdm, "field", "read", b_id, principal_id, 'getCultivations')
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getCultivations",
+        )
         const cultivations = await fdm
             .select({
                 b_lu: schema.cultivations.b_lu,
@@ -426,7 +447,14 @@ export async function getCultivationPlan(
         if (!b_id_farm) {
             throw new Error("Farm ID is required")
         }
-        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id, 'getCultivationPlan')
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getCultivationPlan",
+        )
 
         const cultivations = await fdm
             .select({
@@ -640,7 +668,14 @@ export async function removeCultivation(
     b_lu: schema.cultivationsTypeInsert["b_lu"],
 ): Promise<void> {
     try {
-        await checkPermission(fdm, "cultivation", "write", b_lu, principal_id, 'removeCultivation')
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            principal_id,
+            "removeCultivation",
+        )
         return await fdm.transaction(async (tx: FdmType) => {
             const existing = await tx
                 .select()
@@ -693,7 +728,14 @@ export async function updateCultivation(
     try {
         const updated = new Date()
 
-        await checkPermission(fdm, "cultivation", "write", b_lu, principal_id, 'updateCultivation')
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            principal_id,
+            "updateCultivation",
+        )
 
         if (
             b_sowing_date &&
