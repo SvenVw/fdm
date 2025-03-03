@@ -5,6 +5,7 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
+import { createId } from "./id"
 import {
     addSoilAnalysis,
     getSoilAnalyses,
@@ -12,7 +13,6 @@ import {
     removeSoilAnalysis,
     updateSoilAnalysis,
 } from "./soil"
-import { createId } from "./id"
 
 describe("Soil Analysis Functions", () => {
     let fdm: FdmServerType
@@ -146,7 +146,9 @@ describe("Soil Analysis Functions", () => {
 
         // Test updating existing soil data
         const updated_a_source = "updated test source"
-        await updateSoilAnalysis(fdm, principal_id, test_a_id, { a_source: updated_a_source })
+        await updateSoilAnalysis(fdm, principal_id, test_a_id, {
+            a_source: updated_a_source,
+        })
 
         const updatedAnalysis = await fdm
             .select()

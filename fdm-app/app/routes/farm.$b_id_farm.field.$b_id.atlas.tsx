@@ -9,6 +9,8 @@ import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
@@ -19,8 +21,6 @@ import {
     useLoaderData,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

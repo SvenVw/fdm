@@ -114,7 +114,9 @@ export function SidebarApp(props: SideBarAppType) {
             form.open()
         } catch (error) {
             Sentry.captureException(error)
-            toast.error("Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.")
+            toast.error(
+                "Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.",
+            )
         }
     }
 

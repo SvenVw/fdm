@@ -1,10 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router"
-import { redirect } from "react-router"
 import { Button } from "@/components/ui/button"
-import { Check, MoveDown } from "lucide-react"
-import { signIn } from "@/lib/auth-client"
-import { auth } from "@/lib/auth.server"
-import { cn } from "@/lib/utils"
 import {
     Card,
     CardContent,
@@ -13,8 +7,14 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { toast } from "sonner"
+import { signIn } from "@/lib/auth-client"
+import { auth } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
+import { cn } from "@/lib/utils"
+import { Check, MoveDown } from "lucide-react"
+import type { LoaderFunctionArgs } from "react-router"
+import { redirect } from "react-router"
+import { toast } from "sonner"
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {

@@ -1,9 +1,9 @@
-import type { FdmType } from "./fdm"
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { grantRole } from "./authorization"
 import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
-import { grantRole } from "./authorization"
+import type { FdmType } from "./fdm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 

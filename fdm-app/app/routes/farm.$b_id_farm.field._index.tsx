@@ -1,10 +1,3 @@
-import {
-    type LoaderFunctionArgs,
-    NavLink,
-    data,
-    redirect,
-    useLoaderData,
-} from "react-router"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { Button } from "@/components/ui/button"
@@ -18,10 +11,17 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms, getFields } from "@svenvw/fdm-core"
-import { handleLoaderError } from "@/lib/error"
+import {
+    type LoaderFunctionArgs,
+    NavLink,
+    data,
+    redirect,
+    useLoaderData,
+} from "react-router"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -74,7 +74,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
-            userName: session.userName
+            userName: session.userName,
         }
     } catch (error) {
         throw handleLoaderError(error)

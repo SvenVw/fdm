@@ -1,3 +1,11 @@
+import { FarmContent } from "@/components/custom/farm/farm-content"
+import { FarmHeader } from "@/components/custom/farm/farm-header"
+import { FarmTitle } from "@/components/custom/farm/farm-title"
+import { SidebarInset } from "@/components/ui/sidebar"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
+import { fdm } from "@/lib/fdm.server"
+import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     Outlet,
@@ -5,14 +13,6 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import { FarmContent } from "@/components/custom/farm/farm-content"
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { fdm } from "@/lib/fdm.server"
-import { getFarms, getField, getFields } from "@svenvw/fdm-core"
-import { handleLoaderError } from "@/lib/error"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

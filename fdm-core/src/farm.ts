@@ -1,11 +1,11 @@
 import { asc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
+import { checkPermission, grantRole, listResources } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { checkPermission, grantRole, listResources } from "./authorization"
-import type { PrincipalId } from "./authorization.d"
 
 /**
  * Add a new farm.
@@ -71,7 +71,14 @@ export async function getFarm(
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
-        await checkPermission(fdm, "farm", "read", b_id_farm, principal_id, 'getFarm')
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getFarm",
+        )
 
         const farm = await fdm
             .select()
@@ -135,7 +142,14 @@ export async function updateFarm(
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
-        await checkPermission(fdm, "farm", "write", b_id_farm, principal_id, 'updateFarm')
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "updateFarm",
+        )
         const updatedFarm = await fdm
             .update(schema.farms)
             .set({

@@ -8,9 +8,9 @@ import {
     getCultivationsFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
-    data,
     type LoaderFunctionArgs,
     NavLink,
+    data,
     useLoaderData,
 } from "react-router"
 

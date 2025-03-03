@@ -457,7 +457,7 @@ export const soilTypes = [
     "maasklei",
 ]
 export const gwlClasses: [string, ...string[]] = [
-    "II", 
+    "II",
     "IV",
     "IIIb",
     "V",
@@ -479,8 +479,14 @@ export const gwlClasses: [string, ...string[]] = [
     "bVI",
     "IIIa",
 ]
-export const soiltypeEnum = fdmSchema.enum("b_soiltype_agr", soilTypes as [string, ...string[]])
-export const gwlClassEnum = fdmSchema.enum("b_gwl_class", gwlClasses as [string, ...string[]])
+export const soiltypeEnum = fdmSchema.enum(
+    "b_soiltype_agr",
+    soilTypes as [string, ...string[]],
+)
+export const gwlClassEnum = fdmSchema.enum(
+    "b_gwl_class",
+    gwlClasses as [string, ...string[]],
+)
 
 export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_id: text().primaryKey(),

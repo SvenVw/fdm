@@ -1,11 +1,11 @@
 // Authentication
 import {
+    bigint,
+    boolean,
+    integer,
     pgSchema,
     text,
-    integer,
-    bigint,
     timestamp,
-    boolean,
 } from "drizzle-orm/pg-core"
 
 export const fdmAuthSchema = pgSchema("fdm-authn")

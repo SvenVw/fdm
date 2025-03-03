@@ -1,3 +1,7 @@
+import { SidebarApp } from "@/components/custom/sidebar-app"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { auth, getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -5,10 +9,6 @@ import type {
 } from "react-router"
 import { redirect } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
-import { SidebarApp } from "@/components/custom/sidebar-app"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
 
 export const meta: MetaFunction = () => {
     return [

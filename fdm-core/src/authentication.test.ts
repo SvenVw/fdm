@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
 import { type BetterAuth, createFdmAuth } from "./authentication"
-import { createFdmServer } from "./fdm-server"
 import type { FdmType } from "./fdm"
+import { createFdmServer } from "./fdm-server"
 
 describe("createFdmAuth", () => {
     let fdm: FdmType

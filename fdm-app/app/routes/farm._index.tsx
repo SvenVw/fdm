@@ -1,4 +1,3 @@
-import { type LoaderFunctionArgs, NavLink, useLoaderData } from "react-router"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { Button } from "@/components/ui/button"
@@ -12,10 +11,11 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms } from "@svenvw/fdm-core"
-import { handleLoaderError } from "@/lib/error"
+import { type LoaderFunctionArgs, NavLink, useLoaderData } from "react-router"
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
@@ -35,7 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             farmOptions: farmOptions,
-            username: session.userName
+            username: session.userName,
         }
     } catch (error) {
         throw handleLoaderError(error)

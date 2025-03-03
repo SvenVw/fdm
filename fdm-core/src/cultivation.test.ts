@@ -631,7 +631,9 @@ describe("Cultivation Data Model", () => {
         it("should return an empty array if no cultivations are found for the farm", async () => {
             await expect(
                 getCultivationPlan(fdm, principal_id, createId()), // Use a non-existent farm ID
-            ).rejects.toThrowError("Principal does not have permission to perform this action")
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
         })
     })
 })

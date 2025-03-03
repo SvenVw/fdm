@@ -34,7 +34,7 @@ describe("Farm Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,   
+                farmPostalCode,
             )
 
             const fieldName = "Test Field"
@@ -89,7 +89,7 @@ describe("Farm Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,         
+                farmPostalCode,
             )
 
             const fieldName = "Test Field"
@@ -240,7 +240,7 @@ describe("Farm Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,             
+                farmPostalCode,
             )
 
             const fieldName = "Test Field"
@@ -321,7 +321,7 @@ describe("Farm Data Model", () => {
                 farmName,
                 farmBusinessId,
                 farmAddress,
-                farmPostalCode,       
+                farmPostalCode,
             )
 
             const fieldName = "Test Field"

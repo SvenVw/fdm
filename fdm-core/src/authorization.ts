@@ -1,17 +1,17 @@
+import { and, eq, inArray, isNull } from "drizzle-orm"
 import type {
-    Permission,
-    Resource,
-    Role,
     Action,
+    Permission,
     PrincipalId,
+    Resource,
     ResourceChain,
     ResourceId,
+    Role,
 } from "./authorization.d"
-import { handleError } from "./error"
-import type { FdmType } from "./fdm"
 import * as schema from "./db/schema"
 import * as authZSchema from "./db/schema-authz"
-import { and, eq, inArray, isNull } from "drizzle-orm"
+import { handleError } from "./error"
+import type { FdmType } from "./fdm"
 import { createId } from "./id"
 
 export const resources: Resource[] = [

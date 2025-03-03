@@ -56,7 +56,7 @@ describe("Farm Data Model", () => {
         })
 
         it("should get a farm by ID", async () => {
-            const farm = await getFarm(fdm,  principal_id, b_id_farm)
+            const farm = await getFarm(fdm, principal_id, b_id_farm)
             expect(farm).toBeDefined()
             expect(farm.b_id_farm).toBe(b_id_farm)
         })

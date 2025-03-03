@@ -1,6 +1,8 @@
 import { asc, desc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
+import { check } from "drizzle-orm/pg-core"
+import { type PrincipalId, checkPermission } from "./authorization"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
@@ -8,8 +10,6 @@ import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "./fertilizer.d"
-import { checkPermission, PrincipalId } from "./authorization"
-import { check } from "drizzle-orm/pg-core"
 
 /**
  * Retrieves all fertilizers from the catalogue.

@@ -1,3 +1,18 @@
+import { FormSchema } from "@/components/custom/fertilizer-applications"
+import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
+import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
+import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
+import { extractFormValuesFromRequest } from "@/lib/form"
+import { calculateDose } from "@svenvw/fdm-calculator"
+import {
+    addFertilizerApplication,
+    getCultivationPlan,
+    getFertilizers,
+    removeFertilizerApplication,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -7,22 +22,7 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { FormSchema } from "@/components/custom/fertilizer-applications"
-import { extractFormValuesFromRequest } from "@/lib/form"
-import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
-import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import { Separator } from "@/components/ui/separator"
-import { calculateDose } from "@svenvw/fdm-calculator"
-import {
-    addFertilizerApplication,
-    getCultivationPlan,
-    getFertilizers,
-    removeFertilizerApplication,
-} from "@svenvw/fdm-core"
 import { fdm } from "../lib/fdm.server"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
 
 // Loader
 export async function loader({ request, params }: LoaderFunctionArgs) {
