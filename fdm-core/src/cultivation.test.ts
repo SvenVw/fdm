@@ -216,7 +216,9 @@ describe("Cultivation Data Model", () => {
                     invalid_b_id,
                     b_sowing_date,
                 ),
-            ).rejects.toThrow("Exception for addCultivation")
+            ).rejects.toThrow(
+                "Principal does not have permission to perform this action",
+            )
         })
 
         it("should get cultivations by field ID", async () => {
@@ -237,7 +239,12 @@ describe("Cultivation Data Model", () => {
 
             await expect(
                 getCultivation(fdm, principal_id, b_lu),
-            ).rejects.toThrowError("Exception for getCultivation")
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+
+            const cultivations = await getCultivations(fdm, principal_id, b_id)
+            expect(cultivations.length).toEqual(0)
         })
 
         it("should update an existing cultivation", async () => {
@@ -282,7 +289,9 @@ describe("Cultivation Data Model", () => {
                     b_lu_catalogue,
                     new Date(),
                 ),
-            ).rejects.toThrowError("Exception for updateCultivation")
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
         })
 
         it("should throw an error when updating with invalid catalogue id", async () => {

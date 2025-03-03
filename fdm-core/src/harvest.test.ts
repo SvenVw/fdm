@@ -168,7 +168,9 @@ describe("harvest", () => {
                 harvesting_date,
                 1000,
             ),
-        ).rejects.toThrowError("Exception for addHarvest")
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
     })
 
     it("should get a harvest", async () => {
@@ -209,7 +211,9 @@ describe("harvest", () => {
     it("should throw error if harvest does not exist", async () => {
         await expect(
             getHarvest(fdm, principal_id, "non_existing_harvest"),
-        ).rejects.toThrowError("Exception for getHarvest")
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
     })
 
     it("should get harvests", async () => {
@@ -241,7 +245,9 @@ describe("harvest", () => {
 
         await expect(
             getHarvest(fdm, principal_id, b_id_harvesting),
-        ).rejects.toThrowError("Exception for getHarvest")
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
 
         const harvests = await getHarvests(fdm, principal_id, b_lu_once)
         expect(harvests.length).toEqual(1)
@@ -251,7 +257,9 @@ describe("harvest", () => {
         const nonExistingHarvestId = createId()
         await expect(
             removeHarvest(fdm, principal_id, nonExistingHarvestId),
-        ).rejects.toThrowError("Exception for removeHarvest")
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
     })
 
     describe("getHarvestableTypeOfCultivation", () => {

@@ -59,7 +59,6 @@ describe("Authorization Functions", () => {
         })
 
         it("should throw an error if principal does not have the required role", async () => {
-            console.log(farm_id)
             await expect(
                 checkPermission(
                     fdm,
@@ -114,8 +113,6 @@ describe("Authorization Functions", () => {
 
         it("should store the audit log when a permission check is performed and not allowed", async () => {
             const principal_id_new = createId()
-            console.log("farm_id: ", farm_id)
-            console.log("principal_id: ", principal_id_new)
 
             await expect(
                 checkPermission(
@@ -135,7 +132,6 @@ describe("Authorization Functions", () => {
                 .from(authZSchema.audit)
                 .where(eq(authZSchema.audit.principal_id, principal_id_new))
                 .orderBy(desc(authZSchema.audit.audit_timestamp))
-            console.log(auditLogs[0])
             expect(auditLogs.length).toBeGreaterThanOrEqual(1)
             expect(auditLogs[0].target_resource).toBe("farm")
             expect(auditLogs[0].target_resource_id).toBe(farm_id)
