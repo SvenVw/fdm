@@ -6,7 +6,7 @@ import type { TestProject } from "vitest/node"
 
 let fdm: FdmServerType
 
-export let migrationsRun = true
+export let migrationsRun = false
 
 export default async function setup(project: TestProject) {
     const requiredEnvVars = [
