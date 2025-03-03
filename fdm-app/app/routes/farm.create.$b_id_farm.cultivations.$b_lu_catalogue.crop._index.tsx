@@ -4,7 +4,7 @@ import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -13,7 +13,6 @@ import {
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
-import { E } from "node_modules/better-auth/dist/index-Y--3ocl8"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -21,26 +20,32 @@ import {
     useFetcher,
     useLoaderData,
 } from "react-router"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw new Error("b_lu_catalogue is required")
-    }
-
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw new Error("b_id_farm is required")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get the available cultivations
-    let cultivationOptions = []
-    let b_lu_harvestable: HarvestableType = "none"
     try {
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("b_lu_catalogue is required", {
+                status: 400,
+                statusText: "b_lu_catalogue is required",
+            })
+        }
+
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("b_id_farm is required", {
+                status: 400,
+                statusText: "b_id_farm is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the available cultivations
+        let cultivationOptions = []
+        let b_lu_harvestable: HarvestableType = "none"
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
             .filter(
@@ -61,86 +66,90 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         if (cultivationCatalogueItem) {
             b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
         }
-    } catch (error) {
-        console.error("Failed to fetch cultivations:", error)
-        throw data("Failed to load cultivation options", {
-            status: 500,
-            statusText: "Failed to load cultivation options",
-        })
-    }
 
-    const cultivationPlan = await getCultivationPlan(
-        fdm,
-        session.principal_id,
-        b_id_farm,
-    )
-    const cultivation = cultivationPlan.find(
-        (x) => x.b_lu_catalogue === b_lu_catalogue,
-    )
-    const b_sowing_date = cultivation.b_sowing_date
-    const b_terminating_date = cultivation.b_terminating_date
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        const cultivation = cultivationPlan.find(
+            (x) => x.b_lu_catalogue === b_lu_catalogue,
+        )
+        const b_sowing_date = cultivation.b_sowing_date
+        const b_terminating_date = cultivation.b_terminating_date
 
-    // Find the target cultivation within the cultivation plan
-    const targetCultivation = cultivationPlan.find(
-        (c) => c.b_lu_catalogue === b_lu_catalogue,
-    )
-    if (!targetCultivation) {
-        throw data("Cultivation not found", { status: 404 })
-    }
-
-    // Combine similar harvests across all fields of the target cultivation.
-    interface HarvestInfo {
-        b_harvesting_date: Date
-        harvestables: {
-            harvestable_analyses: {
-                b_lu_yield?: number
-                b_lu_n_harvestable?: number
-            }[]
-        }[]
-    }
-    const harvests = targetCultivation.fields.reduce((accumulator, field) => {
-        for (const harvest of field.harvests) {
-            // Create a key based on harvest properties to identify similar harvests
-            const isSimilarHarvest = (h1: HarvestInfo, h2: HarvestInfo) =>
-                h1.b_harvesting_date.getTime() ===
-                    h2.b_harvesting_date.getTime() &&
-                h1.harvestables[0].harvestable_analyses[0].b_lu_yield ===
-                    h2.harvestables[0].harvestable_analyses[0].b_lu_yield &&
-                h1.harvestables[0].harvestable_analyses[0]
-                    .b_lu_n_harvestable ===
-                    h2.harvestables[0].harvestable_analyses[0]
-                        .b_lu_n_harvestable
-
-            const existingHarvestIndex = accumulator.findIndex(
-                (existingHarvest: HarvestInfo) =>
-                    isSimilarHarvest(existingHarvest, harvest),
-            )
-
-            if (existingHarvestIndex !== -1) {
-                // If similar harvests exist, add the current b_id_harvesting to its b_ids_harvesting array
-                accumulator[existingHarvestIndex].b_ids_harvesting.push(
-                    harvest.b_id_harvesting,
-                )
-            } else {
-                // If it's a new harvest, add it to the accumulator with a new b_ids_harvesting array
-                accumulator.push({
-                    ...harvest,
-                    b_ids_harvesting: [harvest.b_id_harvesting],
-                })
-            }
+        // Find the target cultivation within the cultivation plan
+        const targetCultivation = cultivationPlan.find(
+            (c) => c.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!targetCultivation) {
+            throw data("Cultivation not found", { status: 404 })
         }
 
-        return accumulator
-    }, [] as HarvestInfo[])
+        // Combine similar harvests across all fields of the target cultivation.
+        interface HarvestInfo {
+            b_harvesting_date: Date
+            harvestables: {
+                harvestable_analyses: {
+                    b_lu_yield?: number
+                    b_lu_n_harvestable?: number
+                }[]
+            }[]
+        }
+        const harvests = targetCultivation.fields.reduce(
+            (accumulator, field) => {
+                for (const harvest of field.harvests) {
+                    // Create a key based on harvest properties to identify similar harvests
+                    const isSimilarHarvest = (
+                        h1: HarvestInfo,
+                        h2: HarvestInfo,
+                    ) =>
+                        h1.b_harvesting_date.getTime() ===
+                            h2.b_harvesting_date.getTime() &&
+                        h1.harvestables[0].harvestable_analyses[0]
+                            .b_lu_yield ===
+                            h2.harvestables[0].harvestable_analyses[0]
+                                .b_lu_yield &&
+                        h1.harvestables[0].harvestable_analyses[0]
+                            .b_lu_n_harvestable ===
+                            h2.harvestables[0].harvestable_analyses[0]
+                                .b_lu_n_harvestable
 
-    return {
-        b_lu_catalogue: b_lu_catalogue,
-        b_id_farm: b_id_farm,
-        b_sowing_date: b_sowing_date,
-        b_terminating_date: b_terminating_date,
-        b_lu_harvestable: b_lu_harvestable,
-        harvests: harvests,
-        cultivationOptions: cultivationOptions,
+                    const existingHarvestIndex = accumulator.findIndex(
+                        (existingHarvest: HarvestInfo) =>
+                            isSimilarHarvest(existingHarvest, harvest),
+                    )
+
+                    if (existingHarvestIndex !== -1) {
+                        // If similar harvests exist, add the current b_id_harvesting to its b_ids_harvesting array
+                        accumulator[existingHarvestIndex].b_ids_harvesting.push(
+                            harvest.b_id_harvesting,
+                        )
+                    } else {
+                        // If it's a new harvest, add it to the accumulator with a new b_ids_harvesting array
+                        accumulator.push({
+                            ...harvest,
+                            b_ids_harvesting: [harvest.b_id_harvesting],
+                        })
+                    }
+                }
+
+                return accumulator
+            },
+            [] as HarvestInfo[],
+        )
+
+        return {
+            b_lu_catalogue: b_lu_catalogue,
+            b_id_farm: b_id_farm,
+            b_sowing_date: b_sowing_date,
+            b_terminating_date: b_terminating_date,
+            b_lu_harvestable: b_lu_harvestable,
+            harvests: harvests,
+            cultivationOptions: cultivationOptions,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -255,6 +264,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

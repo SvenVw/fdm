@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,36 +26,40 @@ import {
     useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
 const { isPostalCode } = validator
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get details of farm
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-    if (!farm) {
-        throw data("Farm is not found", {
-            status: 404,
-            statusText: "Farm is not found",
-        })
-    }
+        // Get details of farm
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("Farm is not found", {
+                status: 404,
+                statusText: "Farm is not found",
+            })
+        }
 
-    // Return user information from loader
-    return {
-        farm: farm,
+        // Return user information from loader
+        return {
+            farm: farm,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -248,7 +252,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `${formValues.b_name_farm} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }
 

@@ -14,20 +14,25 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 import { toast } from "sonner"
+import { handleLoaderError } from "@/lib/error"
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    // Get the session
-    const session = await auth.api.getSession({
-        headers: request.headers,
-    })
+    try {
+        // Get the session
+        const session = await auth.api.getSession({
+            headers: request.headers,
+        })
 
-    // If user has an session redirect to app
-    if (session?.session) {
-        return redirect("/farm")
+        // If user has an session redirect to app
+        if (session?.session) {
+            return redirect("/farm")
+        }
+
+        // Return user information from loader
+        return {}
+    } catch (error) {
+        throw handleLoaderError(error)
     }
-
-    // Return user information from loader
-    return {}
 }
 
 export default function SignIn() {

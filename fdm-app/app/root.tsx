@@ -99,7 +99,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const timestamp = new Date().toISOString()
 
     if (isRouteErrorResponse(error)) {
-        // Redirect to signin page if not authentication is provided
+        // Redirect to signin page if authentication is not provided
         if (error.status === 401) {
             redirect("./signin")
         }

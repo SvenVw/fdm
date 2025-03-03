@@ -26,7 +26,7 @@ import {
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -38,38 +38,38 @@ export const meta: MetaFunction = () => {
 
 // Loader
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id and name of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-
-    // Get the fields
-    const fields = await getFields(fdm, session.principal_id, b_id_farm)
-
-    // Sort by name
-    fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
-
-    // Get the Mapbox Token
-    const mapboxToken = process.env.MAPBOX_TOKEN
-    if (!mapboxToken) {
-        throw data("MAPBOX_TOKEN environment variable is not set", {
-            status: 500,
-            statusText: "MAPBOX_TOKEN environment variable is not set",
-        })
-    }
-
-    // Get the available cultivations
-    let cultivationOptions = []
     try {
+        // Get the Id and name of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+
+        // Get the fields
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+
+        // Sort by name
+        fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
+
+        // Get the Mapbox Token
+        const mapboxToken = process.env.MAPBOX_TOKEN
+        if (!mapboxToken) {
+            throw data("MAPBOX_TOKEN environment variable is not set", {
+                status: 500,
+                statusText: "MAPBOX_TOKEN environment variable is not set",
+            })
+        }
+
+        // Get the available cultivations
+        let cultivationOptions = []
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
             .filter(
@@ -80,29 +80,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
-    } catch (error) {
-        console.error("Failed to fetch cultivations:", error)
-        throw data("Failed to load cultivation options", {
-            status: 500,
-            statusText: "Failed to load cultivation options",
+
+        // Create the sidenav
+        const sidebarPageItems = fields.map((field) => {
+            return {
+                title: field.b_name,
+                to: `/farm/create/${b_id_farm}/fields/${field.b_id}`,
+            }
         })
-    }
 
-    // Create the sidenav
-    const sidebarPageItems = fields.map((field) => {
         return {
-            title: field.b_name,
-            to: `/farm/create/${b_id_farm}/fields/${field.b_id}`,
+            sidebarPageItems: sidebarPageItems,
+            cultivationOptions: cultivationOptions,
+            mapboxToken: mapboxToken,
+            b_id_farm: b_id_farm,
+            b_name_farm: farm.b_name_farm,
+            action: `/farm/create/${b_id_farm}/fields`,
         }
-    })
-
-    return {
-        sidebarPageItems: sidebarPageItems,
-        cultivationOptions: cultivationOptions,
-        mapboxToken: mapboxToken,
-        b_id_farm: b_id_farm,
-        b_name_farm: farm.b_name_farm,
-        action: `/farm/create/${b_id_farm}/fields`,
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -210,6 +206,6 @@ export async function action({ request, params }: LoaderFunctionArgs) {
         )
         return { field: updatedField }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

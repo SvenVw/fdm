@@ -2,7 +2,7 @@ import { HarvestForm } from "@/components/custom/harvest/form"
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -19,22 +19,29 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw new Error("b_lu_catalogue is required")
-    }
-
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw new Error("b_id_farm is required")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get the available cultivations
-    let cultivationOptions = []
     try {
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("b_lu_catalogue is required", {
+                status: 400,
+                statusText: "b_lu_catalogue is required",
+            })
+        }
+
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("b_id_farm is required", {
+                status: 400,
+                statusText: "b_id_farm is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the available cultivations
+        let cultivationOptions = []
+
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
             .filter(
@@ -45,38 +52,35 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
+
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        const cultivation = cultivationPlan.find(
+            (x) => x.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!cultivation) {
+            throw data("Cultivation not found", {
+                status: 404,
+                statusText: "Cultivation not found",
+            })
+        }
+        const b_sowing_date = cultivation.b_sowing_date
+        const b_terminating_date = cultivation.b_terminating_date
+        const harvests = cultivation?.fields?.[0]?.harvests
+
+        return {
+            b_lu_catalogue: b_lu_catalogue,
+            b_id_farm: b_id_farm,
+            b_sowing_date: b_sowing_date,
+            b_terminating_date: b_terminating_date,
+            harvests: harvests,
+            cultivationOptions: cultivationOptions,
+        }
     } catch (error) {
-        throw data("Failed to load cultivation options", {
-            status: 500,
-            statusText: "Failed to load cultivation options",
-        })
-    }
-
-    const cultivationPlan = await getCultivationPlan(
-        fdm,
-        session.principal_id,
-        b_id_farm,
-    )
-    const cultivation = cultivationPlan.find(
-        (x) => x.b_lu_catalogue === b_lu_catalogue,
-    )
-    if (!cultivation) {
-        throw data("Cultivation not found", {
-            status: 404,
-            statusText: "Cultivation not found",
-        })
-    }
-    const b_sowing_date = cultivation.b_sowing_date
-    const b_terminating_date = cultivation.b_terminating_date
-    const harvests = cultivation?.fields?.[0]?.harvests
-
-    return {
-        b_lu_catalogue: b_lu_catalogue,
-        b_id_farm: b_id_farm,
-        b_sowing_date: b_sowing_date,
-        b_terminating_date: b_terminating_date,
-        harvests: harvests,
-        cultivationOptions: cultivationOptions,
+        return handleLoaderError(error)
     }
 }
 
@@ -150,6 +154,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         return redirectWithSuccess("../crop", "Oogst is toegevoegd! 🎉")
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

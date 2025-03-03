@@ -2,7 +2,8 @@ import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { auth, getSession } from "@/lib/auth.server"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
@@ -16,64 +17,68 @@ import {
 import { ClientOnly } from "remix-utils/client-only"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get details of farm
-    let farm = null
     try {
-        farm = await getFarm(fdm, session.principal_id, b_id_farm)
-        if (!farm) {
-            throw data("Farm is not found", {
-                status: 404,
-                statusText: "Farm is not found",
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
             })
         }
-    } catch (error) {
-        console.error("Failed to fetch farm details:", error)
-        throw data("Failed to fetch farm details", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
 
-    // Get a list of possible farms of the user
-    const farms = await getFarms(fdm, session.principal_id)
+        // Get the session
+        const session = await getSession(request)
 
-    // Redirect to farms overview if user has no farm
-    if (farms.length === 0) {
-        return redirect("./farm")
-    }
-
-    const farmOptions = farms.map((farm) => {
-        return {
-            b_id_farm: farm.b_id_farm,
-            b_name_farm: farm.b_name_farm,
+        // Get details of farm
+        let farm = null
+        try {
+            farm = await getFarm(fdm, session.principal_id, b_id_farm)
+            if (!farm) {
+                throw data("Farm is not found", {
+                    status: 404,
+                    statusText: "Farm is not found",
+                })
+            }
+        } catch (error) {
+            console.error("Failed to fetch farm details:", error)
+            throw data("Failed to fetch farm details", {
+                status: 500,
+                statusText: "Internal Server Error",
+            })
         }
-    })
 
-    const layerOptions = [
-        { layerKey: "fields", layerName: "Percelen" },
-        { layerKey: "soil", layerName: "Bodem" },
-        { layerKey: "elevation", layerName: "Hoogtekaart" },
-    ]
+        // Get a list of possible farms of the user
+        const farms = await getFarms(fdm, session.principal_id)
 
-    // Return user information from loader
-    return {
-        farm: farm,
-        b_id_farm: b_id_farm,
-        farmOptions: farmOptions,
-        layerOptions: layerOptions,
-        layerSelected: "fields",
+        // Redirect to farms overview if user has no farm
+        if (farms.length === 0) {
+            return redirect("./farm")
+        }
+
+        const farmOptions = farms.map((farm) => {
+            return {
+                b_id_farm: farm.b_id_farm,
+                b_name_farm: farm.b_name_farm,
+            }
+        })
+
+        const layerOptions = [
+            { layerKey: "fields", layerName: "Percelen" },
+            { layerKey: "soil", layerName: "Bodem" },
+            { layerKey: "elevation", layerName: "Hoogtekaart" },
+        ]
+
+        // Return user information from loader
+        return {
+            farm: farm,
+            b_id_farm: b_id_farm,
+            farmOptions: farmOptions,
+            layerOptions: layerOptions,
+            layerSelected: "fields",
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 

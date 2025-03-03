@@ -12,11 +12,10 @@ import {
     PaginationItem,
     PaginationLink,
 } from "@/components/ui/pagination"
-import {
-    getCultivationPlan,
-} from "@svenvw/fdm-core"
+import { getCultivationPlan } from "@svenvw/fdm-core"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -28,51 +27,52 @@ export const meta: MetaFunction = () => {
 
 // Loader
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the cultivation
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw data("Cultivation catalogue ID is required", {
-            status: 400,
-            statusText: "Cultivation catalogue ID is required",
-        })
-    }
-    
-    // Get the session
-    const session = await getSession(request)
-
-    // Get the cultivation details for this cultivation
-    const cultivationPlan = await getCultivationPlan(fdm, session.principal_id, b_id_farm).catch(
-        (error) => {
-            throw data("Failed to fetch cultivation plan", {
-                status: 500,
-                statusText: error.message,
+    try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
             })
-        },
-    )
+        }
 
-    const cultivation = cultivationPlan.find(
-        (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
-    )
-    if (!cultivation) {
-        throw data("Cultivation not found", {
-            status: 404,
-            statusText: "Cultivation not found",
-        })
-    }
+        // Get the cultivation
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("Cultivation catalogue ID is required", {
+                status: 400,
+                statusText: "Cultivation catalogue ID is required",
+            })
+        }
 
-    return {
-        b_lu_catalogue: b_lu_catalogue,
-        b_id_farm: b_id_farm,
-        cultivation: cultivation,
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the cultivation details for this cultivation
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
+        const cultivation = cultivationPlan.find(
+            (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!cultivation) {
+            throw data("Cultivation not found", {
+                status: 404,
+                statusText: "Cultivation not found",
+            })
+        }
+
+        return {
+            b_lu_catalogue: b_lu_catalogue,
+            b_id_farm: b_id_farm,
+            cultivation: cultivation,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 

@@ -18,56 +18,59 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { dataWithError } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { getSession } from "@/lib/auth.server"
 import { handleActionError } from "@/lib/error"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-    // Get the session
-    const session = await getSession(request)
+    try {
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
+        // Get the session
+        const session = await getSession(request)
 
-    // Get details of field
-    const field = await getField(fdm, session.principal_id, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
-        })
-    }
-    const feature = {
-        type: "Feature",
-        properties: {
-            b_id: field.b_id,
-            b_name: field.b_name,
-            b_area: Math.round(field.b_area * 10) / 10,
-            b_lu_name: field.b_lu_name,
-            b_id_source: field.b_id_source,
-        },
-        geometry: field.b_geometry,
-    }
-    const featureCollection: FeatureCollection = {
-        type: "FeatureCollection",
-        features: [feature],
-    }
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field is not found", {
+                status: 404,
+                statusText: "Field is not found",
+            })
+        }
+        const feature = {
+            type: "Feature",
+            properties: {
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
+                b_lu_name: field.b_lu_name,
+                b_id_source: field.b_id_source,
+            },
+            geometry: field.b_geometry,
+        }
+        const featureCollection: FeatureCollection = {
+            type: "FeatureCollection",
+            features: [feature],
+        }
 
-    // Get mapbox token and style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
+        // Get mapbox token and style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
 
-    // Return user information from loader
-    return {
-        field: featureCollection,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
+        // Return user information from loader
+        return {
+            field: featureCollection,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+        }
+    } catch (error) {
+        throw handleActionError(error)
     }
 }
 
@@ -127,6 +130,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw new Error("Missing field ID.")
         }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

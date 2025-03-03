@@ -25,68 +25,76 @@ import { dataWithError, dataWithSuccess, dataWithWarning } from "remix-toast"
 import { toast } from "sonner"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get details of field
-    const field = await getField(fdm, session.principal_id, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
-        })
-    }
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field is not found", {
+                status: 404,
+                statusText: "Field is not found",
+            })
+        }
 
-    // Get available cultivations for the farm
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    // Map cultivations to options for the combobox
-    const cultivationsCatalogueOptions = cultivationsCatalogue.map(
-        (cultivation) => {
-            return {
-                value: cultivation.b_lu_catalogue,
-                label: cultivation.b_lu_name,
-            }
-        },
-    )
+        // Get available cultivations for the farm
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        // Map cultivations to options for the combobox
+        const cultivationsCatalogueOptions = cultivationsCatalogue.map(
+            (cultivation) => {
+                return {
+                    value: cultivation.b_lu_catalogue,
+                    label: cultivation.b_lu_name,
+                }
+            },
+        )
 
-    // Get cultivations for the field
-    const cultivations = await getCultivations(fdm, session.principal_id, b_id)
+        // Get cultivations for the field
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
 
-    // Get the harvests of the cultivations
-    const harvests = await Promise.all(
-        cultivations.map(async (cultivation) => {
-            return await getHarvests(
-                fdm,
-                session.principal_id,
-                cultivation.b_lu,
-            )
-        }),
-    )
+        // Get the harvests of the cultivations
+        const harvests = await Promise.all(
+            cultivations.map(async (cultivation) => {
+                return await getHarvests(
+                    fdm,
+                    session.principal_id,
+                    cultivation.b_lu,
+                )
+            }),
+        )
 
-    // Return user information from loader
-    return {
-        field: field,
-        cultivationsCatalogueOptions: cultivationsCatalogueOptions,
-        cultivations: cultivations,
-        harvests: harvests?.[0] ?? [],
+        // Return user information from loader
+        return {
+            field: field,
+            cultivationsCatalogueOptions: cultivationsCatalogueOptions,
+            cultivations: cultivations,
+            harvests: harvests?.[0] ?? [],
+        }
+    } catch (error) {
+        return handleActionError(error)
     }
 }
 
@@ -173,6 +181,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

@@ -54,7 +54,7 @@ import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -132,65 +132,69 @@ const FormSchema = z.object({
  * Throws an error if farm ID, field ID, or field data is missing.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get the field data
-    const field = await getField(fdm, session.principal_id, b_id)
-    if (!field) {
-        throw data("Field not found", {
-            status: 404,
-            statusText: "Field not found",
-        })
-    }
-    const feature: GeoJSON.Feature = {
-        type: "Feature",
-        properties: {
-            b_id: field.b_id,
-            b_name: field.b_name,
-            b_area: Math.round(field.b_area * 10) / 10,
-            b_lu_name: field.b_lu_name,
-            b_id_source: field.b_id_source,
-        },
-        geometry: field.b_geometry,
-    }
-    const featureCollection: FeatureCollection = {
-        type: "FeatureCollection",
-        features: [feature],
-    }
-
-    // Get the geojson
-    if (!field.b_geometry) {
-        throw data("Field geometry is required", {
-            status: 400,
-            statusText: "Field geometry is required",
-        })
-    }
-
-    // Get soil analysis data
-    const soilAnalysis = await getSoilAnalysis(fdm, session.principal_id, b_id)
-
-    // Get the available cultivations
-    let cultivationOptions = []
     try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
+
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the field data
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field not found", {
+                status: 404,
+                statusText: "Field not found",
+            })
+        }
+        const feature: GeoJSON.Feature = {
+            type: "Feature",
+            properties: {
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
+                b_lu_name: field.b_lu_name,
+                b_id_source: field.b_id_source,
+            },
+            geometry: field.b_geometry,
+        }
+        const featureCollection: FeatureCollection = {
+            type: "FeatureCollection",
+            features: [feature],
+        }
+
+        // Get the geojson
+        if (!field.b_geometry) {
+            throw data("Field geometry is required", {
+                status: 400,
+                statusText: "Field geometry is required",
+            })
+        }
+
+        // Get soil analysis data
+        const soilAnalysis = await getSoilAnalysis(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+
+        // Get the available cultivations
+        let cultivationOptions = []
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
             .filter(
@@ -201,38 +205,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
+
+        // Get the cultivation
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+        const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
+
+        // Get Mapbox token and Style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
+
+        return {
+            b_id: b_id,
+            b_id_farm: b_id_farm,
+            b_name: field.b_name,
+            b_lu_catalogue: b_lu_catalogue,
+            b_sowing_date: cultivations[0]?.b_sowing_date,
+            b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
+            b_gwl_class: soilAnalysis?.b_gwl_class,
+            a_p_al: soilAnalysis?.a_p_al,
+            a_p_cc: soilAnalysis?.a_p_cc,
+            a_som_loi: soilAnalysis?.a_som_loi,
+            b_area: field.b_area,
+            featureCollection: featureCollection,
+            cultivationOptions: cultivationOptions,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+        }
     } catch (error) {
-        console.error("Failed to fetch cultivations:", error)
-        throw data("Failed to load cultivation options", {
-            status: 500,
-            statusText: "Failed to load cultivation options",
-        })
-    }
-
-    // Get the cultivation
-    const cultivations = await getCultivations(fdm, session.principal_id, b_id)
-    const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
-
-    // Get Mapbox token and Style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
-
-    return {
-        b_id: b_id,
-        b_id_farm: b_id_farm,
-        b_name: field.b_name,
-        b_lu_catalogue: b_lu_catalogue,
-        b_sowing_date: cultivations[0]?.b_sowing_date,
-        b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
-        b_gwl_class: soilAnalysis?.b_gwl_class,
-        a_p_al: soilAnalysis?.a_p_al,
-        a_p_cc: soilAnalysis?.a_p_cc,
-        a_som_loi: soilAnalysis?.a_som_loi,
-        b_area: field.b_area,
-        featureCollection: featureCollection,
-        cultivationOptions: cultivationOptions,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
+        throw handleLoaderError(error)
     }
 }
 
@@ -710,6 +714,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

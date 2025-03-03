@@ -3,7 +3,7 @@ import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -17,71 +17,78 @@ import {
     type LoaderFunctionArgs,
     NavLink,
     data,
-    useFetcher,
     useLoaderData,
 } from "react-router"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
 
-    // Get the cultivation id
-    const b_lu = params.b_lu
-    if (!b_lu) {
-        throw data("Cultivation ID is required", {
-            status: 400,
-            statusText: "Cultivation ID is required",
-        })
-    }
+        // Get the cultivation id
+        const b_lu = params.b_lu
+        if (!b_lu) {
+            throw data("Cultivation ID is required", {
+                status: 400,
+                statusText: "Cultivation ID is required",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get details of field
-    const field = await getField(fdm, session.principal_id, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
-        })
-    }
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field is not found", {
+                status: 404,
+                statusText: "Field is not found",
+            })
+        }
 
-    // Get available cultivations for the farm
-    const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
-    // Map cultivations to options for the combobox
-    const cultivationsCatalogueOptions = cultivationsCatalogue.map(
-        (cultivation) => {
-            return {
-                value: cultivation.b_lu_catalogue,
-                label: cultivation.b_lu_name,
-            }
-        },
-    )
+        // Get available cultivations for the farm
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        // Map cultivations to options for the combobox
+        const cultivationsCatalogueOptions = cultivationsCatalogue.map(
+            (cultivation) => {
+                return {
+                    value: cultivation.b_lu_catalogue,
+                    label: cultivation.b_lu_name,
+                }
+            },
+        )
 
-    // Get selected cultivation
-    const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
+        // Get selected cultivation
+        const cultivation = await getCultivation(
+            fdm,
+            session.principal_id,
+            b_lu,
+        )
 
-    // Return user information from loader
-    return {
-        field: field,
-        cultivationsCatalogueOptions: cultivationsCatalogueOptions,
-        cultivation: cultivation,
+        // Return user information from loader
+        return {
+            field: field,
+            cultivationsCatalogueOptions: cultivationsCatalogueOptions,
+            cultivation: cultivation,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -166,6 +173,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

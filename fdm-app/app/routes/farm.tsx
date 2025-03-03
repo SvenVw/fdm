@@ -18,16 +18,20 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    // Get the session
-    const session = await getSession(request)
+    try {
+        // Get the session
+        const session = await getSession(request)
 
-    if (!session?.user) {
-        return redirect("/signin")
-    }
+        if (!session?.user) {
+            return redirect("/signin")
+        }
 
-    // Return user information from loader
-    return {
-        user: session.user,
+        // Return user information from loader
+        return {
+            user: session.user,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -56,6 +60,6 @@ export async function action({ request }: ActionFunctionArgs) {
         })
         return redirect("/signin")
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

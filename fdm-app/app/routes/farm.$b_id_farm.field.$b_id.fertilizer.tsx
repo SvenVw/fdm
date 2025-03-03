@@ -4,7 +4,7 @@ import { FormSchema } from "@/components/custom/fertilizer-applications/formsche
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { calculateDose } from "@svenvw/fdm-calculator"
@@ -26,64 +26,72 @@ import {
 import { dataWithError, dataWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get details of field
-    const field = await getField(fdm, session.principal_id, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
-        })
-    }
-
-    // Get available fertilizers for the farm
-    const fertilizers = await getFertilizers(fdm, b_id_farm)
-    // Map fertilizers to options for the combobox
-    const fertilizerOptions = fertilizers.map((fertilizer) => {
-        return {
-            value: fertilizer.p_id,
-            label: fertilizer.p_name_nl,
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
-    })
 
-    // Get fertilizer applications for the field
-    const fertilizerApplications = await getFertilizerApplications(
-        fdm,
-        session.principal_id,
-        b_id,
-    )
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
 
-    const dose = calculateDose({
-        applications: fertilizerApplications,
-        fertilizers,
-    })
+        // Get the session
+        const session = await getSession(request)
 
-    // Return user information from loader
-    return {
-        field: field,
-        fertilizerOptions: fertilizerOptions,
-        fertilizerApplications: fertilizerApplications,
-        dose: dose,
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field is not found", {
+                status: 404,
+                statusText: "Field is not found",
+            })
+        }
+
+        // Get available fertilizers for the farm
+        const fertilizers = await getFertilizers(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        // Map fertilizers to options for the combobox
+        const fertilizerOptions = fertilizers.map((fertilizer) => {
+            return {
+                value: fertilizer.p_id,
+                label: fertilizer.p_name_nl,
+            }
+        })
+
+        // Get fertilizer applications for the field
+        const fertilizerApplications = await getFertilizerApplications(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+
+        const dose = calculateDose({
+            applications: fertilizerApplications,
+            fertilizers,
+        })
+
+        // Return user information from loader
+        return {
+            field: field,
+            fertilizerOptions: fertilizerOptions,
+            fertilizerApplications: fertilizerApplications,
+            dose: dose,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -181,6 +189,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

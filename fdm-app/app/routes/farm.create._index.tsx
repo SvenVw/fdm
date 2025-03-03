@@ -10,8 +10,6 @@ import type {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { z } from "zod"
-
-// Components
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -21,13 +19,9 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-
-// Blocks
 import { Farm } from "@/components/blocks/farm"
-
 import { extractFormValuesFromRequest } from "@/lib/form"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
-// Services
+import { redirectWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
 import { handleActionError } from "@/lib/error"
@@ -134,6 +128,6 @@ export async function action({ request }: ActionFunctionArgs) {
             message: "Bedrijf is toegevoegd! 🎉",
         })
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

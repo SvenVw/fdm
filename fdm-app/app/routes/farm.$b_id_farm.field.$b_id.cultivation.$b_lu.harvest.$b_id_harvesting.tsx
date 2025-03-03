@@ -3,7 +3,7 @@ import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
@@ -18,62 +18,74 @@ import {
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
 
-    // Get the cultivation id
-    const b_lu = params.b_lu
-    if (!b_lu) {
-        throw data("Cultivation ID is required", {
-            status: 400,
-            statusText: "Cultivation ID is required",
-        })
-    }
+        // Get the cultivation id
+        const b_lu = params.b_lu
+        if (!b_lu) {
+            throw data("Cultivation ID is required", {
+                status: 400,
+                statusText: "Cultivation ID is required",
+            })
+        }
 
-    // Get the harvest id
-    const b_id_harvesting = params.b_id_harvesting
-    if (!b_id_harvesting) {
-        throw data("Harvest ID is required", {
-            status: 400,
-            statusText: "Harvest ID is required",
-        })
-    }
+        // Get the harvest id
+        const b_id_harvesting = params.b_id_harvesting
+        if (!b_id_harvesting) {
+            throw data("Harvest ID is required", {
+                status: 400,
+                statusText: "Harvest ID is required",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get details of cultivation
-    const cultivation = await getCultivation(fdm, session.principal_id, b_lu)
-    if (!cultivation) {
-        throw data("Cultivation is not found", {
-            status: 404,
-            statusText: "Cultivation is not found",
-        })
-    }
+        // Get details of cultivation
+        const cultivation = await getCultivation(
+            fdm,
+            session.principal_id,
+            b_lu,
+        )
+        if (!cultivation) {
+            throw data("Cultivation is not found", {
+                status: 404,
+                statusText: "Cultivation is not found",
+            })
+        }
 
-    // Get selected harvest
-    const harvest = await getHarvest(fdm, session.principal_id, b_id_harvesting)
+        // Get selected harvest
+        const harvest = await getHarvest(
+            fdm,
+            session.principal_id,
+            b_id_harvesting,
+        )
 
-    // Return user information from loader
-    return {
-        cultivation: cultivation,
-        harvest: harvest,
-        b_id_farm: b_id_farm,
+        // Return user information from loader
+        return {
+            cultivation: cultivation,
+            harvest: harvest,
+            b_id_farm: b_id_farm,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -164,6 +176,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

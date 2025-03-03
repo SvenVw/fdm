@@ -19,51 +19,56 @@ import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Get the fields of the farm
-    const fields = await getFields(fdm, session.user.id, b_id_farm)
-    const features = fields.map((field) => {
-        const feature = {
-            type: "Feature",
-            properties: {
-                b_id: field.b_id,
-                b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
-                b_lu_name: field.b_lu_name,
-                b_id_source: field.b_id_source,
-            },
-            geometry: field.b_geometry,
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
-        return feature
-    })
 
-    const featureCollection: FeatureCollection = {
-        type: "FeatureCollection",
-        features: features,
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Get the Mapbox token and style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
+        // Get the fields of the farm
+        const fields = await getFields(fdm, session.user.id, b_id_farm)
+        const features = fields.map((field) => {
+            const feature = {
+                type: "Feature",
+                properties: {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_lu_name: field.b_lu_name,
+                    b_id_source: field.b_id_source,
+                },
+                geometry: field.b_geometry,
+            }
+            return feature
+        })
 
-    // Return user information from loader
-    return {
-        savedFields: featureCollection,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
+        const featureCollection: FeatureCollection = {
+            type: "FeatureCollection",
+            features: features,
+        }
+
+        // Get the Mapbox token and style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
+
+        // Return user information from loader
+        return {
+            savedFields: featureCollection,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 

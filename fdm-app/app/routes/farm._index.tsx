@@ -15,6 +15,7 @@ import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms } from "@svenvw/fdm-core"
+import { handleLoaderError } from "@/lib/error"
 
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
@@ -23,14 +24,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.user.id)
-        if (!Array.isArray(farms)) {
-            throw new Error("Invalid farms data received")
-        }
 
         const farmOptions = farms.map((farm) => {
-            if (!farm?.b_id_farm || !farm?.b_name_farm) {
-                throw new Error("Invalid farm data structure")
-            }
             return {
                 b_id_farm: farm.b_id_farm,
                 b_name_farm: farm.b_name_farm,
@@ -43,12 +38,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
             username: session.userName
         }
     } catch (error) {
-        throw new Response(
-            error instanceof Error ? error.message : "Internal Server Error",
-            {
-                status: error instanceof Response ? error.status : 500,
-            },
-        )
+        throw handleLoaderError(error)
     }
 }
 

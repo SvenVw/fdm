@@ -4,7 +4,7 @@ import type {
     MetaFunction,
 } from "react-router"
 import { auth } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 
 export const meta: MetaFunction = () => {
     return [
@@ -14,7 +14,11 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    return auth.handler(request)
+    try {
+        return auth.handler(request)
+    } catch (error) {
+        return handleLoaderError(error)
+    }
 }
 
 // Action

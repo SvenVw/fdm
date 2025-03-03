@@ -10,7 +10,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
     Popover,
     PopoverContent,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { cn } from "@/lib/utils"
@@ -33,7 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getField, updateField } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
@@ -42,34 +41,38 @@ import {
     useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
+    try {
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get details of field
-    const field = await getField(fdm, session.principal_id, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
-        })
-    }
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field is not found", {
+                status: 404,
+                statusText: "Field is not found",
+            })
+        }
 
-    // Return user information from loader
-    return {
-        field: field,
+        // Return user information from loader
+        return {
+            field: field,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 

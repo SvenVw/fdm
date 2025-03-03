@@ -50,7 +50,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -62,36 +62,40 @@ export const meta: MetaFunction = () => {
 
 // Loader
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id and name of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+    try {
+        // Get the Id and name of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
-    if (!farm) {
-        throw data("Farm not found", {
-            status: 404,
-            statusText: "Farm not found",
-        })
-    }
+        if (!farm) {
+            throw data("Farm not found", {
+                status: 404,
+                statusText: "Farm not found",
+            })
+        }
 
-    // Get the Mapbox token and style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
+        // Get the Mapbox token and style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
 
-    return {
-        b_name_farm: farm.b_name_farm,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
-        fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
+        return {
+            b_name_farm: farm.b_name_farm,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+            fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -329,6 +333,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: "Percelen zijn toegevoegd! 🎉",
         })
     } catch (error) {
-        return handleActionError(error)
+        throw handleActionError(error)
     }
 }

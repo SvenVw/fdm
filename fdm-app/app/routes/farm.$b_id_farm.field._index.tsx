@@ -17,10 +17,11 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
-import { auth, getSession } from "@/lib/auth.server"
+import { getSession } from "@/lib/auth.server"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms, getFields } from "@svenvw/fdm-core"
+import { handleLoaderError } from "@/lib/error"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -76,14 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             userName: session.userName
         }
     } catch (error) {
-        console.error(error)
-        throw data(
-            error instanceof Error ? error.message : "Internal Server Error",
-            {
-                status: 500,
-                statusText: "Internal Server Error",
-            },
-        )
+        throw handleLoaderError(error)
     }
 }
 
