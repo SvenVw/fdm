@@ -4,6 +4,7 @@ import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -12,6 +13,7 @@ import {
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
+import { E } from "node_modules/better-auth/dist/index-Y--3ocl8"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -172,46 +174,40 @@ export default function FarmAFieldCultivationBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw data("b_lu_catalogue is required", {
-            status: 400,
-            statusText: "b_lu_catalogue is required",
-        })
-    }
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("b_id_farm is required", {
-            status: 400,
-            statusText: "b_id_farm is required",
-        })
-    }
+    try {
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw new Error("missing: b_lu_catalogue")
+        }
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    if (request.method === "POST") {
-        // Get cultivation id's for this cultivation code
-        const cultivationPlan = await getCultivationPlan(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        const cultivation = cultivationPlan.find(
-            (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
-        )
-        const b_lu = cultivation.fields.map(
-            (field: { b_lu: string }) => field.b_lu,
-        )
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
+        if (request.method === "POST") {
+            // Get cultivation id's for this cultivation code
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
+            const cultivation = cultivationPlan.find(
+                (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+            )
+            const b_lu = cultivation.fields.map(
+                (field: { b_lu: string }) => field.b_lu,
+            )
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
 
-        // Add cultivation details for each cultivation
-        await Promise.all(
-            b_lu.map(async (item: string) => {
-                try {
+            // Add cultivation details for each cultivation
+            await Promise.all(
+                b_lu.map(async (item: string) => {
                     if (
                         formValues.b_sowing_date ||
                         formValues.b_terminating_date
@@ -225,67 +221,40 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             formValues.b_terminating_date,
                         )
                     }
-                } catch (error) {
-                    console.error(
-                        `Failed to process cultivation ${b_lu_catalogue} for farm ${b_id_farm}:`,
-                        error,
-                    )
-                    throw data(
-                        `Failed to process cultivation ${b_lu_catalogue} for farm ${b_id_farm}: ${error.message}`,
-                        {
-                            status: 500,
-                            statusText: `Failed to process cultivation ${b_lu_catalogue} for farm ${b_id_farm}`,
-                        },
-                    )
-                }
-            }),
-        )
+                }),
+            )
 
-        return dataWithSuccess(
-            { result: "Data saved successfully" },
-            "Gewas is bijgewerkt! 🎉",
-        )
-    }
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const rawHarvestIds = formData.get("b_id_harvesting")
-
-        if (!rawHarvestIds || typeof rawHarvestIds !== "string") {
-            return dataWithError(
-                "Invalid or missing b_ids_harvesting value",
-                "Oops! Something went wrong. Please try again later.",
+            return dataWithSuccess(
+                { result: "Data saved successfully" },
+                "Gewas is bijgewerkt! 🎉",
             )
         }
-        const b_ids_harvesting = rawHarvestIds.split(",")
+        if (request.method === "DELETE") {
+            const formData = await request.formData()
+            const rawHarvestIds = formData.get("b_id_harvesting")
 
-        // Remove harvests for all cultivations
-        await Promise.all(
-            b_ids_harvesting.map(async (b_id_harvesting: string) => {
-                try {
+            if (!rawHarvestIds || typeof rawHarvestIds !== "string") {
+                throw new Error("invalid: rawHarvestIds")
+            }
+            const b_ids_harvesting = rawHarvestIds.split(",")
+
+            // Remove harvests for all cultivations
+            await Promise.all(
+                b_ids_harvesting.map(async (b_id_harvesting: string) => {
                     await removeHarvest(
                         fdm,
                         session.principal_id,
                         b_id_harvesting,
                     )
-                } catch (error) {
-                    console.error(
-                        `Failed to remove harvest ${b_id_harvesting} for ${b_lu_catalogue} for farm ${b_id_farm}:`,
-                        error,
-                    )
-                    throw data(
-                        `Failed remove harvest ${b_id_harvesting} for ${b_lu_catalogue} for farm ${b_id_farm}: ${error.message}`,
-                        {
-                            status: 500,
-                            statusText: `Failed to remove harvest ${b_id_harvesting} for ${b_lu_catalogue} for farm ${b_id_farm}`,
-                        },
-                    )
-                }
-            }),
-        )
+                }),
+            )
 
-        return dataWithSuccess(
-            { result: "Data removed successfully" },
-            "Oogst is verwijderd",
-        )
+            return dataWithSuccess(
+                { result: "Data removed successfully" },
+                "Oogst is verwijderd",
+            )
+        }
+    } catch (error) {
+        return handleActionError(error)
     }
 }

@@ -2,6 +2,7 @@ import { HarvestForm } from "@/components/custom/harvest/form"
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -103,34 +104,39 @@ export default function CultivationPlanAddHarvestBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw new Error("b_lu_catalogue is required")
-    }
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw new Error("b_id_farm is required")
-    }
+    try {
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw new Error("missing: b_lu_catalogue")
+        }
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get cultivation id's for this cultivation code
-    const cultivationPlan = await getCultivationPlan(
-        fdm,
-        session.principal_id,
-        b_id_farm,
-    )
-    const cultivation = cultivationPlan.find(
-        (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
-    )
-    const b_lu = cultivation.fields.map((field: { b_lu: string }) => field.b_lu)
-    const formValues = await extractFormValuesFromRequest(request, FormSchema)
+        // Get cultivation id's for this cultivation code
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        const cultivation = cultivationPlan.find(
+            (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+        )
+        const b_lu = cultivation.fields.map(
+            (field: { b_lu: string }) => field.b_lu,
+        )
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
 
-    // Add cultivation details for each cultivation
-    await Promise.all(
-        b_lu.map(async (item: string) => {
-            try {
+        // Add cultivation details for each cultivation
+        await Promise.all(
+            b_lu.map(async (item: string) => {
                 await addHarvest(
                     fdm,
                     session.principal_id,
@@ -139,21 +145,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     formValues.b_lu_yield,
                     formValues.b_lu_n_harvestable,
                 )
-            } catch (error) {
-                console.error(
-                    `Failed to process cultivation ${b_lu_catalogue} for farm ${b_id_farm}:`,
-                    error,
-                )
-                throw data(
-                    `Failed to process cultivation ${b_lu_catalogue} for farm ${b_id_farm}: ${error.message}`,
-                    {
-                        status: 500,
-                        statusText: `Failed to process cultivation ${b_lu_catalogue} for farm ${b_id_farm}`,
-                    },
-                )
-            }
-        }),
-    )
+            }),
+        )
 
-    return redirectWithSuccess("../crop", "Oogst is toegevoegd! 🎉")
+        return redirectWithSuccess("../crop", "Oogst is toegevoegd! 🎉")
+    } catch (error) {
+        return handleActionError(error)
+    }
 }

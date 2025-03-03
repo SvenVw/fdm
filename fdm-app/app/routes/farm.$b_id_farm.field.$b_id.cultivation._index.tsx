@@ -3,6 +3,7 @@ import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
@@ -20,7 +21,8 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithError, dataWithSuccess, dataWithWarning } from "remix-toast"
+import { toast } from "sonner"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the farm id
@@ -120,62 +122,57 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the field ID
-    const b_id = params.b_id
-    if (!b_id) {
-        return dataWithError(null, "Missing field ID.")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    if (request.method === "POST") {
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { b_lu_catalogue, b_sowing_date, b_terminating_date } = formValues
-
-        await addCultivation(
-            fdm,
-            session.principal_id,
-            b_lu_catalogue,
-            b_id,
-            b_sowing_date,
-            b_terminating_date,
-        )
-
-        return dataWithSuccess(
-            { result: "Data saved successfully" },
-            { message: "Gewas is toegevoegd! 🎉" },
-        )
-    }
-
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const b_lu = formData.get("b_lu")
-
-        if (!b_lu || typeof b_lu !== "string") {
-            return dataWithError(
-                "Invalid or missing b_lu value",
-                "Oops! Something went wrong. Please try again later.",
-            )
+    try {
+        // Get the field ID
+        const b_id = params.b_id
+        if (!b_id) {
+            throw new Error("missing: b_id")
         }
 
-        try {
+        // Get the session
+        const session = await getSession(request)
+
+        if (request.method === "POST") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const { b_lu_catalogue, b_sowing_date, b_terminating_date } =
+                formValues
+
+            await addCultivation(
+                fdm,
+                session.principal_id,
+                b_lu_catalogue,
+                b_id,
+                b_sowing_date,
+                b_terminating_date,
+            )
+
+            return dataWithSuccess(
+                { result: "Data saved successfully" },
+                { message: "Gewas is toegevoegd! 🎉" },
+            )
+        }
+        if (request.method === "DELETE") {
+            const formData = await request.formData()
+            const b_lu = formData.get("b_lu")
+
+            if (!b_lu) {
+                throw new Error("missing: b_lu")
+            }
+            if (typeof b_lu !== "string") {
+                throw new Error("invalid: b_lu")
+            }
+
             await removeCultivation(fdm, session.principal_id, b_lu)
 
             return dataWithSuccess("Date deleted successfully", {
                 message: "Gewas is verwijderd",
             })
-        } catch (error) {
-            // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting cultivation:", error)
-            return dataWithError(
-                error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van het gewas. Probeer het later opnieuw.",
-            )
         }
+    } catch (error) {
+        return handleActionError(error)
     }
 }

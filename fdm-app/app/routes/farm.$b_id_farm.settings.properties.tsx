@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -218,16 +219,16 @@ Wageningen"
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id_farm = params.b_id_farm
-
-    if (!b_id_farm) {
-        return dataWithError(null, "Missing farm ID.")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
     try {
+        const b_id_farm = params.b_id_farm
+
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -247,11 +248,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `${formValues.b_name_farm} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        console.error("Failed to update farm:", error)
-        return dataWithError(
-            null,
-            `Er is iets misgegaan bij het bijwerken van de bedrijfgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
-        )
+        return handleActionError(error)
     }
 }
 

@@ -3,6 +3,7 @@ import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
@@ -118,44 +119,51 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the farm ID
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        return dataWithError(null, "Missing farm ID.")
+    try {
+        // Get the farm ID
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+
+        // Get the field ID
+        const b_id = params.b_id
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+
+        // Get cultivation id
+        const b_lu = params.b_lu
+        if (!b_lu) {
+            throw new Error("missing: b_lu")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        // Collect form entry
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+        const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
+
+        await addHarvest(
+            fdm,
+            session.principal_id,
+            b_lu,
+            b_harvesting_date,
+            b_lu_yield,
+            b_lu_n_harvestable,
+        )
+
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
+            {
+                message: "Oogst is toegevoegd! 🎉",
+            },
+        )
+    } catch (error) {
+        return handleActionError(error)
     }
-
-    // Get the field ID
-    const b_id = params.b_id
-    if (!b_id) {
-        return dataWithError(null, "Missing field ID.")
-    }
-
-    // Get cultivation id
-    const b_lu = params.b_lu
-    if (!b_lu) {
-        return dataWithError(null, "Missing b_lu value.")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    // Collect form entry
-    const formValues = await extractFormValuesFromRequest(request, FormSchema)
-    const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
-
-    await addHarvest(
-        fdm,
-        session.principal_id,
-        b_lu,
-        b_harvesting_date,
-        b_lu_yield,
-        b_lu_n_harvestable,
-    )
-
-    return redirectWithSuccess(
-        `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
-        {
-            message: "Oogst is toegevoegd! 🎉",
-        },
-    )
 }

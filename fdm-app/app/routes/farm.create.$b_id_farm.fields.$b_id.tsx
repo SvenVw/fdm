@@ -54,6 +54,7 @@ import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -625,17 +626,19 @@ export default function Index() {
  * Throws an error if field or farm ID is missing.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id = params.b_id
-    const b_id_farm = params.b_id_farm
-
-    if (!b_id || !b_id_farm) {
-        return dataWithError(null, "Missing field or farm ID.")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
     try {
+        const b_id = params.b_id
+        if (!b_id) {
+            return handleActionError("missing: b_id")
+        }
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            return handleActionError("missing: b_id_farm")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -653,7 +656,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        const cultivations = await getCultivations(fdm, session.principal_id, b_id)
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
         if (cultivations && cultivations.length > 0) {
             await updateCultivation(
                 fdm,
@@ -663,52 +670,46 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 undefined,
                 undefined,
             )
-        } else {
-            // Handle the case where there are no cultivations found (although there should always be at least one)
-            console.error("No existing cultivation found for field ", b_id)
-            return dataWithError(
-                null,
-                "Failed to update cultivation. No cultivation found for field.",
-            )
-        }
 
-        const currentSoilAnalysis = await getSoilAnalysis(fdm, session.principal_id, b_id)
-        const soilPropertiesChanged =
-            currentSoilAnalysis?.b_soiltype_agr !== formValues.b_soiltype_agr ||
-            currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
-            currentSoilAnalysis?.a_p_al !== formValues.a_p_al ||
-            currentSoilAnalysis?.a_p_cc !== formValues.a_p_cc ||
-            currentSoilAnalysis?.a_som_loi !== formValues.a_som_loi
-
-        if (soilPropertiesChanged) {
-            const currentYear = new Date().getFullYear()
-            const defaultDate = new Date(currentYear, 0, 1)
-            await addSoilAnalysis(
+            const currentSoilAnalysis = await getSoilAnalysis(
                 fdm,
                 session.principal_id,
-                defaultDate,
-                "user",
                 b_id,
-                30,
-                defaultDate,
-                {
-                    a_p_al: formValues.a_p_al,
-                    a_p_cc: formValues.a_p_cc,
-                    a_som_loi: formValues.a_som_loi,
-                    b_soiltype_agr: formValues.b_soiltype_agr,
-                    b_gwl_class: formValues.b_gwl_class,
-                },
             )
-        }
+            const soilPropertiesChanged =
+                currentSoilAnalysis?.b_soiltype_agr !==
+                    formValues.b_soiltype_agr ||
+                currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
+                currentSoilAnalysis?.a_p_al !== formValues.a_p_al ||
+                currentSoilAnalysis?.a_p_cc !== formValues.a_p_cc ||
+                currentSoilAnalysis?.a_som_loi !== formValues.a_som_loi
 
-        return dataWithSuccess("fields have been updated", {
-            message: `${formValues.b_name} is bijgewerkt! 🎉`,
-        })
+            if (soilPropertiesChanged) {
+                const currentYear = new Date().getFullYear()
+                const defaultDate = new Date(currentYear, 0, 1)
+                await addSoilAnalysis(
+                    fdm,
+                    session.principal_id,
+                    defaultDate,
+                    "user",
+                    b_id,
+                    30,
+                    defaultDate,
+                    {
+                        a_p_al: formValues.a_p_al,
+                        a_p_cc: formValues.a_p_cc,
+                        a_som_loi: formValues.a_som_loi,
+                        b_soiltype_agr: formValues.b_soiltype_agr,
+                        b_gwl_class: formValues.b_gwl_class,
+                    },
+                )
+            }
+
+            return dataWithSuccess("fields have been updated", {
+                message: `${formValues.b_name} is bijgewerkt! 🎉`,
+            })
+        }
     } catch (error) {
-        console.error("Failed to update field:", error)
-        return dataWithError(
-            null,
-            `Er is iets misgegaan bij het bijwerken van het perceel: ${error instanceof Error ? error.message : "Unknown error"}`,
-        )
+        return handleActionError(error)
     }
 }

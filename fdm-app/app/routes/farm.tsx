@@ -8,6 +8,7 @@ import { Outlet, useLoaderData } from "react-router"
 import { SidebarApp } from "@/components/custom/sidebar-app"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { auth, getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 export const meta: MetaFunction = () => {
     return [
@@ -42,16 +43,19 @@ export default function App() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-    // Get the session
-    const session = await getSession(request)
+    try {
+        // Get the session
+        const session = await getSession(request)
 
-    // Revoke the session
-    await auth.api.revokeSession({
-        headers: request.headers,
-        body: {
-            token: session?.session.token,
-        },
-    })
-
-    return redirect("/signin")
+        // Revoke the session
+        await auth.api.revokeSession({
+            headers: request.headers,
+            body: {
+                token: session?.session.token,
+            },
+        })
+        return redirect("/signin")
+    } catch (error) {
+        return handleActionError(error)
+    }
 }

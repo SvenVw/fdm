@@ -50,6 +50,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -223,57 +224,35 @@ export default function Index() {
 
 // Action
 export async function action({ request, params }: ActionFunctionArgs) {
-    const formData = await request.formData()
-    const b_id_farm = params.b_id_farm
+    try {
+        const formData = await request.formData()
+        const b_id_farm = params.b_id_farm
 
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    const selectedFields = JSON.parse(String(formData.get("selected_fields")))
+        const selectedFields = JSON.parse(
+            String(formData.get("selected_fields")),
+        )
 
-    // Add fields to farm
-    await Promise.all(
-        selectedFields.features.map(async (field, index: number) => {
-            const b_name = `Perceel ${index + 1}`
-            const b_id_source = field.properties.b_id_source
-            const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
-            const b_geometry = field.geometry
-            const currentYear = new Date().getFullYear()
-            const defaultDate = new Date(currentYear, 0, 1)
-            const b_acquiring_date = defaultDate
-            const b_date_sowing = defaultDate
-            const b_terminating_date = undefined
-            const b_acquiring_method = "unknown"
+        // Add fields to farm
+        await Promise.all(
+            selectedFields.features.map(async (field, index: number) => {
+                const b_name = `Perceel ${index + 1}`
+                const b_id_source = field.properties.b_id_source
+                const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
+                const b_geometry = field.geometry
+                const currentYear = new Date().getFullYear()
+                const defaultDate = new Date(currentYear, 0, 1)
+                const b_acquiring_date = defaultDate
+                const b_date_sowing = defaultDate
+                const b_terminating_date = undefined
+                const b_acquiring_method = "unknown"
 
-            // Validate dates
-            if (
-                new Date(b_acquiring_date) > new Date() ||
-                new Date(b_date_sowing) > new Date()
-            ) {
-                throw data("Future dates are not allowed", {
-                    status: 400,
-                    statusText: "Future dates are not allowed",
-                })
-            }
-            if (new Date(b_date_sowing) < new Date(b_acquiring_date)) {
-                throw data(
-                    "Sowing should happen after field started to be managed",
-                    {
-                        status: 400,
-                        statusText:
-                            "Sowing should happen after field started to be managed",
-                    },
-                )
-            }
-
-            try {
                 const b_id = await addField(
                     fdm,
                     session.principal_id,
@@ -343,17 +322,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 }
 
                 return b_id
-            } catch (error) {
-                console.error(`Failed to process field ${b_name}:`, error)
-                throw data(`Failed to add field ${b_name}: ${error.message}`, {
-                    status: 500,
-                    statusText: `Failed to add field ${b_name}`,
-                })
-            }
-        }),
-    )
+            }),
+        )
 
-    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
-        message: "Percelen zijn toegevoegd! 🎉",
-    })
+        return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
+            message: "Percelen zijn toegevoegd! 🎉",
+        })
+    } catch (error) {
+        return handleActionError(error)
+    }
 }

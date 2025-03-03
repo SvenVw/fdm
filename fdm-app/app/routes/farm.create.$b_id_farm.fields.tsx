@@ -26,6 +26,7 @@ import {
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -181,27 +182,21 @@ export default function Index() {
 
 // Action
 export async function action({ request, params }: LoaderFunctionArgs) {
-    const formData = await request.formData()
-    const b_id = formData.get("b_id")?.toString()
-    const b_name = formData.get("b_name")?.toString()
-
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-    if (!b_name) {
-        throw data("Field name is required", {
-            status: 400,
-            statusText: "Field name is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
     try {
+        const formData = await request.formData()
+        const b_id = formData.get("b_id")?.toString()
+        const b_name = formData.get("b_name")?.toString()
+
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+        if (!b_name) {
+            throw new Error("missing: b_name")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const updatedField = await updateField(
             fdm,
             session.principal_id,
@@ -215,9 +210,6 @@ export async function action({ request, params }: LoaderFunctionArgs) {
         )
         return { field: updatedField }
     } catch (error) {
-        throw data(
-            `Failed to update field: ${error instanceof Error ? error.message : "Unknown error"}`,
-            { status: 500, statusText: "Failed to update field" },
-        )
+        return handleActionError(error)
     }
 }

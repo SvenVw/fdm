@@ -21,6 +21,7 @@ import {
 import { dataWithError } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get the field id
@@ -33,7 +34,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
     // Get the session
     const session = await getSession(request)
-    
+
     // Get details of field
     const field = await getField(fdm, session.principal_id, b_id)
     if (!field) {
@@ -119,9 +120,13 @@ export default function FarmFieldAtlasBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id = params.b_id
+    try {
+        const b_id = params.b_id
 
-    if (!b_id) {
-        return dataWithError(null, "Missing field ID.")
+        if (!b_id) {
+            throw new Error("Missing field ID.")
+        }
+    } catch (error) {
+        return handleActionError(error)
     }
 }

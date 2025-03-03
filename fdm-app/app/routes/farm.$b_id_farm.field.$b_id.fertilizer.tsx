@@ -4,6 +4,7 @@ import { FormSchema } from "@/components/custom/fertilizer-applications/formsche
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { calculateDose } from "@svenvw/fdm-calculator"
@@ -124,63 +125,62 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the field ID
-    const b_id = params.b_id
-    if (!b_id) {
-        return dataWithError(null, "Missing field ID.")
-    }
+    try {
+        // Get the field ID
+        const b_id = params.b_id
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    if (request.method === "POST") {
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { p_id, p_app_amount, p_app_date } = formValues
+        if (request.method === "POST") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const { p_id, p_app_amount, p_app_date } = formValues
 
-        await addFertilizerApplication(
-            fdm,
-            session.principal_id,
-            b_id,
-            p_id,
-            p_app_amount,
-            undefined,
-            p_app_date,
-        )
+            await addFertilizerApplication(
+                fdm,
+                session.principal_id,
+                b_id,
+                p_id,
+                p_app_amount,
+                undefined,
+                p_app_date,
+            )
 
-        return dataWithSuccess(
-            { result: "Data saved successfully" },
-            { message: "Bemesting is toegevoegd! 🎉" },
-        )
-    }
-
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const p_app_id = formData.get("p_app_id")
-
-        if (!p_app_id || typeof p_app_id !== "string") {
-            return dataWithError(
-                "Invalid or missing p_app_id value",
-                "Oops! Something went wrong. Please try again later.",
+            return dataWithSuccess(
+                { result: "Data saved successfully" },
+                { message: "Bemesting is toegevoegd! 🎉" },
             )
         }
 
-        try {
-            await removeFertilizerApplication(fdm, session.principal_id, p_app_id)
+        if (request.method === "DELETE") {
+            const formData = await request.formData()
+            const p_app_id = formData.get("p_app_id")
+
+            if (!p_app_id || typeof p_app_id !== "string") {
+                return dataWithError(
+                    "Invalid or missing p_app_id value",
+                    "Oops! Something went wrong. Please try again later.",
+                )
+            }
+
+            await removeFertilizerApplication(
+                fdm,
+                session.principal_id,
+                p_app_id,
+            )
 
             return dataWithSuccess("Date deleted successfully", {
                 message: "Bemesting is verwijderd",
             })
-        } catch (error) {
-            // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting fertilizer application:", error)
-            return dataWithError(
-                error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van de bemesting. Probeer het later opnieuw.",
-            )
         }
+    } catch (error) {
+        return handleActionError(error)
     }
 }

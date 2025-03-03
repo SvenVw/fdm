@@ -30,6 +30,7 @@ import { dataWithError, redirectWithSuccess } from "remix-toast"
 // Services
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -98,14 +99,16 @@ export default function AddFarmPage() {
  * @returns A redirect response to the newly created farm's page.
  */
 export async function action({ request }: ActionFunctionArgs) {
-    // Get the session
-    const session = await getSession(request)
-
-    const formValues = await extractFormValuesFromRequest(request, FormSchema)
-    const { b_name_farm } = formValues
-
-    // Create a farm
     try {
+        // Get the session
+        const session = await getSession(request)
+
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+        const { b_name_farm } = formValues
+
         const b_id_farm = await addFarm(
             fdm,
             session.principal_id,
@@ -122,6 +125,8 @@ export async function action({ request }: ActionFunctionArgs) {
                     session.principal_id,
                     fertilizer.p_id_catalogue,
                     b_id_farm,
+                    null,
+                    null,
                 ),
             ),
         )
@@ -129,10 +134,6 @@ export async function action({ request }: ActionFunctionArgs) {
             message: "Bedrijf is toegevoegd! 🎉",
         })
     } catch (error) {
-        console.error("Failed to create farm with fertilizers:", error)
-        return dataWithError(
-            null,
-            "Er is iets misgegaan bij het aanmaken van het bedrijf.",
-        )
+        return handleActionError(error)
     }
 }

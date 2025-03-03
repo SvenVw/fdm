@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { cn } from "@/lib/utils"
@@ -325,16 +326,16 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id = params.b_id
-
-    if (!b_id) {
-        return dataWithError(null, "Perceel ID ontbreekt.")
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
     try {
+        const b_id = params.b_id
+
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -356,11 +357,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `Perceel ${formValues.b_name} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        console.error("Fout bij bijwerken perceel: ", error)
-        return dataWithError(
-            null,
-            "Er is een onbekende fout opgetreden bij het bijwerken van de perceelgegevens.",
-        )
+        return handleActionError(error)
     }
 }
 

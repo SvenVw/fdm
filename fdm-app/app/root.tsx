@@ -56,8 +56,14 @@ export function Layout() {
         if (toast && toast.type === "error") {
             notify.error(toast.message)
         }
+        if (toast && toast.type === "warning") {
+            notify.warning(toast.message)
+        }
         if (toast && toast.type === "success") {
             notify.success(toast.message)
+        }
+        if (toast && toast.type === "info") {
+            notify.info(toast.message)
         }
     }, [toast])
 

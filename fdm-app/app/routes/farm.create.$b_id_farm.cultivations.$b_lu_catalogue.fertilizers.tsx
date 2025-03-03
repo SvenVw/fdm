@@ -22,6 +22,7 @@ import {
 } from "@svenvw/fdm-core"
 import { fdm } from "../lib/fdm.server"
 import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
 
 // Loader
 export async function loader({ request, params }: LoaderFunctionArgs) {
@@ -157,102 +158,82 @@ export default function Index() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the cultivation
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw data("Cultivation catalogue ID is required", {
-            status: 400,
-            statusText: "Cultivation catalogue ID is required",
-        })
-    }
-
-    // Get the session
-    const session = await getSession(request)
-
-    if (request.method === "POST") {
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { p_id, p_app_amount, p_app_date } = formValues
-
-        // Get the cultivation details for this cultivation
-        const cultivationPlan = await getCultivationPlan(fdm, session.principal_id, b_id_farm).catch(
-            (error) => {
-                throw data("Failed to fetch cultivation plan", {
-                    status: 500,
-                    statusText: error.message,
-                })
-            },
-        )
-
-        // Get the id of the fields with this cultivation
-        const fields = cultivationPlan.find(
-            (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
-        ).fields
-
-        fields.map(async (field) => {
-            const b_id = field.b_id
-            await addFertilizerApplication(
-                fdm,
-                session.principal_id,
-                b_id,
-                p_id,
-                p_app_amount,
-                undefined,
-                p_app_date,
-            )
-        })
-
-        return dataWithSuccess(
-            { result: "Data saved successfully" },
-            { message: "Bemesting is toegevoegd! 🎉" },
-        )
-    }
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const rawAppIds = formData.get("p_app_id")
-
-        if (!rawAppIds || typeof rawAppIds !== "string") {
-            return dataWithError(
-                "Invalid or missing p_app_ids value",
-                "Oops! Something went wrong. Please try again later.",
-            )
+    try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+        // Get the cultivation
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw new Error("missing: b_lu_catalogue")
         }
 
-        try {
+        // Get the session
+        const session = await getSession(request)
+
+        if (request.method === "POST") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const { p_id, p_app_amount, p_app_date } = formValues
+
+            // Get the cultivation details for this cultivation
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
+
+            // Get the id of the fields with this cultivation
+            const fields = cultivationPlan.find(
+                (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+            ).fields
+
+            fields.map(async (field) => {
+                const b_id = field.b_id
+                await addFertilizerApplication(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                    p_id,
+                    p_app_amount,
+                    undefined,
+                    p_app_date,
+                )
+            })
+
+            return dataWithSuccess(
+                { result: "Data saved successfully" },
+                { message: "Bemesting is toegevoegd! 🎉" },
+            )
+        }
+        if (request.method === "DELETE") {
+            const formData = await request.formData()
+            const rawAppIds = formData.get("p_app_id")
+
+            if (!rawAppIds || typeof rawAppIds !== "string") {
+                throw new Error("invalid: p_app_id")
+            }
+
             const p_app_ids = rawAppIds.split(",")
             await Promise.all(
                 p_app_ids.map((p_app_id: string) =>
-                    removeFertilizerApplication(fdm, session.principal_id, p_app_id),
+                    removeFertilizerApplication(
+                        fdm,
+                        session.principal_id,
+                        p_app_id,
+                    ),
                 ),
             )
 
             return dataWithSuccess({}, { message: "Bemesting is verwijderd" })
-        } catch (error) {
-            // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting fertilizer application:", error)
-            return dataWithError(
-                error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van de bemesting. Probeer het later opnieuw.",
-            )
         }
+        throw new Error(`${request.method} is not supported`)
+    } catch (error) {
+        return handleActionError(error)
     }
-
-    //  Handle other methods. This returns an error response for methods other than POST or DELETE, which may or may not be what's desired.
-    console.error(`${request.method} is not supported`)
-    return dataWithError(
-        null,
-        "Oops! Something went wrong. Please try again later.",
-    )
 }
