@@ -44,13 +44,16 @@ export function calculateDose({
         }
 
         // Calculate total nitrogen dose
-        const p_dose_n = application.p_app_amount * (fertilizer.p_n_rt ?? 0)
+        const p_dose_n =
+            application.p_app_amount * ((fertilizer.p_n_rt ?? 0) / 10)
 
         // Calculate phosphate dose
-        const p_dose_p2o5 = application.p_app_amount * (fertilizer.p_p_rt ?? 0)
+        const p_dose_p2o5 =
+            application.p_app_amount * ((fertilizer.p_p_rt ?? 0) / 10)
 
         // Calculate potassium dose
-        const p_dose_k2o = application.p_app_amount * (fertilizer.p_k_rt ?? 0)
+        const p_dose_k2o =
+            application.p_app_amount * ((fertilizer.p_k_rt ?? 0) / 10)
 
         return {
             p_dose_n: p_dose_n,
