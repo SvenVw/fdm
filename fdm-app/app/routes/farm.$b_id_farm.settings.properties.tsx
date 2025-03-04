@@ -31,6 +31,16 @@ import validator from "validator"
 import { z } from "zod"
 const { isPostalCode } = validator
 
+/**
+ * Retrieves the details of a farm using the farm ID from the URL parameters and the user's session.
+ *
+ * This function validates that a farm ID is provided and obtains the current session to fetch the
+ * corresponding farm details. It throws an error with a 400 status if the farm ID is missing and a 404
+ * status if no matching farm is found.
+ *
+ * @returns An object containing the farm details under the `farm` property.
+ * @throws {Response} If the farm ID is missing or if the farm could not be found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -63,6 +73,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a form for updating farm properties.
+ *
+ * This component initializes a form using data loaded from the route loader and sets default values for fields such as company name (required), business ID, address, and postal code. It leverages validation with a Zod schema and automatically resets form data when the loader data changes. Upon submission, the form sends a POST request to update the farm settings.
+ */
 export default function FarmSettingsPropertiesBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
@@ -222,6 +237,16 @@ Wageningen"
     )
 }
 
+/**
+ * Updates farm settings using values submitted from a form.
+ *
+ * This function extracts the farm ID from URL parameters and retrieves the user session
+ * from the request. It then parses and validates form data based on a predefined schema, and
+ * updates the corresponding farm record with the provided values. On successful update, it returns
+ * a response containing a success message.
+ *
+ * @throws {Error} If the farm ID is missing or if an error occurs during the update process.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm

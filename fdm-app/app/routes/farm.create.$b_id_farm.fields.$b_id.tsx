@@ -124,12 +124,18 @@ const FormSchema = z.object({
 })
 
 /**
- * Loader function for the field details page.
- * Fetches field data, soil analysis, cultivation options, and geojson data.
- * @param request - The incoming request object.
- * @param params - URL parameters containing `b_id_farm` (farm ID) and `b_id` (field ID).
- * @returns An object containing field details, cultivation options, and mapbox token.
- * Throws an error if farm ID, field ID, or field data is missing.
+ * Retrieves and prepares data for rendering the field details page.
+ *
+ * This loader validates the presence of the required farm and field IDs extracted from the URL parameters,
+ * obtains the session information, and uses it to fetch the associated field data. It constructs a GeoJSON
+ * FeatureCollection based on the field's geometry and retrieves additional details such as soil analysis,
+ * cultivation options filtered from the catalogue, and Mapbox configuration (token and style).
+ *
+ * @param request - The incoming HTTP request.
+ * @param params - URL parameters with 'b_id_farm' as the farm ID and 'b_id' as the field ID.
+ * @returns An object containing field properties, soil analysis, cultivation details, a GeoJSON FeatureCollection,
+ *   and Mapbox configuration needed for the field details page.
+ * @throws {Error} When required identifiers (farm ID, field ID), field data, or field geometry are missing.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -621,13 +627,17 @@ export default function Index() {
 }
 
 /**
- * Action function for updating field details.
- * Handles form submission, updates field data in the database,
- * and manages soil analysis updates.
- * @param request - The incoming request object containing form data.
- * @param params - URL parameters containing `b_id` (field ID) and `b_id_farm` (farm ID).
- * @returns A success or error toast based on the outcome of the update operation.
- * Throws an error if field or farm ID is missing.
+ * Processes the form submission to update field details.
+ *
+ * This function validates that the necessary URL parameters for the field and farm IDs are present.
+ * It extracts form data and session information from the incoming request, updates the field record,
+ * and, if applicable, updates the related cultivation data. If the submitted soil properties differ from
+ * the existing values, a new soil analysis entry is added.
+ *
+ * @param request - The HTTP request containing form submission and session data.
+ * @param params - An object with URL parameters including the field ID (b_id) and farm ID (b_id_farm).
+ * @returns A payload with a success message upon successful update.
+ * @throws {Error} If either the field ID or farm ID is missing.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {

@@ -3,6 +3,21 @@ import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
 import { Button } from "../ui/button"
 
+/**
+ * Displays a full-screen error block with tailored messaging and navigation options.
+ *
+ * Depending on the provided error status, this component renders:
+ * - A specific message and navigation buttons for a 404 error, indicating that the page does not exist.
+ * - A generic error message along with a button to copy the formatted error details (including status, message, stack trace, page, and timestamp) to the clipboard for other errors.
+ *
+ * If an error message is available, the component also displays the error details formatted as pretty-printed JSON. Otherwise, it shows a fallback message for non-404 errors.
+ *
+ * @param status - HTTP status code of the error or null.
+ * @param message - Detailed error message, or null if not available.
+ * @param stacktrace - Optional stack trace providing additional error context.
+ * @param page - The page where the error occurred.
+ * @param timestamp - The timestamp when the error was recorded.
+ */
 export function ErrorBlock({
     status,
     message,

@@ -31,7 +31,22 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Loads data required for the farm cultivations page.
+ *
+ * This loader verifies that a farm ID is provided in the URL parameters and uses the current user session to fetch
+ * the corresponding farm details. It then retrieves the cultivation plan for the farm and constructs sidebar navigation
+ * items based on the available cultivations.
+ *
+ * @returns An object containing:
+ * - cultivationPlan: An array of cultivation entries.
+ * - sidebarPageItems: An array of navigation items for the sidebar.
+ * - b_id_farm: The farm identifier.
+ * - b_name_farm: The name of the farm.
+ *
+ * @throws {Response} 400 if the farm ID is missing.
+ * @throws {Response} 404 if the farm is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the Id of the farm

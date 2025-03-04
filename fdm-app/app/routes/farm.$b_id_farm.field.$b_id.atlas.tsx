@@ -22,6 +22,15 @@ import {
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
 
+/**
+ * Loads field data and Mapbox configuration for rendering a farm field on the map.
+ *
+ * This function retrieves a farm field's details using the field ID from the route parameters. It establishes a valid user session and uses it to fetch the corresponding field data. The retrieved field details are formatted into a GeoJSON FeatureCollection, and Mapbox configuration values (access token and style) are provided for map rendering.
+ *
+ * @returns An object containing the field's GeoJSON FeatureCollection, Mapbox access token, and Mapbox style.
+ *
+ * @throws {Response} Thrown if the field ID is missing from the parameters or if the field is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the field id
@@ -74,6 +83,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a map view of a farm field.
+ *
+ * This component uses data retrieved from the loader to display a non-interactive Mapbox map with the field overlaid as a styled layer. It computes the view state and field styles, then conditionally renders the map on the client side with a skeleton fallback.
+ *
+ * @returns A JSX element displaying the field map.
+ */
 export default function FarmFieldAtlasBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
@@ -122,6 +138,18 @@ export default function FarmFieldAtlasBlock() {
     )
 }
 
+/**
+ * Validates the presence of a field identifier in the route parameters.
+ *
+ * Extracts the field ID (b_id) from the provided parameters and throws an error if it is absent,
+ * ensuring the action has the required identifier. Any errors are caught and rethrown via the
+ * error handling mechanism.
+ *
+ * @param request - The HTTP request associated with the action.
+ * @param params - The route parameters, expected to include a valid field identifier (b_id).
+ *
+ * @throws {Error} When the field identifier is missing.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id = params.b_id

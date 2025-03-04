@@ -24,7 +24,13 @@ import {
 import { dataWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
 
-// Loader
+/**
+ * Loads fertilizer and cultivation data for a given farm and cultivation catalogue.
+ *
+ * This function retrieves available fertilizers and the cultivation plan using session details, then aggregates similar fertilizer applications across all fields of the target cultivation. It also calculates the fertilizer dose and prepares fertilizer options for a combobox. If the required farm or catalogue identifiers are missing, or if the specified cultivation is not found, it returns an error response through a centralized error handler.
+ *
+ * @returns An object containing the farm ID, cultivation catalogue ID, fertilizer options, aggregated fertilizer applications, and the calculated fertilizer dose.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Extract farm ID from URL parameters
@@ -123,6 +129,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the fertilizer management interface.
+ *
+ * This component displays a form for adding new fertilizer applications alongside a list of existing applications and a card
+ * that shows the calculated fertilizer dose. It retrieves necessary data using loader data, the current location, and a fetcher
+ * for asynchronous actions.
+ *
+ * @example
+ * // Renders the fertilizer applications view.
+ * <Index />
+ */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
@@ -156,6 +173,16 @@ export default function Index() {
     )
 }
 
+/**
+ * Handles the addition and removal of fertilizer applications for a specific farm cultivation.
+ *
+ * Processes POST requests by validating URL parameters, retrieving session data, extracting fertilizer details from the form,
+ * and applying the fertilizer to all fields within the specified cultivation. Processes DELETE requests by validating and parsing
+ * a comma-separated list of fertilizer application IDs and removing each application.
+ *
+ * @throws {Error} If required URL parameters (farm ID or cultivation catalogue ID) are missing, if form data validation fails,
+ * or if the request method is unsupported.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         // Get the Id of the farm

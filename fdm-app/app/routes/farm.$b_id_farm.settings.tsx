@@ -14,6 +14,20 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads farm details, farm options, and sidebar navigation items for a given farm.
+ *
+ * Retrieves the farm identifier from the route parameters, validates it, and uses the user's session from the request to
+ * fetch the corresponding farm details. It also retrieves all farms associated with the user, mapping them into simplified
+ * farm options. Additionally, it constructs sidebar page items for navigating to farm properties, access settings, and deletion.
+ *
+ * @param params - Route parameters; must include a valid `b_id_farm`.
+ * @returns An object containing the farm details, the farm identifier, an array of farm options, and an array of sidebar page items.
+ *
+ * @throws {Response} If `b_id_farm` is missing from the parameters.
+ * @throws {Response} If no farm matches the provided `b_id_farm`.
+ * @throws {Response} If no farms associated with the user are found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -81,6 +95,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the layout for managing farm settings.
+ *
+ * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
+ * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ */
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

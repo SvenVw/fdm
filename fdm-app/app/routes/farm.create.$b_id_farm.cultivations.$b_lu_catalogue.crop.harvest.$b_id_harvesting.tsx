@@ -14,6 +14,20 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads harvest details for a specific cultivation plan.
+ *
+ * This function validates that the required URL parameters (catalogue identifier, farm ID, and harvesting ID) are present before retrieving the user session and fetching the corresponding cultivation plan. It then searches the cultivation plan for the specified harvest and extracts its yield, harvestable count, and harvesting date.
+ *
+ * @returns An object containing:
+ *   - b_lu_catalogue: The provided catalogue identifier.
+ *   - b_id_farm: The provided farm identifier.
+ *   - b_lu_yield: The yield value from the harvest analysis, if available.
+ *   - b_lu_n_harvestable: The number of harvestable items from the harvest analysis, if available.
+ *   - b_harvesting_date: The date of the harvest, if available.
+ *
+ * @throws {Response} When any required parameter (catalogue identifier, farm ID, or harvesting ID) is missing.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         const b_lu_catalogue = params.b_lu_catalogue
@@ -84,6 +98,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a harvest input block for a cultivation plan.
+ *
+ * This component retrieves harvest-related data using loader context and displays a form
+ * to input harvest details such as yield, harvestable N value, and harvesting date.
+ * It also includes a button that navigates back to the crop page.
+ *
+ * @returns A React element representing the harvest details entry block.
+ */
 export default function CultivationPlanGetHarvestBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

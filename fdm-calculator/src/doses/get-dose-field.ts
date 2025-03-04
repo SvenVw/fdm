@@ -11,10 +11,15 @@ import type { Dose } from "./d"
 /**
  * Calculates the total NPK dose applied to a specific field.
  *
+ * This function retrieves fertilizer applications, obtains field details to determine the associated farm ID, and fetches the properties of the fertilizers used.
+ * It then computes the total NPK dose based on the collected data.
+ *
  * @param fdm The FDM data object.
- * @param principal_id The ID of the principal making the request.
+ * @param principal_id The identifier of the principal making the request.
  * @param b_id The ID of the field.
- * @returns A Promise resolving to the total NPK dose applied to the field.
+ * @returns A Promise resolving to the calculated NPK dose for the field.
+ *
+ * @throws {Error} If retrieving data or calculating the dose fails.
  */
 export async function getDoseForField({
     fdm,

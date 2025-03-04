@@ -5,6 +5,23 @@ import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 
+/**
+ * Retrieves details of a specific farm field.
+ *
+ * This asynchronous function validates that the required farm ID (`b_id_farm`)
+ * and field ID (`b_id`) are provided in the parameters. It then obtains the user
+ * session from the request and uses it to fetch the corresponding field details.
+ * If either identifier is missing, it throws an error with a 400 status. If the field
+ * is not found, it throws an error with a 404 status.
+ *
+ * @param request - The incoming HTTP request.
+ * @param params - Route parameters expected to include `b_id_farm` and `b_id`.
+ * @returns An object containing the field details.
+ *
+ * @throws {Error} If the farm ID is missing (HTTP 400).
+ * @throws {Error} If the field ID is missing (HTTP 400).
+ * @throws {Error} If the field is not found (HTTP 404).
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -46,6 +63,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders an overview block for farm field details.
+ *
+ * This component displays a section with a title ("Bodem") and a description indicating that soil analyses will be available soon. It utilizes loader data from the corresponding loader function and includes a separator and grid layout reserved for future content.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

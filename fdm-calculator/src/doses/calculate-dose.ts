@@ -5,11 +5,15 @@ import type {
 import type { Dose } from "./d"
 
 /**
- * Calculates the total dose of N, P, and K applied to a field based on a list of fertilizer applications.
+ * Calculates the cumulative doses of nitrogen, phosphate (as P2O5), and potassium (as K2O) applied to a field.
  *
- * @param applications An array of fertilizer application objects. Each object should have a `p_id` property (fertilizer ID) and a `p_app_amount` property (amount applied).
- * @param fertilizers An array of fertilizer objects. Each object should have a `p_id` property (fertilizer ID), and `p_n_rt`, `p_p_rt`, and `p_k_rt` properties representing the percentage of nitrogen, phosphate, and potassium in the fertilizer, respectively.
- * @returns An object representing the total dose of N, P, and K applied, with properties `p_dose_n`, `p_dose_p`, and `p_dose_k`.
+ * This function iterates over each fertilizer application to determine its contribution to the overall nutrient dose by matching it with a corresponding fertilizer. For each application, it calculates the nutrient dose by multiplying the application amount by the fertilizer's nutrient rate (divided by 10) and then sums all doses into a total dose object.
+ *
+ * @param applications An array of fertilizer application objects, each with a `p_id` (fertilizer ID) and `p_app_amount` (amount applied).
+ * @param fertilizers An array of fertilizer objects, each with a `p_id` (fertilizer ID) and nutrient rates (`p_n_rt`, `p_p_rt`, `p_k_rt`) expected to be non-negative.
+ * @returns An object containing the total doses with properties: `p_dose_n` (nitrogen), `p_dose_p2o5` (phosphate as P2O5), and `p_dose_k2o` (potassium as K2O).
+ *
+ * @throws {Error} If any fertilizer application amount or nutrient rate is negative.
  */
 export function calculateDose({
     applications,

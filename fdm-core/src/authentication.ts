@@ -7,6 +7,20 @@ import type { FdmType } from "./fdm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
+/**
+ * Initializes and configures the authentication system for the farm management application.
+ *
+ * This function sets up the better-auth system with a PostgreSQL database adapter and a custom schema.
+ * It validates that required environment variables for Google and Microsoft authentication are set,
+ * configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
+ * with a 30-day expiration and daily update. It also defines mappings from social provider profiles to user
+ * formats and registers a post-user-creation hook to assign the "owner" role to new users.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @returns The configured authentication instance.
+ *
+ * @throws {Error} If required environment variables are missing or if role assignment fails.
+ */
 export function createFdmAuth(fdm: FdmType): BetterAuth {
     // Validate all required environment variables upfront
     const googleClientId = getRequiredEnvVar("GOOGLE_CLIENT_ID")
@@ -110,6 +124,13 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
     return auth
 }
 
+/**
+ * Retrieves the value of an environment variable.
+ *
+ * @param name - The name of the environment variable to retrieve.
+ * @returns The value of the environment variable.
+ * @throws {Error} If the environment variable is not set.
+ */
 function getRequiredEnvVar(name: string): string {
     const value = process.env[name]
     if (!value) {

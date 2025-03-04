@@ -23,6 +23,23 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Retrieves and processes farm and field options for the specified farm ID based on the current user session.
+ *
+ * This loader function extracts the active farm ID from the route parameters and uses the user’s session to:
+ * - Fetch all farms associated with the user, redirecting to the farms overview if none exist.
+ * - Validate and map the farms into selectable options.
+ * - Retrieve and validate the fields for the active farm, rounding each field's area and sorting the fields alphabetically.
+ *
+ * @throws {Response} When the required farm ID is missing from the route parameters.
+ * @throws {Error} When a farm or field lacks the necessary data structure.
+ *
+ * @returns An object containing:
+ * - b_id_farm: The active farm ID.
+ * - farmOptions: An array of validated farm options.
+ * - fieldOptions: A sorted array of processed field options.
+ * - userName: The name of the current user.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the active farm
@@ -81,6 +98,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a user interface for selecting or creating a field within a farm.
+ *
+ * This component retrieves loader data to access the available farm options, field options, and user information.
+ * Depending on whether fields exist, it either displays:
+ * - A welcome screen prompting the user to create a new field if no fields are present.
+ * - A list of existing fields with selection controls and a time-based greeting for navigation.
+ *
+ * @example
+ * <FarmFieldIndex />
+ */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const greeting = getTimeBasedGreeting()

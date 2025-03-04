@@ -9,18 +9,26 @@ import type { FdmType } from "./fdm"
 import type { getFieldType } from "./field.d"
 
 /**
- * Add a new field
+ * Adds a new field to a farm.
  *
- * @param fdm - The fdm instance.
- * @param principal_id - The id of the principal that is adding the field
- * @param b_id_farm - ID of the farm.
+ * This function verifies that the principal has write permission for the specified farm,
+ * generates a unique field ID, records the field details, and creates an association between
+ * the field and the farm. If a discarding date is provided, the function ensures that the acquiring
+ * date is earlier than the discarding date, throwing an error otherwise.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The unique identifier of the principal performing the operation.
+ * @param b_id_farm - Identifier of the farm to which the field belongs.
  * @param b_name - Name of the field.
- * @param b_id_source - ID of the field in source dataset
- * @param b_geometry - Geometry of field as GeoJSON
- * @param b_acquiring_date - Start date of managing field.
- * @param b_discarding_date - End date of managing field.
- * @param b_acquiring_method - Type of managing field.
- * @returns A Promise that resolves when the field has been added and returns the value for b_id.
+ * @param b_id_source - Identifier for the field in the source dataset.
+ * @param b_geometry - GeoJSON representation of the field geometry.
+ * @param b_acquiring_date - The start date for managing the field.
+ * @param b_acquiring_method - Method used for acquiring the field.
+ * @param b_discarding_date - (Optional) The end date for managing the field.
+ * @returns A promise that resolves to the newly generated field ID.
+ *
+ * @throws {Error} If the acquiring date is not earlier than the discarding date.
+ *
  * @alpha
  */
 export async function addField(
@@ -98,10 +106,17 @@ export async function addField(
 }
 
 /**
- * Get the details of a specific field.
+ * Retrieves detailed information for a specific field.
  *
- * @param b_id - The id of the field to be requested.
- * @returns A Promise that resolves with an object that contains the details of a field.
+ * This function verifies that the principal identified by `principal_id` has permission to read the field,
+ * then fetches and returns the field's properties including its geometry, area, acquisition, and related timestamps.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal making the request.
+ * @param b_id - The unique identifier of the field to retrieve.
+ *
+ * @returns A promise that resolves with the field details.
+ *
  * @alpha
  */
 export async function getField(
@@ -153,12 +168,17 @@ export async function getField(
 }
 
 /**
- * Get the details of the field for a specific farm
+ * Retrieves all fields associated with a specified farm.
  *
- * @param fdm - The fdm instance
- * @param principal_id - The id of the principal that is requesting the fields
- * @param b_id_farm - The id of the farm to be requested.
- * @returns A Promise that resolves with an array of objects that contains the details of fields related to the farm
+ * This function first verifies that the requesting principal has read access to the farm, then
+ * returns an array of field detail objects. Each object includes the field's identifier, name,
+ * source, geometry, area, acquiring and discarding dates, as well as the creation and update timestamps.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal making the request.
+ * @param b_id_farm - The unique identifier of the farm.
+ * @returns A Promise resolving to an array of field detail objects.
+ *
  * @alpha
  */
 export async function getFields(
@@ -210,18 +230,23 @@ export async function getFields(
 }
 
 /**
- * Update the details of a field
+ * Updates the details of an existing field.
  *
- * @param fdm - The fdm instance.
- * @param principal_id - The id of the principal that is updating the field
- * @param b_id - ID of the field.
- * @param b_name - Name of the field.
- * @param b_id_source - ID of the field in source dataset.
- * @param b_geometry - Geometry of field as GeoJSON
- * @param b_acquiring_date - Start date of managing field.
- * @param b_acquiring_method - Type of managing field.
- * @param b_discarding_date - End date of managing field.
- * @returns A Promise that resolves when the field has been added and returns the value for b_id.
+ * This function applies updates to the field's basic information and its associated acquiring and discarding records.
+ * It performs a permission check to ensure the principal has write access and validates that the acquiring date is earlier than the discarding date, when applicable.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal performing the update.
+ * @param b_id - The unique identifier of the field to update.
+ * @param b_name - (Optional) New name for the field.
+ * @param b_id_source - (Optional) New source identifier for the field.
+ * @param b_geometry - (Optional) Updated field geometry in GeoJSON format.
+ * @param b_acquiring_date - (Optional) Updated start date for managing the field.
+ * @param b_acquiring_method - (Optional) Updated method for field management.
+ * @param b_discarding_date - (Optional) Updated end date for managing the field.
+ * @returns A Promise that resolves to the updated field details.
+ *
+ * @throws {Error} If the acquiring date is not before the discarding date.
  * @alpha
  */
 export async function updateField(

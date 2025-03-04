@@ -4,6 +4,17 @@ import { fdm } from "@/lib/fdm.server"
 import { getCultivationPlan } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, redirect } from "react-router"
 
+/**
+ * Loads data for a farm and redirects to the crop page of its first cultivation.
+ *
+ * This function validates the presence of a farm identifier from the URL parameters, retrieves the user session,
+ * and fetches the related cultivation plan. If the farm ID is missing or no cultivation plan is found, it throws an error.
+ * All errors are processed by a custom error handler.
+ *
+ * @returns A redirect response to the crop page based on the first cultivation's catalogue.
+ *
+ * @throws {Error} If the farm identifier is missing or if no cultivations exist for the given farm.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Redirect to first cultivation
