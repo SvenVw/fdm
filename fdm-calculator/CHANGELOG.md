@@ -1,6 +1,16 @@
 # fdm-calculator
 
+## 0.1.1
+
+### Patch Changes
+
+- da00990: Fix using incorrect unit for nutrient content of fertilizer
+- Updated dependencies [9830186]
+- Updated dependencies [06619e7]
+  - @svenvw/fdm-core@0.13.0
+
 ## 0.1.0
+
 ### Minor Changes
 
 - 475986f: Add `calculateDose` and `getDoseForField` to retrieve the nutrient doses

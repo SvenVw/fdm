@@ -1,5 +1,23 @@
 # Changelog fdm-app
 
+## 1.0.0
+
+### Minor Changes
+
+- 315125e: Implement the authorization functionalities of fdm-core
+
+### Patch Changes
+
+- 7f4835c: Switch to using auth from fdm-core instead of a separate implementation
+- 8306249: Standardize error handling in actions
+- 82238cc: Standardize handling errors at loaders
+- Updated dependencies [9830186]
+- Updated dependencies [06619e7]
+- Updated dependencies [da00990]
+  - @svenvw/fdm-core@0.13.0
+  - @svenvw/fdm-calculator@1.0.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.11.2
 
 ### Patch Changes
