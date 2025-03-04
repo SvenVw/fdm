@@ -192,18 +192,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
             ).fields
 
-            fields.map(async (field) => {
-                const b_id = field.b_id
-                await addFertilizerApplication(
-                    fdm,
-                    session.principal_id,
-                    b_id,
-                    p_id,
-                    p_app_amount,
-                    undefined,
-                    p_app_date,
-                )
-            })
+            await Promise.all(
+                fields.map(async (field) => {
+                    const b_id = field.b_id
+                    addFertilizerApplication(
+                        fdm,
+                        session.principal_id,
+                        b_id,
+                        p_id,
+                        p_app_amount,
+                        undefined,
+                        p_app_date,
+                    )
+                }),
+            )
 
             return dataWithSuccess(
                 { result: "Data saved successfully" },
