@@ -14,7 +14,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get the session
-        await getSession(request)
+        const session = await getSession(request)
+
+        // Return the farm ID and session info
+        return {
+            farmId: b_id_farm,
+            session,
+        }
     } catch (error) {
         throw handleActionError(error)
     }
