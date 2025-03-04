@@ -89,33 +89,6 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
                 },
             },
         },
-        databaseHooks: {
-            user: {
-                create: {
-                    after: async (user) => {
-                        // Grant user owner role after account creation
-                        const userId = user.id
-                        try {
-                            await grantRole(
-                                fdm,
-                                "farm",
-                                "owner",
-                                userId,
-                                userId,
-                            )
-                        } catch (err) {
-                            throw handleError(
-                                err,
-                                "Exception for granting user owner role",
-                                {
-                                    userId,
-                                },
-                            )
-                        }
-                    },
-                },
-            },
-        },
         rateLimit: {
             storage: "database",
         },
