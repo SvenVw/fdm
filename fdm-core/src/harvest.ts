@@ -385,10 +385,10 @@ export async function checkHarvestDateCompability(
     // Check if harvest date is after sowing date
     const sowingDate = await tx
         .select({
-            b_lu_start: schema.fieldSowing.b_lu_start,
+            b_lu_start: schema.cultivationStarting.b_lu_start,
         })
-        .from(schema.fieldSowing)
-        .where(eq(schema.fieldSowing.b_lu, b_lu))
+        .from(schema.cultivationStarting)
+        .where(eq(schema.cultivationStarting.b_lu, b_lu))
         .limit(1)
 
     if (sowingDate.length === 0 || sowingDate[0].b_lu_start === null) {

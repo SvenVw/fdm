@@ -271,9 +271,9 @@ export const cultivations = fdmSchema.table(
 export type cultivationsTypeSelect = typeof cultivations.$inferSelect
 export type cultivationsTypeInsert = typeof cultivations.$inferInsert
 
-// Define field_sowing table
-export const fieldSowing = fdmSchema.table(
-    "field_sowing",
+// Define cultivation_starting table
+export const cultivationStarting = fdmSchema.table(
+    "cultivation_starting",
     {
         b_id: text()
             .notNull()
@@ -296,8 +296,8 @@ export const fieldSowing = fdmSchema.table(
     },
 )
 
-export type fieldSowingTypeSelect = typeof fieldSowing.$inferSelect
-export type fieldSowingTypeInsert = typeof fieldSowing.$inferInsert
+export type cultivationStartingTypeSelect = typeof cultivationStarting.$inferSelect
+export type cultivationStartingTypeInsert = typeof cultivationStarting.$inferInsert
 
 // Define cultivations_catalogue table
 export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [

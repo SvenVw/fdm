@@ -97,8 +97,8 @@ export async function addCultivation(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_lu_catalogue: schema.cultivationsTypeInsert["b_lu_catalogue"],
-    b_id: schema.fieldSowingTypeInsert["b_id"],
-    b_lu_start: schema.fieldSowingTypeInsert["b_lu_start"],
+    b_id: schema.cultivationStartingTypeInsert["b_id"],
+    b_lu_start: schema.cultivationStartingTypeInsert["b_lu_start"],
     b_lu_end?: schema.cultivationEndingTypeInsert["b_lu_end"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
@@ -162,19 +162,19 @@ export async function addCultivation(
             // Validate if cultivation is not an duplicate of already existing cultivation
             const existingCultivation = await tx
                 .select()
-                .from(schema.fieldSowing)
+                .from(schema.cultivationStarting)
                 .leftJoin(
                     schema.cultivations,
-                    eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
+                    eq(schema.cultivationStarting.b_lu, schema.cultivations.b_lu),
                 )
                 .where(
                     and(
-                        eq(schema.fieldSowing.b_id, b_id),
+                        eq(schema.cultivationStarting.b_id, b_id),
                         or(
-                            eq(schema.fieldSowing.b_lu, b_lu),
+                            eq(schema.cultivationStarting.b_lu, b_lu),
                             and(
                                 eq(
-                                    schema.fieldSowing.b_lu_start,
+                                    schema.cultivationStarting.b_lu_start,
                                     b_lu_start,
                                 ),
                                 eq(
@@ -196,7 +196,7 @@ export async function addCultivation(
                 b_lu_catalogue: b_lu_catalogue,
             })
 
-            await tx.insert(schema.fieldSowing).values({
+            await tx.insert(schema.cultivationStarting).values({
                 b_id: b_id,
                 b_lu: b_lu,
                 b_lu_start: b_lu_start,
@@ -277,15 +277,15 @@ export async function getCultivation(
                 b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
-                b_lu_start: schema.fieldSowing.b_lu_start,
+                b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end:
                     schema.cultivationEnding.b_lu_end,
-                b_id: schema.fieldSowing.b_id,
+                b_id: schema.cultivationStarting.b_id,
             })
             .from(schema.cultivations)
             .leftJoin(
-                schema.fieldSowing,
-                eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
+                schema.cultivationStarting,
+                eq(schema.cultivationStarting.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
                 schema.cultivationEnding,
@@ -333,7 +333,7 @@ export async function getCultivation(
 export async function getCultivations(
     fdm: FdmType,
     principal_id: PrincipalId,
-    b_id: schema.fieldSowingTypeSelect["b_id"],
+    b_id: schema.cultivationStartingTypeSelect["b_id"],
 ): Promise<getCultivationType[]> {
     try {
         await checkPermission(
@@ -353,15 +353,15 @@ export async function getCultivations(
                 b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
-                b_lu_start: schema.fieldSowing.b_lu_start,
+                b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end:
                     schema.cultivationEnding.b_lu_end,
-                b_id: schema.fieldSowing.b_id,
+                b_id: schema.cultivationStarting.b_id,
             })
             .from(schema.cultivations)
             .leftJoin(
-                schema.fieldSowing,
-                eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
+                schema.cultivationStarting,
+                eq(schema.cultivationStarting.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
                 schema.cultivationEnding,
@@ -377,9 +377,9 @@ export async function getCultivations(
                     schema.cultivationsCatalogue.b_lu_catalogue,
                 ),
             )
-            .where(eq(schema.fieldSowing.b_id, b_id))
+            .where(eq(schema.cultivationStarting.b_id, b_id))
             .orderBy(
-                desc(schema.fieldSowing.b_lu_start),
+                desc(schema.cultivationStarting.b_lu_start),
                 asc(schema.cultivationsCatalogue.b_lu_name),
             )
 
@@ -488,7 +488,7 @@ export async function getCultivationPlan(
                 b_lu: schema.cultivations.b_lu,
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
-                b_lu_start: schema.fieldSowing.b_lu_start,
+                b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end:
                     schema.cultivationEnding.b_lu_end,
                 p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
@@ -521,16 +521,16 @@ export async function getCultivationPlan(
                 eq(schema.fieldAcquiring.b_id, schema.fields.b_id),
             )
             .leftJoin(
-                schema.fieldSowing,
-                eq(schema.fields.b_id, schema.fieldSowing.b_id),
+                schema.cultivationStarting,
+                eq(schema.fields.b_id, schema.cultivationStarting.b_id),
             )
             .leftJoin(
                 schema.cultivationEnding,
-                eq(schema.cultivationEnding.b_lu, schema.fieldSowing.b_lu),
+                eq(schema.cultivationEnding.b_lu, schema.cultivationStarting.b_lu),
             )
             .leftJoin(
                 schema.cultivations,
-                eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
+                eq(schema.cultivationStarting.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
                 schema.cultivationsCatalogue,
@@ -724,8 +724,8 @@ export async function removeCultivation(
                 .where(eq(schema.cultivationEnding.b_lu, b_lu))
 
             await tx
-                .delete(schema.fieldSowing)
-                .where(eq(schema.fieldSowing.b_lu, b_lu))
+                .delete(schema.cultivationStarting)
+                .where(eq(schema.cultivationStarting.b_lu, b_lu))
 
             await tx
                 .delete(schema.cultivations)
@@ -758,7 +758,7 @@ export async function updateCultivation(
     principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
     b_lu_catalogue?: schema.cultivationsTypeInsert["b_lu_catalogue"],
-    b_lu_start?: schema.fieldSowingTypeInsert["b_lu_start"],
+    b_lu_start?: schema.cultivationStartingTypeInsert["b_lu_start"],
     b_lu_end?: schema.cultivationEndingTypeInsert["b_lu_end"],
 ): Promise<void> {
     try {
@@ -849,9 +849,9 @@ export async function updateCultivation(
                 }
 
                 await tx
-                    .update(schema.fieldSowing)
+                    .update(schema.cultivationStarting)
                     .set({ updated: updated, b_lu_start: b_lu_start })
-                    .where(eq(schema.fieldSowing.b_lu, b_lu))
+                    .where(eq(schema.cultivationStarting.b_lu, b_lu))
             }
 
             if (b_lu_end) {
@@ -859,13 +859,13 @@ export async function updateCultivation(
                 if (!b_lu_start) {
                     const result = await tx
                         .select({
-                            b_lu_start: schema.fieldSowing.b_lu_start,
+                            b_lu_start: schema.cultivationStarting.b_lu_start,
                         })
-                        .from(schema.fieldSowing)
+                        .from(schema.cultivationStarting)
                         .where(
                             and(
-                                eq(schema.fieldSowing.b_lu, b_lu),
-                                isNotNull(schema.fieldSowing.b_lu_start),
+                                eq(schema.cultivationStarting.b_lu, b_lu),
+                                isNotNull(schema.cultivationStarting.b_lu_start),
                             ),
                         )
                         .limit(1)
