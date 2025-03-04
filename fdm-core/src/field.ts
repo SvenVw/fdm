@@ -24,7 +24,7 @@ import type { getFieldType } from "./field.d"
  * @param b_geometry - GeoJSON representation of the field geometry.
  * @param b_acquiring_date - The start date for managing the field.
  * @param b_acquiring_method - Method used for acquiring the field.
- * @param b_discarding_date - (Optional) The end date for managing the field.
+ * @param b_end - (Optional) The end date for managing the field.
  * @returns A promise that resolves to the newly generated field ID.
  *
  * @throws {Error} If the acquiring date is not earlier than the discarding date.
@@ -40,7 +40,7 @@ export async function addField(
     b_geometry: schema.fieldsTypeInsert["b_geometry"],
     b_acquiring_date: schema.fieldAcquiringTypeInsert["b_acquiring_date"],
     b_acquiring_method: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
-    b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
+    b_end?: schema.fieldDiscardingTypeInsert["b_end"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
     try {
         await checkPermission(
@@ -76,9 +76,9 @@ export async function addField(
 
             // Check that acquire date is before discarding date
             if (
-                b_discarding_date &&
+                b_end &&
                 b_acquiring_date &&
-                b_acquiring_date.getTime() >= b_discarding_date.getTime()
+                b_acquiring_date.getTime() >= b_end.getTime()
             ) {
                 throw new Error("Acquiring date must be before discarding date")
             }
@@ -86,7 +86,7 @@ export async function addField(
             // Insert relation between field and discarding
             const fieldDiscardingData = {
                 b_id,
-                b_discarding_date,
+                b_end,
             }
             await tx.insert(schema.fieldDiscarding).values(fieldDiscardingData)
 
@@ -100,7 +100,7 @@ export async function addField(
             // b_geometry,
             b_acquiring_date,
             b_acquiring_method,
-            b_discarding_date,
+            b_end,
         })
     }
 }
@@ -144,7 +144,7 @@ export async function getField(
                 b_geometry: schema.fields.b_geometry,
                 b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
                 b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
-                b_discarding_date: schema.fieldDiscarding.b_discarding_date,
+                b_end: schema.fieldDiscarding.b_end,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
                 created: schema.fields.created,
                 updated: schema.fields.updated,
@@ -207,7 +207,7 @@ export async function getFields(
                 b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
                 b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
-                b_discarding_date: schema.fieldDiscarding.b_discarding_date,
+                b_end: schema.fieldDiscarding.b_end,
                 created: schema.fields.created,
                 updated: schema.fields.updated,
             })
@@ -243,7 +243,7 @@ export async function getFields(
  * @param b_geometry - (Optional) Updated field geometry in GeoJSON format.
  * @param b_acquiring_date - (Optional) Updated start date for managing the field.
  * @param b_acquiring_method - (Optional) Updated method for field management.
- * @param b_discarding_date - (Optional) Updated end date for managing the field.
+ * @param b_end - (Optional) Updated end date for managing the field.
  * @returns A Promise that resolves to the updated field details.
  *
  * @throws {Error} If the acquiring date is not before the discarding date.
@@ -258,7 +258,7 @@ export async function updateField(
     b_geometry?: schema.fieldsTypeInsert["b_geometry"],
     b_acquiring_date?: schema.fieldAcquiringTypeInsert["b_acquiring_date"],
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
-    b_discarding_date?: schema.fieldDiscardingTypeInsert["b_discarding_date"],
+    b_end?: schema.fieldDiscardingTypeInsert["b_end"],
 ): Promise<getFieldType> {
     return await fdm.transaction(async (tx: FdmType) => {
         try {
@@ -302,8 +302,8 @@ export async function updateField(
 
             const setfieldDiscarding: Partial<schema.fieldDiscardingTypeInsert> =
                 {}
-            if (b_discarding_date !== undefined) {
-                setfieldDiscarding.b_discarding_date = b_discarding_date
+            if (b_end !== undefined) {
+                setfieldDiscarding.b_end = b_end
             }
             setfieldDiscarding.updated = updated
 
@@ -327,7 +327,7 @@ export async function updateField(
                     b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
                     b_acquiring_method:
                         schema.fieldAcquiring.b_acquiring_method,
-                    b_discarding_date: schema.fieldDiscarding.b_discarding_date,
+                    b_end: schema.fieldDiscarding.b_end,
                     created: schema.fields.created,
                     updated: schema.fields.updated,
                 })
@@ -346,9 +346,9 @@ export async function updateField(
 
             // Check if acquiring date is before discarding date
             if (
-                field.b_discarding_date &&
+                field.b_end &&
                 field.b_acquiring_date.getTime() >=
-                    field.b_discarding_date.getTime()
+                    field.b_end.getTime()
             ) {
                 throw new Error("Acquiring date must be before discarding date")
             }
@@ -362,7 +362,7 @@ export async function updateField(
                 // b_geometry,
                 b_acquiring_date,
                 b_acquiring_method,
-                b_discarding_date,
+                b_end,
             })
         }
     })

@@ -74,7 +74,7 @@ describe("Farm Data Model", () => {
             expect(field.b_geometry).toStrictEqual(fieldGeometry)
             expect(field.b_area).toBeGreaterThan(0)
             expect(field.b_acquiring_date).toEqual(AcquireDate)
-            expect(field.b_discarding_date).toEqual(discardingDate)
+            expect(field.b_end).toEqual(discardingDate)
             expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
@@ -128,7 +128,7 @@ describe("Farm Data Model", () => {
             expect(field.b_geometry).toStrictEqual(fieldGeometry)
             expect(field.b_area).toBeGreaterThan(0)
             expect(field.b_acquiring_date).toEqual(AcquireDate)
-            expect(field.b_discarding_date).toEqual(discardingDate)
+            expect(field.b_end).toEqual(discardingDate)
             expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
@@ -215,7 +215,7 @@ describe("Farm Data Model", () => {
             expect(field1?.b_geometry).toStrictEqual(fieldGeometry1)
             expect(field1?.b_area).toBeGreaterThan(0)
             expect(field1?.b_acquiring_date).toEqual(AcquireDate1)
-            expect(field1?.b_discarding_date).toEqual(discardingDate1)
+            expect(field1?.b_end).toEqual(discardingDate1)
             expect(field1?.b_acquiring_method).toBe(AcquiringMethod1)
 
             const field2 = fields.find((field) => field.b_id === b_id2)
@@ -225,7 +225,7 @@ describe("Farm Data Model", () => {
             expect(field2?.b_geometry).toStrictEqual(fieldGeometry2)
             expect(field2?.b_area).toBeGreaterThan(0)
             expect(field2?.b_acquiring_date).toEqual(AcquireDate2)
-            expect(field2?.b_discarding_date).toEqual(discardingDate2)
+            expect(field2?.b_end).toEqual(discardingDate2)
             expect(field2?.b_acquiring_method).toBe(AcquiringMethod2)
         })
 
@@ -304,7 +304,7 @@ describe("Farm Data Model", () => {
             expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
             expect(updatedField.b_geometry).toStrictEqual(updatedFieldGeometry)
             expect(updatedField.b_acquiring_date).toEqual(updatedAcquireDate)
-            expect(updatedField.b_discarding_date).toEqual(
+            expect(updatedField.b_end).toEqual(
                 updatedDiscardingDate,
             )
             expect(updatedField.b_acquiring_method).toBe(updatedAcquiringMethod)
@@ -371,7 +371,7 @@ describe("Farm Data Model", () => {
             expect(updatedField.b_id_source).toBe(fieldIDSource) // Should remain the same
             expect(updatedField.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
-            expect(updatedField.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField.b_end).toEqual(discardingDate) // Should remain the same
             expect(updatedField.b_acquiring_method).toBe(AcquiringMethod) // Should remain the same
 
             // Update only the manage type
@@ -391,7 +391,7 @@ describe("Farm Data Model", () => {
             expect(updatedField2.b_id_source).toBe(fieldIDSource) // Should remain the same
             expect(updatedField2.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField2.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
-            expect(updatedField2.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField2.b_end).toEqual(discardingDate) // Should remain the same
             expect(updatedField2.b_acquiring_method).toBe(
                 updatedAcquiringMethod,
             ) // Should be updated
@@ -413,7 +413,7 @@ describe("Farm Data Model", () => {
             expect(updatedField3.b_id_source).toBe(updatedFieldIDSource) // Should be updated
             expect(updatedField3.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField3.b_acquiring_date).toEqual(AcquireDate) // Should remain the same
-            expect(updatedField3.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField3.b_end).toEqual(discardingDate) // Should remain the same
             expect(updatedField3.b_acquiring_method).toBe(
                 updatedAcquiringMethod,
             ) // Should remain the same
@@ -435,7 +435,7 @@ describe("Farm Data Model", () => {
             expect(updatedField4.b_id_source).toBe(updatedFieldIDSource) // Should remain the same
             expect(updatedField4.b_geometry).toStrictEqual(fieldGeometry) // Should remain the same
             expect(updatedField4.b_acquiring_date).toEqual(updatedAcquireDate) // Should be updated
-            expect(updatedField4.b_discarding_date).toEqual(discardingDate) // Should remain the same
+            expect(updatedField4.b_end).toEqual(discardingDate) // Should remain the same
             expect(updatedField4.b_acquiring_method).toBe(
                 updatedAcquiringMethod,
             ) // Should remain the same

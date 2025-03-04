@@ -92,7 +92,7 @@ export const fieldDiscarding = fdmSchema.table(
         b_id: text()
             .notNull()
             .references(() => fields.b_id),
-        b_discarding_date: timestamp({ withTimezone: true }),
+        b_end: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
