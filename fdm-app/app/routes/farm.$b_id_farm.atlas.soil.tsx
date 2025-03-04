@@ -26,7 +26,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get the fields of the farm
-        const fields = await getFields(fdm, session.user.id, b_id_farm)
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
         const features = fields.map((field) => {
             const feature = {
                 type: "Feature",

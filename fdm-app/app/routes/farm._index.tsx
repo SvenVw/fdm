@@ -23,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.user.id)
+        const farms = await getFarms(fdm, session.principal_id)
 
         const farmOptions = farms.map((farm) => {
             return {
