@@ -143,7 +143,7 @@ export default function FarmFieldsOverviewBlock() {
                         loaderData.harvest?.harvestables?.[0]
                             ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
                     }
-                    b_harvesting_date={loaderData.harvest?.b_harvesting_date}
+                    b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
                 />
             </div>
         </div>
@@ -185,13 +185,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } = formValues
+        const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } = formValues
 
         await addHarvest(
             fdm,
             session.principal_id,
             b_lu,
-            b_harvesting_date,
+            b_lu_harvest_date,
             b_lu_yield,
             b_lu_n_harvestable,
         )

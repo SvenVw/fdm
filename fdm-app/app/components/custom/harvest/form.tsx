@@ -28,11 +28,11 @@ import { FormSchema } from "./schema"
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
-    b_harvesting_date,
+    b_lu_harvest_date,
 }: {
     b_lu_yield: number | undefined
     b_lu_n_harvestable: number | undefined
-    b_harvesting_date: Date | undefined
+    b_lu_harvest_date: Date | undefined
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -40,7 +40,7 @@ export function HarvestForm({
         defaultValues: {
             b_lu_yield: b_lu_yield,
             b_lu_n_harvestable: b_lu_n_harvestable,
-            b_harvesting_date: b_harvesting_date,
+            b_lu_harvest_date: b_lu_harvest_date,
         },
     })
 
@@ -48,7 +48,7 @@ export function HarvestForm({
     const isHarvestUpdate =
         b_lu_yield !== undefined ||
         b_lu_n_harvestable !== undefined ||
-        b_harvesting_date !== undefined
+        b_lu_harvest_date !== undefined
 
     return (
         <div className="space-y-6">
@@ -170,7 +170,7 @@ export function HarvestForm({
                             /> */}
                             <FormField
                                 control={form.control}
-                                name="b_harvesting_date"
+                                name="b_lu_harvest_date"
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <FormLabel>Oogstdatum</FormLabel>

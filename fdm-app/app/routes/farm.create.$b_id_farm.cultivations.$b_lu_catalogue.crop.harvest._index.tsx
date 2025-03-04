@@ -125,7 +125,7 @@ export default function CultivationPlanAddHarvestBlock() {
             <HarvestForm
                 b_lu_yield={undefined}
                 b_lu_n_harvestable={undefined}
-                b_harvesting_date={undefined}
+                b_lu_harvest_date={undefined}
             />
         </div>
     )
@@ -178,7 +178,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     fdm,
                     session.principal_id,
                     item,
-                    formValues.b_harvesting_date,
+                    formValues.b_lu_harvest_date,
                     formValues.b_lu_yield,
                     formValues.b_lu_n_harvestable,
                 )

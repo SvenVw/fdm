@@ -139,7 +139,7 @@ export default function FarmFieldsOverviewBlock() {
                 <HarvestForm
                     b_lu_yield={undefined}
                     b_lu_n_harvestable={undefined}
-                    b_harvesting_date={undefined}
+                    b_lu_harvest_date={undefined}
                 />
             </div>
         </div>
@@ -186,14 +186,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { b_lu_yield, b_lu_n_harvestable, b_harvesting_date } =
+            const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } =
                 formValues
 
             await addHarvest(
                 fdm,
                 session.principal_id,
                 b_lu,
-                b_harvesting_date,
+                b_lu_harvest_date,
                 b_lu_yield,
                 b_lu_n_harvestable,
             )

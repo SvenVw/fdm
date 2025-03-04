@@ -36,7 +36,7 @@ export const FormSchema = z.object({
         })
         .optional(),
     // b_lu_start: z.coerce.date().optional(),
-    b_harvesting_date: z.coerce.date({
+    b_lu_harvest_date: z.coerce.date({
         required_error: "Oogstdatum is verplicht",
         invalid_type_error: "Oogstdatum moet een datum zijn",
     }),

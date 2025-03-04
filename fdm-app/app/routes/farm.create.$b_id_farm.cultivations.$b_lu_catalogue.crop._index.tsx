@@ -98,7 +98,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Combine similar harvests across all fields of the target cultivation.
         interface HarvestInfo {
-            b_harvesting_date: Date
+            b_lu_harvest_date: Date
             harvestables: {
                 harvestable_analyses: {
                     b_lu_yield?: number
@@ -114,8 +114,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         h1: HarvestInfo,
                         h2: HarvestInfo,
                     ) =>
-                        h1.b_harvesting_date.getTime() ===
-                            h2.b_harvesting_date.getTime() &&
+                        h1.b_lu_harvest_date.getTime() ===
+                            h2.b_lu_harvest_date.getTime() &&
                         h1.harvestables[0].harvestable_analyses[0]
                             .b_lu_yield ===
                             h2.harvestables[0].harvestable_analyses[0]
