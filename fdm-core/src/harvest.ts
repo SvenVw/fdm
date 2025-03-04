@@ -97,9 +97,9 @@ export async function addHarvest(
             // Terminate the cultivation if cultivation can only be harvested once
             if (b_lu_harvestable === "once") {
                 await tx
-                    .update(schema.CultivationEnding)
+                    .update(schema.cultivationEnding)
                     .set({ b_lu_end: b_harvesting_date })
-                    .where(eq(schema.CultivationEnding.b_lu, b_lu))
+                    .where(eq(schema.cultivationEnding.b_lu, b_lu))
             }
 
             // Add harvestable analysis
@@ -313,9 +313,9 @@ export async function removeHarvest(
             if (b_lu_harvestable === "once") {
                 // Remove terminating date for once-harvestable crops, since the harvest is being removed
                 await tx
-                    .update(schema.CultivationEnding)
+                    .update(schema.cultivationEnding)
                     .set({ b_lu_end: null, updated: new Date() })
-                    .where(eq(schema.CultivationEnding.b_lu, b_lu))
+                    .where(eq(schema.cultivationEnding.b_lu, b_lu))
             }
         })
     } catch (err) {
@@ -403,10 +403,10 @@ export async function checkHarvestDateCompability(
     const terminatingDate = await tx
         .select({
             b_lu_end:
-                schema.CultivationEnding.b_lu_end,
+                schema.cultivationEnding.b_lu_end,
         })
-        .from(schema.CultivationEnding)
-        .where(eq(schema.CultivationEnding.b_lu, b_lu))
+        .from(schema.cultivationEnding)
+        .where(eq(schema.cultivationEnding.b_lu, b_lu))
         .limit(1)
 
     if (terminatingDate.length === 0) {
