@@ -7,7 +7,7 @@ export interface getFieldType {
     b_id_source: schema.fieldsTypeSelect["b_id_source"]
     b_geometry: schema.fieldsTypeSelect["b_geometry"]
     b_area: number | null
-    b_acquiring_date: schema.fieldAcquiringTypeSelect["b_acquiring_date"]
+    b_start: schema.fieldAcquiringTypeSelect["b_start"]
     b_end: schema.fieldDiscardingTypeSelect["b_end"]
     b_acquiring_method: schema.fieldAcquiringTypeSelect["b_acquiring_method"]
     created: Date | null

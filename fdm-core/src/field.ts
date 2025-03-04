@@ -22,7 +22,7 @@ import type { getFieldType } from "./field.d"
  * @param b_name - Name of the field.
  * @param b_id_source - Identifier for the field in the source dataset.
  * @param b_geometry - GeoJSON representation of the field geometry.
- * @param b_acquiring_date - The start date for managing the field.
+ * @param b_start - The start date for managing the field.
  * @param b_acquiring_method - Method used for acquiring the field.
  * @param b_end - (Optional) The end date for managing the field.
  * @returns A promise that resolves to the newly generated field ID.
@@ -38,7 +38,7 @@ export async function addField(
     b_name: schema.fieldsTypeInsert["b_name"],
     b_id_source: schema.fieldsTypeInsert["b_id_source"],
     b_geometry: schema.fieldsTypeInsert["b_geometry"],
-    b_acquiring_date: schema.fieldAcquiringTypeInsert["b_acquiring_date"],
+    b_start: schema.fieldAcquiringTypeInsert["b_start"],
     b_acquiring_method: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_end?: schema.fieldDiscardingTypeInsert["b_end"],
 ): Promise<schema.fieldsTypeInsert["b_id"]> {
@@ -69,7 +69,7 @@ export async function addField(
             const fieldAcquiringData = {
                 b_id,
                 b_id_farm,
-                b_acquiring_date,
+                b_start,
                 b_acquiring_method,
             }
             await tx.insert(schema.fieldAcquiring).values(fieldAcquiringData)
@@ -77,8 +77,8 @@ export async function addField(
             // Check that acquire date is before discarding date
             if (
                 b_end &&
-                b_acquiring_date &&
-                b_acquiring_date.getTime() >= b_end.getTime()
+                b_start &&
+                b_start.getTime() >= b_end.getTime()
             ) {
                 throw new Error("Acquiring date must be before discarding date")
             }
@@ -98,7 +98,7 @@ export async function addField(
             b_name,
             b_id_source,
             // b_geometry,
-            b_acquiring_date,
+            b_start,
             b_acquiring_method,
             b_end,
         })
@@ -143,7 +143,7 @@ export async function getField(
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
                 b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
-                b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+                b_start: schema.fieldAcquiring.b_start,
                 b_end: schema.fieldDiscarding.b_end,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
                 created: schema.fields.created,
@@ -205,7 +205,7 @@ export async function getFields(
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
                 b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
-                b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+                b_start: schema.fieldAcquiring.b_start,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
                 b_end: schema.fieldDiscarding.b_end,
                 created: schema.fields.created,
@@ -241,7 +241,7 @@ export async function getFields(
  * @param b_name - (Optional) New name for the field.
  * @param b_id_source - (Optional) New source identifier for the field.
  * @param b_geometry - (Optional) Updated field geometry in GeoJSON format.
- * @param b_acquiring_date - (Optional) Updated start date for managing the field.
+ * @param b_start - (Optional) Updated start date for managing the field.
  * @param b_acquiring_method - (Optional) Updated method for field management.
  * @param b_end - (Optional) Updated end date for managing the field.
  * @returns A Promise that resolves to the updated field details.
@@ -256,7 +256,7 @@ export async function updateField(
     b_name?: schema.fieldsTypeInsert["b_name"],
     b_id_source?: schema.fieldsTypeInsert["b_id_source"],
     b_geometry?: schema.fieldsTypeInsert["b_geometry"],
-    b_acquiring_date?: schema.fieldAcquiringTypeInsert["b_acquiring_date"],
+    b_start?: schema.fieldAcquiringTypeInsert["b_start"],
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_end?: schema.fieldDiscardingTypeInsert["b_end"],
 ): Promise<getFieldType> {
@@ -292,8 +292,8 @@ export async function updateField(
 
             const setfieldAcquiring: Partial<schema.fieldAcquiringTypeInsert> =
                 {}
-            if (b_acquiring_date !== undefined) {
-                setfieldAcquiring.b_acquiring_date = b_acquiring_date
+            if (b_start !== undefined) {
+                setfieldAcquiring.b_start = b_start
             }
             if (b_acquiring_method !== undefined) {
                 setfieldAcquiring.b_acquiring_method = b_acquiring_method
@@ -324,7 +324,7 @@ export async function updateField(
                     b_id_farm: schema.fieldAcquiring.b_id_farm,
                     b_id_source: schema.fields.b_id_source,
                     b_geometry: schema.fields.b_geometry,
-                    b_acquiring_date: schema.fieldAcquiring.b_acquiring_date,
+                    b_start: schema.fieldAcquiring.b_start,
                     b_acquiring_method:
                         schema.fieldAcquiring.b_acquiring_method,
                     b_end: schema.fieldDiscarding.b_end,
@@ -347,7 +347,7 @@ export async function updateField(
             // Check if acquiring date is before discarding date
             if (
                 field.b_end &&
-                field.b_acquiring_date.getTime() >=
+                field.b_start.getTime() >=
                     field.b_end.getTime()
             ) {
                 throw new Error("Acquiring date must be before discarding date")
@@ -360,7 +360,7 @@ export async function updateField(
                 b_name,
                 b_id_source,
                 // b_geometry,
-                b_acquiring_date,
+                b_start,
                 b_acquiring_method,
                 b_end,
             })
