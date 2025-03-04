@@ -45,7 +45,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the active farm
         const b_id_farm = params.b_id_farm
         if (!b_id_farm) {
-            throw new Response("Farm ID is required", { status: 400 })
+            throw data("missing: b_id_farm", {
+                status: 400,
+                statusText: "missing: b_id_farm",
+            })
         }
 
         // Get the session
