@@ -21,7 +21,7 @@ export const resources: Resource[] = [
     "field",
     "cultivation",
     "fertilizer_application",
-    "soil",
+    "soil_analysis",
     "harvesting",
 ] as const
 export const roles: Role[] = ["owner", "advisor", "researcher"] as const
