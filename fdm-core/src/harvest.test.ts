@@ -199,7 +199,7 @@ describe("harvest", () => {
         const harvests = await getHarvests(fdm, principal_id, b_lu_once)
 
         expect(harvests.length).toEqual(1)
-        expect(cultivation.b_terminating_date?.getTime()).toEqual(
+        expect(cultivation.b_lu_end?.getTime()).toEqual(
             harvests[0].b_harvesting_date?.getTime(),
         )
         expect(harvests[0].b_harvesting_date).toEqual(harvesting_date)

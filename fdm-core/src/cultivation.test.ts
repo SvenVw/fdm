@@ -345,7 +345,7 @@ describe("Cultivation Data Model", () => {
             )
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-            expect(updatedCultivation.b_terminating_date).toEqual(
+            expect(updatedCultivation.b_lu_end).toEqual(
                 newTerminateDate,
             )
         })
@@ -408,7 +408,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_lu,
             )
-            expect(updatedCultivation.b_terminating_date).toEqual(
+            expect(updatedCultivation.b_lu_end).toEqual(
                 newTerminateDate,
             )
         })

@@ -426,7 +426,7 @@ export const cultivationTerminating = fdmSchema.table(
         b_lu: text()
             .notNull()
             .references(() => cultivations.b_lu),
-        b_terminating_date: timestamp({ withTimezone: true }),
+        b_lu_end: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },

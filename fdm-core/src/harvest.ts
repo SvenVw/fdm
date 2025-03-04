@@ -98,7 +98,7 @@ export async function addHarvest(
             if (b_lu_harvestable === "once") {
                 await tx
                     .update(schema.cultivationTerminating)
-                    .set({ b_terminating_date: b_harvesting_date })
+                    .set({ b_lu_end: b_harvesting_date })
                     .where(eq(schema.cultivationTerminating.b_lu, b_lu))
             }
 
@@ -314,7 +314,7 @@ export async function removeHarvest(
                 // Remove terminating date for once-harvestable crops, since the harvest is being removed
                 await tx
                     .update(schema.cultivationTerminating)
-                    .set({ b_terminating_date: null, updated: new Date() })
+                    .set({ b_lu_end: null, updated: new Date() })
                     .where(eq(schema.cultivationTerminating.b_lu, b_lu))
             }
         })
@@ -402,8 +402,8 @@ export async function checkHarvestDateCompability(
 
     const terminatingDate = await tx
         .select({
-            b_terminating_date:
-                schema.cultivationTerminating.b_terminating_date,
+            b_lu_end:
+                schema.cultivationTerminating.b_lu_end,
         })
         .from(schema.cultivationTerminating)
         .where(eq(schema.cultivationTerminating.b_lu, b_lu))
@@ -427,9 +427,9 @@ export async function checkHarvestDateCompability(
 
         // If cultivation can only be harvested once, check if harvest is on the same date as terminating date
         if (
-            terminatingDate[0].b_terminating_date &&
+            terminatingDate[0].b_lu_end &&
             b_harvesting_date.getTime() !==
-                terminatingDate[0].b_terminating_date.getTime()
+                terminatingDate[0].b_lu_end.getTime()
         ) {
             throw new Error(
                 "Harvest date must be equal to terminating date for this cultivation",
@@ -440,9 +440,9 @@ export async function checkHarvestDateCompability(
     // If cultivation can be harvested multiple times, check if harvest is before termination date
     if (
         b_lu_harvestable === "multiple" &&
-        terminatingDate[0].b_terminating_date &&
+        terminatingDate[0].b_lu_end &&
         b_harvesting_date.getTime() >
-            terminatingDate[0].b_terminating_date.getTime()
+            terminatingDate[0].b_lu_end.getTime()
     ) {
         throw new Error(
             "Harvest date must be before terminating date for this cultivation",
