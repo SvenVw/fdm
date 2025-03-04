@@ -27,5 +27,12 @@ describe("createFdmAuth", () => {
         // Create the auth server using the mock FdmServer instance
         fdmAuth = createFdmAuth(fdm)
         expect(fdmAuth).toBeDefined()
+
+        // Verify auth providers are correctly configured
+        expect(fdmAuth.options.socialProviders?.google).toBeDefined()
+        expect(fdmAuth.options.socialProviders?.microsoft).toBeDefined()
+
+        // Verify database adapter is properly connected
+        expect(fdmAuth.options.database).toBeDefined()
     })
 })
