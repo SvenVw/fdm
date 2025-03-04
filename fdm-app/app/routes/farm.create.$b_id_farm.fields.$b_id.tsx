@@ -633,11 +633,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id = params.b_id
         if (!b_id) {
-            return handleActionError("missing: b_id")
+            throw new Error("missing: b_id")
         }
         const b_id_farm = params.b_id_farm
         if (!b_id_farm) {
-            return handleActionError("missing: b_id_farm")
+            throw new Error("missing: b_id_farm")
         }
 
         // Get the session
