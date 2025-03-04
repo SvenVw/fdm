@@ -77,7 +77,7 @@ describe("Farm Data Model", () => {
 
             const farms = await getFarms(fdm, principal_id)
             expect(farms).toBeDefined()
-            expect(farms.length).toBeGreaterThanOrEqual(1) // At least 2 farms should exist
+            expect(farms.length).toBeGreaterThanOrEqual(1) // At least 1 farm should exist
             expect(farms[0].b_id_farm).toBeDefined()
         })
 

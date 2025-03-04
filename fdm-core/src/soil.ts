@@ -1,7 +1,5 @@
 import { desc, eq } from "drizzle-orm"
 import { createId } from "./id"
-
-import { check } from "drizzle-orm/mysql-core"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
