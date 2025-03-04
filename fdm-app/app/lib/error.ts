@@ -61,7 +61,7 @@ export function handleLoaderError(error: unknown) {
             },
             {
                 status: 403,
-                statusText: "U heeft helaas geen rechten2 om dit te doen.",
+                statusText: "U heeft helaas geen rechten om dit te doen.",
             },
         )
     }

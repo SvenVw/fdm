@@ -529,39 +529,6 @@ async function getResourceChain(
                 }
             })
             chain.push(...beads)
-        } else if (resource === "soil_analysis") {
-            const result = await fdm
-                .select({
-                    farm: schema.fieldAcquiring.b_id_farm,
-                    field: schema.soilSampling.b_id,
-                    soil_analysis: schema.soilAnalysis.a_id,
-                })
-                .from(schema.soilAnalysis)
-                .leftJoin(
-                    schema.soilSampling,
-                    eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
-                )
-                .leftJoin(
-                    schema.fields,
-                    eq(schema.soilSampling.b_id, schema.fields.b_id),
-                )
-                .leftJoin(
-                    schema.fieldAcquiring,
-                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
-                )
-                .where(eq(schema.soilAnalysis.a_id, resource_id))
-                .limit(1)
-            if (result.length === 0) {
-                // Resource not found, return empty chain
-                return []
-            }
-            const beads = Object.keys(result[0]).map((x) => {
-                return {
-                    resource: x,
-                    resource_id: result[0][x],
-                }
-            })
-            chain.push(...beads)
         } else if (resource === "harvesting") {
             const result = await fdm
                 .select({
@@ -626,6 +593,39 @@ async function getResourceChain(
                     eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
                 )
                 .where(eq(schema.fertilizerApplication.p_app_id, resource_id))
+                .limit(1)
+            if (result.length === 0) {
+                // Resource not found, return empty chain
+                return []
+            }
+            const beads = Object.keys(result[0]).map((x) => {
+                return {
+                    resource: x,
+                    resource_id: result[0][x],
+                }
+            })
+            chain.push(...beads)
+        } else if (resource === "soil_analysis") {
+            const result = await fdm
+                .select({
+                    farm: schema.fieldAcquiring.b_id_farm,
+                    field: schema.soilSampling.b_id,
+                    soil_analysis: schema.soilAnalysis.a_id,
+                })
+                .from(schema.soilAnalysis)
+                .leftJoin(
+                    schema.soilSampling,
+                    eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+                )
+                .leftJoin(
+                    schema.fields,
+                    eq(schema.soilSampling.b_id, schema.fields.b_id),
+                )
+                .leftJoin(
+                    schema.fieldAcquiring,
+                    eq(schema.fields.b_id, schema.fieldAcquiring.b_id),
+                )
+                .where(eq(schema.soilAnalysis.a_id, resource_id))
                 .limit(1)
             if (result.length === 0) {
                 // Resource not found, return empty chain
