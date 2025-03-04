@@ -54,7 +54,7 @@ export function CultivationList({
                             <div>
                                 <p className="text-sm font-light leading-none">
                                     {format(
-                                        cultivation.b_sowing_date,
+                                        cultivation.b_lu_start,
                                         "yyyy-MM-dd",
                                     )}
                                 </p>

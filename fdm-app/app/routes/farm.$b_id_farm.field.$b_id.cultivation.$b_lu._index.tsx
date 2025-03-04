@@ -162,7 +162,7 @@ export default function FarmFieldsOverviewBlock() {
             <div className="space-y-6">
                 <CultivationForm
                     b_lu_catalogue={loaderData.cultivation.b_lu_catalogue}
-                    b_sowing_date={loaderData.cultivation.b_sowing_date}
+                    b_lu_start={loaderData.cultivation.b_lu_start}
                     b_terminating_date={
                         loaderData.cultivation.b_terminating_date
                     }
@@ -214,7 +214,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { b_lu_catalogue, b_sowing_date, b_terminating_date } =
+            const { b_lu_catalogue, b_lu_start, b_terminating_date } =
                 formValues
 
             await updateCultivation(
@@ -222,7 +222,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 session.principal_id,
                 b_lu,
                 b_lu_catalogue,
-                b_sowing_date,
+                b_lu_start,
                 b_terminating_date,
             )
 

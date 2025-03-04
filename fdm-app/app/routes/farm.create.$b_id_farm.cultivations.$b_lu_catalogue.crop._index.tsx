@@ -85,7 +85,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const cultivation = cultivationPlan.find(
             (x) => x.b_lu_catalogue === b_lu_catalogue,
         )
-        const b_sowing_date = cultivation.b_sowing_date
+        const b_lu_start = cultivation.b_lu_start
         const b_terminating_date = cultivation.b_terminating_date
 
         // Find the target cultivation within the cultivation plan
@@ -152,7 +152,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
-            b_sowing_date: b_sowing_date,
+            b_lu_start: b_lu_start,
             b_terminating_date: b_terminating_date,
             b_lu_harvestable: b_lu_harvestable,
             harvests: harvests,
@@ -186,7 +186,7 @@ export default function FarmAFieldCultivationBlock() {
             </div>
             <CultivationForm
                 b_lu_catalogue={loaderData.b_lu_catalogue}
-                b_sowing_date={loaderData.b_sowing_date}
+                b_lu_start={loaderData.b_lu_start}
                 b_terminating_date={loaderData.b_terminating_date}
                 options={loaderData.cultivationOptions}
                 action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`}
@@ -247,7 +247,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             await Promise.all(
                 b_lu.map(async (item: string) => {
                     if (
-                        formValues.b_sowing_date ||
+                        formValues.b_lu_start ||
                         formValues.b_terminating_date
                     ) {
                         await updateCultivation(
@@ -255,7 +255,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             session.principal_id,
                             item,
                             undefined,
-                            formValues.b_sowing_date,
+                            formValues.b_lu_start,
                             formValues.b_terminating_date,
                         )
                     }

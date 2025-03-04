@@ -29,7 +29,7 @@ import type { CultivationsFormProps } from "./types"
 
 export function CultivationForm({
     b_lu_catalogue,
-    b_sowing_date,
+    b_lu_start,
     b_terminating_date,
     options,
     action,
@@ -39,7 +39,7 @@ export function CultivationForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_lu_catalogue: b_lu_catalogue,
-            b_sowing_date: b_sowing_date,
+            b_lu_start: b_lu_start,
             b_terminating_date: b_terminating_date,
         },
     })
@@ -77,7 +77,7 @@ export function CultivationForm({
                         <div>
                             <FormField
                                 control={form.control}
-                                name="b_sowing_date"
+                                name="b_lu_start"
                                 render={({ field }) => (
                                     <FormItem className="">
                                         <FormLabel>Zaaidatum</FormLabel>

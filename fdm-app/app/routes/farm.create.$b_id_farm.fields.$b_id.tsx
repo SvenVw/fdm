@@ -229,7 +229,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             b_name: field.b_name,
             b_lu_catalogue: b_lu_catalogue,
-            b_sowing_date: cultivations[0]?.b_sowing_date,
+            b_lu_start: cultivations[0]?.b_lu_start,
             b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
             b_gwl_class: soilAnalysis?.b_gwl_class,
             a_p_al: soilAnalysis?.a_p_al,
