@@ -272,7 +272,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const b_geometry = field.geometry
                 const currentYear = new Date().getFullYear()
                 const defaultDate = new Date(currentYear, 0, 1)
-                const b_acquiring_date = defaultDate
+                const b_start = defaultDate
                 const b_lu_start = defaultDate
                 const b_lu_end = undefined
                 const b_end = undefined
@@ -285,7 +285,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_name,
                     b_id_source,
                     b_geometry,
-                    b_acquiring_date,
+                    b_start,
                     b_acquiring_method,
                     b_end,
                 )
