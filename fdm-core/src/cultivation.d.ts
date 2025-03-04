@@ -32,7 +32,7 @@ export interface cultivationPlanType {
         }>
         harvests: Array<{
             b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_"]
-            b_harvesting_date: schema.cultivationHarvestingTypeSelect["b_harvesting_date"]
+            b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
             harvestables: Array<{
                 b_id_harvestable: schema.harvestableAnalysesTypeSelect["b_id_harvestable"]
                 harvestable_analyses: Array<{

@@ -26,7 +26,7 @@ import { createId } from "./id"
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The principal's ID used for permission verification.
  * @param b_lu - The cultivation ID.
- * @param b_harvesting_date - The date of the harvest.
+ * @param b_lu_harvest_date - The date of the harvest.
  * @param b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
  * @param b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
  * @param b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
@@ -43,7 +43,7 @@ export async function addHarvest(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeInsert["b_lu"],
-    b_harvesting_date: schema.cultivationHarvestingTypeInsert["b_harvesting_date"],
+    b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
     b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
     b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
     b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
@@ -76,7 +76,7 @@ export async function addHarvest(
             const b_lu_harvestable = await checkHarvestDateCompability(
                 tx,
                 b_lu,
-                b_harvesting_date,
+                b_lu_harvest_date,
             )
 
             // Insert the harvestable in the db
@@ -91,14 +91,14 @@ export async function addHarvest(
                 b_id_harvesting: b_id_harvesting,
                 b_id_harvestable: b_id_harvestable,
                 b_lu: b_lu,
-                b_harvesting_date: b_harvesting_date,
+                b_lu_harvest_date: b_lu_harvest_date,
             })
 
             // Terminate the cultivation if cultivation can only be harvested once
             if (b_lu_harvestable === "once") {
                 await tx
                     .update(schema.cultivationEnding)
-                    .set({ b_lu_end: b_harvesting_date })
+                    .set({ b_lu_end: b_lu_harvest_date })
                     .where(eq(schema.cultivationEnding.b_lu, b_lu))
             }
 
@@ -119,7 +119,7 @@ export async function addHarvest(
             await tx.insert(schema.harvestableSampling).values({
                 b_id_harvestable: b_id_harvestable,
                 b_id_harvestable_analysis: b_id_harvestable_analysis,
-                b_sampling_date: b_harvesting_date,
+                b_sampling_date: b_lu_harvest_date,
             })
 
             return b_id_harvesting
@@ -127,7 +127,7 @@ export async function addHarvest(
     } catch (err) {
         throw handleError(err, "Exception for addHarvest", {
             b_lu,
-            b_harvesting_date,
+            b_lu_harvest_date,
             b_lu_yield,
             b_lu_n_harvestable,
             b_lu_n_residue,
@@ -206,13 +206,13 @@ export async function getHarvests(
         const harvests = await fdm
             .select({
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
-                b_harvesting_date:
-                    schema.cultivationHarvesting.b_harvesting_date,
+                b_lu_harvest_date:
+                    schema.cultivationHarvesting.b_lu_harvest_date,
                 b_lu: schema.cultivationHarvesting.b_lu,
             })
             .from(schema.cultivationHarvesting)
             .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
-            .orderBy(desc(schema.cultivationHarvesting.b_harvesting_date))
+            .orderBy(desc(schema.cultivationHarvesting.b_lu_harvest_date))
 
         // Get details of each harvest
         const result = await Promise.all(
@@ -358,7 +358,7 @@ export async function getHarvestableTypeOfCultivation(
  *
  * @param tx The FDM transaction instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param b_lu - Identifier of the cultivation.
- * @param b_harvesting_date - The proposed harvest date.
+ * @param b_lu_harvest_date - The proposed harvest date.
  * @returns The allowed harvestable type for the cultivation (e.g., "once" or "multiple").
  *
  * @throws {Error} If the harvest date is missing, the cultivation is not harvestable, the sowing date is missing or invalid (i.e., the harvest date is not after the sowing date), the terminating date is missing, or if the harvest date violates the constraints for single or multiple harvest cultivations.
@@ -366,12 +366,12 @@ export async function getHarvestableTypeOfCultivation(
 export async function checkHarvestDateCompability(
     tx: FdmType,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
-    b_harvesting_date: schema.cultivationHarvestingTypeInsert["b_harvesting_date"],
+    b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
 ) {
-    // console.log(b_harvesting_date)
-    if (!b_harvesting_date) {
+    // console.log(b_lu_harvest_date)
+    if (!b_lu_harvest_date) {
         // Handle undefined dates *before* anything else
-        throw new Error("Argument b_harvesting_date is missing")
+        throw new Error("Argument b_lu_harvest_date is missing")
     }
 
     // Check if cultivation can be harvested
@@ -396,7 +396,7 @@ export async function checkHarvestDateCompability(
     }
 
     // If cultivation has harvest date before sowing date throw an error
-    if (b_harvesting_date.getTime() <= sowingDate[0].b_lu_start.getTime()) {
+    if (b_lu_harvest_date.getTime() <= sowingDate[0].b_lu_start.getTime()) {
         throw new Error("Harvest date must be after sowing date")
     }
 
@@ -428,7 +428,7 @@ export async function checkHarvestDateCompability(
         // If cultivation can only be harvested once, check if harvest is on the same date as terminating date
         if (
             terminatingDate[0].b_lu_end &&
-            b_harvesting_date.getTime() !==
+            b_lu_harvest_date.getTime() !==
                 terminatingDate[0].b_lu_end.getTime()
         ) {
             throw new Error(
@@ -441,7 +441,7 @@ export async function checkHarvestDateCompability(
     if (
         b_lu_harvestable === "multiple" &&
         terminatingDate[0].b_lu_end &&
-        b_harvesting_date.getTime() >
+        b_lu_harvest_date.getTime() >
             terminatingDate[0].b_lu_end.getTime()
     ) {
         throw new Error(
@@ -476,7 +476,7 @@ async function getHarvestSimplified(
     const harvesting = await fdm
         .select({
             b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
-            b_harvesting_date: schema.cultivationHarvesting.b_harvesting_date,
+            b_lu_harvest_date: schema.cultivationHarvesting.b_lu_harvest_date,
             b_lu: schema.cultivationHarvesting.b_lu,
         })
         .from(schema.cultivationHarvesting)

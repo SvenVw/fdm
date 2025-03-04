@@ -409,7 +409,7 @@ export const cultivationHarvesting = fdmSchema.table("cultivation_harvesting", {
     b_lu: text()
         .notNull()
         .references(() => cultivations.b_lu),
-    b_harvesting_date: timestamp({ withTimezone: true }),
+    b_lu_harvest_date: timestamp({ withTimezone: true }),
     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updated: timestamp({ withTimezone: true }),
 })

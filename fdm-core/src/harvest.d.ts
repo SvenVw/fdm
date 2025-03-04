@@ -2,7 +2,7 @@ import type * as schema from "./db/schema"
 
 export interface HarvestType {
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"]
-    b_harvesting_date: schema.cultivationHarvestingTypeSelect["b_harvesting_date"]
+    b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"]
     harvestables: HarvestableType[]
 }

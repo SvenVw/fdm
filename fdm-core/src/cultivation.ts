@@ -426,7 +426,7 @@ export async function getCultivations(
  *       harvests: [
  *         {
  *           b_id_harvesting: string;  // Unique ID of the harvest record
- *           b_harvesting_date: Date;  // Harvest date
+ *           b_lu_harvest_date: Date;  // Harvest date
  *           harvestables: [
  *             {
  *               b_id_harvestable: string; // Unique ID of the harvestable
@@ -498,8 +498,8 @@ export async function getCultivationPlan(
                 p_app_date: schema.fertilizerApplication.p_app_date,
                 p_app_id: schema.fertilizerApplication.p_app_id,
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
-                b_harvesting_date:
-                    schema.cultivationHarvesting.b_harvesting_date,
+                b_lu_harvest_date:
+                    schema.cultivationHarvesting.b_lu_harvest_date,
                 b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
                 b_lu_n_harvestable:
                     schema.harvestableAnalyses.b_lu_n_harvestable,
@@ -642,7 +642,7 @@ export async function getCultivationPlan(
                     // Only add if it's a harvest
                     existingField.harvests.push({
                         b_id_harvesting: curr.b_id_harvesting,
-                        b_harvesting_date: curr.b_harvesting_date,
+                        b_lu_harvest_date: curr.b_lu_harvest_date,
                         harvestables: [
                             {
                                 b_id_harvestable: curr.b_id_harvestable,
@@ -902,7 +902,7 @@ export async function updateCultivation(
                             .update(schema.cultivationHarvesting)
                             .set({
                                 updated: updated,
-                                b_harvesting_date: b_lu_end,
+                                b_lu_harvest_date: b_lu_end,
                             })
                             .where(
                                 eq(
