@@ -385,18 +385,18 @@ export async function checkHarvestDateCompability(
     // Check if harvest date is after sowing date
     const sowingDate = await tx
         .select({
-            b_sowing_date: schema.fieldSowing.b_sowing_date,
+            b_lu_start: schema.fieldSowing.b_lu_start,
         })
         .from(schema.fieldSowing)
         .where(eq(schema.fieldSowing.b_lu, b_lu))
         .limit(1)
 
-    if (sowingDate.length === 0 || sowingDate[0].b_sowing_date === null) {
+    if (sowingDate.length === 0 || sowingDate[0].b_lu_start === null) {
         throw new Error("Sowing date does not exist")
     }
 
     // If cultivation has harvest date before sowing date throw an error
-    if (b_harvesting_date.getTime() <= sowingDate[0].b_sowing_date.getTime()) {
+    if (b_harvesting_date.getTime() <= sowingDate[0].b_lu_start.getTime()) {
         throw new Error("Harvest date must be after sowing date")
     }
 

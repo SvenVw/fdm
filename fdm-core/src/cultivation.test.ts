@@ -26,7 +26,7 @@ describe("Cultivation Data Model", () => {
     let b_id_farm: string
     let b_id: string
     let b_lu: string
-    let b_sowing_date: Date
+    let b_lu_start: Date
     let principal_id: string
 
     beforeEach(async () => {
@@ -93,13 +93,13 @@ describe("Cultivation Data Model", () => {
                 b_lu_hcat3_name: "test-hcat3-name",
             })
 
-            b_sowing_date = new Date("2024-01-01")
+            b_lu_start = new Date("2024-01-01")
             b_lu = await addCultivation(
                 fdm,
                 principal_id,
                 b_lu_catalogue,
                 b_id,
-                b_sowing_date,
+                b_lu_start,
             )
         })
 
@@ -143,7 +143,7 @@ describe("Cultivation Data Model", () => {
 
         it("should throw an error when adding a cultivation with an invalid catalogue ID", async () => {
             const invalid_b_lu_catalogue = "invalid-catalogue-id"
-            const b_sowing_date = new Date("2024-01-01")
+            const b_lu_start = new Date("2024-01-01")
 
             await expect(
                 addCultivation(
@@ -151,7 +151,7 @@ describe("Cultivation Data Model", () => {
                     principal_id,
                     invalid_b_lu_catalogue,
                     b_id,
-                    b_sowing_date,
+                    b_lu_start,
                 ),
             ).rejects.toThrow("Exception for addCultivation")
         })
@@ -173,13 +173,13 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should add a new cultivation", async () => {
-            const b_sowing_date = new Date("2024-02-01")
+            const b_lu_start = new Date("2024-02-01")
             const new_b_lu = await addCultivation(
                 fdm,
                 principal_id,
                 b_lu_catalogue,
                 b_id,
-                b_sowing_date,
+                b_lu_start,
             )
             expect(b_lu).toBeDefined()
 
@@ -189,7 +189,7 @@ describe("Cultivation Data Model", () => {
                 new_b_lu,
             )
             expect(cultivation.b_lu).toBeDefined() // Check existence
-            expect(cultivation.b_sowing_date).toEqual(b_sowing_date) // Check value
+            expect(cultivation.b_lu_start).toEqual(b_lu_start) // Check value
         })
 
         it("should handle duplicate cultivation gracefully", async () => {
@@ -200,7 +200,7 @@ describe("Cultivation Data Model", () => {
                     principal_id,
                     b_lu_catalogue,
                     b_id,
-                    b_sowing_date,
+                    b_lu_start,
                 ),
             ).rejects.toThrow("Exception for addCultivation")
         })
@@ -214,7 +214,7 @@ describe("Cultivation Data Model", () => {
                     principal_id,
                     b_lu_catalogue,
                     invalid_b_id,
-                    b_sowing_date,
+                    b_lu_start,
                 ),
             ).rejects.toThrow(
                 "Principal does not have permission to perform this action",
@@ -275,7 +275,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_lu,
             )
-            expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
+            expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
         })
 
@@ -343,7 +343,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_lu,
             )
-            expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
+            expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
             expect(updatedCultivation.b_lu_end).toEqual(
                 newTerminateDate,
@@ -388,7 +388,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_lu,
             )
-            expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
+            expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
         })
 
         it("should update a cultivation with only the terminate date", async () => {

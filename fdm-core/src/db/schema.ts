@@ -281,7 +281,7 @@ export const fieldSowing = fdmSchema.table(
         b_lu: text()
             .notNull()
             .references(() => cultivations.b_lu),
-        b_sowing_date: timestamp({ withTimezone: true }),
+        b_lu_start: timestamp({ withTimezone: true }),
         b_sowing_amount: numericCasted(),
         b_sowing_method: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
