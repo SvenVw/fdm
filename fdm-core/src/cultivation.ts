@@ -99,7 +99,7 @@ export async function addCultivation(
     b_lu_catalogue: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_id: schema.fieldSowingTypeInsert["b_id"],
     b_sowing_date: schema.fieldSowingTypeInsert["b_sowing_date"],
-    b_lu_end?: schema.cultivationTerminatingTypeInsert["b_lu_end"],
+    b_lu_end?: schema.CultivationEndingTypeInsert["b_lu_end"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
         await checkPermission(
@@ -202,7 +202,7 @@ export async function addCultivation(
                 b_sowing_date: b_sowing_date,
             })
 
-            await tx.insert(schema.cultivationTerminating).values({
+            await tx.insert(schema.CultivationEnding).values({
                 b_lu: b_lu,
                 b_lu_end: b_lu_end,
             })
@@ -279,7 +279,7 @@ export async function getCultivation(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_sowing_date: schema.fieldSowing.b_sowing_date,
                 b_lu_end:
-                    schema.cultivationTerminating.b_lu_end,
+                    schema.CultivationEnding.b_lu_end,
                 b_id: schema.fieldSowing.b_id,
             })
             .from(schema.cultivations)
@@ -288,9 +288,9 @@ export async function getCultivation(
                 eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
-                schema.cultivationTerminating,
+                schema.CultivationEnding,
                 eq(
-                    schema.cultivationTerminating.b_lu,
+                    schema.CultivationEnding.b_lu,
                     schema.cultivations.b_lu,
                 ),
             )
@@ -355,7 +355,7 @@ export async function getCultivations(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_sowing_date: schema.fieldSowing.b_sowing_date,
                 b_lu_end:
-                    schema.cultivationTerminating.b_lu_end,
+                    schema.CultivationEnding.b_lu_end,
                 b_id: schema.fieldSowing.b_id,
             })
             .from(schema.cultivations)
@@ -364,9 +364,9 @@ export async function getCultivations(
                 eq(schema.fieldSowing.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
-                schema.cultivationTerminating,
+                schema.CultivationEnding,
                 eq(
-                    schema.cultivationTerminating.b_lu,
+                    schema.CultivationEnding.b_lu,
                     schema.cultivations.b_lu,
                 ),
             )
@@ -490,7 +490,7 @@ export async function getCultivationPlan(
                 b_name: schema.fields.b_name,
                 b_sowing_date: schema.fieldSowing.b_sowing_date,
                 b_lu_end:
-                    schema.cultivationTerminating.b_lu_end,
+                    schema.CultivationEnding.b_lu_end,
                 p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_app_amount: schema.fertilizerApplication.p_app_amount,
@@ -525,8 +525,8 @@ export async function getCultivationPlan(
                 eq(schema.fields.b_id, schema.fieldSowing.b_id),
             )
             .leftJoin(
-                schema.cultivationTerminating,
-                eq(schema.cultivationTerminating.b_lu, schema.fieldSowing.b_lu),
+                schema.CultivationEnding,
+                eq(schema.CultivationEnding.b_lu, schema.fieldSowing.b_lu),
             )
             .leftJoin(
                 schema.cultivations,
@@ -720,8 +720,8 @@ export async function removeCultivation(
             }
 
             await tx
-                .delete(schema.cultivationTerminating)
-                .where(eq(schema.cultivationTerminating.b_lu, b_lu))
+                .delete(schema.CultivationEnding)
+                .where(eq(schema.CultivationEnding.b_lu, b_lu))
 
             await tx
                 .delete(schema.fieldSowing)
@@ -759,7 +759,7 @@ export async function updateCultivation(
     b_lu: schema.cultivationsTypeSelect["b_lu"],
     b_lu_catalogue?: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_sowing_date?: schema.fieldSowingTypeInsert["b_sowing_date"],
-    b_lu_end?: schema.cultivationTerminatingTypeInsert["b_lu_end"],
+    b_lu_end?: schema.CultivationEndingTypeInsert["b_lu_end"],
 ): Promise<void> {
     try {
         const updated = new Date()
@@ -821,15 +821,15 @@ export async function updateCultivation(
                     const result = await tx
                         .select({
                             b_lu_end:
-                                schema.cultivationTerminating
+                                schema.CultivationEnding
                                     .b_lu_end,
                         })
-                        .from(schema.cultivationTerminating)
+                        .from(schema.CultivationEnding)
                         .where(
                             and(
-                                eq(schema.cultivationTerminating.b_lu, b_lu),
+                                eq(schema.CultivationEnding.b_lu, b_lu),
                                 isNotNull(
-                                    schema.cultivationTerminating
+                                    schema.CultivationEnding
                                         .b_lu_end,
                                 ),
                             ),
@@ -883,12 +883,12 @@ export async function updateCultivation(
                 }
 
                 await tx
-                    .update(schema.cultivationTerminating)
+                    .update(schema.CultivationEnding)
                     .set({
                         updated: updated,
                         b_lu_end: b_lu_end,
                     })
-                    .where(eq(schema.cultivationTerminating.b_lu, b_lu))
+                    .where(eq(schema.CultivationEnding.b_lu, b_lu))
 
                 const harvestableType = await getHarvestableTypeOfCultivation(
                     tx,

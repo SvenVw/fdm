@@ -419,9 +419,9 @@ export type cultivationHarvestingTypeSelect =
 export type cultivationHarvestingTypeInsert =
     typeof cultivationHarvesting.$inferInsert
 
-// Define cultivation terminating table
-export const cultivationTerminating = fdmSchema.table(
-    "cultivation_terminating",
+// Define cultivation ending table
+export const cultivationEnding = fdmSchema.table(
+    "cultivation_ending",
     {
         b_lu: text()
             .notNull()
@@ -439,10 +439,10 @@ export const cultivationTerminating = fdmSchema.table(
     },
 )
 
-export type cultivationTerminatingTypeSelect =
-    typeof cultivationTerminating.$inferSelect
-export type cultivationTerminatingTypeInsert =
-    typeof cultivationTerminating.$inferInsert
+export type cultivationEndingTypeSelect =
+    typeof cultivationEnding.$inferSelect
+export type cultivationEndingTypeInsert =
+    typeof cultivationEnding.$inferInsert
 
 // Define soil_analyis table
 export const soilTypes = [
