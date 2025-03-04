@@ -6,21 +6,31 @@ CREATE SCHEMA "fdm-authz";
 --> statement-breakpoint
 CREATE TYPE "fdm"."b_acquiring_method" AS ENUM('owner', 'lease', 'unknown');--> statement-breakpoint
 CREATE TYPE "fdm"."p_app_method" AS ENUM('slotted coulter', 'incorporation', 'injection', 'spraying', 'broadcasting', 'spoke wheel', 'pocket placement');--> statement-breakpoint
-CREATE TYPE "fdm"."b_gwl_class" AS ENUM('II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-|', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa');--> statement-breakpoint
+CREATE TYPE "fdm"."b_gwl_class" AS ENUM('II', 'IV', 'IIIb', 'V', 'VI', 'VII', 'Vb', '-', 'Va', 'III', 'VIII', 'sVI', 'I', 'IIb', 'sVII', 'IVu', 'bVII', 'sV', 'sVb', 'bVI', 'IIIa');--> statement-breakpoint
 CREATE TYPE "fdm"."b_lu_harvestable" AS ENUM('none', 'once', 'multiple');--> statement-breakpoint
 CREATE TYPE "fdm"."b_soiltype_agr" AS ENUM('moerige_klei', 'rivierklei', 'dekzand', 'zeeklei', 'dalgrond', 'veen', 'loess', 'duinzand', 'maasklei');--> statement-breakpoint
-CREATE TABLE "fdm"."cultivation_harvesting" (
-	"b_id_harvesting" text PRIMARY KEY NOT NULL,
-	"b_id_harvestable" text NOT NULL,
+CREATE TABLE "fdm"."cultivation_ending" (
 	"b_lu" text NOT NULL,
-	"b_harvesting_date" timestamp with time zone,
+	"b_lu_end" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "fdm"."cultivation_terminating" (
+CREATE TABLE "fdm"."cultivation_harvesting" (
+	"b_id_harvesting" text PRIMARY KEY NOT NULL,
+	"b_id_harvestable" text NOT NULL,
 	"b_lu" text NOT NULL,
-	"b_terminating_date" timestamp with time zone,
+	"b_lu_harvest_date" timestamp with time zone,
+	"created" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated" timestamp with time zone
+);
+--> statement-breakpoint
+CREATE TABLE "fdm"."cultivation_starting" (
+	"b_id" text NOT NULL,
+	"b_lu" text NOT NULL,
+	"b_lu_start" timestamp with time zone,
+	"b_sowing_amount" numeric,
+	"b_sowing_method" text,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -144,7 +154,7 @@ CREATE TABLE "fdm"."fertilizers_catalogue" (
 CREATE TABLE "fdm"."field_acquiring" (
 	"b_id" text NOT NULL,
 	"b_id_farm" text NOT NULL,
-	"b_acquiring_date" timestamp with time zone,
+	"b_start" timestamp with time zone,
 	"b_acquiring_method" "fdm"."b_acquiring_method" DEFAULT 'unknown' NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
@@ -152,17 +162,7 @@ CREATE TABLE "fdm"."field_acquiring" (
 --> statement-breakpoint
 CREATE TABLE "fdm"."field_discarding" (
 	"b_id" text NOT NULL,
-	"b_discarding_date" timestamp with time zone,
-	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated" timestamp with time zone
-);
---> statement-breakpoint
-CREATE TABLE "fdm"."field_sowing" (
-	"b_id" text NOT NULL,
-	"b_lu" text NOT NULL,
-	"b_sowing_date" timestamp with time zone,
-	"b_sowing_amount" numeric,
-	"b_sowing_method" text,
+	"b_end" timestamp with time zone,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated" timestamp with time zone
 );
@@ -310,9 +310,11 @@ CREATE TABLE "fdm-authz"."role" (
 	"deleted" timestamp with time zone
 );
 --> statement-breakpoint
+ALTER TABLE "fdm"."cultivation_ending" ADD CONSTRAINT "cultivation_ending_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."cultivation_harvesting" ADD CONSTRAINT "cultivation_harvesting_b_id_harvestable_harvestables_b_id_harvestable_fk" FOREIGN KEY ("b_id_harvestable") REFERENCES "fdm"."harvestables"("b_id_harvestable") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."cultivation_harvesting" ADD CONSTRAINT "cultivation_harvesting_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm"."cultivation_terminating" ADD CONSTRAINT "cultivation_terminating_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm"."cultivation_starting" ADD CONSTRAINT "cultivation_starting_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "fdm"."cultivation_starting" ADD CONSTRAINT "cultivation_starting_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."cultivations" ADD CONSTRAINT "cultivations_b_lu_catalogue_cultivations_catalogue_b_lu_catalogue_fk" FOREIGN KEY ("b_lu_catalogue") REFERENCES "fdm"."cultivations_catalogue"("b_lu_catalogue") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."fertilizer_acquiring" ADD CONSTRAINT "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."fertilizer_acquiring" ADD CONSTRAINT "fertilizer_acquiring_p_id_fertilizers_p_id_fk" FOREIGN KEY ("p_id") REFERENCES "fdm"."fertilizers"("p_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -323,8 +325,6 @@ ALTER TABLE "fdm"."fertilizer_picking" ADD CONSTRAINT "fertilizer_picking_p_id_c
 ALTER TABLE "fdm"."field_acquiring" ADD CONSTRAINT "field_acquiring_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."field_acquiring" ADD CONSTRAINT "field_acquiring_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."field_discarding" ADD CONSTRAINT "field_discarding_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm"."field_sowing" ADD CONSTRAINT "field_sowing_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "fdm"."field_sowing" ADD CONSTRAINT "field_sowing_b_lu_cultivations_b_lu_fk" FOREIGN KEY ("b_lu") REFERENCES "fdm"."cultivations"("b_lu") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."harvestable_sampling" ADD CONSTRAINT "harvestable_sampling_b_id_harvestable_harvestables_b_id_harvestable_fk" FOREIGN KEY ("b_id_harvestable") REFERENCES "fdm"."harvestables"("b_id_harvestable") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."harvestable_sampling" ADD CONSTRAINT "harvestable_sampling_b_id_harvestable_analysis_harvestable_analyses_b_id_harvestable_analysis_fk" FOREIGN KEY ("b_id_harvestable_analysis") REFERENCES "fdm"."harvestable_analyses"("b_id_harvestable_analysis") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_sampling" ADD CONSTRAINT "soil_sampling_b_id_fields_b_id_fk" FOREIGN KEY ("b_id") REFERENCES "fdm"."fields"("b_id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
