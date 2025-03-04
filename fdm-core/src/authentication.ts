@@ -1,8 +1,6 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { grantRole } from "./authorization"
 import * as authNSchema from "./db/schema-authn"
-import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
@@ -14,7 +12,7 @@ export type BetterAuth = ReturnType<typeof betterAuth>
  * It validates that required environment variables for Google and Microsoft authentication are set,
  * configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
  * with a 30-day expiration and daily update. It also defines mappings from social provider profiles to user
- * formats and registers a post-user-creation hook to assign the "owner" role to new users.
+ * formats.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @returns The configured authentication instance.
