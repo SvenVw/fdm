@@ -23,7 +23,7 @@ import { createId } from "./id"
  * The function assumes that the harvest is not combined with another harvestable and that the analysis is performed
  * on the same day as the harvest.
  *
- * @param fdm - The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The principal's ID used for permission verification.
  * @param b_lu - The cultivation ID.
  * @param b_harvesting_date - The date of the harvest.
@@ -145,6 +145,7 @@ export async function addHarvest(
  * This function verifies the read permission for the requesting principal before
  * obtaining and returning the harvest data. An error is thrown if the harvest is not found.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - Identifier of the principal requesting the harvest.
  * @param b_id_harvesting - Unique identifier for the harvest.
  * @returns A promise that resolves with the harvest details.
@@ -179,6 +180,7 @@ export async function getHarvest(
  * harvest data, then fetches all harvest records in descending order by harvest date. Each record
  * is enriched with additional details via a simplified query.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - Identifier for the principal requesting the harvest details.
  * @param b_lu - Identifier of the cultivation.
  *
@@ -237,6 +239,7 @@ export async function getHarvests(
  * and the harvestable record, and finally removes the harvest record itself. For once-harvestable
  * cultivations, it also clears the cultivation's terminating date.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param b_id_harvesting Identifier of the harvest record to remove.
  * @throws Error if an error occurs during the transaction.
  */
@@ -353,6 +356,7 @@ export async function getHarvestableTypeOfCultivation(
  *
  * This function ensures that a harvest date is provided and that it falls after the sowing date. It also verifies that the cultivation is harvestable. For cultivations that support a single harvest, it checks that no previous harvest exists and that the harvest date exactly matches the terminating date. For cultivations that support multiple harvests, it ensures the harvest date occurs before the terminating date.
  *
+ * @param tx The FDM transaction instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param b_lu - Identifier of the cultivation.
  * @param b_harvesting_date - The proposed harvest date.
  * @returns The allowed harvestable type for the cultivation (e.g., "once" or "multiple").
@@ -455,6 +459,7 @@ export async function checkHarvestDateCompability(
  * After fetching the primary harvest information, it retrieves the related harvestable record and its analysis details.
  * If no harvest is found for the given ID, the function throws an error.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param b_id_harvesting - Unique identifier of the harvest record to retrieve.
  *
  * @returns An object containing the harvest details along with its associated harvestable and analysis data.

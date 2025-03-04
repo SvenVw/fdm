@@ -13,6 +13,7 @@ import type { FdmType } from "./fdm"
  * This function starts a database transaction, generates a unique identifier for the new farm, 
  * inserts the farm details into the database, and then grants the given principal the owner role.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal creating the farm.
  * @param b_name_farm - The name of the farm.
  * @param b_businessid_farm - The business identifier for the farm.
@@ -67,6 +68,7 @@ export async function addFarm(
  *
  * This function checks the principal's permissions before querying the database for the farm identified by the provided ID.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal making the request.
  * @param b_id_farm - The unique identifier of the farm to retrieve.
  * @returns A Promise that resolves with the farm's details.
@@ -105,6 +107,7 @@ export async function getFarm(
  *
  * This function uses authorization checks to determine which farms the principal is allowed to read, then returns the corresponding farm details ordered by name.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting access.
  * @returns A Promise that resolves with an array of farm detail objects.
  * @alpha
@@ -134,6 +137,7 @@ export async function getFarms(
  * This function first checks if the specified principal is authorized to update the farm,
  * then updates the farm's name, business ID, address, and postal code along with a new timestamp.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - ID of the principal initiating the update.
  * @param b_id_farm - Unique identifier of the farm to update.
  * @param b_name_farm - New name for the farm.

@@ -14,6 +14,7 @@ import type { getSoilAnalysisType } from "./soil.d"
  * in the soil analysis and soil sampling tables within a database transaction. The ID of the newly created soil
  * analysis record is returned.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the operation.
  * @param a_date - The date when the soil analysis was performed.
  * @param a_source - The source of the soil analysis data.
@@ -88,6 +89,7 @@ export async function addSoilAnalysis(
  * analysis record. It then executes a transaction to update the soil analysis entry with the provided
  * changes and refreshes the corresponding soil sampling record's update timestamp.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - Identifier of the principal performing the update.
  * @param a_id - The unique identifier of the soil analysis record to update.
  * @param soilAnalysisData - Object containing the fields to update; supports partial updates.
@@ -136,6 +138,7 @@ export async function updateSoilAnalysis(
  * Verifies that the principal has write permissions, then executes a transaction to delete
  * the corresponding entries from both the soil sampling and soil analysis tables.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The ID of the principal performing the removal.
  * @param a_id - The ID of the soil analysis record to remove.
  *
@@ -174,6 +177,7 @@ export async function removeSoilAnalysis(
  *
  * This function validates that the requesting principal has the necessary read permissions for the field before querying for the latest soil analysis data based on the creation timestamp.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The unique ID of the principal requesting the soil analysis.
  * @param b_id - The identifier of the field.
  * @returns The latest soil analysis record for the field, or null if no record exists.
@@ -226,6 +230,7 @@ export async function getSoilAnalysis(
 /**
  * Retrieves all soil analysis records for a specified field, sorted by sampling date in descending order.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting the data.
  * @param b_id - The identifier of the field.
  * @returns An array of soil analysis records with corresponding soil sampling details. Returns an empty array if no records are found.

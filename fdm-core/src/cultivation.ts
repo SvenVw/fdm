@@ -15,7 +15,7 @@ import { createId } from "./id"
 /**
  * Retrieves cultivations available in the catalogue.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @returns A Promise that resolves with an array of cultivation catalogue entries.
  * @alpha
  */
@@ -32,7 +32,7 @@ export async function getCultivationsFromCatalogue(
 /**
  * Adds a new cultivation to the catalogue.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param properties The properties of the cultivation to add.
  * @returns A Promise that resolves when the cultivation is added.
  * @throws If the insertion fails.
@@ -83,6 +83,7 @@ export async function addCultivationToCatalogue(
  *
  * The function validates that the sowing and (if provided) termination dates are valid Date objects and that the termination date is after the sowing date. It ensures the target field and cultivation catalogue entry exist and that no duplicate cultivation is recorded. A permission check is performed before any database operations. If a termination date is provided for a cultivation that is harvestable only once, a harvest record is automatically scheduled for the termination date.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the operation.
  * @param b_lu_catalogue - The catalogue ID corresponding to the cultivation entry.
  * @param b_id - The identifier of the field to which the cultivation is added.
@@ -243,6 +244,7 @@ export async function addCultivation(
 /**
  * Retrieves details of a specific cultivation after verifying access permissions.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting access.
  * @param b_lu - The unique identifier of the cultivation.
  * @returns A promise that resolves with the cultivation details.
@@ -319,6 +321,7 @@ export async function getCultivation(
  * This function verifies that the requesting principal has read access to the field, then queries the database
  * and returns an array of cultivation records.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - Identifier of the principal requesting access.
  * @param b_id - Identifier of the field.
  * @returns A Promise resolving to an array of cultivation details.
@@ -394,6 +397,7 @@ export async function getCultivations(
  * and an array of fields on which the cultivation was applied. Each field entry details associated fertilizer
  * applications and harvest records (with accompanying analyses).
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting access to the cultivation plan.
  * @param b_id_farm - The unique ID of the farm for which the cultivation plan is to be retrieved.
  * @returns A Promise that resolves to an array representing the cultivation plan. Each element in the array has the following structure:
@@ -681,6 +685,7 @@ export async function getCultivationPlan(
  * deletes the cultivation's termination, sowing, and main records. An error is thrown if the cultivation does not exist
  * or if the deletion fails.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param b_lu - The unique identifier of the cultivation to remove.
  *
  * @returns A Promise that resolves once the removal is complete.
@@ -736,6 +741,7 @@ export async function removeCultivation(
  *
  * Performs permission checks and validates that the new dates are logically consistent and that the referenced cultivation and catalogue entries exist. Depending on the inputs, it updates the main cultivation record along with its related sowing, termination, and, if applicable, harvest records.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The ID of the principal authorized to perform this update.
  * @param b_lu - The unique cultivation identifier.
  * @param b_lu_catalogue - (Optional) The new catalogue ID; if provided, it must correspond to an existing catalogue entry.

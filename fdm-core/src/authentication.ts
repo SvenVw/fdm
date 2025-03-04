@@ -16,7 +16,7 @@ export type BetterAuth = ReturnType<typeof betterAuth>
  * with a 30-day expiration and daily update. It also defines mappings from social provider profiles to user
  * formats and registers a post-user-creation hook to assign the "owner" role to new users.
  *
- * @param fdm - The farm management instance used for database operations and role assignments.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @returns The configured authentication instance.
  *
  * @throws {Error} If required environment variables are missing or if role assignment fails.

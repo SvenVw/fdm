@@ -16,6 +16,7 @@ import type { getFieldType } from "./field.d"
  * the field and the farm. If a discarding date is provided, the function ensures that the acquiring
  * date is earlier than the discarding date, throwing an error otherwise.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The unique identifier of the principal performing the operation.
  * @param b_id_farm - Identifier of the farm to which the field belongs.
  * @param b_name - Name of the field.
@@ -110,6 +111,7 @@ export async function addField(
  * This function verifies that the principal identified by `principal_id` has permission to read the field,
  * then fetches and returns the field's properties including its geometry, area, acquisition, and related timestamps.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal making the request.
  * @param b_id - The unique identifier of the field to retrieve.
  *
@@ -172,6 +174,7 @@ export async function getField(
  * returns an array of field detail objects. Each object includes the field's identifier, name,
  * source, geometry, area, acquiring and discarding dates, as well as the creation and update timestamps.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The ID of the principal making the request.
  * @param b_id_farm - The unique identifier of the farm.
  * @returns A Promise resolving to an array of field detail objects.
@@ -232,7 +235,7 @@ export async function getFields(
  * This function applies updates to the field's basic information and its associated acquiring and discarding records.
  * It performs a permission check to ensure the principal has write access and validates that the acquiring date is earlier than the discarding date, when applicable.
  *
- * @param fdm - The field management instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the update.
  * @param b_id - The unique identifier of the field to update.
  * @param b_name - (Optional) New name for the field.

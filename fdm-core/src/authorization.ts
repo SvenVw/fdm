@@ -142,6 +142,7 @@ export const permissions: Permission[] = [
  * and iterates through the chain to verify if any level grants the required permission for the principal(s). It records
  * the permission check details in the audit log and throws an error if the permission is denied.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of resource being accessed.
  * @param action - The action the principal intends to perform.
  * @param resource_id - The unique identifier of the specific resource.
@@ -244,6 +245,7 @@ export async function checkPermission(
  * inserts a new role record into the database within a transaction. If the resource or role is invalid, or if the database
  * operation fails, an error is thrown.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The target resource type for which the role is being assigned.
  * @param role - The role to be granted.
  * @param resource_id - The identifier of the resource.
@@ -297,6 +299,7 @@ export async function grantRole(
  * that the provided resource and role are valid, and executes the update within a transaction. If the input
  * values are invalid or if the operation fails, an error is thrown.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of the resource from which the role should be revoked.
  * @param role - The role to revoke.
  * @param resource_id - The identifier of the resource instance.
@@ -352,6 +355,7 @@ export async function revokeRole(
  * resource IDs. The principal identifier is normalized to an array, ensuring multiple
  * identifiers are handled consistently.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of resource to check access for.
  * @param action - The action based on which access permissions are determined.
  * @param principal_id - The principal's identifier or an array of identifiers.
@@ -444,6 +448,7 @@ function getRolesForAction(action: Action, resource: Resource): Role[] {
  * "farm", "field", "cultivation", "harvesting", "fertilizer_application", "soil_analysis". If the resource is not found,
  * an empty array is returned.
  *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of the resource for which to construct the chain.
  * @param resource_id - The identifier of the resource.
  * @returns A promise that resolves to an array representing the ordered chain of resource beads.
