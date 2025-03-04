@@ -439,10 +439,8 @@ export const cultivationEnding = fdmSchema.table(
     },
 )
 
-export type cultivationEndingTypeSelect =
-    typeof cultivationEnding.$inferSelect
-export type cultivationEndingTypeInsert =
-    typeof cultivationEnding.$inferInsert
+export type cultivationEndingTypeSelect = typeof cultivationEnding.$inferSelect
+export type cultivationEndingTypeInsert = typeof cultivationEnding.$inferInsert
 
 // Define soil_analyis table
 export const soilTypes = [
@@ -464,7 +462,7 @@ export const gwlClasses: [string, ...string[]] = [
     "VI",
     "VII",
     "Vb",
-    "-|",
+    "-",
     "Va",
     "III",
     "VIII",
