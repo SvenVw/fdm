@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Add `createFdmAuth` to create better-auth instance of fdm
+Add `createFdmAuth` to create a better-auth instance for fdm
