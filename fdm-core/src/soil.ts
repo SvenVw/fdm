@@ -120,7 +120,7 @@ export async function updateSoilAnalysis(
                 .where(eq(schema.soilSampling.a_id, a_id))
         })
     } catch (err) {
-        handleError(err, "Exception for updateSoilAnalysis", {
+        throw handleError(err, "Exception for updateSoilAnalysis", {
             a_id,
             ...soilAnalysisData,
         })
