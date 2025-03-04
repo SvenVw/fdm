@@ -87,10 +87,15 @@ export default function AddFarmPage() {
 }
 
 /**
- * Action function for handling the submission of the add farm form.
- * Processes and validates form data to create a new farm.
- * @param request - The incoming request object containing form data.
- * @returns A redirect response to the newly created farm's page.
+ * Handles the submission of the add farm form by creating a new farm and attaching default fertilizers.
+ *
+ * This function retrieves the user session from the request, extracts and validates form data using a predefined schema,
+ * and creates a new farm with the provided name. It then fetches available fertilizers from a catalogue and associates them
+ * with the newly created farm. On success, it returns a redirect response to the farm's atlas page with a confirmation message.
+ *
+ * @param request - The incoming request containing form data and session details.
+ * @returns A redirect response to the newly created farm's atlas page.
+ * @throws {Error} Throws an error if the form processing, farm creation, or fertilizer attachment fails.
  */
 export async function action({ request }: ActionFunctionArgs) {
     try {

@@ -22,6 +22,16 @@ import {
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 
+/**
+ * Loads and prepares cultivation and harvest data for a specified farm and catalogue.
+ *
+ * This loader validates that the required route parameters are provided, retrieves the session, and fetches available cultivation
+ * options from the catalogue. It then obtains the farm's cultivation plan, identifies the target cultivation, extracts its sowing
+ * and terminating dates, and aggregates similar harvest entries by combining their identifiers based on harvest date and yield data.
+ * Structured error responses are thrown if required parameters are missing or if the target cultivation is not found.
+ *
+ * @throws {Response} When b_lu_catalogue or b_id_farm is missing, or if the target cultivation does not exist.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         const b_lu_catalogue = params.b_lu_catalogue
@@ -153,6 +163,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the farm cultivation management interface.
+ *
+ * This component displays a form for updating cultivation details and a list of harvests. It retrieves
+ * cultivation data using the loader hook and uses a fetcher to handle form submissions, enabling users
+ * to update sowing and terminating dates as well as manage harvest records.
+ *
+ * @returns A JSX element representing the cultivation form and harvest list.
+ */
 export default function FarmAFieldCultivationBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const fetcher = useFetcher()
@@ -182,6 +201,16 @@ export default function FarmAFieldCultivationBlock() {
     )
 }
 
+/**
+ * Processes POST and DELETE requests to update cultivation details or remove harvest records.
+ *
+ * For POST requests, it updates the cultivation fields with provided sowing and terminating dates for the specified farm and catalogue.
+ * For DELETE requests, it removes the specified harvest entries.
+ *
+ * This function validates that the required route parameters are present and uses session information to execute the appropriate operation.
+ *
+ * @throws {Error} If required parameters are missing or if the provided harvest IDs are invalid.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_lu_catalogue = params.b_lu_catalogue

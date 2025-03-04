@@ -11,6 +11,15 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads farm field data and a Mapbox token for the elevation feature.
+ *
+ * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. A Mapbox token is also obtained to enable map rendering on the client side. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
+ *
+ * @throws {Error} If the farm ID is not provided (HTTP 400) or if an internal error occurs during data fetching.
+ *
+ * @returns An object containing the Mapbox token and the GeoJSON FeatureCollection of farm fields.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -58,6 +67,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a placeholder UI for the farm elevation feature.
+ *
+ * This component displays a message informing the user that the elevation map is not yet available and provides a button that navigates to the field map.
+ */
 export default function FarmAtlasElevationBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

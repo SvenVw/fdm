@@ -25,6 +25,19 @@ import {
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 
+/**
+ * Loads data necessary for managing fertilizer applications for a specific field.
+ *
+ * This function validates that both the farm and field IDs are provided in the route parameters.
+ * It retrieves the user session, fetches field details (throwing an error if the field is not found),
+ * obtains available fertilizers for the farm and maps them to combobox options, and retrieves existing
+ * fertilizer applications for the field. It also calculates the required fertilizer dose based on the retrieved data.
+ *
+ * @returns An object containing the field details, fertilizer options (for a combobox), the list of fertilizer applications,
+ *          and the calculated fertilizer dose.
+ *
+ * @throws {Error} If the farm or field ID is missing, or if the specified field does not exist.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -95,6 +108,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the overview for managing fertilizer applications on a field.
+ *
+ * This component displays a header and descriptive text followed by a grid layout.
+ * The grid contains a form for submitting new fertilizer applications along with a list
+ * of existing applications, and a section showcasing the calculated fertilizer dose in cards.
+ * Data required for rendering is obtained via the loader, and the component leverages
+ * React Router hooks for location tracking and data fetching.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
@@ -132,6 +154,18 @@ export default function FarmFieldsOverviewBlock() {
     )
 }
 
+/**
+ * Processes form submissions to add or delete fertilizer applications for a field.
+ *
+ * For POST requests, this function extracts form data and uses it along with the active user session
+ * to add a new fertilizer application. For DELETE requests, it validates and retrieves the application ID
+ * from the form data before removing the corresponding application. The function requires a valid field
+ * identifier from the URL parameters and ensures that the session is correctly retrieved.
+ *
+ * @returns A response object indicating the success or error outcome of the operation.
+ *
+ * @throws {Error} If the field identifier is missing or an unexpected error occurs during processing.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         // Get the field ID

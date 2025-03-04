@@ -14,6 +14,26 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads data required to render the farm field index page.
+ *
+ * This function verifies that both a farm ID and a field ID are provided in the route parameters, retrieving the user session before fetching farms and fields associated with the user's principal ID.
+ * It constructs selectable options for farms and fields (with field areas rounded to one decimal place), ensures field options are sorted alphabetically, and retrieves detailed information about the specified field.
+ * Additionally, it builds sidebar navigation items for the page.
+ *
+ * @returns An object containing:
+ *  - b_id_farm: The farm identifier.
+ *  - farmOptions: An array of valid farm options.
+ *  - fieldOptions: A sorted array of valid field options, each including an identifier, name, and area.
+ *  - field: Detailed information about the field.
+ *  - b_id: The field identifier.
+ *  - sidebarPageItems: An array of navigation items for the sidebar.
+ *  - user: Data of the authenticated user.
+ *
+ * @throws {Response} If either the farm ID or field ID is missing, with a status of 400.
+ * @throws {Error} If the retrieved farm or field data does not match the expected structure.
+ * @throws The error processed by {@link handleLoaderError} for any other issues encountered.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -124,6 +144,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the farm field index page.
+ *
+ * This component uses loader data to display a sidebar with navigation controls and a header
+ * featuring farm and field options. It further presents a main section with the field’s title,
+ * a descriptive message, and an outlet for nested route content.
+ *
+ * @returns A React component representing the farm field index view.
+ */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
 

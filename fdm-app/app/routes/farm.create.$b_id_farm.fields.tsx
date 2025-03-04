@@ -36,7 +36,23 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Loads and prepares all data required for the farm creation page.
+ *
+ * This loader retrieves the details of a farm and its associated fields using the provided farm ID from the URL parameters.
+ * It also fetches available cultivation options from the catalogue and the Mapbox access token from the environment.
+ * The fields are sorted alphabetically by name and converted into sidebar navigation items for use in the UI.
+ *
+ * @returns An object containing:
+ * - sidebarPageItems: Navigation items for each field.
+ * - cultivationOptions: A list of available cultivation options.
+ * - mapboxToken: The Mapbox access token.
+ * - b_id_farm: The farm ID.
+ * - b_name_farm: The name of the farm.
+ * - action: The URL for field update submissions.
+ *
+ * @throws {Response} If the farm ID is missing or if the Mapbox token is not set.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the Id and name of the farm
@@ -176,7 +192,18 @@ export default function Index() {
     )
 }
 
-// Action
+/**
+ * Processes a form submission to update a field.
+ *
+ * Extracts the field ID ("b_id") and name ("b_name") from the request's form data, validates their presence,
+ * retrieves the user session, and applies the update using the updateField service. Returns an object containing
+ * the updated field data.
+ *
+ * @returns An object with a "field" property holding the updated field information.
+ * 
+ * @throws {Error} If the form data is missing the "b_id" or "b_name" field.
+ * @throws {Error} If an error occurs during the field update process.
+ */
 export async function action({ request, params }: LoaderFunctionArgs) {
     try {
         const formData = await request.formData()

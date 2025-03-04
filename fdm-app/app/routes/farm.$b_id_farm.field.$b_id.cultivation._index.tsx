@@ -24,6 +24,22 @@ import {
 import { dataWithError, dataWithSuccess, dataWithWarning } from "remix-toast"
 import { toast } from "sonner"
 
+/**
+ * Loads data required for rendering the overview of a specific farm field.
+ *
+ * This function extracts the farm and field identifiers from the URL parameters and validates their presence.
+ * It retrieves the user session to authorize data access, then fetches the field details, a catalogue of available
+ * cultivations (formatted as combobox options), the list of cultivations for the field, and the corresponding harvests.
+ *
+ * @param args - An object containing the HTTP request and URL parameters. The route parameters must include "b_id_farm" (farm identifier) and "b_id" (field identifier).
+ * @returns An object containing:
+ *   - field: The details of the specified field.
+ *   - cultivationsCatalogueOptions: A list of catalogue options for cultivations, formatted for use in a combobox.
+ *   - cultivations: The list of cultivations associated with the field.
+ *   - harvests: The harvest data for the first collection of cultivation harvests, or an empty array if none are available.
+ *
+ * @throws {Response} When the "b_id_farm" or "b_id" parameters are missing or if the field is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -98,6 +114,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the overview block for farm fields.
+ *
+ * This component displays a UI section for managing cultivations in a farm field. It renders a header with a description,
+ * a form for adding new cultivations (populated with catalogue options from loader data), and a list of existing cultivations
+ * along with their associated harvests. The form's action is determined by the current URL.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
@@ -129,6 +152,21 @@ export default function FarmFieldsOverviewBlock() {
     )
 }
 
+/**
+ * Handles form submissions to add or remove a cultivation.
+ *
+ * For POST requests, the function extracts cultivation data from the request,
+ * and adds a new cultivation to the specified field using the current user session.
+ * For DELETE requests, it removes an existing cultivation based on the cultivation ID
+ * provided in the form data.
+ *
+ * Throws an error if the field identifier (b_id) is missing from the URL parameters,
+ * or if, in a DELETE request, the cultivation identifier (b_lu) is missing or invalid.
+ *
+ * @returns A response object containing a success message.
+ *
+ * @throws {Error} When the field identifier is absent, or when the cultivation identifier is missing or invalid.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         // Get the field ID

@@ -11,6 +11,18 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads farm fields as a GeoJSON FeatureCollection along with a Mapbox token.
+ *
+ * This function validates that the farm ID is present in the route parameters, retrieves the user session, and
+ * fetches the farm's fields. It then converts each field into a GeoJSON feature with its area rounded to one
+ * decimal place, assembles these features into a FeatureCollection, and obtains a Mapbox token. The returned
+ * object includes both the token and the FeatureCollection.
+ *
+ * @returns A promise that resolves to an object containing a Mapbox token and a GeoJSON FeatureCollection of farm fields.
+ *
+ * @throws {Response} If the farm ID is missing from the parameters or an error occurs during data fetching.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -57,6 +69,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a placeholder message indicating that the soil map is not available.
+ *
+ * This component displays a centered layout with an informative message and a navigation button
+ * linking to the field map.
+ */
 export default function FarmAtlasSoilBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

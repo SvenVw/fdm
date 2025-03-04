@@ -44,6 +44,16 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 
+/**
+ * Loads farm field details for the overview page.
+ *
+ * Retrieves the field ID from route parameters and uses the current user's session to fetch the corresponding field details.
+ * Throws an error with a 400 status if the field ID is missing, or with a 404 status if the field is not found.
+ *
+ * @returns An object containing the retrieved field details.
+ *
+ * @throws {Response} When the field ID is missing or the field is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the field id
@@ -76,6 +86,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the overview block for editing farm field details.
+ *
+ * Retrieves initial field data via useLoaderData and initializes a validated form with fields for the
+ * field's name, acquiring method, acquiring date, and terminating date. The form automatically resets
+ * its values when updated loader data is provided and integrates with a submit handler to update the field.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
@@ -328,6 +345,13 @@ export default function FarmFieldsOverviewBlock() {
     )
 }
 
+/**
+ * Updates a farm field's details using the form data submitted in the request.
+ *
+ * This action function retrieves the required field identifier from the route parameters, obtains the user session,
+ * and extracts validated form data according to a predefined schema. It then updates the corresponding farm field record
+ * and returns a success response. Any errors encountered during the process are handled by a centralized error handler.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id = params.b_id

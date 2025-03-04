@@ -135,6 +135,22 @@ export const permissions: Permission[] = [
     },
 ]
 
+/**
+ * Checks whether the principal is authorized to perform an action on a resource.
+ *
+ * This function retrieves the valid roles for the specified action and resource, constructs the resource hierarchy,
+ * and iterates through the chain to verify if any level grants the required permission for the principal(s). It records
+ * the permission check details in the audit log and throws an error if the permission is denied.
+ *
+ * @param resource - The type of resource being accessed.
+ * @param action - The action the principal intends to perform.
+ * @param resource_id - The unique identifier of the specific resource.
+ * @param principal_id - The principal identifier(s); supports a single ID or an array.
+ * @param origin - The source origin used for audit logging the permission check.
+ * @returns Resolves to true if the principal is permitted to perform the action.
+ *
+ * @throws {Error} When the principal does not have the required permission.
+ */
 export async function checkPermission(
     fdm: FdmType,
     resource: Resource,
@@ -221,6 +237,20 @@ export async function checkPermission(
     }
 }
 
+/**
+ * Grants a specified role to a principal for a given resource.
+ *
+ * This function validates that the provided resource and role are allowed. It then generates a unique role identifier and
+ * inserts a new role record into the database within a transaction. If the resource or role is invalid, or if the database
+ * operation fails, an error is thrown.
+ *
+ * @param resource - The target resource type for which the role is being assigned.
+ * @param role - The role to be granted.
+ * @param resource_id - The identifier of the resource.
+ * @param principal_id - The identifier of the principal receiving the role.
+ *
+ * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
+ */
 export async function grantRole(
     fdm: FdmType,
     resource: Resource,
@@ -260,6 +290,20 @@ export async function grantRole(
     }
 }
 
+/**
+ * Revokes a role from a principal for a specified resource.
+ *
+ * This function revokes a role by marking the corresponding record as deleted in the database. It validates
+ * that the provided resource and role are valid, and executes the update within a transaction. If the input
+ * values are invalid or if the operation fails, an error is thrown.
+ *
+ * @param resource - The type of the resource from which the role should be revoked.
+ * @param role - The role to revoke.
+ * @param resource_id - The identifier of the resource instance.
+ * @param principal_id - The identifier of the principal whose role is being revoked.
+ *
+ * @throws {Error} If the resource or role is invalid, or if the revocation operation fails.
+ */
 export async function revokeRole(
     fdm: FdmType,
     resource: Resource,
@@ -300,6 +344,20 @@ export async function revokeRole(
     }
 }
 
+/**
+ * Retrieves a list of resource IDs accessible by a principal for a specified action.
+ *
+ * This function validates the provided resource and action, retrieves the roles allowed
+ * for the action on the resource, and queries the authorization schema to fetch matching
+ * resource IDs. The principal identifier is normalized to an array, ensuring multiple
+ * identifiers are handled consistently.
+ *
+ * @param resource - The type of resource to check access for.
+ * @param action - The action based on which access permissions are determined.
+ * @param principal_id - The principal's identifier or an array of identifiers.
+ * @returns A promise that resolves to an array of resource IDs that the principal can access.
+ * @throws {Error} If the resource or action is invalid or if the database query fails.
+ */
 export async function listResources(
     fdm: FdmType,
     resource: Resource,
@@ -351,6 +409,17 @@ export async function listResources(
     }
 }
 
+/**
+ * Retrieves the roles authorized to perform a specific action on a given resource.
+ *
+ * This function filters the global permissions array for entries that match the specified
+ * resource and include the provided action. It then extracts and returns a flattened list of roles
+ * from the matching permission entries.
+ *
+ * @param action - The action to check permissions for.
+ * @param resource - The resource associated with the action.
+ * @returns An array of roles permitted to perform the specified action on the resource.
+ */
 function getRolesForAction(action: Action, resource: Resource): Role[] {
     const roles = permissions.filter((permission) => {
         return (
@@ -366,6 +435,21 @@ function getRolesForAction(action: Action, resource: Resource): Role[] {
     return rolesFlat
 }
 
+/**
+ * Constructs a sorted chain of related resources for a provided resource type and identifier.
+ *
+ * This function retrieves and assembles linked resource information from the database based on the resource type.
+ * For supported resource types ("farm", "field", "cultivation", "soil_analysis", "harvesting", "fertilizer_application"),
+ * it gathers associated resource identifiers and orders them following the sequence:
+ * "farm", "field", "cultivation", "harvesting", "fertilizer_application", "soil_analysis". If the resource is not found,
+ * an empty array is returned.
+ *
+ * @param resource - The type of the resource for which to construct the chain.
+ * @param resource_id - The identifier of the resource.
+ * @returns A promise that resolves to an array representing the ordered chain of resource beads.
+ *
+ * @throws {Error} If the resource type is not recognized or if a database error occurs.
+ */
 async function getResourceChain(
     fdm: FdmType,
     resource: Resource,

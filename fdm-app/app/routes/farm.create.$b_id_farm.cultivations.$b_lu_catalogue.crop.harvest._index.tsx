@@ -18,6 +18,24 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 
+/**
+ * Retrieves required harvest and cultivation details for rendering the harvest addition form.
+ *
+ * This loader function validates that the necessary route parameters ("b_lu_catalogue" and "b_id_farm") are present,
+ * retrieves the user session, and then obtains a list of available cultivation options from the catalogue.
+ * It fetches the cultivation plan using the session's principal identifier and extracts the specific cultivation details,
+ * including sowing and terminating dates as well as any associated harvest data.
+ *
+ * @returns An object containing:
+ *   - b_lu_catalogue: The catalogue identifier for the cultivation.
+ *   - b_id_farm: The identifier of the farm.
+ *   - b_sowing_date: The sowing date of the cultivation.
+ *   - b_terminating_date: The terminating date of the cultivation.
+ *   - harvests: The existing harvest data for the cultivation (if available).
+ *   - cultivationOptions: An array of available cultivation options with { value, label }.
+ *
+ * @throws {Response} If "b_lu_catalogue" or "b_id_farm" is missing in the route parameters, or if the specified cultivation is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         const b_lu_catalogue = params.b_lu_catalogue
@@ -84,6 +102,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a block for adding harvest details to a cultivation plan.
+ *
+ * This component displays an instructional message for entering the harvest date, yield, and harvestable nitrogen,
+ * provides a navigation link to return to the crop overview, and includes a HarvestForm component initialized with unset values.
+ */
 export default function CultivationPlanAddHarvestBlock() {
     return (
         <div className="space-y-6">
@@ -107,6 +131,15 @@ export default function CultivationPlanAddHarvestBlock() {
     )
 }
 
+/**
+ * Handles the submission of the harvest form.
+ *
+ * Validates that the required parameters (b_lu_catalogue and b_id_farm) are present, retrieves the user session and corresponding cultivation plan, and extracts form values to add harvest data for each field associated with the selected cultivation. Returns a redirect response with a success message upon completion.
+ *
+ * @returns A redirect response indicating successful addition of the harvest data.
+ *
+ * @throws {Error} If required parameters are missing or if processing fails.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_lu_catalogue = params.b_lu_catalogue

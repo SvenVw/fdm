@@ -25,7 +25,16 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Loads cultivation details for a specific farm and catalogue.
+ *
+ * This function verifies that the route parameters include a valid farm ID and cultivation catalogue ID.
+ * It retrieves the user session and fetches the cultivation plan for the specified farm using the session's principal ID.
+ * The function then searches for the cultivation matching the provided catalogue ID and returns an object containing the farm ID,
+ * the catalogue ID, and the corresponding cultivation details.
+ *
+ * @throws {Response} When the required farm ID or cultivation catalogue ID is missing, or if the specified cultivation is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the Id of the farm

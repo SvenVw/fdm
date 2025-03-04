@@ -17,6 +17,18 @@ import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, NavLink, useLoaderData } from "react-router"
 
+/**
+ * Retrieves the user session and associated farms data.
+ *
+ * The function obtains the user session from the incoming request and then fetches the user's farms using the session's principal ID. It maps the farm data into a simplified array containing each farm's identifier and name, and returns this alongside the user's name.
+ *
+ * @param request - The HTTP request object used to retrieve session information.
+ * @returns An object containing:
+ *   - farmOptions: An array of objects, each with a farm's ID and name.
+ *   - username: The user's name from the session data.
+ *
+ * @throws {Error} If retrieving the session or fetching the farm data fails.
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
@@ -42,6 +54,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the user interface for farm management.
+ *
+ * This component uses data from the loader to display a personalized greeting and either a list of available
+ * farms for selection or a prompt to create a new farm if none exist. It integrates various UI elements like
+ * the header, title, card layout, and navigation buttons to facilitate seamless interaction.
+ */
 export default function AppIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const greeting = getTimeBasedGreeting()

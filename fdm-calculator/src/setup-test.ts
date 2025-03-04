@@ -8,6 +8,21 @@ let fdm: FdmServerType
 
 export let migrationsRun = false
 
+/**
+ * Initializes the database connection for the testing environment.
+ *
+ * This asynchronous function validates that all required PostgreSQL environment variables
+ * are present and correctly formatted. It creates the database server instance, runs migrations
+ * if they haven't been executed yet, and provides the connection details (host, port, user, password,
+ * database) to the given test project context.
+ *
+ * @param project - The testing project context used to supply the database connection details.
+ *
+ * @throws {Error} If any required environment variable is missing, if the POSTGRES_PORT is invalid,
+ * or if database server creation/migration fails.
+ *
+ * @remark Migrations are only executed once per testing session.
+ */
 export default async function setup(project: TestProject) {
     const requiredEnvVars = [
         "POSTGRES_HOST",

@@ -21,6 +21,21 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 
+/**
+ * Loads the necessary data for the harvest page.
+ *
+ * This function extracts the farm, field, and cultivation IDs from the URL parameters and validates their presence.
+ * Using the current user session, it retrieves:
+ * - The details of the specified field.
+ * - A list of cultivations formatted as combobox options.
+ * - The selected cultivation information.
+ *
+ * Throws an error with a 400 status if any required identifier is missing, or a 404 status if the field is not found.
+ *
+ * @returns An object containing the field details, the available cultivation options, and the selected cultivation.
+ *
+ * @throws {Error} If a required parameter is missing or if the field does not exist.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -92,6 +107,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a UI block that displays the current cultivation's overview and a harvest entry form.
+ *
+ * This component retrieves data using the loader context to display the selected cultivation's name
+ * and a prompt for entering harvest data. It also includes a navigation button to return to the
+ * cultivation overview and renders the HarvestForm component for submitting harvest details.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
@@ -124,6 +146,17 @@ export default function FarmFieldsOverviewBlock() {
     )
 }
 
+/**
+ * Handles POST requests to record harvest data for a specific cultivation.
+ *
+ * This action function validates that the required route parameters (farm ID, field ID, and cultivation ID)
+ * are provided. It retrieves the current user session, extracts form data using a defined schema, and records
+ * the new harvest entry tied to the user's session. On successful submission, it redirects to the cultivation's
+ * page with a success message.
+ *
+ * @throws {Error} If any required identifier (farm ID, field ID, or cultivation ID) is missing.
+ * @throws {Error} If an error occurs during form processing, the error is wrapped with a custom handler and re-thrown.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         // Get the farm ID

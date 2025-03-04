@@ -21,6 +21,21 @@ import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 
+/**
+ * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.
+ *
+ * This loader function extracts the farm ID from the route parameters and validates its presence,
+ * retrieves the current user session, and fetches fields associated with the specified farm.
+ * It converts these fields into a GeoJSON FeatureCollection—rounding the field area values for precision—
+ * and obtains the Mapbox access token and style configuration for map rendering.
+ *
+ * @returns An object containing:
+ *  - savedFields: A GeoJSON FeatureCollection of the farm fields.
+ *  - mapboxToken: The Mapbox access token.
+ *  - mapboxStyle: The Mapbox style configuration.
+ *
+ * @throws {Response} If the farm ID is missing or if an error occurs during data retrieval and processing.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -72,6 +87,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders a Mapbox map displaying farm fields with interactive controls.
+ *
+ * This component consumes preloaded farm field data to compute the map's view state and stylize the field boundaries. 
+ * It integrates geolocation and navigation controls, wraps the field layer in a non-interactive source, and includes a panel for displaying additional field details on hover.
+ */
 export default function FarmAtlasFieldsBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

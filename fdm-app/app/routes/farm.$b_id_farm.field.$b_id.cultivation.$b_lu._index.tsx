@@ -26,6 +26,24 @@ import {
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 
+/**
+ * Loads and prepares data for the farm fields overview page.
+ *
+ * This loader function validates the presence of required farm, field, and cultivation IDs from the request parameters.
+ * It retrieves the user session and fetches details of the specified field and cultivation, along with available
+ * cultivation options and associated harvest records. It also determines the harvestable type based on the cultivation
+ * catalogue.
+ *
+ * @returns An object containing:
+ *   - field: The details of the specified field.
+ *   - cultivationsCatalogueOptions: Mapped options for cultivation selection.
+ *   - cultivation: The data of the specified cultivation.
+ *   - harvests: The list of harvests related to the cultivation.
+ *   - b_lu_harvestable: The harvestable type from the catalogue, or "none" if not applicable.
+ *   - b_id_farm: The farm ID.
+ *
+ * @throws {Response} If the farm, field, or cultivation ID is missing (status 400) or if the field or cultivation cannot be found (status 404).
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
@@ -114,6 +132,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Renders the overview block for a farm field cultivation.
+ *
+ * This component displays the cultivation's name along with a prompt to enter harvest data, provides a navigation button to return to the cultivation list, and incorporates a form for updating cultivation details. It also shows a list of harvest entries along with their current status, sourcing its data from the loader via React Router hooks.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const fetcher = useFetcher()
@@ -157,6 +180,17 @@ export default function FarmFieldsOverviewBlock() {
     )
 }
 
+/**
+ * Processes form submissions to update cultivation data or delete a harvest.
+ *
+ * For POST requests, it extracts cultivation details from the submitted form and updates the corresponding record.
+ * For DELETE requests, it removes a harvest identified by a provided ID.
+ * The function validates the presence of required URL parameters and uses the authenticated user's session
+ * to ensure authorized operations. It returns a response object indicating the outcome of the action.
+ *
+ * @returns A response object with either success data and a message or an error message if validations fail.
+ * @throws {Error} When an unexpected error occurs during processing, after being handled by {@link handleActionError}.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         // Get the field ID

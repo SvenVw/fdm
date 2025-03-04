@@ -60,7 +60,15 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Retrieves farm details and map configurations for rendering the farm map.
+ *
+ * This loader function extracts the farm ID from route parameters, validates its presence, and uses the current session to fetch the corresponding farm details. It then retrieves the Mapbox token and style configuration, and returns these along with the farm's display name and a URL for available fields. Any errors encountered during processing are transformed using {@link handleLoaderError}.
+ *
+ * @throws {Response} When the farm ID is missing, the specified farm is not found, or another error occurs during data retrieval.
+ *
+ * @returns An object containing the farm name, Mapbox token, Mapbox style, and the URL for available fields.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the Id and name of the farm
@@ -226,7 +234,19 @@ export default function Index() {
     )
 }
 
-// Action
+/**
+ * Processes form submission for adding fields to a farm.
+ *
+ * This action extracts selected fields from the incoming form data, validates the presence
+ * of the farm identifier, and establishes the user session. It adds each field to the specified farm,
+ * creates the corresponding cultivation entry, and conditionally performs soil analysis if an API key is present.
+ * Upon successful processing, it redirects to the farm fields page with a success message.
+ *
+ * @returns A redirect response to the farm fields page with a success message.
+ *
+ * @throws {Error} If the farm identifier is missing or if an operation (such as adding a field, cultivation,
+ * or soil analysis) fails.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const formData = await request.formData()

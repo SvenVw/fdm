@@ -13,24 +13,31 @@ import type { HarvestType } from "./harvest.d"
 import { createId } from "./id"
 
 /**
- * Add a harvest to a cultivation.
+ * Adds a new harvest to a cultivation.
  *
- * This function simplifies adding a harvest to a cultivation. It assumes that the harvest is not combined with another harvestable and that a same day analysis is performed on this harvest.
+ * This function verifies the principal's permission and ensures that the designated cultivation exists
+ * before adding a new harvest record. Within a single transaction, it creates associated records for the
+ * harvestable, its analyses, and the corresponding sampling entry. If the cultivation allows only one harvest,
+ * the function also updates its termination date to the harvest date.
  *
- * @param fdm The FDM instance.
- * @param principal_id  - The id of the principal that is adding the harvest
- * @param b_lu The ID of the cultivation.
- * @param b_harvesting_date The date of the harvest.
- * @param b_lu_yield The amount of yield as dry matter for this harvest, expressed as kg / ha
- * @param b_lu_n_harvestable Total nitrogen content of harvested crop in harvestable yield, expressed as g N / kg
- * @param b_lu_n_residue Total nitrogen content of harvested crop in crop residue, expressed as g N / kg
- * @param b_lu_p_harvestable Total phosphorus content of harvested crop in harvestable yield, expressed as g P2O5 / kg
- * @param b_lu_p_residue Total phosphorus content of harvested crop in crop residue, expressed as g P2O5 / kg
- * @param b_lu_k_harvestable Total potasium content of harvested crop in harvestable yield, expressed as g K2O / kg
- * @param b_lu_k_residue Total potasium content of harvested crop in crop residue, expressed as g K2O / kg
+ * The function assumes that the harvest is not combined with another harvestable and that the analysis is performed
+ * on the same day as the harvest.
  *
- * @returns A Promise that resolves with the ID of the new harvest.
- * @throws If the cultivation or field does not exist or if the insertion fails.
+ * @param fdm - The FDM instance.
+ * @param principal_id - The principal's ID used for permission verification.
+ * @param b_lu - The cultivation ID.
+ * @param b_harvesting_date - The date of the harvest.
+ * @param b_lu_yield - The dry-matter yield for the harvest, in kg/ha.
+ * @param b_lu_n_harvestable - The total nitrogen content in the harvestable yield (g N/kg).
+ * @param b_lu_n_residue - The total nitrogen content in the crop residue (g N/kg).
+ * @param b_lu_p_harvestable - The total phosphorus content in the harvestable yield (g P2O5/kg).
+ * @param b_lu_p_residue - The total phosphorus content in the crop residue (g P2O5/kg).
+ * @param b_lu_k_harvestable - The total potassium content in the harvestable yield (g K2O/kg).
+ * @param b_lu_k_residue - The total potassium content in the crop residue (g K2O/kg).
+ *
+ * @returns A Promise that resolves with the new harvest's unique identifier.
+ *
+ * @throws Error If the cultivation does not exist, permission checks fail, or any database insertion fails.
  */
 export async function addHarvest(
     fdm: FdmType,
@@ -133,13 +140,15 @@ export async function addHarvest(
 }
 
 /**
- * Retrieves the details of a specific harvest.
+ * Retrieves harvest details for a specific record.
  *
- * @param fdm The FDM instance.
- * @param principal_id - The id of the principal that is requesting the harvest
- * @param b_id_harvesting The ID of the harvesting action.
+ * This function verifies the read permission for the requesting principal before
+ * obtaining and returning the harvest data. An error is thrown if the harvest is not found.
+ *
+ * @param principal_id - Identifier of the principal requesting the harvest.
+ * @param b_id_harvesting - Unique identifier for the harvest.
  * @returns A promise that resolves with the harvest details.
- * @throws If the harvest does not exist.
+ * @throws {Error} When the specified harvest record does not exist.
  */
 export async function getHarvest(
     fdm: FdmType,
@@ -164,12 +173,18 @@ export async function getHarvest(
 }
 
 /**
- * Retrieves all harvests for a given cultivation.
+ * Retrieves harvest details for a specified cultivation.
  *
- * @param fdm The FDM instance.
- * @param principal_id - The id of the principal that is requesting the harvests
- * @param b_lu The ID of the cultivation.
- * @returns A Promise that resolves with an array of harvest details.
+ * This function verifies that the requesting principal has permission to access the cultivation's
+ * harvest data, then fetches all harvest records in descending order by harvest date. Each record
+ * is enriched with additional details via a simplified query.
+ *
+ * @param principal_id - Identifier for the principal requesting the harvest details.
+ * @param b_lu - Identifier of the cultivation.
+ *
+ * @returns A promise that resolves with an array of detailed harvest information.
+ *
+ * @throws {Error} If access is denied or if an error occurs during data retrieval.
  */
 export async function getHarvests(
     fdm: FdmType,
@@ -215,12 +230,15 @@ export async function getHarvests(
 }
 
 /**
- * Removes a harvest record and associated data.
+ * Removes a harvest record along with its related sampling, analyses, and harvestable entries.
  *
- * @param fdm The FDM database instance.
- * @param principal_id - The id of the principal that is removing the harvest
- * @param b_id_harvesting The ID of the harvest record to remove.
- * @throws If there's an error during the database transaction.
+ * This asynchronous function verifies that the principal has write permission on the specified harvest.
+ * In a single transaction, it retrieves the harvest details, deletes linked sampling entries, analyses,
+ * and the harvestable record, and finally removes the harvest record itself. For once-harvestable
+ * cultivations, it also clears the cultivation's terminating date.
+ *
+ * @param b_id_harvesting Identifier of the harvest record to remove.
+ * @throws Error if an error occurs during the transaction.
  */
 export async function removeHarvest(
     fdm: FdmType,
@@ -330,6 +348,17 @@ export async function getHarvestableTypeOfCultivation(
     return b_lu_harvestable[0].b_lu_harvestable
 }
 
+/**
+ * Validates whether the proposed harvest date fits within the cultivation's schedule.
+ *
+ * This function ensures that a harvest date is provided and that it falls after the sowing date. It also verifies that the cultivation is harvestable. For cultivations that support a single harvest, it checks that no previous harvest exists and that the harvest date exactly matches the terminating date. For cultivations that support multiple harvests, it ensures the harvest date occurs before the terminating date.
+ *
+ * @param b_lu - Identifier of the cultivation.
+ * @param b_harvesting_date - The proposed harvest date.
+ * @returns The allowed harvestable type for the cultivation (e.g., "once" or "multiple").
+ *
+ * @throws {Error} If the harvest date is missing, the cultivation is not harvestable, the sowing date is missing or invalid (i.e., the harvest date is not after the sowing date), the terminating date is missing, or if the harvest date violates the constraints for single or multiple harvest cultivations.
+ */
 export async function checkHarvestDateCompability(
     tx: FdmType,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
@@ -419,6 +448,21 @@ export async function checkHarvestDateCompability(
     return b_lu_harvestable
 }
 
+/**
+ * Retrieves simplified details of a harvest, including its associated harvestable and analysis.
+ *
+ * This asynchronous function queries the database for a harvest record matching the provided identifier.
+ * After fetching the primary harvest information, it retrieves the related harvestable record and its analysis details.
+ * If no harvest is found for the given ID, the function throws an error.
+ *
+ * @param b_id_harvesting - Unique identifier of the harvest record to retrieve.
+ *
+ * @returns An object containing the harvest details along with its associated harvestable and analysis data.
+ *
+ * @throws {Error} If the harvest record does not exist.
+ *
+ * @remark Currently, only one-to-one joins for harvest, harvestable, and harvestable analysis are supported.
+ */
 async function getHarvestSimplified(
     fdm: FdmType,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
