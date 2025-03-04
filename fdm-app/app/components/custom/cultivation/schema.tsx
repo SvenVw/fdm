@@ -8,7 +8,7 @@ export const FormSchema = z.object({
         required_error: "Datum is verplicht",
         invalid_type_error: "Datum is ongeldig",
     }),
-    b_terminating_date: z.coerce
+    b_lu_end: z.coerce
         .date({
             invalid_type_error: "Datum is ongeldig",
         })

@@ -61,9 +61,9 @@ export function CultivationList({
                             </div>
                             <div>
                                 <p className="text-sm font-light leading-none">
-                                    {cultivation.b_terminating_date
+                                    {cultivation.b_lu_end
                                         ? format(
-                                              cultivation.b_terminating_date,
+                                              cultivation.b_lu_end,
                                               "yyyy-MM-dd",
                                           )
                                         : "Nog niet beëindigd"}

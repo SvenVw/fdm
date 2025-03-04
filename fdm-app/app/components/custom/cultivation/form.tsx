@@ -30,7 +30,7 @@ import type { CultivationsFormProps } from "./types"
 export function CultivationForm({
     b_lu_catalogue,
     b_lu_start,
-    b_terminating_date,
+    b_lu_end,
     options,
     action,
 }: CultivationsFormProps) {
@@ -40,7 +40,7 @@ export function CultivationForm({
         defaultValues: {
             b_lu_catalogue: b_lu_catalogue,
             b_lu_start: b_lu_start,
-            b_terminating_date: b_terminating_date,
+            b_lu_end: b_lu_end,
         },
     })
 
@@ -132,7 +132,7 @@ export function CultivationForm({
                         <div>
                             <FormField
                                 control={form.control}
-                                name="b_terminating_date"
+                                name="b_lu_end"
                                 render={({ field }) => (
                                     <FormItem className="">
                                         <FormLabel>Einddatum</FormLabel>

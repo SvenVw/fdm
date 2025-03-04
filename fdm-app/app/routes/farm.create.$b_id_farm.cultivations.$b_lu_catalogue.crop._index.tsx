@@ -86,7 +86,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (x) => x.b_lu_catalogue === b_lu_catalogue,
         )
         const b_lu_start = cultivation.b_lu_start
-        const b_terminating_date = cultivation.b_terminating_date
+        const b_lu_end = cultivation.b_lu_end
 
         // Find the target cultivation within the cultivation plan
         const targetCultivation = cultivationPlan.find(
@@ -153,7 +153,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
             b_lu_start: b_lu_start,
-            b_terminating_date: b_terminating_date,
+            b_lu_end: b_lu_end,
             b_lu_harvestable: b_lu_harvestable,
             harvests: harvests,
             cultivationOptions: cultivationOptions,
@@ -187,7 +187,7 @@ export default function FarmAFieldCultivationBlock() {
             <CultivationForm
                 b_lu_catalogue={loaderData.b_lu_catalogue}
                 b_lu_start={loaderData.b_lu_start}
-                b_terminating_date={loaderData.b_terminating_date}
+                b_lu_end={loaderData.b_lu_end}
                 options={loaderData.cultivationOptions}
                 action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`}
             />
@@ -248,7 +248,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_lu.map(async (item: string) => {
                     if (
                         formValues.b_lu_start ||
-                        formValues.b_terminating_date
+                        formValues.b_lu_end
                     ) {
                         await updateCultivation(
                             fdm,
@@ -256,7 +256,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             item,
                             undefined,
                             formValues.b_lu_start,
-                            formValues.b_terminating_date,
+                            formValues.b_lu_end,
                         )
                     }
                 }),

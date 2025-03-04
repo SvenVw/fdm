@@ -228,7 +228,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
             undefined, // b_id_source
             undefined, // b_geometry
             undefined, // b_acquiring_date
-            undefined, // b_terminating_date
+            undefined, // b_lu_end
             undefined, // b_acquiring_method
         )
         return { field: updatedField }

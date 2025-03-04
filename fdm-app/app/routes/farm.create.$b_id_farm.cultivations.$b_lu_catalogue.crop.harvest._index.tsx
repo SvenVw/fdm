@@ -30,7 +30,7 @@ import { redirectWithSuccess } from "remix-toast"
  *   - b_lu_catalogue: The catalogue identifier for the cultivation.
  *   - b_id_farm: The identifier of the farm.
  *   - b_lu_start: The sowing date of the cultivation.
- *   - b_terminating_date: The terminating date of the cultivation.
+ *   - b_lu_end: The terminating date of the cultivation.
  *   - harvests: The existing harvest data for the cultivation (if available).
  *   - cultivationOptions: An array of available cultivation options with { value, label }.
  *
@@ -86,14 +86,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
         const b_lu_start = cultivation.b_lu_start
-        const b_terminating_date = cultivation.b_terminating_date
+        const b_lu_end = cultivation.b_lu_end
         const harvests = cultivation?.fields?.[0]?.harvests
 
         return {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
             b_lu_start: b_lu_start,
-            b_terminating_date: b_terminating_date,
+            b_lu_end: b_lu_end,
             harvests: harvests,
             cultivationOptions: cultivationOptions,
         }
