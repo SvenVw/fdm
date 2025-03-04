@@ -8,6 +8,12 @@ import type { FdmType } from "./fdm"
 export type BetterAuth = ReturnType<typeof betterAuth>
 
 export function createFdmAuth(fdm: FdmType): BetterAuth {
+    // Validate all required environment variables upfront
+    const googleClientId = getRequiredEnvVar("GOOGLE_CLIENT_ID")
+    const googleClientSecret = getRequiredEnvVar("GOOGLE_CLIENT_SECRET")
+    const msClientId = getRequiredEnvVar("MS_CLIENT_ID")
+    const msClientSecret = getRequiredEnvVar("MS_CLIENT_SECRET")
+
     const auth: BetterAuth = betterAuth({
         database: drizzleAdapter(fdm, {
             provider: "pg",
@@ -43,8 +49,8 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
         },
         socialProviders: {
             google: {
-                clientId: process.env.GOOGLE_CLIENT_ID as string,
-                clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+                clientId: googleClientId,
+                clientSecret: googleClientSecret,
                 mapProfileToUser: (profile) => {
                     return {
                         name: profile.name,
@@ -56,8 +62,8 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
                 },
             },
             microsoft: {
-                clientId: process.env.MS_CLIENT_ID as string,
-                clientSecret: process.env.MS_CLIENT_SECRET as string,
+                clientId: msClientId,
+                clientSecret: msClientSecret,
                 tenantId: "common",
                 requireSelectAccount: true,
                 mapProfileToUser: (profile) => {
@@ -102,4 +108,12 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
     })
 
     return auth
+}
+
+function getRequiredEnvVar(name: string): string {
+    const value = process.env[name]
+    if (!value) {
+        throw new Error(`Required environment variable ${name} is not set`)
+    }
+    return value
 }
