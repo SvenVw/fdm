@@ -350,7 +350,7 @@ describe("Authorization Functions", () => {
                 "field",
                 "cultivation",
                 "fertilizer_application",
-                "soil",
+                "soil_analysis",
                 "harvesting",
             ])
         })
