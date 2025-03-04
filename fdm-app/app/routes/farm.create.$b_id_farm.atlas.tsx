@@ -273,8 +273,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const currentYear = new Date().getFullYear()
                 const defaultDate = new Date(currentYear, 0, 1)
                 const b_acquiring_date = defaultDate
-                const b_date_sowing = defaultDate
+                const b_lu_start = defaultDate
                 const b_lu_end = undefined
+                const b_end = undefined
                 const b_acquiring_method = "unknown"
 
                 const b_id = await addField(
@@ -286,14 +287,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_geometry,
                     b_acquiring_date,
                     b_acquiring_method,
-                    b_lu_end,
+                    b_end,
                 )
                 await addCultivation(
                     fdm,
                     session.principal_id,
                     b_lu_catalogue,
                     b_id,
-                    b_date_sowing,
+                    b_lu_start,
                     b_lu_end,
                 )
 

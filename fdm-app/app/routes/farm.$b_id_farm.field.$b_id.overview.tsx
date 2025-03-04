@@ -103,7 +103,7 @@ export default function FarmFieldsOverviewBlock() {
             b_name: loaderData.field.b_name,
             b_acquiring_method: loaderData.field.b_acquiring_method,
             b_acquiring_date: loaderData.field.b_acquiring_date,
-            b_lu_end: loaderData.field.b_lu_end,
+            b_end: loaderData.field.b_end,
         },
     })
 
@@ -112,7 +112,7 @@ export default function FarmFieldsOverviewBlock() {
             b_name: loaderData.field.b_name,
             b_acquiring_method: loaderData.field.b_acquiring_method,
             b_acquiring_date: loaderData.field.b_acquiring_date,
-            b_lu_end: loaderData.field.b_lu_end,
+            b_end: loaderData.field.b_end,
         })
     }, [loaderData, form.reset])
 
@@ -259,7 +259,7 @@ export default function FarmFieldsOverviewBlock() {
                             <div className="flex flex-col space-y-1.5">
                                 <FormField
                                     control={form.control}
-                                    name="b_lu_end"
+                                    name="b_end"
                                     render={({ field }) => (
                                         <FormItem className="flex flex-col">
                                             <FormLabel>
@@ -377,7 +377,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
             formValues.b_acquiring_date,
             formValues.b_acquiring_method,
-            formValues.b_lu_end,
+            formValues.b_end,
         )
 
         return dataWithSuccess("field is updated", {
@@ -395,5 +395,5 @@ const FormSchema = z.object({
     }),
     b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
     b_acquiring_date: z.coerce.date().optional(),
-    b_lu_end: z.coerce.date().optional(),
+    b_end: z.coerce.date().optional(),
 })
