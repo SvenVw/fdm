@@ -14,8 +14,6 @@ import type { Dose } from "./d"
  * @returns An object containing the total doses with properties: `p_dose_n` (nitrogen), `p_dose_p2o5` (phosphate as P2O5), and `p_dose_k2o` (potassium as K2O).
  *
  * @throws {Error} If any fertilizer application amount or nutrient rate is negative.
- *
- * @remark Each nutrient dose is computed by multiplying the application amount by its corresponding nutrient rate divided by 10.
  */
 export function calculateDose({
     applications,
