@@ -115,7 +115,7 @@ export function HarvestForm({
                             />
                             {/* <FormField
                                 control={form.control}
-                                name="b_sowing_date"                    
+                                name="b_lu_start"                    
                                 render={({ field }) => (
                                     <FormItem className="flex flex-col">
                                         <FormLabel>Zaaidatum</FormLabel>
