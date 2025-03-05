@@ -25,7 +25,7 @@ function FertilizerApplicationsCard({
                 <p className="text-xs text-muted-foreground">{shortname}</p>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="text-2xl font-bold">{`${value} ${unit}`}</div>
+                <div className="text-2xl font-bold">{`${Math.round(value)} ${unit}`}</div>
                 <div className="grid grid-cols-2 items-center space-x-2">
                     <TooltipProvider>
                         <Tooltip>
