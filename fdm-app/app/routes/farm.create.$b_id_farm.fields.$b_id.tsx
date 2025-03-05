@@ -73,9 +73,11 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van perceel moet minimaal 3 karakters bevatten",
         }),
-    b_area: z.coerce.number({
-        required_error: "Oppervlakte van perceel is verplicht",
-    }),
+    b_area: z.coerce
+        .number({
+            required_error: "Oppervlakte van perceel is verplicht",
+        })
+        .optional(),
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
@@ -263,7 +265,7 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
-            b_area: `${Math.round(loaderData.b_area * 10) / 10} ha`,
+            b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
             b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
             b_gwl_class: loaderData.b_gwl_class ?? undefined,
@@ -317,7 +319,7 @@ export default function Index() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>
-                                                            Oppervlak
+                                                            Oppervlak (ha)
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Input
