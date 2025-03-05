@@ -44,12 +44,18 @@ export function calculateDose({
 
         // Check if fertilizer exists before accessing properties
         if (!fertilizer) {
-            return { p_dose_n: 0, p_dose_p2o5: 0, p_dose_k2o: 0 }
+            return { p_dose_n: 0, p_dose_nw: 0, p_dose_p2o5: 0, p_dose_k2o: 0 }
         }
 
         // Calculate total nitrogen dose
         const p_dose_n =
             application.p_app_amount * ((fertilizer.p_n_rt ?? 0) / 1000) // Convert from g N / kg to kg N / kg
+
+        // Calculate workable nitrogen dose
+        const p_dose_nw =
+            application.p_app_amount *
+            ((fertilizer.p_n_rt ?? 0) / 1000) * // Convert from g N / kg to kg N / kg
+            (fertilizer.p_n_wc ?? 1)
 
         // Calculate phosphate dose
         const p_dose_p2o5 =
@@ -61,6 +67,7 @@ export function calculateDose({
 
         return {
             p_dose_n: p_dose_n,
+            p_dose_nw: p_dose_nw,
             p_dose_p2o5: p_dose_p2o5,
             p_dose_k2o: p_dose_k2o,
         }
@@ -71,11 +78,12 @@ export function calculateDose({
         (acc, curr) => {
             return {
                 p_dose_n: acc.p_dose_n + curr.p_dose_n,
+                p_dose_nw: acc.p_dose_nw + curr.p_dose_nw,
                 p_dose_p2o5: acc.p_dose_p2o5 + curr.p_dose_p2o5,
                 p_dose_k2o: acc.p_dose_k2o + curr.p_dose_k2o,
             }
         },
-        { p_dose_n: 0, p_dose_p2o5: 0, p_dose_k2o: 0 },
+        { p_dose_n: 0, p_dose_nw: 0, p_dose_p2o5: 0, p_dose_k2o: 0 },
     )
 
     return totalDose

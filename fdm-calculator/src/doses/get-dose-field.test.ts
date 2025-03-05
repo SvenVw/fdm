@@ -130,10 +130,13 @@ describe("getDoseForField", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 2,
+            p_dose_nw: 0,
             p_dose_p2o5: 1,
             p_dose_k2o: 0.5,
         }
-        expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(expectedDose)
+        expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(
+            expectedDose,
+        )
     })
 
     it("should return 0 dose when no applications are found", async () => {
@@ -169,9 +172,12 @@ describe("getDoseForField", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 0,
+            p_dose_nw: 0,
             p_dose_p2o5: 0,
             p_dose_k2o: 0,
         }
-        expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(expectedDose)
+        expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(
+            expectedDose,
+        )
     })
 })

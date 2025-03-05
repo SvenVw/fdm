@@ -12,6 +12,7 @@ describe("calculateDose", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 2,
+            p_dose_nw: 2,
             p_dose_p2o5: 1,
             p_dose_k2o: 0.5,
         }
@@ -32,6 +33,7 @@ describe("calculateDose", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 2.5,
+            p_dose_nw: 2.5,
             p_dose_p2o5: 1.25,
             p_dose_k2o: 0.625,
         }
@@ -46,6 +48,7 @@ describe("calculateDose", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 0,
+            p_dose_nw: 0,
             p_dose_p2o5: 0,
             p_dose_k2o: 0,
         }
@@ -62,6 +65,7 @@ describe("calculateDose", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 2,
+            p_dose_nw: 2,
             p_dose_p2o5: 0,
             p_dose_k2o: 0.5,
         }
@@ -78,6 +82,7 @@ describe("calculateDose", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 2,
+            p_dose_nw: 2,
             p_dose_p2o5: 1,
             p_dose_k2o: 0,
         }
@@ -94,6 +99,7 @@ describe("calculateDose", () => {
 
         const expectedDose: Dose = {
             p_dose_n: 0,
+            p_dose_nw: 0,
             p_dose_p2o5: 0,
             p_dose_k2o: 0,
         }
@@ -101,4 +107,54 @@ describe("calculateDose", () => {
             expectedDose,
         )
     })
+
+    it("should throw an error for negative application amount", () => {
+        const applications = [{ p_id: "fertilizer1", p_app_amount: -100 }]
+        const fertilizers = [
+            { p_id: "fertilizer1", p_n_rt: 20, p_p_rt: 10, p_k_rt: 5 },
+        ]
+
+        expect(() =>
+            calculateDose({ applications, fertilizers }),
+        ).toThrowError("Application amounts must be non-negative")
+    })
+
+    it("should throw an error for negative nutrient rates", () => {
+        const applications = [{ p_id: "fertilizer1", p_app_amount: 100 }]
+        const fertilizers = [
+            { p_id: "fertilizer1", p_n_rt: -20, p_p_rt: 10, p_k_rt: 5 },
+        ]
+
+        expect(() =>
+            calculateDose({ applications, fertilizers }),
+        ).toThrowError("Nutrient rates must be non-negative")
+    })
+    it("should correctly calculate workable nitrogen dose when p_n_wc is provided", () => {
+        const applications = [{ p_id: "fertilizer1", p_app_amount: 100 }];
+        const fertilizers = [
+            { p_id: "fertilizer1", p_n_rt: 20, p_n_wc: 0.5, p_p_rt: 10, p_k_rt: 5 }, // p_n_wc is 0.5
+        ];
+
+        const expectedDose: Dose = {
+            p_dose_n: 2,
+            p_dose_nw: 1, // 2 * 0.5 = 1
+            p_dose_p2o5: 1,
+            p_dose_k2o: 0.5,
+        };
+        expect(calculateDose({ applications, fertilizers })).toEqual(expectedDose);
+    });
+    it("should use 1 as default when p_n_wc is not provided", () => {
+        const applications = [{ p_id: "fertilizer1", p_app_amount: 100 }];
+        const fertilizers = [
+            { p_id: "fertilizer1", p_n_rt: 20, p_p_rt: 10, p_k_rt: 5 }, // no p_n_wc
+        ];
+
+        const expectedDose: Dose = {
+            p_dose_n: 2,
+            p_dose_nw: 2,
+            p_dose_p2o5: 1,
+            p_dose_k2o: 0.5,
+        };
+        expect(calculateDose({ applications, fertilizers })).toEqual(expectedDose);
+    });
 })
