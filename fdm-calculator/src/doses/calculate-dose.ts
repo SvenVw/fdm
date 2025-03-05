@@ -49,15 +49,15 @@ export function calculateDose({
 
         // Calculate total nitrogen dose
         const p_dose_n =
-            application.p_app_amount * ((fertilizer.p_n_rt ?? 0) / 10) // Convert from g N / kg to fraction
+            application.p_app_amount * ((fertilizer.p_n_rt ?? 0) / 1000) // Convert from g N / kg to kg N / kg
 
         // Calculate phosphate dose
         const p_dose_p2o5 =
-            application.p_app_amount * ((fertilizer.p_p_rt ?? 0) / 10) // Convert from g P2O5/ kg to fraction
+            application.p_app_amount * ((fertilizer.p_p_rt ?? 0) / 1000) // Convert from g P2O5/ kg to kg P2O5 / kg
 
         // Calculate potassium dose
         const p_dose_k2o =
-            application.p_app_amount * ((fertilizer.p_k_rt ?? 0) / 10) // Convert from g K2O/ kg to fraction
+            application.p_app_amount * ((fertilizer.p_k_rt ?? 0) / 1000) // Convert from g K2O/ kg to kg K2O / kg
 
         return {
             p_dose_n: p_dose_n,

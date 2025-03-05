@@ -129,9 +129,9 @@ describe("getDoseForField", () => {
         )
 
         const expectedDose: Dose = {
-            p_dose_n: 200,
-            p_dose_p2o5: 100,
-            p_dose_k2o: 50,
+            p_dose_n: 2,
+            p_dose_p2o5: 1,
+            p_dose_k2o: 0.5,
         }
         expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(expectedDose)
     })
