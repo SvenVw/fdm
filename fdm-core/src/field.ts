@@ -11,23 +11,21 @@ import type { getFieldType } from "./field.d"
 /**
  * Adds a new field to a farm.
  *
- * This function verifies that the principal has write permission for the specified farm,
- * generates a unique field ID, records the field details, and creates an association between
- * the field and the farm. If a discarding date is provided, the function ensures that the acquiring
- * date is earlier than the discarding date, throwing an error otherwise.
+ * This function verifies that the principal has write permission for the specified farm, generates a unique field ID,
+ * stores the field details, and establishes an association between the field and the farm. If an end date is provided, it
+ * ensures that the start date precedes the end date, throwing an error if not.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The unique identifier of the principal performing the operation.
- * @param b_id_farm - Identifier of the farm to which the field belongs.
- * @param b_name - Name of the field.
- * @param b_id_source - Identifier for the field in the source dataset.
- * @param b_geometry - GeoJSON representation of the field geometry.
+ * @param b_id_farm - The identifier of the farm to which the field belongs.
+ * @param b_name - The name of the field.
+ * @param b_id_source - The field's identifier in the source dataset.
+ * @param b_geometry - The GeoJSON representation of the field's geometry.
  * @param b_start - The start date for managing the field.
- * @param b_acquiring_method - Method used for acquiring the field.
+ * @param b_acquiring_method - The method used for acquiring the field.
  * @param b_end - (Optional) The end date for managing the field.
  * @returns A promise that resolves to the newly generated field ID.
  *
- * @throws {Error} If the acquiring date is not earlier than the discarding date.
+ * @throws {Error} If the start date is not before the end date.
  *
  * @alpha
  */
@@ -102,16 +100,16 @@ export async function addField(
 }
 
 /**
- * Retrieves detailed information for a specific field.
+ * Retrieves detailed information for a field.
  *
- * This function verifies that the principal identified by `principal_id` has permission to read the field,
- * then fetches and returns the field's properties including its geometry, area, acquisition, and related timestamps.
+ * Verifies that the principal has read permission for the field, then retrieves and returns its properties,
+ * including geometry, area, acquisition start and optional end dates, acquisition method, and timestamps for creation and update.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal making the request.
  * @param b_id - The unique identifier of the field to retrieve.
- *
  * @returns A promise that resolves with the field details.
+ *
+ * @throws {Error} If the principal lacks read permission or if an error occurs during retrieval.
  *
  * @alpha
  */
@@ -164,16 +162,16 @@ export async function getField(
 }
 
 /**
- * Retrieves all fields associated with a specified farm.
+ * Retrieves all fields associated with the specified farm.
  *
- * This function first verifies that the requesting principal has read access to the farm, then
- * returns an array of field detail objects. Each object includes the field's identifier, name,
- * source, geometry, area, acquiring and discarding dates, as well as the creation and update timestamps.
+ * This asynchronous function verifies that the requesting principal has read access to the farm,
+ * then returns an array of field detail objects. Each object includes the field's identifier, name,
+ * source, geometry and computed area, acquisition start date, acquisition method, optional end date,
+ * as well as creation and update timestamps.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal making the request.
- * @param b_id_farm - The unique identifier of the farm.
- * @returns A Promise resolving to an array of field detail objects.
+ * @param principal_id - ID of the principal making the request.
+ * @param b_id_farm - Unique identifier of the farm whose fields are being retrieved.
+ * @returns A promise that resolves to an array of field detail objects.
  *
  * @alpha
  */
@@ -226,23 +224,23 @@ export async function getFields(
 }
 
 /**
- * Updates the details of an existing field.
+ * Updates an existing field's details.
  *
- * This function applies updates to the field's basic information and its associated acquiring and discarding records.
- * It performs a permission check to ensure the principal has write access and validates that the acquiring date is earlier than the discarding date, when applicable.
+ * Applies updates to the field's basic properties as well as its associated acquiring and discarding records.
+ * Ensures that the provided start date precedes the end date (if an end date is supplied) and verifies that the principal
+ * has write permissions for the field.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the update.
- * @param b_id - The unique identifier of the field to update.
+ * @param principal_id - Identifier of the principal performing the update.
+ * @param b_id - Unique identifier of the field to update.
  * @param b_name - (Optional) New name for the field.
  * @param b_id_source - (Optional) New source identifier for the field.
  * @param b_geometry - (Optional) Updated field geometry in GeoJSON format.
- * @param b_start - (Optional) Updated start date for managing the field.
+ * @param b_start - (Optional) Updated start (acquiring) date for the field.
  * @param b_acquiring_method - (Optional) Updated method for field management.
- * @param b_end - (Optional) Updated end date for managing the field.
+ * @param b_end - (Optional) Updated end (discarding) date for the field.
  * @returns A Promise that resolves to the updated field details.
  *
- * @throws {Error} If the acquiring date is not before the discarding date.
+ * @throws {Error} If the start date is not before the end date.
  * @alpha
  */
 export async function updateField(

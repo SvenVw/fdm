@@ -5,6 +5,21 @@ import { NavLink, useFetcher } from "react-router"
 import { LoadingSpinner } from "../loadingspinner"
 import type { HarverstableType, Harvest } from "./types"
 
+/**
+ * Renders a list of harvest entries with options for viewing details and deleting a harvest.
+ *
+ * The component displays each harvest's formatted date and yield along with buttons to view or delete the harvest.
+ * The delete button is disabled and shows a loading spinner when a deletion submission is in progress.
+ * Depending on the harvestable type and the number of harvests, it conditionally renders a prompt to add a new harvest 
+ * or a message indicating that the crop is not harvestable. A new harvest can be added only if the type is "multiple" 
+ * or if it is "once" and no harvest exists.
+ *
+ * @param harvests - The array of harvest records to display.
+ * @param b_lu_harvestable - Specifies if the crop can have a single ("once") or multiple harvests.
+ * @param state - Indicates the current state of the component, particularly during deletion submission.
+ *
+ * @returns A React element representing the harvest list interface.
+ */
 export function HarvestsList({
     harvests,
     b_lu_harvestable,

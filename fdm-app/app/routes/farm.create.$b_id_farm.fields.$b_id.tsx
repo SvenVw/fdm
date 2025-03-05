@@ -249,8 +249,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Component for displaying and updating field details.
- * Renders a form with field information, including name, crop, soil type, and soil analysis data.
+ * Renders the field details page for viewing and updating field information.
+ *
+ * This component displays a form pre-populated with existing field data — including the field’s name,
+ * area (in hectares), crop selection, soil type, and soil analysis metrics — allowing users to update details.
+ * It also includes a non-interactive map that visualizes the field's geometry.
+ *
  * @returns The JSX element representing the field details page.
  */
 export default function Index() {

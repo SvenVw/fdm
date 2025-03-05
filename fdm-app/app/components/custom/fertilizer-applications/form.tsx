@@ -28,6 +28,17 @@ import { LoadingSpinner } from "../loadingspinner"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
+/**
+ * Renders the fertilizer application form.
+ *
+ * This component provides a user interface for submitting fertilizer application details,
+ * including a selection for fertilizer type, an input for the application amount in kg/ha,
+ * and a date picker for choosing the application date. The form resets automatically after a
+ * successful submission.
+ *
+ * @param options - An array of fertilizer options available for selection.
+ * @param action - The endpoint URL for form submission.
+ */
 export function FertilizerApplicationForm({
     options,
     action,

@@ -1,4 +1,5 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
+import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
@@ -23,12 +24,9 @@ import {
 import { dataWithSuccess } from "remix-toast"
 
 /**
- * Loads and prepares cultivation and harvest data for a specified farm and catalogue.
+ * Loads and prepares cultivation and harvest data for a specific farm and catalogue.
  *
- * This loader validates that the required route parameters are provided, retrieves the session, and fetches available cultivation
- * options from the catalogue. It then obtains the farm's cultivation plan, identifies the target cultivation, extracts its sowing
- * and terminating dates, and aggregates similar harvest entries by combining their identifiers based on harvest date and yield data.
- * Structured error responses are thrown if required parameters are missing or if the target cultivation is not found.
+ * Validates that the required route parameters (b_lu_catalogue and b_id_farm) are provided, retrieves the user session, and fetches available cultivation options from the catalogue. It then obtains the cultivation plan for the specified farm, identifies the target cultivation by the provided catalogue ID, extracts its start (b_lu_start) and end (b_lu_end) dates, and groups similar harvest entries by merging their harvesting identifiers based on harvest date and yield data.
  *
  * @throws {Response} When b_lu_catalogue or b_id_farm is missing, or if the target cultivation does not exist.
  */
@@ -166,11 +164,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 /**
  * Renders the farm cultivation management interface.
  *
- * This component displays a form for updating cultivation details and a list of harvests. It retrieves
- * cultivation data using the loader hook and uses a fetcher to handle form submissions, enabling users
- * to update sowing and terminating dates as well as manage harvest records.
+ * This component displays a form for updating cultivation details—including the crop start (b_lu_start)
+ * and end (b_lu_end) dates—and a list of harvest records. It obtains cultivation data with the loader hook
+ * and uses a fetcher to handle form submissions for updating cultivation timing and managing harvest entries.
  *
- * @returns A JSX element representing the cultivation form and harvest list.
+ * @returns A JSX element containing the cultivation form and harvest list.
  */
 export default function FarmAFieldCultivationBlock() {
     const loaderData = useLoaderData<typeof loader>()
@@ -206,12 +204,12 @@ export default function FarmAFieldCultivationBlock() {
 /**
  * Processes POST and DELETE requests to update cultivation details or remove harvest records.
  *
- * For POST requests, it updates the cultivation fields with provided sowing and terminating dates for the specified farm and catalogue.
- * For DELETE requests, it removes the specified harvest entries.
+ * For POST requests, updates cultivation records using the provided start and end dates for the specified farm and catalogue.
+ * For DELETE requests, removes harvest entries identified by a comma-separated list of harvest IDs.
  *
- * This function validates that the required route parameters are present and uses session information to execute the appropriate operation.
+ * Validates required route parameters and utilizes session information to perform the requested operation.
  *
- * @throws {Error} If required parameters are missing or if the provided harvest IDs are invalid.
+ * @throws {Error} When required parameters are missing or the provided harvest IDs are invalid.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {

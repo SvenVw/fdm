@@ -79,18 +79,16 @@ export async function addCultivationToCatalogue(
 }
 
 /**
- * Adds a new cultivation to a specific field.
+ * Adds a new cultivation to a field.
  *
- * The function validates that the sowing and (if provided) termination dates are valid Date objects and that the termination date is after the sowing date. It ensures the target field and cultivation catalogue entry exist and that no duplicate cultivation is recorded. A permission check is performed before any database operations. If a termination date is provided for a cultivation that is harvestable only once, a harvest record is automatically scheduled for the termination date.
+ * Validates and inserts a cultivation with the specified start and optional end dates. The function ensures that the start (b_lu_start) and, if provided, end (b_lu_end) dates are valid Date objects with the end date occurring after the start date. It verifies the existence of the specified field and cultivation catalogue entry and checks that the cultivation does not already exist. If the cultivation is harvestable only once, a harvest record is automatically scheduled on the end date.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal performing the operation.
- * @param b_lu_catalogue - The catalogue ID corresponding to the cultivation entry.
- * @param b_id - The identifier of the field to which the cultivation is added.
- * @param b_lu_start - The sowing date of the cultivation.
- * @param b_lu_end - The optional termination date of the cultivation.
- * @returns A promise that resolves with the unique ID of the newly added cultivation.
- * @throws {Error} If the sowing date is invalid, the termination date is invalid or not after the sowing date, the field or catalogue entry does not exist, or a duplicate cultivation is detected.
+ * @param b_lu_catalogue - The cultivation catalogue identifier.
+ * @param b_id - The field identifier to which the cultivation is added.
+ * @param b_lu_start - The start date of the cultivation.
+ * @param b_lu_end - The optional end date of the cultivation.
+ * @returns A promise that resolves with the unique identifier of the newly created cultivation.
+ * @throws {Error} If the dates are invalid, the field or catalogue entry is missing, or a duplicate cultivation exists.
  * @alpha
  */
 export async function addCultivation(
@@ -245,15 +243,14 @@ export async function addCultivation(
 }
 
 /**
- * Retrieves details of a specific cultivation after verifying access permissions.
+ * Retrieves details for a specific cultivation.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal requesting access.
+ * @param principal_id - The identifier of the principal making the request.
  * @param b_lu - The unique identifier of the cultivation.
  * @returns A promise that resolves with the cultivation details.
- * @throws {Error} If no cultivation matches the provided identifier.
+ * @throws {Error} When no cultivation matches the provided identifier.
  *
- * @remark A permission check is performed to ensure the requesting principal has read access.
+ * @remark Permission is verified prior to retrieving the cultivation details.
  */
 export async function getCultivation(
     fdm: FdmType,
@@ -315,17 +312,16 @@ export async function getCultivation(
 }
 
 /**
- * Retrieves all cultivations associated with a specific field.
+ * Retrieves all cultivations for a specific field.
  *
- * This function verifies that the requesting principal has read access to the field, then queries the database
- * and returns an array of cultivation records.
+ * Validates that the requesting principal has read access to the designated field, then fetches
+ * and returns an array of cultivation records, including catalog details and cultivation periods,
+ * sorted by start date (descending) and name (ascending).
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - Identifier of the principal requesting access.
- * @param b_id - Identifier of the field.
- * @returns A Promise resolving to an array of cultivation details.
+ * @param b_id - The identifier of the field.
+ * @returns A promise that resolves to an array of cultivation details.
  *
- * @throws {Error} If the principal does not have read permission or if the database query fails.
+ * @throws {Error} When read permission is denied or if the database query fails.
  *
  * @alpha
  */
@@ -387,74 +383,21 @@ export async function getCultivations(
 /**
  * Retrieves a comprehensive cultivation plan for a specified farm.
  *
- * This function aggregates cultivation data from multiple related tables and returns an array of cultivation
- * entries. Each entry includes the catalogue identifier, its name, sowing and termination dates (if available),
- * and an array of fields on which the cultivation was applied. Each field entry details associated fertilizer
- * applications and harvest records (with accompanying analyses).
+ * Aggregates cultivation data from multiple database tables into a structured plan. Each plan entry includes the catalogue identifier, name, and cultivation start and end dates (if available), along with associated field records. Each field record contains details of the cultivation record, fertilizer applications, and harvest records with corresponding analyses.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The identifier of the principal requesting access to the cultivation plan.
- * @param b_id_farm - The unique ID of the farm for which the cultivation plan is to be retrieved.
- * @returns A Promise that resolves to an array representing the cultivation plan. Each element in the array has the following structure:
+ * @param principal_id - Identifier of the principal requesting access.
+ * @param b_id_farm - Unique identifier of the farm.
+ * @returns A promise that resolves to an array of cultivation plan entries. If no cultivations exist for the farm, the array is empty.
  *
- * ```
- * {
- *   b_lu_catalogue: string;   // Unique ID of the cultivation catalogue item
- *   b_lu_name: string;        // Name of the cultivation
- *   b_lu_start: Date;      // Sowing date for the cultivation (if available)
- *   b_lu_end: Date; // Termination date for the cultivation (if available)
- *   fields: [
- *     {
- *       b_lu: string;        // Unique ID of the cultivation record
- *       b_id: string;        // Unique ID of the field
- *       b_name: string;      // Name of the field
- *       fertilizer_applications: [
- *         {
- *           p_id_catalogue: string; // Fertilizer catalogue ID
- *           p_name_nl: string;      // Fertilizer name (Dutch)
- *           p_app_amount: number;   // Amount applied
- *           p_app_method: string;   // Application method
- *           p_app_date: Date;       // Application date
- *           p_app_id: string;       // Unique ID of the fertilizer application
- *         }
- *       ],
- *       harvests: [
- *         {
- *           b_id_harvesting: string;  // Unique ID of the harvest record
- *           b_lu_harvest_date: Date;  // Harvest date
- *           harvestables: [
- *             {
- *               b_id_harvestable: string; // Unique ID of the harvestable
- *               harvestable_analyses: [
- *                 {
- *                   b_lu_yield: number;         // Yield in kg/ha
- *                   b_lu_n_harvestable: number;   // N content in harvestable yield (g N/kg)
- *                   b_lu_n_residue: number;       // N content in residue (g N/kg)
- *                   b_lu_p_harvestable: number;   // P content in harvestable yield (g P2O5/kg)
- *                   b_lu_p_residue: number;       // P content in residue (g P2O5/kg)
- *                   b_lu_k_harvestable: number;   // K content in harvestable yield (g K2O/kg)
- *                   b_lu_k_residue: number;       // K content in residue (g K2O/kg)
- *                 }
- *               ]
- *             }
- *           ]
- *         }
- *       ]
- *     }
- *   ]
- * }
- * ```
- * If no cultivations are found for the specified farm, an empty array is returned.
+ * @throws {Error} If the farm ID is missing or an error occurs during data retrieval.
  *
  * @example
- * ```typescript
- * const cultivationPlan = await getCultivationPlan(fdm, 'principal123', 'farm123');
+ * const cultivationPlan = await getCultivationPlan('principal123', 'farm123');
  * if (cultivationPlan.length) {
  *   console.log("Cultivation Plan:", cultivationPlan);
  * } else {
  *   console.log("No cultivations found for this farm.");
  * }
- * ```
  *
  * @alpha
  */
@@ -676,18 +619,15 @@ export async function getCultivationPlan(
 }
 
 /**
- * Removes a cultivation and its related sowing and termination records from the database.
+ * Removes a cultivation and its associated starting and ending records from the database.
  *
- * The function first verifies that the principal has permission to perform the removal, then executes a transaction that
- * deletes the cultivation's termination, sowing, and main records. An error is thrown if the cultivation does not exist
- * or if the deletion fails.
+ * This function verifies that the principal has write permissions for the cultivation and then executes a transaction
+ * that deletes related records from the cultivationEnding, cultivationStarting, and cultivations tables. The operation
+ * is atomic, and an error is thrown if the cultivation is not found or if the deletion fails.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param b_lu - The unique identifier of the cultivation to remove.
  *
- * @returns A Promise that resolves once the removal is complete.
- *
- * @throws {Error} If the cultivation is not found or the deletion operation fails.
+ * @throws {Error} If the cultivation does not exist or if an error occurs during deletion.
  *
  * @alpha
  */
@@ -734,16 +674,15 @@ export async function removeCultivation(
 }
 
 /**
- * Updates the specified cultivation's details.
+ * Updates the cultivation details.
  *
- * Performs permission checks and validates that the new dates are logically consistent and that the referenced cultivation and catalogue entries exist. Depending on the inputs, it updates the main cultivation record along with its related sowing, termination, and, if applicable, harvest records.
+ * Validates permissions and date consistency before updating the cultivation record along with its related sowing, termination, and, if applicable, harvest entries. The update requires that the cultivation exists and, if provided, that the new catalogue ID corresponds to an existing catalogue entry.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param principal_id - The ID of the principal authorized to perform this update.
+ * @param principal_id - The identifier of the principal authorized to perform this update.
  * @param b_lu - The unique cultivation identifier.
- * @param b_lu_catalogue - (Optional) The new catalogue ID; if provided, it must correspond to an existing catalogue entry.
- * @param b_lu_start - (Optional) The updated sowing date; when provided with a termination date, it must precede it.
- * @param b_lu_end - (Optional) The updated termination date; if provided, it must be later than the sowing date.
+ * @param b_lu_catalogue - (Optional) The new catalogue ID; must correspond to an existing catalogue entry.
+ * @param b_lu_start - (Optional) The updated sowing date; must precede the termination date if both are provided.
+ * @param b_lu_end - (Optional) The updated termination date; must be later than the sowing date.
  * @returns A Promise that resolves upon successful completion of the update.
  *
  * @throws {Error} If the cultivation does not exist, if date validations fail, or if the update operation encounters an issue.

@@ -10,6 +10,18 @@ import type { Dose } from "@svenvw/fdm-calculator"
 import { Lightbulb, Scale } from "lucide-react"
 import type { FertilizerApplicationsCardProps } from "./types.d"
 
+/**
+ * Renders a card displaying fertilizer application data.
+ *
+ * The component shows a header with a title and a short label, and a content area presenting a rounded fertilizer value along with its unit. Tooltips for usage norm (limit) and fertilizer advice are conditionally rendered when their values are provided.
+ *
+ * @param title - Full title displayed in the header and tooltips.
+ * @param shortname - Abbreviated name shown in the header.
+ * @param value - Numeric fertilizer application value, rounded before display.
+ * @param unit - Measurement unit appended to the value.
+ * @param limit - Usage norm value; its tooltip is shown if defined.
+ * @param advice - Fertilizer advice; its tooltip is shown if defined.
+ */
 function FertilizerApplicationsCard({
     title,
     shortname,
@@ -93,6 +105,16 @@ export function FertilizerApplicationsCards({ dose }: { dose: Dose }) {
     )
 }
 
+/**
+ * Constructs an array of fertilizer application card configuration objects.
+ *
+ * Using the provided dose information, this function creates configuration objects for
+ * each fertilizer application card. Each object contains a title, short name, value, and unit,
+ * while the limit and advice properties are set to undefined.
+ *
+ * @param dose - The dose data containing fertilizer application values.
+ * @returns An array of fertilizer application card configuration objects.
+ */
 function constructCards(dose: Dose) {
     // Construct the fertilizer application cards
     const cards: FertilizerApplicationsCardProps[] = [

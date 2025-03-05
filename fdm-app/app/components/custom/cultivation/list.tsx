@@ -12,6 +12,19 @@ interface Harvest {
     b_lu_n_harvestable: number
 }
 
+/**
+ * Renders a list of cultivation items along with their associated harvest information.
+ *
+ * This React component displays each cultivation's name, harvest count, and formatted start and end dates.
+ * If the end date is not provided, it indicates that the cultivation is ongoing. Each item includes controls
+ * for editing (via navigation) and deleting the cultivation. Deletion is handled by a fetcher that prevents
+ * duplicate submissions while a delete request is in progress.
+ *
+ * @param cultivations - Array of cultivation objects to be rendered.
+ * @param harvests - Array of harvest objects used to associate harvest data with each cultivation.
+ *
+ * @returns A React element displaying the cultivation list.
+ */
 export function CultivationList({
     cultivations,
     harvests,

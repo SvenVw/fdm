@@ -27,6 +27,17 @@ import { LoadingSpinner } from "../loadingspinner"
 import { FormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
 
+/**
+ * Renders a cultivation form for creating or updating cultivation entries.
+ *
+ * This component sets up a form using remix-hook-form with zod validation in "onTouched" mode. It provides a combobox for catalogue selection and date pickers for specifying the cultivation start and end dates. The catalogue field is disabled when an initial catalogue value is present, and the form resets after a successful submission.
+ *
+ * @param b_lu_catalogue - The initial catalogue value; disables the catalogue selector if provided.
+ * @param b_lu_start - The initial start date for cultivation.
+ * @param b_lu_end - The initial end date for cultivation.
+ * @param options - The options available for the catalogue combobox.
+ * @param action - The URL endpoint for form submission.
+ */
 export function CultivationForm({
     b_lu_catalogue,
     b_lu_start,

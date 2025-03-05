@@ -153,19 +153,18 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 /**
- * Handles form submissions to add or remove a cultivation.
+ * Processes form submissions to add or remove a cultivation for a farm field.
  *
- * For POST requests, the function extracts cultivation data from the request,
- * and adds a new cultivation to the specified field using the current user session.
- * For DELETE requests, it removes an existing cultivation based on the cultivation ID
- * provided in the form data.
+ * For POST requests, extracts cultivation details—including the catalogue ID, the start date (b_lu_start), 
+ * and the end date (b_lu_end)—from the request form data, and adds a new cultivation using the current user session.
  *
- * Throws an error if the field identifier (b_id) is missing from the URL parameters,
- * or if, in a DELETE request, the cultivation identifier (b_lu) is missing or invalid.
+ * For DELETE requests, validates and retrieves the cultivation identifier (b_lu) from the form data, 
+ * and removes the corresponding cultivation.
  *
- * @returns A response object containing a success message.
+ * @returns A response object confirming the successful addition or removal of a cultivation.
  *
- * @throws {Error} When the field identifier is absent, or when the cultivation identifier is missing or invalid.
+ * @throws {Error} When the field identifier (b_id) is missing, or when the cultivation identifier (b_lu) 
+ *                 is missing or invalid in a DELETE request.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {

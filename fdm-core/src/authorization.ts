@@ -440,20 +440,17 @@ function getRolesForAction(action: Action, resource: Resource): Role[] {
 }
 
 /**
- * Constructs a sorted chain of related resources for a provided resource type and identifier.
+ * Constructs an ordered chain of related resource beads for a given resource type and identifier.
  *
- * This function retrieves and assembles linked resource information from the database based on the resource type.
- * For supported resource types ("farm", "field", "cultivation", "soil_analysis", "harvesting", "fertilizer_application"),
- * it gathers associated resource identifiers and orders them following the sequence:
- * "farm", "field", "cultivation", "harvesting", "fertilizer_application", "soil_analysis". If the resource is not found,
- * an empty array is returned.
+ * Retrieves associated resource beads from the database for resource types "farm", "field", "cultivation", "harvesting", "fertilizer_application", 
+ * and "soil_analysis". The beads are returned in the order: farm, field, cultivation, harvesting, fertilizer_application, soil_analysis. 
+ * If no matching resource is found, an empty array is returned.
  *
- * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param resource - The type of the resource for which to construct the chain.
+ * @param resource - The resource type for which to construct the chain.
  * @param resource_id - The identifier of the resource.
- * @returns A promise that resolves to an array representing the ordered chain of resource beads.
+ * @returns A promise that resolves to an ordered array of resource beads.
  *
- * @throws {Error} If the resource type is not recognized or if a database error occurs.
+ * @throws {Error} If the resource type is unrecognized or if a database error occurs.
  */
 async function getResourceChain(
     fdm: FdmType,

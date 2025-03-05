@@ -103,7 +103,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-// Main
+/**
+ * Renders the main interface for the farm cultivation management page.
+ *
+ * This component displays a header with a sidebar trigger and breadcrumb navigation, and a main section that includes
+ * the cultivation plan title, description, and a process completion button which is disabled if no cultivation plan is available.
+ * It conditionally renders a sidebar navigation pane when sidebar items are provided, and includes an Outlet for nested routes.
+ *
+ * The component utilizes loader data to obtain farm details (such as farm ID and farm name), the cultivation plan,
+ * and any associated sidebar navigation items.
+ */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
 

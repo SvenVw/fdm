@@ -89,9 +89,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 /**
  * Renders the overview block for editing farm field details.
  *
- * Retrieves initial field data via useLoaderData and initializes a validated form with fields for the
- * field's name, acquiring method, acquiring date, and terminating date. The form automatically resets
- * its values when updated loader data is provided and integrates with a submit handler to update the field.
+ * This component retrieves initial field data via loader data and initializes a validated form with preset values
+ * for the field's name, acquisition method, start date (b_start), and end date (b_end). The form automatically resets
+ * when fresh loader data is received, and form submission updates the field details.
+ *
+ * @returns A JSX element representing the editable overview block for a farm field.
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
@@ -346,11 +348,14 @@ export default function FarmFieldsOverviewBlock() {
 }
 
 /**
- * Updates a farm field's details using the form data submitted in the request.
+ * Updates a farm field record with new details from submitted form data.
  *
- * This action function retrieves the required field identifier from the route parameters, obtains the user session,
- * and extracts validated form data according to a predefined schema. It then updates the corresponding farm field record
- * and returns a success response. Any errors encountered during the process are handled by a centralized error handler.
+ * This action function retrieves the farm field identifier from route parameters, obtains the user session,
+ * and validates the incoming form data against a predefined schema. It then updates the corresponding farm field record
+ * with new values such as the field's name, acquisition method, start date, and end date. On success, it returns
+ * a structured response confirming the operation; any errors encountered during the process are delegated to a centralized error handler.
+ *
+ * @throws {Error} If the farm field identifier is missing.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     try {

@@ -25,6 +25,17 @@ import type { z } from "zod"
 import { LoadingSpinner } from "../loadingspinner"
 import { FormSchema } from "./schema"
 
+/**
+ * Renders a form for inputting or updating harvest data.
+ *
+ * This component displays fields for harvest yield, harvestable nitrogen content, and harvest date.
+ * It initializes form state with provided values and validates input using a schema resolver.
+ * When any initial value is provided, the form assumes an update mode and disables input fields.
+ *
+ * @param b_lu_yield - Harvest yield (e.g., in ton dry matter per hectare).
+ * @param b_lu_n_harvestable - Harvestable nitrogen content (e.g., in kg N per hectare).
+ * @param b_lu_harvest_date - Harvest date for initializing the date-picker.
+ */
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,

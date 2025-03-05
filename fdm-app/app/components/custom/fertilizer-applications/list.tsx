@@ -3,6 +3,14 @@ import { format } from "date-fns"
 import { LoadingSpinner } from "../loadingspinner"
 import type { FertilizerApplication } from "./types.d"
 
+/**
+ * Renders a list of fertilizer applications with delete functionality.
+ *
+ * The component displays each fertilizer application's name, application amount
+ * (in kg/ha), and formatted application date. Each entry includes a delete button
+ * that triggers a DELETE submission via the provided fetcher. The delete action is
+ * disabled while a submission is in progress.
+ */
 export function FertilizerApplicationsList({
     fertilizerApplications,
     fetcher,

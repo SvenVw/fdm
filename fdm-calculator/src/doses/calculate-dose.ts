@@ -5,13 +5,23 @@ import type {
 import type { Dose } from "./d"
 
 /**
- * Calculates the cumulative doses of nitrogen, phosphate (as P2O5), and potassium (as K2O) applied to a field as kg / ha
+ * Computes cumulative nutrient doses from fertilizer applications.
  *
- * This function iterates over each fertilizer application to determine its contribution to the overall nutrient dose by matching it with a corresponding fertilizer. For each application, it calculates the nutrient dose by multiplying the application amount by the fertilizer's nutrient rate and then sums all doses into a total dose object.
+ * The function matches each fertilizer application with its corresponding fertilizer record using the fertilizer's identifier.
+ * It then calculates the nutrient contributions by converting fertilizer nutrient rates from grams per kilogram to kilograms per kilogram
+ * (dividing by 1000) and multiplying by the application amount. In addition to the total nitrogen dose (p_dose_n), a workable nitrogen dose (p_dose_nw)
+ * is computed by applying a coefficient from the fertilizer record (p_n_wc, defaulting to 1). Phosphate (as P2O5) and potassium (as K2O) doses are also calculated.
+ * If an application references a fertilizer that is not found, the function assigns zero doses for that application.
  *
- * @param applications An array of fertilizer application objects, each with a `p_id` (fertilizer ID) and `p_app_amount` (amount applied).
- * @param fertilizers An array of fertilizer objects, each with a `p_id` (fertilizer ID) and nutrient rates (`p_n_rt`, `p_p_rt`, `p_k_rt`) expected to be non-negative.
- * @returns An object containing the total doses with properties: `p_dose_n` (nitrogen), `p_dose_nw` (workable nitrogen - adjusted by the `p_n_wc` coefficient), `p_dose_p2o5` (phosphate as P2O5), and `p_dose_k2o` (potassium as K2O).
+ * @param applications - Array of fertilizer application objects. Each object includes an identifier (p_id) and an application amount (p_app_amount).
+ * @param fertilizers - Array of fertilizer objects. Each should include an identifier (p_id) and nutrient rates:
+ *                      nitrogen (p_n_rt), phosphate (p_p_rt), potassium (p_k_rt), and optionally a workable nitrogen coefficient (p_n_wc).
+ * @returns An object with cumulative doses:
+ *          p_dose_n: Total nitrogen dose,
+ *          p_dose_nw: Total workable nitrogen dose,
+ *          p_dose_p2o5: Total phosphate dose (as P2O5),
+ *          p_dose_k2o: Total potassium dose (as K2O).
+ *
  * @throws {Error} If any fertilizer application amount or nutrient rate is negative.
  */
 export function calculateDose({
