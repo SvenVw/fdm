@@ -106,7 +106,7 @@ export function FertilizerApplicationForm({
                                                         ? ""
                                                         : field.value
                                                 }
-                                                placeholder="12 ton/ha"
+                                                placeholder="12500 kg/ha"
                                                 aria-required="true"
                                                 required
                                             />

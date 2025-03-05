@@ -38,7 +38,7 @@ export function FertilizerApplicationsList({
                         </div>
                         <div>
                             <p className="text-sm font-light leading-none">
-                                {application.p_app_amount} ton / ha
+                                {application.p_app_amount} kg / ha
                             </p>
                         </div>
                         <div>
