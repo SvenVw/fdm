@@ -101,16 +101,16 @@ function constructCards(dose: Dose) {
             shortname: "Ntot",
             value: dose.p_dose_n,
             unit: "kg/ha",
-            limit: 250,
-            advice: 200,
+            limit: undefined,
+            advice: undefined,
         },
         {
             title: "Fosfaat, totaal",
             shortname: "P2O5",
             value: dose.p_dose_p2o5,
             unit: "kg/ha",
-            limit: 75,
-            advice: 40,
+            limit: undefined,
+            advice: undefined,
         },
         {
             title: "Kalium, totaal",
@@ -118,7 +118,7 @@ function constructCards(dose: Dose) {
             value: dose.p_dose_k2o,
             unit: "kg/ha",
             limit: undefined,
-            advice: 90,
+            advice: undefined,
         },
     ]
 
