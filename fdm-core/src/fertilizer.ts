@@ -1,4 +1,4 @@
-import { asc, desc, eq } from "drizzle-orm"
+import { asc, desc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
 import { checkPermission } from "./authorization"
@@ -12,24 +12,62 @@ import type {
 } from "./fertilizer.d"
 
 /**
- * Retrieves all fertilizers from the catalogue.
+ * Retrieves all fertilizers from the enabled catalogues for a farm.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id The ID of the principal making the request.
+ * @param b_id_farm The ID of the farm.
  * @returns A Promise that resolves with an array of fertilizer catalogue entries.
  * @alpha
  */
 export async function getFertilizersFromCatalogue(
     fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<schema.fertilizersCatalogueTypeSelect[]> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getFertilizersFromCatalogue",
+        )
+
+        // Get enabled catalogues for the farm
+        const enabledCatalogues = await fdm
+            .select({
+                p_source: schema.fertilizerCatalogueEnabling.p_source,
+            })
+            .from(schema.fertilizerCatalogueEnabling)
+            .where(eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm))
+
+        // If no catalogues are enabled, return empty array
+        if (enabledCatalogues.length === 0) {
+            return []
+        }
+
+        // Get fertilizers from enabled catalogues
         const fertilizersCatalogue = await fdm
             .select()
             .from(schema.fertilizersCatalogue)
+            .where(
+                inArray(
+                    schema.fertilizersCatalogue.p_source,
+                    enabledCatalogues.map(
+                        (c: { p_source: string }) => c.p_source,
+                    ),
+                ),
+            )
             .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
         return fertilizersCatalogue
     } catch (err) {
-        throw handleError(err, "Exception for getFertilizersFromCatalogue", {})
+        throw handleError(err, "Exception for getFertilizersFromCatalogue", {
+            principal_id,
+            b_id_farm,
+        })
     }
 }
 
