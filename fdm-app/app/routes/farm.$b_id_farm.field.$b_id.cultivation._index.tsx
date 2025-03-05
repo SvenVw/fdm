@@ -184,8 +184,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { b_lu_catalogue, b_lu_start, b_lu_end } =
-                formValues
+            const { b_lu_catalogue, b_lu_start, b_lu_end } = formValues
 
             await addCultivation(
                 fdm,

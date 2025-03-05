@@ -506,7 +506,10 @@ async function getResourceChain(
                 .from(schema.cultivations)
                 .leftJoin(
                     schema.cultivationStarting,
-                    eq(schema.cultivations.b_lu, schema.cultivationStarting.b_lu),
+                    eq(
+                        schema.cultivations.b_lu,
+                        schema.cultivationStarting.b_lu,
+                    ),
                 )
                 .leftJoin(
                     schema.fields,
@@ -547,7 +550,10 @@ async function getResourceChain(
                 )
                 .leftJoin(
                     schema.cultivationStarting,
-                    eq(schema.cultivations.b_lu, schema.cultivationStarting.b_lu),
+                    eq(
+                        schema.cultivations.b_lu,
+                        schema.cultivationStarting.b_lu,
+                    ),
                 )
                 .leftJoin(
                     schema.fields,

@@ -345,9 +345,7 @@ describe("Cultivation Data Model", () => {
             )
             expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
-            expect(updatedCultivation.b_lu_end).toEqual(
-                newTerminateDate,
-            )
+            expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
         })
 
         it("should update a cultivation with only the catalogue ID", async () => {
@@ -408,9 +406,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_lu,
             )
-            expect(updatedCultivation.b_lu_end).toEqual(
-                newTerminateDate,
-            )
+            expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
         })
 
         it("should throw an error when updating with invalid sowing date - before termination date", async () => {

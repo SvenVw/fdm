@@ -10,7 +10,7 @@ import type { FdmType } from "./fdm"
 /**
  * Creates a new farm record and assigns the "owner" role to the specified principal.
  *
- * This function starts a database transaction, generates a unique identifier for the new farm, 
+ * This function starts a database transaction, generates a unique identifier for the new farm,
  * inserts the farm details into the database, and then grants the given principal the owner role.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.

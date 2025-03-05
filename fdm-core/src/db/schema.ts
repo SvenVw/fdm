@@ -296,8 +296,10 @@ export const cultivationStarting = fdmSchema.table(
     },
 )
 
-export type cultivationStartingTypeSelect = typeof cultivationStarting.$inferSelect
-export type cultivationStartingTypeInsert = typeof cultivationStarting.$inferInsert
+export type cultivationStartingTypeSelect =
+    typeof cultivationStarting.$inferSelect
+export type cultivationStartingTypeInsert =
+    typeof cultivationStarting.$inferInsert
 
 // Define cultivations_catalogue table
 export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [

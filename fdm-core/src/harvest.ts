@@ -402,8 +402,7 @@ export async function checkHarvestDateCompability(
 
     const terminatingDate = await tx
         .select({
-            b_lu_end:
-                schema.cultivationEnding.b_lu_end,
+            b_lu_end: schema.cultivationEnding.b_lu_end,
         })
         .from(schema.cultivationEnding)
         .where(eq(schema.cultivationEnding.b_lu, b_lu))
@@ -441,8 +440,7 @@ export async function checkHarvestDateCompability(
     if (
         b_lu_harvestable === "multiple" &&
         terminatingDate[0].b_lu_end &&
-        b_lu_harvest_date.getTime() >
-            terminatingDate[0].b_lu_end.getTime()
+        b_lu_harvest_date.getTime() > terminatingDate[0].b_lu_end.getTime()
     ) {
         throw new Error(
             "Harvest date must be before terminating date for this cultivation",

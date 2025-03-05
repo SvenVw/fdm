@@ -104,7 +104,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * Renders a block displaying cultivation details and a harvest input form.
  *
  * This component uses data loaded by the router to show the name of the cultivation and an instruction
- * for entering harvest information. It also provides a navigation link back to the cultivation details page 
+ * for entering harvest information. It also provides a navigation link back to the cultivation details page
  * and renders a HarvestForm component prefilled with available harvest analytics data when present.
  *
  * @returns The JSX element representing the harvest overview block.

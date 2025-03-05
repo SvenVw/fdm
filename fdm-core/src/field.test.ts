@@ -304,9 +304,7 @@ describe("Farm Data Model", () => {
             expect(updatedField.b_id_source).toBe(updatedFieldIDSource)
             expect(updatedField.b_geometry).toStrictEqual(updatedFieldGeometry)
             expect(updatedField.b_start).toEqual(updatedAcquireDate)
-            expect(updatedField.b_end).toEqual(
-                updatedDiscardingDate,
-            )
+            expect(updatedField.b_end).toEqual(updatedDiscardingDate)
             expect(updatedField.b_acquiring_method).toBe(updatedAcquiringMethod)
         })
 

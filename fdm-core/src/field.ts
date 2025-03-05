@@ -75,11 +75,7 @@ export async function addField(
             await tx.insert(schema.fieldAcquiring).values(fieldAcquiringData)
 
             // Check that acquire date is before discarding date
-            if (
-                b_end &&
-                b_start &&
-                b_start.getTime() >= b_end.getTime()
-            ) {
+            if (b_end && b_start && b_start.getTime() >= b_end.getTime()) {
                 throw new Error("Acquiring date must be before discarding date")
             }
 
@@ -347,8 +343,7 @@ export async function updateField(
             // Check if acquiring date is before discarding date
             if (
                 field.b_end &&
-                field.b_start.getTime() >=
-                    field.b_end.getTime()
+                field.b_start.getTime() >= field.b_end.getTime()
             ) {
                 throw new Error("Acquiring date must be before discarding date")
             }

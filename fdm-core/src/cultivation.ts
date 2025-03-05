@@ -165,7 +165,10 @@ export async function addCultivation(
                 .from(schema.cultivationStarting)
                 .leftJoin(
                     schema.cultivations,
-                    eq(schema.cultivationStarting.b_lu, schema.cultivations.b_lu),
+                    eq(
+                        schema.cultivationStarting.b_lu,
+                        schema.cultivations.b_lu,
+                    ),
                 )
                 .where(
                     and(
@@ -278,8 +281,7 @@ export async function getCultivation(
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
-                b_lu_end:
-                    schema.cultivationEnding.b_lu_end,
+                b_lu_end: schema.cultivationEnding.b_lu_end,
                 b_id: schema.cultivationStarting.b_id,
             })
             .from(schema.cultivations)
@@ -289,10 +291,7 @@ export async function getCultivation(
             )
             .leftJoin(
                 schema.cultivationEnding,
-                eq(
-                    schema.cultivationEnding.b_lu,
-                    schema.cultivations.b_lu,
-                ),
+                eq(schema.cultivationEnding.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
                 schema.cultivationsCatalogue,
@@ -354,8 +353,7 @@ export async function getCultivations(
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
-                b_lu_end:
-                    schema.cultivationEnding.b_lu_end,
+                b_lu_end: schema.cultivationEnding.b_lu_end,
                 b_id: schema.cultivationStarting.b_id,
             })
             .from(schema.cultivations)
@@ -365,10 +363,7 @@ export async function getCultivations(
             )
             .leftJoin(
                 schema.cultivationEnding,
-                eq(
-                    schema.cultivationEnding.b_lu,
-                    schema.cultivations.b_lu,
-                ),
+                eq(schema.cultivationEnding.b_lu, schema.cultivations.b_lu),
             )
             .leftJoin(
                 schema.cultivationsCatalogue,
@@ -489,8 +484,7 @@ export async function getCultivationPlan(
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
-                b_lu_end:
-                    schema.cultivationEnding.b_lu_end,
+                b_lu_end: schema.cultivationEnding.b_lu_end,
                 p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_app_amount: schema.fertilizerApplication.p_app_amount,
@@ -526,7 +520,10 @@ export async function getCultivationPlan(
             )
             .leftJoin(
                 schema.cultivationEnding,
-                eq(schema.cultivationEnding.b_lu, schema.cultivationStarting.b_lu),
+                eq(
+                    schema.cultivationEnding.b_lu,
+                    schema.cultivationStarting.b_lu,
+                ),
             )
             .leftJoin(
                 schema.cultivations,
@@ -820,26 +817,20 @@ export async function updateCultivation(
                 if (!b_lu_end) {
                     const result = await tx
                         .select({
-                            b_lu_end:
-                                schema.cultivationEnding
-                                    .b_lu_end,
+                            b_lu_end: schema.cultivationEnding.b_lu_end,
                         })
                         .from(schema.cultivationEnding)
                         .where(
                             and(
                                 eq(schema.cultivationEnding.b_lu, b_lu),
-                                isNotNull(
-                                    schema.cultivationEnding
-                                        .b_lu_end,
-                                ),
+                                isNotNull(schema.cultivationEnding.b_lu_end),
                             ),
                         )
                         .limit(1)
 
                     if (result.length > 0) {
                         if (
-                            b_lu_start.getTime() >=
-                            result[0].b_lu_end.getTime()
+                            b_lu_start.getTime() >= result[0].b_lu_end.getTime()
                         ) {
                             throw new Error(
                                 "Sowing date must be before termination date",
@@ -865,15 +856,16 @@ export async function updateCultivation(
                         .where(
                             and(
                                 eq(schema.cultivationStarting.b_lu, b_lu),
-                                isNotNull(schema.cultivationStarting.b_lu_start),
+                                isNotNull(
+                                    schema.cultivationStarting.b_lu_start,
+                                ),
                             ),
                         )
                         .limit(1)
 
                     if (result.length > 0) {
                         if (
-                            result[0].b_lu_start.getTime() >=
-                            b_lu_end.getTime()
+                            result[0].b_lu_start.getTime() >= b_lu_end.getTime()
                         ) {
                             throw new Error(
                                 "Terminate date must be after sowing date",
