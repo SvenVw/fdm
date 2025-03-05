@@ -1,4 +1,4 @@
-import { FormSchema } from "@/components/custom/fertilizer-applications"
+import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
 import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
 import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
