@@ -115,6 +115,15 @@ importers:
       '@sentry/vite-plugin':
         specifier: ^3.2.0
         version: 3.2.0
+      '@svenvw/fdm-calculator':
+        specifier: workspace:>=0.2.1
+        version: link:../fdm-calculator
+      '@svenvw/fdm-core':
+        specifier: workspace:>=0.14.0
+        version: link:../fdm-core
+      '@svenvw/fdm-data':
+        specifier: workspace:>=0.10.3
+        version: link:../fdm-data
       '@turf/centroid':
         specifier: ^7.2.0
         version: 7.2.0
@@ -206,15 +215,6 @@ importers:
       '@react-router/fs-routes':
         specifier: ^7.2.0
         version: 7.2.0(@react-router/dev@7.2.0(@react-router/serve@7.2.0(react-router@7.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.7.3))(@types/node@22.13.5)(jiti@1.21.7)(lightningcss@1.29.1)(react-router@7.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.7.3)(vite@6.1.1(@types/node@22.13.5)(jiti@1.21.7)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0))(yaml@2.7.0))(typescript@5.7.3)
-      '@svenvw/fdm-calculator':
-        specifier: workspace:*
-        version: link:../fdm-calculator
-      '@svenvw/fdm-core':
-        specifier: workspace:*
-        version: link:../fdm-core
-      '@svenvw/fdm-data':
-        specifier: workspace:*
-        version: link:../fdm-data
       '@types/geojson':
         specifier: ^7946.0.16
         version: 7946.0.16
@@ -259,6 +259,10 @@ importers:
         version: 5.1.4(typescript@5.7.3)(vite@6.1.1(@types/node@22.13.5)(jiti@1.21.7)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0))
 
   fdm-calculator:
+    dependencies:
+      '@svenvw/fdm-core':
+        specifier: workspace:>=0.14.0
+        version: link:../fdm-core
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: 'catalog:'
@@ -272,9 +276,6 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.1.2
         version: 12.1.2(rollup@4.34.8)(tslib@2.8.1)(typescript@5.7.3)
-      '@svenvw/fdm-core':
-        specifier: workspace:*
-        version: link:../fdm-core
       '@vitest/coverage-v8':
         specifier: 'catalog:'
         version: 2.1.9(vitest@2.1.9(@types/node@22.13.5)(lightningcss@1.29.1)(terser@5.39.0))
@@ -359,6 +360,10 @@ importers:
         version: 3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(jiti@1.21.7)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
 
   fdm-data:
+    dependencies:
+      '@svenvw/fdm-core':
+        specifier: workspace:>=0.14.0
+        version: link:../fdm-core
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: 'catalog:'
@@ -375,9 +380,6 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.1.2
         version: 12.1.2(rollup@4.34.8)(tslib@2.8.1)(typescript@5.7.3)
-      '@svenvw/fdm-core':
-        specifier: workspace:*
-        version: link:../fdm-core
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.39.2(@electric-sql/pglite@0.2.17)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@19.0.10)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
