@@ -116,13 +116,13 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0
       '@svenvw/fdm-calculator':
-        specifier: workspace:>=0.2.0
+        specifier: workspace:>=0.2.1
         version: link:../fdm-calculator
       '@svenvw/fdm-core':
         specifier: workspace:>=0.14.0
         version: link:../fdm-core
       '@svenvw/fdm-data':
-        specifier: workspace:>=0.10.2
+        specifier: workspace:>=0.10.3
         version: link:../fdm-data
       '@turf/centroid':
         specifier: ^7.2.0
