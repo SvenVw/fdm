@@ -105,6 +105,14 @@ function constructCards(dose: Dose) {
             advice: undefined,
         },
         {
+            title: "Stikstof, werkzaam",
+            shortname: "Nw",
+            value: dose.p_dose_nw,
+            unit: "kg/ha",
+            limit: undefined,
+            advice: undefined,
+        },
+        {
             title: "Fosfaat, totaal",
             shortname: "P2O5",
             value: dose.p_dose_p2o5,
