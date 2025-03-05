@@ -1,5 +1,14 @@
 # Changelog fdm-app
 
+## 0.13.1
+
+### Patch Changes
+
+- 98e20ac: List other `fdm` packages as `dependencies` instead `peerDependencies` to prevent not needed major version bumps
+- Updated dependencies [98e20ac]
+  - @svenvw/fdm-calculator@0.2.1
+  - @svenvw/fdm-data@0.10.3
+
 ## 0.13.0
 
 ### Minor Changes

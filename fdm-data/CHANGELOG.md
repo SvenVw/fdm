@@ -1,5 +1,11 @@
 # fdm-data
 
+## 0.10.3
+
+### Patch Changes
+
+- 98e20ac: List other `fdm` packages as `dependencies` instead `peerDependencies` to prevent not needed major version bumps
+
 ## 0.10.2
 
 ### Patch Changes
