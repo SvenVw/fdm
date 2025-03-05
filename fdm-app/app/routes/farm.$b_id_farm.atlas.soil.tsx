@@ -1,5 +1,7 @@
 import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
 import { Button } from "@/components/ui/button"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import {
@@ -9,45 +11,70 @@ import {
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads farm fields as a GeoJSON FeatureCollection along with a Mapbox token.
+ *
+ * This function validates that the farm ID is present in the route parameters, retrieves the user session, and
+ * fetches the farm's fields. It then converts each field into a GeoJSON feature with its area rounded to one
+ * decimal place, assembles these features into a FeatureCollection, and obtains a Mapbox token. The returned
+ * object includes both the token and the FeatureCollection.
+ *
+ * @returns A promise that resolves to an object containing a Mapbox token and a GeoJSON FeatureCollection of farm fields.
+ *
+ * @throws {Response} If the farm ID is missing from the parameters or an error occurs during data fetching.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the fields of the farm
-    const fields = await getFields(fdm, b_id_farm)
-    const features = fields.map((field) => {
-        const feature = {
-            type: "Feature",
-            properties: {
-                b_id: field.b_id,
-                b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
-            },
-            geometry: wkx.Geometry.parse(field.b_geometry).toGeoJSON(),
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
-        return feature
-    })
 
-    const featureCollection = {
-        type: "FeatureCollection",
-        features: features,
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Get the Mapbox token
-    const mapboxToken = getMapboxToken()
-    // Return user information from loader
-    return {
-        mapboxToken: mapboxToken,
-        fields: featureCollection,
+        // Get the fields of the farm
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const features = fields.map((field) => {
+            const feature = {
+                type: "Feature",
+                properties: {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                },
+                geometry: field.b_geometry,
+            }
+            return feature
+        })
+
+        const featureCollection = {
+            type: "FeatureCollection",
+            features: features,
+        }
+
+        // Get the Mapbox token
+        const mapboxToken = getMapboxToken()
+        // Return user information from loader
+        return {
+            mapboxToken: mapboxToken,
+            fields: featureCollection,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
+/**
+ * Renders a placeholder message indicating that the soil map is not available.
+ *
+ * This component displays a centered layout with an informative message and a navigation button
+ * linking to the field map.
+ */
 export default function FarmAtlasSoilBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

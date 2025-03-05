@@ -1,3 +1,18 @@
+import { FormSchema } from "@/components/custom/fertilizer-applications"
+import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
+import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
+import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
+import { extractFormValuesFromRequest } from "@/lib/form"
+import { calculateDose } from "@svenvw/fdm-calculator"
+import {
+    addFertilizerApplication,
+    getCultivationPlan,
+    getFertilizers,
+    removeFertilizerApplication,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -6,119 +21,125 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
-import { dataWithError, dataWithSuccess } from "remix-toast"
-
-// Components
-import { FertilizerApplicationsForm } from "@/components/custom/fertilizer-applications"
-import { FormSchema } from "@/components/custom/fertilizer-applications"
-import { extractFormValuesFromRequest } from "@/lib/form"
-
-import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
-import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import { FertilizerApplicationsCardProps } from "@/components/custom/fertilizer-applications/types.d"
-import { Separator } from "@/components/ui/separator"
-import { calculateDose } from "@svenvw/fdm-calculator"
-import {
-    addFertilizerApplication,
-    getCultivationPlan,
-    getFertilizers,
-    removeFertilizerApplication,
-} from "@svenvw/fdm-core"
-// FDM
+import { dataWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
 
-// Loader
+/**
+ * Loads fertilizer and cultivation data for a given farm and cultivation catalogue.
+ *
+ * This function retrieves available fertilizers and the cultivation plan using session details, then aggregates similar fertilizer applications across all fields of the target cultivation. It also calculates the fertilizer dose and prepares fertilizer options for a combobox. If the required farm or catalogue identifiers are missing, or if the specified cultivation is not found, it returns an error response through a centralized error handler.
+ *
+ * @returns An object containing the farm ID, cultivation catalogue ID, fertilizer options, aggregated fertilizer applications, and the calculated fertilizer dose.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Extract farm ID from URL parameters
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Extract cultivation catalogue ID from URL parameters
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw data("Cultivation catalogue ID is required", {
-            status: 400,
-            statusText: "Cultivation catalogue ID is required",
-        })
-    }
-
-    // Fetch available fertilizers for the farm
-    const fertilizers = await getFertilizers(fdm, b_id_farm)
-    // Map fertilizers to options for the combobox
-    const fertilizerOptions = fertilizers.map((fertilizer) => {
-        return {
-            value: fertilizer.p_id,
-            label: fertilizer.p_name_nl,
+    try {
+        // Extract farm ID from URL parameters
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
-    })
 
-    // Fetch the cultivation plan for the farm
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
-        (error) => {
-            throw data("Failed to fetch cultivation plan", {
-                status: 500,
-                statusText: error.message,
+        // Extract cultivation catalogue ID from URL parameters
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("Cultivation catalogue ID is required", {
+                status: 400,
+                statusText: "Cultivation catalogue ID is required",
             })
-        },
-    )
+        }
 
-    // Find the target cultivation within the cultivation plan
-    const targetCultivation = cultivationPlan.find(
-        (c) => c.b_lu_catalogue === b_lu_catalogue,
-    )
-    if (!targetCultivation) {
-        throw data("Cultivation not found", { status: 404 })
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Combine similar fertilizer applications across all fields of the target cultivation.
-    const fertilizerApplications = targetCultivation.fields.reduce(
-        (accumulator, field) => {
-            field.fertilizer_applications.forEach((app) => {
-                // Create a key based on application properties to identify similar applications.
-                const isSimilarApplication = (app1: any, app2: any) =>
-                    app1.p_id_catalogue === app2.p_id_catalogue &&
-                    app1.p_app_amount === app2.p_app_amount &&
-                    app1.p_app_method === app2.p_app_method &&
-                    app1.p_app_date.getTime() === app2.p_app_date.getTime()
+        // Fetch available fertilizers for the farm
+        const fertilizers = await getFertilizers(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        // Map fertilizers to options for the combobox
+        const fertilizerOptions = fertilizers.map((fertilizer) => {
+            return {
+                value: fertilizer.p_id,
+                label: fertilizer.p_name_nl,
+            }
+        })
 
-                const existingApplication = accumulator.find((existingApp) =>
-                    isSimilarApplication(existingApp, app),
-                )
+        // Fetch the cultivation plan for the farm
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
 
-                if (existingApplication) {
-                    // If similar application exists, add the current p_app_id to its p_app_ids array.
-                    existingApplication.p_app_ids.push(app.p_app_id)
-                } else {
-                    // If it's a new application, add it to the accumulator with a new p_app_ids array.
-                    accumulator.push({ ...app, p_app_ids: [app.p_app_id] })
-                }
-            })
+        // Find the target cultivation within the cultivation plan
+        const targetCultivation = cultivationPlan.find(
+            (c) => c.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!targetCultivation) {
+            throw data("Cultivation not found", { status: 404 })
+        }
 
-            return accumulator
-        },
-        [],
-    )
+        // Combine similar fertilizer applications across all fields of the target cultivation.
+        const fertilizerApplications = targetCultivation.fields.reduce(
+            (accumulator, field) => {
+                field.fertilizer_applications.forEach((app) => {
+                    // Create a key based on application properties to identify similar applications.
+                    const isSimilarApplication = (app1: any, app2: any) =>
+                        app1.p_id_catalogue === app2.p_id_catalogue &&
+                        app1.p_app_amount === app2.p_app_amount &&
+                        app1.p_app_method === app2.p_app_method &&
+                        app1.p_app_date.getTime() === app2.p_app_date.getTime()
 
-    const dose = calculateDose({
-        applications: fertilizerApplications,
-        fertilizers,
-    })
+                    const existingApplication = accumulator.find(
+                        (existingApp) => isSimilarApplication(existingApp, app),
+                    )
 
-    return {
-        b_lu_catalogue: b_lu_catalogue,
-        b_id_farm: b_id_farm,
-        fertilizerOptions: fertilizerOptions,
-        fertilizerApplications: fertilizerApplications,
-        dose: dose,
+                    if (existingApplication) {
+                        // If similar application exists, add the current p_app_id to its p_app_ids array.
+                        existingApplication.p_app_ids.push(app.p_app_id)
+                    } else {
+                        // If it's a new application, add it to the accumulator with a new p_app_ids array.
+                        accumulator.push({ ...app, p_app_ids: [app.p_app_id] })
+                    }
+                })
+
+                return accumulator
+            },
+            [],
+        )
+
+        const dose = calculateDose({
+            applications: fertilizerApplications,
+            fertilizers,
+        })
+
+        return {
+            b_lu_catalogue: b_lu_catalogue,
+            b_id_farm: b_id_farm,
+            fertilizerOptions: fertilizerOptions,
+            fertilizerApplications: fertilizerApplications,
+            dose: dose,
+        }
+    } catch (error) {
+        return handleLoaderError(error)
     }
 }
 
+/**
+ * Renders the fertilizer management interface.
+ *
+ * This component displays a form for adding new fertilizer applications alongside a list of existing applications and a card
+ * that shows the calculated fertilizer dose. It retrieves necessary data using loader data, the current location, and a fetcher
+ * for asynchronous actions.
+ *
+ * @example
+ * // Renders the fertilizer applications view.
+ * <Index />
+ */
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
@@ -152,99 +173,95 @@ export default function Index() {
     )
 }
 
+/**
+ * Handles the addition and removal of fertilizer applications for a specific farm cultivation.
+ *
+ * Processes POST requests by validating URL parameters, retrieving session data, extracting fertilizer details from the form,
+ * and applying the fertilizer to all fields within the specified cultivation. Processes DELETE requests by validating and parsing
+ * a comma-separated list of fertilizer application IDs and removing each application.
+ *
+ * @throws {Error} If required URL parameters (farm ID or cultivation catalogue ID) are missing, if form data validation fails,
+ * or if the request method is unsupported.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the cultivation
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw data("Cultivation catalogue ID is required", {
-            status: 400,
-            statusText: "Cultivation catalogue ID is required",
-        })
-    }
-
-    if (request.method === "POST") {
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { p_id, p_app_amount, p_app_date } = formValues
-
-        // Get the cultivation details for this cultivation
-        const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
-            (error) => {
-                throw data("Failed to fetch cultivation plan", {
-                    status: 500,
-                    statusText: error.message,
-                })
-            },
-        )
-
-        // Get the id of the fields with this cultivation
-        const fields = cultivationPlan.find(
-            (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
-        ).fields
-
-        fields.map(async (field) => {
-            const b_id = field.b_id
-            await addFertilizerApplication(
-                fdm,
-                b_id,
-                p_id,
-                p_app_amount,
-                undefined,
-                p_app_date,
-            )
-        })
-
-        return dataWithSuccess(
-            { result: "Data saved successfully" },
-            { message: "Bemesting is toegevoegd! 🎉" },
-        )
-    }
-    if (request.method === "DELETE") {
-        const formData = await request.formData()
-        const rawAppIds = formData.get("p_app_id")
-
-        if (!rawAppIds || typeof rawAppIds !== "string") {
-            return dataWithError(
-                "Invalid or missing p_app_ids value",
-                "Oops! Something went wrong. Please try again later.",
-            )
+    try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+        // Get the cultivation
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw new Error("missing: b_lu_catalogue")
         }
 
-        try {
+        // Get the session
+        const session = await getSession(request)
+
+        if (request.method === "POST") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const { p_id, p_app_amount, p_app_date } = formValues
+
+            // Get the cultivation details for this cultivation
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
+
+            // Get the id of the fields with this cultivation
+            const fields = cultivationPlan.find(
+                (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+            ).fields
+
+            await Promise.all(
+                fields.map(async (field) => {
+                    const b_id = field.b_id
+                    addFertilizerApplication(
+                        fdm,
+                        session.principal_id,
+                        b_id,
+                        p_id,
+                        p_app_amount,
+                        undefined,
+                        p_app_date,
+                    )
+                }),
+            )
+
+            return dataWithSuccess(
+                { result: "Data saved successfully" },
+                { message: "Bemesting is toegevoegd! 🎉" },
+            )
+        }
+        if (request.method === "DELETE") {
+            const formData = await request.formData()
+            const rawAppIds = formData.get("p_app_id")
+
+            if (!rawAppIds || typeof rawAppIds !== "string") {
+                throw new Error("invalid: p_app_id")
+            }
+
             const p_app_ids = rawAppIds.split(",")
             await Promise.all(
                 p_app_ids.map((p_app_id: string) =>
-                    removeFertilizerApplication(fdm, p_app_id),
+                    removeFertilizerApplication(
+                        fdm,
+                        session.principal_id,
+                        p_app_id,
+                    ),
                 ),
             )
 
             return dataWithSuccess({}, { message: "Bemesting is verwijderd" })
-        } catch (error) {
-            // Handle errors appropriately. Log the error for debugging purposes.
-            console.error("Error deleting fertilizer application:", error)
-            return dataWithError(
-                error instanceof Error ? error.message : "Unknown error",
-                "Er is een fout opgetreden bij het verwijderen van de bemesting. Probeer het later opnieuw.",
-            )
         }
+        throw new Error(`${request.method} is not supported`)
+    } catch (error) {
+        throw handleActionError(error)
     }
-
-    //  Handle other methods. This returns an error response for methods other than POST or DELETE, which may or may not be what's desired.
-    console.error(`${request.method} is not supported`)
-    return dataWithError(
-        null,
-        "Oops! Something went wrong. Please try again later.",
-    )
 }

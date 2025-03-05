@@ -20,11 +20,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import {
     Select,
     SelectContent,
     SelectItem,
@@ -32,8 +27,9 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { extractFormValuesFromRequest } from "@/lib/form"
-import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
@@ -44,10 +40,7 @@ import {
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
-import { format } from "date-fns/format"
-import { nl } from "date-fns/locale/nl"
 import type { FeatureCollection } from "geojson"
-import { CalendarIcon } from "lucide-react"
 import { Form } from "react-hook-form"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {
@@ -131,70 +124,83 @@ const FormSchema = z.object({
 })
 
 /**
- * Loader function for the field details page.
- * Fetches field data, soil analysis, cultivation options, and geojson data.
- * @param request - The incoming request object.
- * @param params - URL parameters containing `b_id_farm` (farm ID) and `b_id` (field ID).
- * @returns An object containing field details, cultivation options, and mapbox token.
- * Throws an error if farm ID, field ID, or field data is missing.
+ * Retrieves and prepares data for rendering the field details page.
+ *
+ * This loader validates the presence of the required farm and field IDs extracted from the URL parameters,
+ * obtains the session information, and uses it to fetch the associated field data. It constructs a GeoJSON
+ * FeatureCollection based on the field's geometry and retrieves additional details such as soil analysis,
+ * cultivation options filtered from the catalogue, and Mapbox configuration (token and style).
+ *
+ * @param request - The incoming HTTP request.
+ * @param params - URL parameters with 'b_id_farm' as the farm ID and 'b_id' as the field ID.
+ * @returns An object containing field properties, soil analysis, cultivation details, a GeoJSON FeatureCollection,
+ *   and Mapbox configuration needed for the field details page.
+ * @throws {Error} When required identifiers (farm ID, field ID), field data, or field geometry are missing.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-
-    // Get the field data
-    const field = await getField(fdm, b_id)
-    if (!field) {
-        throw data("Field not found", {
-            status: 404,
-            statusText: "Field not found",
-        })
-    }
-    const feature: GeoJSON.Feature = {
-        type: "Feature",
-        properties: {
-            b_id: field.b_id,
-            b_name: field.b_name,
-            b_area: Math.round(field.b_area * 10) / 10,
-            b_lu_name: field.b_lu_name,
-            b_id_source: field.b_id_source,
-        },
-        geometry: field.b_geometry,
-    }
-    const featureCollection: FeatureCollection = {
-        type: "FeatureCollection",
-        features: [feature],
-    }
-
-    // Get the geojson
-    if (!field.b_geometry) {
-        throw data("Field geometry is required", {
-            status: 400,
-            statusText: "Field geometry is required",
-        })
-    }
-
-    // Get soil analysis data
-    const soilAnalysis = await getSoilAnalysis(fdm, b_id)
-
-    // Get the available cultivations
-    let cultivationOptions = []
     try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
+
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the field data
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field not found", {
+                status: 404,
+                statusText: "Field not found",
+            })
+        }
+        const feature: GeoJSON.Feature = {
+            type: "Feature",
+            properties: {
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
+                b_lu_name: field.b_lu_name,
+                b_id_source: field.b_id_source,
+            },
+            geometry: field.b_geometry,
+        }
+        const featureCollection: FeatureCollection = {
+            type: "FeatureCollection",
+            features: [feature],
+        }
+
+        // Get the geojson
+        if (!field.b_geometry) {
+            throw data("Field geometry is required", {
+                status: 400,
+                statusText: "Field geometry is required",
+            })
+        }
+
+        // Get soil analysis data
+        const soilAnalysis = await getSoilAnalysis(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+
+        // Get the available cultivations
+        let cultivationOptions = []
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
             .filter(
@@ -205,38 +211,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
+
+        // Get the cultivation
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+        const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
+
+        // Get Mapbox token and Style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
+
+        return {
+            b_id: b_id,
+            b_id_farm: b_id_farm,
+            b_name: field.b_name,
+            b_lu_catalogue: b_lu_catalogue,
+            b_sowing_date: cultivations[0]?.b_sowing_date,
+            b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
+            b_gwl_class: soilAnalysis?.b_gwl_class,
+            a_p_al: soilAnalysis?.a_p_al,
+            a_p_cc: soilAnalysis?.a_p_cc,
+            a_som_loi: soilAnalysis?.a_som_loi,
+            b_area: field.b_area,
+            featureCollection: featureCollection,
+            cultivationOptions: cultivationOptions,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+        }
     } catch (error) {
-        console.error("Failed to fetch cultivations:", error)
-        throw data("Failed to load cultivation options", {
-            status: 500,
-            statusText: "Failed to load cultivation options",
-        })
-    }
-
-    // Get the cultivation
-    const cultivations = await getCultivations(fdm, b_id)
-    const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
-
-    // Get Mapbox token and Style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
-
-    return {
-        b_id: b_id,
-        b_id_farm: b_id_farm,
-        b_name: field.b_name,
-        b_lu_catalogue: b_lu_catalogue,
-        b_sowing_date: cultivations[0]?.b_sowing_date,
-        b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
-        b_gwl_class: soilAnalysis?.b_gwl_class,
-        a_p_al: soilAnalysis?.a_p_al,
-        a_p_cc: soilAnalysis?.a_p_cc,
-        a_som_loi: soilAnalysis?.a_som_loi,
-        b_area: field.b_area,
-        featureCollection: featureCollection,
-        cultivationOptions: cultivationOptions,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
+        throw handleLoaderError(error)
     }
 }
 
@@ -621,23 +627,32 @@ export default function Index() {
 }
 
 /**
- * Action function for updating field details.
- * Handles form submission, updates field data in the database,
- * and manages soil analysis updates.
- * @param request - The incoming request object containing form data.
- * @param params - URL parameters containing `b_id` (field ID) and `b_id_farm` (farm ID).
- * @returns A success or error toast based on the outcome of the update operation.
- * Throws an error if field or farm ID is missing.
+ * Processes the form submission to update field details.
+ *
+ * This function validates that the necessary URL parameters for the field and farm IDs are present.
+ * It extracts form data and session information from the incoming request, updates the field record,
+ * and, if applicable, updates the related cultivation data. If the submitted soil properties differ from
+ * the existing values, a new soil analysis entry is added.
+ *
+ * @param request - The HTTP request containing form submission and session data.
+ * @param params - An object with URL parameters including the field ID (b_id) and farm ID (b_id_farm).
+ * @returns A payload with a success message upon successful update.
+ * @throws {Error} If either the field ID or farm ID is missing.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id = params.b_id
-    const b_id_farm = params.b_id_farm
-
-    if (!b_id || !b_id_farm) {
-        return dataWithError(null, "Missing field or farm ID.")
-    }
-
     try {
+        const b_id = params.b_id
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -645,6 +660,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateField(
             fdm,
+            session.principal_id,
             b_id,
             formValues.b_name,
             undefined,
@@ -654,60 +670,60 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        const cultivations = await getCultivations(fdm, b_id)
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
         if (cultivations && cultivations.length > 0) {
             await updateCultivation(
                 fdm,
+                session.principal_id,
                 cultivations[0].b_lu,
                 formValues.b_lu_catalogue,
                 undefined,
                 undefined,
             )
-        } else {
-            // Handle the case where there are no cultivations found (although there should always be at least one)
-            console.error("No existing cultivation found for field ", b_id)
-            return dataWithError(
-                null,
-                "Failed to update cultivation. No cultivation found for field.",
-            )
-        }
 
-        const currentSoilAnalysis = await getSoilAnalysis(fdm, b_id)
-        const soilPropertiesChanged =
-            currentSoilAnalysis?.b_soiltype_agr !== formValues.b_soiltype_agr ||
-            currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
-            currentSoilAnalysis?.a_p_al !== formValues.a_p_al ||
-            currentSoilAnalysis?.a_p_cc !== formValues.a_p_cc ||
-            currentSoilAnalysis?.a_som_loi !== formValues.a_som_loi
-
-        if (soilPropertiesChanged) {
-            const currentYear = new Date().getFullYear()
-            const defaultDate = new Date(currentYear, 0, 1)
-            await addSoilAnalysis(
+            const currentSoilAnalysis = await getSoilAnalysis(
                 fdm,
-                defaultDate,
-                "user",
+                session.principal_id,
                 b_id,
-                30,
-                defaultDate,
-                {
-                    a_p_al: formValues.a_p_al,
-                    a_p_cc: formValues.a_p_cc,
-                    a_som_loi: formValues.a_som_loi,
-                    b_soiltype_agr: formValues.b_soiltype_agr,
-                    b_gwl_class: formValues.b_gwl_class,
-                },
             )
-        }
+            const soilPropertiesChanged =
+                currentSoilAnalysis?.b_soiltype_agr !==
+                    formValues.b_soiltype_agr ||
+                currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
+                currentSoilAnalysis?.a_p_al !== formValues.a_p_al ||
+                currentSoilAnalysis?.a_p_cc !== formValues.a_p_cc ||
+                currentSoilAnalysis?.a_som_loi !== formValues.a_som_loi
 
-        return dataWithSuccess("fields have been updated", {
-            message: `${formValues.b_name} is bijgewerkt! 🎉`,
-        })
+            if (soilPropertiesChanged) {
+                const currentYear = new Date().getFullYear()
+                const defaultDate = new Date(currentYear, 0, 1)
+                await addSoilAnalysis(
+                    fdm,
+                    session.principal_id,
+                    defaultDate,
+                    "user",
+                    b_id,
+                    30,
+                    defaultDate,
+                    {
+                        a_p_al: formValues.a_p_al,
+                        a_p_cc: formValues.a_p_cc,
+                        a_som_loi: formValues.a_som_loi,
+                        b_soiltype_agr: formValues.b_soiltype_agr,
+                        b_gwl_class: formValues.b_gwl_class,
+                    },
+                )
+            }
+
+            return dataWithSuccess("fields have been updated", {
+                message: `${formValues.b_name} is bijgewerkt! 🎉`,
+            })
+        }
     } catch (error) {
-        console.error("Failed to update field:", error)
-        return dataWithError(
-            null,
-            `Er is iets misgegaan bij het bijwerken van het perceel: ${error instanceof Error ? error.message : "Unknown error"}`,
-        )
+        throw handleActionError(error)
     }
 }

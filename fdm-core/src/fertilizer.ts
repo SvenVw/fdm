@@ -1,6 +1,8 @@
 import { asc, desc, eq } from "drizzle-orm"
 import { createId } from "./id"
 
+import { checkPermission } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
@@ -12,7 +14,7 @@ import type {
 /**
  * Retrieves all fertilizers from the catalogue.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @returns A Promise that resolves with an array of fertilizer catalogue entries.
  * @alpha
  */
@@ -34,7 +36,7 @@ export async function getFertilizersFromCatalogue(
 /**
  * Adds a new fertilizer to the catalogue.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param properties The properties of the fertilizer to add.
  * @returns A Promise that resolves when the fertilizer has been added.
  * @throws If adding the fertilizer fails.
@@ -106,23 +108,38 @@ export async function addFertilizerToCatalogue(
 /**
  * Adds a fertilizer application record to a farm.
  *
- * @param fdm The FDM instance.
+ * This function creates a new fertilizer application record by performing a transactional insertion into the
+ * fertilizers, fertilizerAcquiring, and fertilizerPicking tables. It verifies that the user has write permission
+ * on the specified farm before proceeding.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id The identifier of the user making the request.
  * @param p_id_catalogue The catalogue ID of the fertilizer.
- * @param b_id_farm The ID of the farm.
- * @param p_app_amount The amount of fertilizer applied.
- * @param p_acquiring_date The date the fertilizer was acquired.
- * @returns A Promise that resolves with the ID of the fertilizer application record.
+ * @param b_id_farm The ID of the farm where the fertilizer is applied.
+ * @param p_acquiring_amount The amount of fertilizer acquired.
+ * @param p_acquiring_date The date when the fertilizer was acquired.
+ * @returns A Promise resolving to the ID of the newly created fertilizer application record.
  * @throws If adding the fertilizer application record fails.
  * @alpha
  */
 export async function addFertilizer(
     fdm: FdmType,
+    principal_id: PrincipalId,
     p_id_catalogue: schema.fertilizersCatalogueTypeInsert["p_id_catalogue"],
     b_id_farm: schema.fertilizerAcquiringTypeInsert["b_id_farm"],
     p_acquiring_amount: schema.fertilizerAcquiringTypeInsert["p_acquiring_amount"],
     p_acquiring_date: schema.fertilizerAcquiringTypeInsert["p_acquiring_date"],
 ): Promise<schema.fertilizerAcquiringTypeInsert["p_id"]> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "addFertilizer",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the fertilizer
             const p_id = createId()
@@ -168,7 +185,7 @@ export async function addFertilizer(
 /**
  * Retrieves the details of a specific fertilizer.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param p_id The ID of the fertilizer.
  * @returns A Promise that resolves with the fertilizer details.
  * @throws If retrieving the fertilizer details fails or the fertilizer is not found.
@@ -247,18 +264,34 @@ export async function getFertilizer(
 }
 
 /**
- * Retrieves all fertilizer available for a given farm.
+ * Retrieves fertilizer details for a specified farm.
  *
- * @param fdm The FDM instance.
- * @param b_id_farm The ID of the farm.
- * @returns A Promise that resolves with an array of fertilizer IDs.
+ * This function verifies that the requesting principal has read access to the farm,
+ * then queries the database to return a list of fertilizers along with their catalogue
+ * and application details.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal making the request.
+ * @param b_id_farm - The ID of the farm for which the fertilizers are retrieved.
+ * @returns A promise that resolves with an array of fertilizer detail objects.
+ *
  * @alpha
  */
 export async function getFertilizers(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.fertilizerAcquiringTypeSelect["b_id_farm"],
 ): Promise<getFertilizerType[]> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getFertilizers",
+        )
+
         const fertilizers = await fdm
             .select({
                 p_id: schema.fertilizers.p_id,
@@ -362,17 +395,22 @@ export async function removeFertilizer(
 /**
  * Adds a fertilizer application record.
  *
- * @param fdm The FDM instance.
- * @param b_id The ID of the field.
- * @param p_id The ID of the fertilizer.
- * @param p_app_amount The amount of fertilizer applied.
- * @param p_app_method The method of fertilizer application.
- * @param p_app_date The date of fertilizer application.
- * @returns A Promise that resolves with the ID of the fertilizer application record.
- * @throws If adding the fertilizer application record fails.
+ * Validates that the specified field and fertilizer exist and that the principal has write permission on the field before inserting the application record.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal performing the operation.
+ * @param b_id - The ID of the field where the fertilizer application is recorded.
+ * @param p_id - The ID of the fertilizer to be applied.
+ * @param p_app_amount - The amount of fertilizer applied.
+ * @param p_app_method - The method used for applying the fertilizer.
+ * @param p_app_date - The date of the fertilizer application.
+ * @returns A Promise that resolves with the unique ID of the newly created fertilizer application record.
+ *
+ * @throws {Error} When the specified field or fertilizer does not exist or if the record insertion fails.
  */
 export async function addFertilizerApplication(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.fertilizerApplicationTypeInsert["b_id"],
     p_id: schema.fertilizerApplicationTypeInsert["p_id"],
     p_app_amount: schema.fertilizerApplicationTypeInsert["p_app_amount"],
@@ -380,6 +418,14 @@ export async function addFertilizerApplication(
     p_app_date: schema.fertilizerApplicationTypeInsert["p_app_date"],
 ): Promise<schema.fertilizerApplicationTypeInsert["p_app_id"]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            principal_id,
+            "addFertilizerApplication",
+        )
         // Validate that the field exists
         const fieldExists = await fdm
             .select()
@@ -424,36 +470,43 @@ export async function addFertilizerApplication(
 }
 
 /**
- * Updates a fertilizer application record.
+ * Updates an existing fertilizer application record.
  *
- * @param fdm The FDM instance.
- * @param p_app_id The ID of the fertilizer application record to update.
- * @param b_id The ID of the field.
- * @param p_id The ID of the fertilizer.
- * @param p_app_amount The amount of fertilizer applied.
- * @param p_app_method The method of fertilizer application.
- * @param p_app_date The date of fertilizer application.
- * @returns A Promise that resolves when the record has been updated.
- * @throws If updating the record fails.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal performing the update.
+ * @param p_app_id - The unique identifier of the fertilizer application record.
+ * @param p_id - The unique identifier of the associated fertilizer.
+ * @param p_app_amount - The amount of fertilizer applied.
+ * @param p_app_method - The method used for applying the fertilizer.
+ * @param p_app_date - The date when the fertilizer was applied.
+ *
+ * @throws {Error} Thrown if the update operation fails due to insufficient permissions or a database error.
  */
 export async function updateFertilizerApplication(
     fdm: FdmType,
+    principal_id: PrincipalId,
     p_app_id: schema.fertilizerApplicationTypeInsert["p_app_id"],
-    b_id: schema.fertilizerApplicationTypeInsert["b_id"],
     p_id: schema.fertilizerApplicationTypeInsert["p_id"],
     p_app_amount: schema.fertilizerApplicationTypeInsert["p_app_amount"],
     p_app_method: schema.fertilizerApplicationTypeInsert["p_app_method"],
     p_app_date: schema.fertilizerApplicationTypeInsert["p_app_date"],
 ): Promise<void> {
     try {
+        await checkPermission(
+            fdm,
+            "fertilizer_application",
+            "write",
+            p_app_id,
+            principal_id,
+            "updateFertilizerApplication",
+        )
         await fdm
             .update(schema.fertilizerApplication)
-            .set({ b_id, p_id, p_app_amount, p_app_method, p_app_date })
+            .set({ p_id, p_app_amount, p_app_method, p_app_date })
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
     } catch (err) {
         throw handleError(err, "Exception for updateFertilizerApplication", {
             p_app_id,
-            b_id,
             p_id,
             p_app_amount,
             p_app_method,
@@ -465,17 +518,31 @@ export async function updateFertilizerApplication(
 /**
  * Removes a fertilizer application record.
  *
- * @param fdm The FDM instance.
- * @param p_app_id The ID of the fertilizer application record to remove.
- * @returns A Promise that resolves when the record has been removed.
- * @throws If removing the record fails.
+ * This function verifies that the principal has write permissions before deleting the fertilizer
+ * application record identified by the given ID.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal performing the removal.
+ * @param p_app_id - The fertilizer application record's ID to remove.
+ *
+ * @throws {Error} If the removal operation fails.
  */
 export async function removeFertilizerApplication(
     fdm: FdmType,
+    principal_id: PrincipalId,
     p_app_id: schema.fertilizerApplicationTypeInsert["p_app_id"],
 ): Promise<void> {
     try {
-        await fdm
+        await checkPermission(
+            fdm,
+            "fertilizer_application",
+            "write",
+            p_app_id,
+            principal_id,
+            "removeFertilizerApplication",
+        )
+
+        return await fdm
             .delete(schema.fertilizerApplication)
             .where(eq(schema.fertilizerApplication.p_app_id, p_app_id))
     } catch (err) {
@@ -486,18 +553,33 @@ export async function removeFertilizerApplication(
 }
 
 /**
- * Retrieves a fertilizer application record.
+ * Retrieves a fertilizer application record by its unique identifier.
  *
- * @param fdm The FDM instance.
- * @param p_app_id The ID of the fertilizer application record to retrieve.
+ * Checks if the principal has read permission before querying the database for the fertilizer
+ * application record, including associated catalogue details. Returns the record if found,
+ * or null otherwise.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal retrieving the application.
+ * @param p_app_id - The unique ID of the fertilizer application record.
  * @returns A Promise that resolves with the fertilizer application record, or null if not found.
- * @throws If retrieving the record fails.
+ * @throws Error if the retrieval process fails.
  */
 export async function getFertilizerApplication(
     fdm: FdmType,
+    principal_id: PrincipalId,
     p_app_id: schema.fertilizerApplicationTypeSelect["p_app_id"],
 ): Promise<getFertilizerApplicationType | null> {
     try {
+        await checkPermission(
+            fdm,
+            "fertilizer_application",
+            "read",
+            p_app_id,
+            principal_id,
+            "getFertilizerApplication",
+        )
+
         const result = await fdm
             .select({
                 p_id: schema.fertilizerApplication.p_id,
@@ -534,19 +616,34 @@ export async function getFertilizerApplication(
 }
 
 /**
- * Retrieves all fertilizer applications for a given field
+ * Retrieves fertilizer application records for a specific field.
  *
- * @param fdm The FDM instance.
- * @param b_id The ID of the field.
- * @returns A Promise that resolves with an array of fertilizer application records.
- * @throws If retrieving the records fails.
+ * This function first ensures that the requesting principal has read permission for the specified field, then
+ * queries the database for fertilizer application records associated with that field. The returned records are
+ * ordered by application date in descending order.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal making the request.
+ * @param b_id - The identifier of the field.
+ * @returns A promise that resolves with an array of fertilizer application records.
+ * @throws {Error} If permission is denied or if an error occurs during record retrieval.
  */
 export async function getFertilizerApplications(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.fertilizerApplicationTypeSelect["b_id"],
 ): Promise<getFertilizerApplicationType[]> {
     try {
-        const fertilizerApplications = await fdm
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getFertilizerApplications",
+        )
+
+        return await fdm
             .select({
                 p_id: schema.fertilizerApplication.p_id,
                 p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
@@ -573,7 +670,6 @@ export async function getFertilizerApplications(
             )
             .where(eq(schema.fertilizerApplication.b_id, b_id))
             .orderBy(desc(schema.fertilizerApplication.p_app_date))
-        return fertilizerApplications
     } catch (err) {
         throw handleError(err, "Exception for getFertilizerApplications", {
             b_id,

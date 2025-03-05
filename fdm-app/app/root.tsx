@@ -11,6 +11,7 @@ import {
     ScrollRestoration,
     data,
     isRouteErrorResponse,
+    redirect,
     useLoaderData,
     useLocation,
 } from "react-router"
@@ -46,6 +47,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }
 }
 
+/**
+ * Renders the application layout with integrated toast notifications and error handling.
+ *
+ * This component retrieves loader data to display toast notifications for error, warning, success, and info types.
+ * It sets up the HTML document structure, including meta tags, links for stylesheets and fonts, and renders
+ * nested routes along with components for managing notifications, error boundaries, scroll restoration, and scripts.
+ *
+ * @returns The application's base layout as a React element.
+ */
 export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
@@ -55,8 +65,14 @@ export function Layout() {
         if (toast && toast.type === "error") {
             notify.error(toast.message)
         }
+        if (toast && toast.type === "warning") {
+            notify.warning(toast.message)
+        }
         if (toast && toast.type === "success") {
             notify.success(toast.message)
+        }
+        if (toast && toast.type === "info") {
+            notify.info(toast.message)
         }
     }, [toast])
 
@@ -86,13 +102,32 @@ export default function App() {
     return <Layout />
 }
 
+/**
+ * Renders an error boundary that handles and displays error information based on the provided error.
+ *
+ * This component distinguishes between route error responses and generic errors:
+ * - For route errors:
+ *   - Redirects to the signin page if the error status is 401.
+ *   - Renders a 404 error block for client errors with status 400, 403, or 404.
+ *   - Logs other route errors to the error tracking service and renders an error block reflecting the specific status.
+ * - For generic Error instances, it logs the error and renders a 500 error block with the error message and stack trace.
+ * - If the error is null, no error UI is rendered.
+ * - For any other cases, it logs the error and displays an error block with a 500 status and a generic message.
+ *
+ * @param error - The error encountered during route processing, either as a route error response or a generic Error.
+ */
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     const location = useLocation()
     const page = location.pathname
     const timestamp = new Date().toISOString()
 
     if (isRouteErrorResponse(error)) {
-        const clientErrors = [400, 401, 403, 404]
+        // Redirect to signin page if authentication is not provided
+        if (error.status === 401) {
+            redirect("./signin")
+        }
+
+        const clientErrors = [400, 403, 404]
         if (clientErrors.includes(error.status)) {
             return (
                 <ErrorBlock

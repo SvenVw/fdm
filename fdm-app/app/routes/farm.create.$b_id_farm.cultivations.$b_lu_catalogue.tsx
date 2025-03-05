@@ -1,4 +1,13 @@
 import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+} from "@/components/ui/pagination"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
+import { getCultivationPlan } from "@svenvw/fdm-core"
+import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
@@ -6,20 +15,6 @@ import {
     useLocation,
 } from "react-router"
 import { useLoaderData } from "react-router"
-
-// Components
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-} from "@/components/ui/pagination"
-
-import {
-    getCultivationPlan,
-    getCultivationsFromCatalogue,
-} from "@svenvw/fdm-core"
-// FDM
 import { fdm } from "../lib/fdm.server"
 
 // Meta
@@ -30,50 +25,63 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Loads cultivation details for a specific farm and catalogue.
+ *
+ * This function verifies that the route parameters include a valid farm ID and cultivation catalogue ID.
+ * It retrieves the user session and fetches the cultivation plan for the specified farm using the session's principal ID.
+ * The function then searches for the cultivation matching the provided catalogue ID and returns an object containing the farm ID,
+ * the catalogue ID, and the corresponding cultivation details.
+ *
+ * @throws {Response} When the required farm ID or cultivation catalogue ID is missing, or if the specified cultivation is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the cultivation
-    const b_lu_catalogue = params.b_lu_catalogue
-    if (!b_lu_catalogue) {
-        throw data("Cultivation catalogue ID is required", {
-            status: 400,
-            statusText: "Cultivation catalogue ID is required",
-        })
-    }
-
-    // Get the cultivation details for this cultivation
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm).catch(
-        (error) => {
-            throw data("Failed to fetch cultivation plan", {
-                status: 500,
-                statusText: error.message,
+    try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
             })
-        },
-    )
+        }
 
-    const cultivation = cultivationPlan.find(
-        (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
-    )
-    if (!cultivation) {
-        throw data("Cultivation not found", {
-            status: 404,
-            statusText: "Cultivation not found",
-        })
-    }
+        // Get the cultivation
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("Cultivation catalogue ID is required", {
+                status: 400,
+                statusText: "Cultivation catalogue ID is required",
+            })
+        }
 
-    return {
-        b_lu_catalogue: b_lu_catalogue,
-        b_id_farm: b_id_farm,
-        cultivation: cultivation,
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the cultivation details for this cultivation
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
+        const cultivation = cultivationPlan.find(
+            (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!cultivation) {
+            throw data("Cultivation not found", {
+                status: 404,
+                statusText: "Cultivation not found",
+            })
+        }
+
+        return {
+            b_lu_catalogue: b_lu_catalogue,
+            b_id_farm: b_id_farm,
+            cultivation: cultivation,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 

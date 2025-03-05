@@ -25,6 +25,8 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import {
     addCultivation,
     addField,
@@ -58,34 +60,50 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Retrieves farm details and map configurations for rendering the farm map.
+ *
+ * This loader function extracts the farm ID from route parameters, validates its presence, and uses the current session to fetch the corresponding farm details. It then retrieves the Mapbox token and style configuration, and returns these along with the farm's display name and a URL for available fields. Any errors encountered during processing are transformed using {@link handleLoaderError}.
+ *
+ * @throws {Response} When the farm ID is missing, the specified farm is not found, or another error occurs during data retrieval.
+ *
+ * @returns An object containing the farm name, Mapbox token, Mapbox style, and the URL for available fields.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id and name of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-    const farm = await getFarm(fdm, b_id_farm)
+    try {
+        // Get the Id and name of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    if (!farm) {
-        throw data("Farm not found", {
-            status: 404,
-            statusText: "Farm not found",
-        })
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Get the Mapbox token and style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
-    return {
-        b_name_farm: farm.b_name_farm,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
-        fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
+        if (!farm) {
+            throw data("Farm not found", {
+                status: 404,
+                statusText: "Farm not found",
+            })
+        }
+
+        // Get the Mapbox token and style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
+
+        return {
+            b_name_farm: farm.b_name_farm,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+            fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -216,57 +234,52 @@ export default function Index() {
     )
 }
 
-// Action
+/**
+ * Processes form submission for adding fields to a farm.
+ *
+ * This action extracts selected fields from the incoming form data, validates the presence
+ * of the farm identifier, and establishes the user session. It adds each field to the specified farm,
+ * creates the corresponding cultivation entry, and conditionally performs soil analysis if an API key is present.
+ * Upon successful processing, it redirects to the farm fields page with a success message.
+ *
+ * @returns A redirect response to the farm fields page with a success message.
+ *
+ * @throws {Error} If the farm identifier is missing or if an operation (such as adding a field, cultivation,
+ * or soil analysis) fails.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
-    const formData = await request.formData()
-    const b_id_farm = params.b_id_farm
+    try {
+        const formData = await request.formData()
+        const b_id_farm = params.b_id_farm
 
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-    const selectedFields = JSON.parse(String(formData.get("selected_fields")))
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
 
-    // Add fields to farm
-    await Promise.all(
-        selectedFields.features.map(async (field, index: number) => {
-            const b_name = `Perceel ${index + 1}`
-            const b_id_source = field.properties.b_id_source
-            const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
-            const b_geometry = field.geometry
-            const currentYear = new Date().getFullYear()
-            const defaultDate = new Date(currentYear, 0, 1)
-            const b_acquiring_date = defaultDate
-            const b_date_sowing = defaultDate
-            const b_terminating_date = undefined
-            const b_acquiring_method = "unknown"
+        // Get the session
+        const session = await getSession(request)
 
-            // Validate dates
-            if (
-                new Date(b_acquiring_date) > new Date() ||
-                new Date(b_date_sowing) > new Date()
-            ) {
-                throw data("Future dates are not allowed", {
-                    status: 400,
-                    statusText: "Future dates are not allowed",
-                })
-            }
-            if (new Date(b_date_sowing) < new Date(b_acquiring_date)) {
-                throw data(
-                    "Sowing should happen after field started to be managed",
-                    {
-                        status: 400,
-                        statusText:
-                            "Sowing should happen after field started to be managed",
-                    },
-                )
-            }
+        const selectedFields = JSON.parse(
+            String(formData.get("selected_fields")),
+        )
 
-            try {
+        // Add fields to farm
+        await Promise.all(
+            selectedFields.features.map(async (field, index: number) => {
+                const b_name = `Perceel ${index + 1}`
+                const b_id_source = field.properties.b_id_source
+                const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
+                const b_geometry = field.geometry
+                const currentYear = new Date().getFullYear()
+                const defaultDate = new Date(currentYear, 0, 1)
+                const b_acquiring_date = defaultDate
+                const b_date_sowing = defaultDate
+                const b_terminating_date = undefined
+                const b_acquiring_method = "unknown"
+
                 const b_id = await addField(
                     fdm,
+                    session.principal_id,
                     b_id_farm,
                     b_name,
                     b_id_source,
@@ -277,6 +290,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 )
                 await addCultivation(
                     fdm,
+                    session.principal_id,
                     b_lu_catalogue,
                     b_id,
                     b_date_sowing,
@@ -315,6 +329,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
                     await addSoilAnalysis(
                         fdm,
+                        session.principal_id,
                         defaultDate,
                         "NMI",
                         b_id,
@@ -331,17 +346,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 }
 
                 return b_id
-            } catch (error) {
-                console.error(`Failed to process field ${b_name}:`, error)
-                throw data(`Failed to add field ${b_name}: ${error.message}`, {
-                    status: 500,
-                    statusText: `Failed to add field ${b_name}`,
-                })
-            }
-        }),
-    )
+            }),
+        )
 
-    return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
-        message: "Percelen zijn toegevoegd! 🎉",
-    })
+        return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
+            message: "Percelen zijn toegevoegd! 🎉",
+        })
+    } catch (error) {
+        throw handleActionError(error)
+    }
 }

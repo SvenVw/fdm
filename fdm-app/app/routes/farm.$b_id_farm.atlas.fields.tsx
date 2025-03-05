@@ -14,55 +14,85 @@ import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
 import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 
+/**
+ * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.
+ *
+ * This loader function extracts the farm ID from the route parameters and validates its presence,
+ * retrieves the current user session, and fetches fields associated with the specified farm.
+ * It converts these fields into a GeoJSON FeatureCollection—rounding the field area values for precision—
+ * and obtains the Mapbox access token and style configuration for map rendering.
+ *
+ * @returns An object containing:
+ *  - savedFields: A GeoJSON FeatureCollection of the farm fields.
+ *  - mapboxToken: The Mapbox access token.
+ *  - mapboxStyle: The Mapbox style configuration.
+ *
+ * @throws {Response} If the farm ID is missing or if an error occurs during data retrieval and processing.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the fields of the farm
-    const fields = await getFields(fdm, b_id_farm)
-    const features = fields.map((field) => {
-        const feature = {
-            type: "Feature",
-            properties: {
-                b_id: field.b_id,
-                b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
-                b_lu_name: field.b_lu_name,
-                b_id_source: field.b_id_source,
-            },
-            geometry: field.b_geometry,
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
-        return feature
-    })
 
-    const featureCollection: FeatureCollection = {
-        type: "FeatureCollection",
-        features: features,
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Get the Mapbox token and style
-    const mapboxToken = getMapboxToken()
-    const mapboxStyle = getMapboxStyle()
+        // Get the fields of the farm
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const features = fields.map((field) => {
+            const feature = {
+                type: "Feature",
+                properties: {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_lu_name: field.b_lu_name,
+                    b_id_source: field.b_id_source,
+                },
+                geometry: field.b_geometry,
+            }
+            return feature
+        })
 
-    // Return user information from loader
-    return {
-        savedFields: featureCollection,
-        mapboxToken: mapboxToken,
-        mapboxStyle: mapboxStyle,
+        const featureCollection: FeatureCollection = {
+            type: "FeatureCollection",
+            features: features,
+        }
+
+        // Get the Mapbox token and style
+        const mapboxToken = getMapboxToken()
+        const mapboxStyle = getMapboxStyle()
+
+        // Return user information from loader
+        return {
+            savedFields: featureCollection,
+            mapboxToken: mapboxToken,
+            mapboxStyle: mapboxStyle,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
+/**
+ * Renders a Mapbox map displaying farm fields with interactive controls.
+ *
+ * This component consumes preloaded farm field data to compute the map's view state and stylize the field boundaries. 
+ * It integrates geolocation and navigation controls, wraps the field layer in a non-interactive source, and includes a panel for displaying additional field details on hover.
+ */
 export default function FarmAtlasFieldsBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

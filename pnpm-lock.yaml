@@ -12,6 +12,9 @@ catalogs:
     '@vitest/coverage-v8':
       specifier: 3.0.6
       version: 3.0.6
+    better-auth:
+      specifier: ^1.1.21
+      version: 1.1.21
     drizzle-kit:
       specifier: ^0.30.4
       version: 0.30.4
@@ -116,7 +119,7 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0
       better-auth:
-        specifier: ^1.1.21
+        specifier: 'catalog:'
         version: 1.1.21
       class-variance-authority:
         specifier: ^0.7.1
@@ -236,9 +239,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.20(postcss@8.5.3)
-      drizzle-kit:
-        specifier: 'catalog:'
-        version: 0.30.4
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.39.2(@electric-sql/pglite@0.2.17)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@18.3.18)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
@@ -299,6 +299,9 @@ importers:
       '@types/geojson':
         specifier: ^7946.0.16
         version: 7946.0.16
+      better-auth:
+        specifier: 'catalog:'
+        version: 1.1.21
       drizzle-orm:
         specifier: 'catalog:'
         version: 0.39.2(@electric-sql/pglite@0.2.17)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@19.0.10)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
@@ -13732,7 +13735,7 @@ snapshots:
   '@types/react-router@5.1.20':
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 19.0.10
+      '@types/react': 18.3.18
 
   '@types/react@18.3.18':
     dependencies:

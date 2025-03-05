@@ -1,27 +1,33 @@
 import { desc, eq } from "drizzle-orm"
 import { createId } from "./id"
-
+import { checkPermission } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { getSoilAnalysisType } from "./soil.d"
 
 /**
- * Adds a new soil analysis record, including soil sampling details.
+ * Adds a new soil analysis record along with its soil sampling details.
  *
- * @param fdm The FDM database instance.
- * @param a_date The date of the soil analysis.
- * @param a_source The source of the soil analysis data.
- * @param b_id The ID of the field where the soil sample was taken.
- * @param b_depth The depth of the soil sample.
- * @param b_sampling_date The date the soil sample was taken.
- * @param b_sampling_geometry The geometry of the sampling location (e.g., point, multipoint).
- * @param soilAnalysisData Additional soil analysis data (e.g., pH, nutrient levels).
+ * This function verifies that the principal has write access to the specified field, then creates new entries
+ * in the soil analysis and soil sampling tables within a database transaction. The ID of the newly created soil
+ * analysis record is returned.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal performing the operation.
+ * @param a_date - The date when the soil analysis was performed.
+ * @param a_source - The source of the soil analysis data.
+ * @param b_id - The identifier of the field where the soil sample was collected.
+ * @param b_depth - The depth at which the soil sample was taken.
+ * @param b_sampling_date - The date when the soil sample was collected.
+ * @param soilAnalysisData - Optional additional data for the soil analysis (e.g., pH, nutrient levels).
  * @returns The ID of the newly added soil analysis record.
- * @throws If there's an error during the database transaction.
+ * @throws {Error} If the database transaction fails.
  */
 export async function addSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     a_date: schema.soilAnalysisTypeInsert["a_date"],
     a_source: schema.soilAnalysisTypeInsert["a_source"],
     b_id: schema.soilSamplingTypeInsert["b_id"],
@@ -31,6 +37,15 @@ export async function addSoilAnalysis(
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<schema.soilAnalysisTypeSelect["a_id"]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            principal_id,
+            "addSoilAnalysis",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             const a_id = createId()
             const b_id_sampling = createId()
@@ -68,19 +83,34 @@ export async function addSoilAnalysis(
 }
 
 /**
- * Updates an existing soil analysis record.
+ * Updates an existing soil analysis record and the related soil sampling timestamp.
  *
- * @param fdm The FDM database instance.
- * @param a_id The ID of the soil analysis record to update.
- * @param soilAnalysisData The data to update.  Partial updates are supported.
- * @throws If there's an error during the database transaction.
+ * This function first verifies whether the principal has write permission for the specified soil
+ * analysis record. It then executes a transaction to update the soil analysis entry with the provided
+ * changes and refreshes the corresponding soil sampling record's update timestamp.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - Identifier of the principal performing the update.
+ * @param a_id - The unique identifier of the soil analysis record to update.
+ * @param soilAnalysisData - Object containing the fields to update; supports partial updates.
+ * @throws {Error} If the database transaction fails or the permission check does not pass.
  */
 export async function updateSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
     soilAnalysisData: Partial<schema.soilAnalysisTypeInsert>,
 ): Promise<void> {
     try {
+        await checkPermission(
+            fdm,
+            "soil_analysis",
+            "write",
+            a_id,
+            principal_id,
+            "updateSoilAnalysis",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             const updated = new Date()
 
@@ -95,7 +125,7 @@ export async function updateSoilAnalysis(
                 .where(eq(schema.soilSampling.a_id, a_id))
         })
     } catch (err) {
-        handleError(err, "Exception for updateSoilAnalysis", {
+        throw handleError(err, "Exception for updateSoilAnalysis", {
             a_id,
             ...soilAnalysisData,
         })
@@ -103,17 +133,31 @@ export async function updateSoilAnalysis(
 }
 
 /**
- * Removes a soil analysis record and associated sampling data.
+ * Removes a soil analysis record and its associated sampling data.
  *
- * @param fdm The FDM database instance.
- * @param a_id The ID of the soil analysis record to remove.
- * @throws If there's an error during the database transaction.
+ * Verifies that the principal has write permissions, then executes a transaction to delete
+ * the corresponding entries from both the soil sampling and soil analysis tables.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal performing the removal.
+ * @param a_id - The ID of the soil analysis record to remove.
+ *
+ * @throws {Error} If the operation fails due to permission issues or database errors.
  */
 export async function removeSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
 ): Promise<void> {
     try {
+        await checkPermission(
+            fdm,
+            "soil_analysis",
+            "write",
+            a_id,
+            principal_id,
+            "removeSoilAnalysis",
+        )
         return await fdm.transaction(async (tx: FdmType) => {
             await tx
                 .delete(schema.soilSampling)
@@ -129,17 +173,30 @@ export async function removeSoilAnalysis(
 }
 
 /**
- * Retrieves the latest soil analysis for a given field.
+ * Retrieves the most recent soil analysis record for a specified field.
  *
- * @param fdm The FDM database instance.
- * @param b_id The ID of the field.
- * @returns The latest soil analysis data for the field, or null if no analysis is found.
+ * This function validates that the requesting principal has the necessary read permissions for the field before querying for the latest soil analysis data based on the creation timestamp.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The unique ID of the principal requesting the soil analysis.
+ * @param b_id - The identifier of the field.
+ * @returns The latest soil analysis record for the field, or null if no record exists.
+ * @throws {Error} If an error occurs during permission verification or data retrieval.
  */
 export async function getSoilAnalysis(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getSoilAnalysis",
+        )
         const soilAnalysis = await fdm
             .select({
                 a_id: schema.soilAnalysis.a_id,
@@ -171,17 +228,30 @@ export async function getSoilAnalysis(
 }
 
 /**
- * Retrieves all soil analyses for a given field, ordered by date (latest first).
+ * Retrieves all soil analysis records for a specified field, sorted by sampling date in descending order.
  *
- * @param fdm The FDM database instance.
- * @param b_id The ID of the field.
- * @returns An array of soil analysis data for the field. The array will be empty if no analyses are found.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal requesting the data.
+ * @param b_id - The identifier of the field.
+ * @returns An array of soil analysis records with corresponding soil sampling details. Returns an empty array if no records are found.
+ *
+ * @throws {Error} If the principal lacks read permissions for the field or if the database query fails.
  */
 export async function getSoilAnalyses(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType[]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getSoilAnalyses",
+        )
+
         const soilAnalyses = await fdm
             .select({
                 a_id: schema.soilAnalysis.a_id,

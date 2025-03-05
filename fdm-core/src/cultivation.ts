@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, isNotNull, or } from "drizzle-orm"
-
+import { checkPermission } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
 import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
@@ -14,7 +15,7 @@ import { createId } from "./id"
 /**
  * Retrieves cultivations available in the catalogue.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @returns A Promise that resolves with an array of cultivation catalogue entries.
  * @alpha
  */
@@ -31,7 +32,7 @@ export async function getCultivationsFromCatalogue(
 /**
  * Adds a new cultivation to the catalogue.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param properties The properties of the cultivation to add.
  * @returns A Promise that resolves when the cultivation is added.
  * @throws If the insertion fails.
@@ -78,25 +79,38 @@ export async function addCultivationToCatalogue(
 }
 
 /**
- * Adds a cultivation to a field.
+ * Adds a new cultivation to a specific field.
  *
- * @param fdm The FDM instance.
- * @param b_lu_catalogue The catalogue ID of the cultivation.
- * @param b_id The ID of the field.
- * @param b_sowing_date The sowing date of the cultivation.
- * @param b_terminating_date The termination date of the cultivation.
- * @returns A Promise that resolves with the ID of the new cultivation.
- * @throws If the field does not exist or if the insertion fails.
+ * The function validates that the sowing and (if provided) termination dates are valid Date objects and that the termination date is after the sowing date. It ensures the target field and cultivation catalogue entry exist and that no duplicate cultivation is recorded. A permission check is performed before any database operations. If a termination date is provided for a cultivation that is harvestable only once, a harvest record is automatically scheduled for the termination date.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal performing the operation.
+ * @param b_lu_catalogue - The catalogue ID corresponding to the cultivation entry.
+ * @param b_id - The identifier of the field to which the cultivation is added.
+ * @param b_sowing_date - The sowing date of the cultivation.
+ * @param b_terminating_date - The optional termination date of the cultivation.
+ * @returns A promise that resolves with the unique ID of the newly added cultivation.
+ * @throws {Error} If the sowing date is invalid, the termination date is invalid or not after the sowing date, the field or catalogue entry does not exist, or a duplicate cultivation is detected.
  * @alpha
  */
 export async function addCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu_catalogue: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_id: schema.fieldSowingTypeInsert["b_id"],
     b_sowing_date: schema.fieldSowingTypeInsert["b_sowing_date"],
     b_terminating_date?: schema.cultivationTerminatingTypeInsert["b_terminating_date"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            principal_id,
+            "addCultivation",
+        )
+
         return await fdm.transaction(async (tx: FdmType) => {
             // Generate an ID for the cultivation
             const b_lu = createId()
@@ -203,6 +217,7 @@ export async function addCultivation(
                     // If cultivation can only be harvested once, add harvest on terminate date
                     await addHarvest(
                         tx,
+                        principal_id,
                         b_lu,
                         b_terminating_date,
                         undefined,
@@ -227,18 +242,31 @@ export async function addCultivation(
 }
 
 /**
- * Retrieves the details of a specific cultivation.
+ * Retrieves details of a specific cultivation after verifying access permissions.
  *
- * @param fdm The FDM instance.
- * @param b_lu The ID of the cultivation.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal requesting access.
+ * @param b_lu - The unique identifier of the cultivation.
  * @returns A promise that resolves with the cultivation details.
- * @throws If the cultivation does not exist.
+ * @throws {Error} If no cultivation matches the provided identifier.
+ *
+ * @remark A permission check is performed to ensure the requesting principal has read access.
  */
 export async function getCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
 ): Promise<getCultivationType> {
     try {
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "read",
+            b_lu,
+            principal_id,
+            "getCultivation",
+        )
+
         // Get properties of the requested cultivation
         const cultivation = await fdm
             .select({
@@ -288,18 +316,34 @@ export async function getCultivation(
 }
 
 /**
- * Retrieves all cultivations for a given field.
+ * Retrieves all cultivations associated with a specific field.
  *
- * @param fdm The FDM instance.
- * @param b_id The ID of the field.
- * @returns A Promise that resolves with an array of cultivation details.
+ * This function verifies that the requesting principal has read access to the field, then queries the database
+ * and returns an array of cultivation records.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - Identifier of the principal requesting access.
+ * @param b_id - Identifier of the field.
+ * @returns A Promise resolving to an array of cultivation details.
+ *
+ * @throws {Error} If the principal does not have read permission or if the database query fails.
+ *
  * @alpha
  */
 export async function getCultivations(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id: schema.fieldSowingTypeSelect["b_id"],
 ): Promise<getCultivationType[]> {
     try {
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getCultivations",
+        )
         const cultivations = await fdm
             .select({
                 b_lu: schema.cultivations.b_lu,
@@ -346,71 +390,96 @@ export async function getCultivations(
 }
 
 /**
- * Retrieves a cultivation plan for a specific farm.
+ * Retrieves a comprehensive cultivation plan for a specified farm.
  *
- * The cultivation plan is an array of objects, where each object represents a unique cultivation
- * identified by its `b_lu_catalogue`. Each cultivation object also contains a `fields` array,
- * listing the fields associated with that specific cultivation. Within each field object, there's
- * a `fertilizer_applications` array detailing the fertilizers applied to that field.
+ * This function aggregates cultivation data from multiple related tables and returns an array of cultivation
+ * entries. Each entry includes the catalogue identifier, its name, sowing and termination dates (if available),
+ * and an array of fields on which the cultivation was applied. Each field entry details associated fertilizer
+ * applications and harvest records (with accompanying analyses).
  *
- * @param fdm The FDM instance.
- * @param b_id_farm The ID of the farm for which to retrieve the cultivation plan.
- * @returns A Promise that resolves with an array representing the cultivation plan.
- *          Each element in the array is an object with the following structure:
- *          ```
- *          {
- *              b_lu_catalogue: string;  // Unique ID of the cultivation catalogue item
- *              b_lu_name: string;      // Name of the cultivation
- *              fields: {               // Array of fields associated with this cultivation
- *                  b_lu: string;          // Unique ID of the cultivation
- *                  b_id: string;          // Unique ID of the field
- *                  b_name: string;        // Name of the field
- *                  fertilizer_applications: { // Array of fertilizer applications on this field
- *                      p_id_catalogue: string; // Fertilizer catalogue ID
- *                      p_name_nl: string;    // Fertilizer name (Dutch)
- *                      p_app_amount: number;  // Amount applied
- *                      p_app_method: string;  // Application method
- *                      p_app_date: Date;     // Application date
- *                      p_app_id: string;      // Unique ID of the application
- *                  }[]
- *                  harvests: { Array of harvests for this field
- *                      b_id_harvesting: string; // Unique ID of the harvest
- *                      b_harvesting_date: Date; // Harvest date
- *                      harvestables: {        // Array of harvestables associated with this harvest.  Currently, only one harvestable per harvest is supported.
- *                          b_id_harvestable: string; // Unique ID of the harvestable
- *                          harvestable_analyses: {  // Analyses of the harvestable. Currently, only one analysis per harvestable is supported.
- *                              b_lu_yield: number;      // Yield in kg/ha
- *                              b_lu_n_harvestable: number; // N content in harvestable yield (g N/kg)
- *                              b_lu_n_residue: number;   // N content in residue (g N/kg)
- *                              b_lu_p_harvestable: number; // P content in harvestable yield (g P2O5/kg)
- *                              b_lu_p_residue: number;   // P content in residue (g P2O5/kg)
- *                              b_lu_k_harvestable: number; // K content in harvestable yield (g K2O/kg)
- *                              b_lu_k_residue: number;   // K content in residue (g K2O/kg)
- *                          }[];
- *                  }[]
- *              }[];
- *          }
- *          ```
- *          Returns an empty array if no cultivations are found for the specified farm.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal requesting access to the cultivation plan.
+ * @param b_id_farm - The unique ID of the farm for which the cultivation plan is to be retrieved.
+ * @returns A Promise that resolves to an array representing the cultivation plan. Each element in the array has the following structure:
+ *
+ * ```
+ * {
+ *   b_lu_catalogue: string;   // Unique ID of the cultivation catalogue item
+ *   b_lu_name: string;        // Name of the cultivation
+ *   b_sowing_date: Date;      // Sowing date for the cultivation (if available)
+ *   b_terminating_date: Date; // Termination date for the cultivation (if available)
+ *   fields: [
+ *     {
+ *       b_lu: string;        // Unique ID of the cultivation record
+ *       b_id: string;        // Unique ID of the field
+ *       b_name: string;      // Name of the field
+ *       fertilizer_applications: [
+ *         {
+ *           p_id_catalogue: string; // Fertilizer catalogue ID
+ *           p_name_nl: string;      // Fertilizer name (Dutch)
+ *           p_app_amount: number;   // Amount applied
+ *           p_app_method: string;   // Application method
+ *           p_app_date: Date;       // Application date
+ *           p_app_id: string;       // Unique ID of the fertilizer application
+ *         }
+ *       ],
+ *       harvests: [
+ *         {
+ *           b_id_harvesting: string;  // Unique ID of the harvest record
+ *           b_harvesting_date: Date;  // Harvest date
+ *           harvestables: [
+ *             {
+ *               b_id_harvestable: string; // Unique ID of the harvestable
+ *               harvestable_analyses: [
+ *                 {
+ *                   b_lu_yield: number;         // Yield in kg/ha
+ *                   b_lu_n_harvestable: number;   // N content in harvestable yield (g N/kg)
+ *                   b_lu_n_residue: number;       // N content in residue (g N/kg)
+ *                   b_lu_p_harvestable: number;   // P content in harvestable yield (g P2O5/kg)
+ *                   b_lu_p_residue: number;       // P content in residue (g P2O5/kg)
+ *                   b_lu_k_harvestable: number;   // K content in harvestable yield (g K2O/kg)
+ *                   b_lu_k_residue: number;       // K content in residue (g K2O/kg)
+ *                 }
+ *               ]
+ *             }
+ *           ]
+ *         }
+ *       ]
+ *     }
+ *   ]
+ * }
+ * ```
+ * If no cultivations are found for the specified farm, an empty array is returned.
+ *
  * @example
  * ```typescript
- * const cultivationPlan = await getCultivationPlan(fdm, 'farm123');
- * if (cultivationPlan.length > 0) {
+ * const cultivationPlan = await getCultivationPlan(fdm, 'principal123', 'farm123');
+ * if (cultivationPlan.length) {
  *   console.log("Cultivation Plan:", cultivationPlan);
  * } else {
  *   console.log("No cultivations found for this farm.");
  * }
  * ```
+ *
  * @alpha
  */
 export async function getCultivationPlan(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<cultivationPlanType[]> {
     try {
         if (!b_id_farm) {
             throw new Error("Farm ID is required")
         }
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getCultivationPlan",
+        )
 
         const cultivations = await fdm
             .select({
@@ -610,20 +679,36 @@ export async function getCultivationPlan(
 }
 
 /**
- * Removes a cultivation from a field.
+ * Removes a cultivation and its related sowing and termination records from the database.
  *
- * @param fdm The FDM instance.
- * @param b_lu The ID of the cultivation to remove.
- * @returns A Promise that resolves when the cultivation is removed.
- * @throws If the deletion fails.
+ * The function first verifies that the principal has permission to perform the removal, then executes a transaction that
+ * deletes the cultivation's termination, sowing, and main records. An error is thrown if the cultivation does not exist
+ * or if the deletion fails.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param b_lu - The unique identifier of the cultivation to remove.
+ *
+ * @returns A Promise that resolves once the removal is complete.
+ *
+ * @throws {Error} If the cultivation is not found or the deletion operation fails.
+ *
  * @alpha
  */
 export async function removeCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeInsert["b_lu"],
 ): Promise<void> {
-    return await fdm.transaction(async (tx: FdmType) => {
-        try {
+    try {
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            principal_id,
+            "removeCultivation",
+        )
+        return await fdm.transaction(async (tx: FdmType) => {
             const existing = await tx
                 .select()
                 .from(schema.cultivations)
@@ -645,26 +730,32 @@ export async function removeCultivation(
             await tx
                 .delete(schema.cultivations)
                 .where(eq(schema.cultivations.b_lu, b_lu))
-        } catch (err) {
-            handleError(err, "Exception for removeCultivation", { b_lu })
-        }
-    })
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for removeCultivation", { b_lu })
+    }
 }
 
 /**
- * Updates an existing cultivation.
+ * Updates the specified cultivation's details.
  *
- * @param fdm The FDM instance.
- * @param b_lu The ID of the cultivation to update.
- * @param b_lu_catalogue? The catalogue ID of the cultivation.
- * @param b_sowing_date? The sowing date of the cultivation.
- * @param b_terminating_date? The termination date of the cultivation
- * @returns A Promise that resolves when the cultivation is updated.
- * @throws If the update fails.
+ * Performs permission checks and validates that the new dates are logically consistent and that the referenced cultivation and catalogue entries exist. Depending on the inputs, it updates the main cultivation record along with its related sowing, termination, and, if applicable, harvest records.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The ID of the principal authorized to perform this update.
+ * @param b_lu - The unique cultivation identifier.
+ * @param b_lu_catalogue - (Optional) The new catalogue ID; if provided, it must correspond to an existing catalogue entry.
+ * @param b_sowing_date - (Optional) The updated sowing date; when provided with a termination date, it must precede it.
+ * @param b_terminating_date - (Optional) The updated termination date; if provided, it must be later than the sowing date.
+ * @returns A Promise that resolves upon successful completion of the update.
+ *
+ * @throws {Error} If the cultivation does not exist, if date validations fail, or if the update operation encounters an issue.
+ *
  * @alpha
  */
 export async function updateCultivation(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
     b_lu_catalogue?: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_sowing_date?: schema.fieldSowingTypeInsert["b_sowing_date"],
@@ -672,6 +763,15 @@ export async function updateCultivation(
 ): Promise<void> {
     try {
         const updated = new Date()
+
+        await checkPermission(
+            fdm,
+            "cultivation",
+            "write",
+            b_lu,
+            principal_id,
+            "updateCultivation",
+        )
 
         if (
             b_sowing_date &&
@@ -796,7 +896,7 @@ export async function updateCultivation(
                 )
                 if (harvestableType === "once") {
                     // If harvestable type is "once", add harvest on terminate date
-                    const harvests = await getHarvests(tx, b_lu)
+                    const harvests = await getHarvests(tx, principal_id, b_lu)
                     if (harvests.length > 0) {
                         await tx
                             .update(schema.cultivationHarvesting)
@@ -814,6 +914,7 @@ export async function updateCultivation(
                     } else {
                         await addHarvest(
                             tx,
+                            principal_id,
                             b_lu,
                             b_terminating_date,
                             undefined,

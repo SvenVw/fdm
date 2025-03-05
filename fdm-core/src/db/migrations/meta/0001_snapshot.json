@@ -1,12 +1,12 @@
 {
-    "id": "4c31f47f-c9d4-4fed-aee0-ff1cf2106fdb",
+    "id": "d5c3fa50-3e94-4638-987b-db6d55924f1e",
     "prevId": "a835be94-9cd8-4b1f-88c0-749e8bd36b22",
     "version": "7",
     "dialect": "postgresql",
     "tables": {
-        "fdm-dev.cultivation_harvesting": {
+        "fdm.cultivation_harvesting": {
             "name": "cultivation_harvesting",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_harvesting": {
                     "name": "b_id_harvesting",
@@ -52,7 +52,7 @@
                     "name": "cultivation_harvesting_b_id_harvestable_harvestables_b_id_harvestable_fk",
                     "tableFrom": "cultivation_harvesting",
                     "tableTo": "harvestables",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id_harvestable"],
                     "columnsTo": ["b_id_harvestable"],
                     "onDelete": "no action",
@@ -62,7 +62,7 @@
                     "name": "cultivation_harvesting_b_lu_cultivations_b_lu_fk",
                     "tableFrom": "cultivation_harvesting",
                     "tableTo": "cultivations",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_lu"],
                     "columnsTo": ["b_lu"],
                     "onDelete": "no action",
@@ -75,9 +75,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.cultivation_terminating": {
+        "fdm.cultivation_terminating": {
             "name": "cultivation_terminating",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_lu": {
                     "name": "b_lu",
@@ -111,7 +111,7 @@
                     "name": "cultivation_terminating_b_lu_cultivations_b_lu_fk",
                     "tableFrom": "cultivation_terminating",
                     "tableTo": "cultivations",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_lu"],
                     "columnsTo": ["b_lu"],
                     "onDelete": "no action",
@@ -124,9 +124,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.cultivations": {
+        "fdm.cultivations": {
             "name": "cultivations",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_lu": {
                     "name": "b_lu",
@@ -176,7 +176,7 @@
                     "name": "cultivations_b_lu_catalogue_cultivations_catalogue_b_lu_catalogue_fk",
                     "tableFrom": "cultivations",
                     "tableTo": "cultivations_catalogue",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_lu_catalogue"],
                     "columnsTo": ["b_lu_catalogue"],
                     "onDelete": "no action",
@@ -189,9 +189,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.cultivations_catalogue": {
+        "fdm.cultivations_catalogue": {
             "name": "cultivations_catalogue",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_lu_catalogue": {
                     "name": "b_lu_catalogue",
@@ -220,7 +220,7 @@
                 "b_lu_harvestable": {
                     "name": "b_lu_harvestable",
                     "type": "b_lu_harvestable",
-                    "typeSchema": "fdm-dev",
+                    "typeSchema": "fdm",
                     "primaryKey": false,
                     "notNull": true
                 },
@@ -274,9 +274,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.farms": {
+        "fdm.farms": {
             "name": "farms",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_farm": {
                     "name": "b_id_farm",
@@ -346,9 +346,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.fertilizer_acquiring": {
+        "fdm.fertilizer_acquiring": {
             "name": "fertilizer_acquiring",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_farm": {
                     "name": "b_id_farm",
@@ -394,7 +394,7 @@
                     "name": "fertilizer_acquiring_b_id_farm_farms_b_id_farm_fk",
                     "tableFrom": "fertilizer_acquiring",
                     "tableTo": "farms",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id_farm"],
                     "columnsTo": ["b_id_farm"],
                     "onDelete": "no action",
@@ -404,7 +404,7 @@
                     "name": "fertilizer_acquiring_p_id_fertilizers_p_id_fk",
                     "tableFrom": "fertilizer_acquiring",
                     "tableTo": "fertilizers",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["p_id"],
                     "columnsTo": ["p_id"],
                     "onDelete": "no action",
@@ -417,9 +417,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.fertilizer_applying": {
+        "fdm.fertilizer_applying": {
             "name": "fertilizer_applying",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "p_app_id": {
                     "name": "p_app_id",
@@ -448,7 +448,7 @@
                 "p_app_method": {
                     "name": "p_app_method",
                     "type": "p_app_method",
-                    "typeSchema": "fdm-dev",
+                    "typeSchema": "fdm",
                     "primaryKey": false,
                     "notNull": false
                 },
@@ -494,7 +494,7 @@
                     "name": "fertilizer_applying_b_id_fields_b_id_fk",
                     "tableFrom": "fertilizer_applying",
                     "tableTo": "fields",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id"],
                     "columnsTo": ["b_id"],
                     "onDelete": "no action",
@@ -504,7 +504,7 @@
                     "name": "fertilizer_applying_p_id_fertilizers_p_id_fk",
                     "tableFrom": "fertilizer_applying",
                     "tableTo": "fertilizers",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["p_id"],
                     "columnsTo": ["p_id"],
                     "onDelete": "no action",
@@ -517,9 +517,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.fertilizer_picking": {
+        "fdm.fertilizer_picking": {
             "name": "fertilizer_picking",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "p_id": {
                     "name": "p_id",
@@ -559,7 +559,7 @@
                     "name": "fertilizer_picking_p_id_fertilizers_p_id_fk",
                     "tableFrom": "fertilizer_picking",
                     "tableTo": "fertilizers",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["p_id"],
                     "columnsTo": ["p_id"],
                     "onDelete": "no action",
@@ -569,7 +569,7 @@
                     "name": "fertilizer_picking_p_id_catalogue_fertilizers_catalogue_p_id_catalogue_fk",
                     "tableFrom": "fertilizer_picking",
                     "tableTo": "fertilizers_catalogue",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["p_id_catalogue"],
                     "columnsTo": ["p_id_catalogue"],
                     "onDelete": "no action",
@@ -582,9 +582,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.fertilizers": {
+        "fdm.fertilizers": {
             "name": "fertilizers",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "p_id": {
                     "name": "p_id",
@@ -630,9 +630,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.fertilizers_catalogue": {
+        "fdm.fertilizers_catalogue": {
             "name": "fertilizers_catalogue",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "p_id_catalogue": {
                     "name": "p_id_catalogue",
@@ -960,9 +960,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.field_acquiring": {
+        "fdm.field_acquiring": {
             "name": "field_acquiring",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id": {
                     "name": "b_id",
@@ -985,7 +985,7 @@
                 "b_acquiring_method": {
                     "name": "b_acquiring_method",
                     "type": "b_acquiring_method",
-                    "typeSchema": "fdm-dev",
+                    "typeSchema": "fdm",
                     "primaryKey": false,
                     "notNull": true,
                     "default": "'unknown'"
@@ -1010,7 +1010,7 @@
                     "name": "field_acquiring_b_id_fields_b_id_fk",
                     "tableFrom": "field_acquiring",
                     "tableTo": "fields",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id"],
                     "columnsTo": ["b_id"],
                     "onDelete": "no action",
@@ -1020,7 +1020,7 @@
                     "name": "field_acquiring_b_id_farm_farms_b_id_farm_fk",
                     "tableFrom": "field_acquiring",
                     "tableTo": "farms",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id_farm"],
                     "columnsTo": ["b_id_farm"],
                     "onDelete": "no action",
@@ -1033,9 +1033,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.field_discarding": {
+        "fdm.field_discarding": {
             "name": "field_discarding",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id": {
                     "name": "b_id",
@@ -1069,7 +1069,7 @@
                     "name": "field_discarding_b_id_fields_b_id_fk",
                     "tableFrom": "field_discarding",
                     "tableTo": "fields",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id"],
                     "columnsTo": ["b_id"],
                     "onDelete": "no action",
@@ -1082,9 +1082,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.field_sowing": {
+        "fdm.field_sowing": {
             "name": "field_sowing",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id": {
                     "name": "b_id",
@@ -1136,7 +1136,7 @@
                     "name": "field_sowing_b_id_fields_b_id_fk",
                     "tableFrom": "field_sowing",
                     "tableTo": "fields",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id"],
                     "columnsTo": ["b_id"],
                     "onDelete": "no action",
@@ -1146,7 +1146,7 @@
                     "name": "field_sowing_b_lu_cultivations_b_lu_fk",
                     "tableFrom": "field_sowing",
                     "tableTo": "cultivations",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_lu"],
                     "columnsTo": ["b_lu"],
                     "onDelete": "no action",
@@ -1159,9 +1159,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.fields": {
+        "fdm.fields": {
             "name": "fields",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id": {
                     "name": "b_id",
@@ -1240,9 +1240,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.harvestable_analyses": {
+        "fdm.harvestable_analyses": {
             "name": "harvestable_analyses",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_harvestable_analysis": {
                     "name": "b_id_harvestable_analysis",
@@ -1330,9 +1330,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.harvestable_sampling": {
+        "fdm.harvestable_sampling": {
             "name": "harvestable_sampling",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_harvestable": {
                     "name": "b_id_harvestable",
@@ -1372,7 +1372,7 @@
                     "name": "harvestable_sampling_b_id_harvestable_harvestables_b_id_harvestable_fk",
                     "tableFrom": "harvestable_sampling",
                     "tableTo": "harvestables",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id_harvestable"],
                     "columnsTo": ["b_id_harvestable"],
                     "onDelete": "no action",
@@ -1382,7 +1382,7 @@
                     "name": "harvestable_sampling_b_id_harvestable_analysis_harvestable_analyses_b_id_harvestable_analysis_fk",
                     "tableFrom": "harvestable_sampling",
                     "tableTo": "harvestable_analyses",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id_harvestable_analysis"],
                     "columnsTo": ["b_id_harvestable_analysis"],
                     "onDelete": "no action",
@@ -1395,9 +1395,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.harvestables": {
+        "fdm.harvestables": {
             "name": "harvestables",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_harvestable": {
                     "name": "b_id_harvestable",
@@ -1443,9 +1443,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.soil_analysis": {
+        "fdm.soil_analysis": {
             "name": "soil_analysis",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "a_id": {
                     "name": "a_id",
@@ -1486,14 +1486,14 @@
                 "b_gwl_class": {
                     "name": "b_gwl_class",
                     "type": "b_gwl_class",
-                    "typeSchema": "fdm-dev",
+                    "typeSchema": "fdm",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "b_soiltype_agr": {
                     "name": "b_soiltype_agr",
                     "type": "b_soiltype_agr",
-                    "typeSchema": "fdm-dev",
+                    "typeSchema": "fdm",
                     "primaryKey": false,
                     "notNull": false
                 },
@@ -1519,9 +1519,9 @@
             "checkConstraints": {},
             "isRLSEnabled": false
         },
-        "fdm-dev.soil_sampling": {
+        "fdm.soil_sampling": {
             "name": "soil_sampling",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "columns": {
                 "b_id_sampling": {
                     "name": "b_id_sampling",
@@ -1579,7 +1579,7 @@
                     "name": "soil_sampling_b_id_fields_b_id_fk",
                     "tableFrom": "soil_sampling",
                     "tableTo": "fields",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["b_id"],
                     "columnsTo": ["b_id"],
                     "onDelete": "no action",
@@ -1589,7 +1589,7 @@
                     "name": "soil_sampling_a_id_soil_analysis_a_id_fk",
                     "tableFrom": "soil_sampling",
                     "tableTo": "soil_analysis",
-                    "schemaTo": "fdm-dev",
+                    "schemaTo": "fdm",
                     "columnsFrom": ["a_id"],
                     "columnsTo": ["a_id"],
                     "onDelete": "no action",
@@ -1601,17 +1601,544 @@
             "policies": {},
             "checkConstraints": {},
             "isRLSEnabled": false
+        },
+        "fdm-authn.account": {
+            "name": "account",
+            "schema": "fdm-authn",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "account_id": {
+                    "name": "account_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "provider_id": {
+                    "name": "provider_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "access_token": {
+                    "name": "access_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "refresh_token": {
+                    "name": "refresh_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "id_token": {
+                    "name": "id_token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "access_token_expires_at": {
+                    "name": "access_token_expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "refresh_token_expires_at": {
+                    "name": "refresh_token_expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "scope": {
+                    "name": "scope",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "password": {
+                    "name": "password",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "account_user_id_user_id_fk": {
+                    "name": "account_user_id_user_id_fk",
+                    "tableFrom": "account",
+                    "tableTo": "user",
+                    "schemaTo": "fdm-authn",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "fdm-authn.rate_limit": {
+            "name": "rate_limit",
+            "schema": "fdm-authn",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "key": {
+                    "name": "key",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "count": {
+                    "name": "count",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "last_request": {
+                    "name": "last_request",
+                    "type": "bigint",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "fdm-authn.session": {
+            "name": "session",
+            "schema": "fdm-authn",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "token": {
+                    "name": "token",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "ip_address": {
+                    "name": "ip_address",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "user_agent": {
+                    "name": "user_agent",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {
+                "session_user_id_user_id_fk": {
+                    "name": "session_user_id_user_id_fk",
+                    "tableFrom": "session",
+                    "tableTo": "user",
+                    "schemaTo": "fdm-authn",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "session_token_unique": {
+                    "name": "session_token_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["token"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "fdm-authn.user": {
+            "name": "user",
+            "schema": "fdm-authn",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email_verified": {
+                    "name": "email_verified",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "image": {
+                    "name": "image",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "firstname": {
+                    "name": "firstname",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "surname": {
+                    "name": "surname",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "lang": {
+                    "name": "lang",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "farm_active": {
+                    "name": "farm_active",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "user_email_unique": {
+                    "name": "user_email_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["email"]
+                }
+            },
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "fdm-authn.verification": {
+            "name": "verification",
+            "schema": "fdm-authn",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "identifier": {
+                    "name": "identifier",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "value": {
+                    "name": "value",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "fdm-authz.audit": {
+            "name": "audit",
+            "schema": "fdm-authz",
+            "columns": {
+                "audit_id": {
+                    "name": "audit_id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "audit_timestamp": {
+                    "name": "audit_timestamp",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "audit_origin": {
+                    "name": "audit_origin",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "principal_id": {
+                    "name": "principal_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "target_resource": {
+                    "name": "target_resource",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "target_resource_id": {
+                    "name": "target_resource_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "granting_resource": {
+                    "name": "granting_resource",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "granting_resource_id": {
+                    "name": "granting_resource_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "action": {
+                    "name": "action",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "allowed": {
+                    "name": "allowed",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "duration": {
+                    "name": "duration",
+                    "type": "integer",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
+        },
+        "fdm-authz.role": {
+            "name": "role",
+            "schema": "fdm-authz",
+            "columns": {
+                "role_id": {
+                    "name": "role_id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "resource": {
+                    "name": "resource",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "resource_id": {
+                    "name": "resource_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "principal_id": {
+                    "name": "principal_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "role": {
+                    "name": "role",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created": {
+                    "name": "created",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": "now()"
+                },
+                "deleted": {
+                    "name": "deleted",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": false
+                }
+            },
+            "indexes": {
+                "role_idx": {
+                    "name": "role_idx",
+                    "columns": [
+                        {
+                            "expression": "resource",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "resource_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "principal_id",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "role",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        },
+                        {
+                            "expression": "deleted",
+                            "isExpression": false,
+                            "asc": true,
+                            "nulls": "last"
+                        }
+                    ],
+                    "isUnique": false,
+                    "concurrently": false,
+                    "method": "btree",
+                    "with": {}
+                }
+            },
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {},
+            "policies": {},
+            "checkConstraints": {},
+            "isRLSEnabled": false
         }
     },
     "enums": {
-        "fdm-dev.b_acquiring_method": {
+        "fdm.b_acquiring_method": {
             "name": "b_acquiring_method",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "values": ["owner", "lease", "unknown"]
         },
-        "fdm-dev.p_app_method": {
+        "fdm.p_app_method": {
             "name": "p_app_method",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "values": [
                 "slotted coulter",
                 "incorporation",
@@ -1622,9 +2149,9 @@
                 "pocket placement"
             ]
         },
-        "fdm-dev.b_gwl_class": {
+        "fdm.b_gwl_class": {
             "name": "b_gwl_class",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "values": [
                 "II",
                 "IV",
@@ -1649,14 +2176,14 @@
                 "IIIa"
             ]
         },
-        "fdm-dev.b_lu_harvestable": {
+        "fdm.b_lu_harvestable": {
             "name": "b_lu_harvestable",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "values": ["none", "once", "multiple"]
         },
-        "fdm-dev.b_soiltype_agr": {
+        "fdm.b_soiltype_agr": {
             "name": "b_soiltype_agr",
-            "schema": "fdm-dev",
+            "schema": "fdm",
             "values": [
                 "moerige_klei",
                 "rivierklei",
@@ -1671,7 +2198,9 @@
         }
     },
     "schemas": {
-        "fdm-dev": "fdm-dev"
+        "fdm": "fdm",
+        "fdm-authn": "fdm-authn",
+        "fdm-authz": "fdm-authz"
     },
     "sequences": {},
     "roles": {},

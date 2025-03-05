@@ -59,6 +59,13 @@ interface SideBarAppType {
     }
 }
 
+/**
+ * Renders the sidebar navigation component.
+ *
+ * This component displays the main application sidebar with sections for farm management, apps, and support. It dynamically generates navigation links based on whether the user has an active farm and sets up Sentry for user tracking and feedback collection. The component also manages loading state to ensure feedback data is available before rendering.
+ *
+ * @param props - Contains user details such as first name, surname, full name, email, profile image, and active farm identifier.
+ */
 export function SidebarApp(props: SideBarAppType) {
     const user = props.user
     const avatarInitials =
@@ -114,7 +121,9 @@ export function SidebarApp(props: SideBarAppType) {
             form.open()
         } catch (error) {
             Sentry.captureException(error)
-            toast.error("Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.")
+            toast.error(
+                "Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.",
+            )
         }
     }
 

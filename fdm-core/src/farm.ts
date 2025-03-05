@@ -1,22 +1,34 @@
-import { asc, eq } from "drizzle-orm"
+import { asc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
+import { checkPermission, grantRole, listResources } from "./authorization"
+import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 
 /**
- * Add a new farm.
+ * Creates a new farm record and assigns the "owner" role to the specified principal.
  *
- * @param b_name_farm - Name of the farm
- * @param b_businessid_farm - Business ID of the farm
- * @param b_address_farm - Address of the farm
- * @param b_postalcode_farm - Postal code of the farm
- * @returns A Promise that resolves when the farm has been added and returns the value for b_id_farm
+ * This function starts a database transaction, generates a unique identifier for the new farm, 
+ * inserts the farm details into the database, and then grants the given principal the owner role.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal creating the farm.
+ * @param b_name_farm - The name of the farm.
+ * @param b_businessid_farm - The business identifier for the farm.
+ * @param b_address_farm - The address of the farm.
+ * @param b_postalcode_farm - The postal code associated with the farm.
+ *
+ * @returns The generated unique identifier for the new farm.
+ *
+ * @throws {Error} If the transaction fails to create the farm record.
+ *
  * @alpha
  */
 export async function addFarm(
     fdm: FdmType,
+    principal_id: string,
     b_name_farm: schema.farmsTypeInsert["b_name_farm"],
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
     b_address_farm: schema.farmsTypeInsert["b_address_farm"],
@@ -36,6 +48,9 @@ export async function addFarm(
             }
             await tx.insert(schema.farms).values(farmData)
 
+            // Grant owner role to farm
+            await grantRole(tx, "farm", "owner", b_id_farm, principal_id)
+
             return b_id_farm
         })
     } catch (err) {
@@ -49,17 +64,32 @@ export async function addFarm(
 }
 
 /**
- * Get the details of a specific farm.
+ * Retrieves a farm's details after verifying that the requesting principal has read access.
  *
- * @param b_id_farm - The id of the farm to be requested.
- * @returns A Promise that resolves with an object that contains the details of a farm.
+ * This function checks the principal's permissions before querying the database for the farm identified by the provided ID.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal making the request.
+ * @param b_id_farm - The unique identifier of the farm to retrieve.
+ * @returns A Promise that resolves with the farm's details.
+ * @throws {Error} If permission checks fail or if an error occurs while retrieving the farm.
  * @alpha
  */
 export async function getFarm(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getFarm",
+        )
+
         const farm = await fdm
             .select()
             .from(schema.farms)
@@ -73,18 +103,26 @@ export async function getFarm(
 }
 
 /**
- * Get a list of farms and their details
+ * Retrieves a list of farms accessible by the specified principal.
  *
- * @returns A Promise that resolves with a array of objecta that contain the details of the farms.
+ * This function uses authorization checks to determine which farms the principal is allowed to read, then returns the corresponding farm details ordered by name.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal requesting access.
+ * @returns A Promise that resolves with an array of farm detail objects.
  * @alpha
  */
 export async function getFarms(
     fdm: FdmType,
+    principal_id: PrincipalId,
 ): Promise<schema.farmsTypeSelect[]> {
     try {
+        const resources = await listResources(fdm, "farm", "read", principal_id)
+
         const farm = await fdm
             .select()
             .from(schema.farms)
+            .where(inArray(schema.farms.b_id_farm, resources))
             .orderBy(asc(schema.farms.b_name_farm))
 
         return farm
@@ -94,18 +132,27 @@ export async function getFarms(
 }
 
 /**
- * Update the details of a farm.
+ * Updates a farm's details after confirming the principal has write access.
  *
- * @param b_id_farm - The id of the farm to be updated.
- * @param b_name_farm - The new value for the name of the farm.
- * @param b_businessid_farm - The new value for the business ID of the farm.
- * @param b_address_farm - The new value for the address of the farm.
- * @param b_postalcode_farm - The new value for the postal code of the farm.
- * @returns A Promise that resolves with an object that contains the details of a farm.
+ * This function first checks if the specified principal is authorized to update the farm,
+ * then updates the farm's name, business ID, address, and postal code along with a new timestamp.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - ID of the principal initiating the update.
+ * @param b_id_farm - Unique identifier of the farm to update.
+ * @param b_name_farm - New name for the farm.
+ * @param b_businessid_farm - New business ID for the farm.
+ * @param b_address_farm - New address for the farm.
+ * @param b_postalcode_farm - New postal code for the farm.
+ * @returns A Promise resolving to the updated farm details.
+ *
+ * @throws {Error} If the principal lacks the necessary write permission or the update operation fails.
+ *
  * @alpha
  */
 export async function updateFarm(
     fdm: FdmType,
+    principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     b_name_farm: schema.farmsTypeInsert["b_name_farm"],
     b_businessid_farm: schema.farmsTypeInsert["b_businessid_farm"],
@@ -113,6 +160,14 @@ export async function updateFarm(
     b_postalcode_farm: schema.farmsTypeInsert["b_postalcode_farm"],
 ): Promise<schema.farmsTypeSelect> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "updateFarm",
+        )
         const updatedFarm = await fdm
             .update(schema.farms)
             .set({

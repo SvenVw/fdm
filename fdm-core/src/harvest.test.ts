@@ -25,6 +25,7 @@ describe("harvest", () => {
     let b_id: string
     let sowing_date: Date
     let terminating_date: Date
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -33,6 +34,7 @@ describe("harvest", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+        principal_id = createId()
 
         // Seed data: Add a cultivation to catalogue
         const b_lu_catalogue_once = createId()
@@ -53,6 +55,7 @@ describe("harvest", () => {
         const farmPostalCode = "12345"
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             farmName,
             farmBusinessId,
             farmAddress,
@@ -61,6 +64,7 @@ describe("harvest", () => {
 
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "test source",
@@ -86,6 +90,7 @@ describe("harvest", () => {
         terminating_date = new Date("2024-10-10")
         b_lu_once = await addCultivation(
             fdm,
+            principal_id,
             b_lu_catalogue_once,
             b_id,
             sowing_date,
@@ -106,6 +111,7 @@ describe("harvest", () => {
         b_lu_once_nonexistent = await addCultivation(
             // Assign new b_lu
             fdm,
+            principal_id,
             b_lu_catalogue_nonexistent, // Using the new catalogue entry
             b_id,
             sowing_date,
@@ -125,6 +131,7 @@ describe("harvest", () => {
         })
         b_lu_multiple = await addCultivation(
             fdm,
+            principal_id,
             b_lu_catalogue_multiple,
             b_id,
             sowing_date,
@@ -137,6 +144,7 @@ describe("harvest", () => {
 
         const b_id_harvesting = await addHarvest(
             fdm,
+            principal_id,
             b_lu_multiple,
             harvesting_date,
             1000,
@@ -153,20 +161,29 @@ describe("harvest", () => {
     it("should throw error if cultivation does not exist", async () => {
         const harvesting_date = new Date(terminating_date)
         await expect(
-            addHarvest(fdm, "non_existing_cultivation", harvesting_date, 1000),
-        ).rejects.toThrowError("Exception for addHarvest")
+            addHarvest(
+                fdm,
+                principal_id,
+                "non_existing_cultivation",
+                harvesting_date,
+                1000,
+            ),
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
     })
 
     it("should get a harvest", async () => {
         const harvesting_date = terminating_date
         const b_id_harvesting = await addHarvest(
             fdm,
+            principal_id,
             b_lu_multiple,
             harvesting_date,
             1000,
         )
 
-        const harvest = await getHarvest(fdm, b_id_harvesting)
+        const harvest = await getHarvest(fdm, principal_id, b_id_harvesting)
 
         expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
         expect(harvest.b_harvesting_date).toEqual(harvesting_date)
@@ -178,8 +195,8 @@ describe("harvest", () => {
     it("should have same date for cultivation harvest as for terminate date when harvestable type is 'once'", async () => {
         const harvesting_date = terminating_date
 
-        const cultivation = await getCultivation(fdm, b_lu_once)
-        const harvests = await getHarvests(fdm, b_lu_once)
+        const cultivation = await getCultivation(fdm, principal_id, b_lu_once)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
 
         expect(harvests.length).toEqual(1)
         expect(cultivation.b_terminating_date?.getTime()).toEqual(
@@ -193,16 +210,24 @@ describe("harvest", () => {
 
     it("should throw error if harvest does not exist", async () => {
         await expect(
-            getHarvest(fdm, "non_existing_harvest"),
-        ).rejects.toThrowError("Exception for getHarvest")
+            getHarvest(fdm, principal_id, "non_existing_harvest"),
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
     })
 
     it("should get harvests", async () => {
         const harvesting_date = terminating_date
 
-        await addHarvest(fdm, b_lu_multiple, harvesting_date, 1000)
+        await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            harvesting_date,
+            1000,
+        )
 
-        const harvests = await getHarvests(fdm, b_lu_once)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
         expect(harvests.length).toBeGreaterThanOrEqual(1)
     })
 
@@ -210,26 +235,31 @@ describe("harvest", () => {
         const harvesting_date = terminating_date
         const b_id_harvesting = await addHarvest(
             fdm,
+            principal_id,
             b_lu_multiple,
             harvesting_date,
             1000,
         )
 
-        await removeHarvest(fdm, b_id_harvesting)
+        await removeHarvest(fdm, principal_id, b_id_harvesting)
 
-        await expect(getHarvest(fdm, b_id_harvesting)).rejects.toThrowError(
-            "Exception for getHarvest",
+        await expect(
+            getHarvest(fdm, principal_id, b_id_harvesting),
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
         )
 
-        const harvests = await getHarvests(fdm, b_lu_once)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
         expect(harvests.length).toEqual(1)
     })
 
     it("should throw error if harvest does not exist", async () => {
         const nonExistingHarvestId = createId()
         await expect(
-            removeHarvest(fdm, nonExistingHarvestId),
-        ).rejects.toThrowError("Exception for removeHarvest")
+            removeHarvest(fdm, principal_id, nonExistingHarvestId),
+        ).rejects.toThrowError(
+            "Principal does not have permission to perform this action",
+        )
     })
 
     describe("getHarvestableTypeOfCultivation", () => {
@@ -265,6 +295,7 @@ describe("harvest", () => {
 
             const newCultivation = await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 sowing_date,
@@ -304,6 +335,7 @@ describe("harvest", () => {
             })
             const b_lu_none = await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 sowing_date,

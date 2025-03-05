@@ -11,9 +11,9 @@ describe("calculateDose", () => {
         ]
 
         const expectedDose: Dose = {
-            p_dose_n: 2000,
-            p_dose_p2o5: 1000,
-            p_dose_k2o: 500,
+            p_dose_n: 200,
+            p_dose_p2o5: 100,
+            p_dose_k2o: 50,
         }
         expect(calculateDose({ applications, fertilizers })).toEqual(
             expectedDose,
@@ -31,9 +31,9 @@ describe("calculateDose", () => {
         ]
 
         const expectedDose: Dose = {
-            p_dose_n: 2500,
-            p_dose_p2o5: 1250,
-            p_dose_k2o: 625,
+            p_dose_n: 250,
+            p_dose_p2o5: 125,
+            p_dose_k2o: 62.5,
         }
         expect(calculateDose({ applications, fertilizers })).toEqual(
             expectedDose,
@@ -61,9 +61,9 @@ describe("calculateDose", () => {
         ]
 
         const expectedDose: Dose = {
-            p_dose_n: 2000,
+            p_dose_n: 200,
             p_dose_p2o5: 0,
-            p_dose_k2o: 500,
+            p_dose_k2o: 50,
         }
         expect(calculateDose({ applications, fertilizers })).toEqual(
             expectedDose,
@@ -77,8 +77,8 @@ describe("calculateDose", () => {
         ]
 
         const expectedDose: Dose = {
-            p_dose_n: 2000,
-            p_dose_p2o5: 1000,
+            p_dose_n: 200,
+            p_dose_p2o5: 100,
             p_dose_k2o: 0,
         }
         expect(calculateDose({ applications, fertilizers })).toEqual(

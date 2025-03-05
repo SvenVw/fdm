@@ -1,3 +1,16 @@
+import { Farm } from "@/components/blocks/farm"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError } from "@/lib/error"
+import { extractFormValuesFromRequest } from "@/lib/form"
 import {
     addFarm,
     addFertilizer,
@@ -9,25 +22,8 @@ import type {
     MetaFunction,
 } from "react-router"
 import { useLoaderData } from "react-router"
+import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-
-// Components
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-
-// Blocks
-import { Farm } from "@/components/blocks/farm"
-
-import { extractFormValuesFromRequest } from "@/lib/form"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
-// Services
 import { fdm } from "../lib/fdm.server"
 
 // Meta
@@ -91,32 +87,52 @@ export default function AddFarmPage() {
 }
 
 /**
- * Action function for handling the submission of the add farm form.
- * Processes and validates form data to create a new farm.
- * @param request - The incoming request object containing form data.
- * @returns A redirect response to the newly created farm's page.
+ * Handles the submission of the add farm form by creating a new farm and attaching default fertilizers.
+ *
+ * This function retrieves the user session from the request, extracts and validates form data using a predefined schema,
+ * and creates a new farm with the provided name. It then fetches available fertilizers from a catalogue and associates them
+ * with the newly created farm. On success, it returns a redirect response to the farm's atlas page with a confirmation message.
+ *
+ * @param request - The incoming request containing form data and session details.
+ * @returns A redirect response to the newly created farm's atlas page.
+ * @throws {Error} Throws an error if the form processing, farm creation, or fertilizer attachment fails.
  */
 export async function action({ request }: ActionFunctionArgs) {
-    const formValues = await extractFormValuesFromRequest(request, FormSchema)
-    const { b_name_farm } = formValues
-
-    // Create a farm
     try {
-        const b_id_farm = await addFarm(fdm, b_name_farm, null, null, null)
+        // Get the session
+        const session = await getSession(request)
+
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+        const { b_name_farm } = formValues
+
+        const b_id_farm = await addFarm(
+            fdm,
+            session.principal_id,
+            b_name_farm,
+            null,
+            null,
+            null,
+        )
         const fertilizers = await getFertilizersFromCatalogue(fdm)
         await Promise.all(
             fertilizers.map((fertilizer) =>
-                addFertilizer(fdm, fertilizer.p_id_catalogue, b_id_farm),
+                addFertilizer(
+                    fdm,
+                    session.principal_id,
+                    fertilizer.p_id_catalogue,
+                    b_id_farm,
+                    null,
+                    null,
+                ),
             ),
         )
         return redirectWithSuccess(`./${b_id_farm}/atlas`, {
             message: "Bedrijf is toegevoegd! 🎉",
         })
     } catch (error) {
-        console.error("Failed to create farm with fertilizers:", error)
-        return dataWithError(
-            null,
-            "Er is iets misgegaan bij het aanmaken van het bedrijf.",
-        )
+        throw handleActionError(error)
     }
 }

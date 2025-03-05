@@ -1,4 +1,3 @@
-import { Fields } from "@/components/blocks/fields"
 import { SidebarPage } from "@/components/custom/sidebar-page"
 import {
     Breadcrumb,
@@ -10,10 +9,10 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/toaster"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { cn } from "@/lib/utils"
 import {
-    getCultivations,
     getCultivationsFromCatalogue,
     getFarm,
     getFields,
@@ -37,36 +36,56 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Loads and prepares all data required for the farm creation page.
+ *
+ * This loader retrieves the details of a farm and its associated fields using the provided farm ID from the URL parameters.
+ * It also fetches available cultivation options from the catalogue and the Mapbox access token from the environment.
+ * The fields are sorted alphabetically by name and converted into sidebar navigation items for use in the UI.
+ *
+ * @returns An object containing:
+ * - sidebarPageItems: Navigation items for each field.
+ * - cultivationOptions: A list of available cultivation options.
+ * - mapboxToken: The Mapbox access token.
+ * - b_id_farm: The farm ID.
+ * - b_name_farm: The name of the farm.
+ * - action: The URL for field update submissions.
+ *
+ * @throws {Response} If the farm ID is missing or if the Mapbox token is not set.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id and name of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-    const farm = await getFarm(fdm, b_id_farm)
-
-    // Get the fields
-    const fields = await getFields(fdm, b_id_farm)
-
-    // Sort by name
-    fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
-
-    // Get the Mapbox Token
-    const mapboxToken = process.env.MAPBOX_TOKEN
-    if (!mapboxToken) {
-        throw data("MAPBOX_TOKEN environment variable is not set", {
-            status: 500,
-            statusText: "MAPBOX_TOKEN environment variable is not set",
-        })
-    }
-
-    // Get the available cultivations
-    let cultivationOptions = []
     try {
+        // Get the Id and name of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+
+        // Get the fields
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+
+        // Sort by name
+        fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
+
+        // Get the Mapbox Token
+        const mapboxToken = process.env.MAPBOX_TOKEN
+        if (!mapboxToken) {
+            throw data("MAPBOX_TOKEN environment variable is not set", {
+                status: 500,
+                statusText: "MAPBOX_TOKEN environment variable is not set",
+            })
+        }
+
+        // Get the available cultivations
+        let cultivationOptions = []
         const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
         cultivationOptions = cultivationsCatalogue
             .filter(
@@ -77,29 +96,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
-    } catch (error) {
-        console.error("Failed to fetch cultivations:", error)
-        throw data("Failed to load cultivation options", {
-            status: 500,
-            statusText: "Failed to load cultivation options",
+
+        // Create the sidenav
+        const sidebarPageItems = fields.map((field) => {
+            return {
+                title: field.b_name,
+                to: `/farm/create/${b_id_farm}/fields/${field.b_id}`,
+            }
         })
-    }
 
-    // Create the sidenav
-    const sidebarPageItems = fields.map((field) => {
         return {
-            title: field.b_name,
-            to: `/farm/create/${b_id_farm}/fields/${field.b_id}`,
+            sidebarPageItems: sidebarPageItems,
+            cultivationOptions: cultivationOptions,
+            mapboxToken: mapboxToken,
+            b_id_farm: b_id_farm,
+            b_name_farm: farm.b_name_farm,
+            action: `/farm/create/${b_id_farm}/fields`,
         }
-    })
-
-    return {
-        sidebarPageItems: sidebarPageItems,
-        cultivationOptions: cultivationOptions,
-        mapboxToken: mapboxToken,
-        b_id_farm: b_id_farm,
-        b_name_farm: farm.b_name_farm,
-        action: `/farm/create/${b_id_farm}/fields`,
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -177,28 +192,37 @@ export default function Index() {
     )
 }
 
-// Action
+/**
+ * Processes a form submission to update a field.
+ *
+ * Extracts the field ID ("b_id") and name ("b_name") from the request's form data, validates their presence,
+ * retrieves the user session, and applies the update using the updateField service. Returns an object containing
+ * the updated field data.
+ *
+ * @returns An object with a "field" property holding the updated field information.
+ * 
+ * @throws {Error} If the form data is missing the "b_id" or "b_name" field.
+ * @throws {Error} If an error occurs during the field update process.
+ */
 export async function action({ request, params }: LoaderFunctionArgs) {
-    const formData = await request.formData()
-    const b_id = formData.get("b_id")?.toString()
-    const b_name = formData.get("b_name")?.toString()
-
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-    if (!b_name) {
-        throw data("Field name is required", {
-            status: 400,
-            statusText: "Field name is required",
-        })
-    }
-
     try {
+        const formData = await request.formData()
+        const b_id = formData.get("b_id")?.toString()
+        const b_name = formData.get("b_name")?.toString()
+
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+        if (!b_name) {
+            throw new Error("missing: b_name")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const updatedField = await updateField(
             fdm,
+            session.principal_id,
             b_id,
             b_name,
             undefined, // b_id_source
@@ -209,9 +233,6 @@ export async function action({ request, params }: LoaderFunctionArgs) {
         )
         return { field: updatedField }
     } catch (error) {
-        throw data(
-            `Failed to update field: ${error instanceof Error ? error.message : "Unknown error"}`,
-            { status: 500, statusText: "Failed to update field" },
-        )
+        throw handleActionError(error)
     }
 }

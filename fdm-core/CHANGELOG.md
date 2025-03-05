@@ -1,5 +1,15 @@
 # Changelog fdm-core
 
+## 0.13.0
+
+### Minor Changes
+
+- 9830186: Add `createFdmAuth` to create a better-auth instance for fdm
+
+### Patch Changes
+
+- 06619e7: Rename schema `fdm-dev` to `fdm`
+
 ## 0.12.0
 
 ### Minor Changes

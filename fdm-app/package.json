@@ -1,12 +1,11 @@
 {
     "name": "@svenvw/fdm-app",
-    "version": "0.11.2",
+    "version": "0.12.0",
     "private": true,
     "sideEffects": false,
     "type": "module",
     "scripts": {
         "build": "react-router build",
-        "db:generate": "npx @better-auth/cli generate --output ./db/schema.ts --config app/lib/auth.server.ts && npx drizzle-kit generate",
         "dev": "dotenvx run -- react-router dev",
         "dotenvx": "dotenvx",
         "start": "dotenvx run -- react-router-serve ./build/server/index.js",
@@ -35,7 +34,7 @@
         "@sentry/react": "^9.1.0",
         "@sentry/vite-plugin": "^3.2.0",
         "@turf/centroid": "^7.2.0",
-        "better-auth": "^1.1.21",
+        "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "1.0.4",
@@ -77,7 +76,6 @@
         "@types/react-dom": "^18.3.5",
         "@types/validator": "^13.12.2",
         "autoprefixer": "^10.4.20",
-        "drizzle-kit": "catalog:",
         "drizzle-orm": "catalog:",
         "postcss": "^8.5.3",
         "tailwindcss": "^3.4.17",
@@ -86,9 +84,9 @@
         "vite-tsconfig-paths": "catalog:"
     },
     "peerDependencies": {
-        "@svenvw/fdm-calculator": "workspace:>=0.1.0",
-        "@svenvw/fdm-core": "workspace:>=0.12.0",
-        "@svenvw/fdm-data": "workspace:>=0.10.0"
+        "@svenvw/fdm-calculator": "workspace:>=0.1.1",
+        "@svenvw/fdm-core": "workspace:>=0.13.0",
+        "@svenvw/fdm-data": "workspace:>=0.10.1"
     },
     "engines": {
         "node": ">=20.0.0"

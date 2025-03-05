@@ -27,6 +27,7 @@ describe("Cultivation Data Model", () => {
     let b_id: string
     let b_lu: string
     let b_sowing_date: Date
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -41,8 +42,10 @@ describe("Cultivation Data Model", () => {
         const farmBusinessId = "123456"
         const farmAddress = "123 Farm Lane"
         const farmPostalCode = "12345"
+        principal_id = createId()
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             farmName,
             farmBusinessId,
             farmAddress,
@@ -51,6 +54,7 @@ describe("Cultivation Data Model", () => {
 
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "test source",
@@ -92,6 +96,7 @@ describe("Cultivation Data Model", () => {
             b_sowing_date = new Date("2024-01-01")
             b_lu = await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 b_sowing_date,
@@ -143,6 +148,7 @@ describe("Cultivation Data Model", () => {
             await expect(
                 addCultivation(
                     fdm,
+                    principal_id,
                     invalid_b_lu_catalogue,
                     b_id,
                     b_sowing_date,
@@ -170,13 +176,18 @@ describe("Cultivation Data Model", () => {
             const b_sowing_date = new Date("2024-02-01")
             const new_b_lu = await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 b_sowing_date,
             )
             expect(b_lu).toBeDefined()
 
-            const cultivation = await getCultivation(fdm, new_b_lu)
+            const cultivation = await getCultivation(
+                fdm,
+                principal_id,
+                new_b_lu,
+            )
             expect(cultivation.b_lu).toBeDefined() // Check existence
             expect(cultivation.b_sowing_date).toEqual(b_sowing_date) // Check value
         })
@@ -184,7 +195,13 @@ describe("Cultivation Data Model", () => {
         it("should handle duplicate cultivation gracefully", async () => {
             // Attempt to add the same cultivation again
             await expect(
-                addCultivation(fdm, b_lu_catalogue, b_id, b_sowing_date),
+                addCultivation(
+                    fdm,
+                    principal_id,
+                    b_lu_catalogue,
+                    b_id,
+                    b_sowing_date,
+                ),
             ).rejects.toThrow("Exception for addCultivation")
         })
 
@@ -194,31 +211,40 @@ describe("Cultivation Data Model", () => {
             await expect(
                 addCultivation(
                     fdm,
+                    principal_id,
                     b_lu_catalogue,
                     invalid_b_id,
                     b_sowing_date,
                 ),
-            ).rejects.toThrow("Exception for addCultivation")
+            ).rejects.toThrow(
+                "Principal does not have permission to perform this action",
+            )
         })
 
         it("should get cultivations by field ID", async () => {
             await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 new Date("2024-03-01"),
             )
 
-            const cultivations = await getCultivations(fdm, b_id)
+            const cultivations = await getCultivations(fdm, principal_id, b_id)
             expect(cultivations.length).toBe(2)
         })
 
         it("should remove a cultivation", async () => {
-            await removeCultivation(fdm, b_lu)
+            await removeCultivation(fdm, principal_id, b_lu)
 
-            await expect(getCultivation(fdm, b_lu)).rejects.toThrowError(
-                "Exception for getCultivation",
+            await expect(
+                getCultivation(fdm, principal_id, b_lu),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
             )
+
+            const cultivations = await getCultivations(fdm, principal_id, b_id)
+            expect(cultivations.length).toEqual(0)
         })
 
         it("should update an existing cultivation", async () => {
@@ -236,9 +262,19 @@ describe("Cultivation Data Model", () => {
                 b_lu_hcat3_name: "new-hcat3-name",
             })
 
-            await updateCultivation(fdm, b_lu, newCatalogueId, newSowingDate)
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                newCatalogueId,
+                newSowingDate,
+            )
 
-            const updatedCultivation = await getCultivation(fdm, b_lu)
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
         })
@@ -248,11 +284,14 @@ describe("Cultivation Data Model", () => {
             await expect(
                 updateCultivation(
                     fdm,
+                    principal_id,
                     nonExistentBlu,
                     b_lu_catalogue,
                     new Date(),
                 ),
-            ).rejects.toThrowError("Exception for updateCultivation")
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
         })
 
         it("should throw an error when updating with invalid catalogue id", async () => {
@@ -261,6 +300,7 @@ describe("Cultivation Data Model", () => {
             await expect(
                 updateCultivation(
                     fdm,
+                    principal_id,
                     b_lu,
                     nonExistentCatalogueId,
                     new Date(),
@@ -269,7 +309,7 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should get a cultivation by ID", async () => {
-            const cultivation = await getCultivation(fdm, b_lu)
+            const cultivation = await getCultivation(fdm, principal_id, b_lu)
             expect(cultivation.b_lu).toBe(b_lu)
             expect(cultivation.b_lu_catalogue).toBe(b_lu_catalogue)
         })
@@ -291,13 +331,18 @@ describe("Cultivation Data Model", () => {
 
             await updateCultivation(
                 fdm,
+                principal_id,
                 b_lu,
                 newCatalogueId,
                 newSowingDate,
                 newTerminateDate,
             )
 
-            const updatedCultivation = await getCultivation(fdm, b_lu)
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
             expect(updatedCultivation.b_terminating_date).toEqual(
@@ -317,18 +362,32 @@ describe("Cultivation Data Model", () => {
                 b_lu_hcat3_name: "new-hcat3-name",
             })
 
-            await updateCultivation(fdm, b_lu, newCatalogueId)
+            await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
 
-            const updatedCultivation = await getCultivation(fdm, b_lu)
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
         })
 
         it("should update a cultivation with only the sowing date", async () => {
             const newSowingDate = new Date("2024-02-01")
 
-            await updateCultivation(fdm, b_lu, undefined, newSowingDate)
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                newSowingDate,
+            )
 
-            const updatedCultivation = await getCultivation(fdm, b_lu)
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
             expect(updatedCultivation.b_sowing_date).toEqual(newSowingDate)
         })
 
@@ -337,13 +396,18 @@ describe("Cultivation Data Model", () => {
 
             await updateCultivation(
                 fdm,
+                principal_id,
                 b_lu,
                 undefined,
                 undefined,
                 newTerminateDate,
             )
 
-            const updatedCultivation = await getCultivation(fdm, b_lu)
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
             expect(updatedCultivation.b_terminating_date).toEqual(
                 newTerminateDate,
             )
@@ -356,6 +420,7 @@ describe("Cultivation Data Model", () => {
             await expect(
                 updateCultivation(
                     fdm,
+                    principal_id,
                     b_lu,
                     undefined,
                     newSowingDate,
@@ -371,6 +436,7 @@ describe("Cultivation Data Model", () => {
             await expect(
                 updateCultivation(
                     fdm,
+                    principal_id,
                     b_lu,
                     undefined,
                     newSowingDate,
@@ -393,6 +459,7 @@ describe("Cultivation Data Model", () => {
             const farmPostalCode = "12345"
             b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
@@ -401,6 +468,7 @@ describe("Cultivation Data Model", () => {
 
             b_id = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 "test field",
                 "test source",
@@ -434,6 +502,7 @@ describe("Cultivation Data Model", () => {
 
             await addCultivation(
                 fdm,
+                principal_id,
                 b_lu_catalogue,
                 b_id,
                 new Date("2024-03-01"),
@@ -501,6 +570,7 @@ describe("Cultivation Data Model", () => {
 
             p_id = await addFertilizer(
                 fdm,
+                principal_id,
                 p_id_catalogue,
                 b_id_farm,
                 p_acquiring_amount,
@@ -511,6 +581,7 @@ describe("Cultivation Data Model", () => {
         it("should get cultivation plan for a farm", async () => {
             const p_app_id1 = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 100,
@@ -519,6 +590,7 @@ describe("Cultivation Data Model", () => {
             )
             const p_app_id2 = await addFertilizerApplication(
                 fdm,
+                principal_id,
                 b_id,
                 p_id,
                 200,
@@ -526,7 +598,11 @@ describe("Cultivation Data Model", () => {
                 new Date("2024-04-15"),
             )
 
-            const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
 
             expect(cultivationPlan).toBeDefined()
             expect(cultivationPlan.length).toBeGreaterThan(0)
@@ -562,8 +638,11 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should return an empty array if no cultivations are found for the farm", async () => {
-            const emptyPlan = await getCultivationPlan(fdm, createId()) // Use a non-existent farm ID
-            expect(emptyPlan).toEqual([])
+            await expect(
+                getCultivationPlan(fdm, principal_id, createId()), // Use a non-existent farm ID
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
         })
     })
 })

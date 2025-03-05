@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { cn } from "@/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
@@ -29,46 +31,75 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Loader
+/**
+ * Loads data required for the farm cultivations page.
+ *
+ * This loader verifies that a farm ID is provided in the URL parameters and uses the current user session to fetch
+ * the corresponding farm details. It then retrieves the cultivation plan for the farm and constructs sidebar navigation
+ * items based on the available cultivations.
+ *
+ * @returns An object containing:
+ * - cultivationPlan: An array of cultivation entries.
+ * - sidebarPageItems: An array of navigation items for the sidebar.
+ * - b_id_farm: The farm identifier.
+ * - b_name_farm: The name of the farm.
+ *
+ * @throws {Response} 400 if the farm ID is missing.
+ * @throws {Response} 404 if the farm is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the Id of the farm
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-    const farm = await getFarm(fdm, b_id_farm).catch((error) => {
-        throw data(`Failed to fetch farm: ${error.message}`, {
-            status: 404,
-            statusText: "Farm not found",
-        })
-    })
-
-    if (!farm) {
-        throw data("Farm not found", {
-            status: 404,
-            statusText: "Farm not found",
-        })
-    }
-
-    // Get the cultivationPlan
-    const cultivationPlan = await getCultivationPlan(fdm, b_id_farm)
-
-    // Create the sidenav
-    const sidebarPageItems = cultivationPlan.map((cultivation) => {
-        return {
-            title: cultivation.b_lu_name,
-            to: `/farm/create/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`,
+    try {
+        // Get the Id of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
-    })
 
-    return {
-        cultivationPlan: cultivationPlan,
-        sidebarPageItems: sidebarPageItems,
-        b_id_farm: b_id_farm,
-        b_name_farm: farm.b_name_farm,
+        // Get the session
+        const session = await getSession(request)
+
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm).catch(
+            (error) => {
+                throw data(`Failed to fetch farm: ${error.message}`, {
+                    status: 404,
+                    statusText: "Farm not found",
+                })
+            },
+        )
+
+        if (!farm) {
+            throw data("Farm not found", {
+                status: 404,
+                statusText: "Farm not found",
+            })
+        }
+
+        // Get the cultivationPlan
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
+        // Create the sidenav
+        const sidebarPageItems = cultivationPlan.map((cultivation) => {
+            return {
+                title: cultivation.b_lu_name,
+                to: `/farm/create/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`,
+            }
+        })
+
+        return {
+            cultivationPlan: cultivationPlan,
+            sidebarPageItems: sidebarPageItems,
+            b_id_farm: b_id_farm,
+            b_name_farm: farm.b_name_farm,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 

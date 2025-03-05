@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -24,36 +26,58 @@ import {
     useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
 const { isPostalCode } = validator
 
+/**
+ * Retrieves the details of a farm using the farm ID from the URL parameters and the user's session.
+ *
+ * This function validates that a farm ID is provided and obtains the current session to fetch the
+ * corresponding farm details. It throws an error with a 400 status if the farm ID is missing and a 404
+ * status if no matching farm is found.
+ *
+ * @returns An object containing the farm details under the `farm` property.
+ * @throws {Response} If the farm ID is missing or if the farm could not be found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
+        }
 
-    // Get details of farm
-    const farm = await getFarm(fdm, b_id_farm)
-    if (!farm) {
-        throw data("Farm is not found", {
-            status: 404,
-            statusText: "Farm is not found",
-        })
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Return user information from loader
-    return {
-        farm: farm,
+        // Get details of farm
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("Farm is not found", {
+                status: 404,
+                statusText: "Farm is not found",
+            })
+        }
+
+        // Return user information from loader
+        return {
+            farm: farm,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
+/**
+ * Renders a form for updating farm properties.
+ *
+ * This component initializes a form using data loaded from the route loader and sets default values for fields such as company name (required), business ID, address, and postal code. It leverages validation with a Zod schema and automatically resets form data when the loader data changes. Upon submission, the form sends a POST request to update the farm settings.
+ */
 export default function FarmSettingsPropertiesBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
@@ -213,14 +237,27 @@ Wageningen"
     )
 }
 
+/**
+ * Updates farm settings using values submitted from a form.
+ *
+ * This function extracts the farm ID from URL parameters and retrieves the user session
+ * from the request. It then parses and validates form data based on a predefined schema, and
+ * updates the corresponding farm record with the provided values. On successful update, it returns
+ * a response containing a success message.
+ *
+ * @throws {Error} If the farm ID is missing or if an error occurs during the update process.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id_farm = params.b_id_farm
-
-    if (!b_id_farm) {
-        return dataWithError(null, "Missing farm ID.")
-    }
-
     try {
+        const b_id_farm = params.b_id_farm
+
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -228,6 +265,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateFarm(
             fdm,
+            session.principal_id,
             b_id_farm,
             formValues.b_name_farm,
             formValues.b_businessid_farm,
@@ -239,11 +277,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `${formValues.b_name_farm} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        console.error("Failed to update farm:", error)
-        return dataWithError(
-            null,
-            `Er is iets misgegaan bij het bijwerken van de bedrijfgegevens: ${error instanceof Error ? error.message : "Onbekende fout"}`,
-        )
+        throw handleActionError(error)
     }
 }
 

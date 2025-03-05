@@ -3,110 +3,104 @@ import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Toaster } from "@/components/ui/sonner"
-import { auth } from "@/lib/auth.server"
+import { getSession } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     Outlet,
     data,
-    redirect,
     useLoaderData,
 } from "react-router"
 
+/**
+ * Loads farm details, farm options, and sidebar navigation items for a given farm.
+ *
+ * Retrieves the farm identifier from the route parameters, validates it, and uses the user's session from the request to
+ * fetch the corresponding farm details. It also retrieves all farms associated with the user, mapping them into simplified
+ * farm options. Additionally, it constructs sidebar page items for navigating to farm properties, access settings, and deletion.
+ *
+ * @param params - Route parameters; must include a valid `b_id_farm`.
+ * @returns An object containing the farm details, the farm identifier, an array of farm options, and an array of sidebar page items.
+ *
+ * @throws {Response} If `b_id_farm` is missing from the parameters.
+ * @throws {Response} If no farm matches the provided `b_id_farm`.
+ * @throws {Response} If no farms associated with the user are found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get details of farm
-    let farm
     try {
-        farm = await getFarm(fdm, b_id_farm)
-        if (!farm) {
-            throw data("Farm is not found", {
-                status: 404,
-                statusText: "Farm is not found",
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("invalid: b_id_farm", {
+                status: 400,
+                statusText: "invalid: b_id_farm",
             })
         }
-    } catch (error) {
-        console.error("Failed to fetch farm details:", error)
-        throw data("Failed to fetch farm details", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
 
-    // Set farm to active
-    try {
-        await auth.api.updateUser({
-            body: {
-                farm_active: b_id_farm,
-            },
-            headers: request.headers,
-        })
-    } catch (error) {
-        console.error("Failed to update active farm:", error)
-        throw data("Failed to update active farm", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Get a list of possible farms of the user
-    let farms: Awaited<ReturnType<typeof getFarms>>
-    try {
-        farms = await getFarms(fdm)
-    } catch (error) {
-        console.error("Failed to fetch farms list:", error)
-        throw data("Failed to fetch farms list", {
-            status: 500,
-            statusText: "Internal Server Error",
-        })
-    }
-
-    // Redirect to farms overview if user has no farm
-    if (farms.length === 0) {
-        return redirect("./farm")
-    }
-
-    const farmOptions = farms.map((farm) => {
-        return {
-            b_id_farm: farm.b_id_farm,
-            b_name_farm: farm.b_name_farm,
+        // Get details of farm
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("not found: b_id_farm", {
+                status: 404,
+                statusText: "not found: b_id_farm",
+            })
         }
-    })
 
-    // Create the items for sidebar page
-    const sidebarPageItems = [
-        {
-            to: `/farm/${b_id_farm}/settings/properties`,
-            title: "Gegevens",
-        },
-        {
-            to: `/farm/${b_id_farm}/settings/access`,
-            title: "Toegang",
-        },
-        {
-            to: `/farm/${b_id_farm}/settings/delete`,
-            title: "Verwijderen",
-        },
-    ]
+        // Get a list of possible farms of the user
+        const farms = await getFarms(fdm, session.principal_id)
+        if (!farms || farms.length === 0) {
+            throw data("not found: farms", {
+                status: 404,
+                statusText: "not found: farms",
+            })
+        }
 
-    // Return user information from loader
-    return {
-        farm: farm,
-        b_id_farm: b_id_farm,
-        farmOptions: farmOptions,
-        sidebarPageItems: sidebarPageItems,
+        const farmOptions = farms.map((farm) => {
+            return {
+                b_id_farm: farm.b_id_farm,
+                b_name_farm: farm.b_name_farm,
+            }
+        })
+
+        // Create the items for sidebar page
+        const sidebarPageItems = [
+            {
+                to: `/farm/${b_id_farm}/settings/properties`,
+                title: "Gegevens",
+            },
+            {
+                to: `/farm/${b_id_farm}/settings/access`,
+                title: "Toegang",
+            },
+            {
+                to: `/farm/${b_id_farm}/settings/delete`,
+                title: "Verwijderen",
+            },
+        ]
+
+        // Return user information from loader
+        return {
+            farm: farm,
+            b_id_farm: b_id_farm,
+            farmOptions: farmOptions,
+            sidebarPageItems: sidebarPageItems,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
+/**
+ * Renders the layout for managing farm settings.
+ *
+ * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
+ * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ */
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
 

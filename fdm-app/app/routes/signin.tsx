@@ -1,14 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
-import { redirect } from "react-router"
-
-// Components
 import { Button } from "@/components/ui/button"
-import { Check, MoveDown } from "lucide-react"
-
-import { signIn } from "@/lib/auth-client"
-import { auth } from "@/lib/auth.server"
-// Services
-import { cn } from "@/lib/utils"
 import {
     Card,
     CardContent,
@@ -17,23 +7,57 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
+import { signIn } from "@/lib/auth-client"
+import { auth } from "@/lib/auth.server"
+import { handleLoaderError } from "@/lib/error"
+import { cn } from "@/lib/utils"
+import { Check, MoveDown } from "lucide-react"
+import type { LoaderFunctionArgs } from "react-router"
+import { redirect } from "react-router"
 import { toast } from "sonner"
 
+/**
+ * Checks for an existing user session and redirects authenticated users.
+ *
+ * This asynchronous loader function retrieves the user session from the request headers
+ * via the authentication API. If a valid session exists, the function redirects the user
+ * to the "/farm" route; otherwise, it returns an empty object. Any errors during session
+ * retrieval are processed by {@link handleLoaderError} and thrown.
+ *
+ * @param request - The HTTP request object whose headers are used to retrieve the session.
+ *
+ * @returns A redirect response to "/farm" if a session exists, or an empty object otherwise.
+ *
+ * @throws {Error} If session retrieval fails, the error processed by {@link handleLoaderError} is thrown.
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
-    // Get the session
-    const session = await auth.api.getSession({
-        headers: request.headers,
-    })
+    try {
+        // Get the session
+        const session = await auth.api.getSession({
+            headers: request.headers,
+        })
 
-    // If user has an session redirect to app
-    if (session?.session) {
-        return redirect("/farm")
+        // If user has an session redirect to app
+        if (session?.session) {
+            return redirect("/farm")
+        }
+
+        // Return user information from loader
+        return {}
+    } catch (error) {
+        throw handleLoaderError(error)
     }
-
-    // Return user information from loader
-    return {}
 }
 
+/**
+ * Renders the sign-in page with social authentication options.
+ *
+ * This component displays a structured interface for user sign-in. It provides social sign-in buttons for Microsoft and Google,
+ * along with information about service benefits and a link to the privacy policy. If a social sign-in attempt fails, a toast notification
+ * is displayed and the error is logged to the console.
+ *
+ * @returns A React element representing the sign-in page.
+ */
 export default function SignIn() {
     const handleSignInError = (provider: string, error: Error) => {
         toast(

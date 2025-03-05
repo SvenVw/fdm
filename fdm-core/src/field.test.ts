@@ -4,11 +4,13 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
+import { createId } from "./id"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
 describe("Farm Data Model", () => {
     let fdm: FdmServerType
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -17,6 +19,7 @@ describe("Farm Data Model", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+        principal_id = createId()
     })
 
     describe("Field CRUD", () => {
@@ -27,6 +30,7 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
@@ -52,6 +56,7 @@ describe("Farm Data Model", () => {
             const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
@@ -62,7 +67,7 @@ describe("Farm Data Model", () => {
             )
             expect(b_id).toBeDefined()
 
-            const field = await getField(fdm, b_id)
+            const field = await getField(fdm, principal_id, b_id)
             expect(field.b_name).toBe(fieldName)
             expect(field.b_id_farm).toBe(b_id_farm)
             expect(field.b_id_source).toBe(fieldIDSource)
@@ -80,6 +85,7 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
@@ -105,6 +111,7 @@ describe("Farm Data Model", () => {
             const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
@@ -114,7 +121,7 @@ describe("Farm Data Model", () => {
                 discardingDate,
             )
 
-            const field = await getField(fdm, b_id)
+            const field = await getField(fdm, principal_id, b_id)
             expect(field.b_name).toBe(fieldName)
             expect(field.b_id_farm).toBe(b_id_farm)
             expect(field.b_id_source).toBe(fieldIDSource)
@@ -132,6 +139,7 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
@@ -158,6 +166,7 @@ describe("Farm Data Model", () => {
             const AcquiringMethod1 = "owner"
             const b_id1 = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 fieldName1,
                 fieldIDSource1,
@@ -186,6 +195,7 @@ describe("Farm Data Model", () => {
             const AcquiringMethod2 = "lease"
             const b_id2 = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 fieldName2,
                 fieldIDSource2,
@@ -195,7 +205,7 @@ describe("Farm Data Model", () => {
                 discardingDate2,
             )
 
-            const fields = await getFields(fdm, b_id_farm)
+            const fields = await getFields(fdm, principal_id, b_id_farm)
             expect(fields.length).toBe(2)
 
             const field1 = fields.find((field) => field.b_id === b_id1)
@@ -226,6 +236,7 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
@@ -251,6 +262,7 @@ describe("Farm Data Model", () => {
             const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
@@ -279,6 +291,7 @@ describe("Farm Data Model", () => {
             const updatedAcquiringMethod = "lease"
             const updatedField = await updateField(
                 fdm,
+                principal_id,
                 b_id,
                 updatedFieldName,
                 updatedFieldIDSource,
@@ -304,6 +317,7 @@ describe("Farm Data Model", () => {
             const farmPostalCode = "12345"
             const b_id_farm = await addFarm(
                 fdm,
+                principal_id,
                 farmName,
                 farmBusinessId,
                 farmAddress,
@@ -329,6 +343,7 @@ describe("Farm Data Model", () => {
             const AcquiringMethod = "owner"
             const b_id = await addField(
                 fdm,
+                principal_id,
                 b_id_farm,
                 fieldName,
                 fieldIDSource,
@@ -342,6 +357,7 @@ describe("Farm Data Model", () => {
             const updatedFieldName = "Updated Test Field"
             const updatedField = await updateField(
                 fdm,
+                principal_id,
                 b_id,
                 updatedFieldName,
                 undefined,
@@ -362,6 +378,7 @@ describe("Farm Data Model", () => {
             const updatedAcquiringMethod = "lease"
             const updatedField2 = await updateField(
                 fdm,
+                principal_id,
                 b_id,
                 undefined,
                 undefined,
@@ -383,6 +400,7 @@ describe("Farm Data Model", () => {
             const updatedFieldIDSource = "updated-test-field-id"
             const updatedField3 = await updateField(
                 fdm,
+                principal_id,
                 b_id,
                 undefined,
                 updatedFieldIDSource,
@@ -404,6 +422,7 @@ describe("Farm Data Model", () => {
             const updatedAcquireDate = new Date("2023-02-01")
             const updatedField4 = await updateField(
                 fdm,
+                principal_id,
                 b_id,
                 undefined,
                 undefined,

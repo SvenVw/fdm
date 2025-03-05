@@ -10,7 +10,6 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
     Popover,
     PopoverContent,
@@ -24,6 +23,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from "@/lib/auth.server"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { cn } from "@/lib/utils"
@@ -31,7 +32,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { getField, updateField } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
@@ -40,34 +41,58 @@ import {
     useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 
+/**
+ * Loads farm field details for the overview page.
+ *
+ * Retrieves the field ID from route parameters and uses the current user's session to fetch the corresponding field details.
+ * Throws an error with a 400 status if the field ID is missing, or with a 404 status if the field is not found.
+ *
+ * @returns An object containing the retrieved field details.
+ *
+ * @throws {Response} When the field ID is missing or the field is not found.
+ */
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
+    try {
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("Field ID is required", {
+                status: 400,
+                statusText: "Field ID is required",
+            })
+        }
 
-    // Get details of field
-    const field = await getField(fdm, b_id)
-    if (!field) {
-        throw data("Field is not found", {
-            status: 404,
-            statusText: "Field is not found",
-        })
-    }
+        // Get the session
+        const session = await getSession(request)
 
-    // Return user information from loader
-    return {
-        field: field,
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("Field is not found", {
+                status: 404,
+                statusText: "Field is not found",
+            })
+        }
+
+        // Return user information from loader
+        return {
+            field: field,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
+/**
+ * Renders the overview block for editing farm field details.
+ *
+ * Retrieves initial field data via useLoaderData and initializes a validated form with fields for the
+ * field's name, acquiring method, acquiring date, and terminating date. The form automatically resets
+ * its values when updated loader data is provided and integrates with a submit handler to update the field.
+ */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
@@ -320,14 +345,24 @@ export default function FarmFieldsOverviewBlock() {
     )
 }
 
+/**
+ * Updates a farm field's details using the form data submitted in the request.
+ *
+ * This action function retrieves the required field identifier from the route parameters, obtains the user session,
+ * and extracts validated form data according to a predefined schema. It then updates the corresponding farm field record
+ * and returns a success response. Any errors encountered during the process are handled by a centralized error handler.
+ */
 export async function action({ request, params }: ActionFunctionArgs) {
-    const b_id = params.b_id
-
-    if (!b_id) {
-        return dataWithError(null, "Perceel ID ontbreekt.")
-    }
-
     try {
+        const b_id = params.b_id
+
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+
+        // Get the session
+        const session = await getSession(request)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -335,6 +370,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         await updateField(
             fdm,
+            session.principal_id,
             b_id,
             formValues.b_name,
             undefined,
@@ -348,11 +384,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `Perceel ${formValues.b_name} is bijgewerkt! 🎉`,
         })
     } catch (error) {
-        console.error("Fout bij bijwerken perceel: ", error)
-        return dataWithError(
-            null,
-            "Er is een onbekende fout opgetreden bij het bijwerken van de perceelgegevens.",
-        )
+        return handleActionError(error)
     }
 }
 

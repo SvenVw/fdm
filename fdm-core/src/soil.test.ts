@@ -5,6 +5,7 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
+import { createId } from "./id"
 import {
     addSoilAnalysis,
     getSoilAnalyses,
@@ -17,6 +18,7 @@ describe("Soil Analysis Functions", () => {
     let fdm: FdmServerType
     let b_id: string
     let test_a_id: string
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -31,8 +33,10 @@ describe("Soil Analysis Functions", () => {
         const farmBusinessId = "123456"
         const farmAddress = "123 Farm Lane"
         const farmPostalCode = "12345"
+        principal_id = createId()
         const b_id_farm = await addFarm(
             fdm,
+            principal_id,
             farmName,
             farmBusinessId,
             farmAddress,
@@ -58,6 +62,7 @@ describe("Soil Analysis Functions", () => {
         const acquiringMethod = "owner"
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             fieldName,
             fieldIDSource,
@@ -81,6 +86,7 @@ describe("Soil Analysis Functions", () => {
 
         test_a_id = await addSoilAnalysis(
             fdm,
+            principal_id,
             a_date,
             a_source,
             b_id,
@@ -130,6 +136,7 @@ describe("Soil Analysis Functions", () => {
 
         test_a_id = await addSoilAnalysis(
             fdm,
+            principal_id,
             a_date,
             a_source,
             b_id,
@@ -139,7 +146,9 @@ describe("Soil Analysis Functions", () => {
 
         // Test updating existing soil data
         const updated_a_source = "updated test source"
-        await updateSoilAnalysis(fdm, test_a_id, { a_source: updated_a_source })
+        await updateSoilAnalysis(fdm, principal_id, test_a_id, {
+            a_source: updated_a_source,
+        })
 
         const updatedAnalysis = await fdm
             .select()
@@ -159,6 +168,7 @@ describe("Soil Analysis Functions", () => {
 
         test_a_id = await addSoilAnalysis(
             fdm,
+            principal_id,
             a_date,
             a_source,
             b_id,
@@ -167,7 +177,7 @@ describe("Soil Analysis Functions", () => {
         )
 
         // Test removing existing soil data
-        await removeSoilAnalysis(fdm, test_a_id)
+        await removeSoilAnalysis(fdm, principal_id, test_a_id)
 
         const removedAnalysis = await fdm
             .select()
@@ -192,6 +202,7 @@ describe("Soil Analysis Functions", () => {
 
         test_a_id = await addSoilAnalysis(
             fdm,
+            principal_id,
             a_date_old,
             a_source,
             b_id,
@@ -205,6 +216,7 @@ describe("Soil Analysis Functions", () => {
 
         await addSoilAnalysis(
             fdm,
+            principal_id,
             a_date_old,
             a_source,
             b_id,
@@ -213,11 +225,11 @@ describe("Soil Analysis Functions", () => {
             { a_som_loi: a_som_loi },
         )
 
-        const allAnalyses = await getSoilAnalyses(fdm, b_id)
+        const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id)
         expect(allAnalyses).toHaveLength(2)
 
         // get latest soil analysis for field
-        const latestAnalysis = await getSoilAnalysis(fdm, b_id)
+        const latestAnalysis = await getSoilAnalysis(fdm, principal_id, b_id)
         expect(latestAnalysis?.a_date).toEqual(a_date_old)
         expect(latestAnalysis?.b_sampling_date).toEqual(b_sampling_date_new)
         expect(latestAnalysis?.a_som_loi).toEqual(a_som_loi)
@@ -234,6 +246,7 @@ describe("Soil Analysis Functions", () => {
         // Add first soil analysis
         await addSoilAnalysis(
             fdm,
+            principal_id,
             a_date,
             a_source,
             b_id,
@@ -245,6 +258,7 @@ describe("Soil Analysis Functions", () => {
         // Add second soil analysis
         await addSoilAnalysis(
             fdm,
+            principal_id,
             new Date(Date.now() + 1000),
             a_source,
             b_id,
@@ -253,7 +267,7 @@ describe("Soil Analysis Functions", () => {
             { a_som_loi: a_som_loi },
         )
 
-        const allAnalyses = await getSoilAnalyses(fdm, b_id)
+        const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id)
         expect(allAnalyses).toHaveLength(2)
     })
 })

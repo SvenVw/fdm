@@ -10,7 +10,7 @@ import {
 import { geometry, numericCasted } from "./schema-custom-types"
 
 // Define postgres schema
-export const fdmSchema = pgSchema("fdm-dev")
+export const fdmSchema = pgSchema("fdm")
 export type fdmSchemaTypeSelect = typeof fdmSchema
 
 // Define farms table
@@ -456,7 +456,7 @@ export const soilTypes = [
     "duinzand",
     "maasklei",
 ]
-export const gwlClasses = [
+export const gwlClasses: [string, ...string[]] = [
     "II",
     "IV",
     "IIIb",
@@ -479,8 +479,14 @@ export const gwlClasses = [
     "bVI",
     "IIIa",
 ]
-export const soiltypeEnum = fdmSchema.enum("b_soiltype_agr", soilTypes)
-export const gwlClassEnum = fdmSchema.enum("b_gwl_class", gwlClasses)
+export const soiltypeEnum = fdmSchema.enum(
+    "b_soiltype_agr",
+    soilTypes as [string, ...string[]],
+)
+export const gwlClassEnum = fdmSchema.enum(
+    "b_gwl_class",
+    gwlClasses as [string, ...string[]],
+)
 
 export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_id: text().primaryKey(),

@@ -17,6 +17,7 @@ describe("getDoseForField", () => {
     let b_id: string
     let p_id: string
     let p_id_catalogue: string
+    let principal_id: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -25,11 +26,13 @@ describe("getDoseForField", () => {
         const password = inject("password")
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
+        principal_id = "test-user"
     })
 
     it("should calculate the correct dose for a field with a single application", async () => {
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             "test farm",
             "1234567890",
             "test address",
@@ -37,6 +40,7 @@ describe("getDoseForField", () => {
         )
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "1",
@@ -108,6 +112,7 @@ describe("getDoseForField", () => {
         })
         p_id = await addFertilizer(
             fdm,
+            principal_id,
             p_id_catalogue,
             b_id_farm,
             1000,
@@ -115,6 +120,7 @@ describe("getDoseForField", () => {
         )
         await addFertilizerApplication(
             fdm,
+            principal_id,
             b_id,
             p_id,
             100,
@@ -123,16 +129,17 @@ describe("getDoseForField", () => {
         )
 
         const expectedDose: Dose = {
-            p_dose_n: 2000,
-            p_dose_p2o5: 1000,
-            p_dose_k2o: 500,
+            p_dose_n: 200,
+            p_dose_p2o5: 100,
+            p_dose_k2o: 50,
         }
-        expect(await getDoseForField({ fdm, b_id })).toEqual(expectedDose)
+        expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(expectedDose)
     })
 
     it("should return 0 dose when no applications are found", async () => {
         b_id_farm = await addFarm(
             fdm,
+            principal_id,
             "test farm",
             "1234567890",
             "test address",
@@ -140,6 +147,7 @@ describe("getDoseForField", () => {
         )
         b_id = await addField(
             fdm,
+            principal_id,
             b_id_farm,
             "test field",
             "1",
@@ -164,6 +172,6 @@ describe("getDoseForField", () => {
             p_dose_p2o5: 0,
             p_dose_k2o: 0,
         }
-        expect(await getDoseForField({ fdm, b_id })).toEqual(expectedDose)
+        expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(expectedDose)
     })
 })
