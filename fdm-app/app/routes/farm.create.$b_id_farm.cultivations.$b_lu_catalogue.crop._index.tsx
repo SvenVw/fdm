@@ -1,4 +1,5 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
+import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
@@ -180,23 +181,25 @@ export default function FarmAFieldCultivationBlock() {
         <div className="space-y-6">
             <div>
                 <p className="text-sm text-muted-foreground">
-                    Werk de opbrengst, stikstofgehalte en zaai- en oogstdatum
-                    bij voor dit gewas.
+                    Vul de oogsten in voor dit gewas.
                 </p>
             </div>
-            <CultivationForm
-                b_lu_catalogue={loaderData.b_lu_catalogue}
-                b_lu_start={loaderData.b_lu_start}
-                b_lu_end={loaderData.b_lu_end}
-                options={loaderData.cultivationOptions}
-                action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`}
-            />
             <Separator />
-            <HarvestsList
-                harvests={loaderData.harvests}
-                b_lu_harvestable={loaderData.b_lu_harvestable}
-                state={fetcher.state}
-            />
+            <div className="grid md:grid-cols-2 gap-8">
+                <CultivationForm
+                    b_lu_catalogue={loaderData.b_lu_catalogue}
+                    b_lu_start={loaderData.b_lu_start}
+                    b_lu_end={loaderData.b_lu_end}
+                    options={loaderData.cultivationOptions}
+                    action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`}
+                />
+                <div>{null}</div>
+                <HarvestsList
+                    harvests={loaderData.harvests}
+                    b_lu_harvestable={loaderData.b_lu_harvestable}
+                    state={fetcher.state}
+                />
+            </div>
         </div>
     )
 }
@@ -246,10 +249,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             // Add cultivation details for each cultivation
             await Promise.all(
                 b_lu.map(async (item: string) => {
-                    if (
-                        formValues.b_lu_start ||
-                        formValues.b_lu_end
-                    ) {
+                    if (formValues.b_lu_start || formValues.b_lu_end) {
                         await updateCultivation(
                             fdm,
                             session.principal_id,
