@@ -1,5 +1,4 @@
 import { CultivationForm } from "@/components/custom/cultivation/form"
-import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"

@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": minor
 ---
 
-Add `p_n_nw` to output at `calculateDose`
+Add `p_dose_nw` to output at `calculateDose`
