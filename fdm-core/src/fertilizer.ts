@@ -106,9 +106,9 @@ export async function addFertilizerToCatalogue(
 }
 
 /**
- * Adds a fertilizer application record to a farm.
+ * Adds a fertilizer aqcuiring record to a farm.
  *
- * This function creates a new fertilizer application record by performing a transactional insertion into the
+ * This function creates a new fertilizer acquiring record by performing a transactional insertion into the
  * fertilizers, fertilizerAcquiring, and fertilizerPicking tables. It verifies that the user has write permission
  * on the specified farm before proceeding.
  *
@@ -118,8 +118,8 @@ export async function addFertilizerToCatalogue(
  * @param b_id_farm The ID of the farm where the fertilizer is applied.
  * @param p_acquiring_amount The amount of fertilizer acquired.
  * @param p_acquiring_date The date when the fertilizer was acquired.
- * @returns A Promise resolving to the ID of the newly created fertilizer application record.
- * @throws If adding the fertilizer application record fails.
+ * @returns A Promise resolving to the ID of the newly created fertilizer acquiring record.
+ * @throws If adding the fertilizer acquiring record fails.
  * @alpha
  */
 export async function addFertilizer(
