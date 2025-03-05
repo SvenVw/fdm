@@ -1,5 +1,24 @@
 # fdm-calculator
 
+## 0.2.0
+
+### Minor Changes
+
+- 45eda20: Add `p_dose_nw` to output at `calculateDose`
+
+### Patch Changes
+
+- e312060: Fix at `calculateDose` the unit of the output
+- Updated dependencies [4d1dbd9]
+- Updated dependencies [4d1dbd9]
+- Updated dependencies [0224544]
+- Updated dependencies [0b28bd5]
+- Updated dependencies [1a295b0]
+- Updated dependencies [6a01698]
+- Updated dependencies [972bac8]
+- Updated dependencies [7387530]
+  - @svenvw/fdm-core@0.14.0
+
 ## 0.1.1
 
 ### Patch Changes

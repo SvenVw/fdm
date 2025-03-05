@@ -1,5 +1,19 @@
 # fdm-data
 
+## 0.10.2
+
+### Patch Changes
+
+- Updated dependencies [4d1dbd9]
+- Updated dependencies [4d1dbd9]
+- Updated dependencies [0224544]
+- Updated dependencies [0b28bd5]
+- Updated dependencies [1a295b0]
+- Updated dependencies [6a01698]
+- Updated dependencies [972bac8]
+- Updated dependencies [7387530]
+  - @svenvw/fdm-core@0.14.0
+
 ## 0.10.1
 
 ### Patch Changes

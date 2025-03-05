@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-data",
     "private": false,
-    "version": "0.10.1",
+    "version": "0.10.2",
     "description": "Extend Farm Data Model with catalogue data",
     "license": "MIT",
     "homepage": "https://github.com/SvenVw/fdm",
@@ -55,7 +55,7 @@
         "vitest": "catalog:"
     },
     "peerDependencies": {
-        "@svenvw/fdm-core": "workspace:>=0.13.0"
+        "@svenvw/fdm-core": "workspace:>=0.14.0"
     },
     "packageManager": "pnpm@10.4.1",
     "publishConfig": {
