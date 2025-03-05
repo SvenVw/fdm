@@ -229,7 +229,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             b_name: field.b_name,
             b_lu_catalogue: b_lu_catalogue,
-            b_sowing_date: cultivations[0]?.b_sowing_date,
+            b_lu_start: cultivations[0]?.b_lu_start,
             b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
             b_gwl_class: soilAnalysis?.b_gwl_class,
             a_p_al: soilAnalysis?.a_p_al,
@@ -263,7 +263,7 @@ export default function Index() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: loaderData.b_name ?? "",
-            b_area: `${Math.round(loaderData.b_area * 10) / 10} ha`,
+            b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
             b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
             b_gwl_class: loaderData.b_gwl_class ?? undefined,
@@ -274,8 +274,8 @@ export default function Index() {
     })
 
     return (
-        <>
-            <div className="flex-1 lg:max-w-3xl">
+        <div className="grid md:grid-cols-3 gap-4 p-4">
+            <div className="w-full md:col-span-2">
                 <RemixFormProvider {...form}>
                     <Form
                         id="formField"
@@ -289,7 +289,7 @@ export default function Index() {
                                         <CardTitle>Perceel</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="grid grid-cols-2 items-center gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
                                             <FormField
                                                 control={form.control}
                                                 name="b_name"
@@ -317,7 +317,7 @@ export default function Index() {
                                                 render={({ field }) => (
                                                     <FormItem>
                                                         <FormLabel>
-                                                            Oppervlak
+                                                            Oppervlak (ha)
                                                         </FormLabel>
                                                         <FormControl>
                                                             <Input
@@ -340,7 +340,7 @@ export default function Index() {
                                         <CardTitle>Gewas</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="grid grid-cols-2 items-center gap-4">
+                                        <div className="grid grid-cols-1 items-center gap-4">
                                             <Combobox
                                                 options={
                                                     loaderData.cultivationOptions
@@ -361,7 +361,7 @@ export default function Index() {
                                         <CardTitle>Bodem</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
                                             <FormField
                                                 control={form.control}
                                                 name="b_soiltype_agr"
@@ -595,34 +595,38 @@ export default function Index() {
                     </Form>
                 </RemixFormProvider>
             </div>
-            <aside>
-                <ClientOnly
-                    fallback={<Skeleton className="h-full w-full rounded-xl" />}
-                >
-                    {() => (
-                        <MapGL
-                            {...viewState}
-                            style={{
-                                height: "75%",
-                                width: "100%",
-                                position: "absolute",
-                            }}
-                            interactive={false}
-                            mapStyle={loaderData.mapboxStyle}
-                            mapboxAccessToken={loaderData.mapboxToken}
-                            interactiveLayerIds={[id]}
-                        >
-                            <FieldsSourceNotClickable
-                                id={id}
-                                fieldsData={fields}
+            <div className="w-full md:sticky md:top-4">
+                <aside className="h-[400px] md:h-[600px] lg:h-[800px] w-full">
+                    <ClientOnly
+                        fallback={
+                            <Skeleton className="h-full w-full rounded-xl" />
+                        }
+                    >
+                        {() => (
+                            <MapGL
+                                {...viewState}
+                                style={{
+                                    height: "100%",
+                                    width: "100%",
+                                    borderRadius: "0.75rem",
+                                }}
+                                interactive={false}
+                                mapStyle={loaderData.mapboxStyle}
+                                mapboxAccessToken={loaderData.mapboxToken}
+                                interactiveLayerIds={[id]}
                             >
-                                <Layer {...fieldsSavedStyle} />
-                            </FieldsSourceNotClickable>
-                        </MapGL>
-                    )}
-                </ClientOnly>
-            </aside>
-        </>
+                                <FieldsSourceNotClickable
+                                    id={id}
+                                    fieldsData={fields}
+                                >
+                                    <Layer {...fieldsSavedStyle} />
+                                </FieldsSourceNotClickable>
+                            </MapGL>
+                        )}
+                    </ClientOnly>
+                </aside>
+            </div>
+        </div>
     )
 }
 

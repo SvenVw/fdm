@@ -41,7 +41,7 @@ export function HarvestsList({
                                     <div>
                                         <p className="text-sm font-medium leading-none">
                                             {format(
-                                                harvest.b_harvesting_date,
+                                                harvest.b_lu_harvest_date,
                                                 "yyyy-MM-dd",
                                             )}
                                         </p>

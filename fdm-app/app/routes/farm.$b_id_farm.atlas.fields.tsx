@@ -90,7 +90,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 /**
  * Renders a Mapbox map displaying farm fields with interactive controls.
  *
- * This component consumes preloaded farm field data to compute the map's view state and stylize the field boundaries. 
+ * This component consumes preloaded farm field data to compute the map's view state and stylize the field boundaries.
  * It integrates geolocation and navigation controls, wraps the field layer in a non-interactive source, and includes a panel for displaying additional field details on hover.
  */
 export default function FarmAtlasFieldsBlock() {

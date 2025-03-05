@@ -47,7 +47,7 @@ export const fieldAcquiring = fdmSchema.table(
         b_id_farm: text()
             .notNull()
             .references(() => farms.b_id_farm),
-        b_acquiring_date: timestamp({ withTimezone: true }),
+        b_start: timestamp({ withTimezone: true }),
         b_acquiring_method: acquiringMethodEnum().notNull().default("unknown"),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -92,7 +92,7 @@ export const fieldDiscarding = fdmSchema.table(
         b_id: text()
             .notNull()
             .references(() => fields.b_id),
-        b_discarding_date: timestamp({ withTimezone: true }),
+        b_end: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -271,9 +271,9 @@ export const cultivations = fdmSchema.table(
 export type cultivationsTypeSelect = typeof cultivations.$inferSelect
 export type cultivationsTypeInsert = typeof cultivations.$inferInsert
 
-// Define field_sowing table
-export const fieldSowing = fdmSchema.table(
-    "field_sowing",
+// Define cultivation_starting table
+export const cultivationStarting = fdmSchema.table(
+    "cultivation_starting",
     {
         b_id: text()
             .notNull()
@@ -281,7 +281,7 @@ export const fieldSowing = fdmSchema.table(
         b_lu: text()
             .notNull()
             .references(() => cultivations.b_lu),
-        b_sowing_date: timestamp({ withTimezone: true }),
+        b_lu_start: timestamp({ withTimezone: true }),
         b_sowing_amount: numericCasted(),
         b_sowing_method: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -296,8 +296,10 @@ export const fieldSowing = fdmSchema.table(
     },
 )
 
-export type fieldSowingTypeSelect = typeof fieldSowing.$inferSelect
-export type fieldSowingTypeInsert = typeof fieldSowing.$inferInsert
+export type cultivationStartingTypeSelect =
+    typeof cultivationStarting.$inferSelect
+export type cultivationStartingTypeInsert =
+    typeof cultivationStarting.$inferInsert
 
 // Define cultivations_catalogue table
 export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [
@@ -409,7 +411,7 @@ export const cultivationHarvesting = fdmSchema.table("cultivation_harvesting", {
     b_lu: text()
         .notNull()
         .references(() => cultivations.b_lu),
-    b_harvesting_date: timestamp({ withTimezone: true }),
+    b_lu_harvest_date: timestamp({ withTimezone: true }),
     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
     updated: timestamp({ withTimezone: true }),
 })
@@ -419,14 +421,14 @@ export type cultivationHarvestingTypeSelect =
 export type cultivationHarvestingTypeInsert =
     typeof cultivationHarvesting.$inferInsert
 
-// Define cultivation terminating table
-export const cultivationTerminating = fdmSchema.table(
-    "cultivation_terminating",
+// Define cultivation ending table
+export const cultivationEnding = fdmSchema.table(
+    "cultivation_ending",
     {
         b_lu: text()
             .notNull()
             .references(() => cultivations.b_lu),
-        b_terminating_date: timestamp({ withTimezone: true }),
+        b_lu_end: timestamp({ withTimezone: true }),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -439,10 +441,8 @@ export const cultivationTerminating = fdmSchema.table(
     },
 )
 
-export type cultivationTerminatingTypeSelect =
-    typeof cultivationTerminating.$inferSelect
-export type cultivationTerminatingTypeInsert =
-    typeof cultivationTerminating.$inferInsert
+export type cultivationEndingTypeSelect = typeof cultivationEnding.$inferSelect
+export type cultivationEndingTypeInsert = typeof cultivationEnding.$inferInsert
 
 // Define soil_analyis table
 export const soilTypes = [
@@ -464,7 +464,7 @@ export const gwlClasses: [string, ...string[]] = [
     "VI",
     "VII",
     "Vb",
-    "-|",
+    "-",
     "Va",
     "III",
     "VIII",

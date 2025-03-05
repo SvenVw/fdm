@@ -8,16 +8,16 @@ export interface getCultivationType {
     b_lu_name_en: schema.cultivationsCatalogueTypeSelect["b_lu_name_en"]
     b_lu_hcat3: schema.cultivationsCatalogueTypeSelect["b_lu_hcat3"]
     b_lu_hcat3_name: schema.cultivationsCatalogueTypeSelect["b_lu_hcat3_name"]
-    b_sowing_date: schema.fieldSowingTypeSelect["b_sowing_date"]
-    b_terminating_date: schema.cultivationTerminatingTypeSelect["b_terminating_date"]
-    b_id: schema.fieldSowingTypeSelect["b_id"]
+    b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
+    b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
+    b_id: schema.cultivationStartingTypeSelect["b_id"]
 }
 
 export interface cultivationPlanType {
     b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"]
     b_lu_name: schema.cultivationsCatalogueTypeSelect["b_lu_name"]
-    b_sowing_date: schema.fieldSowingTypeSelect["b_sowing_date"]
-    b_terminating_date: schema.cultivationTerminatingTypeSelect["b_terminating_date"]
+    b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
+    b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
     fields: Array<{
         b_lu: schema.cultivationsTypeSelect["b_lu"]
         b_id: schema.fieldsTypeSelect["b_id"]
@@ -32,7 +32,7 @@ export interface cultivationPlanType {
         }>
         harvests: Array<{
             b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_"]
-            b_harvesting_date: schema.cultivationHarvestingTypeSelect["b_harvesting_date"]
+            b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
             harvestables: Array<{
                 b_id_harvestable: schema.harvestableAnalysesTypeSelect["b_id_harvestable"]
                 harvestable_analyses: Array<{

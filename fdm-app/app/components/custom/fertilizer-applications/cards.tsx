@@ -25,7 +25,7 @@ function FertilizerApplicationsCard({
                 <p className="text-xs text-muted-foreground">{shortname}</p>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="text-2xl font-bold">{`${value} ${unit}`}</div>
+                <div className="text-2xl font-bold">{`${Math.round(value)} ${unit}`}</div>
                 <div className="grid grid-cols-2 items-center space-x-2">
                     <TooltipProvider>
                         <Tooltip>
@@ -101,16 +101,24 @@ function constructCards(dose: Dose) {
             shortname: "Ntot",
             value: dose.p_dose_n,
             unit: "kg/ha",
-            limit: 250,
-            advice: 200,
+            limit: undefined,
+            advice: undefined,
+        },
+        {
+            title: "Stikstof, werkzaam",
+            shortname: "Nw",
+            value: dose.p_dose_nw,
+            unit: "kg/ha",
+            limit: undefined,
+            advice: undefined,
         },
         {
             title: "Fosfaat, totaal",
             shortname: "P2O5",
             value: dose.p_dose_p2o5,
             unit: "kg/ha",
-            limit: 75,
-            advice: 40,
+            limit: undefined,
+            advice: undefined,
         },
         {
             title: "Kalium, totaal",
@@ -118,7 +126,7 @@ function constructCards(dose: Dose) {
             value: dose.p_dose_k2o,
             unit: "kg/ha",
             limit: undefined,
-            advice: 90,
+            advice: undefined,
         },
     ]
 

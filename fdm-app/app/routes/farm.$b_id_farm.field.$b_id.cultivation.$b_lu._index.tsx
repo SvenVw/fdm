@@ -162,10 +162,8 @@ export default function FarmFieldsOverviewBlock() {
             <div className="space-y-6">
                 <CultivationForm
                     b_lu_catalogue={loaderData.cultivation.b_lu_catalogue}
-                    b_sowing_date={loaderData.cultivation.b_sowing_date}
-                    b_terminating_date={
-                        loaderData.cultivation.b_terminating_date
-                    }
+                    b_lu_start={loaderData.cultivation.b_lu_start}
+                    b_lu_end={loaderData.cultivation.b_lu_end}
                     options={loaderData.cultivationsCatalogueOptions}
                     action={`/farm/${loaderData.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
                 />
@@ -214,16 +212,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { b_lu_catalogue, b_sowing_date, b_terminating_date } =
-                formValues
+            const { b_lu_catalogue, b_lu_start, b_lu_end } = formValues
 
             await updateCultivation(
                 fdm,
                 session.principal_id,
                 b_lu,
                 b_lu_catalogue,
-                b_sowing_date,
-                b_terminating_date,
+                b_lu_start,
+                b_lu_end,
             )
 
             return dataWithSuccess(

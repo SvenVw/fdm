@@ -200,7 +200,7 @@ export default function Index() {
  * the updated field data.
  *
  * @returns An object with a "field" property holding the updated field information.
- * 
+ *
  * @throws {Error} If the form data is missing the "b_id" or "b_name" field.
  * @throws {Error} If an error occurs during the field update process.
  */
@@ -228,7 +228,7 @@ export async function action({ request, params }: LoaderFunctionArgs) {
             undefined, // b_id_source
             undefined, // b_geometry
             undefined, // b_acquiring_date
-            undefined, // b_terminating_date
+            undefined, // b_lu_end
             undefined, // b_acquiring_method
         )
         return { field: updatedField }

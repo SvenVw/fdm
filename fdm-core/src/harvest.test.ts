@@ -186,7 +186,7 @@ describe("harvest", () => {
         const harvest = await getHarvest(fdm, principal_id, b_id_harvesting)
 
         expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
-        expect(harvest.b_harvesting_date).toEqual(harvesting_date)
+        expect(harvest.b_lu_harvest_date).toEqual(harvesting_date)
         expect(
             harvest.harvestables[0].harvestable_analyses[0].b_lu_yield,
         ).toEqual(1000)
@@ -199,10 +199,10 @@ describe("harvest", () => {
         const harvests = await getHarvests(fdm, principal_id, b_lu_once)
 
         expect(harvests.length).toEqual(1)
-        expect(cultivation.b_terminating_date?.getTime()).toEqual(
-            harvests[0].b_harvesting_date?.getTime(),
+        expect(cultivation.b_lu_end?.getTime()).toEqual(
+            harvests[0].b_lu_harvest_date?.getTime(),
         )
-        expect(harvests[0].b_harvesting_date).toEqual(harvesting_date)
+        expect(harvests[0].b_lu_harvest_date).toEqual(harvesting_date)
         expect(
             harvests[0].harvestables[0].harvestable_analyses[0].b_lu_yield,
         ).toEqual(null)

@@ -29,8 +29,8 @@ import { redirectWithSuccess } from "remix-toast"
  * @returns An object containing:
  *   - b_lu_catalogue: The catalogue identifier for the cultivation.
  *   - b_id_farm: The identifier of the farm.
- *   - b_sowing_date: The sowing date of the cultivation.
- *   - b_terminating_date: The terminating date of the cultivation.
+ *   - b_lu_start: The sowing date of the cultivation.
+ *   - b_lu_end: The terminating date of the cultivation.
  *   - harvests: The existing harvest data for the cultivation (if available).
  *   - cultivationOptions: An array of available cultivation options with { value, label }.
  *
@@ -85,15 +85,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Cultivation not found",
             })
         }
-        const b_sowing_date = cultivation.b_sowing_date
-        const b_terminating_date = cultivation.b_terminating_date
+        const b_lu_start = cultivation.b_lu_start
+        const b_lu_end = cultivation.b_lu_end
         const harvests = cultivation?.fields?.[0]?.harvests
 
         return {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
-            b_sowing_date: b_sowing_date,
-            b_terminating_date: b_terminating_date,
+            b_lu_start: b_lu_start,
+            b_lu_end: b_lu_end,
             harvests: harvests,
             cultivationOptions: cultivationOptions,
         }
@@ -125,7 +125,7 @@ export default function CultivationPlanAddHarvestBlock() {
             <HarvestForm
                 b_lu_yield={undefined}
                 b_lu_n_harvestable={undefined}
-                b_harvesting_date={undefined}
+                b_lu_harvest_date={undefined}
             />
         </div>
     )
@@ -178,7 +178,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     fdm,
                     session.principal_id,
                     item,
-                    formValues.b_harvesting_date,
+                    formValues.b_lu_harvest_date,
                     formValues.b_lu_yield,
                     formValues.b_lu_n_harvestable,
                 )

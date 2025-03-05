@@ -1,5 +1,37 @@
 # Changelog fdm-app
 
+## 0.13.0
+
+### Minor Changes
+
+- c5c3dd9: Do not show example values for advice and limit at fertilizer application cards
+- 3759d58: Add a card at fertilizer applications with workable nitrogen
+
+### Patch Changes
+
+- 46b9f71: Rename `b_harvesting_date` to `b_lu_harvest_date`
+- d9d2b6f: Fix displaying unit of `p_app_amount`
+- 649d93b: Rename `b_terminating_date` to `b_lu_end`
+- e67cf12: Rename `b_acquiring_date` to `b_start`
+- e82a0eb: Improve layout of the fields page at the create farm wizard to show the map better
+- 054da12: Fix saving fields details at create farm wizard by using correct format for b_area
+- 877a7f1: Remame `b_discarding_date` to `b_end`
+- 3e77a90: Fix exception at adding fertilizer applications in create farm wizard
+- def1d0b: Rename `b_sowing_date` to `b_lu_start`
+- Updated dependencies [4d1dbd9]
+- Updated dependencies [4d1dbd9]
+- Updated dependencies [0224544]
+- Updated dependencies [0b28bd5]
+- Updated dependencies [45eda20]
+- Updated dependencies [1a295b0]
+- Updated dependencies [6a01698]
+- Updated dependencies [e312060]
+- Updated dependencies [972bac8]
+- Updated dependencies [7387530]
+  - @svenvw/fdm-core@0.14.0
+  - @svenvw/fdm-calculator@1.0.0
+  - @svenvw/fdm-data@1.0.0
+
 ## 0.12.0
 
 ### Minor Changes

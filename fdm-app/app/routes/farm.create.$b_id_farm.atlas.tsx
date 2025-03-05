@@ -272,9 +272,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const b_geometry = field.geometry
                 const currentYear = new Date().getFullYear()
                 const defaultDate = new Date(currentYear, 0, 1)
-                const b_acquiring_date = defaultDate
-                const b_date_sowing = defaultDate
-                const b_terminating_date = undefined
+                const b_start = defaultDate
+                const b_lu_start = defaultDate
+                const b_lu_end = undefined
+                const b_end = undefined
                 const b_acquiring_method = "unknown"
 
                 const b_id = await addField(
@@ -284,17 +285,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_name,
                     b_id_source,
                     b_geometry,
-                    b_acquiring_date,
+                    b_start,
                     b_acquiring_method,
-                    b_terminating_date,
+                    b_end,
                 )
                 await addCultivation(
                     fdm,
                     session.principal_id,
                     b_lu_catalogue,
                     b_id,
-                    b_date_sowing,
-                    b_terminating_date,
+                    b_lu_start,
+                    b_lu_end,
                 )
 
                 if (process.env.NMI_API_KEY) {

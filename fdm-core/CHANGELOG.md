@@ -1,5 +1,21 @@
 # Changelog fdm-core
 
+## 0.14.0
+
+### Minor Changes
+
+- 4d1dbd9: Rename table `cultivation_terminating` to `cultivation_ending`
+- 4d1dbd9: Rename `b_terminating_date` to `b_lu_end`
+- 0224544: Rename table `field_sowing` to `cultivation_starting`
+- 0b28bd5: Rename `b_harvesting_date` to `b_lu_harvest_date`
+- 1a295b0: Rename `b_discarding_date` to `b_end`
+- 972bac8: Rename `b_sowing_date` to `b_lu_start`
+- 7387530: Rename `b_acquiring_date` to `b_start`
+
+### Patch Changes
+
+- 6a01698: Fix value for option `-` at `b_gwl_class`
+
 ## 0.13.0
 
 ### Minor Changes

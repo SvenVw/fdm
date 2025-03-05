@@ -24,7 +24,7 @@ import {
  *   - b_id_farm: The provided farm identifier.
  *   - b_lu_yield: The yield value from the harvest analysis, if available.
  *   - b_lu_n_harvestable: The number of harvestable items from the harvest analysis, if available.
- *   - b_harvesting_date: The date of the harvest, if available.
+ *   - b_lu_harvest_date: The date of the harvest, if available.
  *
  * @throws {Response} When any required parameter (catalogue identifier, farm ID, or harvesting ID) is missing.
  */
@@ -91,7 +91,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_n_harvestable:
                 harvest?.harvestables?.[0].harvestable_analyses?.[0]
                     .b_lu_n_harvestable,
-            b_harvesting_date: harvest?.b_harvesting_date,
+            b_lu_harvest_date: harvest?.b_lu_harvest_date,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -126,7 +126,7 @@ export default function CultivationPlanGetHarvestBlock() {
             <HarvestForm
                 b_lu_yield={loaderData.b_lu_yield}
                 b_lu_n_harvestable={loaderData.b_lu_n_harvestable}
-                b_harvesting_date={loaderData.b_harvesting_date}
+                b_lu_harvest_date={loaderData.b_lu_harvest_date}
             />
         </div>
     )

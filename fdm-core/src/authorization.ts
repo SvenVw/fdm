@@ -500,17 +500,20 @@ async function getResourceChain(
             const result = await fdm
                 .select({
                     farm: schema.fieldAcquiring.b_id_farm,
-                    field: schema.fieldSowing.b_id,
+                    field: schema.cultivationStarting.b_id,
                     cultivation: schema.cultivations.b_lu,
                 })
                 .from(schema.cultivations)
                 .leftJoin(
-                    schema.fieldSowing,
-                    eq(schema.cultivations.b_lu, schema.fieldSowing.b_lu),
+                    schema.cultivationStarting,
+                    eq(
+                        schema.cultivations.b_lu,
+                        schema.cultivationStarting.b_lu,
+                    ),
                 )
                 .leftJoin(
                     schema.fields,
-                    eq(schema.fieldSowing.b_id, schema.fields.b_id),
+                    eq(schema.cultivationStarting.b_id, schema.fields.b_id),
                 )
                 .leftJoin(
                     schema.fieldAcquiring,
@@ -533,7 +536,7 @@ async function getResourceChain(
             const result = await fdm
                 .select({
                     farm: schema.fieldAcquiring.b_id_farm,
-                    field: schema.fieldSowing.b_id,
+                    field: schema.cultivationStarting.b_id,
                     cultivation: schema.cultivationHarvesting.b_lu,
                     harvesting: schema.cultivationHarvesting.b_id_harvesting,
                 })
@@ -546,12 +549,15 @@ async function getResourceChain(
                     ),
                 )
                 .leftJoin(
-                    schema.fieldSowing,
-                    eq(schema.cultivations.b_lu, schema.fieldSowing.b_lu),
+                    schema.cultivationStarting,
+                    eq(
+                        schema.cultivations.b_lu,
+                        schema.cultivationStarting.b_lu,
+                    ),
                 )
                 .leftJoin(
                     schema.fields,
-                    eq(schema.fieldSowing.b_id, schema.fields.b_id),
+                    eq(schema.cultivationStarting.b_id, schema.fields.b_id),
                 )
                 .leftJoin(
                     schema.fieldAcquiring,

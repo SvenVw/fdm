@@ -35,8 +35,8 @@ export const FormSchema = z.object({
             message: "Hoeveelheid moet een safe getal zijn",
         })
         .optional(),
-    // b_sowing_date: z.coerce.date().optional(),
-    b_harvesting_date: z.coerce.date({
+    // b_lu_start: z.coerce.date().optional(),
+    b_lu_harvest_date: z.coerce.date({
         required_error: "Oogstdatum is verplicht",
         invalid_type_error: "Oogstdatum moet een datum zijn",
     }),
