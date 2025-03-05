@@ -524,3 +524,55 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
 
 export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
 export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
+
+// Define fertilizer_catalogue_enabling table
+export const fertilizerCatalogueEnabling = fdmSchema.table(
+    "fertilizer_catalogue_enabling",
+    {
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        p_source: text().notNull(),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => {
+        return [
+            {
+                pk: primaryKey({ columns: [table.b_id_farm, table.p_source] }),
+            },
+        ]
+    },
+)
+
+export type fertilizerCatalogueEnablingTypeSelect =
+    typeof fertilizerCatalogueEnabling.$inferSelect
+export type fertilizerCatalogueEnablingTypeInsert =
+    typeof fertilizerCatalogueEnabling.$inferInsert
+
+// Define cultivation_catalogue_selecting table
+export const cultivationCatalogueSelecting = fdmSchema.table(
+    "cultivation_catalogue_selecting",
+    {
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        b_lu_source: text().notNull(),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => {
+        return [
+            {
+                pk: primaryKey({
+                    columns: [table.b_id_farm, table.b_lu_source],
+                }),
+            },
+        ]
+    },
+)
+
+export type cultivationCatalogueSelectingTypeSelect =
+    typeof cultivationCatalogueSelecting.$inferSelect
+export type cultivationCatalogueSelectingTypeInsert =
+    typeof cultivationCatalogueSelecting.$inferInsert
