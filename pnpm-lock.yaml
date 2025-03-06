@@ -32,7 +32,7 @@ catalogs:
       version: 5.1.4
     vitest:
       specifier: ^3.0.6
-      version: 2.1.9
+      version: 3.0.6
 
 packageExtensionsChecksum: sha256-VQuFGSJ2NQgmUfUYujaw/wyx7PoF3FcUJ5DmmDpAEDo=
 
@@ -297,6 +297,9 @@ importers:
       '@electric-sql/pglite':
         specifier: ^0.2.17
         version: 0.2.17
+      '@svenvw/fdm-data':
+        specifier: workspace:*
+        version: link:../fdm-data
       '@types/geojson':
         specifier: ^7946.0.16
         version: 7946.0.16
@@ -360,10 +363,6 @@ importers:
         version: 3.0.6(@types/debug@4.1.12)(@types/node@22.13.5)(jiti@1.21.7)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
 
   fdm-data:
-    dependencies:
-      '@svenvw/fdm-core':
-        specifier: workspace:>=0.14.0
-        version: link:../fdm-core
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: 'catalog:'
@@ -380,9 +379,6 @@ importers:
       '@rollup/plugin-typescript':
         specifier: ^12.1.2
         version: 12.1.2(rollup@4.34.8)(tslib@2.8.1)(typescript@5.7.3)
-      drizzle-orm:
-        specifier: 'catalog:'
-        version: 0.39.2(@electric-sql/pglite@0.2.17)(@opentelemetry/api@1.9.0)(@types/pg@8.6.1)(@types/react@19.0.10)(kysely@0.27.5)(postgres@3.4.5)(react@18.3.1)
       rollup:
         specifier: ^4.34.8
         version: 4.34.8
