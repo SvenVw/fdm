@@ -1,5 +1,8 @@
-import type { CatalogueFertilizer } from "../d"
+import type { CatalogueFertilizer, CatalogueFertilizerItem } from "../d"
 import srm from "./srm.json"
+import xxhash from "xxhash-wasm"
+
+const { h32ToString } = await xxhash()
 
 /**
  * Retrieves the SRM (Sluiting Regionale Kringlopen) fertilizer catalogue.
@@ -13,7 +16,7 @@ import srm from "./srm.json"
  */
 export function getCatalogueSrm(): CatalogueFertilizer {
     const catalogueSrm = srm.map((fertilizer) => {
-        return {
+        const item: CatalogueFertilizerItem = {
             p_source: "srm",
             p_id_catalogue: fertilizer.p_id_catalogue,
             p_name_nl: fertilizer.p_name_nl,
@@ -68,7 +71,13 @@ export function getCatalogueSrm(): CatalogueFertilizer {
             p_type_manure: fertilizer.p_type_manure,
             p_type_mineral: fertilizer.p_type_mineral,
             p_type_compost: fertilizer.p_type_compost,
+            hash: null,
         }
+
+        // Hash the item
+        item.hash = h32ToString(JSON.stringify(item))
+
+        return item
     })
 
     return catalogueSrm

@@ -8,6 +8,7 @@ export interface CatalogueCultivationItem {
     b_lu_harvestable: "once" | "none" | "multiple"
     b_lu_hcat3: string | null
     b_lu_hcat3_name: string | null
+    hash: string | null
 }
 
 export type CatalogueCultivation = CatalogueCultivationItem[]

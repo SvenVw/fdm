@@ -1,5 +1,8 @@
 import type { CatalogueCultivation, CatalogueCultivationItem } from "../d"
 import brp from "./brp.json"
+import xxhash from "xxhash-wasm"
+
+const { h32ToString } = await xxhash()
 
 /**
  * Retrieves the BRP (Basisregistratie Perceel) cultivation catalogue.
@@ -33,7 +36,12 @@ export function getCatalogueBrp(): CatalogueCultivation {
             b_lu_harvestable: harvestable,
             b_lu_hcat3: cultivation.b_lu_hcat3,
             b_lu_hcat3_name: cultivation.b_lu_hcat3_name,
+            hash: null,
         }
+
+        // Hash the item
+        item.hash = h32ToString(JSON.stringify(item))
+
         return item
     })
 

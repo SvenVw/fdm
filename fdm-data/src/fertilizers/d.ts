@@ -49,6 +49,7 @@ export interface CatalogueFertilizerItem {
     p_type_manure: boolean | null
     p_type_mineral: boolean | null
     p_type_compost: boolean | null
+    hash: string | null
 }
 
 export type CatalogueFertilizer = CatalogueFertilizerItem[]

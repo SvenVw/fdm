@@ -84,6 +84,7 @@ describe("getCatalogueSrm", () => {
             expect(item).toHaveProperty("p_type_manure")
             expect(item).toHaveProperty("p_type_mineral")
             expect(item).toHaveProperty("p_type_compost")
+            expect(item).toHaveProperty("hash")
         }
     })
 

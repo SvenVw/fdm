@@ -1,4 +1,4 @@
-import { describe, it, expect} from "vitest"
+import { describe, it, expect } from "vitest"
 import { getCultivationCatalogue } from "./index"
 import { getCatalogueBrp } from "./catalogues/brp"
 
@@ -51,6 +51,7 @@ describe("getCatalogueBrp", () => {
             expect(item).toHaveProperty("b_lu_harvestable")
             expect(item).toHaveProperty("b_lu_hcat3")
             expect(item).toHaveProperty("b_lu_hcat3_name")
+            expect(item).toHaveProperty("hash")
         }
     })
 
