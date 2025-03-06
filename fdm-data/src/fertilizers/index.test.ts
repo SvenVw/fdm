@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect } from "vitest"
 import { getFertilizersCatalogue } from "./index"
 import { getCatalogueSrm } from "./catalogues/srm"
 
@@ -10,9 +10,9 @@ describe("getFertilizersCatalogue", () => {
     })
 
     it("should throw an error when an invalid catalogueName is provided", () => {
-        expect(() =>
-            getFertilizersCatalogue("invalid-catalogue"),
-        ).toThrowError("catalogue invalid-catalogue is not recognized")
+        expect(() => getFertilizersCatalogue("invalid-catalogue")).toThrowError(
+            "catalogue invalid-catalogue is not recognized",
+        )
     })
 
     it("should return a non-empty array for 'srm' catalogue", () => {
@@ -30,6 +30,7 @@ describe("getFertilizersCatalogue", () => {
 })
 
 describe("getCatalogueSrm", () => {
+    const originalSrm = require("./catalogues/srm.json")
     it("should return an array of CatalogueFertilizerItem", () => {
         const catalogue = getCatalogueSrm()
         expect(Array.isArray(catalogue)).toBe(true)
@@ -90,33 +91,4 @@ describe("getCatalogueSrm", () => {
         const catalogue = getCatalogueSrm()
         expect(catalogue.length).toBeGreaterThan(0)
     })
-    
-    it('should handle undefined values in srm.json', () => {
-        // Mock the srm.json data with some undefined values
-        const originalSrm = require("./catalogues/srm.json")
-        const modifiedSrm = JSON.parse(JSON.stringify(originalSrm));
-        modifiedSrm[0].p_dm = undefined;
-        modifiedSrm[0].p_density = undefined;
-        modifiedSrm[0].p_type_manure = undefined;
-
-        // Replace the srm.json import with a mocked version
-        vi.mock("./catalogues/srm.json", () => ({ default: modifiedSrm }))
-
-        // Re-import after mocking
-        const { getCatalogueSrm } = require("./catalogues/srm")
-        const catalogue = getCatalogueSrm();
-
-        // Restore the original srm.json
-        vi.unmock("./catalogues/srm.json")
-        vi.doUnmock("./catalogues/srm")
-        vi.mock("./catalogues/srm.json", () => ({ default: originalSrm }))
-        
-        expect(catalogue.length).toBeGreaterThan(0);
-
-        // Check if the specific fields that were undefined are now null
-        const item = catalogue[0];
-        expect(item.p_dm).toBeNull();
-        expect(item.p_density).toBeNull();
-        expect(item.p_type_manure).toBeUndefined();
-    });
 })

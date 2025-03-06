@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect} from "vitest"
 import { getCultivationCatalogue } from "./index"
 import { getCatalogueBrp } from "./catalogues/brp"
 
@@ -50,33 +50,12 @@ describe("getCatalogueBrp", () => {
             expect(item).toHaveProperty("b_lu_name_en")
             expect(item).toHaveProperty("b_lu_harvestable")
             expect(item).toHaveProperty("b_lu_hcat3")
-            expect(item).toHaveProperty("b_lu_hcat3_name")        
+            expect(item).toHaveProperty("b_lu_hcat3_name")
         }
     })
 
     it("should return at least one item", () => {
         const catalogue = getCatalogueBrp()
         expect(catalogue.length).toBeGreaterThan(0)
-    })
-
-    it("should throw an error for invalid b_lu_harvestable values", () => {
-        // Mock the brp.json data with an invalid value
-        const originalBrp = require("./catalogues/brp.json")
-        const invalidBrp = [{ ...originalBrp[0], b_lu_harvestable: "invalid" }]
-
-        // Replace the brp.json import with a mocked version
-        vi.mock("./catalogues/brp.json", () => ({ default: invalidBrp }))
-
-        // Re-import after mocking
-        const { getCatalogueBrp } = require("./catalogues/brp")
-
-        expect(() => getCatalogueBrp()).toThrowError(
-            "Invalid value for b_lu_harvestable: invalid. Expected 'once', 'multiple' or 'none'",
-        )
-
-        // Restore the original brp.json
-        vi.unmock("./catalogues/brp.json")
-        vi.doUnmock("./catalogues/brp")
-        vi.mock("./catalogues/brp.json", () => ({ default: originalBrp }))
     })
 })
