@@ -158,6 +158,60 @@ describe("Catalogues", () => {
             expect(enabledCatalogues).toHaveLength(sources.length)
             expect(enabledCatalogues).toEqual(expect.arrayContaining(sources))
         })
+        it("should throw an error when permission check fails for getEnabledFertilizerCatalogues", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                getEnabledFertilizerCatalogues(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error when permission check fails for enableFertilizerCatalogue", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                enableFertilizerCatalogue(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error when permission check fails for disableFertilizerCatalogue", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                disableFertilizerCatalogue(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error when permission check fails for isFertilizerCatalogueEnabled", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                isFertilizerCatalogueEnabled(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
 
         it("should handle edge cases for disableFertilizerCatalogue", async () => {
             const p_source = "test_disable_source"
@@ -408,6 +462,48 @@ describe("Catalogues", () => {
                     fdm,
                     invalidPrincipalId,
                     b_id_farm,
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error when permission check fails for enableCultivationCatalogue", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                enableCultivationCatalogue(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error when permission check fails for disableCultivationCatalogue", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                disableCultivationCatalogue(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error when permission check fails for isCultivationCatalogueEnabled", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                isCultivationCatalogueEnabled(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
                 ),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
