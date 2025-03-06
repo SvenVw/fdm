@@ -19,7 +19,6 @@ import {
     getFertilizersCatalogue,
 } from "@svenvw/fdm-data"
 import { addFarm } from "./farm"
-import { hash } from "crypto"
 
 describe("Catalogues", () => {
     let fdm: FdmType
