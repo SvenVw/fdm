@@ -158,6 +158,138 @@ describe("Catalogues", () => {
             expect(enabledCatalogues).toHaveLength(sources.length)
             expect(enabledCatalogues).toEqual(expect.arrayContaining(sources))
         })
+
+        it("should handle edge cases for disableFertilizerCatalogue", async () => {
+            const p_source = "test_disable_source"
+
+            // Case 1: Disabling a fertilizer catalogue that isn't enabled should not throw errors
+            // This tests the compound condition in the where clause
+            await disableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_source,
+            )
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    p_source,
+                ),
+            ).toBe(false)
+
+            // Case 2: Enable and then disable with same farm but different source
+            await enableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_source,
+            )
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    p_source,
+                ),
+            ).toBe(true)
+
+            // Disable with wrong source - should not disable the original
+            await disableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                "wrong_source",
+            )
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    p_source,
+                ),
+            ).toBe(true)
+
+            // Case 3: Test with different farm
+            // Create a second test farm
+            const secondFarmName = "Second Test Farm"
+            const secondFarmBusinessId = "654321"
+            const secondFarmAddress = "456 Farm Lane"
+            const secondFarmPostalCode = "54321"
+            const second_b_id_farm = await addFarm(
+                fdm,
+                principal_id,
+                secondFarmName,
+                secondFarmBusinessId,
+                secondFarmAddress,
+                secondFarmPostalCode,
+            )
+
+            // Enable for second farm
+            await enableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                second_b_id_farm,
+                p_source,
+            )
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    second_b_id_farm,
+                    p_source,
+                ),
+            ).toBe(true)
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    p_source,
+                ),
+            ).toBe(true)
+
+            // Disable for first farm should not affect second farm
+            await disableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_source,
+            )
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    p_source,
+                ),
+            ).toBe(false)
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    second_b_id_farm,
+                    p_source,
+                ),
+            ).toBe(true)
+
+            // Disable for second farm
+            await disableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                second_b_id_farm,
+                p_source,
+            )
+            expect(
+                await isFertilizerCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    second_b_id_farm,
+                    p_source,
+                ),
+            ).toBe(false)
+        })
     })
 
     describe("Cultivation Catalogues", () => {
