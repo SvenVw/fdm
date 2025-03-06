@@ -428,7 +428,7 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
                 )
             } else {
                 // Update item if different
-                if (!brpItem.hash && brpItem.hash !== existingItem[0].hash) {
+                if (brpItem.hash && brpItem.hash !== existingItem[0].hash) {
                     await fdm
                         .update(schema.cultivationsCatalogue)
                         .set(brpItem)

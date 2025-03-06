@@ -10,9 +10,16 @@ import {
     disableCultivationCatalogue,
     isFertilizerCatalogueEnabled,
     isCultivationCatalogueEnabled,
+    syncCatalogues,
 } from "./catalogues"
 import type { FdmType } from "./fdm"
+import { eq, isNotNull } from "drizzle-orm"
+import {
+    getCultivationCatalogue,
+    getFertilizersCatalogue,
+} from "@svenvw/fdm-data"
 import { addFarm } from "./farm"
+import { hash } from "crypto"
 
 describe("Catalogues", () => {
     let fdm: FdmType
@@ -263,5 +270,153 @@ describe("Catalogues", () => {
             expect(enabledCatalogues).toHaveLength(sources.length)
             expect(enabledCatalogues).toEqual(expect.arrayContaining(sources))
         })
+    })
+})
+
+describe("Catalogues syncing", () => {
+    let fdm: FdmType
+
+    beforeEach(async () => {
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
+    })
+
+    it("should sync catalogues", async () => {
+        await syncCatalogues(fdm)
+
+        // Check if catalogue data is similiar to fdm-data
+        const srmCatalogue = await fdm
+            .select()
+            .from(schema.fertilizersCatalogue)
+
+        const srmCatalogueOriginal = getFertilizersCatalogue("srm")
+        expect(srmCatalogue.length).toBeGreaterThan(srmCatalogueOriginal.length)
+
+        const brpCatalogue = await fdm
+            .select()
+            .from(schema.cultivationsCatalogue)
+        expect(brpCatalogue.length).toBeGreaterThan(0)
+
+        const brpCatalogueOriginal = getCultivationCatalogue("brp")
+        expect(brpCatalogue.length).toBeGreaterThan(brpCatalogueOriginal.length)
+    })
+
+    it("should update fertilizer catalogue", async () => {
+        await syncCatalogues(fdm)
+
+        // Update a catalogue item
+        const item = await fdm
+            .select({
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                hash: schema.fertilizersCatalogue.hash,
+            })
+            .from(schema.fertilizersCatalogue)
+            .where(isNotNull(schema.fertilizersCatalogue.hash))
+            .limit(1)
+        expect(item[0].p_id_catalogue).toBeDefined()
+
+        await fdm
+            .update(schema.fertilizersCatalogue)
+            .set({ hash: "Updated hash" })
+            .where(
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    item[0].p_id_catalogue,
+                ),
+            )
+
+        const itemUpdated = await fdm
+            .select({
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                hash: schema.fertilizersCatalogue.hash,
+            })
+            .from(schema.fertilizersCatalogue)
+            .where(
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    item[0].p_id_catalogue,
+                ),
+            )
+        expect(itemUpdated[0].p_id_catalogue).toBeDefined()
+        expect(itemUpdated[0].hash).toBe("Updated hash")
+
+        await syncCatalogues(fdm)
+
+        const itemSynced = await fdm
+            .select({
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                hash: schema.fertilizersCatalogue.hash,
+            })
+            .from(schema.fertilizersCatalogue)
+            .where(
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    item[0].p_id_catalogue,
+                ),
+            )
+
+        expect(itemSynced[0].p_id_catalogue).toBeDefined()
+        expect(itemSynced[0].hash).toBe(item[0].hash)
+    })
+
+    it("should update cultivation catalogue", async () => {
+        await syncCatalogues(fdm)
+
+        // Update a catalogue item
+        const item = await fdm
+            .select({
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                hash: schema.cultivationsCatalogue.hash,
+            })
+            .from(schema.cultivationsCatalogue)
+            .where(isNotNull(schema.cultivationsCatalogue.hash))
+            .limit(1)
+        expect(item[0].b_lu_catalogue).toBeDefined()
+
+        await fdm
+            .update(schema.cultivationsCatalogue)
+            .set({ hash: "Updated hash" })
+            .where(
+                eq(
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                    item[0].b_lu_catalogue,
+                ),
+            )
+
+        const itemUpdated = await fdm
+            .select({
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                hash: schema.cultivationsCatalogue.hash,
+            })
+            .from(schema.cultivationsCatalogue)
+            .where(
+                eq(
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                    item[0].b_lu_catalogue,
+                ),
+            )
+        expect(itemUpdated[0].b_lu_catalogue).toBeDefined()
+        expect(itemUpdated[0].hash).toBe("Updated hash")
+
+        await syncCatalogues(fdm)
+
+        const itemSynced = await fdm
+            .select({
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                hash: schema.cultivationsCatalogue.hash,
+            })
+            .from(schema.cultivationsCatalogue)
+            .where(
+                eq(
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                    item[0].b_lu_catalogue,
+                ),
+            )
+        expect(itemSynced[0].b_lu_catalogue).toBeDefined()
+        expect(itemSynced[0].hash).toBe(item[0].hash)
     })
 })
