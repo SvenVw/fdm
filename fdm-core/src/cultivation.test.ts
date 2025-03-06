@@ -680,3 +680,38 @@ describe("Cultivation Data Model", () => {
         })
     })
 })
+
+describe("getCultivationsFromCatalogue error handling", () => {
+    const principal_id = "test-principal"
+    const b_id_farm = "test-farm"
+
+    it("should handle database errors", async () => {
+        // Create a custom fdm implementation that throws an error
+        const mockFdm = {
+            select: () => {
+                throw new Error("Database error")
+            },
+        }
+
+        // Act & Assert
+        try {
+            await getCultivationsFromCatalogue(
+                mockFdm as any,
+                principal_id,
+                b_id_farm,
+            )
+            // Should not reach here
+            expect.fail("Expected an error to be thrown")
+        } catch (err: any) {
+            // Check that error was handled correctly
+            expect(err).toBeDefined()
+            expect(err.message).toContain(
+                "Exception for getCultivationsFromCatalogue",
+            )
+            expect(err.context).toEqual({
+                principal_id,
+                b_id_farm,
+            })
+        }
+    })
+})

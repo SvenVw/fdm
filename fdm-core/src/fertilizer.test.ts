@@ -25,7 +25,7 @@ import {
 } from "./fertilizer"
 import { addField } from "./field"
 import { createId } from "./id"
-import { enableFertilizerCatalogue } from "./catalogues"
+import { disableFertilizerCatalogue, enableFertilizerCatalogue } from "./catalogues"
 
 describe("Fertilizer Data Model", () => {
     let fdm: FdmServerType
@@ -374,6 +374,24 @@ describe("Fertilizer Data Model", () => {
 
             const fertilizer = await getFertilizer(fdm, p_id)
             expect(fertilizer).toBeUndefined()
+        })
+
+        it("should return empty array when no catalogues are enabled", async () => {
+            const fertilizersWithEnabledCatalogue =
+                await getFertilizersFromCatalogue(fdm, principal_id, b_id_farm)
+            expect(fertilizersWithEnabledCatalogue).toBeDefined()
+
+            await disableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_source,
+            )
+
+            const fertilizersWithNoCatalogue =
+                await getFertilizersFromCatalogue(fdm, principal_id, b_id_farm)
+            expect(fertilizersWithNoCatalogue).toEqual([])
+            expect(fertilizersWithNoCatalogue.length).toBe(0)
         })
     })
 
