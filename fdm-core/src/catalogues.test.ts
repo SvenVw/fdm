@@ -269,6 +269,44 @@ describe("Catalogues", () => {
             expect(enabledCatalogues).toHaveLength(sources.length)
             expect(enabledCatalogues).toEqual(expect.arrayContaining(sources))
         })
+        it("should throw an error when permission check fails", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                getEnabledCultivationCatalogues(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should include context in the error when database query fails", async () => {
+            const invalidFdm = {
+                ...fdm,
+                select: () => {
+                    throw new Error("Database error")
+                },
+            }
+
+            try {
+                await getEnabledCultivationCatalogues(
+                    invalidFdm,
+                    principal_id,
+                    b_id_farm,
+                )
+                // Should not reach here
+                expect(true).toBe(false)
+            } catch (error) {
+                expect(error.message).toContain(
+                    "Exception for getEnabledCultivationCatalogues",
+                )
+                expect(error.context).toBeDefined()
+                expect(error.context.principal_id).toBe(principal_id)
+                expect(error.context.b_id_farm).toBe(b_id_farm)
+            }
+        })
     })
 })
 
