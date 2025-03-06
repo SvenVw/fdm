@@ -4,6 +4,10 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import { and, eq } from "drizzle-orm"
 import { checkPermission } from "./authorization"
+import {
+    getCultivationCatalogue,
+    getFertilizersCatalogue,
+} from "@svenvw/fdm-data"
 
 /**
  * Gets all enabled fertilizer catalogues for a farm.
@@ -352,5 +356,97 @@ export async function isCultivationCatalogueEnabled(
             b_id_farm,
             b_lu_source,
         })
+    }
+}
+
+/**
+ * Synchronizes the fertilizer and cultivation catalogues in the FDM database with the data from fdm-data.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @returns A promise that resolves when the synchronization is complete.
+ */
+export async function syncCatalogues(fdm: FdmType): Promise<void> {
+    try {
+        // Sync fertilizers catalogue (SRM)
+        const srmCatalogue = getFertilizersCatalogue("srm")
+        for (const srmItem of srmCatalogue) {
+            const existingItem = await fdm
+                .select()
+                .from(schema.fertilizersCatalogue)
+                .where(
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        srmItem.p_id_catalogue,
+                    ),
+                )
+                .limit(1)
+
+            if (existingItem.length === 0) {
+                await fdm.insert(schema.fertilizersCatalogue).values(srmItem)
+                console.log(
+                    `Inserted fertilizer catalogue item: ${srmItem.p_id_catalogue}`,
+                )
+            } else {
+                // Update item if different
+                if (
+                    JSON.stringify(existingItem[0]) !== JSON.stringify(srmItem)
+                ) {
+                    await fdm
+                        .update(schema.fertilizersCatalogue)
+                        .set(srmItem)
+                        .where(
+                            eq(
+                                schema.fertilizersCatalogue.p_id_catalogue,
+                                srmItem.p_id_catalogue,
+                            ),
+                        )
+                    console.log(
+                        `Updated fertilizer catalogue item: ${srmItem.p_id_catalogue}`,
+                    )
+                }
+            }
+        }
+
+        // Sync cultivation catalogue (BRP)
+        const brpCatalogue = getCultivationCatalogue("brp")
+        for (const brpItem of brpCatalogue) {
+            const existingItem = await fdm
+                .select()
+                .from(schema.cultivationsCatalogue)
+                .where(
+                    eq(
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                        brpItem.b_lu_catalogue,
+                    ),
+                )
+                .limit(1)
+
+            if (existingItem.length === 0) {
+                await fdm.insert(schema.cultivationsCatalogue).values(brpItem)
+                console.log(
+                    `Inserted cultivation catalogue item: ${brpItem.b_lu_catalogue}`,
+                )
+            } else {
+                // Update item if different
+                if (
+                    JSON.stringify(existingItem[0]) !== JSON.stringify(brpItem)
+                ) {
+                    await fdm
+                        .update(schema.cultivationsCatalogue)
+                        .set(brpItem)
+                        .where(
+                            eq(
+                                schema.cultivationsCatalogue.b_lu_catalogue,
+                                brpItem.b_lu_catalogue,
+                            ),
+                        )
+                    console.log(
+                        `Updated cultivation catalogue item: ${brpItem.b_lu_catalogue}`,
+                    )
+                }
+            }
+        }
+    } catch (err) {
+        throw handleError(err, "Exception for syncCatalogues")
     }
 }
