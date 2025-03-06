@@ -286,7 +286,8 @@ export async function isFertilizerCatalogueEnabled(
         )
         const result = await fdm
             .select({
-                count: fdm.fn.count().as("count"),
+                b_id_farm: schema.fertilizerCatalogueEnabling.b_id_farm,
+                p_source: schema.fertilizerCatalogueEnabling.p_source,
             })
             .from(schema.fertilizerCatalogueEnabling)
             .where(
@@ -296,7 +297,7 @@ export async function isFertilizerCatalogueEnabled(
                 ),
             )
 
-        return result[0].count > 0
+        return result.length > 0
     } catch (err) {
         throw handleError(err, "Exception for isFertilizerCatalogueEnabled", {
             principal_id,
@@ -333,7 +334,8 @@ export async function isCultivationCatalogueEnabled(
         )
         const result = await fdm
             .select({
-                count: fdm.fn.count().as("count"),
+                b_id_farm: schema.cultivationCatalogueSelecting.b_id_farm,
+                b_lu_source: schema.cultivationCatalogueSelecting.b_lu_source,
             })
             .from(schema.cultivationCatalogueSelecting)
             .where(
@@ -349,7 +351,7 @@ export async function isCultivationCatalogueEnabled(
                 ),
             )
 
-        return result[0].count > 0
+        return result.length > 0
     } catch (err) {
         throw handleError(err, "Exception for isCultivationCatalogueEnabled", {
             principal_id,

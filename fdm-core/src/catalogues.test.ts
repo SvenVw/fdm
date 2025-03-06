@@ -12,6 +12,7 @@ import {
     isCultivationCatalogueEnabled,
 } from "./catalogues"
 import type { FdmType } from "./fdm"
+import { addFarm } from "./farm"
 
 describe("Catalogues", () => {
     let fdm: FdmType
@@ -26,16 +27,20 @@ describe("Catalogues", () => {
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
         principal_id = "test_principal"
-        b_id_farm = "test_farm"
 
         // Create a test farm
-        await fdm.insert(schema.farms).values({
-            b_id_farm,
-            b_name_farm: "Test Farm",
-            b_businessid_farm: "123456",
-            b_address_farm: "Test Address",
-            b_postalcode_farm: "1234AB",
-        })
+        const farmName = "Test Farm"
+        const farmBusinessId = "123456"
+        const farmAddress = "123 Farm Lane"
+        const farmPostalCode = "12345"
+        b_id_farm = await addFarm(
+            fdm,
+            principal_id,
+            farmName,
+            farmBusinessId,
+            farmAddress,
+            farmPostalCode,
+        )
     })
 
     describe("Fertilizer Catalogues", () => {
