@@ -390,9 +390,7 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
                 )
             } else {
                 // Update item if different
-                if (
-                    JSON.stringify(existingItem[0]) !== JSON.stringify(srmItem)
-                ) {
+                if (srmItem.hash && srmItem.hash !== existingItem[0].hash) {
                     await fdm
                         .update(schema.fertilizersCatalogue)
                         .set(srmItem)
@@ -430,9 +428,7 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
                 )
             } else {
                 // Update item if different
-                if (
-                    JSON.stringify(existingItem[0]) !== JSON.stringify(brpItem)
-                ) {
+                if (!brpItem.hash && brpItem.hash !== existingItem[0].hash) {
                     await fdm
                         .update(schema.cultivationsCatalogue)
                         .set(brpItem)
