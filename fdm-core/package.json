@@ -46,7 +46,7 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
-        "@rollup/plugin-commonjs": "^28.0.2",
+        "@rollup/plugin-commonjs": "^28.0.3",
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-typescript": "^12.1.2",
         "@svenvw/fdm-data": "workspace:^0.10.3",
