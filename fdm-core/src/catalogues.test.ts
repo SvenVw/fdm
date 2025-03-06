@@ -439,6 +439,39 @@ describe("Catalogues", () => {
                 expect(error.context.b_id_farm).toBe(b_id_farm)
             }
         })
+
+        it("should handle errors when disabling cultivation catalogue", async () => {
+            const b_lu_source = "test_source"
+            const invalidPrincipal = "invalid_principal" // Principal without permissions
+
+            // Enable the catalogue first with valid principal
+            await enableCultivationCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                b_lu_source,
+            )
+
+            // Attempt to disable with invalid principal should throw an error
+            await expect(
+                disableCultivationCatalogue(
+                    fdm,
+                    invalidPrincipal,
+                    b_id_farm,
+                    b_lu_source,
+                ),
+            ).rejects.toThrow()
+
+            // The catalogue should still be enabled
+            expect(
+                await isCultivationCatalogueEnabled(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    b_lu_source,
+                ),
+            ).toBe(true)
+        })
     })
 })
 
