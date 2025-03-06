@@ -1,87 +1,95 @@
-import {
-    type FdmType,
-    getFertilizersFromCatalogue,
-    fdmSchema as schema,
-} from "@svenvw/fdm-core"
-import { afterAll, beforeEach, describe, expect, it } from "vitest"
-import { extendFertilizersCatalogue } from "."
+import { describe, it, expect } from "vitest"
+import { getFertilizersCatalogue } from "./index"
+import { getCatalogueSrm } from "./catalogues/srm"
 
-import { drizzle } from "drizzle-orm/postgres-js"
-import { migrate } from "drizzle-orm/postgres-js/migrator"
-
-describe("Fertilizers Data [server]", () => {
-    let fdm: FdmType
-
-    beforeEach(async () => {
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath =
-            "node_modules/@svenvw/fdm-core/dist/db/migrations"
-
-        try {
-            // TODO: Replace workaround with createFdmServer once issue is resolved
-            // Current blocker: Migration does not work with fdmServer
-            // const fdm = await createFdmServer(
-            //     host,
-            //     port,
-            //     user,
-            //     password,
-            //     database
-            //   )
-            // await migrateFdmServer(fdm)
-
-            // Workaround
-            fdm = drizzle({
-                connection: {
-                    user: user,
-                    password: password,
-                    host: host,
-                    port: port,
-                    database: database,
-                },
-                logger: false,
-                schema: schema,
-            })
-
-            // Run migration
-            await migrate(fdm, {
-                migrationsFolder: migrationsFolderPath,
-                migrationsSchema: "fdm-migrations",
-            })
-        } catch (error) {
-            console.error("Failed to setup database:", error)
-            throw error
-        }
+describe("getFertilizersCatalogue", () => {
+    it("should return the SRM catalogue when catalogueName is 'srm'", () => {
+        const expectedCatalogue = getCatalogueSrm()
+        const actualCatalogue = getFertilizersCatalogue("srm")
+        expect(actualCatalogue).toEqual(expectedCatalogue)
     })
 
-    afterAll(async () => {
-        try {
-            // Clean up test data
-            await fdm.transaction(async (tx: FdmType) => {
-                await tx.delete(schema.fertilizerPicking).execute()
-                await tx.delete(schema.fertilizersCatalogue).execute()
-            })
-        } catch (error) {
-            console.error("Failed to cleanup:", error)
-            throw error
-        }
-    })
-
-    it("should throw error if dataset is not recognized", async () => {
-        await expect(
-            extendFertilizersCatalogue(fdm, "not-existing-dataset"),
-        ).rejects.toThrowError(
-            "catalogue not-existing-dataset is not recognized",
+    it("should throw an error when an invalid catalogueName is provided", () => {
+        expect(() => getFertilizersCatalogue("invalid-catalogue")).toThrowError(
+            "catalogue invalid-catalogue is not recognized",
         )
     })
 
-    it("should extend fertilizers catalogue with srm dataset", async () => {
-        await extendFertilizersCatalogue(fdm, "srm")
+    it("should return a non-empty array for 'srm' catalogue", () => {
+        const catalogue = getFertilizersCatalogue("srm")
+        expect(Array.isArray(catalogue)).toBe(true)
+        expect(catalogue.length).toBeGreaterThan(0)
+    })
 
-        const result = await getFertilizersFromCatalogue(fdm)
-        expect(result.length).toBeGreaterThan(0)
+    it("should check if all items in the srm catalogue have the correct source", () => {
+        const catalogue = getFertilizersCatalogue("srm")
+        for (const item of catalogue) {
+            expect(item.p_source).toBe("srm")
+        }
+    })
+})
+
+describe("getCatalogueSrm", () => {
+    const originalSrm = require("./catalogues/srm.json")
+    it("should return an array of CatalogueFertilizerItem", () => {
+        const catalogue = getCatalogueSrm()
+        expect(Array.isArray(catalogue)).toBe(true)
+        for (const item of catalogue) {
+            expect(typeof item).toBe("object")
+            expect(item).toHaveProperty("p_source")
+            expect(item).toHaveProperty("p_id_catalogue")
+            expect(item).toHaveProperty("p_name_nl")
+            expect(item).toHaveProperty("p_name_en")
+            expect(item).toHaveProperty("p_description")
+            expect(item).toHaveProperty("p_dm")
+            expect(item).toHaveProperty("p_density")
+            expect(item).toHaveProperty("p_om")
+            expect(item).toHaveProperty("p_a")
+            expect(item).toHaveProperty("p_hc")
+            expect(item).toHaveProperty("p_eom")
+            expect(item).toHaveProperty("p_eoc")
+            expect(item).toHaveProperty("p_c_rt")
+            expect(item).toHaveProperty("p_c_of")
+            expect(item).toHaveProperty("p_c_if")
+            expect(item).toHaveProperty("p_c_fr")
+            expect(item).toHaveProperty("p_cn_of")
+            expect(item).toHaveProperty("p_n_rt")
+            expect(item).toHaveProperty("p_n_if")
+            expect(item).toHaveProperty("p_n_of")
+            expect(item).toHaveProperty("p_n_wc")
+            expect(item).toHaveProperty("p_p_rt")
+            expect(item).toHaveProperty("p_k_rt")
+            expect(item).toHaveProperty("p_mg_rt")
+            expect(item).toHaveProperty("p_ca_rt")
+            expect(item).toHaveProperty("p_ne")
+            expect(item).toHaveProperty("p_s_rt")
+            expect(item).toHaveProperty("p_s_wc")
+            expect(item).toHaveProperty("p_cu_rt")
+            expect(item).toHaveProperty("p_zn_rt")
+            expect(item).toHaveProperty("p_na_rt")
+            expect(item).toHaveProperty("p_si_rt")
+            expect(item).toHaveProperty("p_b_rt")
+            expect(item).toHaveProperty("p_mn_rt")
+            expect(item).toHaveProperty("p_ni_rt")
+            expect(item).toHaveProperty("p_fe_rt")
+            expect(item).toHaveProperty("p_mo_rt")
+            expect(item).toHaveProperty("p_co_rt")
+            expect(item).toHaveProperty("p_as_rt")
+            expect(item).toHaveProperty("p_cd_rt")
+            expect(item).toHaveProperty("p_cr_rt")
+            expect(item).toHaveProperty("p_cr_vi")
+            expect(item).toHaveProperty("p_pb_rt")
+            expect(item).toHaveProperty("p_hg_rt")
+            expect(item).toHaveProperty("p_cl_cr")
+            expect(item).toHaveProperty("p_type_manure")
+            expect(item).toHaveProperty("p_type_mineral")
+            expect(item).toHaveProperty("p_type_compost")
+            expect(item).toHaveProperty("hash")
+        }
+    })
+
+    it("should return at least one item", () => {
+        const catalogue = getCatalogueSrm()
+        expect(catalogue.length).toBeGreaterThan(0)
     })
 })

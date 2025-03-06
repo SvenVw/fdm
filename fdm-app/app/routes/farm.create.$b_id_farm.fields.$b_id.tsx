@@ -8,7 +8,6 @@ import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { Combobox } from "@/components/custom/combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     FormControl,
@@ -51,7 +50,7 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
@@ -201,7 +200,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the available cultivations
         let cultivationOptions = []
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>

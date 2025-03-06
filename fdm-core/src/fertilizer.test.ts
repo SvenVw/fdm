@@ -25,11 +25,14 @@ import {
 } from "./fertilizer"
 import { addField } from "./field"
 import { createId } from "./id"
+import { disableFertilizerCatalogue, enableFertilizerCatalogue } from "./catalogues"
 
 describe("Fertilizer Data Model", () => {
     let fdm: FdmServerType
     let p_id_catalogue: string
     let principal_id: string
+    let b_id_farm: string
+    let p_source: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -39,24 +42,42 @@ describe("Fertilizer Data Model", () => {
         const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
 
-        p_id_catalogue = createId()
         principal_id = "test-principal-id"
+        const farmName = "Test Farm"
+        const farmBusinessId = "123456"
+        const farmAddress = "123 Farm Lane"
+        const farmPostalCode = "12345"
+        b_id_farm = await addFarm(
+            fdm,
+            principal_id,
+            farmName,
+            farmBusinessId,
+            farmAddress,
+            farmPostalCode,
+        )
+
+        p_source = "custom"
+        await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source)
+
+        p_id_catalogue = createId()
     })
 
     afterAll(async () => {})
 
     describe("Fertilizer CRUD", () => {
         it("should get fertilizers from catalogue", async () => {
-            const fertilizers = await getFertilizersFromCatalogue(fdm)
+            const fertilizers = await getFertilizersFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
             expect(fertilizers).toBeDefined()
         })
 
         it("should add a new fertilizer to the catalogue", async () => {
-            const p_source = "custom"
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
-            // const p_id_catalogue = 'test-fertilizer-id' // Use a predefined ID for testing
             await addFertilizerToCatalogue(fdm, {
                 p_id_catalogue,
                 p_source,
@@ -108,7 +129,11 @@ describe("Fertilizer Data Model", () => {
                 p_type_compost: false,
             })
 
-            const fertilizers = await getFertilizersFromCatalogue(fdm)
+            const fertilizers = await getFertilizersFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
             expect(fertilizers.length).toBeGreaterThanOrEqual(1)
             const fertilizer = fertilizers.find(
                 (f) => f.p_id_catalogue === p_id_catalogue,
@@ -121,21 +146,7 @@ describe("Fertilizer Data Model", () => {
         })
 
         it("should add a new fertilizer", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                principal_id,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-            )
-
             // Add fertilizer to catalogue
-            const p_source = "custom"
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
@@ -207,21 +218,7 @@ describe("Fertilizer Data Model", () => {
         })
 
         it("should get fertilizers by farm ID", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                principal_id,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-            )
-
             // Add fertilizer to catalogue
-            const p_source = "custom"
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
@@ -306,21 +303,7 @@ describe("Fertilizer Data Model", () => {
         })
 
         it("should remove a fertilizer", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                principal_id,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-            )
-
             // Add fertilizer to catalogue
-            const p_source = "custom"
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
@@ -392,6 +375,24 @@ describe("Fertilizer Data Model", () => {
             const fertilizer = await getFertilizer(fdm, p_id)
             expect(fertilizer).toBeUndefined()
         })
+
+        it("should return empty array when no catalogues are enabled", async () => {
+            const fertilizersWithEnabledCatalogue =
+                await getFertilizersFromCatalogue(fdm, principal_id, b_id_farm)
+            expect(fertilizersWithEnabledCatalogue).toBeDefined()
+
+            await disableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_source,
+            )
+
+            const fertilizersWithNoCatalogue =
+                await getFertilizersFromCatalogue(fdm, principal_id, b_id_farm)
+            expect(fertilizersWithNoCatalogue).toEqual([])
+            expect(fertilizersWithNoCatalogue.length).toBe(0)
+        })
     })
 
     describe("Fertilizer Application", () => {
@@ -438,7 +439,6 @@ describe("Fertilizer Data Model", () => {
 
             // Add fertilizer to catalogue
             p_id_catalogue = createId()
-            const p_source = "custom"
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"

@@ -14,7 +14,10 @@ import { extractFormValuesFromRequest } from "@/lib/form"
 import {
     addFarm,
     addFertilizer,
+    enableCultivationCatalogue,
+    enableFertilizerCatalogue,
     getFertilizersFromCatalogue,
+    PrincipalId,
 } from "@svenvw/fdm-core"
 import type {
     ActionFunctionArgs,
@@ -116,7 +119,23 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
         )
-        const fertilizers = await getFertilizersFromCatalogue(fdm)
+        await enableFertilizerCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            "srm",
+        )
+        await enableCultivationCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            "brp",
+        )
+        const fertilizers = await getFertilizersFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         await Promise.all(
             fertilizers.map((fertilizer) =>
                 addFertilizer(

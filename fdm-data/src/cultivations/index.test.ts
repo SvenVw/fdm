@@ -1,131 +1,62 @@
-import {
-    type FdmServerType,
-    getCultivationsFromCatalogue,
-    fdmSchema as schema,
-} from "@svenvw/fdm-core"
-import { afterAll, beforeEach, describe, expect, it } from "vitest"
+import { describe, it, expect } from "vitest"
+import { getCultivationCatalogue } from "./index"
 import { getCatalogueBrp } from "./catalogues/brp"
-import { extendCultivationsCatalogue } from "./index"
 
-import { drizzle } from "drizzle-orm/postgres-js"
-import { migrate } from "drizzle-orm/postgres-js/migrator"
-
-describe("Cultivations Catalogue", () => {
-    let fdm: FdmServerType
-
-    beforeEach(async () => {
-        const requiredEnvVars = [
-            "POSTGRES_HOST",
-            "POSTGRES_PORT",
-            "POSTGRES_USER",
-            "POSTGRES_PASSWORD",
-            "POSTGRES_DB",
-        ]
-        for (const envVar of requiredEnvVars) {
-            if (!process.env[envVar]) {
-                throw new Error(
-                    `Missing required environment variable: ${envVar}`,
-                )
-            }
-        }
-
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        if (Number.isNaN(port)) {
-            throw new Error("POSTGRES_PORT must be a valid number")
-        }
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
-        const migrationsFolderPath =
-            "node_modules/@svenvw/fdm-core/dist/db/migrations"
-
-        try {
-            // TODO: Replace workaround with createFdmServer once issue is resolved
-            // Current blocker: Migration does not work with fdmServer
-            // const fdm = await createFdmServer(
-            //     host,
-            //     port,
-            //     user,
-            //     password,
-            //     database
-            //   )
-            // await migrateFdmServer(fdm)
-
-            // Workaround
-            fdm = drizzle({
-                connection: {
-                    user: user,
-                    password: password,
-                    host: host,
-                    port: port,
-                    database: database,
-                },
-                logger: false,
-                schema: schema,
-            })
-
-            // Run migration
-            await migrate(fdm, {
-                migrationsFolder: migrationsFolderPath,
-                migrationsSchema: "fdm-migrations",
-            })
-        } catch (error) {
-            console.error("Failed to setup database:", error)
-            throw error
-        }
-    })
-
-    afterAll(async () => {
-        try {
-            // Clean up test data
-            await fdm.delete(schema.fieldSowing).execute()
-            await fdm.delete(schema.cultivations).execute()
-            await fdm.delete(schema.cultivationsCatalogue).execute()
-        } catch (error) {
-            console.error("Failed to cleanup:", error)
-            throw error
-        }
-    })
-
-    it("should extend cultivations catalogue with brp", async () => {
-        // Verify initial state
-        const initialCatalogue = await getCultivationsFromCatalogue(fdm)
-        expect(initialCatalogue).toHaveLength(0)
-
-        const catalogueName = "brp"
-        await extendCultivationsCatalogue(fdm, catalogueName)
-
-        // Retrieve the catalogue from the database to verify
-        const dbCatalogue = await getCultivationsFromCatalogue(fdm)
-
-        // Get the expected catalogue
+describe("getCultivationCatalogue", () => {
+    it("should return the BRP catalogue when catalogueName is 'brp'", () => {
         const expectedCatalogue = getCatalogueBrp()
+        const actualCatalogue = getCultivationCatalogue("brp")
+        expect(actualCatalogue).toEqual(expectedCatalogue)
+    })
 
-        // Check if all expected entries are in the database
-        expect(dbCatalogue.length).toBeGreaterThanOrEqual(
-            expectedCatalogue.length,
+    it("should throw an error when an invalid catalogueName is provided", () => {
+        expect(() => getCultivationCatalogue("invalid-catalogue")).toThrowError(
+            "catalogue invalid-catalogue is not recognized",
         )
+    })
 
-        for (const expectedItem of expectedCatalogue) {
-            const dbItem = dbCatalogue.find(
-                (item: schema.cultivationsCatalogueTypeSelect) =>
-                    item.b_lu_catalogue === expectedItem.b_lu_catalogue,
-            )
-            expect(dbItem).toBeDefined()
-            expect(dbItem?.b_lu_source).toBe(expectedItem.b_lu_source)
-            expect(dbItem?.b_lu_name).toBe(expectedItem.b_lu_name)
-            expect(dbItem?.b_lu_name_en).toBe(expectedItem.b_lu_name_en)
-            expect(dbItem?.b_lu_harvestable).toBe(expectedItem.b_lu_harvestable)
-            expect(dbItem?.b_lu_hcat3).toBe(expectedItem.b_lu_hcat3)
-            expect(dbItem?.b_lu_hcat3_name).toBe(expectedItem.b_lu_hcat3_name)
+    it("should return a non-empty array for 'brp' catalogue", () => {
+        const catalogue = getCultivationCatalogue("brp")
+        expect(Array.isArray(catalogue)).toBe(true)
+        expect(catalogue.length).toBeGreaterThan(0)
+    })
+
+    it("should check if all items in the brp catalogue have the correct source", () => {
+        const catalogue = getCultivationCatalogue("brp")
+        for (const item of catalogue) {
+            expect(item.b_lu_source).toBe("brp")
         }
     })
 
-    it("should throw error if catalogue name is not recognized", async () => {
-        const catalogueName = "invalid_catalogue_name"
-        await expect(
-            extendCultivationsCatalogue(fdm, catalogueName),
-        ).rejects.toThrowError(`catalogue ${catalogueName} is not recognized`)
+    it("should check if all items in the brp catalogue have the correct b_lu_harvestable values", () => {
+        const catalogue = getCultivationCatalogue("brp")
+        for (const item of catalogue) {
+            expect(["once", "multiple", "none"]).toContain(
+                item.b_lu_harvestable,
+            )
+        }
+    })
+})
+
+describe("getCatalogueBrp", () => {
+    it("should return an array of CatalogueCultivationItem", () => {
+        const catalogue = getCatalogueBrp()
+        expect(Array.isArray(catalogue)).toBe(true)
+        for (const item of catalogue) {
+            expect(typeof item).toBe("object")
+            expect(item).toHaveProperty("b_lu_source")
+            expect(item).toHaveProperty("b_lu_catalogue")
+            expect(item).toHaveProperty("b_lu_name")
+            expect(item).toHaveProperty("b_lu_name_en")
+            expect(item).toHaveProperty("b_lu_harvestable")
+            expect(item).toHaveProperty("b_lu_hcat3")
+            expect(item).toHaveProperty("b_lu_hcat3_name")
+            expect(item).toHaveProperty("hash")
+        }
+    })
+
+    it("should return at least one item", () => {
+        const catalogue = getCatalogueBrp()
+        expect(catalogue.length).toBeGreaterThan(0)
     })
 })

@@ -19,6 +19,10 @@ import {
 } from "./fertilizer"
 import { addField } from "./field"
 import { createId } from "./id"
+import {
+    enableCultivationCatalogue,
+    enableFertilizerCatalogue,
+} from "./catalogues"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -28,6 +32,7 @@ describe("Cultivation Data Model", () => {
     let b_lu: string
     let b_lu_start: Date
     let principal_id: string
+    let b_lu_source: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -74,6 +79,14 @@ describe("Cultivation Data Model", () => {
             "owner",
             new Date("2023-12-31"),
         )
+
+        b_lu_source = "custom"
+        await enableCultivationCatalogue(
+            fdm,
+            principal_id,
+            b_id_farm,
+            b_lu_source,
+        )
     })
 
     afterAll(async () => {
@@ -85,7 +98,7 @@ describe("Cultivation Data Model", () => {
             // Ensure catalogue entry exists before each test
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue,
-                b_lu_source: "test-source",
+                b_lu_source: b_lu_source,
                 b_lu_name: "test-name",
                 b_lu_name_en: "test-name-en",
                 b_lu_harvestable: "once",
@@ -104,7 +117,11 @@ describe("Cultivation Data Model", () => {
         })
 
         it("should get cultivations from catalogue", async () => {
-            const cultivations = await getCultivationsFromCatalogue(fdm)
+            const cultivations = await getCultivationsFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
             expect(cultivations).toBeDefined()
         })
 
@@ -127,7 +144,11 @@ describe("Cultivation Data Model", () => {
                 b_lu_hcat3_name,
             })
 
-            const cultivations = await getCultivationsFromCatalogue(fdm)
+            const cultivations = await getCultivationsFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
             expect(cultivations.length).toBeGreaterThanOrEqual(1)
 
             const cultivation = cultivations.find(
@@ -162,7 +183,7 @@ describe("Cultivation Data Model", () => {
             await expect(
                 addCultivationToCatalogue(fdm, {
                     b_lu_catalogue,
-                    b_lu_source: "test-source",
+                    b_lu_source: b_lu_source,
                     b_lu_name: "test-name",
                     b_lu_name_en: "test-name-en",
                     b_lu_harvestable: "invalid-value",
@@ -254,7 +275,7 @@ describe("Cultivation Data Model", () => {
             // Add the new cultivation to the catalogue first
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: newCatalogueId,
-                b_lu_source: "new-source",
+                b_lu_source: b_lu_source,
                 b_lu_name: "new-name",
                 b_lu_name_en: "new-name-en",
                 b_lu_harvestable: "multiple",
@@ -318,7 +339,7 @@ describe("Cultivation Data Model", () => {
             const newCatalogueId = createId()
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: newCatalogueId,
-                b_lu_source: "new-source",
+                b_lu_source: b_lu_source,
                 b_lu_name: "new-name",
                 b_lu_name_en: "new-name-en",
                 b_lu_harvestable: "multiple",
@@ -352,7 +373,7 @@ describe("Cultivation Data Model", () => {
             const newCatalogueId = createId()
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: newCatalogueId,
-                b_lu_source: "new-source",
+                b_lu_source: b_lu_source,
                 b_lu_name: "new-name",
                 b_lu_name_en: "new-name-en",
                 b_lu_harvestable: "none",
@@ -447,6 +468,8 @@ describe("Cultivation Data Model", () => {
         let b_id: string
         let b_lu_catalogue: string
         let p_id: string
+        let b_lu_source: string
+        let p_source: string
 
         beforeEach(async () => {
             const farmName = "Test Farm"
@@ -460,6 +483,22 @@ describe("Cultivation Data Model", () => {
                 farmBusinessId,
                 farmAddress,
                 farmPostalCode,
+            )
+
+            b_lu_source = "custom"
+            await enableCultivationCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                b_lu_source,
+            )
+
+            p_source = "custom"
+            await enableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_source,
             )
 
             b_id = await addField(
@@ -488,7 +527,7 @@ describe("Cultivation Data Model", () => {
             b_lu_catalogue = createId()
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: b_lu_catalogue,
-                b_lu_source: "test",
+                b_lu_source: b_lu_source,
                 b_lu_name: "Wheat",
                 b_lu_name_en: "Wheat",
                 b_lu_harvestable: "once",
@@ -506,7 +545,6 @@ describe("Cultivation Data Model", () => {
 
             // Add fertilizer to catalogue (needed for fertilizer application)
             const p_id_catalogue = createId()
-            const p_source = "custom"
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
@@ -640,5 +678,40 @@ describe("Cultivation Data Model", () => {
                 "Principal does not have permission to perform this action",
             )
         })
+    })
+})
+
+describe("getCultivationsFromCatalogue error handling", () => {
+    const principal_id = "test-principal"
+    const b_id_farm = "test-farm"
+
+    it("should handle database errors", async () => {
+        // Create a custom fdm implementation that throws an error
+        const mockFdm = {
+            select: () => {
+                throw new Error("Database error")
+            },
+        }
+
+        // Act & Assert
+        try {
+            await getCultivationsFromCatalogue(
+                mockFdm as any,
+                principal_id,
+                b_id_farm,
+            )
+            // Should not reach here
+            expect.fail("Expected an error to be thrown")
+        } catch (err: any) {
+            // Check that error was handled correctly
+            expect(err).toBeDefined()
+            expect(err.message).toContain(
+                "Exception for getCultivationsFromCatalogue",
+            )
+            expect(err.context).toEqual({
+                principal_id,
+                b_id_farm,
+            })
+        }
     })
 })

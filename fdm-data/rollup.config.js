@@ -20,5 +20,4 @@ export default defineConfig({
         }),
         json(),
     ],
-    external: ["@svenvw/fdm-core"],
 })
