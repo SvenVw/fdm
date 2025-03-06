@@ -41,7 +41,7 @@
         "watch": "dotenvx run -- vitest"
     },
     "dependencies": {
-        "@svenvw/fdm-core": "workspace:>=0.14.0"
+        "@svenvw/fdm-core": "workspace:^"
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
@@ -50,7 +50,7 @@
         "@rollup/plugin-typescript": "^12.1.2",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.34.8",
+        "rollup": "^4.34.9",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"

@@ -27,7 +27,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
@@ -47,7 +49,7 @@
         "@rollup/plugin-node-resolve": "^16.0.0",
         "@rollup/plugin-typescript": "^12.1.2",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.34.8",
+        "rollup": "^4.34.9",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
