@@ -8,7 +8,7 @@ import { checkPermission } from "./authorization"
 /**
  * Gets all enabled fertilizer catalogues for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @returns A Promise that resolves to an array of enabled fertilizer catalogue sources.
@@ -47,7 +47,7 @@ export async function getEnabledFertilizerCatalogues(
 /**
  * Gets all enabled cultivation catalogues for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @returns A Promise that resolves to an array of enabled cultivation catalogue sources.
@@ -92,7 +92,7 @@ export async function getEnabledCultivationCatalogues(
 /**
  * Enables a fertilizer catalogue for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @param p_source The source/name of the fertilizer catalogue to enable.
@@ -130,7 +130,7 @@ export async function enableFertilizerCatalogue(
 /**
  * Enables a cultivation catalogue for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @param b_lu_source The source/name of the cultivation catalogue to enable.
@@ -168,7 +168,7 @@ export async function enableCultivationCatalogue(
 /**
  * Disables a fertilizer catalogue for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @param p_source The source/name of the fertilizer catalogue to disable.
@@ -210,7 +210,7 @@ export async function disableFertilizerCatalogue(
 /**
  * Disables a cultivation catalogue for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @param b_lu_source The source/name of the cultivation catalogue to disable.
@@ -258,7 +258,7 @@ export async function disableCultivationCatalogue(
 /**
  * Checks if a fertilizer catalogue is enabled for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @param p_source The source/name of the fertilizer catalogue to check.
@@ -305,7 +305,7 @@ export async function isFertilizerCatalogueEnabled(
 /**
  * Checks if a cultivation catalogue is enabled for a farm.
  *
- * @param fdm The FDM instance providing the connection to the database.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id The ID of the principal making the request.
  * @param b_id_farm The ID of the farm.
  * @param b_lu_source The source/name of the cultivation catalogue to check.

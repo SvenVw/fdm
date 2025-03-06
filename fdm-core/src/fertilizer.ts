@@ -399,7 +399,7 @@ export async function getFertilizers(
 /**
  * Removes a fertilizer from a farm.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param p_id The ID of the fertilizer to remove.
  * @returns A Promise that resolves when the fertilizer has been removed.
  * @throws If removing the fertilizer fails.
