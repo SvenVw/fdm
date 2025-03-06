@@ -12,22 +12,8 @@
     {
       "idx": 1,
       "version": "7",
-      "when": 1741101924203,
-      "tag": "0001_common_chat",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1741188049618,
-      "tag": "0002_closed_nightmare",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1741267314690,
-      "tag": "0003_red_red_ghost",
+      "when": 1741267610502,
+      "tag": "0001_curved_proemial_gods",
       "breakpoints": true
     }
   ]
