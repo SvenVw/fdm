@@ -1,9 +1,4 @@
-import { fdmSchema as schema } from "@svenvw/fdm-core"
-import {
-    extendCultivationsCatalogue,
-    extendFertilizersCatalogue,
-} from "@svenvw/fdm-data"
-// import postgres from 'postgres'
+import { fdmSchema as schema, syncCatalogues } from "@svenvw/fdm-core"
 import { drizzle } from "drizzle-orm/postgres-js"
 import { migrate } from "drizzle-orm/postgres-js/migrator"
 
@@ -53,16 +48,5 @@ await migrate(fdm, {
     migrationsSchema: "fdm-migrations",
 })
 
-// Add SRM fertilzers to catalogue
-const FERTILIZERS_CATALOGUE = "srm"
-const CULTIVATIONS_CATALOGUE = "brp"
-
-try {
-    await Promise.all([
-        extendFertilizersCatalogue(fdm, FERTILIZERS_CATALOGUE),
-        extendCultivationsCatalogue(fdm, CULTIVATIONS_CATALOGUE),
-    ])
-} catch (error) {
-    console.error("Failed to extend catalogues:", error)
-    throw error
-}
+// Sync catalogues
+await syncCatalogues(fdm)
