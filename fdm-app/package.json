@@ -6,10 +6,11 @@
     "type": "module",
     "scripts": {
         "build": "react-router build",
-        "dev": "dotenvx run -- react-router dev",
+        "dev": "dotenvx run -- pnpm db:migrate && dotenvx run -- react-router dev",
         "dotenvx": "dotenvx",
-        "start": "react-router-serve ./build/server/index.js",
-        "start-dev": "dotenvx run -- react-router-serve ./build/server/index.js",
+        "start": "pnpm db:migrate && react-router-serve ./build/server/index.js",
+        "start-dev": "pnpm db:migrate && dotenvx run -- react-router-serve ./build/server/index.js",
+        "db:migrate": "node ./app/lib/fdm-migrate.server.js",
         "typecheck": "react-router typegen && tsc"
     },
     "dependencies": {
@@ -62,6 +63,7 @@
         "tailwind-merge": "^2.6.0",
         "tailwindcss-animate": "^1.0.7",
         "validator": "^13.12.0",
+        "vite-node": "^3.0.8",
         "zod": "^3.24.2"
     },
     "devDependencies": {
