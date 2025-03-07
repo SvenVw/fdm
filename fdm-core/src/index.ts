@@ -73,6 +73,5 @@ export {
     isFertilizerCatalogueEnabled,
     isCultivationCatalogueEnabled,
     syncCatalogues,
-
 } from "./catalogues"
-
+export { runMigration } from "./migrate"
