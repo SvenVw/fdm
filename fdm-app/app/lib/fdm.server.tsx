@@ -1,4 +1,4 @@
-import { fdmSchema as schema, syncCatalogues } from "@svenvw/fdm-core"
+import { fdmSchema as schema } from "@svenvw/fdm-core"
 import { drizzle } from "drizzle-orm/postgres-js"
 
 // Get credentials to connect to db
@@ -39,6 +39,3 @@ export const fdm = drizzle({
     logger: false,
     schema: schema,
 })
-
-// Sync catalogues
-await syncCatalogues(fdm)
