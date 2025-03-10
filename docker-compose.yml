@@ -1,0 +1,64 @@
+services:
+  fdm-app:
+    build:
+      context: .
+      dockerfile: ./fdm-app/dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
+      - FDM_SESSION_SECRET=YOUR_FDM_SESSION_SECRET # Replace with a strong, randomly generated secret
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=fdm-app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=YOUR_POSTGRES_PASSWORD # Replace with your actual PostgreSQL password
+      - MAPBOX_TOKEN=YOUR_MAPBOX_TOKEN # Replace with your actual Mapbox token
+      - BETTER_AUTH_SECRET=YOUR_BETTER_AUTH_SECRET # Replace with your Better Auth secret
+      - BETTER_AUTH_URL=YOUR_DOMAIN # Replace with your domain
+      - GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID # Replace with your Google Client ID
+      - GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET # Replace with your Google Client Secret
+      - MS_CLIENT_ID=YOUR_MS_CLIENT_ID # Replace with your Microsoft Client ID
+      - MS_CLIENT_SECRET=YOUR_MS_CLIENT_SECRET # Replace with your Microsoft Client Secret
+      - AVAILABLE_FIELDS_URL=YOUR_STORAGE_ULR # Replace with the url of the storage location
+      - FDM_APP_URL=YOUR_DOMAIN # Replace with your domain
+      - VITE_SENTRY_ORG=YOUR_SENTRY_ORG # Replace with your Sentry organization
+      - VITE_SENTRY_PROJECT=YOUR_SENTRY_PROJECT # Replace with your Sentry project
+      - VITE_SENTRY_DSN=YOUR_SENTRY_DSN # Replace with your Sentry DSN
+      - SENTRY_AUTH_TOKEN=YOUR_SENTRY_AUTH_TOKEN # Replace with your Sentry authentication token
+      - VITE_SENTRY_TRACE_SAMPLE_RATE=1
+      - VITE_SENTRY_REPLAY_SAMPLE_RATE=0
+      - VITE_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR=1
+      - VITE_SENTRY_PROFILE_SAMPLE_RATE=1
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fdm-network
+
+  postgres:
+    image: postgis/postgis:17-3.5
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=fdm-app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=YOUR_POSTGRES_PASSWORD # Replace with your actual PostgreSQL password
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fdm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fdm-app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  fdm-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
