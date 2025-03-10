@@ -1,0 +1,30 @@
+ARG NODE_VERSION=20
+ARG PROJECT=@svenvw/fdm-app
+
+# Alpine image
+FROM node:${NODE_VERSION}-alpine AS base
+RUN apk update
+RUN apk add --no-cache libc6-compat
+RUN npm install pnpm turbo --global
+RUN pnpm config set store-dir ~/.pnpm-store
+
+FROM base AS builder
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY fdm-app/package.json fdm-app/
+COPY fdm-core/package.json fdm-core/
+COPY fdm-data/package.json fdm-data/
+COPY fdm-calculator/package.json fdm-calculator/
+
+RUN pnpm install --frozen-lockfile
+COPY . ./
+RUN pnpm build
+RUN pnpm prune --prod
+
+FROM builder AS runner
+COPY --from=builder /app/fdm-app /app/fdm-app
+WORKDIR /app/fdm-app
+ENV PORT=${PORT}
+EXPOSE ${PORT}
+
+CMD ["pnpm", "start"]
