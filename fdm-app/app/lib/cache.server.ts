@@ -86,14 +86,25 @@ export function getCacheControlHeaders(
 
     // Dynamic routes (farm data, etc.)
     if (url.pathname.startsWith("/farm")) {
-        headers.set(
-            "Cache-Control",
-            generateCacheControl({
-                maxAge: 60, // 1 minute
-                staleWhileRevalidate: 300, // 5 minutes
-                mustRevalidate: true,
-            }),
-        )
+        // Check if it's a data mutation (POST, PUT, DELETE) or viewing data
+        if (request.method !== "GET") {
+            headers.set(
+                "Cache-Control",
+                generateCacheControl({
+                    maxAge: 0,
+                    noStore: true,
+                }),
+            )
+        } else {
+            headers.set(
+                "Cache-Control",
+                generateCacheControl({
+                    maxAge: 0, // No caching for farm data views
+                    staleWhileRevalidate: 5, // Very short stale time
+                    mustRevalidate: true,
+                }),
+            )
+        }
         return headers
     }
 
