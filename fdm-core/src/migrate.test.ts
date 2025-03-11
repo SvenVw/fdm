@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, it } from "vitest"
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 import { runMigration } from "./migrate"
 import postgres from "postgres"
 
@@ -52,8 +52,22 @@ describe("runMigration", () => {
 
     it("should handle migration failure", async () => {
         const invalidMigrationsFolderPath = "invalid/path"
-        console.error = () => {}
+
+        // Spy on console.error to verify error handling
+        const consoleErrorSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {})
+
         //Run migration
         await runMigration(client, invalidMigrationsFolderPath)
+
+        // Verify error was logged
+        expect(consoleErrorSpy).toHaveBeenCalled()
+        expect(consoleErrorSpy.mock.calls[0][0]).toContain(
+            "Migration failed 🚨:",
+        )
+
+        // Restore original console.error
+        consoleErrorSpy.mockRestore()
     })
 })
