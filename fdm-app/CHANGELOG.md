@@ -6,6 +6,7 @@
 
 - c399b8b: Add `docker-compose.yml` for instructions to run `fdm-app` together with a database
 - c399b8b: Add docker file to build image for `fdm-app`
+- a5f5c3b: Add cache control settings and setting security headers
 
 ### Patch Changes
 
