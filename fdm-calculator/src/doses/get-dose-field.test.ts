@@ -7,10 +7,9 @@ import {
     addFertilizerToCatalogue,
     addField,
 } from "@svenvw/fdm-core"
-import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, inject, it } from "vitest"
 import type { Dose } from "./d"
 import { getDoseForField } from "./get-dose-field"
-import postgres from "postgres"
 
 describe("getDoseForField", () => {
     let fdm: FdmServerType
@@ -19,27 +18,14 @@ describe("getDoseForField", () => {
     let p_id: string
     let p_id_catalogue: string
     let principal_id: string
-    let client: ReturnType<typeof postgres>
-
     beforeEach(async () => {
-        const host = process.env.POSTGRES_HOST
-        const port = Number(process.env.POSTGRES_PORT)
-        const user = process.env.POSTGRES_USER
-        const password = process.env.POSTGRES_PASSWORD
-        const database = process.env.POSTGRES_DB
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
         fdm = createFdmServer(host, port, user, password, database)
         principal_id = "test-user"
-        client = postgres({
-            host,
-            port,
-            user,
-            password,
-            database,
-            max: 1,
-        })
-    })
-        afterEach(async () => {
-        await client.end()
     })
     it("should calculate the correct dose for a field with a single application", async () => {
         b_id_farm = await addFarm(
