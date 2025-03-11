@@ -1,0 +1,66 @@
+# Dependencies
+node_modules
+.pnpm-store
+pnpm-debug.log
+
+# Build outputs
+dist
+build
+*.tsbuildinfo
+.next
+.turbo
+
+# Environment files
+.env*
+!.env.example
+
+# IDE files
+.vscode
+.idea
+*.sublime-*
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# System files
+.DS_Store
+Thumbs.db
+*.pem
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Test coverage
+coverage
+.nyc_output
+
+# React Router
+.react-router
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Documentation
+docs
+*.md
+LICENSE
+
+# Development configs
+*.config.js
+*.config.ts
+!vite.config.ts
+!tailwind.config.ts
+tsconfig.tsbuildinfo
+
+# Debug
+.debug 
