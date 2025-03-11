@@ -1,27 +1,15 @@
 import { drizzle } from "drizzle-orm/postgres-js"
 import { migrate } from "drizzle-orm/postgres-js/migrator"
-import postgres from "postgres"
+import type postgres from "postgres"
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js"
 
 export async function runMigration(
-    host: string,
-    port: number,
-    user: string,
-    password: string,
-    database: string,
+    client: ReturnType<typeof postgres>,
     migrationsFolderPath: string,
 ) {
     console.log("Migration started ⌛")
 
-    const client = postgres({
-        host,
-        port,
-        user,
-        password,
-        database,
-        max: 1,
-    })
-
-    const db = drizzle(client)
+    const db: PostgresJsDatabase = drizzle(client)
     try {
         await migrate(db, {
             migrationsFolder: migrationsFolderPath,
