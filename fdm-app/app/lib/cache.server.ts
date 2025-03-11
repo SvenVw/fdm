@@ -125,7 +125,7 @@ export function addSecurityHeaders(headers: Headers): Headers {
         script-src 'self' 'unsafe-inline' 'unsafe-eval';
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
         font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data: https://*.mapbox.com https://*.public.blob.vercel-storage.com;
+        img-src 'self' data: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com;
         connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl;
         report-uri ${sentryReportUri};
         report-to ${sentryReportUri}`
