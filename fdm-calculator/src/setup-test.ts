@@ -1,11 +1,8 @@
-// globalSetup.ts
-import type { FdmServerType } from "@svenvw/fdm-core"
-import { migrateFdmServer } from "@svenvw/fdm-core"
-import { createFdmServer } from "@svenvw/fdm-core"
 import type { TestProject } from "vitest/node"
+import postgres from "postgres"
+import { runMigration } from "@svenvw/fdm-core"
 
-let fdm: FdmServerType
-
+let client: ReturnType<typeof postgres>
 export let migrationsRun = false
 
 /**
@@ -46,17 +43,18 @@ export default async function setup(project: TestProject) {
     const password = String(process.env.POSTGRES_PASSWORD)
     const database = String(process.env.POSTGRES_DB)
 
-    try {
-        fdm = createFdmServer(host, port, user, password, database)
+    client = postgres({
+        host,
+        port,
+        user,
+        password,
+        database,
+        max: 1,
+    })
 
-        if (!migrationsRun) {
-            await migrateFdmServer(fdm)
-            migrationsRun = true
-        }
-    } catch (error) {
-        throw new Error(
-            `Failed to connect/migrate to database: ${error.message}`,
-        )
+    if (!migrationsRun) {
+        await runMigration(client)
+        migrationsRun = true
     }
 
     project.provide("host", host)
@@ -74,4 +72,8 @@ declare module "vitest" {
         password: string
         database: string
     }
+}
+
+export async function teardown() {
+    await client.end()
 }
