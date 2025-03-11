@@ -1,5 +1,18 @@
 # Changelog fdm-app
 
+## 0.15.0
+
+### Minor Changes
+
+- c399b8b: Add `docker-compose.yml` for instructions to run `fdm-app` together with a database
+- c399b8b: Add docker file to build image for `fdm-app`
+
+### Patch Changes
+
+- Updated dependencies [e134cfc]
+  - @svenvw/fdm-core@0.16.0
+  - @svenvw/fdm-calculator@0.2.3
+
 ## 0.14.0
 
 ### Minor Changes

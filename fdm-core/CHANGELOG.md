@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.16.0
+
+### Minor Changes
+
+- e134cfc: Remove `migrateFdmServer` as it is replaced by `runMigration`
+
 ## 0.15.0
 
 ### Minor Changes
