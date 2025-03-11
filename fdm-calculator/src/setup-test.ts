@@ -2,7 +2,7 @@ import type { TestProject } from "vitest/node"
 import postgres from "postgres"
 import { runMigration } from "@svenvw/fdm-core"
 
-let migrationsRun = true
+let migrationsRun = false
 let client: ReturnType<typeof postgres>
 
 /**

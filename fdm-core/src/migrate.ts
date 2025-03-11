@@ -18,7 +18,5 @@ export async function runMigration(
         console.log("Migration completed ✅")
     } catch (error) {
         console.error("Migration failed 🚨:", error)
-    } finally {
-        await client.end()
     }
 }
