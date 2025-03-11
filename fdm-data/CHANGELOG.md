@@ -1,5 +1,17 @@
 # fdm-data
 
+## 0.11.0
+
+### Minor Changes
+
+- c93c076: Add function `getFertilizerCatalogue` to replace `extendFertilizersCatalogue`
+- 5a93b69: Add function `getCultivationCatalogue` to replace `extendCultivationsCatalogue`
+
+### Patch Changes
+
+- 7499eae: Remove dependency on `drizzle-orm` and `fdm-core`
+- ae3447f: Add CI tests
+
 ## 0.10.3
 
 ### Patch Changes
