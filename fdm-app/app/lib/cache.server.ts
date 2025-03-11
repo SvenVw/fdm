@@ -122,13 +122,19 @@ export function addSecurityHeaders(headers: Headers): Headers {
     headers.set(
         "Content-Security-Policy",
         `default-src 'self';
-        script-src 'self' 'unsafe-inline' 'unsafe-eval';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mapbox.com;
+        worker-src 'self' blob:;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com;
-        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl;
-        report-uri ${sentryReportUri};
-        report-to ${sentryReportUri}`
+        font-src 'self' https://fonts.gstatic.com data:;
+        img-src 'self' data: blob: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com;
+        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl ws://localhost:* http://localhost:*;
+        frame-src 'self';
+        media-src 'self';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'none';
+        report-uri ${sentryReportUri}`
             .replace(/\s+/g, " ")
             .trim(),
     )
