@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNotNull, or } from "drizzle-orm"
+import { and, asc, desc, eq, isNotNull, or, inArray } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
@@ -13,20 +13,64 @@ import {
 import { createId } from "./id"
 
 /**
- * Retrieves cultivations available in the catalogue.
+ * Retrieves cultivations available in the enabled catalogues for a farm.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id The ID of the principal making the request.
+ * @param b_id_farm The ID of the farm.
  * @returns A Promise that resolves with an array of cultivation catalogue entries.
  * @alpha
  */
 export async function getCultivationsFromCatalogue(
     fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<schema.cultivationsCatalogueTypeSelect[]> {
-    const cultivationsCatalogue = await fdm
-        .select()
-        .from(schema.cultivationsCatalogue)
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getCultivationsFromCatalogue",
+        )
 
-    return cultivationsCatalogue
+        // Get enabled catalogues for the farm
+        const enabledCatalogues = await fdm
+            .select({
+                b_lu_source: schema.cultivationCatalogueSelecting.b_lu_source,
+            })
+            .from(schema.cultivationCatalogueSelecting)
+            .where(
+                eq(schema.cultivationCatalogueSelecting.b_id_farm, b_id_farm),
+            )
+
+        // If no catalogues are enabled, return empty array
+        if (enabledCatalogues.length === 0) {
+            return []
+        }
+
+        // Get cultivations from enabled catalogues
+        const cultivationsCatalogue = await fdm
+            .select()
+            .from(schema.cultivationsCatalogue)
+            .where(
+                inArray(
+                    schema.cultivationsCatalogue.b_lu_source,
+                    enabledCatalogues.map(
+                        (c: { b_lu_source: string }) => c.b_lu_source,
+                    ),
+                ),
+            )
+
+        return cultivationsCatalogue
+    } catch (err) {
+        throw handleError(err, "Exception for getCultivationsFromCatalogue", {
+            principal_id,
+            b_id_farm,
+        })
+    }
 }
 
 /**

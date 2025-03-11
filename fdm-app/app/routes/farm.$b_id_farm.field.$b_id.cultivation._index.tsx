@@ -73,7 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get available cultivations for the farm
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
         // Map cultivations to options for the combobox
         const cultivationsCatalogueOptions = cultivationsCatalogue.map(
             (cultivation) => {

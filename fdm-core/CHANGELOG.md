@@ -1,5 +1,23 @@
 # Changelog fdm-core
 
+## 0.15.0
+
+### Minor Changes
+
+- b601b5f: Add tables `fertilizer_catalogue_enabling` and `cultivation_catalogue_selecting` to store which catalogues at farm level are enabled
+- f056396: Add `syncCatalogues` to enabling syncing of catalogue data in fdm instance and `fdm-data`
+- cdb1d02: Add the functions `getEnabledFertilizerCatalogues`, `getEnabledCultivationCatalogues`, `enableFertilizerCatalogue`, `enableCultivationCatalogue`, `disableCultivationCatalogue`, `disableFertilizerCatalogue`, `isFertilizerCatalogueEnabled` and `isCultivationCatalogueEnabled`
+- 9a6e329: The function `getFertilizersFromCatalogue` and `getCultivationFromCatalogue` now require `principal_id` and `b_id_farm` as argument
+
+### Patch Changes
+
+- 9b1f522: Fix documentation about `addFertilizer`, so that it describes acquiring a fertilizer not applying
+- Updated dependencies [7499eae]
+- Updated dependencies [c93c076]
+- Updated dependencies [5a93b69]
+- Updated dependencies [ae3447f]
+  - @svenvw/fdm-data@0.11.0
+
 ## 0.14.0
 
 ### Minor Changes

@@ -1,4 +1,4 @@
-import { asc, desc, eq } from "drizzle-orm"
+import { asc, desc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
 import { checkPermission } from "./authorization"
@@ -12,24 +12,62 @@ import type {
 } from "./fertilizer.d"
 
 /**
- * Retrieves all fertilizers from the catalogue.
+ * Retrieves all fertilizers from the enabled catalogues for a farm.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id The ID of the principal making the request.
+ * @param b_id_farm The ID of the farm.
  * @returns A Promise that resolves with an array of fertilizer catalogue entries.
  * @alpha
  */
 export async function getFertilizersFromCatalogue(
     fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeSelect["b_id_farm"],
 ): Promise<schema.fertilizersCatalogueTypeSelect[]> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getFertilizersFromCatalogue",
+        )
+
+        // Get enabled catalogues for the farm
+        const enabledCatalogues = await fdm
+            .select({
+                p_source: schema.fertilizerCatalogueEnabling.p_source,
+            })
+            .from(schema.fertilizerCatalogueEnabling)
+            .where(eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm))
+
+        // If no catalogues are enabled, return empty array
+        if (enabledCatalogues.length === 0) {
+            return []
+        }
+
+        // Get fertilizers from enabled catalogues
         const fertilizersCatalogue = await fdm
             .select()
             .from(schema.fertilizersCatalogue)
+            .where(
+                inArray(
+                    schema.fertilizersCatalogue.p_source,
+                    enabledCatalogues.map(
+                        (c: { p_source: string }) => c.p_source,
+                    ),
+                ),
+            )
             .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
         return fertilizersCatalogue
     } catch (err) {
-        throw handleError(err, "Exception for getFertilizersFromCatalogue", {})
+        throw handleError(err, "Exception for getFertilizersFromCatalogue", {
+            principal_id,
+            b_id_farm,
+        })
     }
 }
 
@@ -106,9 +144,9 @@ export async function addFertilizerToCatalogue(
 }
 
 /**
- * Adds a fertilizer application record to a farm.
+ * Adds a fertilizer aqcuiring record to a farm.
  *
- * This function creates a new fertilizer application record by performing a transactional insertion into the
+ * This function creates a new fertilizer acquiring record by performing a transactional insertion into the
  * fertilizers, fertilizerAcquiring, and fertilizerPicking tables. It verifies that the user has write permission
  * on the specified farm before proceeding.
  *
@@ -118,8 +156,8 @@ export async function addFertilizerToCatalogue(
  * @param b_id_farm The ID of the farm where the fertilizer is applied.
  * @param p_acquiring_amount The amount of fertilizer acquired.
  * @param p_acquiring_date The date when the fertilizer was acquired.
- * @returns A Promise resolving to the ID of the newly created fertilizer application record.
- * @throws If adding the fertilizer application record fails.
+ * @returns A Promise resolving to the ID of the newly created fertilizer acquiring record.
+ * @throws If adding the fertilizer acquiring record fails.
  * @alpha
  */
 export async function addFertilizer(
@@ -361,7 +399,7 @@ export async function getFertilizers(
 /**
  * Removes a fertilizer from a farm.
  *
- * @param fdm The FDM instance.
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param p_id The ID of the fertilizer to remove.
  * @returns A Promise that resolves when the fertilizer has been removed.
  * @throws If removing the fertilizer fails.
