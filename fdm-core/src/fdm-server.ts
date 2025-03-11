@@ -30,20 +30,3 @@ export function createFdmServer(
         throw handleError(err, "Exception for createFdmServer")
     }
 }
-
-export async function migrateFdmServer(
-    fdm: FdmServerType,
-    migrationsFolderPath = "node_modules/@svenvw/fdm-core/dist/db/migrations",
-): Promise<void> {
-    try {
-        // Run migration
-        await migrate(fdm, {
-            migrationsFolder: migrationsFolderPath,
-            migrationsSchema: "fdm-migrations",
-        })
-    } catch (err) {
-        throw handleError(err, "Exception for migrateFdmServer", {
-            migrationsFolderPath,
-        })
-    }
-}
