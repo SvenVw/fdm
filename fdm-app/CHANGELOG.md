@@ -1,5 +1,24 @@
 # Changelog fdm-app
 
+## 0.14.0
+
+### Minor Changes
+
+- 89ce485: Show only cultivation and fertilizers from catalogues that are enabled
+
+### Patch Changes
+
+- 121edf9: Add that the `srm` and `brp` catalogues are enabled
+- 2fd9dc8: Use the `syncCatalogues` function to replace `extendFertilizersCatalogue` and `extendCultivationsCatalogue` functions
+- d7bbdf9: Remove dependency on `fdm-data`
+- Updated dependencies [b601b5f]
+- Updated dependencies [9b1f522]
+- Updated dependencies [f056396]
+- Updated dependencies [cdb1d02]
+- Updated dependencies [9a6e329]
+  - @svenvw/fdm-core@0.15.0
+  - @svenvw/fdm-calculator@0.2.2
+
 ## 0.13.1
 
 ### Patch Changes

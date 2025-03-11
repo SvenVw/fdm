@@ -1,5 +1,16 @@
 # fdm-calculator
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [b601b5f]
+- Updated dependencies [9b1f522]
+- Updated dependencies [f056396]
+- Updated dependencies [cdb1d02]
+- Updated dependencies [9a6e329]
+  - @svenvw/fdm-core@0.15.0
+
 ## 0.2.1
 
 ### Patch Changes
