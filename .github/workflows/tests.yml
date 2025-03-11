@@ -21,7 +21,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image with postgis extension
-        image: postgis/postgis:15-3.5
+        image: postgis/postgis:17-3.5
         # Provide the password for postgres
         env:
           POSTGRES_USER: postgres
@@ -114,7 +114,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image with postgis extension
-        image: postgis/postgis:15-3.5
+        image: postgis/postgis:17-3.5
         # Provide the password for postgres
         env:
           POSTGRES_USER: postgres
