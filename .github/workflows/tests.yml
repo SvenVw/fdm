@@ -68,7 +68,7 @@ jobs:
       - name: Build fdm-data
         run: pnpm build
         working-directory: ./fdm-data
-      
+
       - name: Build fdm-core
         run: pnpm build
         working-directory: ./fdm-core
@@ -158,10 +158,14 @@ jobs:
       - name: Install Dependencies
         run: pnpm i
 
+      - name: Build fdm-data
+        run: pnpm build
+        working-directory: ./fdm-data
+
       - name: Build fdm-core
         run: pnpm build
         working-directory: ./fdm-core
-      
+
       - name: Build fdm-calculator
         run: pnpm build
         working-directory: ./fdm-calculator
