@@ -112,14 +112,25 @@ export function getCacheControlHeaders(
  * Add security headers to the response
  */
 export function addSecurityHeaders(headers: Headers): Headers {
+    const sentryReportUri = process.env.VITE_SENTRY_SECURITY_REPORT_URI
+    if (!sentryReportUri) {
+        throw new Error(
+            "VITE_SENTRY_SECURITY_REPORT_URI environment variable is required",
+        )
+    }
+
     headers.set(
         "Content-Security-Policy",
-        "default-src 'self'; " +
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-            "font-src 'self' https://fonts.gstatic.com; " +
-            "img-src 'self' data: https://*.mapbox.com https://*.public.blob.vercel-storage.com; " +
-            "connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl",
+        `default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data: https://*.mapbox.com https://*.public.blob.vercel-storage.com;
+        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl;
+        report-uri ${sentryReportUri};
+        report-to ${sentryReportUri}`
+            .replace(/\s+/g, " ")
+            .trim(),
     )
     headers.set("X-Content-Type-Options", "nosniff")
     headers.set("X-Frame-Options", "DENY")
