@@ -3,12 +3,12 @@ import { migrate } from "drizzle-orm/postgres-js/migrator"
 import postgres from "postgres"
 
 export async function runMigration(
-    host,
-    port,
-    user,
-    password,
-    database,
-    migrationsFolderPath,
+    host: string,
+    port: number,
+    user: string,
+    password: string,
+    database: string,
+    migrationsFolderPath: string,
 ) {
     console.log("Migration started ⌛")
 
