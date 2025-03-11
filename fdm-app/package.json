@@ -9,7 +9,7 @@
         "dev": "dotenvx run -- pnpm db:migrate && dotenvx run -- react-router dev",
         "dotenvx": "dotenvx",
         "start": "pnpm db:migrate && react-router-serve ./build/server/index.js",
-        "start-dev": "pnpm db:migrate && dotenvx run -- react-router-serve ./build/server/index.js",
+        "start-dev": "dotenvx run -- pnpm db:migrate && dotenvx run -- react-router-serve ./build/server/index.js",
         "db:migrate": "node ./app/lib/fdm-migrate.server.js",
         "typecheck": "react-router typegen && tsc"
     },
