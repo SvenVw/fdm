@@ -17,8 +17,8 @@ import * as fdmSchema from "./db/schema"
 export { fdmSchema }
 export type { FdmType } from "./fdm.d"
 export type { FdmServerType } from "./fdm-server.d"
-export { createFdmServer, migrateFdmServer } from "./fdm-server"
-// export { createFdmLocal, migrateFdmLocal } from './fdm-local'
+export { createFdmServer } from "./fdm-server"
+// export { createFdmLocal } from './fdm-local'
 export { createFdmAuth } from "./authentication"
 export type { PrincipalId } from "./authorization.d"
 export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
@@ -73,6 +73,5 @@ export {
     isFertilizerCatalogueEnabled,
     isCultivationCatalogueEnabled,
     syncCatalogues,
-
 } from "./catalogues"
-
+export { runMigration } from "./migrate"

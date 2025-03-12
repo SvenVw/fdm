@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm"
 import { beforeEach, describe, expect, inject, it } from "vitest"
-import { createFdmServer, migrateFdmServer } from "./fdm-server"
+import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 
 describe("Farm Data Model", () => {
@@ -20,24 +20,6 @@ describe("Farm Data Model", () => {
             const statement = sql`SELECT 1 + 1`
             const result = await fdm.execute(statement)
             expect(result).toBeDefined()
-        })
-    })
-
-    describe("Database Migration", () => {
-        it("should migrate the database", async () => {
-            const migrationsFolderPath = "src/db/migrations"
-            await migrateFdmServer(fdm, migrationsFolderPath)
-
-            // Add assertion to check if migration was successful
-            // For example, check if a specific table exists
-            const statement = sql`
-        SELECT table_name
-        FROM information_schema.tables
-        WHERE table_schema = 'fdm'
-      `
-            const tables = await fdm.execute(statement)
-            const tableNames = tables.map((row) => row.table_name)
-            expect(tableNames).toContain("farms")
         })
     })
 })

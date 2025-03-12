@@ -1,20 +1,15 @@
-// globalSetup.ts
-import type { FdmServerType } from "@svenvw/fdm-core"
-import { migrateFdmServer } from "@svenvw/fdm-core"
-import { createFdmServer } from "@svenvw/fdm-core"
 import type { TestProject } from "vitest/node"
+import postgres from "postgres"
+import { runMigration } from "@svenvw/fdm-core"
 
-let fdm: FdmServerType
-
-export let migrationsRun = false
+let migrationsRun = false
+let client: ReturnType<typeof postgres>
 
 /**
  * Initializes the database connection for the testing environment.
  *
  * This asynchronous function validates that all required PostgreSQL environment variables
- * are present and correctly formatted. It creates the database server instance, runs migrations
- * if they haven't been executed yet, and provides the connection details (host, port, user, password,
- * database) to the given test project context.
+ * are present and correctly formatted.
  *
  * @param project - The testing project context used to supply the database connection details.
  *
@@ -45,18 +40,21 @@ export default async function setup(project: TestProject) {
     const user = String(process.env.POSTGRES_USER)
     const password = String(process.env.POSTGRES_PASSWORD)
     const database = String(process.env.POSTGRES_DB)
+    const migrationsFolderPath =
+        "node_modules/@svenvw/fdm-core/dist/db/migrations"
 
-    try {
-        fdm = createFdmServer(host, port, user, password, database)
+    client = postgres({
+        host,
+        port,
+        user,
+        password,
+        database,
+        max: 1,
+    })
 
-        if (!migrationsRun) {
-            await migrateFdmServer(fdm)
-            migrationsRun = true
-        }
-    } catch (error) {
-        throw new Error(
-            `Failed to connect/migrate to database: ${error.message}`,
-        )
+    if (!migrationsRun) {
+        await runMigration(client, migrationsFolderPath)
+        migrationsRun = true
     }
 
     project.provide("host", host)
@@ -74,4 +72,8 @@ declare module "vitest" {
         password: string
         database: string
     }
+}
+
+export async function teardown() {
+    await client.end()
 }

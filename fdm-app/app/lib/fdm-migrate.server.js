@@ -1,5 +1,10 @@
-import { fdmSchema as schema } from "@svenvw/fdm-core"
+import {
+    runMigration,
+    syncCatalogues,
+    fdmSchema as schema,
+} from "@svenvw/fdm-core"
 import { drizzle } from "drizzle-orm/postgres-js"
+import postgres from "postgres"
 
 // Get credentials to connect to db
 const host =
@@ -27,15 +32,32 @@ const database =
     (() => {
         throw new Error("POSTGRES_DB environment variable is required")
     })()
+const migrationsFolderPath = "node_modules/@svenvw/fdm-core/dist/db/migrations"
 
-export const fdm = drizzle({
-    connection: {
-        user: user,
-        password: password,
-        host: host,
-        port: port,
-        database: database,
-    },
+const client = postgres({
+    host: host,
+    port: port,
+    user: user,
+    password: password,
+    database: database,
+    max: 1,
+})
+
+// Run the schema migrations
+await runMigration(client, migrationsFolderPath).catch((error) =>
+    console.error("Error in migration process 🚨:", error),
+)
+
+// Sync catalogues
+const fdm = drizzle(client, {
+    mode: "postgres",
     logger: false,
     schema: schema,
 })
+await syncCatalogues(fdm).catch((error) =>
+    console.error("Error in syncing catalogues 🚨:", error),
+)
+
+// Close the connection
+await client.end()
+process.exit(0)

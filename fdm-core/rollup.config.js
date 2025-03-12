@@ -31,5 +31,15 @@ export default {
             },
         },
     ],
-    external: ["fs", "os", "net", "tls", "crypto", "stream", "postgres"],
+    external: [
+        "fs",
+        "os",
+        "net",
+        "tls",
+        "crypto",
+        "stream",
+        "postgres",
+        "better-auth",
+        "drizzle-orm",
+    ],
 }

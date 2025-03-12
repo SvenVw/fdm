@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-calculator",
     "private": false,
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Calculate various insights based on the Farm Data Model",
     "license": "MIT",
     "homepage": "https://github.com/SvenVw/fdm",
@@ -34,7 +34,6 @@
         "build": "rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
-        "prepare": "pnpm build",
         "preview": "vite preview",
         "test": "dotenvx run -- vitest run",
         "test-coverage": "dotenvx run -- vitest run --coverage",
@@ -50,7 +49,8 @@
         "@rollup/plugin-typescript": "^12.1.2",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.34.9",
+        "postgres": "^3.4.5",
+        "rollup": "^4.35.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"

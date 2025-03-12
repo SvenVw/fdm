@@ -1,0 +1,54 @@
+ARG NODE_VERSION=22
+ARG PROJECT=@svenvw/fdm-app
+
+# Alpine image
+FROM node:${NODE_VERSION}-alpine AS base
+RUN apk update && \
+    apk add --no-cache libc6-compat && \
+    npm install -g pnpm turbo && \
+    pnpm config set store-dir ~/.pnpm-store
+
+# Builder stage
+FROM base AS builder
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+
+# Production runner stage
+FROM node:${NODE_VERSION}-alpine AS runner
+WORKDIR /app
+
+# Add non-root user for security
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 user && \
+    apk add --no-cache libc6-compat && \
+    npm install -g pnpm
+
+# Copy necessary files
+COPY --from=builder --chown=user:nodejs /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=builder --chown=user:nodejs /app/fdm-app/package.json ./fdm-app/
+COPY --from=builder --chown=user:nodejs /app/fdm-core/package.json ./fdm-core/
+COPY --from=builder --chown=user:nodejs /app/fdm-app/build ./fdm-app/build
+COPY --from=builder --chown=user:nodejs /app/fdm-app/app ./fdm-app/app
+COPY --from=builder --chown=user:nodejs /app/fdm-core/dist ./fdm-core/dist
+
+# Install production dependencies
+RUN pnpm install --prod --frozen-lockfile
+
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# Use non-root user
+USER user
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -q --spider http://localhost:8080/health || exit 1
+
+WORKDIR /app/fdm-app
+CMD ["pnpm", "start"]

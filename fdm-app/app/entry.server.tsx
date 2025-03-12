@@ -16,6 +16,7 @@ import type {
     HandleErrorFunction,
 } from "react-router"
 import { ServerRouter } from "react-router"
+import { addSecurityHeaders, getCacheControlHeaders } from "./lib/cache.server"
 
 export const streamTimeout = 5000
 
@@ -29,6 +30,15 @@ export default function handleRequest(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     loadContext: AppLoadContext,
 ) {
+    // Add cache control headers based on the request path
+    const cacheHeaders = getCacheControlHeaders(request, reactRouterContext)
+    cacheHeaders.forEach((value, key) => {
+        responseHeaders.set(key, value)
+    })
+
+    // Add security headers
+    addSecurityHeaders(responseHeaders)
+
     return isbot(request.headers.get("user-agent") || "")
         ? handleBotRequest(
               request,
@@ -52,6 +62,7 @@ function handleBotRequest(
 ) {
     return new Promise((resolve, reject) => {
         let shellRendered = false
+        let currentStatus = responseStatusCode
         const { pipe, abort } = renderToPipeableStream(
             <ServerRouter context={reactRouterContext} url={request.url} />,
             {
@@ -61,11 +72,12 @@ function handleBotRequest(
                     const stream = createReadableStreamFromReadable(body)
 
                     responseHeaders.set("Content-Type", "text/html")
+                    responseHeaders.set("Vary", "User-Agent")
 
                     resolve(
                         new Response(stream, {
                             headers: responseHeaders,
-                            status: responseStatusCode,
+                            status: currentStatus,
                         }),
                     )
 
@@ -75,7 +87,7 @@ function handleBotRequest(
                     reject(error)
                 },
                 onError(error: unknown) {
-                    responseStatusCode = 500
+                    currentStatus = 500
                     // Log streaming rendering errors from inside the shell.  Don't log
                     // errors encountered during initial shell rendering since they'll
                     // reject and get logged in handleDocumentRequest.
@@ -98,6 +110,7 @@ function handleBrowserRequest(
 ) {
     return new Promise((resolve, reject) => {
         let shellRendered = false
+        let currentStatus = responseStatusCode
         const { pipe, abort } = renderToPipeableStream(
             <ServerRouter context={reactRouterContext} url={request.url} />,
             {
@@ -107,11 +120,12 @@ function handleBrowserRequest(
                     const stream = createReadableStreamFromReadable(body)
 
                     responseHeaders.set("Content-Type", "text/html")
+                    responseHeaders.set("Vary", "User-Agent")
 
                     resolve(
                         new Response(stream, {
                             headers: responseHeaders,
-                            status: responseStatusCode,
+                            status: currentStatus,
                         }),
                     )
 
@@ -121,7 +135,7 @@ function handleBrowserRequest(
                     reject(error)
                 },
                 onError(error: unknown) {
-                    responseStatusCode = 500
+                    currentStatus = 500
                     // Log streaming rendering errors from inside the shell.  Don't log
                     // errors encountered during initial shell rendering since they'll
                     // reject and get logged in handleDocumentRequest.

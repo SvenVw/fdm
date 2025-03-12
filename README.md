@@ -28,6 +28,52 @@ FDM comprises several interconnected packages, each serving a distinct purpose:
 
 * **`fdm-docs`:** Houses the comprehensive documentation for the entire FDM project.
 
+## Running Locally with Docker
+
+The preferred way to run the `fdm-app` locally is using Docker. This ensures a consistent environment and simplifies setup. Here's how you can get started:
+
+**Prerequisites:**
+
+*   **Docker Desktop:** Ensure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running on your system.
+*   **Git:** Ensure you have [Git](https://git-scm.com/downloads) installed on your system. This is needed to clone the repository.
+
+**Steps:**
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/SvenVw/fdm.git
+    cd fdm
+    ```
+    This will download the entire FDM project to your local machine.
+
+2.  **Build the Docker Images:**
+    ```bash
+    docker compose build
+    ```
+    This command builds the Docker images defined in the `docker-compose.yml` file. This includes setting up the `fdm-app` and the `postgres` service. This step only needs to be executed once, or after changing a part of the code.
+
+3.  **Start the Application:**
+    ```bash
+    docker compose up -d
+    ```
+    This command starts the application in detached mode (`-d`), meaning it will run in the background. This will start both the `fdm-app` and the `postgres` service. You can then access the application by browsing to http://localhost:5173
+
+4. **Run migrations and sync catalogues**
+    The first time the app starts, the migrations will be run. This will only happen once. If the database gets reset, the migrations will be ran again.
+
+5.  **Stop the Application:**
+    ```bash
+    docker compose down
+    ```
+    This command stops and removes the containers created by `docker compose up`.
+
+**Additional Notes:**
+
+*   **Database Persistence:** The `docker-compose.yml` file is configured to persist the PostgreSQL database data in a volume. This means your data will not be lost when you stop and restart the containers. If you want to fully reset the database, also execute `docker compose volume rm postgres_data`
+*   **Environment Variables:** The application requires several environment variables to be set. These are configured in the `docker-compose.yml` file. If you run the application outside of docker, make sure to set the variables in the `.env` file as well.
+*   **Accessing the Application:** Once the containers are running, the `fdm-app` will be accessible in your browser at `http://localhost:5173`.
+* **Changing Code:** If you change the code, make sure to rebuild the images with `docker compose build`
+
 ## Getting Involved
 
 We welcome contributions of all kinds! Whether you're a developer, agronomist, or simply an interested user, you can contribute by:

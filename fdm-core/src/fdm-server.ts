@@ -1,8 +1,8 @@
 import { drizzle } from "drizzle-orm/postgres-js"
-import { migrate } from "drizzle-orm/postgres-js/migrator"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmServerType } from "./fdm-server.d"
+import postgres from "postgres"
 
 export function createFdmServer(
     host: string | undefined,
@@ -10,17 +10,19 @@ export function createFdmServer(
     user: string | undefined,
     password: string | (() => string | Promise<string>) | undefined,
     database: string | undefined,
+    max = 40,
 ): FdmServerType {
     try {
+        const client = postgres({
+            user: user,
+            password: password,
+            host: host,
+            port: port,
+            database: database,
+            max: max,
+        })
         // Create drizzle instance
-        const db = drizzle({
-            connection: {
-                user: user,
-                password: password,
-                host: host,
-                port: port,
-                database: database,
-            },
+        const db = drizzle(client, {
             logger: false,
             schema: schema,
         })
@@ -28,22 +30,5 @@ export function createFdmServer(
         return db
     } catch (err) {
         throw handleError(err, "Exception for createFdmServer")
-    }
-}
-
-export async function migrateFdmServer(
-    fdm: FdmServerType,
-    migrationsFolderPath = "node_modules/@svenvw/fdm-core/dist/db/migrations",
-): Promise<void> {
-    try {
-        // Run migration
-        await migrate(fdm, {
-            migrationsFolder: migrationsFolderPath,
-            migrationsSchema: "fdm-migrations",
-        })
-    } catch (err) {
-        throw handleError(err, "Exception for migrateFdmServer", {
-            migrationsFolderPath,
-        })
     }
 }

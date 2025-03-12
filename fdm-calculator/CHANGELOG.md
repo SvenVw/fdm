@@ -1,5 +1,12 @@
 # fdm-calculator
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies [e134cfc]
+  - @svenvw/fdm-core@0.16.0
+
 ## 0.2.2
 
 ### Patch Changes

@@ -59,6 +59,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
+    const location = useLocation()
 
     // Hook to show the toasts
     useEffect(() => {
@@ -90,8 +91,13 @@ export function Layout() {
             <body>
                 <Outlet />
                 <Toaster />
-                <ErrorBoundary />
-                <ScrollRestoration />
+                <ErrorBoundary error={null} params={{}} />
+                <ScrollRestoration
+                    getKey={(location) => {
+                        // Use pathname for scroll restoration
+                        return location.pathname
+                    }}
+                />
                 <Scripts />
             </body>
         </html>

@@ -27,9 +27,7 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
@@ -37,7 +35,6 @@
         "build": "rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
-        "prepare": "pnpm build",
         "preview": "vite preview",
         "test": "vitest run",
         "test-coverage": "vitest run --coverage",

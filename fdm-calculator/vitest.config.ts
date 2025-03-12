@@ -22,5 +22,6 @@ export default defineConfig({
             "@": "./src",
         },
         environment: "node",
+        include: ["src/**/*.{test,spec}.?(c|m)[jt]s?(x)"],
     },
 })
