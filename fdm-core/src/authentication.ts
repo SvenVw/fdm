@@ -79,10 +79,13 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
                 tenantId: "common",
                 requireSelectAccount: true,
                 mapProfileToUser: (profile) => {
+                    const { firstname, surname } = splitFullName(profile.name)
                     return {
                         name: profile.name,
                         email: profile.email,
                         image: profile.picture,
+                        firstname: firstname,
+                        surname: surname,
                     }
                 },
             },
@@ -93,6 +96,42 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
     })
 
     return auth
+}
+
+/**
+ * Splits a full name into first name and surname, handling various formats including "LastName, FirstName".
+ *
+ * @param fullName - The full name string.
+ * @returns An object containing the first name and surname.
+ */
+export function splitFullName(fullName: string | undefined): {
+    firstname: string | null
+    surname: string | null
+} {
+    if (!fullName || fullName.trim() === "") {
+        return { firstname: null, surname: null }
+    }
+
+    fullName = fullName.trim()
+    // Check for "LastName, FirstName" format
+    if (fullName.includes(",")) {
+        const parts = fullName.split(",").map((part) => part.trim())
+        if (parts.length === 2) {
+            return { firstname: parts[1], surname: parts[0] }
+        }
+    }
+
+    const names = fullName.split(/\s+/) // Split by one or more spaces
+
+    if (names.length === 1) {
+        // Only one name provided
+        return { firstname: names[0], surname: null }
+    } else {
+        // Multiple names provided
+        const firstname = names[0]
+        const surname = names.slice(-1)[0] // Get the last name
+        return { firstname, surname }
+    }
 }
 
 /**
