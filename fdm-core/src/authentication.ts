@@ -112,26 +112,26 @@ export function splitFullName(fullName: string | undefined): {
         return { firstname: null, surname: null }
     }
 
-    fullName = fullName.trim()
+    const trimmedName = fullName.trim()
     // Check for "LastName, FirstName" format
-    if (fullName.includes(",")) {
-        const parts = fullName.split(",").map((part) => part.trim())
+    if (trimmedName.includes(",")) {
+        const parts = trimmedName.split(",").map((part) => part.trim())
         if (parts.length === 2) {
             return { firstname: parts[1], surname: parts[0] }
         }
     }
 
-    const names = fullName.split(/\s+/) // Split by one or more spaces
+    const names = trimmedName.split(/\s+/) // Split by one or more spaces
 
     if (names.length === 1) {
         // Only one name provided
         return { firstname: names[0], surname: null }
-    } else {
-        // Multiple names provided
-        const firstname = names[0]
-        const surname = names.slice(-1)[0] // Get the last name
-        return { firstname, surname }
     }
+
+    // Multiple names provided
+    const firstname = names[0]
+    const surname = names.slice(-1)[0] // Get the last name
+    return { firstname, surname }
 }
 
 /**
