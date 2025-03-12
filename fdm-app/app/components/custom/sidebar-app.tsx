@@ -99,6 +99,10 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = undefined
     }
 
+    const nutrienBalanceLink = undefined
+    const omBalanceLink = undefined
+    const baatLink = undefined
+
     try {
         Sentry.setUser({
             fullName: user.name,
@@ -240,10 +244,17 @@ export function SidebarApp(props: SideBarAppType) {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="#">
-                                        <ArrowRightLeft />
-                                        <span>Nutriëntenbalans</span>
-                                    </NavLink>
+                                    {nutrienBalanceLink ? (
+                                        <NavLink to={nutrienBalanceLink}>
+                                            <ArrowRightLeft />
+                                            <span>Nutriëntenbalans</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <ArrowRightLeft />
+                                            <span>Nutriëntenbalans</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -251,10 +262,17 @@ export function SidebarApp(props: SideBarAppType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="#">
-                                        <Scale />
-                                        <span>OS Balans</span>
-                                    </NavLink>
+                                    {omBalanceLink ? (
+                                        <NavLink to={omBalanceLink}>
+                                            <Scale />
+                                            <span>OS Balans</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Scale />
+                                            <span>OS Balans</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -262,10 +280,17 @@ export function SidebarApp(props: SideBarAppType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="#">
-                                        <GitPullRequestArrow />
-                                        <span>BAAT</span>
-                                    </NavLink>
+                                    {baatLink ? (
+                                        <NavLink to={baatLink}>
+                                            <GitPullRequestArrow />
+                                            <span>BAAT</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <GitPullRequestArrow />
+                                            <span>BAAT</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
