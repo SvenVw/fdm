@@ -11,11 +11,12 @@ import { signIn } from "@/lib/auth-client"
 import { auth } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { cn } from "@/lib/utils"
-import { Check, MoveDown } from "lucide-react"
+import { Check, MoveDown, Info } from "lucide-react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import { toast } from "sonner"
 import type { MetaFunction } from "react-router"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 /**
  * Checks for an existing user session and redirects authenticated users.
@@ -138,6 +139,20 @@ export default function SignIn() {
                             </div>
                         </div>
                     </div>
+                    <Alert className="mb-4">
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>
+                            <p className="text-sm text-left font-medium leading-none">
+                                Let op!
+                            </p>
+                        </AlertTitle>
+                        <AlertDescription>
+                            <p className="text-sm text-left text-muted-foreground">
+                                MINAS2 is nog in ontwikkeling. Functionaliteiten
+                                kunnen nog ontbreken of veranderen.
+                            </p>
+                        </AlertDescription>
+                    </Alert>
                     <Card>
                         <CardHeader>
                             <CardTitle>Aanmelden</CardTitle>
