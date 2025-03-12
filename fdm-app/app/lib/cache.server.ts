@@ -138,7 +138,7 @@ export function addSecurityHeaders(headers: Headers): Headers {
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
         font-src 'self' https://fonts.gstatic.com data:;
         img-src 'self' data: blob: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com;
-        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl ws://localhost:* http://localhost:*;
+        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl https://storage.googleapis.com/fdm-public-data/ ws://localhost:* http://localhost:*;
         frame-src 'self';
         media-src 'self';
         object-src 'none';
