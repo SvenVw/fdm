@@ -47,6 +47,8 @@ import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
+import { toast } from "sonner"
+import { useFarm } from "@/context/farm-context"
 
 interface SideBarAppType {
     user: {
@@ -55,7 +57,6 @@ interface SideBarAppType {
         name: string
         email: string
         image: string | undefined
-        farm_active: string | undefined
     }
 }
 
@@ -72,26 +73,30 @@ export function SidebarApp(props: SideBarAppType) {
         props.user.firstname.slice(0, 1).toUpperCase() +
         props.user.surname.slice(0, 1).toUpperCase()
     const isMobile = useIsMobile()
+    const { farmId } = useFarm() // Get farmId from context
 
     let farmLink: string
-    if (user.farm_active) {
-        farmLink = `/farm/${user.farm_active}`
+    let farmLinkDisplay: string
+    if (farmId) {
+        farmLink = `/farm/${farmId}`
+        farmLinkDisplay = "Bedrijf"
     } else {
         farmLink = "/farm"
+        farmLinkDisplay = "Selecteer een bedrijf"
     }
 
-    let fieldsLink: string
-    if (user.farm_active) {
-        fieldsLink = `/farm/${user.farm_active}/field`
+    let fieldsLink: string | undefined
+    if (farmId) {
+        fieldsLink = `/farm/${farmId}/field`
     } else {
-        fieldsLink = "/field"
+        fieldsLink = undefined
     }
 
-    let atlasLink: string
-    if (user.farm_active) {
-        atlasLink = `/farm/${user.farm_active}/atlas`
+    let atlasLink: string | undefined
+    if (farmId) {
+        atlasLink = `/farm/${farmId}/atlas`
     } else {
-        atlasLink = "#"
+        atlasLink = undefined
     }
 
     try {
@@ -155,24 +160,38 @@ export function SidebarApp(props: SideBarAppType) {
                                 <SidebarMenuButton asChild>
                                     <NavLink to={farmLink}>
                                         <House />
-                                        <span>Bedrijf</span>
+                                        <span>{farmLinkDisplay}</span>
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={atlasLink}>
-                                        <MapIcon />
-                                        <span>Kaart</span>
-                                    </NavLink>
+                                    {atlasLink ? (
+                                        <NavLink to={atlasLink}>
+                                            <MapIcon />
+                                            <span>Kaart</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <MapIcon />
+                                            <span>Kaart</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={fieldsLink}>
-                                        <Square />
-                                        <span>Percelen</span>
-                                    </NavLink>
+                                    {fieldsLink ? (
+                                        <NavLink to={fieldsLink}>
+                                            <Square />
+                                            <span>Percelen</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Square />
+                                            <span>Percelen</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>

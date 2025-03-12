@@ -1,14 +1,16 @@
 import { SidebarApp } from "@/components/custom/sidebar-app"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
 import { redirect } from "react-router"
-import { Outlet, useLoaderData } from "react-router"
+import { Outlet, useLoaderData, useMatches } from "react-router"
+import { FarmContext } from "@/context/farm-context"
+import { useState, useEffect } from "react"
 
 export const meta: MetaFunction = () => {
     return [
@@ -53,12 +55,25 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function App() {
     const loaderData = useLoaderData<typeof loader>()
+    const matches = useMatches()
+    const farmMatch = matches.find(
+        (match) =>
+            match.pathname.startsWith("/farm/") && match.params.b_id_farm,
+    )
+    const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
+    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId)
+
+    useEffect(() => {
+        setFarmId(initialFarmId)
+    }, [initialFarmId])
 
     return (
-        <SidebarProvider>
-            <SidebarApp user={loaderData.user} />
-            <Outlet />
-        </SidebarProvider>
+        <FarmContext.Provider value={{ farmId, setFarmId }}>
+            <SidebarProvider>
+                <SidebarApp user={loaderData.user} />
+                <Outlet />
+            </SidebarProvider>
+        </FarmContext.Provider>
     )
 }
 
