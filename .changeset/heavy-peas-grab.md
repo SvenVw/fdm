@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Improve and standardize handling avatar initials
+Improve and standardize the handling of avatar initials

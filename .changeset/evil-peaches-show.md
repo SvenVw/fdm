@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Improved parsing of names of Micrsoft accounts at registration
+Improved parsing of names of Microsoft accounts at registration

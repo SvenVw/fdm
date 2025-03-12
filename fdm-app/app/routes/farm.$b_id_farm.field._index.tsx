@@ -22,8 +22,6 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
 
 /**
  * Retrieves and processes farm and field options for the specified farm ID based on the current user session.
