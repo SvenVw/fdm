@@ -54,6 +54,7 @@ import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
+import { useEffect } from "react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -200,7 +201,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the available cultivations
         let cultivationOptions = []
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>
@@ -271,6 +276,19 @@ export default function Index() {
             a_som_loi: loaderData.a_som_loi ?? undefined,
         },
     })
+
+    useEffect(() => {
+        form.reset({
+            b_name: loaderData.b_name ?? "",
+            b_area: Math.round(loaderData.b_area * 10) / 10,
+            b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
+            b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
+            b_gwl_class: loaderData.b_gwl_class ?? undefined,
+            a_p_al: loaderData.a_p_al ?? undefined,
+            a_p_cc: loaderData.a_p_cc ?? undefined,
+            a_som_loi: loaderData.a_som_loi ?? undefined,
+        })
+    }, [loaderData, form.reset])
 
     return (
         <div className="grid md:grid-cols-3 gap-4 p-4">
