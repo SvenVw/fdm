@@ -132,6 +132,19 @@ export function SidebarApp(props: SideBarAppType) {
         }
     }
 
+    const handleSupportClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const button = event.currentTarget
+        const username = button.dataset.username
+        const domain = window.location.hostname
+
+        if (username && domain) {
+            const email = `${username}@${domain}`
+            window.location.href = `mailto:${email}`
+        } else {
+            console.error("Email data attributes are missing.")
+        }
+    }
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -265,11 +278,13 @@ export function SidebarApp(props: SideBarAppType) {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem key="support">
-                                <SidebarMenuButton asChild size="sm">
-                                    <NavLink to="#">
-                                        <LifeBuoy />
-                                        <span>Ondersteuning</span>
-                                    </NavLink>
+                                <SidebarMenuButton
+                                    size="sm"
+                                    onClick={handleSupportClick}
+                                    data-username="support"
+                                >
+                                    <LifeBuoy />
+                                    <span>Ondersteuning</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem key="feedback">
