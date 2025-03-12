@@ -1,23 +1,25 @@
-import { SidebarApp } from "@/components/custom/sidebar-app"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
+import { SidebarApp } from "@/components/custom/sidebar-app";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { auth, getSession } from "@/lib/auth.server";
+import { handleActionError, handleLoaderError } from "@/lib/error";
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
-} from "react-router"
-import { redirect } from "react-router"
-import { Outlet, useLoaderData, useMatches } from "react-router"
-import { FarmContext } from "@/context/farm-context"
-import { useState, useEffect } from "react"
+} from "react-router";
+import { redirect, useRoutes } from "react-router";
+import { Outlet, useLoaderData, useMatches } from "react-router";
+import { FarmContext } from "@/context/farm-context";
+import { useState, useEffect } from "react";
+import WhatsNew, { updatePosts } from "./farm.whats-new"; // Import updatePosts
+import { SidebarInset } from "@/components/ui/sidebar";
 
 export const meta: MetaFunction = () => {
     return [
         { title: "FDM App" },
         { name: "description", content: "Welcome to FDM!" },
-    ]
-}
+    ];
+};
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
@@ -33,18 +35,19 @@ export const meta: MetaFunction = () => {
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
-        const session = await getSession(request)
+        const session = await getSession(request);
 
         if (!session?.user) {
-            return redirect("/signin")
+            return redirect("/signin");
         }
 
         // Return user information from loader
         return {
             user: session.user,
-        }
+            updatePosts: updatePosts, // Add updatePosts to the loader data
+        };
     } catch (error) {
-        throw handleLoaderError(error)
+        throw handleLoaderError(error);
     }
 }
 
@@ -54,27 +57,44 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * This component retrieves user data from the loader using React Router's useLoaderData hook and passes it to the SidebarApp component within a SidebarProvider context. It also renders an Outlet to display nested routes.
  */
 export default function App() {
-    const loaderData = useLoaderData<typeof loader>()
-    const matches = useMatches()
+    const loaderData = useLoaderData<typeof loader>();
+    const matches = useMatches();
     const farmMatch = matches.find(
         (match) =>
             match.pathname.startsWith("/farm/") && match.params.b_id_farm,
-    )
-    const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
-    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId)
+    );
+    const initialFarmId = farmMatch?.params.b_id_farm as string | undefined;
+    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId);
 
     useEffect(() => {
-        setFarmId(initialFarmId)
-    }, [initialFarmId])
+        setFarmId(initialFarmId);
+    }, [initialFarmId]);
+
+    const routes = useRoutes([
+        {
+            path: "/farm/whats-new",
+            element: <WhatsNew />,
+        },
+        {
+            path: "*",
+            element: <Outlet />,
+        },
+    ]);
 
     return (
         <FarmContext.Provider value={{ farmId, setFarmId }}>
             <SidebarProvider>
-                <SidebarApp user={loaderData.user} />
-                <Outlet />
+                <SidebarApp
+                    user={loaderData.user}
+                    updatePosts={loaderData.updatePosts} // Pass updatePosts as a prop
+                />
+                <SidebarInset>
+                    <Outlet />
+                    {routes}
+                </SidebarInset>
             </SidebarProvider>
         </FarmContext.Provider>
-    )
+    );
 }
 
 /**
@@ -92,7 +112,7 @@ export default function App() {
 export async function action({ request }: ActionFunctionArgs) {
     try {
         // Get the session
-        const session = await getSession(request)
+        const session = await getSession(request);
 
         // Revoke the session
         await auth.api.revokeSession({
@@ -100,9 +120,9 @@ export async function action({ request }: ActionFunctionArgs) {
             body: {
                 token: session?.session.token,
             },
-        })
-        return redirect("/signin")
+        });
+        return redirect("/signin");
     } catch (error) {
-        throw handleActionError(error)
+        throw handleActionError(error);
     }
 }

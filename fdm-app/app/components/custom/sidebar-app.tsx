@@ -49,6 +49,7 @@ import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
 import { useFarm } from "@/context/farm-context"
+import { updatePosts } from "@/routes/farm.whats-new"
 
 interface SideBarAppType {
     user: {
@@ -383,9 +384,11 @@ export function SidebarApp(props: SideBarAppType) {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
-                                        <Sparkles />
-                                        Wat is er nieuw?
+                                    <DropdownMenuItem asChild>
+                                        <NavLink to="/farm/whats-new">
+                                            <Sparkles className="mr-2 h-4 w-4" />
+                                            Wat is er nieuw?                                        
+                                        </NavLink>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
