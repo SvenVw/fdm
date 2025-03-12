@@ -9,10 +9,22 @@ import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     Outlet,
     data,
     useLoaderData,
 } from "react-router"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Instellingen - Bedrijf | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de instellingen van je bedrijf.",
+        },
+    ]
+}
 
 /**
  * Loads farm details, farm options, and sidebar navigation items for a given farm.

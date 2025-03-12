@@ -8,8 +8,12 @@ import type {
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "MINAS2 App" },
-        { name: "description", content: "Welcome to MINAS2!" },
+        { title: "Authenticatie | FDM" },
+        {
+            name: "description",
+            content:
+                "Beveiligde authenticatie voor toegang tot het FDM platform.",
+        },
     ]
 }
 

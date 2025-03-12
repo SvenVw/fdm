@@ -19,12 +19,24 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useFetcher,
     useLoaderData,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Gewas - Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gegevens van je gewas.",
+        },
+    ]
+}
 
 /**
  * Loads and prepares data for the farm fields overview page.

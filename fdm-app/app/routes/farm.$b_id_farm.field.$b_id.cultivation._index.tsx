@@ -17,12 +17,24 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useLoaderData,
     useLocation,
 } from "react-router"
-import { dataWithError, dataWithSuccess, dataWithWarning } from "remix-toast"
-import { toast } from "sonner"
+import {dataWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Gewas - Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gewassen van je perceel.",
+        },
+    ]
+}
+
 
 /**
  * Loads data required for rendering the overview of a specific farm field.

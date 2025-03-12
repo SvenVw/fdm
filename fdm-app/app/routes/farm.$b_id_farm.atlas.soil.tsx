@@ -6,10 +6,22 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Bodem  - Kaart | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk bodemgegevens op de kaart.",
+        },
+    ]
+}
 
 /**
  * Loads farm fields as a GeoJSON FeatureCollection along with a Mapbox token.

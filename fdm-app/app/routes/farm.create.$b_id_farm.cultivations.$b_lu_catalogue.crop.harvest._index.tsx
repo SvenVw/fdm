@@ -13,10 +13,23 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Oogst- Bouwplan - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk en selecteer de oogsten van een gewas uit je bouwplan.",
+        },
+    ]
+}
 
 /**
  * Retrieves required harvest and cultivation details for rendering the harvest addition form.

@@ -4,6 +4,17 @@ import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
+import type { MetaFunction } from "@remix-run/node"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Bodemanalyse - Perceel | FDM" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de bodemanalyses van je perceel.",
+        },
+    ]
+}
 
 /**
  * Retrieves details of a specific farm field.

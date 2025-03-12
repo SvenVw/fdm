@@ -12,8 +12,12 @@ import { Outlet, useLoaderData } from "react-router"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "MINAS2 App" },
-        { name: "description", content: "Welcome to MINAS2!" },
+        { title: "Dashboard | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Beheer je bedrijfsgegevens, percelen en gewassen in één overzichtelijk dashboard.",
+        },
     ]
 }
 

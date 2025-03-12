@@ -22,11 +22,23 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
+import type { MetaFunction } from "@remix-run/node"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Perceel | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Beheer al uw percelen op één plek. Bekijk een overzicht van alle percelen binnen uw bedrijf met hun belangrijkste kenmerken.",
+        },
+    ]
+}
 
 /**
  * Retrieves and processes farm and field options for the specified farm ID based on the current user session.
  *
- * This loader function extracts the active farm ID from the route parameters and uses the user’s session to:
+ * This loader function extracts the active farm ID from the route parameters and uses the user's session to:
  * - Fetch all farms associated with the user, redirecting to the farms overview if none exist.
  * - Validate and map the farms into selectable options.
  * - Retrieve and validate the fields for the active farm, rounding each field's area and sorting the fields alphabetically.

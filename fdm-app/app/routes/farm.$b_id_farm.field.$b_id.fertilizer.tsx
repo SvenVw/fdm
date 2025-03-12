@@ -18,12 +18,24 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useFetcher,
     useLoaderData,
     useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Bemesting - Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de bemestinggegevens van je perceel.",
+        },
+    ]
+}
 
 /**
  * Loads data necessary for managing fertilizer applications for a specific field.

@@ -58,8 +58,12 @@ import { fdm } from "../lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "MINAS2 App" },
-        { name: "description", content: "Welcome to MINAS2!" },
+        { title: "Perceel bewerken - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk en bewerk de details van een nieuw toe te voegen perceel, inclusief bodemgegevens en gewassen.",
+        },
     ]
 }
 

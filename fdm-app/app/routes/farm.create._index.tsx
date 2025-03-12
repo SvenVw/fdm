@@ -17,7 +17,6 @@ import {
     enableCultivationCatalogue,
     enableFertilizerCatalogue,
     getFertilizersFromCatalogue,
-    PrincipalId,
 } from "@svenvw/fdm-core"
 import type {
     ActionFunctionArgs,
@@ -32,8 +31,12 @@ import { fdm } from "../lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "MINAS2 App" },
-        { name: "description", content: "Welcome to MINAS2!" },
+        { title: "Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Voeg een nieuw bedrijf toe aan MINAS2.",
+        },
     ]
 }
 

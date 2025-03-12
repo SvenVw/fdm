@@ -55,8 +55,12 @@ import { fdm } from "../lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "MINAS2 App" },
-        { name: "description", content: "Welcome to MINAS2!" },
+        { title: "Kaart - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk en bewerk je percelen op een interactieve kaart. Pas perceelgrenzen aan en bekijk satellietbeelden.",
+        },
     ]
 }
 

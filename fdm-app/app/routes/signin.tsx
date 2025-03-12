@@ -15,6 +15,7 @@ import { Check, MoveDown } from "lucide-react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import { toast } from "sonner"
+import type { MetaFunction } from "react-router"
 
 /**
  * Checks for an existing user session and redirects authenticated users.
@@ -59,7 +60,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns A React element representing the sign-in page.
  */
 export default function SignIn() {
-    const handleSignInError = (provider: string, error: Error) => {
+    const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
         )
@@ -279,4 +280,14 @@ export default function SignIn() {
             </div>
         </div>
     )
+}
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Aanmelden | MINAS2" },
+        {
+            name: "description",
+            content: "Meld je aan bij MINAS2!",
+        },
+    ]
 }

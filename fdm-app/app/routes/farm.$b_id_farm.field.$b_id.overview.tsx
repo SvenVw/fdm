@@ -43,6 +43,18 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
+import type { MetaFunction } from "@remix-run/node"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Overzicht - Perceel | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk en beheer de algemene informatie van uw perceel, inclusief naam, eigendomsgegevens en tijdsperiode.",
+        },
+    ]
+}
 
 /**
  * Loads farm field details for the overview page.

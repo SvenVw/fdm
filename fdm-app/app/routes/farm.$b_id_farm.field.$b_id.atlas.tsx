@@ -21,6 +21,18 @@ import {
     useLoaderData,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
+import type { MetaFunction } from "@remix-run/node"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Kaart - Perceel  MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk uw perceel op de kaart met interactieve visualisatie van de locatie, grenzen en geografische kenmerken.",
+        },
+    ]
+}
 
 /**
  * Loads field data and Mapbox configuration for rendering a farm field on the map.

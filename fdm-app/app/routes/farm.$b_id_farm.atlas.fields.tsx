@@ -20,6 +20,18 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
+import type { MetaFunction } from "@remix-run/node"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Percelen - Kaart | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk alle percelen van uw bedrijf op één interactieve kaart. Visualiseer de geografische spreiding en onderlinge relaties tussen uw percelen.",
+        },
+    ]
+}
 
 /**
  * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.
