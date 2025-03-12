@@ -12,8 +12,8 @@ import { Outlet, useLoaderData } from "react-router"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: "MINAS2 App" },
+        { name: "description", content: "Welcome to MINAS2!" },
     ]
 }
 

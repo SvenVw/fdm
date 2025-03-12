@@ -138,7 +138,9 @@ export function SidebarApp(props: SideBarAppType) {
                                     <Sprout className="size-4" />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">FDM</span>
+                                    <span className="font-semibold">
+                                        MINAS2
+                                    </span>
                                     {/* <span className="">2024</span> */}
                                 </div>
                             </NavLink>
