@@ -43,7 +43,7 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
-import type { MetaFunction } from "@remix-run/node"
+import type { MetaFunction } from "react-router"
 
 export const meta: MetaFunction = () => {
     return [

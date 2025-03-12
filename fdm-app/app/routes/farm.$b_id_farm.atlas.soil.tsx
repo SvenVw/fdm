@@ -15,7 +15,7 @@ import {
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bodem  - Kaart | MINAS2" },
+        { title: "Bodem - Kaart | MINAS2" },
         {
             name: "description",
             content: "Bekijk bodemgegevens op de kaart.",

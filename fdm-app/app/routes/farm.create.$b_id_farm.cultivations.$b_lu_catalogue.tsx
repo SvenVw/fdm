@@ -28,7 +28,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-
 /**
  * Loads cultivation details for a specific farm and catalogue.
  *

@@ -20,7 +20,7 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
-import type { MetaFunction } from "@remix-run/node"
+import type { MetaFunction } from "react-router"
 
 export const meta: MetaFunction = () => {
     return [

@@ -4,7 +4,7 @@ import type { MetaFunction } from "react-router"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "toegang - Instellingen - Bedrijf | MINAS2" },
+        { title: "Toegang - Instellingen - Bedrijf | MINAS2" },
         {
             name: "description",
             content: "Bekijk en bewerk de toegang tot je bedrijf.",
