@@ -1,10 +1,8 @@
 import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { type LoaderFunctionArgs, useLoaderData } from "react-router"
-import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
-import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -18,7 +16,6 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { cn } from "@/lib/utils"
 
 // Define the structure for a single update post
 export interface UpdatePost {
@@ -130,7 +127,6 @@ export default function WhatsNew() {
                             <CardContent className="py-4">
                                 {/* Use ReactMarkdown to render the description */}
                                 <ReactMarkdown
-                                    children={post.description}
                                     remarkPlugins={[remarkGfm]}
                                     components={{
                                         p: ({ node, ...props }) => (
@@ -167,7 +163,9 @@ export default function WhatsNew() {
                                             <em className="italic" {...props} />
                                         ),
                                     }}
-                                />
+                                >
+                                    {post.description}
+                                </ReactMarkdown>
                             </CardContent>
                         </Card>
                     ))}
