@@ -8,7 +8,7 @@ import type { MetaFunction } from "@remix-run/node"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bodemanalyse - Perceel | FDM" },
+        { title: "Bodemanalyse - Perceel | MINAS2" },
         {
             name: "description",
             content: "Bekijk en bewerk de bodemanalyses van je perceel.",
