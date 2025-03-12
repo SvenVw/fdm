@@ -31,8 +31,12 @@ import { fdm } from "../lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: "Percelen beheren - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Beheer de percelen van je bedrijf. Pas namen aan en bekijk perceelsinformatie.",
+        },
     ]
 }
 

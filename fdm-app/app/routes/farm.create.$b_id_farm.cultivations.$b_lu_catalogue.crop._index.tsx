@@ -16,11 +16,24 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useFetcher,
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Gewas- Bouwplan - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk en selecteer de oogst van een gewas uit je bouwplan.",
+        },
+    ]
+}
 
 /**
  * Loads and prepares cultivation and harvest data for a specified farm and catalogue.
@@ -54,7 +67,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the available cultivations
         let cultivationOptions = []
         let b_lu_harvestable: HarvestableType = "none"
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>

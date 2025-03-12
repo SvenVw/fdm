@@ -15,11 +15,23 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Oogsten - Gewas - Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de oogsten van je gewas.",
+        },
+    ]
+}
 
 /**
  * Loads the necessary data for the harvest page.

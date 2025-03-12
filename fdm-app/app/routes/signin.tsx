@@ -11,10 +11,12 @@ import { signIn } from "@/lib/auth-client"
 import { auth } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { cn } from "@/lib/utils"
-import { Check, MoveDown } from "lucide-react"
+import { Check, MoveDown, Info } from "lucide-react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import { toast } from "sonner"
+import type { MetaFunction } from "react-router"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 /**
  * Checks for an existing user session and redirects authenticated users.
@@ -59,7 +61,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns A React element representing the sign-in page.
  */
 export default function SignIn() {
-    const handleSignInError = (provider: string, error: Error) => {
+    const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
         )
@@ -70,8 +72,8 @@ export default function SignIn() {
             <div className="flex h-screen items-center justify-center py-12">
                 <div className="mx-auto grid w-[350px] gap-6">
                     <div className="grid gap-2 text-center">
-                        {/* <img src="logo.png" alt="Logo FDM"/> */}
-                        <h1 className="text-3xl font-bold">FDM</h1>
+                        {/* <img src="logo.png" alt="Logo MINAS2"/> */}
+                        <h1 className="text-3xl font-bold">MINAS2</h1>
                         <p className="text-balance text-muted-foreground">
                             Maak een account aan en krijg toegang tot:
                         </p>
@@ -137,6 +139,20 @@ export default function SignIn() {
                             </div>
                         </div>
                     </div>
+                    <Alert className="mb-4">
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>
+                            <p className="text-sm text-left font-medium leading-none">
+                                Let op!
+                            </p>
+                        </AlertTitle>
+                        <AlertDescription>
+                            <p className="text-sm text-left text-muted-foreground">
+                                MINAS2 is nog in ontwikkeling. Functionaliteiten
+                                kunnen nog ontbreken of veranderen.
+                            </p>
+                        </AlertDescription>
+                    </Alert>
                     <Card>
                         <CardHeader>
                             <CardTitle>Aanmelden</CardTitle>
@@ -262,7 +278,7 @@ export default function SignIn() {
                     </Card>
                     <div className="mb-4 text-center text-sm">
                         <Button variant={"outline"}>
-                            Lees meer over FDM <MoveDown />
+                            Lees meer over MINAS2 <MoveDown />
                         </Button>
                     </div>
                 </div>
@@ -279,4 +295,14 @@ export default function SignIn() {
             </div>
         </div>
     )
+}
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Aanmelden | MINAS2" },
+        {
+            name: "description",
+            content: "Meld je aan bij MINAS2!",
+        },
+    ]
 }

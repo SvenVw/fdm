@@ -6,10 +6,22 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Hoogte - Kaart | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk hoogtegegevens op de kaart.",
+        },
+    ]
+}
 
 /**
  * Loads farm field data and a Mapbox token for the elevation feature.

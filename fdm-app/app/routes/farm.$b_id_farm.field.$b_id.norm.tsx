@@ -3,7 +3,19 @@ import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
+import { type LoaderFunctionArgs, type MetaFunction, data, useLoaderData } from "react-router"
+
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Gebruiksnormen - Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gebruiksnormen van je perceel.",
+        },
+    ]
+}
 
 /**
  * Loads field details using the farm and field IDs from route parameters.

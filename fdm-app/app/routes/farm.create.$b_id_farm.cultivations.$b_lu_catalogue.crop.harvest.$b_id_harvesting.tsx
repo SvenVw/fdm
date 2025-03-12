@@ -9,10 +9,22 @@ import {
 } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Oogst - Bouwplan - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en selecteer de oogst van een gewas uit je bouwplan.",
+        },
+    ]
+}
 
 /**
  * Loads harvest details for a specific cultivation plan.

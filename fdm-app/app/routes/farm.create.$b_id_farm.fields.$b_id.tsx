@@ -58,8 +58,12 @@ import { fdm } from "../lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: "Perceel bewerken - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content:
+                "Bekijk en bewerk de details van een nieuw toe te voegen perceel, inclusief bodemgegevens en gewassen.",
+        },
     ]
 }
 
@@ -200,7 +204,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the available cultivations
         let cultivationOptions = []
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>

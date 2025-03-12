@@ -15,7 +15,18 @@ import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
 import { getFarms } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, NavLink, useLoaderData } from "react-router"
+import { type LoaderFunctionArgs, type MetaFunction, NavLink, useLoaderData } from "react-router"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Bedrijf | MINAS2" },
+        {
+            name: "description",
+            content: "Selecteer een bedrijf.",
+        },
+    ]
+}
 
 /**
  * Retrieves the user session and associated farms data.

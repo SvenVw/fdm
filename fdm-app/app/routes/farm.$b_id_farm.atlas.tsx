@@ -8,6 +8,7 @@ import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     Outlet,
     data,
     redirect,
@@ -15,6 +16,17 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Kaarten | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk informatie op de kaart.",
+        },
+    ]
+}
 
 /**
  * Retrieves farm details, user farm options, and layer configuration based on the farm ID in the URL parameters.

@@ -22,6 +22,7 @@ import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useLoaderData,
 } from "react-router"
@@ -30,6 +31,17 @@ import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
 const { isPostalCode } = validator
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Eigenschappen - Instellingen - Bedrijf | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de eigenschappen van je bedrijf.",
+        },
+    ]
+}
 
 /**
  * Retrieves the details of a farm using the farm ID from the URL parameters and the user's session.

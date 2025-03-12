@@ -26,8 +26,11 @@ import { Outlet, useLoaderData } from "react-router"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: "Bowuplan - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content: "Beheer de gewassen op je percelen.",
+        },
     ]
 }
 

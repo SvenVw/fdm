@@ -16,6 +16,7 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useFetcher,
     useLoaderData,
@@ -23,6 +24,17 @@ import {
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Bemesting - Bouwplan - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en voeg bemestingen toe aan je bouwplan.",
+        },
+    ]
+}
 
 /**
  * Loads fertilizer and cultivation data for a given farm and cultivation catalogue.

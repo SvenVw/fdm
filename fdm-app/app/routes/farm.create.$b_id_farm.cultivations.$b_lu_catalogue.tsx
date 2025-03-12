@@ -20,8 +20,11 @@ import { fdm } from "../lib/fdm.server"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: "Bowupland - Bedrijf toevoegen | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en selecteer een gewas uit je bouwplan.",
+        },
     ]
 }
 

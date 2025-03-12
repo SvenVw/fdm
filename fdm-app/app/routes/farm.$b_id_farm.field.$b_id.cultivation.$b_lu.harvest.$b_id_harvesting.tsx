@@ -10,12 +10,23 @@ import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
-    useFetcher,
     useLoaderData,
 } from "react-router"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Oogst - Gewas - Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de oogst van je gewas.",
+        },
+    ]
+}
 
 /**
  * Retrieves cultivation and harvest data based on provided URL parameters.

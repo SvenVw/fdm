@@ -8,11 +8,23 @@ import { fdm } from "@/lib/fdm.server"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     Outlet,
     data,
     redirect,
     useLoaderData,
 } from "react-router"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Perceel | MINAS2" },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gegevens van je perceel.",
+        },
+    ]
+}
 
 /**
  * Loads data required to render the farm field index page.

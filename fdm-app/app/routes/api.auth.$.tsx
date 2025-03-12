@@ -8,8 +8,12 @@ import type {
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: "Authenticatie | FDM" },
+        {
+            name: "description",
+            content:
+                "Beveiligde authenticatie voor toegang tot het FDM platform.",
+        },
     ]
 }
 
