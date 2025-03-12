@@ -207,30 +207,30 @@ export function SidebarApp(props: SideBarAppType) {
                                     )}
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./cultivations">
                                         <Sprout />
                                         <span>Gewassen</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            </SidebarMenuItem> */}
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./fertilizers">
                                         <Shapes />
                                         <span>Meststoffen</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            </SidebarMenuItem> */}
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./stable">
                                         <PawPrint />
                                         <span>Stal & dieren</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            </SidebarMenuItem> */}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
