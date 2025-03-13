@@ -27,7 +27,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
@@ -43,10 +45,10 @@
     "devDependencies": {
         "@rollup/plugin-commonjs": "^28.0.3",
         "@rollup/plugin-json": "^6.1.0",
-        "@rollup/plugin-node-resolve": "^16.0.0",
+        "@rollup/plugin-node-resolve": "^16.0.1",
         "@rollup/plugin-typescript": "^12.1.2",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.34.9",
+        "rollup": "^4.35.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
