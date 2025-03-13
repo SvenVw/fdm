@@ -6,10 +6,9 @@ import {
     isNotNull,
     or,
     inArray,
-    gt,
     gte,
     lte,
-    SQL,
+    type SQL,
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
@@ -23,7 +22,7 @@ import {
     getHarvests,
 } from "./harvest"
 import { createId } from "./id"
-import { Timeframe } from "./timeframe"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Retrieves cultivations available in the enabled catalogues for a farm.
@@ -1006,7 +1005,7 @@ export async function updateCultivation(
 }
 
 // Helper function to build date range conditions
-const buildDateRangeCondition = (
+export const buildDateRangeCondition = (
     dateStart: Date | null | undefined,
     dateEnd: Date | null | undefined,
 ): SQL | undefined => {
@@ -1031,7 +1030,7 @@ const buildDateRangeCondition = (
 }
 
 // Helper function to build date range conditions for ending
-const buildDateRangeConditionEnding = (
+export const buildDateRangeConditionEnding = (
     dateStart: Date | null | undefined,
     dateEnd: Date | null | undefined,
 ): SQL | undefined => {

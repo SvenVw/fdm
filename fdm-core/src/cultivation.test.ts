@@ -2,6 +2,8 @@ import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     addCultivation,
     addCultivationToCatalogue,
+    buildDateRangeCondition,
+    buildDateRangeConditionEnding,
     getCultivation,
     getCultivationPlan,
     getCultivations,
@@ -23,6 +25,8 @@ import {
     enableCultivationCatalogue,
     enableFertilizerCatalogue,
 } from "./catalogues"
+import { and, gte, isNotNull, lte, or } from "drizzle-orm"
+import * as schema from "./db/schema"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -713,5 +717,105 @@ describe("getCultivationsFromCatalogue error handling", () => {
                 b_id_farm,
             })
         }
+    })
+})
+
+describe("buildDateRangeCondition", () => {
+    it("should return undefined when both dateStart and dateEnd are null or undefined", () => {
+        expect(buildDateRangeCondition(null, null)).toBeUndefined()
+        expect(buildDateRangeCondition(undefined, undefined)).toBeUndefined()
+        expect(buildDateRangeCondition(null, undefined)).toBeUndefined()
+        expect(buildDateRangeCondition(undefined, null)).toBeUndefined()
+    })
+
+    it("should return gte condition when only dateStart is provided", () => {
+        const dateStart = new Date("2024-01-01")
+        const result = buildDateRangeCondition(dateStart, null)
+        expect(result).toEqual(
+            gte(schema.cultivationStarting.b_lu_start, dateStart),
+        )
+    })
+
+    it("should return lte condition when only dateEnd is provided", () => {
+        const dateEnd = new Date("2024-12-31")
+        const result = buildDateRangeCondition(null, dateEnd)
+        expect(result).toEqual(
+            lte(schema.cultivationStarting.b_lu_start, dateEnd),
+        )
+    })
+
+    it("should return and condition when both dateStart and dateEnd are provided", () => {
+        const dateStart = new Date("2024-01-01")
+        const dateEnd = new Date("2024-12-31")
+        const result = buildDateRangeCondition(dateStart, dateEnd)
+        expect(result).toEqual(
+            and(
+                gte(schema.cultivationStarting.b_lu_start, dateStart),
+                lte(schema.cultivationStarting.b_lu_start, dateEnd),
+            ),
+        )
+    })
+})
+
+describe("buildDateRangeConditionEnding", () => {
+    it("should return undefined when both dateStart and dateEnd are null or undefined", () => {
+        expect(buildDateRangeConditionEnding(null, null)).toBeUndefined()
+        expect(
+            buildDateRangeConditionEnding(undefined, undefined),
+        ).toBeUndefined()
+        expect(buildDateRangeConditionEnding(null, undefined)).toBeUndefined()
+        expect(buildDateRangeConditionEnding(undefined, null)).toBeUndefined()
+    })
+
+    it("should return or condition with gte when only dateStart is provided", () => {
+        const dateStart = new Date("2024-01-01")
+        const result = buildDateRangeConditionEnding(dateStart, null)
+        expect(result).toEqual(
+            or(
+                gte(schema.cultivationEnding.b_lu_end, dateStart),
+                and(
+                    isNotNull(schema.cultivationEnding.b_lu_end),
+                    gte(schema.cultivationStarting.b_lu_start, dateStart),
+                ),
+            ),
+        )
+    })
+
+    it("should return or condition with lte when only dateEnd is provided", () => {
+        const dateEnd = new Date("2024-12-31")
+        const result = buildDateRangeConditionEnding(null, dateEnd)
+        expect(result).toEqual(
+            or(
+                lte(schema.cultivationEnding.b_lu_end, dateEnd),
+                and(
+                    isNotNull(schema.cultivationEnding.b_lu_end),
+                    lte(schema.cultivationStarting.b_lu_start, dateEnd),
+                ),
+            ),
+        )
+    })
+
+    it("should return and condition with or conditions when both dateStart and dateEnd are provided", () => {
+        const dateStart = new Date("2024-01-01")
+        const dateEnd = new Date("2024-12-31")
+        const result = buildDateRangeConditionEnding(dateStart, dateEnd)
+        expect(result).toEqual(
+            and(
+                or(
+                    gte(schema.cultivationEnding.b_lu_end, dateStart),
+                    and(
+                        isNotNull(schema.cultivationEnding.b_lu_end),
+                        gte(schema.cultivationStarting.b_lu_start, dateStart),
+                    ),
+                ),
+                or(
+                    lte(schema.cultivationEnding.b_lu_end, dateEnd),
+                    and(
+                        isNotNull(schema.cultivationEnding.b_lu_end),
+                        lte(schema.cultivationStarting.b_lu_start, dateEnd),
+                    ),
+                ),
+            ),
+        )
     })
 })
