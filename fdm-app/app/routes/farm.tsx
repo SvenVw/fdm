@@ -8,12 +8,13 @@ import type {
     MetaFunction,
 } from "react-router"
 import { redirect, useRoutes } from "react-router"
-import { Outlet, useLoaderData, useMatches } from "react-router"
+import { useLoaderData, useMatches } from "react-router"
 import { FarmContext } from "@/context/farm-context"
 import { useState, useEffect } from "react"
 import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
+import { Outlet } from "react-router-dom"
 
 export const meta: MetaFunction = () => {
     return [
