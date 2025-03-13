@@ -412,7 +412,7 @@ export async function getCultivations(
             timeframe?.end,
         )
 
-        const whereClause = and(
+        const timeframeClause = and(
             eq(schema.cultivationStarting.b_id, b_id),
             or(startingDateCondition, endingDateCondition),
         )
@@ -446,7 +446,7 @@ export async function getCultivations(
                     schema.cultivationsCatalogue.b_lu_catalogue,
                 ),
             )
-            .where(whereClause)
+            .where(timeframeClause)
             .orderBy(
                 desc(schema.cultivationStarting.b_lu_start),
                 asc(schema.cultivationsCatalogue.b_lu_name),
@@ -469,6 +469,8 @@ export async function getCultivations(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting access to the cultivation plan.
  * @param b_id_farm - The unique ID of the farm for which the cultivation plan is to be retrieved.
+ * @param timeframe - Optional timeframe to filter cultivations by start and end dates.
+ *
  * @returns A Promise that resolves to an array representing the cultivation plan. Each element in the array has the following structure:
  *
  * ```
@@ -536,6 +538,7 @@ export async function getCultivationPlan(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+    timeframe?: Timeframe,
 ): Promise<cultivationPlanType[]> {
     try {
         if (!b_id_farm) {
@@ -548,6 +551,20 @@ export async function getCultivationPlan(
             b_id_farm,
             principal_id,
             "getCultivationPlan",
+        )
+
+        const startingDateCondition = buildDateRangeCondition(
+            timeframe?.start,
+            timeframe?.end,
+        )
+        const endingDateCondition = buildDateRangeConditionEnding(
+            timeframe?.start,
+            timeframe?.end,
+        )
+
+        const timeframeClause = and(
+            eq(schema.cultivationStarting.b_id, b_id),
+            or(startingDateCondition, endingDateCondition),
         )
 
         const cultivations = await fdm
@@ -657,6 +674,7 @@ export async function getCultivationPlan(
                 and(
                     eq(schema.farms.b_id_farm, b_id_farm),
                     isNotNull(schema.cultivationsCatalogue.b_lu_catalogue),
+                    timeframeClause,
                 ),
             )
 
