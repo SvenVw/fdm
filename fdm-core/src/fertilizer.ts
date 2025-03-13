@@ -1,4 +1,4 @@
-import { asc, desc, eq, inArray } from "drizzle-orm"
+import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm"
 import { createId } from "./id"
 
 import { checkPermission } from "./authorization"
@@ -10,6 +10,7 @@ import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "./fertilizer.d"
+import { Timeframe } from "./timeframe"
 
 /**
  * Retrieves all fertilizers from the enabled catalogues for a farm.
@@ -663,6 +664,7 @@ export async function getFertilizerApplication(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal making the request.
  * @param b_id - The identifier of the field.
+ * @param timeframe - Optional timeframe to filter the fertilizer applications.
  * @returns A promise that resolves with an array of fertilizer application records.
  * @throws {Error} If permission is denied or if an error occurs during record retrieval.
  */
@@ -670,6 +672,7 @@ export async function getFertilizerApplications(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.fertilizerApplicationTypeSelect["b_id"],
+    timeframe?: Timeframe,
 ): Promise<getFertilizerApplicationType[]> {
     try {
         await checkPermission(
@@ -706,7 +709,25 @@ export async function getFertilizerApplications(
                     schema.fertilizerPicking.p_id_catalogue,
                 ),
             )
-            .where(eq(schema.fertilizerApplication.b_id, b_id))
+            .where(
+                timeframe
+                    ? and(
+                          eq(schema.fertilizerApplication.b_id, b_id),
+                          timeframe.start
+                              ? gte(
+                                    schema.fertilizerApplication.p_app_date,
+                                    timeframe.start,
+                                )
+                              : undefined,
+                          timeframe.end
+                              ? lte(
+                                    schema.fertilizerApplication.p_app_date,
+                                    timeframe.end,
+                                )
+                              : undefined,
+                      )
+                    : eq(schema.fertilizerApplication.b_id, b_id),
+            )
             .orderBy(desc(schema.fertilizerApplication.p_app_date))
     } catch (err) {
         throw handleError(err, "Exception for getFertilizerApplications", {
