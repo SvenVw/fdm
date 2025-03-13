@@ -50,7 +50,6 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
-import { useFarm } from "@/context/farm-context"
 import {
     Collapsible,
     CollapsibleContent,
@@ -58,6 +57,7 @@ import {
 } from "@/components/ui/collapsible"
 import { useCalendarStore } from "@/store/calendar"
 import { Check } from "lucide-react"
+import { useFarmStore } from "@/store/farm"
 
 interface SideBarAppType {
     user: {
@@ -83,7 +83,7 @@ export function SidebarApp(props: SideBarAppType) {
     const userName = props.userName
     const avatarInitials = props.initials
     const isMobile = useIsMobile()
-    const { farmId } = useFarm()
+    const farmId = useFarmStore((state) => state.farmId)
 
     const selectedSeasonKey = useCalendarStore(
         (state) => state.selectedSeasonKey,

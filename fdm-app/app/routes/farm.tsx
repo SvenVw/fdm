@@ -15,6 +15,7 @@ import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import { useFarmStore } from "@/store/farm"
 
 export const meta: MetaFunction = () => {
     return [
@@ -67,11 +68,11 @@ export default function App() {
             match.pathname.startsWith("/farm/") && match.params.b_id_farm,
     )
     const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
-    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId)
+    const setFarmId = useFarmStore((state) => state.setFarmId)
 
     useEffect(() => {
         setFarmId(initialFarmId)
-    }, [initialFarmId])
+    }, [initialFarmId, setFarmId])
 
     const routes = useRoutes([
         {
@@ -89,19 +90,17 @@ export default function App() {
     ])
 
     return (
-        <FarmContext.Provider value={{ farmId, setFarmId }}>
-            <SidebarProvider>
-                <SidebarApp
-                    user={loaderData.user}
-                    userName={loaderData.userName}
-                    initials={loaderData.initials}
-                />
-                <SidebarInset>
-                    <Outlet />
-                    {routes}
-                </SidebarInset>
-            </SidebarProvider>
-        </FarmContext.Provider>
+        <SidebarProvider>
+            <SidebarApp
+                user={loaderData.user}
+                userName={loaderData.userName}
+                initials={loaderData.initials}
+            />
+            <SidebarInset>
+                <Outlet />
+                {routes}
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
 
