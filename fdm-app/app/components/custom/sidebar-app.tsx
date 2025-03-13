@@ -179,7 +179,7 @@ export function SidebarApp(props: SideBarAppType) {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
-            <SidebarContent>               
+            <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Bedrijf</SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -201,9 +201,14 @@ export function SidebarApp(props: SideBarAppType) {
                                 >
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={"Kalender"}>
+                                            <SidebarMenuButton
+                                                tooltip={"Kalender"}
+                                            >
                                                 <Calendar />
-                                                <span>{`Kalender: ${selectedSeason?.title}`}</span>
+                                                <span>Kalender </span>
+                                                <Badge className="ml-1">
+                                                    {selectedSeason?.title}
+                                                </Badge>
                                                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                             </SidebarMenuButton>
                                         </CollapsibleTrigger>
@@ -229,7 +234,9 @@ export function SidebarApp(props: SideBarAppType) {
                                                         >
                                                             <a href="#">
                                                                 <span>
-                                                                    {season.title}
+                                                                    {
+                                                                        season.title
+                                                                    }
                                                                 </span>
                                                                 {selectedSeasonKey ===
                                                                     season.key && (
@@ -245,7 +252,10 @@ export function SidebarApp(props: SideBarAppType) {
                                 </Collapsible>
                             ) : (
                                 <SidebarMenuItem>
-                                    <SidebarMenuButton tooltip={"Kalender"} className="cursor-default text-muted-foreground">
+                                    <SidebarMenuButton
+                                        tooltip={"Kalender"}
+                                        className="cursor-default text-muted-foreground"
+                                    >
                                         <Calendar />
                                         <span>Kalender</span>
                                     </SidebarMenuButton>
