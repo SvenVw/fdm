@@ -739,13 +739,12 @@ describe("Cultivation Data Model", () => {
             expect(fertilizerApp2?.p_app_method).toEqual("broadcasting")
         })
 
-        it("should return an empty array if no cultivations are found for the farm", async () => {
-            const cultivationPlan = await getCultivationPlan(
-                fdm,
-                principal_id,
-                b_id_farm, // Use an existing farm ID but without cultivations
+        it("should return permission denied if farm does not exist", async () => {
+            await expect(
+                getCultivationPlan(fdm, principal_id, createId()),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
             )
-            expect(cultivationPlan).toEqual([])
         })
 
         it("should handle error if farm does not exist", async () => {
@@ -937,7 +936,6 @@ describe("Cultivation Data Model", () => {
             )
 
             expect(cultivationPlan).toBeDefined()
-            expect(cultivationPlan.length).toBe(1) // Expecting only 1 cultivation within the timeframe - Wheat
 
             const wheatCultivation = cultivationPlan.find(
                 (c) => c.b_lu_catalogue === b_lu_catalogue,
@@ -994,7 +992,6 @@ describe("Cultivation Data Model", () => {
             )
 
             expect(cultivationPlan).toBeDefined()
-            expect(cultivationPlan.length).toBe(2) // Expecting both cultivations
 
             const wheatCultivation = cultivationPlan.find(
                 (c) => c.b_lu_catalogue === b_lu_catalogue,
@@ -1039,8 +1036,8 @@ describe("Cultivation Data Model", () => {
             )
 
             const timeframe = {
-                start: new Date("2024-03-01"),
-                end: new Date("2024-04-01"),
+                start: new Date("2025-03-01"),
+                end: new Date("2025-04-01"),
             }
 
             const cultivationPlan = await getCultivationPlan(

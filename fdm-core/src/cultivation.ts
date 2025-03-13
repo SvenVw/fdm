@@ -668,6 +668,7 @@ export async function getCultivationPlan(
                 and(
                     eq(schema.farms.b_id_farm, b_id_farm),
                     isNotNull(schema.cultivationsCatalogue.b_lu_catalogue),
+                    isNotNull(schema.cultivationStarting.b_id),
                     timeframeClause,
                 ),
             )
@@ -684,6 +685,17 @@ export async function getCultivationPlan(
                 )
 
                 if (!existingCultivation) {
+                    if (timeframe) {
+                        if (
+                            !isCultivationWithinTimeframe(
+                                curr.b_lu_start,
+                                curr.b_lu_end,
+                                timeframe,
+                            )
+                        ) {
+                            return acc
+                        }
+                    }
                     existingCultivation = {
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
@@ -747,17 +759,33 @@ export async function getCultivationPlan(
                         ],
                     })
                 }
-
                 return acc
             },
             [],
         )
-
         return cultivationPlan
     } catch (err) {
         throw handleError(err, "Exception for getCultivationPlan", {
             b_id_farm,
         })
+    }
+}
+
+const isCultivationWithinTimeframe = (
+    b_lu_start: Date | null,
+    b_lu_end: Date | null,
+    timeframe: Timeframe,
+): boolean => {
+    if (!b_lu_start) return false
+
+    if (b_lu_end) {
+        return (
+            (b_lu_start >= timeframe.start! && b_lu_start <= timeframe.end!) ||
+            (b_lu_end >= timeframe.start! && b_lu_end <= timeframe.end!) ||
+            (b_lu_start <= timeframe.start! && b_lu_end >= timeframe.end!)
+        )
+    } else {
+        return b_lu_start >= timeframe.start! && b_lu_start <= timeframe.end!
     }
 }
 
