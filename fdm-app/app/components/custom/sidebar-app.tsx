@@ -88,9 +88,11 @@ export function SidebarApp(props: SideBarAppType) {
     const selectedSeasonKey = useCalendarStore(
         (state) => state.selectedSeasonKey,
     )
-    const setSelectedSeasonKey = useCalendarStore(
-        (state) => state.setSelectedSeasonKey,
+    const setSelectedSeason = useCalendarStore(
+        (state) => state.setSelectedSeason,
     )
+    const selectedSeason = useCalendarStore((state) => state.selectedSeason)
+    const seasons = useCalendarStore((state) => state.seasons)
 
     let farmLink: string
     let farmLinkDisplay: string
@@ -158,27 +160,6 @@ export function SidebarApp(props: SideBarAppType) {
         window.location.href = `mailto:${supportEmail}`
     }
 
-    const seasons = [
-        {
-            title: "Alles",
-            key: "all",
-            startDate: null,
-            endDate: null,
-        },
-        {
-            title: "2025",
-            key: "2025",
-            startDate: new Date("2025-01-01"),
-            endDate: new Date("2025-12-31"),
-        },
-        {
-            title: "2024",
-            key: "2024",
-            startDate: new Date("2024-01-01"),
-            endDate: new Date("2024-12-31"),
-        },
-    ]
-
     return (
         <Sidebar>
             <SidebarHeader>
@@ -199,8 +180,8 @@ export function SidebarApp(props: SideBarAppType) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
+                <SidebarGroupLabel>Kalender</SidebarGroupLabel>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Kalender</SidebarGroupLabel>
                     <SidebarMenu>
                         <Collapsible
                             asChild
@@ -211,7 +192,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton tooltip={"Seizoen"}>
                                         <Calendar />
-                                        <span>{`Kalender: ${selectedSeasonKey}`}</span>
+                                        <span>{`Kalender: ${selectedSeason?.title}`}</span>
                                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
@@ -230,8 +211,8 @@ export function SidebarApp(props: SideBarAppType) {
                                                 <SidebarMenuSubButton
                                                     asChild
                                                     onClick={() =>
-                                                        setSelectedSeasonKey(
-                                                            season.key,
+                                                        setSelectedSeason(
+                                                            season,
                                                         )
                                                     }
                                                 >
