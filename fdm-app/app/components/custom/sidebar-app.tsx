@@ -44,6 +44,7 @@ import {
     Sparkles,
     Sprout,
     Square,
+    Check
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -56,7 +57,6 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useCalendarStore } from "@/store/calendar"
-import { Check } from "lucide-react"
 import { useFarmStore } from "@/store/farm"
 
 interface SideBarAppType {
@@ -93,6 +93,7 @@ export function SidebarApp(props: SideBarAppType) {
     )
     const selectedSeason = useCalendarStore((state) => state.selectedSeason)
     const seasons = useCalendarStore((state) => state.seasons)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     let farmLink: string
     let farmLinkDisplay: string
@@ -198,17 +199,21 @@ export function SidebarApp(props: SideBarAppType) {
                                     asChild
                                     defaultOpen={false}
                                     className="group/collapsible"
+                                    onOpenChange={setIsCalendarOpen}
                                 >
                                     <SidebarMenuItem>
                                         <CollapsibleTrigger asChild>
                                             <SidebarMenuButton
                                                 tooltip={"Kalender"}
+                                                className="flex items-center"
                                             >
                                                 <Calendar />
                                                 <span>Kalender </span>
-                                                <Badge className="ml-1">
-                                                    {selectedSeason?.title}
-                                                </Badge>
+                                                {!isCalendarOpen && (
+                                                    <Badge className="ml-1">
+                                                        {selectedSeason?.title}
+                                                    </Badge>
+                                                )}
                                                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                             </SidebarMenuButton>
                                         </CollapsibleTrigger>
@@ -232,7 +237,7 @@ export function SidebarApp(props: SideBarAppType) {
                                                                 )
                                                             }
                                                         >
-                                                            <a href="#">
+                                                            <a href="#" className="flex items-center">
                                                                 <span>
                                                                     {
                                                                         season.title
