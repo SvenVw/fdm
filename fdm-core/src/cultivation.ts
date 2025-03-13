@@ -411,11 +411,7 @@ export async function getCultivations(
             timeframe?.start,
             timeframe?.end,
         )
-
-        const timeframeClause = and(
-            eq(schema.cultivationStarting.b_id, b_id),
-            or(startingDateCondition, endingDateCondition),
-        )
+        const timeframeClause = or(startingDateCondition, endingDateCondition)
 
         const cultivations = await fdm
             .select({
@@ -446,7 +442,9 @@ export async function getCultivations(
                     schema.cultivationsCatalogue.b_lu_catalogue,
                 ),
             )
-            .where(timeframeClause)
+            .where(
+                and(eq(schema.cultivationStarting.b_id, b_id), timeframeClause),
+            )
             .orderBy(
                 desc(schema.cultivationStarting.b_lu_start),
                 asc(schema.cultivationsCatalogue.b_lu_name),
@@ -561,11 +559,7 @@ export async function getCultivationPlan(
             timeframe?.start,
             timeframe?.end,
         )
-
-        const timeframeClause = and(
-            eq(schema.cultivationStarting.b_id, b_id),
-            or(startingDateCondition, endingDateCondition),
-        )
+        const timeframeClause = or(startingDateCondition, endingDateCondition)
 
         const cultivations = await fdm
             .select({

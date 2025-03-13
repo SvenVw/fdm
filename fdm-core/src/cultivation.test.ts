@@ -287,11 +287,11 @@ describe("Cultivation Data Model", () => {
                 fdm,
                 principal_id,
                 b_id,
-                { start: new Date("2024-02-01"), end: new Date("2024-04-01") },
+                { start: new Date("2024-02-01"), end: new Date("2024-05-03") },
             )
             expect(cultivations.length).toBe(2)
-            expect(cultivations[0].b_lu_start).toEqual(new Date("2024-03-01"))
-            expect(cultivations[1].b_lu_start).toEqual(new Date("2024-01-01"))
+            expect(cultivations[0].b_lu_start).toEqual(new Date("2024-05-01"))
+            expect(cultivations[1].b_lu_start).toEqual(new Date("2024-03-01"))
 
             const cultivations2 = await getCultivations(
                 fdm,
