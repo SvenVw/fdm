@@ -33,11 +33,9 @@ import {
     LifeBuoy,
     LogOut,
     Map as MapIcon,
-    PawPrint,
     Scale,
     Send,
     Settings,
-    Shapes,
     Sparkles,
     Sprout,
     Square,
@@ -47,6 +45,8 @@ import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
+import { toast } from "sonner"
+import { useFarm } from "@/context/farm-context"
 
 interface SideBarAppType {
     user: {
@@ -55,8 +55,8 @@ interface SideBarAppType {
         name: string
         email: string
         image: string | undefined
-        farm_active: string | undefined
     }
+    initials: string
 }
 
 /**
@@ -68,31 +68,37 @@ interface SideBarAppType {
  */
 export function SidebarApp(props: SideBarAppType) {
     const user = props.user
-    const avatarInitials =
-        props.user.firstname.slice(0, 1).toUpperCase() +
-        props.user.surname.slice(0, 1).toUpperCase()
+    const avatarInitials = props.initials
     const isMobile = useIsMobile()
+    const { farmId } = useFarm()
 
     let farmLink: string
-    if (user.farm_active) {
-        farmLink = `/farm/${user.farm_active}`
+    let farmLinkDisplay: string
+    if (farmId) {
+        farmLink = `/farm/${farmId}`
+        farmLinkDisplay = "Bedrijf"
     } else {
         farmLink = "/farm"
+        farmLinkDisplay = "Selecteer een bedrijf"
     }
 
-    let fieldsLink: string
-    if (user.farm_active) {
-        fieldsLink = `/farm/${user.farm_active}/field`
+    let fieldsLink: string | undefined
+    if (farmId) {
+        fieldsLink = `/farm/${farmId}/field`
     } else {
-        fieldsLink = "/field"
+        fieldsLink = undefined
     }
 
-    let atlasLink: string
-    if (user.farm_active) {
-        atlasLink = `/farm/${user.farm_active}/atlas`
+    let atlasLink: string | undefined
+    if (farmId) {
+        atlasLink = `/farm/${farmId}/atlas`
     } else {
-        atlasLink = "#"
+        atlasLink = undefined
     }
+
+    const nutrienBalanceLink = undefined
+    const omBalanceLink = undefined
+    const baatLink = undefined
 
     try {
         Sentry.setUser({
@@ -127,6 +133,19 @@ export function SidebarApp(props: SideBarAppType) {
         }
     }
 
+    const handleSupportClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        const button = event.currentTarget
+        const username = button.dataset.username
+        const domain = window.location.hostname
+
+        if (username && domain) {
+            const email = `${username}@${domain}`
+            window.location.href = `mailto:${email}`
+        } else {
+            console.error("Email data attributes are missing.")
+        }
+    }
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -155,50 +174,64 @@ export function SidebarApp(props: SideBarAppType) {
                                 <SidebarMenuButton asChild>
                                     <NavLink to={farmLink}>
                                         <House />
-                                        <span>Bedrijf</span>
+                                        <span>{farmLinkDisplay}</span>
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={atlasLink}>
-                                        <MapIcon />
-                                        <span>Kaart</span>
-                                    </NavLink>
+                                    {atlasLink ? (
+                                        <NavLink to={atlasLink}>
+                                            <MapIcon />
+                                            <span>Kaart</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <MapIcon />
+                                            <span>Kaart</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to={fieldsLink}>
-                                        <Square />
-                                        <span>Percelen</span>
-                                    </NavLink>
+                                    {fieldsLink ? (
+                                        <NavLink to={fieldsLink}>
+                                            <Square />
+                                            <span>Percelen</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Square />
+                                            <span>Percelen</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./cultivations">
                                         <Sprout />
                                         <span>Gewassen</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            </SidebarMenuItem> */}
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./fertilizers">
                                         <Shapes />
                                         <span>Meststoffen</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
+                            </SidebarMenuItem> */}
+                            {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./stable">
                                         <PawPrint />
                                         <span>Stal & dieren</span>
                                     </NavLink>
                                 </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            </SidebarMenuItem> */}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -208,10 +241,17 @@ export function SidebarApp(props: SideBarAppType) {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="#">
-                                        <ArrowRightLeft />
-                                        <span>Nutriëntenbalans</span>
-                                    </NavLink>
+                                    {nutrienBalanceLink ? (
+                                        <NavLink to={nutrienBalanceLink}>
+                                            <ArrowRightLeft />
+                                            <span>Nutriëntenbalans</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <ArrowRightLeft />
+                                            <span>Nutriëntenbalans</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -219,10 +259,17 @@ export function SidebarApp(props: SideBarAppType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="#">
-                                        <Scale />
-                                        <span>OS Balans</span>
-                                    </NavLink>
+                                    {omBalanceLink ? (
+                                        <NavLink to={omBalanceLink}>
+                                            <Scale />
+                                            <span>OS Balans</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Scale />
+                                            <span>OS Balans</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -230,10 +277,17 @@ export function SidebarApp(props: SideBarAppType) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="#">
-                                        <GitPullRequestArrow />
-                                        <span>BAAT</span>
-                                    </NavLink>
+                                    {baatLink ? (
+                                        <NavLink to={baatLink}>
+                                            <GitPullRequestArrow />
+                                            <span>BAAT</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <GitPullRequestArrow />
+                                            <span>BAAT</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
                                 <SidebarMenuBadge>
                                     <Badge>Binnenkort</Badge>
@@ -246,11 +300,13 @@ export function SidebarApp(props: SideBarAppType) {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem key="support">
-                                <SidebarMenuButton asChild size="sm">
-                                    <NavLink to="#">
-                                        <LifeBuoy />
-                                        <span>Ondersteuning</span>
-                                    </NavLink>
+                                <SidebarMenuButton
+                                    size="sm"
+                                    onClick={handleSupportClick}
+                                    data-username="support"
+                                >
+                                    <LifeBuoy />
+                                    <span>Ondersteuning</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem key="feedback">
@@ -324,24 +380,40 @@ export function SidebarApp(props: SideBarAppType) {
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
-                                        <Sparkles />
-                                        Wat is er nieuw?
+                                    <DropdownMenuItem asChild>
+                                        <NavLink to="/farm/account">
+                                            <BadgeCheck className="mr-2 h-4 w-4" />
+                                            Account
+                                        </NavLink>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        {/* <NavLink to="#">
+                                            <Languages className="mr-2 h-4 w-4" />
+                                            Taal
+                                        </NavLink> */}
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Languages className="mr-2 h-4 w-4" />
+                                            <span>Taal</span>
+                                        </span>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
-                                        <BadgeCheck />
-                                        Account
+                                    <DropdownMenuItem asChild>
+                                        {/* <NavLink to="/farm/whats-new">
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            Instellingen
+                                        </NavLink> */}
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            <span>Instellingen</span>
+                                        </span>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Languages />
-                                        Taal
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Settings />
-                                        Instellingen
+                                    <DropdownMenuItem asChild>
+                                        <NavLink to="/farm/whats-new">
+                                            <Sparkles className="mr-2 h-4 w-4" />
+                                            Wat is er nieuw?
+                                        </NavLink>
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />

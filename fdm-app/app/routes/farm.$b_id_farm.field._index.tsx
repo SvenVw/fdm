@@ -142,18 +142,18 @@ export default function FarmFieldIndex() {
                                     :(
                                 </h1>
                                 <p className="text-sm text-muted-foreground">
-                                    Maak een perceel aan
+                                    Het aanmaken van een perceel is binnenkort
+                                    beschikbaar.
                                 </p>
                             </div>
-                            <Button asChild>
-                                <NavLink
-                                    to={`./farm/${loaderData.b_id_farm}/field/create`}
-                                >
+                            <div className="flex flex-col items-center relative">
+                                <Button disabled>
                                     Maak een perceel
-                                </NavLink>
-                            </Button>
+                                    <br />
+                                    (nog niet beschikbaar)
+                                </Button>
+                            </div>
                             {/* <p className="px-8 text-center text-sm text-muted-foreground">
-                                De meeste gebruikers lukt het binnen 6 minuten.
                             </p> */}
                         </div>
                     </>
@@ -216,16 +216,18 @@ export default function FarmFieldIndex() {
                                         </div>
                                     </div>
                                 </CardContent>
-                                <CardFooter className="flex flex-col items-center space-y-2">
+                                <CardFooter className="flex flex-col items-center space-y-2 relative">
                                     <Separator />
                                     <p className="text-muted-foreground text-sm">
                                         Of maak een nieuw perceel aan:
                                     </p>
-                                    <NavLink to={"./create"}>
-                                        <Button className="w-full">
-                                            Nieuw perceel
+                                    <div className="flex flex-col items-center w-full">
+                                        <Button disabled>
+                                            Maak een perceel
+                                            <br />
+                                            (nog niet beschikbaar)
                                         </Button>
-                                    </NavLink>
+                                    </div>
                                 </CardFooter>
                             </Card>
                         </div>
