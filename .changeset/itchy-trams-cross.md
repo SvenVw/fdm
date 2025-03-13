@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Allow display of google profile picture
+Allow display of Google profile picture
