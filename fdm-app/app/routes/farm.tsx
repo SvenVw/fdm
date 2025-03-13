@@ -1,14 +1,19 @@
 import { SidebarApp } from "@/components/custom/sidebar-app"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import { redirect } from "react-router"
-import { Outlet, useLoaderData } from "react-router"
+import { redirect, useRoutes } from "react-router"
+import { Outlet, useLoaderData, useMatches } from "react-router"
+import { FarmContext } from "@/context/farm-context"
+import { useState, useEffect } from "react"
+import WhatsNew from "./farm.whats-new"
+import Account from "./farm.account"
+import { SidebarInset } from "@/components/ui/sidebar"
 
 export const meta: MetaFunction = () => {
     return [
@@ -40,6 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             user: session.user,
+            initials: session.initials,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -53,12 +59,46 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function App() {
     const loaderData = useLoaderData<typeof loader>()
+    const matches = useMatches()
+    const farmMatch = matches.find(
+        (match) =>
+            match.pathname.startsWith("/farm/") && match.params.b_id_farm,
+    )
+    const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
+    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId)
+
+    useEffect(() => {
+        setFarmId(initialFarmId)
+    }, [initialFarmId])
+
+    const routes = useRoutes([
+        {
+            path: "/farm/whats-new",
+            element: <WhatsNew />,
+        },
+        {
+            path: "/farm/account",
+            element: <Account />,
+        },
+        {
+            path: "*",
+            element: <Outlet />,
+        },
+    ])
 
     return (
-        <SidebarProvider>
-            <SidebarApp user={loaderData.user} />
-            <Outlet />
-        </SidebarProvider>
+        <FarmContext.Provider value={{ farmId, setFarmId }}>
+            <SidebarProvider>
+                <SidebarApp
+                    user={loaderData.user}
+                    initials={loaderData.initials}
+                />
+                <SidebarInset>
+                    <Outlet />
+                    {routes}
+                </SidebarInset>
+            </SidebarProvider>
+        </FarmContext.Provider>
     )
 }
 
