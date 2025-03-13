@@ -1,4 +1,16 @@
-import { and, asc, desc, eq, isNotNull, or, inArray } from "drizzle-orm"
+import {
+    and,
+    asc,
+    desc,
+    eq,
+    isNotNull,
+    or,
+    inArray,
+    gt,
+    gte,
+    lte,
+    SQL,
+} from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
@@ -11,6 +23,7 @@ import {
     getHarvests,
 } from "./harvest"
 import { createId } from "./id"
+import { Timeframe } from "./timeframe"
 
 /**
  * Retrieves cultivations available in the enabled catalogues for a farm.
@@ -367,6 +380,8 @@ export async function getCultivation(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - Identifier of the principal requesting access.
  * @param b_id - Identifier of the field.
+ * @param timeframe - Optional timeframe to filter cultivations by start and end dates.
+ *
  * @returns A Promise resolving to an array of cultivation details.
  *
  * @throws {Error} If the principal does not have read permission or if the database query fails.
@@ -377,6 +392,7 @@ export async function getCultivations(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.cultivationStartingTypeSelect["b_id"],
+    timeframe?: Timeframe,
 ): Promise<getCultivationType[]> {
     try {
         await checkPermission(
@@ -387,6 +403,21 @@ export async function getCultivations(
             principal_id,
             "getCultivations",
         )
+
+        const startingDateCondition = buildDateRangeCondition(
+            timeframe?.start,
+            timeframe?.end,
+        )
+        const endingDateCondition = buildDateRangeConditionEnding(
+            timeframe?.start,
+            timeframe?.end,
+        )
+
+        const whereClause = and(
+            eq(schema.cultivationStarting.b_id, b_id),
+            or(startingDateCondition, endingDateCondition),
+        )
+
         const cultivations = await fdm
             .select({
                 b_lu: schema.cultivations.b_lu,
@@ -416,7 +447,7 @@ export async function getCultivations(
                     schema.cultivationsCatalogue.b_lu_catalogue,
                 ),
             )
-            .where(eq(schema.cultivationStarting.b_id, b_id))
+            .where(whereClause)
             .orderBy(
                 desc(schema.cultivationStarting.b_lu_start),
                 asc(schema.cultivationsCatalogue.b_lu_name),
@@ -972,4 +1003,66 @@ export async function updateCultivation(
             b_lu_end,
         })
     }
+}
+
+// Helper function to build date range conditions
+const buildDateRangeCondition = (
+    dateStart: Date | null | undefined,
+    dateEnd: Date | null | undefined,
+): SQL | undefined => {
+    if (!dateStart && !dateEnd) {
+        return undefined
+    }
+    const startCondition = dateStart
+        ? gte(schema.cultivationStarting.b_lu_start, dateStart)
+        : undefined
+    const endCondition = dateEnd
+        ? lte(schema.cultivationStarting.b_lu_start, dateEnd)
+        : undefined
+
+    if (startCondition && endCondition) {
+        return and(startCondition, endCondition)
+    } else if (startCondition) {
+        return startCondition
+    } else if (endCondition) {
+        return endCondition
+    }
+    return undefined
+}
+
+// Helper function to build date range conditions for ending
+const buildDateRangeConditionEnding = (
+    dateStart: Date | null | undefined,
+    dateEnd: Date | null | undefined,
+): SQL | undefined => {
+    if (!dateStart && !dateEnd) {
+        return undefined
+    }
+    const startCondition = dateStart
+        ? or(
+              gte(schema.cultivationEnding.b_lu_end, dateStart),
+              and(
+                  isNotNull(schema.cultivationEnding.b_lu_end),
+                  gte(schema.cultivationStarting.b_lu_start, dateStart),
+              ),
+          )
+        : undefined
+    const endCondition = dateEnd
+        ? or(
+              lte(schema.cultivationEnding.b_lu_end, dateEnd),
+              and(
+                  isNotNull(schema.cultivationEnding.b_lu_end),
+                  lte(schema.cultivationStarting.b_lu_start, dateEnd),
+              ),
+          )
+        : undefined
+
+    if (startCondition && endCondition) {
+        return and(startCondition, endCondition)
+    } else if (startCondition) {
+        return startCondition
+    } else if (endCondition) {
+        return endCondition
+    }
+    return undefined
 }
