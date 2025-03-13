@@ -1,5 +1,26 @@
 # Changelog fdm-app
 
+## 0.16.0
+
+### Minor Changes
+
+- 7ec422b: Improve the links in the sidebar. Activate them when the farm is selected
+- df5b29d: Add mailto link at `Ondersteuning` in sidebar
+- e093565: Deactivate the button to add a new field
+- 9877b9c: Add "what's new" page
+- bd84340: Deactivate links in sidebar to `Nutrientenbalans`, `OS Balans` and `BAAT`
+- e36c466: Remove links in the sidebar to `Meststoffen`, `Gewassen` and `Stal & Dieren`
+- d062979: Add page with account details
+
+### Patch Changes
+
+- 932c410: Fixes at the fields page in the create farm wizard the values in the form change when another field is selected
+- d20d1db: Improve and standardize the handling of avatar initials
+- a13b971: Fix CSP setting for requesting field geometries from Google Cloud Storage
+- Updated dependencies [9bfd0a8]
+  - @svenvw/fdm-core@0.17.0
+  - @svenvw/fdm-calculator@0.2.4
+
 ## 0.15.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.17.0
+
+### Minor Changes
+
+- 9bfd0a8: Improved parsing of names of Microsoft accounts at registration
+
 ## 0.16.0
 
 ### Minor Changes
