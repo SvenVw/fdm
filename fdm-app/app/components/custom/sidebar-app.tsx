@@ -21,11 +21,16 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
     BadgeCheck,
+    Calendar,
+    ChevronRight,
     ChevronsUpDown,
     GitPullRequestArrow,
     House,
@@ -47,6 +52,12 @@ import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
 import { useFarm } from "@/context/farm-context"
+import { se } from "date-fns/locale"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "../ui/collapsible"
 
 interface SideBarAppType {
     user: {
@@ -140,6 +151,24 @@ export function SidebarApp(props: SideBarAppType) {
         window.location.href = `mailto:${supportEmail}`
     }
 
+    const seasons = [
+        {
+            title: "Alles",
+            startDate: null,
+            endDate: null,
+        },
+        {
+            title: "2025",
+            startDate: new Date("2025-01-01"),
+            endDate: new Date("2025-12-31"),
+        },
+        {
+            title: "2024",
+            startDate: new Date("2024-01-01"),
+            endDate: new Date("2024-12-31"),
+        },
+    ]
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -160,6 +189,43 @@ export function SidebarApp(props: SideBarAppType) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Kalender</SidebarGroupLabel>
+                    <SidebarMenu>
+                        <Collapsible
+                            asChild
+                            defaultOpen={true}
+                            className="group/collapsible"
+                        >
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton tooltip={"Seizoen"}>
+                                        <Calendar />
+                                        <span>{"Kalender: "}</span>
+                                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        {seasons?.map((season) => (
+                                            <SidebarMenuSubItem
+                                                key={season.title}
+                                            >
+                                                <SidebarMenuSubButton asChild>
+                                                    <a href={""}>
+                                                        <span>
+                                                            {season.title}
+                                                        </span>
+                                                    </a>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        ))}
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                        </Collapsible>
+                    </SidebarMenu>
+                </SidebarGroup>
                 <SidebarGroup>
                     <SidebarGroupLabel>Mijn bedrijf</SidebarGroupLabel>
                     <SidebarGroupContent>
