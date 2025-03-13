@@ -56,6 +56,7 @@ interface SideBarAppType {
         email: string
         image: string | undefined
     }
+    userName: string
     initials: string
 }
 
@@ -68,6 +69,7 @@ interface SideBarAppType {
  */
 export function SidebarApp(props: SideBarAppType) {
     const user = props.user
+    const userName = props.userName
     const avatarInitials = props.initials
     const isMobile = useIsMobile()
     const { farmId } = useFarm()
@@ -361,7 +363,7 @@ export function SidebarApp(props: SideBarAppType) {
                                         </Avatar>
                                         <div className="grid flex-1 text-left text-sm leading-tight">
                                             <span className="truncate font-semibold">
-                                                {`${user.firstname} ${user.surname}`}
+                                                {userName}
                                             </span>
                                             <span className="truncate text-xs">
                                                 {user.email}

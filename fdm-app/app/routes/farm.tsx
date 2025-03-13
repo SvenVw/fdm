@@ -45,6 +45,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             user: session.user,
+            userName: session.userName,
             initials: session.initials,
         }
     } catch (error) {
@@ -91,6 +92,7 @@ export default function App() {
             <SidebarProvider>
                 <SidebarApp
                     user={loaderData.user}
+                    userName={loaderData.userName}
                     initials={loaderData.initials}
                 />
                 <SidebarInset>

@@ -26,7 +26,12 @@ export async function getSession(request: Request): Promise<FdmSession> {
     }
 
     // Determine userName
-    const userName = session.user.firstname ?? session.user.name
+    let userName = session.user.name
+    if (session.user.firstname && session.user.surname) {
+        userName = `${session.user.firstname} ${session.user.surname}`
+    } else if (session.user.firstname) {
+        userName = session.user.firstname
+    }
 
     // Expand session
     const sessionWithUserName = {
