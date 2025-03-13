@@ -45,19 +45,19 @@ import {
     Sprout,
     Square,
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
 import { useFarm } from "@/context/farm-context"
-import { se } from "date-fns/locale"
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from "../ui/collapsible"
+} from "@/components/ui/collapsible"
+import { useCalendarStore } from "@/store/calendar"
+import { Check } from "lucide-react"
 
 interface SideBarAppType {
     user: {
@@ -84,6 +84,13 @@ export function SidebarApp(props: SideBarAppType) {
     const avatarInitials = props.initials
     const isMobile = useIsMobile()
     const { farmId } = useFarm()
+
+    const selectedSeasonKey = useCalendarStore(
+        (state) => state.selectedSeasonKey,
+    )
+    const setSelectedSeasonKey = useCalendarStore(
+        (state) => state.setSelectedSeasonKey,
+    )
 
     let farmLink: string
     let farmLinkDisplay: string
@@ -154,16 +161,19 @@ export function SidebarApp(props: SideBarAppType) {
     const seasons = [
         {
             title: "Alles",
+            key: "all",
             startDate: null,
             endDate: null,
         },
         {
             title: "2025",
+            key: "2025",
             startDate: new Date("2025-01-01"),
             endDate: new Date("2025-12-31"),
         },
         {
             title: "2024",
+            key: "2024",
             startDate: new Date("2024-01-01"),
             endDate: new Date("2024-12-31"),
         },
@@ -201,7 +211,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton tooltip={"Seizoen"}>
                                         <Calendar />
-                                        <span>{"Kalender: "}</span>
+                                        <span>{`Kalender: ${selectedSeasonKey}`}</span>
                                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
@@ -209,13 +219,30 @@ export function SidebarApp(props: SideBarAppType) {
                                     <SidebarMenuSub>
                                         {seasons?.map((season) => (
                                             <SidebarMenuSubItem
-                                                key={season.title}
+                                                key={season.key}
+                                                className={
+                                                    selectedSeasonKey ===
+                                                    season.key
+                                                        ? "bg-accent text-accent-foreground"
+                                                        : ""
+                                                }
                                             >
-                                                <SidebarMenuSubButton asChild>
-                                                    <a href={""}>
+                                                <SidebarMenuSubButton
+                                                    asChild
+                                                    onClick={() =>
+                                                        setSelectedSeasonKey(
+                                                            season.key,
+                                                        )
+                                                    }
+                                                >
+                                                    <a href="#">
                                                         <span>
                                                             {season.title}
                                                         </span>
+                                                        {selectedSeasonKey ===
+                                                            season.key && (
+                                                            <Check className="ml-auto h-4 w-4" />
+                                                        )}
                                                     </a>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
