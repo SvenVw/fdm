@@ -17,7 +17,7 @@ interface CalendarState {
 
 const initialSeasons: Season[] = [
     {
-        title: "Alles",
+        title: "Alle jaren",
         key: "all",
         startDate: null,
         endDate: null,
