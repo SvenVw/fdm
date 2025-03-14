@@ -21,11 +21,16 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
     BadgeCheck,
+    Calendar,
+    ChevronRight,
     ChevronsUpDown,
     GitPullRequestArrow,
     House,
@@ -39,14 +44,20 @@ import {
     Sparkles,
     Sprout,
     Square,
+    Check
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
-import { useFarm } from "@/context/farm-context"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import { useCalendarStore } from "@/store/calendar"
+import { useFarmStore } from "@/store/farm"
 
 interface SideBarAppType {
     user: {
@@ -72,7 +83,17 @@ export function SidebarApp(props: SideBarAppType) {
     const userName = props.userName
     const avatarInitials = props.initials
     const isMobile = useIsMobile()
-    const { farmId } = useFarm()
+    const farmId = useFarmStore((state) => state.farmId)
+
+    const selectedSeasonKey = useCalendarStore(
+        (state) => state.selectedSeasonKey,
+    )
+    const setSelectedSeason = useCalendarStore(
+        (state) => state.setSelectedSeason,
+    )
+    const selectedSeason = useCalendarStore((state) => state.selectedSeason)
+    const seasons = useCalendarStore((state) => state.seasons)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     let farmLink: string
     let farmLinkDisplay: string
@@ -161,7 +182,7 @@ export function SidebarApp(props: SideBarAppType) {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Mijn bedrijf</SidebarGroupLabel>
+                    <SidebarGroupLabel>Bedrijf</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
@@ -172,6 +193,79 @@ export function SidebarApp(props: SideBarAppType) {
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+                            {/* Conditionally render the Kalender item */}
+                            {farmId ? (
+                                <Collapsible
+                                    asChild
+                                    defaultOpen={false}
+                                    className="group/collapsible"
+                                    onOpenChange={setIsCalendarOpen}
+                                >
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton
+                                                tooltip={"Kalender"}
+                                                className="flex items-center"
+                                            >
+                                                <Calendar />
+                                                <span>Kalender </span>
+                                                {!isCalendarOpen && (
+                                                    <Badge className="ml-1">
+                                                        {selectedSeason?.title}
+                                                    </Badge>
+                                                )}
+                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <SidebarMenuSub>
+                                                {seasons?.map((season) => (
+                                                    <SidebarMenuSubItem
+                                                        key={season.key}
+                                                        className={
+                                                            selectedSeasonKey ===
+                                                            season.key
+                                                                ? "bg-accent text-accent-foreground"
+                                                                : ""
+                                                        }
+                                                    >
+                                                        <SidebarMenuSubButton
+                                                            asChild
+                                                            onClick={() =>
+                                                                setSelectedSeason(
+                                                                    season,
+                                                                )
+                                                            }
+                                                        >
+                                                            <a href="#" className="flex items-center">
+                                                                <span>
+                                                                    {
+                                                                        season.title
+                                                                    }
+                                                                </span>
+                                                                {selectedSeasonKey ===
+                                                                    season.key && (
+                                                                    <Check className="ml-auto h-4 w-4" />
+                                                                )}
+                                                            </a>
+                                                        </SidebarMenuSubButton>
+                                                    </SidebarMenuSubItem>
+                                                ))}
+                                            </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                    </SidebarMenuItem>
+                                </Collapsible>
+                            ) : (
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        tooltip={"Kalender"}
+                                        className="cursor-default text-muted-foreground"
+                                    >
+                                        <Calendar />
+                                        <span>Kalender</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            )}
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     {atlasLink ? (

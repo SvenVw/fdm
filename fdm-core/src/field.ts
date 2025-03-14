@@ -1,4 +1,15 @@
-import { asc, eq, sql } from "drizzle-orm"
+import {
+    and,
+    asc,
+    eq,
+    gte,
+    isNotNull,
+    isNull,
+    lte,
+    or,
+    type SQL,
+    sql,
+} from "drizzle-orm"
 import { createId } from "./id"
 
 import { checkPermission } from "./authorization"
@@ -7,6 +18,7 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { getFieldType } from "./field.d"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Adds a new field to a farm.
@@ -173,6 +185,7 @@ export async function getField(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The ID of the principal making the request.
  * @param b_id_farm - The unique identifier of the farm.
+ * @param timeframe - Optional timeframe to filter fields by start and end dates.
  * @returns A Promise resolving to an array of field detail objects.
  *
  * @alpha
@@ -181,6 +194,7 @@ export async function getFields(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+    timeframe?: Timeframe,
 ): Promise<getFieldType[]> {
     try {
         await checkPermission(
@@ -191,6 +205,42 @@ export async function getFields(
             principal_id,
             "getFields",
         )
+
+        let whereClause: SQL | undefined = undefined
+
+        if (timeframe?.start && timeframe.end) {
+            whereClause = and(
+                eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
+                and(
+                    // Check if the acquiring date is within the timeframe
+                    gte(schema.fieldAcquiring.b_start, timeframe.start),
+                    lte(schema.fieldAcquiring.b_start, timeframe.end),
+                ),
+                // Check if there is a discarding date and if it is within the timeframe
+                or(
+                    and(
+                        isNotNull(schema.fieldDiscarding.b_end),
+                        gte(schema.fieldDiscarding.b_end, timeframe.start),
+                        lte(schema.fieldDiscarding.b_end, timeframe.end),
+                    ),
+                    // Check if there is no discarding date or if the discarding date is after the timeframe
+                    isNull(schema.fieldDiscarding.b_end),
+                    gte(schema.fieldDiscarding.b_end, timeframe.end),
+                ),
+            )
+        } else if (timeframe?.start) {
+            whereClause = and(
+                eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
+                gte(schema.fieldAcquiring.b_start, timeframe.start),
+            )
+        } else if (timeframe?.end) {
+            whereClause = and(
+                eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
+                lte(schema.fieldAcquiring.b_start, timeframe.end),
+            )
+        } else {
+            whereClause = eq(schema.fieldAcquiring.b_id_farm, b_id_farm)
+        }
 
         // Get properties of the requested field
         const fields = await fdm
@@ -216,7 +266,7 @@ export async function getFields(
                 schema.fieldDiscarding,
                 eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
             )
-            .where(eq(schema.fieldAcquiring.b_id_farm, b_id_farm))
+            .where(whereClause)
             .orderBy(asc(schema.fields.b_name))
 
         return fields

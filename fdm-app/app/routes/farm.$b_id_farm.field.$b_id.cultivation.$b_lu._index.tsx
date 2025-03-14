@@ -8,6 +8,7 @@ import { getSession } from "@/lib/auth.server"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { useCalendarStore } from "@/store/calendar"
 import {
     getCultivation,
     getCultivationsFromCatalogue,
@@ -16,6 +17,7 @@ import {
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
+import { timestamp } from "drizzle-orm/mysql-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -76,6 +78,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -86,7 +91,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get available cultivations for the farm
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         // Map cultivations to options for the combobox
         const cultivationsCatalogueOptions = cultivationsCatalogue.map(
             (cultivation) => {
@@ -108,7 +117,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get harvests
-        const harvests = await getHarvests(fdm, session.principal_id, b_lu)
+        const harvests = await getHarvests(
+            fdm,
+            session.principal_id,
+            b_lu,
+            timeframe,
+        )
 
         let b_lu_harvestable: HarvestableType = "none"
         const cultivationCatalogueItem = cultivationsCatalogue.find((item) => {

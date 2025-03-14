@@ -5,6 +5,7 @@ import { getSession } from "@/lib/auth.server"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { useCalendarStore } from "@/store/calendar"
 import {
     addHarvest,
     getCultivationPlan,
@@ -57,10 +58,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get the available cultivations
         let cultivationOptions = []
 
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>
@@ -75,6 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
         const cultivation = cultivationPlan.find(
             (x) => x.b_lu_catalogue === b_lu_catalogue,
@@ -154,11 +163,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get cultivation id's for this cultivation code
         const cultivationPlan = await getCultivationPlan(
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
         const cultivation = cultivationPlan.find(
             (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,

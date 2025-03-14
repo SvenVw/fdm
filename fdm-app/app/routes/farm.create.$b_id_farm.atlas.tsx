@@ -51,6 +51,7 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
+import { useCalendarStore } from "@/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -259,6 +260,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         const selectedFields = JSON.parse(
             String(formData.get("selected_fields")),
         )
@@ -271,7 +275,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
                 const b_geometry = field.geometry
                 const currentYear = new Date().getFullYear()
-                const defaultDate = new Date(currentYear, 0, 1)
+                const defaultDate = timeframe.start ? timeframe.start : `${currentYear}-01-01`
                 const b_start = defaultDate
                 const b_lu_start = defaultDate
                 const b_lu_end = undefined

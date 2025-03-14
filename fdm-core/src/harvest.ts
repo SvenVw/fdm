@@ -3,7 +3,7 @@
 // The database schema supports combined harvests, but the functions here do not yet implement this feature.
 // The current join structure is: cultivations (1) => cultivation_harvesting (M) => harvestables (1) => harvestable_sampling (1) => harvestable_analyses (1)
 
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq, gte, lte, type SQL } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -11,6 +11,7 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { HarvestType } from "./harvest.d"
 import { createId } from "./id"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Adds a new harvest to a cultivation.
@@ -192,6 +193,7 @@ export async function getHarvests(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"],
+    timeframe?: Timeframe,
 ): Promise<HarvestType[]> {
     try {
         await checkPermission(
@@ -203,6 +205,39 @@ export async function getHarvests(
             "getHarvests",
         )
 
+        let whereClause: SQL | undefined = undefined
+        if (timeframe?.start && timeframe?.end) {
+            whereClause = and(
+                eq(schema.cultivationHarvesting.b_lu, b_lu),
+                gte(
+                    schema.cultivationHarvesting.b_lu_harvest_date,
+                    timeframe.start,
+                ),
+                lte(
+                    schema.cultivationHarvesting.b_lu_harvest_date,
+                    timeframe.end,
+                ),
+            )
+        } else if (timeframe?.start) {
+            whereClause = and(
+                eq(schema.cultivationHarvesting.b_lu, b_lu),
+                gte(
+                    schema.cultivationHarvesting.b_lu_harvest_date,
+                    timeframe.start,
+                ),
+            )
+        } else if (timeframe?.end) {
+            whereClause = and(
+                eq(schema.cultivationHarvesting.b_lu, b_lu),
+                lte(
+                    schema.cultivationHarvesting.b_lu_harvest_date,
+                    timeframe.end,
+                ),
+            )
+        } else {
+            whereClause = eq(schema.cultivationHarvesting.b_lu, b_lu)
+        }
+
         const harvests = await fdm
             .select({
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
@@ -211,7 +246,7 @@ export async function getHarvests(
                 b_lu: schema.cultivationHarvesting.b_lu,
             })
             .from(schema.cultivationHarvesting)
-            .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            .where(whereClause)
             .orderBy(desc(schema.cultivationHarvesting.b_lu_harvest_date))
 
         // Get details of each harvest

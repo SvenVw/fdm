@@ -7,6 +7,7 @@ import { getSession } from "@/lib/auth.server"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { useCalendarStore } from "@/store/calendar"
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
@@ -61,6 +62,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -89,6 +93,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
 
         const dose = calculateDose({

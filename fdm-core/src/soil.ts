@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq, gte, lte, type SQL } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -6,6 +6,7 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { createId } from "./id"
 import type { getSoilAnalysisType } from "./soil.d"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Adds a new soil analysis record along with its soil sampling details.
@@ -233,6 +234,7 @@ export async function getSoilAnalysis(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting the data.
  * @param b_id - The identifier of the field.
+ * @param timeframe - Optional timeframe to filter the soil analyses.
  * @returns An array of soil analysis records with corresponding soil sampling details. Returns an empty array if no records are found.
  *
  * @throws {Error} If the principal lacks read permissions for the field or if the database query fails.
@@ -241,6 +243,7 @@ export async function getSoilAnalyses(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
+    timeframe?: Timeframe,
 ): Promise<getSoilAnalysisType[]> {
     try {
         await checkPermission(
@@ -251,6 +254,27 @@ export async function getSoilAnalyses(
             principal_id,
             "getSoilAnalyses",
         )
+
+        let whereClause: SQL | undefined = undefined
+        if (timeframe?.start && timeframe.end) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                gte(schema.soilSampling.b_sampling_date, timeframe.start),
+                lte(schema.soilSampling.b_sampling_date, timeframe.end),
+            )
+        } else if (timeframe?.start) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                gte(schema.soilSampling.b_sampling_date, timeframe.start),
+            )
+        } else if (timeframe?.end) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                lte(schema.soilSampling.b_sampling_date, timeframe.end),
+            )
+        } else {
+            whereClause = eq(schema.soilSampling.b_id, b_id)
+        }
 
         const soilAnalyses = await fdm
             .select({
@@ -272,7 +296,7 @@ export async function getSoilAnalyses(
                 schema.soilSampling,
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
-            .where(eq(schema.soilSampling.b_id, b_id))
+            .where(whereClause)
             .orderBy(desc(schema.soilSampling.b_sampling_date))
 
         return soilAnalyses

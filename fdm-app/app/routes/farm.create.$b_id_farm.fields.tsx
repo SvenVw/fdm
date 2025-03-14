@@ -27,6 +27,7 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
+import { useCalendarStore } from "@/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -67,10 +68,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
         // Get the fields
-        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
 
         // Sort by name
         fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
