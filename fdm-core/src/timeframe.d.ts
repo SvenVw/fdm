@@ -1,4 +1,4 @@
 export interface Timeframe {
-    start: Date | null
-    end: Date | null
+    start: Date | null | undefined
+    end: Date | null | undefined
 }
