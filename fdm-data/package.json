@@ -27,14 +27,12 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
-        "build": "rollup -c",
+        "build": "dotenvx run -- rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -46,6 +44,7 @@
         "@rollup/plugin-commonjs": "^28.0.3",
         "@rollup/plugin-json": "^6.1.0",
         "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
         "@vitest/coverage-v8": "catalog:",
         "rollup": "^4.35.0",
