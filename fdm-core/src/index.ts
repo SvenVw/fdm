@@ -74,4 +74,5 @@ export {
     isCultivationCatalogueEnabled,
     syncCatalogues,
 } from "./catalogues"
+export type { Timeframe } from "./timeframe.d"
 export { runMigration } from "./migrate"

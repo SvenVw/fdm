@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import type { Timeframe } from "@svenvw/fdm-core"
 
 interface Season {
     title: string
@@ -12,7 +13,7 @@ interface CalendarState {
     selectedSeason: Season | null
     setSelectedSeason: (season: Season) => void
     seasons: Season[]
-    getSeasonDates: () => { startDate: Date | null; endDate: Date | null }
+    getTimeframe: () => Timeframe
 }
 
 const initialSeasons: Season[] = [
@@ -43,11 +44,11 @@ export const useCalendarStore = create<CalendarState>((set, get) => ({
     setSelectedSeason: (season) =>
         set({ selectedSeason: season, selectedSeasonKey: season.key }),
     seasons: initialSeasons,
-    getSeasonDates: () => {
+    getTimeframe: () => {
         const selectedSeason = get().selectedSeason
         return {
-            startDate: selectedSeason?.startDate || null,
-            endDate: selectedSeason?.endDate || null,
+            start: selectedSeason?.startDate || null,
+            end: selectedSeason?.endDate || null,
         }
     },
 }))
