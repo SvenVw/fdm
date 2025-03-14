@@ -60,7 +60,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the available cultivations
         let cultivationOptions = []
 
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>
