@@ -270,4 +270,146 @@ describe("Soil Analysis Functions", () => {
         const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id)
         expect(allAnalyses).toHaveLength(2)
     })
+
+    it("should get soil analyses within a timeframe", async () => {
+        // Add soil analyses with different sampling dates
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            new Date("2023-03-15"),
+            "source1",
+            b_id,
+            10,
+            new Date("2023-03-15"),
+        )
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            new Date("2023-04-20"),
+            "source2",
+            b_id,
+            15,
+            new Date("2023-04-20"),
+        )
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            new Date("2023-05-25"),
+            "source3",
+            b_id,
+            20,
+            new Date("2023-05-25"),
+        )
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            new Date("2023-06-30"),
+            "source4",
+            b_id,
+            25,
+            new Date("2023-06-30"),
+        )
+
+        // Test with a timeframe that includes only the second analysis
+        const timeframe1 = {
+            start: new Date("2023-04-01"),
+            end: new Date("2023-04-30"),
+        }
+        const analyses1 = await getSoilAnalyses(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe1,
+        )
+        analyses1.map((analysis) => {
+            expect(analysis.b_sampling_date).toBeInstanceOf(Date)
+            expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe1.start.getTime(),
+            )
+            expect(analysis.b_sampling_date?.getTime()).toBeLessThanOrEqual(
+                timeframe1.end.getTime(),
+            )
+        })
+
+        // Test with a timeframe that includes the second and third analyses
+        const timeframe2 = {
+            start: new Date("2023-04-01"),
+            end: new Date("2023-05-31"),
+        }
+        const analyses2 = await getSoilAnalyses(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe2,
+        )
+        analyses2.map((analysis) => {
+            expect(analysis.b_sampling_date).toBeInstanceOf(Date)
+            expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe2.start.getTime(),
+            )
+            expect(analysis.b_sampling_date?.getTime()).toBeLessThanOrEqual(
+                timeframe2.end.getTime(),
+            )
+        })
+
+        // Test with a timeframe that includes all analyses
+        const timeframe3 = {
+            start: new Date("2023-03-01"),
+            end: new Date("2023-06-30"),
+        }
+        const analyses3 = await getSoilAnalyses(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe3,
+        )
+        analyses3.map((analysis) => {
+            expect(analysis.b_sampling_date).toBeInstanceOf(Date)
+            expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe3.start.getTime(),
+            )
+            expect(analysis.b_sampling_date?.getTime()).toBeLessThanOrEqual(
+                timeframe3.end.getTime(),
+            )
+        })
+
+        // Test with only start date
+        const timeframe4 = {
+            start: new Date("2023-05-01"),
+            end: undefined,
+        }
+        const analyses4 = await getSoilAnalyses(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe4,
+        )
+        analyses4.map((analysis) => {
+            expect(analysis.b_sampling_date).toBeInstanceOf(Date)
+            expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe4.start.getTime(),
+            )
+        })
+
+        // Test with only end date
+        const timeframe5 = {
+            start: undefined,
+            end: new Date("2023-04-30"),
+        }
+        const analyses5 = await getSoilAnalyses(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe5,
+        )
+        analyses5.map((analysis) => {
+            expect(analysis.b_sampling_date).toBeInstanceOf(Date)
+            expect(analysis.b_sampling_date?.getTime()).toBeLessThanOrEqual(
+                timeframe5.end.getTime(),
+            )
+        })
+        // Test with no timeframe
+        const analyses6 = await getSoilAnalyses(fdm, principal_id, b_id)
+        expect(analyses6).toHaveLength(4)
+    })
 })
