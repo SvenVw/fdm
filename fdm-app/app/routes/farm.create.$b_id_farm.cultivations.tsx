@@ -61,6 +61,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         const farm = await getFarm(fdm, session.principal_id, b_id_farm).catch(
             (error) => {
                 throw data(`Failed to fetch farm: ${error.message}`, {
@@ -82,6 +85,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
 
         // Create the sidenav

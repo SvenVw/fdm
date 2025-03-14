@@ -16,6 +16,7 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
+import { useCalendarStore } from "@/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -58,11 +59,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get the cultivation details for this cultivation
         const cultivationPlan = await getCultivationPlan(
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
 
         const cultivation = cultivationPlan.find(

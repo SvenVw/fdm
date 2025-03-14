@@ -14,6 +14,7 @@ import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
+import { useCalendarStore } from "@/store/calendar"
 import { getFarms, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -54,6 +55,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
 
@@ -74,7 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Get the fields to be selected
-        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const fields = await getFields(fdm, session.principal_id, b_id_farm, timeframe)
         const fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")

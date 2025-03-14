@@ -54,6 +54,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Fetch available fertilizers for the farm
         const fertilizers = await getFertilizers(
             fdm,
@@ -73,6 +76,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
 
         // Find the target cultivation within the cultivation plan
@@ -199,6 +203,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         if (request.method === "POST") {
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
@@ -212,6 +219,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 session.principal_id,
                 b_id_farm,
+                timeframe,
             )
 
             // Get the id of the fields with this cultivation

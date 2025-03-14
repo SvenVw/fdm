@@ -55,6 +55,7 @@ import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
 import { useEffect } from "react"
+import { useCalendarStore } from "@/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -160,6 +161,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         // Get the field data
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -221,6 +225,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
@@ -674,6 +679,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = useCalendarStore.getState().getTimeframe()
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -695,6 +703,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         if (cultivations && cultivations.length > 0) {
             await updateCultivation(
