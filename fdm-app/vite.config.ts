@@ -17,7 +17,7 @@ export default defineConfig({
         global: {},
     },
     build: {
-        sourcemap: true,
+        sourcemap: process.env.NODE_ENV === "development",
         target: "ES2022",
     },
 })
