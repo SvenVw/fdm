@@ -8,9 +8,10 @@ export default defineConfig({
         reactRouter(),
         tsconfigPaths(),
         sentryVitePlugin({
-            org: process.env.SENTRY_ORG,
+            org: process.env.VITE_SENTRY_ORG,
             authToken: process.env.SENTRY_AUTH_TOKEN,
-            project: process.env.SENTRY_PROJECT,
+            project: process.env.VITE_SENTRY_PROJECT,
+            telemetry: false,
         }),
     ],
     define: {
