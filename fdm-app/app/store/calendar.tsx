@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { persist, createJSONStorage } from "zustand/middleware"
 import type { Timeframe } from "@svenvw/fdm-core"
 
 interface Season {
@@ -37,18 +38,26 @@ const initialSeasons: Season[] = [
     },
 ]
 
-export const useCalendarStore = create<CalendarState>((set, get) => ({
-    selectedSeasonKey: "all",
-    selectedSeason:
-        initialSeasons.find((season) => season.key === "all") || null,
-    setSelectedSeason: (season) =>
-        set({ selectedSeason: season, selectedSeasonKey: season.key }),
-    seasons: initialSeasons,
-    getTimeframe: () => {
-        const selectedSeason = get().selectedSeason
-        return {
-            start: selectedSeason?.startDate || null,
-            end: selectedSeason?.endDate || null,
-        }
-    },
-}))
+export const useCalendarStore = create<CalendarState>()(
+    persist(
+        (set, get) => ({
+            selectedSeasonKey: "all",
+            selectedSeason:
+                initialSeasons.find((season) => season.key === "all") || null,
+            setSelectedSeason: (season) =>
+                set({ selectedSeason: season, selectedSeasonKey: season.key }),
+            seasons: initialSeasons,
+            getTimeframe: () => {
+                const selectedSeason = get().selectedSeason
+                return {
+                    start: selectedSeason?.startDate || null,
+                    end: selectedSeason?.endDate || null,
+                }
+            },
+        }),
+        {
+            name: "calendar-storage", // unique name
+            storage: createJSONStorage(() => localStorage), // (optional) by default, 'localStorage' is used
+        },
+    ),
+)
