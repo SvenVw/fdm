@@ -386,6 +386,9 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0
     devDependencies:
+      '@dotenvx/dotenvx':
+        specifier: 'catalog:'
+        version: 1.33.0
       '@rollup/plugin-commonjs':
         specifier: ^28.0.3
         version: 28.0.3(rollup@4.35.0)
