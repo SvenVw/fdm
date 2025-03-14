@@ -2,7 +2,7 @@
 import resolve from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
 import { defineConfig } from "rollup"
-import { terser } from "rollup-plugin-terser"
+import terser from "@rollup/plugin-terser"
 
 export default defineConfig({
     input: "src/index.ts", // Your entry point
