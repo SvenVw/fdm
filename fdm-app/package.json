@@ -5,7 +5,7 @@
     "sideEffects": false,
     "type": "module",
     "scripts": {
-        "build": "react-router build",
+        "build": "dotenvx run -- react-router build",
         "dev": "dotenvx run -- pnpm db:migrate && dotenvx run -- react-router dev",
         "dotenvx": "dotenvx",
         "start": "pnpm db:migrate && react-router-serve ./build/server/index.js",

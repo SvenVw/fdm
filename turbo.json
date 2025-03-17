@@ -3,6 +3,11 @@
     "tasks": {
         "build": {
             "outputs": ["dist/**", "build/**"],
+            "passThroughEnv": [
+                "SENTRY_AUTH_TOKEN",
+                "VITE_SENTRY_ORG",
+                "VITE_SENTRY_PROJECT"
+            ],
             "dependsOn": ["^build"]
         },
         "build-docs": {
