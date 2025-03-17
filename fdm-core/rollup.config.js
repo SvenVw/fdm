@@ -1,7 +1,8 @@
 import commonjs from "@rollup/plugin-commonjs"
 import resolve from "@rollup/plugin-node-resolve"
 import typescript from "@rollup/plugin-typescript"
-import { copy } from "fs-extra" // For copying migrations
+import { copy } from "fs-extra"
+import terser from "@rollup/plugin-terser"
 
 export default {
     input: "src/index.ts",
@@ -16,6 +17,15 @@ export default {
         typescript({
             tsconfig: "./tsconfig.json",
         }), // Compiles TypeScript
+        terser({
+            sourceMap:
+                process.env.NODE_ENV === "production"
+                    ? {
+                          fileName: "dist/fdm-core.esm.js.map",
+                          url: "fdm-core.esm.js.map",
+                      }
+                    : false,
+        }), // Minifies the output
         {
             name: "copy-migrations-folder",
             closeBundle: () => {
