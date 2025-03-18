@@ -58,7 +58,7 @@ import {
 } from "@/components/ui/collapsible"
 import { useCalendarStore } from "@/store/calendar"
 import { useFarmStore } from "@/store/farm"
-import { calendarSelection, getCalendarSelection } from "@/lib/calendar"
+import { getCalendarSelection } from "@/lib/calendar"
 
 interface SideBarAppType {
     user: {
@@ -216,39 +216,51 @@ export function SidebarApp(props: SideBarAppType) {
                                         <CollapsibleContent>
                                             <SidebarMenuSub>
                                                 {calendarSelection?.map(
-                                                    (item) => (
-                                                        <SidebarMenuSubItem
-                                                            key={item}
-                                                            className={
-                                                                selectedCalendar ===
-                                                                item
-                                                                    ? "bg-accent text-accent-foreground"
-                                                                    : ""
-                                                            }
-                                                        >
-                                                            <SidebarMenuSubButton
-                                                                asChild
-                                                                onClick={() =>
-                                                                    setCalendar(
-                                                                        item,
-                                                                    )
+                                                    (item) => {
+                                                        // Construct the new URL with the selected calendar
+                                                        const newUrl =
+                                                            location.pathname.replace(
+                                                                /\/(\d{4}|Alle jaren)/,
+                                                                `/${item}`,
+                                                            )
+                                                        return (
+                                                            <SidebarMenuSubItem
+                                                                key={item}
+                                                                className={
+                                                                    selectedCalendar ===
+                                                                    item
+                                                                        ? "bg-accent text-accent-foreground"
+                                                                        : ""
                                                                 }
                                                             >
-                                                                <a
-                                                                    href="#"
-                                                                    className="flex items-center"
+                                                                <SidebarMenuSubButton
+                                                                    asChild
+                                                                    onClick={() =>
+                                                                        setCalendar(
+                                                                            item,
+                                                                        )
+                                                                    }
                                                                 >
-                                                                    <span>
-                                                                        {item}
-                                                                    </span>
-                                                                    {selectedCalendar ===
-                                                                        item && (
-                                                                        <Check className="ml-auto h-4 w-4" />
-                                                                    )}
-                                                                </a>
-                                                            </SidebarMenuSubButton>
-                                                        </SidebarMenuSubItem>
-                                                    ),
+                                                                    <NavLink
+                                                                        to={
+                                                                            newUrl
+                                                                        }
+                                                                        className="flex items-center"
+                                                                    >
+                                                                        <span>
+                                                                            {
+                                                                                item
+                                                                            }
+                                                                        </span>
+                                                                        {selectedCalendar ===
+                                                                            item && (
+                                                                            <Check className="ml-auto h-4 w-4" />
+                                                                        )}
+                                                                    </NavLink>
+                                                                </SidebarMenuSubButton>
+                                                            </SidebarMenuSubItem>
+                                                        )
+                                                    },
                                                 )}
                                             </SidebarMenuSub>
                                         </CollapsibleContent>

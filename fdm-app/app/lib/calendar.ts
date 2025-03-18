@@ -31,10 +31,14 @@ export function getCalendarSelection(): string[] {
     const currentYear = new Date().getFullYear()
 
     // Create array of years from 2020 to current year
-    const years = ["all"]
+    const years = []
     for (let i = 2020; i <= currentYear; i++) {
         years.push(i.toString())
     }
+    years.push("Alle jaren")
+
+    // Reverse the array
+    years.reverse()
 
     return years
 }
