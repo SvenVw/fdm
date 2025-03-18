@@ -1,9 +1,9 @@
 import { HarvestForm } from "@/components/custom/harvest/form"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
@@ -59,7 +59,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         // Get the available cultivations
         let cultivationOptions = []
