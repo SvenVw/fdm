@@ -7,5 +7,5 @@ interface CalendarState {
 
 export const useCalendarStore = create<CalendarState>((set) => ({
     calendar: "all", // Initial calendar is 'all'
-    setCalendar: (calendar) => set({ calendar }),
+    setCalendar: (calendar) => set({ calendar: calendar ? calendar : "all" }),
 }))

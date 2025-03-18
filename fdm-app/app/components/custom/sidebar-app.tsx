@@ -220,7 +220,7 @@ export function SidebarApp(props: SideBarAppType) {
                                                         // Construct the new URL with the selected calendar
                                                         const newUrl =
                                                             location.pathname.replace(
-                                                                /\/(\d{4}|Alle jaren)/,
+                                                                /\/(\d{4}|all)/,
                                                                 `/${item}`,
                                                             )
                                                         return (

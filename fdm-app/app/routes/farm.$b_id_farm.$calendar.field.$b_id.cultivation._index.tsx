@@ -3,6 +3,7 @@ import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframeFromCalendar } from "@/lib/calendar"
 import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -22,7 +23,7 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
-import { dataWithSuccess, dataWithWarning } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 
 /**
  * Loads data required for rendering the overview of a specific farm field.
@@ -64,7 +65,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = params.calendar
+        const timeframe = getTimeframeFromCalendar(calendar)
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)

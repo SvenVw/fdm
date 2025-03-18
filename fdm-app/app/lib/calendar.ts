@@ -4,8 +4,8 @@ export function getTimeframeFromCalendar(
     calendar: string | undefined,
 ): Timeframe {
     const timeframe = {
-        start_date: new Date("1970-01-01T00:00:00.000Z"),
-        end_date: new Date("2099-12-31T00:00:00.000Z"),
+        start: new Date("1970-01-01T00:00:00.000Z"),
+        end: new Date("2099-12-31T00:00:00.000Z"),
     }
 
     // Check if calendar is year and create a timeframe
@@ -18,8 +18,8 @@ export function getTimeframeFromCalendar(
                 throw new Error(`Unsupported year: ${calendar}`)
             }
             // Set start and end date
-            timeframe.start_date = new Date(`${year}-01-01T00:00:00.000Z`)
-            timeframe.end_date = new Date(`${year}-12-31T23:59:59.999Z`)
+            timeframe.start = new Date(`${year}-01-01T00:00:00.000Z`)
+            timeframe.end = new Date(`${year}-12-31T23:59:59.999Z`)
         }
     }
 
@@ -35,7 +35,7 @@ export function getCalendarSelection(): string[] {
     for (let i = 2020; i <= currentYear; i++) {
         years.push(i.toString())
     }
-    years.push("Alle jaren")
+    years.push("all")
 
     // Reverse the array
     years.reverse()

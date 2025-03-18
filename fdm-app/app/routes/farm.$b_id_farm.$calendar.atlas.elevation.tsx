@@ -1,11 +1,10 @@
 import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframeFromCalendar } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
 import { getFields } from "@svenvw/fdm-core"
-import { time } from "drizzle-orm/mysql-core"
 import {
     type LoaderFunctionArgs,
     NavLink,
@@ -37,10 +36,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = params.calendar
+        const timeframe = getTimeframeFromCalendar(calendar)
 
         // Get the fields of the farm
-        const fields = await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
         const features = fields.map((field) => {
             const feature = {
                 type: "Feature",

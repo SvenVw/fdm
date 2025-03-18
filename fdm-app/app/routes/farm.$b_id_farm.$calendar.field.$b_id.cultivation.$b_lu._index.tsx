@@ -5,10 +5,10 @@ import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframeFromCalendar } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
-import { useCalendarStore } from "@/store/calendar"
 import {
     getCultivation,
     getCultivationsFromCatalogue,
@@ -17,7 +17,6 @@ import {
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
-import { timestamp } from "drizzle-orm/mysql-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -79,7 +78,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = params.calendar
+        const timeframe = getTimeframeFromCalendar(calendar)
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)

@@ -12,10 +12,9 @@ import {
     type LoaderFunctionArgs,
     NavLink,
     data,
-    useFetcher,
     useLoaderData,
 } from "react-router"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 
 /**
  * Retrieves cultivation and harvest data based on provided URL parameters.
