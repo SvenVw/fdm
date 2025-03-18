@@ -771,22 +771,21 @@ export async function getCultivationPlan(
     }
 }
 
-const isCultivationWithinTimeframe = (
+export function isCultivationWithinTimeframe(
     b_lu_start: Date | null,
     b_lu_end: Date | null,
     timeframe: Timeframe,
-): boolean => {
-    if (!b_lu_start) return false
+): boolean {
+    if (!b_lu_start || !timeframe.start || !timeframe.end) return false
 
     if (b_lu_end) {
         return (
-            (b_lu_start >= timeframe.start! && b_lu_start <= timeframe.end!) ||
-            (b_lu_end >= timeframe.start! && b_lu_end <= timeframe.end!) ||
-            (b_lu_start <= timeframe.start! && b_lu_end >= timeframe.end!)
+            (b_lu_start >= timeframe.start && b_lu_start <= timeframe.end) ||
+            (b_lu_end >= timeframe.start && b_lu_end <= timeframe.end) ||
+            (b_lu_start <= timeframe.start && b_lu_end >= timeframe.end)
         )
-    } else {
-        return b_lu_start >= timeframe.start! && b_lu_start <= timeframe.end!
     }
+    return b_lu_start >= timeframe.start && b_lu_start <= timeframe.end
 }
 
 /**
