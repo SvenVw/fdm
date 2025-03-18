@@ -170,7 +170,7 @@ export function FarmHeader({
                                                         key={option.layerKey}
                                                     >
                                                         <NavLink
-                                                            to={`/farm/${b_id_farm}/${calender}/atlas/${option.layerKey}`}
+                                                            to={`/farm/${b_id_farm}/${calendar}/atlas/${option.layerKey}`}
                                                         >
                                                             {option.layerName}
                                                         </NavLink>
