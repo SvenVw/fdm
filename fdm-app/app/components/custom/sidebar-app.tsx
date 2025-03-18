@@ -94,7 +94,7 @@ export function SidebarApp(props: SideBarAppType) {
     let farmLink: string
     let farmLinkDisplay: string
     if (farmId) {
-        farmLink = `/farm/${farmId}/${selectedCalendar}`
+        farmLink = `/farm/${farmId}`
         farmLinkDisplay = "Bedrijf"
     } else {
         farmLink = "/farm"
