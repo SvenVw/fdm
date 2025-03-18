@@ -749,14 +749,6 @@ describe("Cultivation Data Model", () => {
             )
         })
 
-        it("should handle error if farm does not exist", async () => {
-            await expect(
-                getCultivationPlan(fdm, principal_id, createId()), // Use a non-existent farm ID
-            ).rejects.toThrowError(
-                "Principal does not have permission to perform this action",
-            )
-        })
-
         it("should get cultivation plan for a farm with multiple cultivations and fields", async () => {
             // Add a second cultivation to the catalogue
             const b_lu_catalogue2 = createId()

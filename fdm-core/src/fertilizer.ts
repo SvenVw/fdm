@@ -10,7 +10,7 @@ import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "./fertilizer.d"
-import { Timeframe } from "./timeframe"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Retrieves all fertilizers from the enabled catalogues for a farm.

@@ -5,7 +5,7 @@ import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
 import { createId } from "./id"
-import { FdmType } from "./fdm"
+import type { FdmType } from "./fdm"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 

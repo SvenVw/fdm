@@ -16,8 +16,6 @@ import {
 } from "./harvest"
 import { createId } from "./id"
 import { type FdmServerType, addFarm, addField, createFdmServer } from "./index"
-import { time } from "console"
-
 describe("harvest", () => {
     let fdm: FdmServerType
     let b_lu_once: schema.cultivationsTypeSelect["b_lu"]
