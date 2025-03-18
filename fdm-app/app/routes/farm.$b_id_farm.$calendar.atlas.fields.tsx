@@ -20,7 +20,7 @@ import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
-import { getTimeframeFromCalendar } from "@/lib/calendar"
+import { getTimeframe } from "@/lib/calendar"
 
 /**
  * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.
@@ -52,8 +52,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const calendar = params.calendar
-        const timeframe = getTimeframeFromCalendar(calendar)
+        const timeframe = getTimeframe(params)
 
         // Get the fields of the farm
         const fields = await getFields(

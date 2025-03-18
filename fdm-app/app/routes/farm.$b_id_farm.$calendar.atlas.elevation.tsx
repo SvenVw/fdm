@@ -1,7 +1,7 @@
 import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
-import { getTimeframeFromCalendar } from "@/lib/calendar"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
@@ -36,8 +36,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const calendar = params.calendar
-        const timeframe = getTimeframeFromCalendar(calendar)
+        const timeframe = getTimeframe(params)
 
         // Get the fields of the farm
         const fields = await getFields(

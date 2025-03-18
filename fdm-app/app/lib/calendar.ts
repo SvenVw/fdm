@@ -1,8 +1,15 @@
 import type { Timeframe } from "@svenvw/fdm-core"
+import type { Params } from "react-router"
 
-export function getTimeframeFromCalendar(
-    calendar: string | undefined,
-): Timeframe {
+export function getCalendar(params: Params): string {
+    const calendar = params.calendar as string | "all"
+
+    return calendar
+}
+
+export function getTimeframe(params: Params): Timeframe {
+    const calendar = getCalendar(params)
+
     const timeframe = {
         start: new Date("1970-01-01T00:00:00.000Z"),
         end: new Date("2099-12-31T00:00:00.000Z"),

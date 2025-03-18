@@ -3,7 +3,7 @@ import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
-import { getTimeframeFromCalendar } from "@/lib/calendar"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { useCalendarStore } from "@/store/calendar"
@@ -60,8 +60,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const calendar = params.calendar
-        const timeframe = getTimeframeFromCalendar(calendar)
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)

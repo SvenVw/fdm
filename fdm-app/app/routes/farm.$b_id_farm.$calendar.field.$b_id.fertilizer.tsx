@@ -4,7 +4,7 @@ import { FormSchema } from "@/components/custom/fertilizer-applications/formsche
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { getTimeframeFromCalendar } from "@/lib/calendar"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -63,8 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const calendar = params.calendar
-        const timeframe = getTimeframeFromCalendar(calendar)
+        const timeframe = getTimeframe(params)
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
