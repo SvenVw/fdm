@@ -207,7 +207,10 @@ export function SidebarApp(props: SideBarAppType) {
                                                 <span>Kalender </span>
                                                 {!isCalendarOpen && (
                                                     <Badge className="ml-1">
-                                                        {selectedCalendar}
+                                                        {selectedCalendar ===
+                                                        "all"
+                                                            ? "Alle jaren"
+                                                            : selectedCalendar}
                                                     </Badge>
                                                 )}
                                                 <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -248,9 +251,10 @@ export function SidebarApp(props: SideBarAppType) {
                                                                         className="flex items-center"
                                                                     >
                                                                         <span>
-                                                                            {
-                                                                                item
-                                                                            }
+                                                                            {item ===
+                                                                            "all"
+                                                                                ? "Alle jaren"
+                                                                                : item}
                                                                         </span>
                                                                         {selectedCalendar ===
                                                                             item && (
