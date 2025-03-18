@@ -8,6 +8,7 @@ import {
     getCultivationPlan,
     getCultivations,
     getCultivationsFromCatalogue,
+    isCultivationWithinTimeframe,
     removeCultivation,
     updateCultivation,
 } from "./cultivation"
@@ -27,6 +28,7 @@ import {
 } from "./catalogues"
 import { and, gte, isNotNull, lte, or } from "drizzle-orm"
 import * as schema from "./db/schema"
+import { Timeframe } from "./timeframe"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -1185,5 +1187,140 @@ describe("buildDateRangeConditionEnding", () => {
                 ),
             ),
         )
+    })
+})
+
+describe("isCultivationWithinTimeframe", () => {
+    const timeframe: Timeframe = {
+        start: new Date("2023-01-01T00:00:00.000Z"),
+        end: new Date("2023-12-31T23:59:59.999Z"),
+    }
+
+    it("should return true if start date is within timeframe", () => {
+        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
+        const b_lu_end = new Date("2024-01-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if end date is within timeframe", () => {
+        const b_lu_start = new Date("2022-12-15T00:00:00.000Z")
+        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if cultivation spans the timeframe", () => {
+        const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
+        const b_lu_end = new Date("2024-06-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return false if cultivation is entirely before the timeframe", () => {
+        const b_lu_start = new Date("2022-01-01T00:00:00.000Z")
+        const b_lu_end = new Date("2022-12-31T23:59:59.999Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(false)
+    })
+
+    it("should return false if cultivation is entirely after the timeframe", () => {
+        const b_lu_start = new Date("2024-01-01T00:00:00.000Z")
+        const b_lu_end = new Date("2024-12-31T23:59:59.999Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(false)
+    })
+
+    it("should return true if start date is at the beginning of the timeframe", () => {
+        const b_lu_start = new Date("2023-01-01T00:00:00.000Z")
+        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if start date is at the end of the timeframe", () => {
+        const b_lu_start = new Date("2023-12-31T23:59:59.999Z")
+        const b_lu_end = new Date("2024-06-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if end date is at the beginning of the timeframe", () => {
+        const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
+        const b_lu_end = new Date("2023-01-01T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if end date is at the end of the timeframe", () => {
+        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
+        const b_lu_end = new Date("2023-12-31T23:59:59.999Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if cultivation has only start date and is within timeframe", () => {
+        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
+        const b_lu_end = null
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return false if cultivation has only start date and is before timeframe", () => {
+        const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
+        const b_lu_end = null
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(false)
+    })
+
+    it("should return false if cultivation has only start date and is after timeframe", () => {
+        const b_lu_start = new Date("2024-06-15T00:00:00.000Z")
+        const b_lu_end = null
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(false)
+    })
+
+    it("should return false if cultivation has no start date", () => {
+        const b_lu_start = null
+        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(false)
+    })
+
+    it("should return true if start and end date are the same as the start of the timeframe", () => {
+        const b_lu_start = new Date("2023-01-01T00:00:00.000Z")
+        const b_lu_end = new Date("2023-01-01T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if start and end date are the same as the end of the timeframe", () => {
+        const b_lu_start = new Date("2023-12-31T23:59:59.999Z")
+        const b_lu_end = new Date("2023-12-31T23:59:59.999Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
+    })
+
+    it("should return true if start and end date are the same and within the timeframe", () => {
+        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
+        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
+        expect(
+            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
+        ).toBe(true)
     })
 })
