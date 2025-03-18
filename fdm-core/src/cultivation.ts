@@ -1060,7 +1060,8 @@ export const buildDateRangeCondition = (
 
     if (startCondition && endCondition) {
         return and(startCondition, endCondition)
-    } else if (startCondition) {
+    }
+    if (startCondition) {
         return startCondition
     }
     return endCondition
@@ -1095,7 +1096,8 @@ export const buildDateRangeConditionEnding = (
 
     if (startCondition && endCondition) {
         return and(startCondition, endCondition)
-    } else if (startCondition) {
+    }
+    if (startCondition) {
         return startCondition
     }
     return endCondition
