@@ -224,8 +224,10 @@ export async function getFields(
                         lte(schema.fieldDiscarding.b_end, timeframe.end),
                     ),
                     // Check if there is no discarding date or if the discarding date is after the timeframe
-                    isNull(schema.fieldDiscarding.b_end),
-                    gte(schema.fieldDiscarding.b_end, timeframe.end),
+                    or(
+                        isNull(schema.fieldDiscarding.b_end),
+                        gte(schema.fieldDiscarding.b_end, timeframe.end),
+                    ),
                 ),
             )
         } else if (timeframe?.start) {
