@@ -49,7 +49,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useEffect, useState } from "react"
-import { Form, NavLink } from "react-router"
+import { Form, NavLink, useLocation } from "react-router"
 import { toast } from "sonner"
 import {
     Collapsible,
@@ -91,9 +91,17 @@ export function SidebarApp(props: SideBarAppType) {
     const [isCalendarOpen, setIsCalendarOpen] = useState(false)
     const calendarSelection = getCalendarSelection()
 
+    // Check if page contains `farm/create` in url
+    const location = useLocation()
+    const isCreateFarmWizard = location.pathname.includes("farm/create")
+
+    // Set the farm link
     let farmLink: string
     let farmLinkDisplay: string
-    if (farmId) {
+    if (isCreateFarmWizard) {
+        farmLink = "/farm"
+        farmLinkDisplay = "Terug naar bedrijven"
+    } else if (farmId) {
         farmLink = `/farm/${farmId}`
         farmLinkDisplay = "Bedrijf"
     } else {
@@ -102,14 +110,18 @@ export function SidebarApp(props: SideBarAppType) {
     }
 
     let fieldsLink: string | undefined
-    if (farmId) {
+    if (isCreateFarmWizard) {
+        fieldsLink = undefined
+    } else if (farmId) {
         fieldsLink = `/farm/${farmId}/${selectedCalendar}/field`
     } else {
         fieldsLink = undefined
     }
 
     let atlasLink: string | undefined
-    if (farmId) {
+    if (isCreateFarmWizard) {
+        atlasLink = undefined
+    } else if (farmId) {
         atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
     } else {
         atlasLink = undefined
@@ -190,7 +202,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             {/* Conditionally render the Kalender item */}
-                            {farmId ? (
+                            {farmId && !isCreateFarmWizard ? (
                                 <Collapsible
                                     asChild
                                     defaultOpen={false}
