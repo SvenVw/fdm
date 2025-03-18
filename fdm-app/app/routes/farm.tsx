@@ -9,13 +9,13 @@ import type {
 } from "react-router"
 import { redirect, useRoutes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
-import { FarmContext } from "@/context/farm-context"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
 import { useFarmStore } from "@/store/farm"
+import { useCalendarStore } from "@/store/calendar"
 
 export const meta: MetaFunction = () => {
     return [
@@ -88,6 +88,16 @@ export default function App() {
             element: <Outlet />,
         },
     ])
+
+    const calendarMatch = matches.find(
+        (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
+    )
+    const initialCalendar = calendarMatch?.params.calendar as string | undefined
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+
+    useEffect(() => {
+        setCalendar(initialCalendar)
+    }, [initialCalendar, setCalendar])
 
     return (
         <SidebarProvider>
