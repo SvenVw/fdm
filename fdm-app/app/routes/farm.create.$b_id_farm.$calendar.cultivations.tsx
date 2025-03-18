@@ -9,8 +9,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/sonner"
 import { getSession } from "@/lib/auth.server"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { cn } from "@/lib/utils"
@@ -62,7 +62,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
 
         const farm = await getFarm(fdm, session.principal_id, b_id_farm).catch(
             (error) => {
@@ -92,7 +93,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const sidebarPageItems = cultivationPlan.map((cultivation) => {
             return {
                 title: cultivation.b_lu_name,
-                to: `/farm/create/${b_id_farm}/cultivations/${cultivation.b_lu_catalogue}`,
+                to: `/farm/create/${b_id_farm}/${calendar}/cultivations/${cultivation.b_lu_catalogue}`,
             }
         })
 
@@ -101,6 +102,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             sidebarPageItems: sidebarPageItems,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
+            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -151,7 +153,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/${loaderData.b_id_farm}/field`}
+                                to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         loaderData.cultivationPlan.length === 0,

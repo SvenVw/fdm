@@ -56,6 +56,7 @@ import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
 import { useEffect } from "react"
 import { useCalendarStore } from "@/store/calendar"
+import { getTimeframe } from "@/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -162,7 +163,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         // Get the field data
         const field = await getField(fdm, session.principal_id, b_id)
@@ -680,7 +681,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         const formValues = await extractFormValuesFromRequest(
             request,

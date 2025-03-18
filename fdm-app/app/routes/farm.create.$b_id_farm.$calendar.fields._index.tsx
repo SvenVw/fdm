@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { useCalendarStore } from "@/store/calendar"
@@ -28,7 +29,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         const fields = await getFields(
             fdm,

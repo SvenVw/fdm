@@ -17,6 +17,7 @@ import {
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
 import { useCalendarStore } from "@/store/calendar"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -60,7 +61,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
 
         // Get the cultivation details for this cultivation
         const cultivationPlan = await getCultivationPlan(
@@ -83,6 +85,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
+            calendar: calendar,
             cultivation: cultivation,
         }
     } catch (error) {
@@ -105,15 +108,15 @@ export default function Index() {
     const items = [
         {
             title: "Gewas",
-            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`,
+            href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`,
         },
         {
             title: "Bemesting",
-            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`,
+            href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`,
         },
         {
             title: "Vanggewas",
-            href: `/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/covercrop`,
+            href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/covercrop`,
         },
     ]
 

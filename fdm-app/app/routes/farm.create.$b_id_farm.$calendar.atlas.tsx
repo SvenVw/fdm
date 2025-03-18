@@ -52,6 +52,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 import { useCalendarStore } from "@/store/calendar"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -261,7 +262,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
 
         const selectedFields = JSON.parse(
             String(formData.get("selected_fields")),
@@ -275,7 +277,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
                 const b_geometry = field.geometry
                 const currentYear = new Date().getFullYear()
-                const defaultDate = timeframe.start ? timeframe.start : `${currentYear}-01-01`
+                const defaultDate = timeframe.start
+                    ? timeframe.start
+                    : `${currentYear}-01-01`
                 const b_start = defaultDate
                 const b_lu_start = defaultDate
                 const b_lu_end = undefined
@@ -354,9 +358,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             }),
         )
 
-        return redirectWithSuccess(`/farm/create/${b_id_farm}/fields`, {
-            message: "Percelen zijn toegevoegd! 🎉",
-        })
+        return redirectWithSuccess(
+            `/farm/create/${b_id_farm}/${calendar}/fields`,
+            {
+                message: "Percelen zijn toegevoegd! 🎉",
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }

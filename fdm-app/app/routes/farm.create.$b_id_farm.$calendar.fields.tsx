@@ -28,6 +28,7 @@ import {
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
 import { useCalendarStore } from "@/store/calendar"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -69,7 +70,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
 
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
@@ -114,7 +116,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const sidebarPageItems = fields.map((field) => {
             return {
                 title: field.b_name,
-                to: `/farm/create/${b_id_farm}/fields/${field.b_id}`,
+                to: `/farm/create/${b_id_farm}/${calendar}/fields/${field.b_id}`,
             }
         })
 
@@ -124,7 +126,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             mapboxToken: mapboxToken,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
-            action: `/farm/create/${b_id_farm}/fields`,
+            calendar: calendar,
+            action: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -175,7 +178,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/create/${loaderData.b_id_farm}/cultivations`}
+                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         loaderData.sidebarPageItems.length ===
@@ -217,7 +220,7 @@ export default function Index() {
  * @throws {Error} If the form data is missing the "b_id" or "b_name" field.
  * @throws {Error} If an error occurs during the field update process.
  */
-export async function action({ request, params }: LoaderFunctionArgs) {
+export async function action({ request }: LoaderFunctionArgs) {
     try {
         const formData = await request.formData()
         const b_id = formData.get("b_id")?.toString()

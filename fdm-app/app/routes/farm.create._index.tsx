@@ -148,7 +148,11 @@ export async function action({ request }: ActionFunctionArgs) {
                 ),
             ),
         )
-        return redirectWithSuccess(`./${b_id_farm}/atlas`, {
+
+        // Get current year
+        const year = new Date().getFullYear()
+
+        return redirectWithSuccess(`./${b_id_farm}/${year}/atlas`, {
             message: "Bedrijf is toegevoegd! 🎉",
         })
     } catch (error) {

@@ -2,6 +2,7 @@ import { HarvestForm } from "@/components/custom/harvest/form"
 import { FormSchema } from "@/components/custom/harvest/schema"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -59,7 +60,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         // Get the available cultivations
         let cultivationOptions = []
@@ -164,7 +165,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         // Get cultivation id's for this cultivation code
         const cultivationPlan = await getCultivationPlan(

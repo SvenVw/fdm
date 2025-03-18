@@ -23,7 +23,7 @@ import {
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
+import { getTimeframe } from "@/lib/calendar"
 
 /**
  * Loads fertilizer and cultivation data for a given farm and cultivation catalogue.
@@ -56,7 +56,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         // Fetch available fertilizers for the farm
         const fertilizers = await getFertilizers(
@@ -205,7 +205,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
-        const timeframe = useCalendarStore.getState().getTimeframe()
+        const timeframe = getTimeframe(params)
 
         if (request.method === "POST") {
             // Collect form entry
