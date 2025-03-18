@@ -1062,10 +1062,8 @@ export const buildDateRangeCondition = (
         return and(startCondition, endCondition)
     } else if (startCondition) {
         return startCondition
-    } else if (endCondition) {
-        return endCondition
     }
-    return undefined
+    return endCondition
 }
 
 // Helper function to build date range conditions for ending
