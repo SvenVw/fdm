@@ -79,14 +79,14 @@ export function HarvestForm({
                                         <FormLabel>Opbrengst</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="Bv. 37 ton ds / ha"
+                                                placeholder="Bv. 37500 kg ds / ha"
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            In ton droge stof per hectare
+                                            In kg droge stof per hectare
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
