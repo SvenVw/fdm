@@ -335,8 +335,6 @@ export async function getCurrentSoilData(
             .where(eq(schema.soilSampling.b_id, b_id))
             .orderBy(desc(schema.soilSampling.b_sampling_date))
 
-        const currentSoilData: CurrentSoilData = {}
-
         const parameters: SoilParameters[] = [
             "a_p_al",
             "a_p_cc",
@@ -345,19 +343,25 @@ export async function getCurrentSoilData(
             "b_soiltype_agr",
         ]
 
-        for (const analysis of soilAnalyses) {
-            for (const parameter of parameters) {
-                const value = analysis[parameter as keyof typeof analysis]
-                if (value !== null && !currentSoilData[parameter]) {
-                    currentSoilData[parameter] = {
-                        value: value,
+        const currentSoilData: CurrentSoilData = parameters.reduce(
+            (acc: CurrentSoilData, parameter: SoilParameters) => {
+                const analysis = soilAnalyses.find(
+                    (analysis) =>
+                        analysis[parameter as keyof typeof analysis] !== null,
+                )
+                if (analysis) {
+                    acc.push({
+                        parameter: parameter,
+                        value: analysis[parameter as keyof typeof analysis],
                         a_id: analysis.a_id,
                         b_sampling_date: analysis.b_sampling_date,
                         a_source: analysis.a_source,
-                    }
+                    })
                 }
-            }
-        }
+                return acc
+            },
+            [],
+        )
 
         return currentSoilData
     } catch (err) {

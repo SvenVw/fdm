@@ -14,6 +14,7 @@ import {
     removeSoilAnalysis,
     updateSoilAnalysis,
 } from "./soil"
+import { CurrentSoilData } from "./soil"
 
 describe("Soil Analysis Functions", () => {
     let fdm: FdmServerType
@@ -313,22 +314,32 @@ describe("Soil Analysis Functions", () => {
             },
         )
 
-        const currentData = await getCurrentSoilData(fdm, principal_id, b_id)
-        expect(Object.keys(currentData).length).toBeGreaterThanOrEqual(3)
-        expect(currentData.a_som_loi?.value).toEqual(a_som_loi_new)
-        expect(currentData.a_som_loi?.b_sampling_date).toEqual(
-            b_sampling_date_new,
+        const currentData: CurrentSoilData = await getCurrentSoilData(
+            fdm,
+            principal_id,
+            b_id,
         )
-        expect(currentData.a_p_al?.value).toEqual(a_p_al_new)
-        expect(currentData.a_p_al?.b_sampling_date).toEqual(b_sampling_date_new)
-        expect(currentData.b_gwl_class?.value).toEqual(b_gwl_class_new)
-        expect(currentData.b_gwl_class?.b_sampling_date).toEqual(
-            b_sampling_date_new,
+        expect(currentData.length).toBeGreaterThanOrEqual(3)
+
+        const somLoiData = currentData.find(
+            (item) => item.parameter === "a_som_loi",
         )
+        expect(somLoiData?.value).toEqual(a_som_loi_new)
+        expect(somLoiData?.b_sampling_date).toEqual(b_sampling_date_new)
+
+        const pAlData = currentData.find((item) => item.parameter === "a_p_al")
+        expect(pAlData?.value).toEqual(a_p_al_new)
+        expect(pAlData?.b_sampling_date).toEqual(b_sampling_date_new)
+
+        const gwlClassData = currentData.find(
+            (item) => item.parameter === "b_gwl_class",
+        )
+        expect(gwlClassData?.value).toEqual(b_gwl_class_new)
+        expect(gwlClassData?.b_sampling_date).toEqual(b_sampling_date_new)
     })
 
-    it("should return empty object if no soil data is present", async () => {
+    it("should return empty array if no soil data is present", async () => {
         const currentData = await getCurrentSoilData(fdm, principal_id, b_id)
-        expect(Object.keys(currentData).length).toEqual(0)
+        expect(currentData.length).toEqual(0)
     })
 })
