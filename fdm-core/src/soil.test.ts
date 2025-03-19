@@ -11,6 +11,7 @@ import {
     getCurrentSoilData,
     getSoilAnalyses,
     getSoilAnalysis,
+    getSoilParametersDescription,
     removeSoilAnalysis,
     updateSoilAnalysis,
 } from "./soil"
@@ -341,5 +342,46 @@ describe("Soil Analysis Functions", () => {
     it("should return empty array if no soil data is present", async () => {
         const currentData = await getCurrentSoilData(fdm, principal_id, b_id)
         expect(currentData.length).toEqual(0)
+    })
+})
+
+describe("getSoilParametersDescription", () => {
+    it("should return the correct soil parameter descriptions for NL-nl locale", () => {
+        const descriptions = getSoilParametersDescription("NL-nl")
+        expect(descriptions).toHaveLength(5)
+        for (const description of descriptions) {
+            expect(description).toHaveProperty("parameter")
+            expect(description).toHaveProperty("unit")
+            expect(description).toHaveProperty("name")
+            expect(description).toHaveProperty("type")
+            expect(description).toHaveProperty("description")
+            if (description.type === "enum") {
+                expect(description).toHaveProperty("options")
+            }
+        }
+    })
+
+    it("should throw an error for unsupported locales", () => {
+        expect(() => getSoilParametersDescription("en-US")).toThrowError(
+            "Unsupported locale",
+        )
+        expect(() => getSoilParametersDescription("de-DE")).toThrowError(
+            "Unsupported locale",
+        )
+    })
+
+    it("should return the correct soil parameter descriptions for default locale", () => {
+        const descriptions = getSoilParametersDescription()
+        expect(descriptions).toHaveLength(5)
+        for (const description of descriptions) {
+            expect(description).toHaveProperty("parameter")
+            expect(description).toHaveProperty("unit")
+            expect(description).toHaveProperty("name")
+            expect(description).toHaveProperty("type")
+            expect(description).toHaveProperty("description")
+            if (description.type === "enum") {
+                expect(description).toHaveProperty("options")
+            }
+        }
     })
 })

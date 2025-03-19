@@ -31,3 +31,16 @@ export interface CurrentSoilDataItem {
 }
 
 export type CurrentSoilData = CurrentSoilDataItem[]
+
+export interface SoilParameterDescriptionItem {
+    parameter: SoilParameters
+    unit: string
+    type: "numeric" | "enum"
+    name: string
+    description: string,
+    min?: number
+    max?: number
+    options?: string[]
+}
+
+export type SoilParameterDescription = SoilParameterDescriptionItem[]

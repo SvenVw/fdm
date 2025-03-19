@@ -8,6 +8,7 @@ import { createId } from "./id"
 import type {
     CurrentSoilData,
     getSoilAnalysisType,
+    SoilParameterDescription,
     SoilParameters,
 } from "./soil.d"
 
@@ -367,4 +368,62 @@ export async function getCurrentSoilData(
     } catch (err) {
         throw handleError(err, "Exception for getCurrentSoilData", { b_id })
     }
+}
+
+/**
+ * Retrieves a description of the available soil parameters.
+ *
+ * This function returns an array of objects, each describing a soil parameter.
+ * Each description includes the parameter's name, unit, type (numeric or enum),
+ * a human-readable name, a detailed description, and optional constraints like
+ * minimum and maximum values or a list of valid options for enum types.
+ *
+ * @param locale - The locale for which to retrieve the descriptions. Currently only 'NL-nl' is supported.
+ * @returns An array of SoilParameterDescriptionItem objects.
+ * @throws {Error} If an unsupported locale is provided.
+ */
+export function getSoilParametersDescription(locale = 'NL-nl'): SoilParameterDescription {
+    if (locale !== 'NL-nl') throw new Error('Unsupported locale')
+    const soilParameterDescription: SoilParameterDescription = [
+        {
+            parameter: "a_p_al",
+            unit: "mg P2O5/100 g",
+            name: "P-AL",
+            type: "numeric",
+            description: "Totaal fosfaatgehalte",
+        },
+        {
+            parameter: "a_p_cc",
+            unit: "mg P/kg",
+            name: "P-plantbeschikbaar",
+            type: "numeric",
+            description: "Fosfor, plantbeschikbaar",
+        },
+        {
+            parameter: "a_som_loi",
+            unit: "%",
+            name: "OS",
+            type: "numeric",
+            description: "Organische stof",
+        },
+        {
+            parameter: "b_gwl_class",
+            unit: "",
+            name: "GWT",
+            type: "enum",
+            description: "Grondwatertrap",
+            options: schema.gwlClasses
+        },
+        {
+            parameter: "b_soiltype_agr",
+            unit: "",
+            name: "Bodemtype",
+            type: "enum",
+            description: "Agrarisch bodemtype",
+            options: schema.soilTypes
+        },
+        
+    ]
+
+    return soilParameterDescription
 }
