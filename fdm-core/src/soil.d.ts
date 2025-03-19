@@ -14,3 +14,20 @@ export interface getSoilAnalysisType {
     b_sampling_date: schema.soilSamplingTypeSelect["b_sampling_date"]
     b_sampling_geometry: schema.soilSamplingTypeSelect["b_sampling_geometry"]
 }
+
+export type SoilParameters =
+    | "a_p_al"
+    | "a_p_cc"
+    | "a_som_loi"
+    | "b_gwl_class"
+    | "b_soiltype_agr"
+
+export type CurrentSoilData = Record<
+    string,
+    {
+        value: number | string | null
+        a_id: schema.soilAnalysisTypeSelect["a_id"]
+        b_sampling_date: schema.soilSamplingTypeSelect["b_sampling_date"]
+        a_source: schema.soilAnalysisTypeSelect["a_source"]
+    }
+>

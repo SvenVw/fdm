@@ -8,6 +8,7 @@ import { addField } from "./field"
 import { createId } from "./id"
 import {
     addSoilAnalysis,
+    getCurrentSoilData,
     getSoilAnalyses,
     getSoilAnalysis,
     removeSoilAnalysis,
@@ -269,5 +270,65 @@ describe("Soil Analysis Functions", () => {
 
         const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id)
         expect(allAnalyses).toHaveLength(2)
+    })
+
+    it("should get current soil data", async () => {
+        const a_date_old = new Date("2024-01-02T00:00:00Z")
+        const a_source = "test source"
+        const a_som_loi_old = 5
+        const a_p_al_old = 10
+        const b_depth = 10
+        const b_sampling_date_old = new Date("2024-01-01T00:00:00Z")
+
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date_old,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date_old,
+            { a_som_loi: a_som_loi_old, a_p_al: a_p_al_old },
+        )
+
+        const b_sampling_date_new = new Date(
+            b_sampling_date_old.getTime() + 5000,
+        ) // Add 5 seconds
+        const a_som_loi_new = 7
+        const a_p_al_new = 12
+        const b_gwl_class_new = "III"
+
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date_old,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date_new,
+            {
+                a_som_loi: a_som_loi_new,
+                a_p_al: a_p_al_new,
+                b_gwl_class: b_gwl_class_new,
+            },
+        )
+
+        const currentData = await getCurrentSoilData(fdm, principal_id, b_id)
+        expect(Object.keys(currentData).length).toBeGreaterThanOrEqual(3)
+        expect(currentData.a_som_loi?.value).toEqual(a_som_loi_new)
+        expect(currentData.a_som_loi?.b_sampling_date).toEqual(
+            b_sampling_date_new,
+        )
+        expect(currentData.a_p_al?.value).toEqual(a_p_al_new)
+        expect(currentData.a_p_al?.b_sampling_date).toEqual(b_sampling_date_new)
+        expect(currentData.b_gwl_class?.value).toEqual(b_gwl_class_new)
+        expect(currentData.b_gwl_class?.b_sampling_date).toEqual(
+            b_sampling_date_new,
+        )
+    })
+
+    it("should return empty object if no soil data is present", async () => {
+        const currentData = await getCurrentSoilData(fdm, principal_id, b_id)
+        expect(Object.keys(currentData).length).toEqual(0)
     })
 })
