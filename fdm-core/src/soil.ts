@@ -178,27 +178,27 @@ export async function removeSoilAnalysis(
 }
 
 /**
- * Retrieves the most recent soil analysis record for a specified field.
+ * Retrieves the soil analysis record for a specified analysis.
  *
- * This function validates that the requesting principal has the necessary read permissions for the field before querying for the latest soil analysis data based on the creation timestamp.
+ * This function validates that the requesting principal has the necessary read permissions for the soil analysis before querying for soil analysis data based on the id.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The unique ID of the principal requesting the soil analysis.
- * @param b_id - The identifier of the field.
- * @returns The latest soil analysis record for the field, or null if no record exists.
+ * @param a_id - The identifier of the analysis.
+ * @returns The soil analysis record for the field
  * @throws {Error} If an error occurs during permission verification or data retrieval.
  */
 export async function getSoilAnalysis(
     fdm: FdmType,
     principal_id: PrincipalId,
-    b_id: schema.soilSamplingTypeSelect["b_id"],
+    a_id: schema.soilSamplingTypeSelect["b_id"],
 ): Promise<getSoilAnalysisType> {
     try {
         await checkPermission(
             fdm,
-            "field",
+            "soil_analysis",
             "read",
-            b_id,
+            a_id,
             principal_id,
             "getSoilAnalysis",
         )
@@ -218,17 +218,14 @@ export async function getSoilAnalysis(
                 // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
             })
             .from(schema.soilAnalysis)
-            .innerJoin(
-                schema.soilSampling,
-                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
-            )
-            .where(eq(schema.soilSampling.b_id, b_id))
+            .leftJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
+            .where(eq(schema.soilAnalysis.a_id, a_id))
             .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
             .limit(1)
 
         return soilAnalysis[0] || null
     } catch (err) {
-        throw handleError(err, "Exception for getSoilAnalysis", { b_id })
+        throw handleError(err, "Exception for getSoilAnalysis", { a_id })
     }
 }
 
@@ -382,8 +379,10 @@ export async function getCurrentSoilData(
  * @returns An array of SoilParameterDescriptionItem objects.
  * @throws {Error} If an unsupported locale is provided.
  */
-export function getSoilParametersDescription(locale = 'NL-nl'): SoilParameterDescription {
-    if (locale !== 'NL-nl') throw new Error('Unsupported locale')
+export function getSoilParametersDescription(
+    locale = "NL-nl",
+): SoilParameterDescription {
+    if (locale !== "NL-nl") throw new Error("Unsupported locale")
     const soilParameterDescription: SoilParameterDescription = [
         {
             parameter: "a_p_al",
@@ -412,7 +411,7 @@ export function getSoilParametersDescription(locale = 'NL-nl'): SoilParameterDes
             name: "GWT",
             type: "enum",
             description: "Grondwatertrap",
-            options: schema.gwlClasses
+            options: schema.gwlClasses,
         },
         {
             parameter: "b_soiltype_agr",
@@ -420,9 +419,8 @@ export function getSoilParametersDescription(locale = 'NL-nl'): SoilParameterDes
             name: "Bodemtype",
             type: "enum",
             description: "Agrarisch bodemtype",
-            options: schema.soilTypes
+            options: schema.soilTypes,
         },
-        
     ]
 
     return soilParameterDescription

@@ -15,7 +15,7 @@ import {
     removeSoilAnalysis,
     updateSoilAnalysis,
 } from "./soil"
-import { CurrentSoilData } from "./soil"
+import type { CurrentSoilData } from "./soil.d"
 
 describe("Soil Analysis Functions", () => {
     let fdm: FdmServerType
@@ -231,8 +231,8 @@ describe("Soil Analysis Functions", () => {
         const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id)
         expect(allAnalyses).toHaveLength(2)
 
-        // get latest soil analysis for field
-        const latestAnalysis = await getSoilAnalysis(fdm, principal_id, b_id)
+        // get soil analysis for field
+        const latestAnalysis = await getSoilAnalysis(fdm, principal_id, allAnalyses[0].a_id)
         expect(latestAnalysis?.a_date).toEqual(a_date_old)
         expect(latestAnalysis?.b_sampling_date).toEqual(b_sampling_date_new)
         expect(latestAnalysis?.a_som_loi).toEqual(a_som_loi)
