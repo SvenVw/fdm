@@ -1,4 +1,5 @@
 import { SoilDataCards } from "@/components/custom/soil/cards"
+import { SoilAnalysesList } from "@/components/custom/soil/list"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -16,6 +17,7 @@ import {
     type LoaderFunctionArgs,
     NavLink,
     data,
+    useFetcher,
     useLoaderData,
 } from "react-router"
 
@@ -105,6 +107,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const fetcher = useFetcher()
 
     return (
         <Tabs defaultValue="parameters" className="space-y-6">
@@ -159,12 +162,10 @@ export default function FarmFieldSoilOverviewBlock() {
                     )}
                 </TabsContent>
                 <TabsContent value="analyses">
-                    <Button asChild>
-                        <NavLink to="./analysis">
-                            <Plus />
-                            Bodemanalyse toevoegen
-                        </NavLink>
-                    </Button>
+                    <SoilAnalysesList
+                        soilAnalyses={loaderData.soilAnalyses}
+                        fetcher={fetcher}
+                    />
                 </TabsContent>
             </div>
         </Tabs>
