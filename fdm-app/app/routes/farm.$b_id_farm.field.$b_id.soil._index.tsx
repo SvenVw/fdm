@@ -123,7 +123,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 </Button>
             </div>
             <Separator />
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="">
                 {loaderData.soilAnalyses.length === 0 ? (
                     <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                         <div className="flex flex-col space-y-2 text-center">
@@ -142,14 +142,12 @@ export default function FarmFieldSoilOverviewBlock() {
                         </Button>
                     </div>
                 ) : (
-                    <div>
-                        <SoilDataCards
-                            currentSoilData={loaderData.currentSoilData}
-                            soilParameterDescription={
-                                loaderData.soilParameterDescription
-                            }
-                        />
-                    </div>
+                    <SoilDataCards
+                        currentSoilData={loaderData.currentSoilData}
+                        soilParameterDescription={
+                            loaderData.soilParameterDescription
+                        }
+                    />
                 )}
             </div>
         </div>

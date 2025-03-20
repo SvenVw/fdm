@@ -17,8 +17,6 @@ import {
     Pencil,
     Sparkles,
     User,
-    Wand,
-    WandSparkles,
 } from "lucide-react"
 import { NavLink } from "react-router"
 
@@ -131,10 +129,8 @@ export function SoilDataCards({
         currentSoilData,
         soilParameterDescription,
     )
-    console.log(cards)
-
     return (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl2:grid-cols-3 xl3:grid-cols-5">
             {cards.map((card) => (
                 <SoilDataCard
                     key={card.title}
