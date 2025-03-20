@@ -218,7 +218,10 @@ export async function getSoilAnalysis(
                 // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
             })
             .from(schema.soilAnalysis)
-            .leftJoin(schema.soilSampling, eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id))
+            .leftJoin(
+                schema.soilSampling,
+                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+            )
             .where(eq(schema.soilAnalysis.a_id, a_id))
             .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
             .limit(1)
@@ -384,6 +387,27 @@ export function getSoilParametersDescription(
 ): SoilParameterDescription {
     if (locale !== "NL-nl") throw new Error("Unsupported locale")
     const soilParameterDescription: SoilParameterDescription = [
+        {
+            parameter: "a_source",
+            unit: "",
+            name: "Bron",
+            type: "text",
+            description: "Laboratorium of bron van analyse",
+        },
+        {
+            parameter: "a_id",
+            unit: "",
+            name: "ID",
+            type: "text",
+            description: "Analyse ID",
+        },
+        {
+            parameter: "b_sampling_date",
+            unit: "",
+            name: "Datum",
+            type: "date",
+            description: "Datum van monstername",
+        },
         {
             parameter: "a_p_al",
             unit: "mg P2O5/100 g",

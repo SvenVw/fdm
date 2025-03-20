@@ -16,6 +16,9 @@ export interface getSoilAnalysisType {
 }
 
 export type SoilParameters =
+    | "a_source"	
+    | "a_id"
+    | "b_sampling_date"
     | "a_p_al"
     | "a_p_cc"
     | "a_som_loi"
@@ -35,7 +38,7 @@ export type CurrentSoilData = CurrentSoilDataItem[]
 export interface SoilParameterDescriptionItem {
     parameter: SoilParameters
     unit: string
-    type: "numeric" | "enum"
+    type: "numeric" | "enum" | "date" | "text"
     name: string
     description: string,
     min?: number
