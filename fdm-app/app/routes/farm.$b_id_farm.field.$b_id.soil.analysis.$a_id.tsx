@@ -122,7 +122,7 @@ export default function FarmFieldSoilOverviewBlock() {
                     </p>
                 </div>
                 <Button asChild>
-                    <NavLink to="../">
+                    <NavLink to="../soil">
                         <ArrowLeft />
                         Terug
                     </NavLink>
