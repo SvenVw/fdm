@@ -124,7 +124,7 @@ export function handleActionError(error: unknown) {
             typeof error.status === "number" &&
             typeof error.statusText === "string"
         ) {
-            console.warn(`Loader error: ${error.status} - ${error.statusText}`)
+            console.warn(`Action error: ${error.status} - ${error.statusText}`)
 
             // Customize the user-facing message based on the status code
             let userMessage = "Er is iets fout gegaan." // Default message
