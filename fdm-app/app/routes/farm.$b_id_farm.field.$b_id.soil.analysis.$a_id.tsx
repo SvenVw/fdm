@@ -3,21 +3,25 @@ import { generateFormSchema } from "@/components/custom/soil/formschema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
+import { extractFormValuesFromRequest } from "@/lib/form"
 import {
     getField,
     getSoilAnalysis,
     getSoilParametersDescription,
+    updateSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
+    type ActionFunctionArgs,
     type LoaderFunctionArgs,
     NavLink,
     data,
     useFetcher,
     useLoaderData,
 } from "react-router"
+import { redirectWithSuccess } from "remix-toast"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -110,7 +114,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
@@ -133,9 +136,77 @@ export default function FarmFieldSoilOverviewBlock() {
                 soilAnalysis={loaderData.soilAnalysis}
                 soilParameterDescription={loaderData.soilParameterDescription}
                 FormSchema={loaderData.FormSchema}
-                action=""
-                fetcher={fetcher}
+                action="."
             />
         </div>
     )
+}
+
+/**
+ * Action function to update the soil analysis.
+ *
+ * This function updates a soil analysis based on the provided form data.
+ * It validates the data, retrieves the necessary IDs from the route parameters,
+ * and uses the `updateSoilAnalysis` function from `@svenvw/fdm-core` to perform the update.
+ *
+ * @param request - The HTTP request object.
+ * @param params - The route parameters, including `a_id`, `b_id`, and `b_id_farm`.
+ * @returns A redirect response after successful update.
+ * @throws {Response} If any ID is missing (HTTP 400).
+ * @throws {Response} If there is an error during the update (HTTP 500).
+ */
+export async function action({ request, params }: ActionFunctionArgs) {
+    console.log("hoi")
+    // Get the farm id
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
+        })
+    }
+
+    // Get the field id
+    const b_id = params.b_id
+    if (!b_id) {
+        throw data("Field ID is required", {
+            status: 400,
+            statusText: "Field ID is required",
+        })
+    }
+
+    // Get the analysis id
+    const a_id = params.a_id
+    if (!a_id) {
+        throw data("Analysis ID is required", {
+            status: 400,
+            statusText: "Analysis ID is required",
+        })
+    }
+
+    try {
+        // Get the session
+        const session = await getSession(request)
+
+        // Get from values
+        const soilParameterDescription = getSoilParametersDescription()
+        const FormSchema = generateFormSchema(soilParameterDescription)
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+        const { b_sampling_date, ...rest } = formValues
+
+        //update Soilanalysis
+        await updateSoilAnalysis(fdm, session.principal_id, a_id, {
+            b_sampling_date: new Date(b_sampling_date),
+            ...rest,
+        })
+
+        return redirectWithSuccess("../soil", {
+            message: "Bodemanalyse is bijgewerkt! 🎉",
+        })
+    } catch (error) {
+        throw handleActionError(error)
+    }
 }

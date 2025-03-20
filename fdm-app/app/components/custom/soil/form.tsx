@@ -1,8 +1,10 @@
-import type { SoilParameterDescription, getSoilAnalysisType } from "@svenvw/fdm-core"
+import type {
+    SoilParameterDescription,
+    getSoilAnalysisType,
+} from "@svenvw/fdm-core"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
-    FormControl,
     FormControl,
     FormDescription,
     FormField,
@@ -22,28 +24,30 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { CalendarIcon } from "lucide-react"
 import { useEffect } from "react"
-import { Form } from "react-hook-form"
+import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 export function SoilAnalysisForm({
     soilAnalysis,
     soilParameterDescription,
     FormSchema,
     action,
-    fetcher,
 }: {
     soilAnalysis: getSoilAnalysisType
     soilParameterDescription: SoilParameterDescription
-    FormSchema: ReturnType<typeof import("../soil/formschema").generateFormSchema>
+    FormSchema: ReturnType<
+        typeof import("../soil/formschema").generateFormSchema
+    >
     action: string
-    fetcher: {
-        state: string
-        Form: typeof Form
-        submit: (data: FormData, options?: { method: string }) => void
-    }
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -55,7 +59,8 @@ export function SoilAnalysisForm({
             a_som_loi: soilAnalysis.a_som_loi,
             b_gwl_class: soilAnalysis.b_gwl_class,
             b_soiltype_agr: soilAnalysis.b_soiltype_agr,
-            b_sampling_date: soilAnalysis.b_sampling_date,        },
+            b_sampling_date: soilAnalysis.b_sampling_date,
+        },
     })
 
     useEffect(() => {
@@ -72,66 +77,65 @@ export function SoilAnalysisForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset
-                    disabled={
-                        form.formState.isSubmitting ||
-                        fetcher.state === "submitting"
-                    }
-                >
+                <fieldset disabled={form.formState.isSubmitting}>
                     <div className="space-y-4">
-                    <div className="grid grid-cols-2 items-end gap-x-3 space-y-4 justify-between">
-                        <FormField
-                            control={form.control}
-                            name="a_source"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                    {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            type="text"
-                                            value={
-                                                field.value === 0
-                                                    ? ""
-                                                    : field.value
-                                            }
-                                            placeholder="Bv. Jansen lab B.V."
-                                            aria-required="true"
-                                            required
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                    {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        }
-                                        </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            />
-                        <FormField
+                        <div className="grid grid-cols-2 items-end gap-x-3 space-y-4 justify-between">
+                            <FormField
                                 control={form.control}
-                                name="b_sampling_date"
+                                name="a_source"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="text"
+                                                value={
+                                                    field.value === 0
+                                                        ? ""
+                                                        : field.value
+                                                }
+                                                placeholder="Bv. Jansen lab B.V."
+                                                aria-required="true"
+                                                required
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            }
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="b_sampling_date" // TODO: Enable when bug for submitting Select values is solved
+                                disabled={true}
                                 render={({ field }) => (
                                     <FormItem className="">
                                         <FormLabel>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
@@ -175,253 +179,282 @@ export function SoilAnalysisForm({
                                             </PopoverContent>
                                         </Popover>
                                         <FormDescription>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        }
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            }
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            /> 
-                        <FormField
-                            control={form.control}
-                            name="a_p_al"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            type="number"
-                                            value={
-                                                field.value === 0
-                                                    ? ""
-                                                    : field.value
-                                            }
-                                            placeholder="Bv. 14.5 mg P2O5/kg"
-                                            aria-required="true"
-                                            required
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        {`${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        } [${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).unit
-                                        }]`}
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="a_p_cc"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            type="number"
-                                            value={
-                                                field.value === 0
-                                                    ? ""
-                                                    : field.value
-                                            }
-                                            placeholder="Bv. 1.2 mg P/kg"
-                                            aria-required="true"
-                                            required
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        {`${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        } [${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).unit
-                                        }]`}
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="a_som_loi"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            type="number"
-                                            value={
-                                                field.value === 0
-                                                    ? ""
-                                                    : field.value
-                                            }
-                                            placeholder="Bv. 3.7%"
-                                            aria-required="true"
-                                            required
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        {`${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        } [${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).unit
-                                        }]`}
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="b_soiltype_agr"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Selecteer bodemtype" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {soilParameterDescription.find(
+                            />
+                            <FormField
+                                control={form.control}
+                                name="a_p_al"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {
+                                                soilParameterDescription.find(
                                                     (x) =>
-                                                        x.parameter === field.name,
-                                                ).options.map((option) => (
-                                                    <SelectItem key={option} value={option}>{option}</SelectItem>))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormDescription>
-                                        {`${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        }`}
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="b_gwl_class"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        {
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).name
-                                        }
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Selecteer bodemtype" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {soilParameterDescription.find(
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={
+                                                    field.value === 0
+                                                        ? ""
+                                                        : field.value
+                                                }
+                                                placeholder="Bv. 14.5 mg P2O5/kg"
+                                                aria-required="true"
+                                                required
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${
+                                                soilParameterDescription.find(
                                                     (x) =>
-                                                        x.parameter === field.name,
-                                                ).options.map((option) => (
-                                                    <SelectItem key={option} value={option}>{option}</SelectItem>))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormDescription>
-                                        {`${
-                                            soilParameterDescription.find(
-                                                (x) =>
-                                                    x.parameter === field.name,
-                                            ).description
-                                        }`}
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    </div>
-                    <div>
-                        <div className="justify-end items-end">
-                            <Button type="submit">
-                                {form.formState.isSubmitting ? (
-                                    <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
-                                        <span>Opslaan...</span>
-                                    </div>
-                                ) : (
-                                    "Opslaan"
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            } [${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).unit
+                                            }]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
-                            </Button>
+                            />
+                            <FormField
+                                control={form.control}
+                                name="a_p_cc"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={
+                                                    field.value === 0
+                                                        ? ""
+                                                        : field.value
+                                                }
+                                                placeholder="Bv. 1.2 mg P/kg"
+                                                aria-required="true"
+                                                required
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            } [${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).unit
+                                            }]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="a_som_loi"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={
+                                                    field.value === 0
+                                                        ? ""
+                                                        : field.value
+                                                }
+                                                placeholder="Bv. 3.7%"
+                                                aria-required="true"
+                                                required
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            } [${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).unit
+                                            }]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="b_soiltype_agr"
+                                disabled={true} // TODO: Enable when bug for submitting Select values is solved
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <SelectTrigger {...field}>
+                                                {" "}
+                                                <SelectValue placeholder="Selecteer bodemtype" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {soilParameterDescription
+                                                    .find(
+                                                        (x) =>
+                                                            x.parameter ===
+                                                            field.name,
+                                                    )
+                                                    .options.map((option) => (
+                                                        <SelectItem
+                                                            key={option}
+                                                            value={option}
+                                                        >
+                                                            {option}
+                                                        </SelectItem>
+                                                    ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>
+                                            {`${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            }`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="b_gwl_class"
+                                disabled={true} // TODO: Enable when bug for submitting Select values is solved
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).name
+                                            }
+                                        </FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            value={field.value}
+                                        >
+                                            <SelectTrigger {...field}>
+                                                {" "}
+                                                {/* Remove FormControl here */}
+                                                <SelectValue placeholder="Selecteer bodemtype" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {soilParameterDescription
+                                                    .find(
+                                                        (x) =>
+                                                            x.parameter ===
+                                                            field.name,
+                                                    )
+                                                    .options.map((option) => (
+                                                        <SelectItem
+                                                            key={option}
+                                                            value={option}
+                                                        >
+                                                            {option}
+                                                        </SelectItem>
+                                                    ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormDescription>
+                                            {`${
+                                                soilParameterDescription.find(
+                                                    (x) =>
+                                                        x.parameter ===
+                                                        field.name,
+                                                ).description
+                                            }`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                        <div>
+                            <div className="justify-end items-end">
+                                <Button type="submit">
+                                    {form.formState.isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Opslaan...</span>
+                                        </div>
+                                    ) : (
+                                        "Opslaan"
+                                    )}
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                    </div>                  
                 </fieldset>
             </Form>
         </RemixFormProvider>
