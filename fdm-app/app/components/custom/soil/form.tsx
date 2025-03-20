@@ -42,7 +42,7 @@ export function SoilAnalysisForm({
     FormSchema,
     action,
 }: {
-    soilAnalysis: getSoilAnalysisType
+    soilAnalysis: getSoilAnalysisType | undefined
     soilParameterDescription: SoilParameterDescription
     FormSchema: ReturnType<
         typeof import("../soil/formschema").generateFormSchema
@@ -53,13 +53,19 @@ export function SoilAnalysisForm({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            a_source: soilAnalysis.a_source,
-            a_p_al: soilAnalysis.a_p_al,
-            a_p_cc: soilAnalysis.a_p_cc,
-            a_som_loi: soilAnalysis.a_som_loi,
-            b_gwl_class: soilAnalysis.b_gwl_class,
-            b_soiltype_agr: soilAnalysis.b_soiltype_agr,
-            b_sampling_date: soilAnalysis.b_sampling_date,
+            a_source: soilAnalysis?.a_source ? soilAnalysis.a_source : "",
+            a_p_al: soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : "",
+            a_p_cc: soilAnalysis?.a_p_cc ? soilAnalysis.a_p_cc : "",
+            a_som_loi: soilAnalysis?.a_som_loi ? soilAnalysis.a_som_loi : "",
+            b_gwl_class: soilAnalysis?.b_gwl_class
+                ? soilAnalysis.b_gwl_class
+                : "",
+            b_soiltype_agr: soilAnalysis?.b_soiltype_agr
+                ? soilAnalysis.b_soiltype_agr
+                : "",
+            b_sampling_date: soilAnalysis?.b_sampling_date
+                ? new Date(soilAnalysis.b_sampling_date)
+                : "",
         },
     })
 
