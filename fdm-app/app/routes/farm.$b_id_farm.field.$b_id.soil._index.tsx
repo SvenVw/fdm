@@ -1,6 +1,7 @@
 import { SoilDataCards } from "@/components/custom/soil/cards"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
@@ -106,7 +107,7 @@ export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <div className="space-y-6">
+        <Tabs defaultValue="parameters" className="space-y-6">
             <div className="space-y-4">
                 <div>
                     <h3 className="text-lg font-medium">Bodem</h3>
@@ -115,41 +116,57 @@ export default function FarmFieldSoilOverviewBlock() {
                         gemeten voor elke bodemparameter
                     </p>
                 </div>
-                <Button asChild>
-                    <NavLink to="./analysis">
-                        <Plus />
-                        Bodemanalyse toevoegen
-                    </NavLink>
-                </Button>
+                <div className="flex items-center justify-between">
+                    <TabsList>
+                        <TabsTrigger value="parameters">Parameters</TabsTrigger>
+                        <TabsTrigger value="analyses">Analyses</TabsTrigger>
+                    </TabsList>
+                    <Button asChild>
+                        <NavLink to="./analysis">
+                            <Plus />
+                            Bodemanalyse toevoegen
+                        </NavLink>
+                    </Button>
+                </div>
             </div>
             <Separator />
             <div className="">
-                {loaderData.soilAnalyses.length === 0 ? (
-                    <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
-                        <div className="flex flex-col space-y-2 text-center">
-                            <h1 className="text-2xl font-semibold tracking-tight">
-                                Dit perceel heeft nog geen bodemanalyse
-                            </h1>
-                            <p className="text-sm text-muted-foreground">
-                                Voeg een analyse toe om gegevens over de bodem
-                                bij te houden
-                            </p>
+                <TabsContent value="parameters">
+                    {loaderData.soilAnalyses.length === 0 ? (
+                        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+                            <div className="flex flex-col space-y-2 text-center">
+                                <h1 className="text-2xl font-semibold tracking-tight">
+                                    Dit perceel heeft nog geen bodemanalyse
+                                </h1>
+                                <p className="text-sm text-muted-foreground">
+                                    Voeg een analyse toe om gegevens over de
+                                    bodem bij te houden
+                                </p>
+                            </div>
+                            <Button asChild>
+                                <NavLink to="./analysis">
+                                    Bodemanalyse toevoegen
+                                </NavLink>
+                            </Button>
                         </div>
-                        <Button asChild>
-                            <NavLink to="./analysis">
-                                Bodemanalyse toevoegen
-                            </NavLink>
-                        </Button>
-                    </div>
-                ) : (
-                    <SoilDataCards
-                        currentSoilData={loaderData.currentSoilData}
-                        soilParameterDescription={
-                            loaderData.soilParameterDescription
-                        }
-                    />
-                )}
+                    ) : (
+                        <SoilDataCards
+                            currentSoilData={loaderData.currentSoilData}
+                            soilParameterDescription={
+                                loaderData.soilParameterDescription
+                            }
+                        />
+                    )}
+                </TabsContent>
+                <TabsContent value="analyses">
+                    <Button asChild>
+                        <NavLink to="./analysis">
+                            <Plus />
+                            Bodemanalyse toevoegen
+                        </NavLink>
+                    </Button>
+                </TabsContent>
             </div>
-        </div>
+        </Tabs>
     )
 }
