@@ -213,8 +213,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return redirectWithSuccess("./", {
                 message: "Bodemanalyse is verwijderd! 🎉",
             })
+        } else {
+            throw data("Method not allowed", {
+                status: 405,
+                statusText: "Method not allowed",
+            })
         }
     } catch (error) {
+         throw handleActionError(error)
+    }
+}
         throw handleActionError(error)
     }
 }
