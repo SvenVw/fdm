@@ -86,10 +86,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Component that renders the soil analysis form.
+ * Component that renders the soil analysis creation form for a specific field.
  *
- * This component displays the soil analysis form
- *
+ * This component displays a page header with description, a back button,
+ * and the SoilAnalysisForm component for adding a new soil analysis.
+ * It uses data loaded by the loader function to provide soil parameter descriptions.
  */
 export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()

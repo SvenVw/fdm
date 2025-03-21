@@ -118,7 +118,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 <div>
                     <h3 className="text-lg font-medium">Bodem</h3>
                     <p className="text-sm text-muted-foreground">
-                        In de gegevens hieronder vind je meest recente waarde
+                        In de gegevens hieronder vind je de meest recente waarde
                         gemeten voor elke bodemparameter
                     </p>
                 </div>
