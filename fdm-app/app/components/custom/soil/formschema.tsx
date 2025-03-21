@@ -1,77 +1,25 @@
-import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { z } from "zod"
 
-export function generateFormSchema(
-    soilParameterDescription: SoilParameterDescription,
-) {
-    const FormSchema = z.object(
-        soilParameterDescription.reduce(
-            (acc, param) => {
-                switch (param.type) {
-                    case "numeric":
-                        acc[param.parameter] = z.coerce
-                            .number({
-                                invalid_type_error: `${param.name} is ongeldig`,
-                            })
-                            .refine(
-                                (value) => {
-                                    if (
-                                        param.min !== undefined &&
-                                        value < param.min
-                                    ) {
-                                        return false
-                                    }
-                                    if (
-                                        param.max !== undefined &&
-                                        value > param.max
-                                    ) {
-                                        return false
-                                    }
-                                    return true
-                                },
-                                {
-                                    message:
-                                        param.min !== undefined &&
-                                        param.max !== undefined
-                                            ? `${param.name} moet tussen ${param.min} en ${param.max} liggen`
-                                            : param.min !== undefined
-                                              ? `${param.name} mag niet kleiner zijn dan ${param.min}`
-                                              : param.max !== undefined
-                                                ? `${param.name} mag niet groter zijn dan ${param.max}`
-                                                : `${param.name} is ongeldig`,
-                                },
-                            )
-                        break
-                    case "enum":
-                        acc[param.parameter] = z
-                            .string({
-                                invalid_type_error: `${param.name} is ongeldig`,
-                            })
-                            .refine(
-                                (value) =>
-                                    param.options?.includes(value) || false,
-                                {
-                                    message: `${param.name} is ongeldig`,
-                                },
-                            )
-                        break
-                    case "date":
-                        acc[param.parameter] = z.coerce.date({
-                            invalid_type_error: `${param.name} is ongeldig`,
-                        })
-                        break
-                    case "text":
-                        acc[param.parameter] = z.string({
-                            invalid_type_error: `${param.name} is ongeldig`,
-                        })
-                        break
-                    default:
-                        break
-                }
-                return acc
-            },
-            {} as { [key: string]: any },
-        ),
-    )
-    return FormSchema
-}
+export const FormSchema = z.object({
+    a_source: z.string({
+        required_error: "Bron is verplicht",
+        invalid_type_error: "Bron is ongeldig",
+    }),
+    b_sampling_date: z.coerce.date().optional(),
+    a_p_al: z.coerce
+        .number()
+        .gte(1, "Waarde moet groter dan 1 zijn")
+        .lte(250, "Waarde moet kleiner dan 250 zijn")
+        .optional(),
+    a_p_cc: z.coerce
+        .number()
+        .gte(0.1, "Waarde moet groter dan 0.1 zijn")
+        .lte(100, "Waarde moet kleiner dan 100 zijn")
+        .optional(),
+    a_som_loi: z.coerce.number()
+        .gte(0.5, "Waarde moet groter dan 0.5 zijn")
+        .lte(75, "Waarde moet kleiner dan 75 zijn")
+        .optional(),
+    b_soiltype_agr: z.string().optional(),
+    b_gwl_class: z.string().optional(),
+})

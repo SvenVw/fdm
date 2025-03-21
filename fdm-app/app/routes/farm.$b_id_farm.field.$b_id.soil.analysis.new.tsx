@@ -1,5 +1,5 @@
+import { FormSchema } from "@/components/custom/soil/formschema"
 import { SoilAnalysisForm } from "@/components/custom/soil/form"
-import { generateFormSchema } from "@/components/custom/soil/formschema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
@@ -75,14 +75,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
 
-        // Get the FormSchema
-        const FormSchema = generateFormSchema(soilParameterDescription)
-
         // Return user information from loader
         return {
             field: field,
             soilParameterDescription: soilParameterDescription,
-            FormSchema: FormSchema,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -164,13 +160,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Get from values
-        const soilParameterDescription = getSoilParametersDescription()
-        const FormSchema = generateFormSchema(soilParameterDescription)
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
-        const { b_sampling_date, ...rest } = formValues
 
         // add soil analysis
         await addSoilAnalysis(

@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { format } from "date-fns"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import type { SoilAnalysis } from "./types"
 
 export function SoilAnalysesList({
     soilAnalyses,
     fetcher,
 }: {
-    soilAnalyses: any[]
+    soilAnalyses: SoilAnalysis[]
     fetcher: {
         state: string
         submit: (

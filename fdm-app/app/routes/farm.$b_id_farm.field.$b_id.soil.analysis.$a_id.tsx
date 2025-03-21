@@ -1,5 +1,5 @@
 import { SoilAnalysisForm } from "@/components/custom/soil/form"
-import { generateFormSchema } from "@/components/custom/soil/formschema"
+import { FormSchema } from "@/components/custom/soil/formschema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
@@ -90,15 +90,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
 
-        // Get the FormSchema
-        const FormSchema = generateFormSchema(soilParameterDescription)
-
         // Return user information from loader
         return {
             field: field,
             soilParameterDescription: soilParameterDescription,
             soilAnalysis: soilAnalysis,
-            FormSchema: FormSchema,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -135,7 +131,6 @@ export default function FarmFieldSoilOverviewBlock() {
             <SoilAnalysisForm
                 soilAnalysis={loaderData.soilAnalysis}
                 soilParameterDescription={loaderData.soilParameterDescription}
-                FormSchema={loaderData.FormSchema}
                 action="."
             />
         </div>
@@ -156,7 +151,6 @@ export default function FarmFieldSoilOverviewBlock() {
  * @throws {Response} If there is an error during the update (HTTP 500).
  */
 export async function action({ request, params }: ActionFunctionArgs) {
-    console.log("hoi")
     // Get the farm id
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
@@ -189,19 +183,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Get from values
-        const soilParameterDescription = getSoilParametersDescription()
-        const FormSchema = generateFormSchema(soilParameterDescription)
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
-        const { b_sampling_date, ...rest } = formValues
 
         //update Soilanalysis
-        await updateSoilAnalysis(fdm, session.principal_id, a_id, {
-            b_sampling_date: new Date(b_sampling_date),
-            ...rest,
-        })
+        await updateSoilAnalysis(fdm, session.principal_id, a_id, formValues)
 
         return redirectWithSuccess("../soil", {
             message: "Bodemanalyse is bijgewerkt! 🎉",

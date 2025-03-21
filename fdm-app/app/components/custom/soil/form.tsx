@@ -1,7 +1,4 @@
-import type {
-    SoilParameterDescription,
-    getSoilAnalysisType,
-} from "@svenvw/fdm-core"
+import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -35,18 +32,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { FormSchema } from "./formschema"
+import type { SoilAnalysis } from "./types"
 
 export function SoilAnalysisForm({
     soilAnalysis,
     soilParameterDescription,
-    FormSchema,
     action,
 }: {
-    soilAnalysis: getSoilAnalysisType | undefined
+    soilAnalysis: SoilAnalysis | undefined
     soilParameterDescription: SoilParameterDescription
-    FormSchema: ReturnType<
-        typeof import("../soil/formschema").generateFormSchema
-    >
     action: string
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -54,18 +49,18 @@ export function SoilAnalysisForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             a_source: soilAnalysis?.a_source ? soilAnalysis.a_source : "",
-            a_p_al: soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : "",
-            a_p_cc: soilAnalysis?.a_p_cc ? soilAnalysis.a_p_cc : "",
-            a_som_loi: soilAnalysis?.a_som_loi ? soilAnalysis.a_som_loi : "",
+            a_p_al:  soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : undefined,
+            a_p_cc: soilAnalysis?.a_p_cc ? soilAnalysis.a_p_cc : undefined,
+            a_som_loi: soilAnalysis?.a_som_loi ? soilAnalysis.a_som_loi : undefined,
             b_gwl_class: soilAnalysis?.b_gwl_class
                 ? soilAnalysis.b_gwl_class
-                : "",
+                : undefined,
             b_soiltype_agr: soilAnalysis?.b_soiltype_agr
                 ? soilAnalysis.b_soiltype_agr
-                : "",
+                : undefined,
             b_sampling_date: soilAnalysis?.b_sampling_date
                 ? new Date(soilAnalysis.b_sampling_date)
-                : "",
+                : undefined,
         },
     })
 
@@ -104,11 +99,7 @@ export function SoilAnalysisForm({
                                             <Input
                                                 {...field}
                                                 type="text"
-                                                value={
-                                                    field.value === 0
-                                                        ? ""
-                                                        : field.value
-                                                }
+                                                value={field.value}
                                                 placeholder="Bv. Jansen lab B.V."
                                                 aria-required="true"
                                                 required
@@ -120,7 +111,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             }
                                         </FormDescription>
                                         <FormMessage />
@@ -129,8 +120,7 @@ export function SoilAnalysisForm({
                             />
                             <FormField
                                 control={form.control}
-                                name="b_sampling_date" // TODO: Enable when bug for submitting Select values is solved
-                                disabled={true}
+                                name="b_sampling_date"
                                 render={({ field }) => (
                                     <FormItem className="">
                                         <FormLabel>
@@ -190,7 +180,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             }
                                         </FormDescription>
                                         <FormMessage />
@@ -215,14 +205,8 @@ export function SoilAnalysisForm({
                                             <Input
                                                 {...field}
                                                 type="number"
-                                                value={
-                                                    field.value === 0
-                                                        ? ""
-                                                        : field.value
-                                                }
+                                                value={field.value}
                                                 placeholder="Bv. 14.5 mg P2O5/kg"
-                                                aria-required="true"
-                                                required
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -231,13 +215,13 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             } [${
                                                 soilParameterDescription.find(
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).unit
+                                                )?.unit
                                             }]`}
                                         </FormDescription>
                                         <FormMessage />
@@ -262,14 +246,8 @@ export function SoilAnalysisForm({
                                             <Input
                                                 {...field}
                                                 type="number"
-                                                value={
-                                                    field.value === 0
-                                                        ? ""
-                                                        : field.value
-                                                }
+                                                value={field.value}
                                                 placeholder="Bv. 1.2 mg P/kg"
-                                                aria-required="true"
-                                                required
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -278,13 +256,13 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             } [${
                                                 soilParameterDescription.find(
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).unit
+                                                )?.unit
                                             }]`}
                                         </FormDescription>
                                         <FormMessage />
@@ -309,14 +287,8 @@ export function SoilAnalysisForm({
                                             <Input
                                                 {...field}
                                                 type="number"
-                                                value={
-                                                    field.value === 0
-                                                        ? ""
-                                                        : field.value
-                                                }
+                                                value={field.value}
                                                 placeholder="Bv. 3.7%"
-                                                aria-required="true"
-                                                required
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -325,13 +297,13 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             } [${
                                                 soilParameterDescription.find(
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).unit
+                                                )?.unit
                                             }]`}
                                         </FormDescription>
                                         <FormMessage />
@@ -341,7 +313,6 @@ export function SoilAnalysisForm({
                             <FormField
                                 control={form.control}
                                 name="b_soiltype_agr"
-                                disabled={true} // TODO: Enable when bug for submitting Select values is solved
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
@@ -384,7 +355,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             }`}
                                         </FormDescription>
                                         <FormMessage />
@@ -394,7 +365,6 @@ export function SoilAnalysisForm({
                             <FormField
                                 control={form.control}
                                 name="b_gwl_class"
-                                disabled={true} // TODO: Enable when bug for submitting Select values is solved
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
@@ -438,7 +408,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).description
+                                                )?.description
                                             }`}
                                         </FormDescription>
                                         <FormMessage />
