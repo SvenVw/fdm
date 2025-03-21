@@ -49,9 +49,11 @@ export function SoilAnalysisForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             a_source: soilAnalysis?.a_source ? soilAnalysis.a_source : "",
-            a_p_al:  soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : undefined,
+            a_p_al: soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : undefined,
             a_p_cc: soilAnalysis?.a_p_cc ? soilAnalysis.a_p_cc : undefined,
-            a_som_loi: soilAnalysis?.a_som_loi ? soilAnalysis.a_som_loi : undefined,
+            a_som_loi: soilAnalysis?.a_som_loi
+                ? soilAnalysis.a_som_loi
+                : undefined,
             b_gwl_class: soilAnalysis?.b_gwl_class
                 ? soilAnalysis.b_gwl_class
                 : undefined,
@@ -87,13 +89,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                )?.name || field.name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <FormControl>
                                             <Input
@@ -106,13 +105,10 @@ export function SoilAnalysisForm({
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                )?.description
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.description || ""}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -124,13 +120,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem className="">
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                ).name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -175,13 +168,10 @@ export function SoilAnalysisForm({
                                             </PopoverContent>
                                         </Popover>
                                         <FormDescription>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                )?.description
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.description || ""}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
@@ -193,13 +183,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                ).name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <FormControl>
                                             <Input
@@ -215,13 +202,13 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.description
+                                                )?.description || ""
                                             } [${
                                                 soilParameterDescription.find(
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.unit
+                                                )?.unit || ""
                                             }]`}
                                         </FormDescription>
                                         <FormMessage />
@@ -234,13 +221,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                ).name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <FormControl>
                                             <Input
@@ -256,13 +240,13 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.description
+                                                )?.description || ""
                                             } [${
                                                 soilParameterDescription.find(
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.unit
+                                                )?.unit || ""
                                             }]`}
                                         </FormDescription>
                                         <FormMessage />
@@ -275,13 +259,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                ).name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <FormControl>
                                             <Input
@@ -297,13 +278,13 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.description
+                                                )?.description || ""
                                             } [${
                                                 soilParameterDescription.find(
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.unit
+                                                )?.unit || ""
                                             }]`}
                                         </FormDescription>
                                         <FormMessage />
@@ -316,13 +297,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                ).name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <Select
                                             onValueChange={field.onChange}
@@ -355,7 +333,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.description
+                                                )?.description || ""
                                             }`}
                                         </FormDescription>
                                         <FormMessage />
@@ -368,13 +346,10 @@ export function SoilAnalysisForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            {
-                                                soilParameterDescription.find(
-                                                    (x) =>
-                                                        x.parameter ===
-                                                        field.name,
-                                                ).name
-                                            }
+                                            {soilParameterDescription.find(
+                                                (x) =>
+                                                    x.parameter === field.name,
+                                            )?.name || field.name}
                                         </FormLabel>
                                         <Select
                                             onValueChange={field.onChange}
@@ -408,7 +383,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                )?.description
+                                                )?.description || ""
                                             }`}
                                         </FormDescription>
                                         <FormMessage />
