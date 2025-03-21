@@ -5,6 +5,7 @@ import type { SoilAnalysis } from "./types"
 import { nl } from "date-fns/locale/nl"
 import { NavLink, redirect } from "react-router"
 import { Sparkles } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export function SoilAnalysesList({
     soilAnalyses,
@@ -42,7 +43,7 @@ export function SoilAnalysesList({
                                 {analysis.a_source === "NMI"
                                     ? null
                                     : analysis.a_source === "" ||
-                                        ! analysis.a_source
+                                        !analysis.a_source
                                       ? "Onbekende bron"
                                       : `Gemeten door ${analysis.a_source}`}
                             </p>
@@ -55,46 +56,49 @@ export function SoilAnalysesList({
                             </p> */}
                         </div>
                         <div className="justify-self-end">
-                            {analysis.a_source !== "NMI" ? (
-                                <div className="space-x-4">
-                                    <NavLink
-                                        to={`./analysis/${analysis.a_id}`}
-                                        asChild
-                                    >
-                                        <Button
-                                            variant="default"
-                                            disabled={
-                                                fetcher.state === "submitting"
-                                            }
-                                            onClick={() => {
-                                                return redirect(
-                                                    `./analysis/${analysis.a_id}`,
-                                                )
-                                            }}
-                                        >
-                                            Bewerk
-                                        </Button>
-                                    </NavLink>
+                            {/* {analysis.a_source !== "NMI" ? ( */}
+                            <div className="space-x-4">
+                                <NavLink
+                                    to={`./analysis/${analysis.a_id}`}
+                                    asChild
+                                    className={cn(
+                                        "pointer-events-auto",
+                                        analysis.a_source === "NMI"
+                                            ? "pointer-events-none"
+                                            : "",
+                                    )}
+                                >
                                     <Button
-                                        variant="destructive"
+                                        variant="default"
                                         disabled={
-                                            fetcher.state === "submitting"
+                                            fetcher.state === "submitting" ||
+                                            analysis.a_source === "NMI"
                                         }
-                                        onClick={() => {
-                                            handleDelete(analysis.a_id)
-                                        }}
                                     >
-                                        {fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                                <span>Verwijderen...</span>
-                                            </div>
-                                        ) : (
-                                            "Verwijder"
-                                        )}
+                                        Bewerk
                                     </Button>
-                                </div>
-                            ) : null}
+                                </NavLink>
+                                <Button
+                                    variant="destructive"
+                                    disabled={
+                                        fetcher.state === "submitting" ||
+                                        analysis.a_source === "NMI"
+                                    }
+                                    onClick={() => {
+                                        handleDelete(analysis.a_id)
+                                    }}
+                                >
+                                    {fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Verwijderen...</span>
+                                        </div>
+                                    ) : (
+                                        "Verwijder"
+                                    )}
+                                </Button>
+                            </div>
+                            {/* ) : null} */}
                         </div>
                     </div>
                 ))}
