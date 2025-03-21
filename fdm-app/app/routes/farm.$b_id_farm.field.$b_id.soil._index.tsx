@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
+import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import {
     getField,
     getSoilAnalyses,
     getSoilParametersDescription,
+    removeSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { getCurrentSoilData } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
@@ -19,7 +20,9 @@ import {
     data,
     useFetcher,
     useLoaderData,
+    type ActionFunctionArgs,
 } from "react-router"
+import { redirectWithSuccess } from "remix-toast"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -170,4 +173,48 @@ export default function FarmFieldSoilOverviewBlock() {
             </div>
         </Tabs>
     )
+}
+
+export async function action({ request, params }: ActionFunctionArgs) {
+    // Get the farm id
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
+        })
+    }
+
+    // Get the field id
+    const b_id = params.b_id
+    if (!b_id) {
+        throw data("Field ID is required", {
+            status: 400,
+            statusText: "Field ID is required",
+        })
+    }
+
+    try {
+        if (request.method === "DELETE") {
+            const formData = await request.formData()
+            const a_id = formData.get("a_id") as string | null
+            if (!a_id) {
+                throw data("Analysis ID is required", {
+                    status: 400,
+                    statusText: "Analysis ID is required",
+                })
+            }
+
+            // Get the session
+            const session = await getSession(request)
+
+            // Remove the analysis
+            await removeSoilAnalysis(fdm, session.principal_id, a_id)
+            return redirectWithSuccess("./", {
+                message: "Bodemanalyse is verwijderd! 🎉",
+            })
+        }
+    } catch (error) {
+        throw handleActionError(error)
+    }
 }
