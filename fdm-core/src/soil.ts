@@ -191,9 +191,6 @@ export async function removeSoilAnalysis(
 export async function getSoilAnalysis(
     fdm: FdmType,
     principal_id: PrincipalId,
-export async function getSoilAnalysis(
-    fdm: FdmType,
-    principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
 ): Promise<getSoilAnalysisType> {
     try {
