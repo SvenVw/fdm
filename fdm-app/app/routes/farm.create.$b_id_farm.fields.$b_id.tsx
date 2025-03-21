@@ -8,7 +8,14 @@ import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { Combobox } from "@/components/custom/combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
 import {
     FormControl,
     FormDescription,
@@ -18,34 +25,28 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSession } from "@/lib/auth.server"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
-    addSoilAnalysis,
     getCultivations,
     getCultivationsFromCatalogue,
+    getCurrentSoilData,
     getField,
-    getSoilAnalysis,
+    getSoilParametersDescription,
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
-import { Form } from "react-hook-form"
+import { Form } from "react-router"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     type MetaFunction,
+    NavLink,
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
@@ -54,7 +55,10 @@ import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
-import { useEffect } from "react"
+import { useEffect, useState, useRef } from "react"
+import { Plus } from "lucide-react"
+import { Separator } from "@/components/ui/separator"
+import { SoilDataCards } from "@/components/custom/soil/cards"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -79,48 +83,6 @@ const FormSchema = z.object({
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
-    // b_soiltype_agr: z.enum(fdmSchema.soilTypes, {
-    //     errorMap: () => ({ message: "Selecteer een grondsoort uit de lijst" })
-    // }),
-    // b_gwl_class: z.enum(fdmSchema.gwlClasses, {
-    //     errorMap: () => ({ message: "Selecteer een grondwatertrap uit de lijst" })
-    // }),
-    b_soiltype_agr: z.string({
-        required_error: "Grondsoort is verplicht",
-    }),
-    b_gwl_class: z.string({
-        required_error: "Grondwatertrap is verplicht",
-    }),
-    a_p_al: z.coerce
-        .number({
-            required_error: "Fosfaat PAL is verplicht",
-        })
-        .gte(1, {
-            message: "Fosfaat PAL moet minimaal 1 zijn",
-        })
-        .lte(250, {
-            message: "Fosfaat PAL mag maximaal 250 zijn",
-        }),
-    a_p_cc: z.coerce
-        .number({
-            required_error: "Fosfaat PAE is verplicht",
-        })
-        .gte(0.1, {
-            message: "Fosfaat PAE moet minimaal 0.1 zijn",
-        })
-        .lte(100, {
-            message: "Fosfaat PAE moet mag maximaal 100 zijn",
-        }),
-    a_som_loi: z.coerce
-        .number({
-            required_error: "Organische stofgehalte is verplicht",
-        })
-        .gte(0.5, {
-            message: "Organische stofgehalte moet minimaal 0.5 zijn",
-        })
-        .lte(75, {
-            message: "Organische stofgehalte mag maximaal 75 zijn",
-        }),
 })
 
 /**
@@ -193,11 +155,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get soil analysis data
-        const soilAnalysis = await getSoilAnalysis(
+        const currentSoilData = await getCurrentSoilData(
             fdm,
             session.principal_id,
             b_id,
         )
+        const soilParameterDescription = getSoilParametersDescription()
 
         // Get the available cultivations
         let cultivationOptions = []
@@ -234,11 +197,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_name: field.b_name,
             b_lu_catalogue: b_lu_catalogue,
             b_lu_start: cultivations[0]?.b_lu_start,
-            b_soiltype_agr: soilAnalysis?.b_soiltype_agr,
-            b_gwl_class: soilAnalysis?.b_gwl_class,
-            a_p_al: soilAnalysis?.a_p_al,
-            a_p_cc: soilAnalysis?.a_p_cc,
-            a_som_loi: soilAnalysis?.a_som_loi,
+            currentSoilData: currentSoilData,
+            soilParameterDescription: soilParameterDescription,
             b_area: field.b_area,
             featureCollection: featureCollection,
             cultivationOptions: cultivationOptions,
@@ -269,11 +229,6 @@ export default function Index() {
             b_name: loaderData.b_name ?? "",
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
-            b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
-            b_gwl_class: loaderData.b_gwl_class ?? undefined,
-            a_p_al: loaderData.a_p_al ?? undefined,
-            a_p_cc: loaderData.a_p_cc ?? undefined,
-            a_som_loi: loaderData.a_som_loi ?? undefined,
         },
     })
 
@@ -282,25 +237,26 @@ export default function Index() {
             b_name: loaderData.b_name ?? "",
             b_area: Math.round(loaderData.b_area * 10) / 10,
             b_lu_catalogue: loaderData.b_lu_catalogue ?? "",
-            b_soiltype_agr: loaderData.b_soiltype_agr ?? undefined,
-            b_gwl_class: loaderData.b_gwl_class ?? undefined,
-            a_p_al: loaderData.a_p_al ?? undefined,
-            a_p_cc: loaderData.a_p_cc ?? undefined,
-            a_som_loi: loaderData.a_som_loi ?? undefined,
         })
     }, [loaderData, form.reset])
 
+    //ref to check if map is rendered
+    const mapContainerRef = useRef<HTMLDivElement>(null)
+    const [mapIsLoaded, setMapIsLoaded] = useState(false)
+
+    useEffect(() => {
+        if (mapContainerRef.current) {
+            setMapIsLoaded(true)
+        }
+    }, [])
+
     return (
-        <div className="grid md:grid-cols-3 gap-4 p-4">
-            <div className="w-full md:col-span-2">
-                <RemixFormProvider {...form}>
-                    <Form
-                        id="formField"
-                        onSubmit={form.handleSubmit}
-                        method="post"
-                    >
-                        <fieldset disabled={form.formState.isSubmitting}>
-                            <div className="space-y-6">
+        <div className="space-y-6">
+            <div className="grid grid-cols-4 gap-6">
+                <div className="col-span-2">
+                    <RemixFormProvider {...form}>
+                        <Form id="formField" method="post">
+                            <fieldset disabled={form.formState.isSubmitting}>
                                 <Card>
                                     <CardHeader>
                                         <CardTitle>Perceel</CardTitle>
@@ -348,278 +304,46 @@ export default function Index() {
                                                     </FormItem>
                                                 )}
                                             />
+                                            <div className="col-span-2 items-center gap-4">
+                                                <Combobox
+                                                    options={
+                                                        loaderData.cultivationOptions
+                                                    }
+                                                    form={form}
+                                                    name={"b_lu_catalogue"}
+                                                    label={"Hoofdgewas"}
+                                                    defaultValue={
+                                                        loaderData.b_lu_catalogue
+                                                    }
+                                                />
+                                            </div>
                                         </div>
                                     </CardContent>
-                                </Card>
-
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Gewas</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 items-center gap-4">
-                                            <Combobox
-                                                options={
-                                                    loaderData.cultivationOptions
+                                    <CardFooter>
+                                        <div className="ml-auto">
+                                            <Button
+                                                type="submit"
+                                                disabled={
+                                                    form.formState.isSubmitting
                                                 }
-                                                form={form}
-                                                name={"b_lu_catalogue"}
-                                                label={"Hoofdgewas"}
-                                                defaultValue={
-                                                    loaderData.b_lu_catalogue
-                                                }
-                                            />
+                                                className="m-auto"
+                                            >
+                                                {form.formState
+                                                    .isSubmitting && (
+                                                    <LoadingSpinner />
+                                                )}
+                                                Bijwerken
+                                            </Button>
                                         </div>
-                                    </CardContent>
+                                    </CardFooter>
                                 </Card>
-
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle>Bodem</CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                                            <FormField
-                                                control={form.control}
-                                                name="b_soiltype_agr"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Grondsoort
-                                                        </FormLabel>
-                                                        <Select
-                                                            onValueChange={
-                                                                field.onChange
-                                                            }
-                                                            value={field.value}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Selecteer een grondsoort" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="moerige_klei">
-                                                                    Moerige klei
-                                                                </SelectItem>
-                                                                <SelectItem value="rivierklei">
-                                                                    Rivierklei
-                                                                </SelectItem>
-                                                                <SelectItem value="dekzand">
-                                                                    Dekzand
-                                                                </SelectItem>
-                                                                <SelectItem value="zeeklei">
-                                                                    Zeeklei
-                                                                </SelectItem>
-                                                                <SelectItem value="dalgrond">
-                                                                    Dalgrond
-                                                                </SelectItem>
-                                                                <SelectItem value="veen">
-                                                                    Veen
-                                                                </SelectItem>
-                                                                <SelectItem value="loess">
-                                                                    Löss
-                                                                </SelectItem>
-                                                                <SelectItem value="duinzand">
-                                                                    Duinzand
-                                                                </SelectItem>
-                                                                <SelectItem value="maasklei">
-                                                                    Maasklei
-                                                                </SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="b_gwl_class"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Grondwatertrap
-                                                        </FormLabel>
-                                                        <Select
-                                                            onValueChange={
-                                                                field.onChange
-                                                            }
-                                                            value={field.value}
-                                                        >
-                                                            <FormControl>
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Selecteer een grondwatrap" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                <SelectItem value="-">
-                                                                    -
-                                                                </SelectItem>
-                                                                <SelectItem value="I">
-                                                                    Gt I
-                                                                </SelectItem>
-                                                                <SelectItem value="II">
-                                                                    Gt II
-                                                                </SelectItem>
-                                                                <SelectItem value="IIb">
-                                                                    Gt IIb
-                                                                </SelectItem>
-                                                                <SelectItem value="III">
-                                                                    Gt III
-                                                                </SelectItem>
-                                                                <SelectItem value="IIIa">
-                                                                    Gt IIIa
-                                                                </SelectItem>
-                                                                <SelectItem value="IIIb">
-                                                                    Gt IIIb
-                                                                </SelectItem>
-                                                                <SelectItem value="IV">
-                                                                    Gt IV
-                                                                </SelectItem>
-                                                                <SelectItem value="IVu">
-                                                                    Gt IVu
-                                                                </SelectItem>
-                                                                <SelectItem value="sV">
-                                                                    Gt sV
-                                                                </SelectItem>
-                                                                <SelectItem value="sVb">
-                                                                    Gt sVb
-                                                                </SelectItem>
-                                                                <SelectItem value="V">
-                                                                    Gt V
-                                                                </SelectItem>
-                                                                <SelectItem value="Va">
-                                                                    Gt Va
-                                                                </SelectItem>
-                                                                <SelectItem value="Vb">
-                                                                    Gt Vb
-                                                                </SelectItem>
-                                                                <SelectItem value="sVI">
-                                                                    Gt sVI
-                                                                </SelectItem>
-                                                                <SelectItem value="bVI">
-                                                                    Gt bVI
-                                                                </SelectItem>
-                                                                <SelectItem value="VI">
-                                                                    Gt VI
-                                                                </SelectItem>
-                                                                <SelectItem value="sVII">
-                                                                    Gt sVII
-                                                                </SelectItem>
-                                                                <SelectItem value="bVII">
-                                                                    Gt bVII
-                                                                </SelectItem>
-                                                                <SelectItem value="VII">
-                                                                    Gt VII
-                                                                </SelectItem>
-                                                                <SelectItem value="VIII">
-                                                                    Gt VIII
-                                                                </SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="a_p_al"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Fosfaat PAL{" "}
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="number"
-                                                                step="0.01"
-                                                                required
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="a_p_cc"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Fosfaat PAE{" "}
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="number"
-                                                                step="0.01"
-                                                                required
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-
-                                            <FormField
-                                                control={form.control}
-                                                name="a_som_loi"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>
-                                                            Organische
-                                                            stofgehalte{" "}
-                                                        </FormLabel>
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                type="number"
-                                                                step="0.01"
-                                                                required
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-
-                                <div className="ml-auto">
-                                    <Button
-                                        type="submit"
-                                        disabled={form.formState.isSubmitting}
-                                        className="m-auto"
-                                    >
-                                        {form.formState.isSubmitting && (
-                                            <LoadingSpinner />
-                                        )}
-                                        Bijwerken
-                                    </Button>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </Form>
-                </RemixFormProvider>
-            </div>
-            <div className="w-full md:sticky md:top-4">
-                <aside className="h-[400px] md:h-[600px] lg:h-[800px] w-full">
-                    <ClientOnly
-                        fallback={
-                            <Skeleton className="h-full w-full rounded-xl" />
-                        }
-                    >
-                        {() => (
+                            </fieldset>
+                        </Form>
+                    </RemixFormProvider>
+                </div>
+                <div className="col-span-2">
+                    <div ref={mapContainerRef} className="h-[300px] w-full">
+                        {mapIsLoaded ? (
                             <MapGL
                                 {...viewState}
                                 style={{
@@ -639,9 +363,44 @@ export default function Index() {
                                     <Layer {...fieldsSavedStyle} />
                                 </FieldsSourceNotClickable>
                             </MapGL>
+                        ) : (
+                            <Skeleton className="h-full w-full rounded-xl" />
                         )}
-                    </ClientOnly>
-                </aside>
+                    </div>
+                </div>
+            </div>
+            <div className="col-span-4">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Bodem</CardTitle>
+                        <CardDescription>
+                            Voeg een bodemanalyse toe voor dit perceel of bekijk
+                            de schatting door NMI.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <Button asChild>
+                                    <NavLink to="./analysis/new">
+                                        <Plus />
+                                        Bodemanalyse toevoegen
+                                    </NavLink>
+                                </Button>
+                            </div>
+
+                            <Separator />
+                            <div className="">
+                                <SoilDataCards
+                                    currentSoilData={loaderData.currentSoilData}
+                                    soilParameterDescription={
+                                        loaderData.soilParameterDescription
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
@@ -705,40 +464,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 undefined,
                 undefined,
             )
-
-            const currentSoilAnalysis = await getSoilAnalysis(
-                fdm,
-                session.principal_id,
-                b_id,
-            )
-            const soilPropertiesChanged =
-                currentSoilAnalysis?.b_soiltype_agr !==
-                    formValues.b_soiltype_agr ||
-                currentSoilAnalysis?.b_gwl_class !== formValues.b_gwl_class ||
-                currentSoilAnalysis?.a_p_al !== formValues.a_p_al ||
-                currentSoilAnalysis?.a_p_cc !== formValues.a_p_cc ||
-                currentSoilAnalysis?.a_som_loi !== formValues.a_som_loi
-
-            if (soilPropertiesChanged) {
-                const currentYear = new Date().getFullYear()
-                const defaultDate = new Date(currentYear, 0, 1)
-                await addSoilAnalysis(
-                    fdm,
-                    session.principal_id,
-                    defaultDate,
-                    "user",
-                    b_id,
-                    30,
-                    defaultDate,
-                    {
-                        a_p_al: formValues.a_p_al,
-                        a_p_cc: formValues.a_p_cc,
-                        a_som_loi: formValues.a_som_loi,
-                        b_soiltype_agr: formValues.b_soiltype_agr,
-                        b_gwl_class: formValues.b_gwl_class,
-                    },
-                )
-            }
 
             return dataWithSuccess("fields have been updated", {
                 message: `${formValues.b_name} is bijgewerkt! 🎉`,
