@@ -125,7 +125,7 @@ export default function FarmFieldSoilOverviewBlock() {
                         <TabsTrigger value="analyses">Analyses</TabsTrigger>
                     </TabsList>
                     <Button asChild>
-                        <NavLink to="./analysis">
+                        <NavLink to="./analysis/new">
                             <Plus />
                             Bodemanalyse toevoegen
                         </NavLink>
