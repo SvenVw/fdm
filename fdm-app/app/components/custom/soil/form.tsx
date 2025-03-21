@@ -92,7 +92,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).name
+                                                )?.name || field.name
                                             }
                                         </FormLabel>
                                         <FormControl>
