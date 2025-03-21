@@ -97,7 +97,7 @@ function SoilDataCard({
                             <TooltipContent>
                                 {source === "NMI"
                                     ? "Geschat door NMI"
-                                    : source === "" || source
+                                    : source === "" || !source
                                       ? "Onbekende bron"
                                       : `Gemeten door ${source}`}
                             </TooltipContent>
@@ -182,7 +182,7 @@ function constructSoilDataCards(
             type: description.type,
             link: `./analysis/${item.a_id}`,
             date: item.b_sampling_date,
-            source: "",
+            source: item.a_source,
         }
 
         return cardValue
