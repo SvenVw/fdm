@@ -382,7 +382,7 @@ export default function Index() {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <Button asChild>
-                                    <NavLink to="./analysis/new">
+                                    <NavLink to="./new_analysis">
                                         <Plus />
                                         Bodemanalyse toevoegen
                                     </NavLink>
