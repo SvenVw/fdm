@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm"
+import { desc, eq, sql } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -278,7 +278,10 @@ export async function getSoilAnalyses(
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
             .where(eq(schema.soilSampling.b_id, b_id))
-            .orderBy(desc(schema.soilSampling.b_sampling_date))
+            .orderBy(
+                // Drizzle does not support NULL LAST argument yet
+                sql`${schema.soilSampling.b_sampling_date} DESC NULLS LAST`,
+            )
 
         return soilAnalyses
     } catch (err) {
@@ -334,7 +337,10 @@ export async function getCurrentSoilData(
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
             .where(eq(schema.soilSampling.b_id, b_id))
-            .orderBy(desc(schema.soilSampling.b_sampling_date))
+            .orderBy(
+                // Drizzle does not support NULL LAST argument yet
+                sql`${schema.soilSampling.b_sampling_date} DESC NULLS LAST`,
+            )
 
         const parameters: SoilParameters[] = [
             "a_p_al",
