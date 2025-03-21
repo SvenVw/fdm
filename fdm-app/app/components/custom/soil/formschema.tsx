@@ -1,10 +1,15 @@
 import { z } from "zod"
 
 export const FormSchema = z.object({
-    a_source: z.string({
-        required_error: "Bron is verplicht",
-        invalid_type_error: "Bron is ongeldig",
-    }),
+    a_source: z
+        .string({
+            required_error: "Bron is verplicht",
+            invalid_type_error: "Bron is ongeldig",
+        })
+        .refine((value) => value.toUpperCase() !== "NMI", {
+            message: "Bron mag niet 'NMI' zijn.",
+        })
+        .optional(),
     b_sampling_date: z.coerce.date().optional(),
     a_p_al: z.coerce
         .number()
@@ -16,7 +21,8 @@ export const FormSchema = z.object({
         .gte(0.1, "Waarde moet groter dan 0.1 zijn")
         .lte(100, "Waarde moet kleiner dan 100 zijn")
         .optional(),
-    a_som_loi: z.coerce.number()
+    a_som_loi: z.coerce
+        .number()
         .gte(0.5, "Waarde moet groter dan 0.5 zijn")
         .lte(75, "Waarde moet kleiner dan 75 zijn")
         .optional(),

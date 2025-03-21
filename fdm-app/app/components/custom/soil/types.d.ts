@@ -1,6 +1,6 @@
 export interface SoilAnalysis {
     a_id: string
-    a_source: string
+    a_source: string | undefined | null
     b_sampling_date: Date
     a_p_al: number | undefined | null
     a_p_cc: number | undefined | null

@@ -11,14 +11,10 @@ import type {
     CurrentSoilData,
     SoilParameterDescription,
 } from "@svenvw/fdm-core"
-import {
-    Calendar,
-    Microscope,
-    Pencil,
-    Sparkles,
-    User,
-} from "lucide-react"
+import { Calendar, Microscope, Pencil, Sparkles, User } from "lucide-react"
 import { NavLink } from "react-router"
+import { format } from "date-fns/format"
+import { nl } from "date-fns/locale/nl"
 
 function SoilDataCard({
     title,
@@ -45,9 +41,18 @@ function SoilDataCard({
                 <CardTitle className="text-sm font-medium">
                     {shortname}
                 </CardTitle>
-                <NavLink to={link} className="h-4 w-4">
-                    <Pencil className="text-xs text-muted-foreground h-full w-full" />
-                </NavLink>
+                {source !== "NMI" ? (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <NavLink to={link} className="h-4 w-4">
+                                    <Pencil className="text-xs text-muted-foreground h-full w-full" />
+                                </NavLink>
+                            </TooltipTrigger>
+                            <TooltipContent>Bewerken</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                ) : null}
             </CardHeader>
             <CardContent className="space-y-2">
                 <div className="flex items-baseline space-x-2">
@@ -75,20 +80,26 @@ function SoilDataCard({
                                 >
                                     {source === "NMI" ? (
                                         <Sparkles className="h-4 w-4" />
-                                    ) : source === "user" ? (
+                                    ) : source === "" || !source ? (
                                         <User className="h-4 w-4" />
                                     ) : (
                                         <Microscope className="h-4 w-4" />
                                     )}
-                                    <span>{source === "NMI" ? "NMI" : source === "user" ? "Gebruiker" : "Gemeten"}</span>
+                                    <span>
+                                        {source === "NMI"
+                                            ? "NMI"
+                                            : source === "" || !source
+                                              ? "Onbekend"
+                                              : source}
+                                    </span>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
                                 {source === "NMI"
                                     ? "Geschat door NMI"
-                                    : source === "user"
-                                      ? "Ingevuld door gebruiker"
-                                      : "Gemeten door"}
+                                    : source === "" || source
+                                      ? "Onbekende bron"
+                                      : `Gemeten door ${source}`}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -103,12 +114,16 @@ function SoilDataCard({
                                             : "",
                                     )}
                                 >
-                                    <Calendar className="h-4 w-4"/>
-                                    <span>{date.toLocaleDateString()}</span>
+                                    <Calendar className="h-4 w-4" />
+                                    <span>
+                                        {format(date, "P", { locale: nl })}
+                                    </span>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {`Bemonsterd op: ${date.toLocaleDateString()}`}
+                                {`Bemonsterd op: ${format(date, "PPP", {
+                                    locale: nl,
+                                })}`}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -167,7 +182,7 @@ function constructSoilDataCards(
             type: description.type,
             link: `./analysis/${item.a_id}`,
             date: item.b_sampling_date,
-            source: item.a_source,
+            source: "",
         }
 
         return cardValue
