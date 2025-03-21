@@ -223,9 +223,7 @@ export async function getSoilAnalysis(
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
             .where(eq(schema.soilAnalysis.a_id, a_id))
-            .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
-            .limit(1)
-
+            
         return soilAnalysis[0] || null
     } catch (err) {
         throw handleError(err, "Exception for getSoilAnalysis", { a_id })
