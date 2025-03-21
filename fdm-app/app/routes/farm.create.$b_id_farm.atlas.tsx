@@ -334,7 +334,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         undefined,
                         "NMI",
                         b_id,
-                        30,
+                        0.3,
                         undefined,
                         {
                             a_p_al: response.a_p_al,
