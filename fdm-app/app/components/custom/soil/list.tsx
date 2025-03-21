@@ -3,8 +3,7 @@ import { format } from "date-fns"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import type { SoilAnalysis } from "./types"
 import { nl } from "date-fns/locale/nl"
-import { NavLink, redirect } from "react-router"
-import { Sparkles } from "lucide-react"
+import { NavLink } from "react-router"
 import { cn } from "@/lib/utils"
 
 export function SoilAnalysesList({
@@ -24,7 +23,6 @@ export function SoilAnalysesList({
     }
     return (
         <div className="space-y-4">
-            {/* <div className="text-sm font-medium">Meststoffen</div> */}
             <div className="grid gap-6">
                 {soilAnalyses.map((analysis) => (
                     <div
@@ -48,15 +46,8 @@ export function SoilAnalysesList({
                                       : `Gemeten door ${analysis.a_source}`}
                             </p>
                         </div>
-                        <div>
-                            {/* <p className="text-sm font-light leading-none">
-                                {format(analysis.b_sampling_date, "PP", {
-                                    locale: nl,
-                                })}
-                            </p> */}
-                        </div>
+                        <div>{""}</div>
                         <div className="justify-self-end">
-                            {/* {analysis.a_source !== "NMI" ? ( */}
                             <div className="space-x-4">
                                 <NavLink
                                     to={`./analysis/${analysis.a_id}`}
@@ -98,7 +89,6 @@ export function SoilAnalysesList({
                                     )}
                                 </Button>
                             </div>
-                            {/* ) : null} */}
                         </div>
                     </div>
                 ))}

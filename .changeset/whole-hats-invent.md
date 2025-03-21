@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Improve layout of fields page at create farm wizard
+Improve layout of the fields page in the Create Farm Wizard

@@ -223,7 +223,7 @@ export async function getSoilAnalysis(
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
             .where(eq(schema.soilAnalysis.a_id, a_id))
-            
+
         return soilAnalysis[0] || null
     } catch (err) {
         throw handleError(err, "Exception for getSoilAnalysis", { a_id })
@@ -348,25 +348,22 @@ export async function getCurrentSoilData(
             "b_soiltype_agr",
         ]
 
-        const currentSoilData: CurrentSoilData = parameters.reduce(
-            (acc: CurrentSoilData, parameter: SoilParameters) => {
+        const currentSoilData: CurrentSoilData = parameters
+            .map((parameter) => {
                 const analysis = soilAnalyses.find(
-                    (analysis) =>
-                        analysis[parameter as keyof typeof analysis] !== null,
+                    (a) => a[parameter as keyof typeof a] !== null,
                 )
-                if (analysis) {
-                    acc.push({
-                        parameter: parameter,
-                        value: analysis[parameter as keyof typeof analysis],
-                        a_id: analysis.a_id,
-                        b_sampling_date: analysis.b_sampling_date,
-                        a_source: analysis.a_source,
-                    })
+                if (!analysis) return null
+
+                return {
+                    parameter,
+                    value: analysis[parameter as keyof typeof analysis],
+                    a_id: analysis.a_id,
+                    b_sampling_date: analysis.b_sampling_date,
+                    a_source: analysis.a_source,
                 }
-                return acc
-            },
-            [],
-        )
+            })
+            .filter(Boolean) as CurrentSoilData
 
         return currentSoilData
     } catch (err) {

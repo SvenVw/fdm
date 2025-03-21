@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add the ability to add a new soil analysis at create farm wizard
+Add ability to perform a new soil analysis in the Create Farm Wizard

@@ -83,10 +83,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Component that renders the soil data overview for a farm field..
+ * Component that renders the soil analysis form.
  *
- * This component displays the soil data section, including a title, description, and
- * a list of soil data cards. It also handles the case where no soil analyses are available.
+ * This component displays the soil analysis form
  *
  */
 export default function FarmFieldSoilOverviewBlock() {

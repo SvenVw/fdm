@@ -86,11 +86,11 @@ function SoilDataCard({
                                         <Microscope className="h-4 w-4" />
                                     )}
                                     <span>
-                                        {source === "NMI"
-                                            ? "NMI"
-                                            : source === "" || !source
-                                              ? "Onbekend"
-                                              : source}
+                                        {(() => {
+                                            if (source === "NMI") return "NMI"
+                                            if (!source) return "Onbekend"
+                                            return source
+                                        })()}
                                     </span>
                                 </div>
                             </TooltipTrigger>
@@ -168,8 +168,6 @@ function constructSoilDataCards(
     soilParameterDescription: SoilParameterDescription,
 ) {
     // Construct the soil data cards
-    // console.log(currentSoilData)
-    // console.log(soilParameterDescription)
     const cardValues = currentSoilData.map((item) => {
         const description = soilParameterDescription.find((x) => {
             return x.parameter === item.parameter
