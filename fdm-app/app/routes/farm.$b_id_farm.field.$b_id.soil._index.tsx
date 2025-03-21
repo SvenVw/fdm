@@ -150,7 +150,7 @@ export default function FarmFieldSoilOverviewBlock() {
                                 </p>
                             </div>
                             <Button asChild>
-                                <NavLink to="./analysis">
+                                <NavLink to="./analysis/new">
                                     Bodemanalyse toevoegen
                                 </NavLink>
                             </Button>
