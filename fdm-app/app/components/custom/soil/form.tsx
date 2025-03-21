@@ -92,7 +92,7 @@ export function SoilAnalysisForm({
                                                     (x) =>
                                                         x.parameter ===
                                                         field.name,
-                                                ).name
+                                                )?.name || field.name
                                             }
                                         </FormLabel>
                                         <FormControl>
@@ -339,14 +339,14 @@ export function SoilAnalysisForm({
                                                             x.parameter ===
                                                             field.name,
                                                     )
-                                                    .options.map((option) => (
+                                                    ?.options?.map((option) => (
                                                         <SelectItem
                                                             key={option}
                                                             value={option}
                                                         >
                                                             {option}
                                                         </SelectItem>
-                                                    ))}
+                                                    )) || null}
                                             </SelectContent>
                                         </Select>
                                         <FormDescription>
@@ -392,14 +392,14 @@ export function SoilAnalysisForm({
                                                             x.parameter ===
                                                             field.name,
                                                     )
-                                                    .options.map((option) => (
+                                                    ?.options?.map((option) => (
                                                         <SelectItem
                                                             key={option}
                                                             value={option}
                                                         >
                                                             {option}
                                                         </SelectItem>
-                                                    ))}
+                                                    )) || null}
                                             </SelectContent>
                                         </Select>
                                         <FormDescription>

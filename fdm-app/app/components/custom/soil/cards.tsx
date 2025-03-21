@@ -174,6 +174,12 @@ function constructSoilDataCards(
         const description = soilParameterDescription.find((x) => {
             return x.parameter === item.parameter
         })
+        
+        if (!description) {
+            console.warn(`No description found for parameter: ${item.parameter}`);
+            return null;
+        }
+        
         const cardValue = {
             title: description.name,
             shortname: description.description,
@@ -184,6 +190,10 @@ function constructSoilDataCards(
             date: item.b_sampling_date,
             source: item.a_source,
         }
+        
+        return cardValue;
+    })
+    return cardValues.filter(Boolean)
 
         return cardValue
     })

@@ -191,7 +191,10 @@ export async function removeSoilAnalysis(
 export async function getSoilAnalysis(
     fdm: FdmType,
     principal_id: PrincipalId,
-    a_id: schema.soilSamplingTypeSelect["b_id"],
+export async function getSoilAnalysis(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    a_id: schema.soilAnalysisTypeSelect["a_id"],
 ): Promise<getSoilAnalysisType> {
     try {
         await checkPermission(
