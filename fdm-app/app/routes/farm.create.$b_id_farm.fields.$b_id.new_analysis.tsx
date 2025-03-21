@@ -119,17 +119,17 @@ export default function FarmFieldSoilOverviewBlock() {
 }
 
 /**
- * Action function to update the soil analysis.
+ * Action function to create a new soil analysis.
  *
- * This function updates a soil analysis based on the provided form data.
+ * This function creates a new soil analysis based on the provided form data.
  * It validates the data, retrieves the necessary IDs from the route parameters,
- * and uses the `updateSoilAnalysis` function from `@svenvw/fdm-core` to perform the update.
+ * and uses the `addSoilAnalysis` function from `@svenvw/fdm-core` to perform the creation.
  *
  * @param request - The HTTP request object.
- * @param params - The route parameters, including `a_id`, `b_id`, and `b_id_farm`.
- * @returns A redirect response after successful update.
+ * @param params - The route parameters, including `b_id` and `b_id_farm`.
+ * @returns A redirect response after successful creation.
  * @throws {Response} If any ID is missing (HTTP 400).
- * @throws {Response} If there is an error during the update (HTTP 500).
+ * @throws {Response} If there is an error during the creation (HTTP 500).
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     // Get the farm id

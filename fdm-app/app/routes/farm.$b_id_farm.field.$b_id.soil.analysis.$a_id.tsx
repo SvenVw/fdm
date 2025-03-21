@@ -87,9 +87,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             a_id,
         )
 
+        if (!soilAnalysis) {
+            throw data("Soil analysis not found", {
+                status: 404,
+                statusText: "Soil analysis not found",
+            })
+        }
+
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
-
         // Return user information from loader
         return {
             field: field,
