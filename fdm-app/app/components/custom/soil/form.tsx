@@ -392,14 +392,14 @@ export function SoilAnalysisForm({
                                                             x.parameter ===
                                                             field.name,
                                                     )
-                                                    .options.map((option) => (
+                                                    ?.options?.map((option) => (
                                                         <SelectItem
                                                             key={option}
                                                             value={option}
                                                         >
                                                             {option}
                                                         </SelectItem>
-                                                    ))}
+                                                    )) || null}
                                             </SelectContent>
                                         </Select>
                                         <FormDescription>
