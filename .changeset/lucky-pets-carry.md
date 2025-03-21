@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-At 401 error redirect user to signin page
+Users are now automatically redirected to the sign-in page when encountering a 401 error.
