@@ -115,7 +115,6 @@ export default function FarmFieldSoilOverviewBlock() {
             <SoilAnalysisForm
                 soilAnalysis={undefined}
                 soilParameterDescription={loaderData.soilParameterDescription}
-                FormSchema={loaderData.FormSchema}
                 action="."
             />
         </div>
@@ -136,7 +135,6 @@ export default function FarmFieldSoilOverviewBlock() {
  * @throws {Response} If there is an error during the update (HTTP 500).
  */
 export async function action({ request, params }: ActionFunctionArgs) {
-    console.log("hoi")
     // Get the farm id
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
