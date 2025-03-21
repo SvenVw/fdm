@@ -3,7 +3,6 @@ import { z } from "zod"
 export const FormSchema = z.object({
     a_source: z
         .string({
-            required_error: "Bron is verplicht",
             invalid_type_error: "Bron is ongeldig",
         })
         .refine((value) => value.toUpperCase() !== "NMI", {
