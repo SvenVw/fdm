@@ -15,10 +15,11 @@ import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import config from "~/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Dashboard | MINAS2" },
+        { title: `Dashboard | ${config.name}` },
         {
             name: "description",
             content:

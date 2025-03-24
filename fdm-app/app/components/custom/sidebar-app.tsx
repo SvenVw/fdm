@@ -47,6 +47,7 @@ import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
 import { useFarm } from "@/context/farm-context"
+import config from "~/fdm.config"
 
 interface SideBarAppType {
     user: {
@@ -152,7 +153,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
                                     <span className="font-semibold">
-                                        MINAS2
+                                        {config.name}
                                     </span>
                                     {/* <span className="">2024</span> */}
                                 </div>

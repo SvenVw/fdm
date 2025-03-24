@@ -7,11 +7,12 @@ import {
     type MetaFunction,
     redirect,
 } from "react-router"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Percelen beheren - Bedrijf toevoegen | MINAS2" },
+        { title: `Percelen beheren - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:

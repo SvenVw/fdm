@@ -26,16 +26,17 @@ import type {
 import { useLoaderData } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bedrijf toevoegen | MINAS2" },
+        { title: `Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:
-                "Voeg een nieuw bedrijf toe aan MINAS2.",
+                "Voeg een nieuw bedrijf toe.",
         },
     ]
 }

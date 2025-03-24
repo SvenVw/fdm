@@ -50,12 +50,13 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Kaart - Bedrijf toevoegen | MINAS2" },
+        { title: `Kaart - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:

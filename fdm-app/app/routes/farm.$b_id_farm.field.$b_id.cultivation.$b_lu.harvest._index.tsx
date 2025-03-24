@@ -21,11 +21,12 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Oogsten - Gewas - Perceel | MINAS2" },
+        { title: `Oogsten - Gewas - Perceel | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de oogsten van je gewas.",

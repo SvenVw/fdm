@@ -1,9 +1,10 @@
 import type { MetaFunction } from "react-router"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Vanggewas - Bouwplan - Bedrijf toevoegen | MINAS2" },
+        { title: `Vanggewas - Bouwplan - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:

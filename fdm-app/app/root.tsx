@@ -78,7 +78,7 @@ export function Layout() {
     }, [toast])
 
     return (
-        <html lang="en">
+        <html lang="nl">
             <head>
                 <meta charSet="utf-8" />
                 <meta

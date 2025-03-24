@@ -22,11 +22,12 @@ import {
     data,
 } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bowuplan - Bedrijf toevoegen | MINAS2" },
+        { title: `Bouwplan - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content: "Beheer de gewassen op je percelen.",

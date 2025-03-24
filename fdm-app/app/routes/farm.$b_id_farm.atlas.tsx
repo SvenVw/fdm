@@ -16,11 +16,12 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Kaarten | MINAS2" },
+        { title: `Kaarten | ${config.name}` },
         {
             name: "description",
             content: "Bekijk informatie op de kaart.",

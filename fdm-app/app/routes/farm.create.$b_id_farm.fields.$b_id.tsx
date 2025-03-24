@@ -53,13 +53,14 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
 import { useEffect } from "react"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Perceel bewerken - Bedrijf toevoegen | MINAS2" },
+        { title: `Perceel bewerken - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:

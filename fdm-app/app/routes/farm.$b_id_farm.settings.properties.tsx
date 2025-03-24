@@ -31,11 +31,12 @@ import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
 const { isPostalCode } = validator
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Eigenschappen - Instellingen - Bedrijf | MINAS2" },
+        { title: `Eigenschappen - Instellingen - Bedrijf | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de eigenschappen van je bedrijf.",

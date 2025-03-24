@@ -15,12 +15,13 @@ import {
     useLocation,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bowupland - Bedrijf toevoegen | MINAS2" },
+        { title: `Bouwplan - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en selecteer een gewas uit je bouwplan.",

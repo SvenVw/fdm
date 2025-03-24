@@ -14,11 +14,12 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Perceel | MINAS2" },
+        { title: `Perceel | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gegevens van je perceel.",

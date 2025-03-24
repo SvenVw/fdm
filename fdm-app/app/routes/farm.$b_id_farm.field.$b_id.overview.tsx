@@ -44,10 +44,11 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 import type { MetaFunction } from "react-router"
+import config from "~/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Overzicht - Perceel | MINAS2" },
+        { title: `Overzicht - Perceel | ${config.name}` },
         {
             name: "description",
             content:

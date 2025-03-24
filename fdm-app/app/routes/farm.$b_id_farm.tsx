@@ -1,18 +1,18 @@
 import { getSession } from "@/lib/auth.server"
 import { handleActionError } from "@/lib/error"
 import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bedrijf | MINAS2" },
+        { title: `Bedrijf | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gegevens van je bedrijf.",
         },
     ]
 }
-
 
 /**
  * Processes a request to retrieve a farm's session details.

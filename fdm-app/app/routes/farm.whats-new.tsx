@@ -1,6 +1,10 @@
 import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
-import { type LoaderFunctionArgs, useLoaderData } from "react-router"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    useLoaderData,
+} from "react-router"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
@@ -16,6 +20,17 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import config from "~/fdm.config"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Wat is er nieuw? | ${config.name}` },
+        {
+            name: "description",
+            content: `Blijf op de hoogte van de laatste ontwikkelingen en verbeteringen van ${config.name}.`,
+        },
+    ]
+}
 
 // Define the structure for a single update post
 export interface UpdatePost {
@@ -26,12 +41,12 @@ export interface UpdatePost {
     isNew?: boolean
 }
 
-// Sample data for update posts (replace with a database or CMS later)
+// Dta for update posts
 export const updatePosts: UpdatePost[] = [
     {
         id: "update-1",
-        title: "Lancering MINAS2 🎉",
-        description: `MINAS2 is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 
+        title: `Lancering ${config.name} 🎉`,
+        description: `${config.name} is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 
 
 **Nieuwe features:**
 - Account aanmaken

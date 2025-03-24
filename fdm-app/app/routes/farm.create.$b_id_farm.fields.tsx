@@ -26,12 +26,13 @@ import {
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Percelen beheren - Bedrijf toevoegen | MINAS2" },
+        { title: `Percelen beheren - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:

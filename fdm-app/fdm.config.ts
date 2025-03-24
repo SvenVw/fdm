@@ -1,4 +1,4 @@
-export const config: Config = {
+const config: Config = {
     // Site name
     name: "FDM",
     favicon: "/favicon.ico",
@@ -33,6 +33,7 @@ export const config: Config = {
     },
 }
 
+export default config
 interface Config {
     name: string
     favicon: string

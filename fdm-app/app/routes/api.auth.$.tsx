@@ -5,14 +5,15 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
+import config from "~/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Authenticatie | FDM" },
+        { title: `Authenticatie | ${config.name}` },
         {
             name: "description",
             content:
-                "Beveiligde authenticatie voor toegang tot het FDM platform.",
+                "Beveiligde authenticatie voor toegang tot het platform.",
         },
     ]
 }

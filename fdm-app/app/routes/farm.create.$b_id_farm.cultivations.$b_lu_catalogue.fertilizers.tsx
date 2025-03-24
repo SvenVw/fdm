@@ -23,12 +23,13 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "@/lib/fdm.server"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Bemesting - Bouwplan - Bedrijf toevoegen | MINAS2" },
+        { title: `Bemesting - Bouwplan - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en voeg bemestingen toe aan je bouwplan.",

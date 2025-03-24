@@ -21,10 +21,11 @@ import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
+import config from "~/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "Percelen - Kaart | MINAS2" },
+        { title: `Percelen - Kaart | ${config.name}` },
         {
             name: "description",
             content:

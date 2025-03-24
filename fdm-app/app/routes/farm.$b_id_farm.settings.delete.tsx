@@ -1,10 +1,11 @@
 import { Separator } from "@/components/ui/separator"
 import type { MetaFunction } from "react-router"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Verwijderen - Instellingen - Bedrijf | MINAS2" },
+        { title: `Verwijderen - Instellingen - Bedrijf | ${config.name}` },
         {
             name: "description",
             content: "Verwijder de gegevens van je bedrijf.",

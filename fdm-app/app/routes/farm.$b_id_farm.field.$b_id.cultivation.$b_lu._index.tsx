@@ -26,11 +26,12 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Gewas - Perceel | MINAS2" },
+        { title: `Gewas - Perceel | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gegevens van je gewas.",

@@ -4,12 +4,12 @@ import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, type MetaFunction, data, useLoaderData } from "react-router"
-
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Gebruiksnormen - Perceel | MINAS2" },
+        { title: `Gebruiksnormen - Perceel | ${config.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gebruiksnormen van je perceel.",

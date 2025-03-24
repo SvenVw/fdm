@@ -18,11 +18,12 @@ import {
     data,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+import config from "~/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "Oogst- Bouwplan - Bedrijf toevoegen | MINAS2" },
+        { title: `Oogst- Bouwplan - Bedrijf toevoegen | ${config.name}` },
         {
             name: "description",
             content:
