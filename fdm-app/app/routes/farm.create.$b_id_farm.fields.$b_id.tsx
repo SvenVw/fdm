@@ -1,14 +1,14 @@
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { Combobox } from "@/components/custom/combobox"
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+} from "~/components/custom/atlas/atlas-mapbox"
+import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { Combobox } from "~/components/custom/combobox"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
     FormControl,
     FormDescription,
@@ -16,19 +16,19 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { extractFormValuesFromRequest } from "@/lib/form"
+} from "~/components/ui/select"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
@@ -53,9 +53,9 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
-import { fdm } from "@/lib/fdm.server"
+import { fdm } from "~/lib/fdm.server"
 import { useEffect } from "react"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

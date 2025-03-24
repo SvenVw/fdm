@@ -1,16 +1,16 @@
-import { Farm } from "@/components/blocks/farm"
+import { Farm } from "~/components/blocks/farm"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
-import { extractFormValuesFromRequest } from "@/lib/form"
+} from "~/components/ui/breadcrumb"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError } from "~/lib/error"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import {
     addFarm,
     addFertilizer,
@@ -26,8 +26,8 @@ import type {
 import { useLoaderData } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { fdm } from "@/lib/fdm.server"
-import config from "~/fdm.config"
+import { fdm } from "~/lib/fdm.server"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

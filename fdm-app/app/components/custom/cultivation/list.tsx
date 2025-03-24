@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "~/components/ui/button"
 import { format } from "date-fns/format"
 import { Pencil, Trash2 } from "lucide-react"
 import { NavLink, useFetcher } from "react-router"

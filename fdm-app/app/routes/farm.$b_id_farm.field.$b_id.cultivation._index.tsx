@@ -1,11 +1,11 @@
-import { CultivationForm } from "@/components/custom/cultivation/form"
-import { CultivationList } from "@/components/custom/cultivation/list"
-import { FormSchema } from "@/components/custom/cultivation/schema"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
+import { CultivationForm } from "~/components/custom/cultivation/form"
+import { CultivationList } from "~/components/custom/cultivation/list"
+import { FormSchema } from "~/components/custom/cultivation/schema"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import {
     addCultivation,
     getCultivations,
@@ -23,7 +23,7 @@ import {
     useLocation,
 } from "react-router"
 import {dataWithSuccess } from "remix-toast"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

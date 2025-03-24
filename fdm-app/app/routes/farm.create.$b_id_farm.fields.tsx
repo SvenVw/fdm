@@ -1,17 +1,17 @@
-import { SidebarPage } from "@/components/custom/sidebar-page"
+import { SidebarPage } from "~/components/custom/sidebar-page"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/breadcrumb"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { cn } from "~/lib/utils"
 import {
     getCultivationsFromCatalogue,
     getFarm,
@@ -26,8 +26,8 @@ import {
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { fdm } from "@/lib/fdm.server"
-import config from "~/fdm.config"
+import { fdm } from "~/lib/fdm.server"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

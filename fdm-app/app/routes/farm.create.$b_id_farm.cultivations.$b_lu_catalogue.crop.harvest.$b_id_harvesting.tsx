@@ -1,8 +1,8 @@
-import { HarvestForm } from "@/components/custom/harvest/form"
-import { Button } from "@/components/ui/button"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+import { HarvestForm } from "~/components/custom/harvest/form"
+import { Button } from "~/components/ui/button"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
@@ -14,7 +14,7 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

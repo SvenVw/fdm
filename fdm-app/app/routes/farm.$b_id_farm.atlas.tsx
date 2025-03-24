@@ -1,10 +1,10 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -16,7 +16,7 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

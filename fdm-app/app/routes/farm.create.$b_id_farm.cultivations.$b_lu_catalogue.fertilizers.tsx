@@ -1,11 +1,11 @@
-import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
-import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
-import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { extractFormValuesFromRequest } from "@/lib/form"
+import { FertilizerApplicationsCards } from "~/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "~/components/custom/fertilizer-applications/form"
+import { FormSchema } from "~/components/custom/fertilizer-applications/formschema"
+import { FertilizerApplicationsList } from "~/components/custom/fertilizer-applications/list"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
@@ -23,8 +23,8 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { fdm } from "@/lib/fdm.server"
-import config from "~/fdm.config"
+import { fdm } from "~/lib/fdm.server"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

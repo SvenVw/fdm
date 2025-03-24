@@ -4,18 +4,18 @@ import {
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+} from "~/components/ui/breadcrumb"
+import { Separator } from "~/components/ui/separator"
+import { SidebarTrigger } from "~/components/ui/sidebar"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/dropdown-menu"
+import { cn } from "~/lib/utils"
 import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
 import type {

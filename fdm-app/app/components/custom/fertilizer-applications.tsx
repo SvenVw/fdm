@@ -1,6 +1,6 @@
-import { Combobox } from "@/components/custom/combobox"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Combobox } from "~/components/custom/combobox"
+import { Button } from "~/components/ui/button"
+import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -8,15 +8,15 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/popover"
+import { Separator } from "~/components/ui/separator"
+import { cn } from "~/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"

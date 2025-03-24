@@ -1,13 +1,13 @@
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
     redirect,
 } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

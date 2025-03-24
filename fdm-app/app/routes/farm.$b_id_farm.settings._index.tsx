@@ -1,5 +1,5 @@
 import { type MetaFunction, redirect } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

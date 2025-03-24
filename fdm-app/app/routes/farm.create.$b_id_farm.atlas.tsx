@@ -1,32 +1,32 @@
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
-import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
+import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
+} from "~/components/custom/atlas/atlas-mapbox"
 import {
     FieldsPanelHover,
     FieldsPanelSelection,
     FieldsPanelZoom,
-} from "@/components/custom/atlas/atlas-panels"
+} from "~/components/custom/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceSelected,
-} from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
+} from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
+} from "~/components/ui/breadcrumb"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import {
     addCultivation,
     addField,
@@ -50,8 +50,8 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { fdm } from "@/lib/fdm.server"
-import config from "~/fdm.config"
+import { fdm } from "~/lib/fdm.server"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

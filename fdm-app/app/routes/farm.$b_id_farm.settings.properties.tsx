@@ -1,5 +1,5 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Button } from "@/components/ui/button"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
 import {
     FormControl,
     FormDescription,
@@ -7,14 +7,14 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { Separator } from "~/components/ui/separator"
+import { Textarea } from "~/components/ui/textarea"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getFarm, updateFarm } from "@svenvw/fdm-core"
 import { useEffect } from "react"
@@ -31,7 +31,7 @@ import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
 const { isPostalCode } = validator
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

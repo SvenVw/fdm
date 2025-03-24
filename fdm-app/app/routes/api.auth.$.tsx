@@ -1,11 +1,11 @@
-import { auth } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
+import { auth } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

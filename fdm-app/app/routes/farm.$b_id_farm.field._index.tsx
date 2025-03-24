@@ -1,19 +1,19 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Button } from "@/components/ui/button"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
     CardFooter,
     CardHeader,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { getTimeBasedGreeting } from "@/lib/greetings"
+} from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { getTimeBasedGreeting } from "~/lib/greetings"
 import { getFarms, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -23,7 +23,7 @@ import {
     useLoaderData,
 } from "react-router"
 import type { MetaFunction } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

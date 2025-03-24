@@ -1,11 +1,11 @@
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

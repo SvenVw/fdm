@@ -5,23 +5,23 @@ import {
     NavigationControl,
 } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+} from "~/components/custom/atlas/atlas-mapbox"
+import { FieldsPanelHover } from "~/components/custom/atlas/atlas-panels"
+import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

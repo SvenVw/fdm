@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "~/components/ui/button"
 import { format } from "date-fns"
 import { LoadingSpinner } from "../loadingspinner"
 import type { FertilizerApplication } from "./types.d"

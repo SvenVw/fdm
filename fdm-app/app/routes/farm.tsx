@@ -1,7 +1,7 @@
-import { SidebarApp } from "@/components/custom/sidebar-app"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
+import { SidebarApp } from "~/components/custom/sidebar-app"
+import { SidebarProvider } from "~/components/ui/sidebar"
+import { auth, getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -9,13 +9,13 @@ import type {
 } from "react-router"
 import { redirect, useRoutes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
-import { FarmContext } from "@/context/farm-context"
+import { FarmContext } from "~/context/farm-context"
 import { useState, useEffect } from "react"
 import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
-import { SidebarInset } from "@/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

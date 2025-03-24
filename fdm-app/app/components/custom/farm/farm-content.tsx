@@ -1,7 +1,7 @@
 import {
     SidebarPage,
     type SidebarPageProps,
-} from "@/components/custom/sidebar-page"
+} from "~/components/custom/sidebar-page"
 import type { ReactNode } from "react"
 import { Outlet } from "react-router"
 

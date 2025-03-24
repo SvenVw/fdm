@@ -1,6 +1,6 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
+import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -8,26 +8,26 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
+} from "~/components/ui/popover"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/select"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+import { cn } from "~/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getField, updateField } from "@svenvw/fdm-core"
 import { format } from "date-fns"
@@ -44,7 +44,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 import type { MetaFunction } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

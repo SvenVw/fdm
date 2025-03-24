@@ -1,5 +1,5 @@
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
 import { type LoaderFunctionArgs, type MetaFunction, useLoaderData } from "react-router"
 import {
     Card,
@@ -7,18 +7,18 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+} from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarTrigger } from "~/components/ui/sidebar"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-} from "@/components/ui/breadcrumb"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import config from "~/fdm.config"
+} from "~/components/ui/breadcrumb"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

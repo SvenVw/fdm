@@ -8,8 +8,9 @@
         "**/.client/**/*.tsx",
         ".react-router/types/**/*",
         "app/routes/*.tsx",
-        "app/components/**/*.tsx"
-, "app/lib/fdm-migrate.server.js"    ],
+        "app/components/**/*.tsx",
+        "app/lib/fdm-migrate.server.js"
+    ],
     "compilerOptions": {
         "lib": ["DOM", "DOM.Iterable", "ES2022"],
         "types": ["@react-router/node", "vite/client"],
@@ -26,8 +27,8 @@
         "forceConsistentCasingInFileNames": true,
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./app/*"],
-            "~/*": ["./*"]
+            "@/*": ["./*"],
+            "~/*": ["./app/*"]
         },
         "rootDirs": [".", "./.react-router/types"],
 

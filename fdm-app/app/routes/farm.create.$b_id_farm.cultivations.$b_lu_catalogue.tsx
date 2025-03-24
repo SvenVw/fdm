@@ -3,9 +3,9 @@ import {
     PaginationContent,
     PaginationItem,
     PaginationLink,
-} from "@/components/ui/pagination"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
+} from "~/components/ui/pagination"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
 import { getCultivationPlan } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -15,8 +15,8 @@ import {
     useLocation,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { fdm } from "@/lib/fdm.server"
-import config from "~/fdm.config"
+import { fdm } from "~/lib/fdm.server"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

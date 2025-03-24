@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -6,18 +6,18 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { signIn } from "@/lib/auth-client"
-import { auth } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/card"
+import { signIn } from "~/lib/auth-client"
+import { auth } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { cn } from "~/lib/utils"
 import { Check, MoveDown, Info } from "lucide-react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import { toast } from "sonner"
 import type { MetaFunction } from "react-router"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import config from "~/fdm.config"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

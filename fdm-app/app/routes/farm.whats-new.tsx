@@ -1,5 +1,5 @@
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -7,20 +7,20 @@ import {
 } from "react-router"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
 import { Sparkles } from "lucide-react"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-} from "@/components/ui/breadcrumb"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+} from "~/components/ui/breadcrumb"
+import { SidebarTrigger } from "~/components/ui/sidebar"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 export const meta: MetaFunction = () => {
     return [

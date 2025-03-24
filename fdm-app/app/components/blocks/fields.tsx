@@ -1,10 +1,8 @@
 import type { FeatureCollection } from "geojson"
 import { useEffect, useState } from "react"
 import { Form, useNavigation } from "react-router"
-
-import { FieldMap } from "@/components/blocks/field-map"
-// Components
-import { Button } from "@/components/ui/button"
+import { FieldMap } from "~/components/blocks/field-map"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -12,7 +10,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "~/components/ui/card"
 import {
     Command,
     CommandEmpty,
@@ -20,23 +18,23 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-} from "@/components/ui/command"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "~/components/ui/command"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
+} from "~/components/ui/popover"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "~/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
+import { cn } from "~/lib/utils"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { ClientOnly } from "remix-utils/client-only"
 import { Skeleton } from "../ui/skeleton"

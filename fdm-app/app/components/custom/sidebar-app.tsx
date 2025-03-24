@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Badge } from "~/components/ui/badge"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,7 +8,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "~/components/ui/dropdown-menu"
 import {
     Sidebar,
     SidebarContent,
@@ -21,7 +21,7 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "~/components/ui/sidebar"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
@@ -40,14 +40,13 @@ import {
     Sprout,
     Square,
 } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { Button } from "~/components/ui/button"
+import { useIsMobile } from "~/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink } from "react-router"
 import { toast } from "sonner"
-import { useFarm } from "@/context/farm-context"
-import config from "~/fdm.config"
+import { useFarm } from "~/context/farm-context"
+import config from "@/fdm.config"
 
 interface SideBarAppType {
     user: {

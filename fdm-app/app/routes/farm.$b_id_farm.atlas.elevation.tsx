@@ -1,8 +1,8 @@
-import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
-import { Button } from "@/components/ui/button"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+import { getMapboxToken } from "~/components/custom/atlas/atlas-mapbox"
+import { Button } from "~/components/ui/button"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -11,7 +11,7 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

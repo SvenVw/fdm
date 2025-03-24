@@ -1,19 +1,19 @@
-import { SidebarPage } from "@/components/custom/sidebar-page"
+import { SidebarPage } from "~/components/custom/sidebar-page"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Toaster } from "@/components/ui/sonner"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/breadcrumb"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { Toaster } from "~/components/ui/sonner"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -22,7 +22,7 @@ import {
     data,
 } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

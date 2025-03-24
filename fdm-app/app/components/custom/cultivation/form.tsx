@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { Button } from "~/components/ui/button"
+import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -7,13 +7,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
+} from "~/components/ui/form"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/popover"
+import { cn } from "~/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns/format"
 import { nl } from "date-fns/locale/nl"

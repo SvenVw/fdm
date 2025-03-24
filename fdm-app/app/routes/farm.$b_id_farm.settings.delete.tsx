@@ -1,6 +1,6 @@
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "~/components/ui/separator"
 import type { MetaFunction } from "react-router"
-import config from "~/fdm.config"
+import config from "@/fdm.config"
 
 // Meta
 export const meta: MetaFunction = () => {

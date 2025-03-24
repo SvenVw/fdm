@@ -1,6 +1,6 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -8,8 +8,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { cn } from "@/lib/utils"
+} from "~/components/ui/card"
+import { cn } from "~/lib/utils"
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"

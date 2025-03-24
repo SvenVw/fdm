@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react"
 
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "~/components/ui/sonner"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import { useEffect } from "react"
 import {
@@ -59,7 +59,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
-    const location = useLocation()
 
     // Hook to show the toasts
     useEffect(() => {
