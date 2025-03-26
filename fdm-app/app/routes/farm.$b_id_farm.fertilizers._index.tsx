@@ -1,18 +1,23 @@
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
+import { columns, Fertilizer } from "@/components/custom/fertilizer/columns"
+import { DataTable } from "@/components/custom/fertilizer/table"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import {
+    getFarm,
+    getFarms,
+    getFertilizer,
+    getFertilizers,
+} from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     Outlet,
     data,
     useLoaderData,
 } from "react-router"
-
-
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -53,11 +58,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        // Get the available fertilizers
+        const fertilizers: Fertilizer[] = await getFertilizers(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        // console.log(fertilizers)
+
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
+            fertilizers: fertilizers,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -88,7 +102,10 @@ export default function FarmFertilizersBlock() {
                     title={"Meststoffen"}
                     description={"Beheer de meststoffen van dit bedrijf"}
                 />
-                <Outlet />               
+
+                {/* <div className="container mx-auto py-10"> */}
+                    <DataTable columns={columns} data={loaderData.fertilizers} />
+                {/* </div> */}
             </main>
         </SidebarInset>
     )
