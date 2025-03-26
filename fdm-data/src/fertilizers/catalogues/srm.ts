@@ -1,8 +1,6 @@
 import type { CatalogueFertilizer, CatalogueFertilizerItem } from "../d"
+import { hashFertilizer } from "../hash"
 import srm from "./srm.json"
-import xxhash from "xxhash-wasm"
-
-const { h32ToString } = await xxhash()
 
 /**
  * Retrieves the SRM (Sluiting Regionale Kringlopen) fertilizer catalogue.
@@ -75,7 +73,7 @@ export function getCatalogueSrm(): CatalogueFertilizer {
         }
 
         // Hash the item
-        item.hash = h32ToString(JSON.stringify(item))
+        item.hash = hashFertilizer(item)
 
         return item
     })
