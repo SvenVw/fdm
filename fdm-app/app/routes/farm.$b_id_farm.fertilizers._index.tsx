@@ -1,17 +1,15 @@
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { columns, Fertilizer } from "@/components/custom/fertilizer/columns"
+import {
+    columns,
+    type Fertilizer,
+} from "@/components/custom/fertilizer/columns"
 import { DataTable } from "@/components/custom/fertilizer/table"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
-import {
-    getFarm,
-    getFarms,
-    getFertilizer,
-    getFertilizers,
-} from "@svenvw/fdm-core"
+import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     Outlet,
@@ -102,10 +100,16 @@ export default function FarmFertilizersBlock() {
                     title={"Meststoffen"}
                     description={"Beheer de meststoffen van dit bedrijf"}
                 />
-
-                {/* <div className="container mx-auto py-10"> */}
-                    <DataTable columns={columns} data={loaderData.fertilizers} />
-                {/* </div> */}
+                <div className="space-y-6 p-10 pb-0">
+                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <div className="flex-1">
+                            <DataTable
+                                columns={columns}
+                                data={loaderData.fertilizers}
+                            />
+                        </div>
+                    </div>
+                </div>
             </main>
         </SidebarInset>
     )

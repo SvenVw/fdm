@@ -1,4 +1,7 @@
+import { Button } from "@/components/ui/button"
 import type { ColumnDef } from "@tanstack/react-table"
+import { ArrowUpDown } from "lucide-react"
+import { DataTableColumnHeader } from "./column-header"
 
 export type Fertilizer = {
     p_id: string
@@ -19,10 +22,14 @@ export const columns: ColumnDef<Fertilizer>[] = [
     },
     {
         accessorKey: "p_n_rt",
-        header: "N",
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="N" />
+        },
     },
     {
         accessorKey: "p_p_rt",
-        header: "P",
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="P" />
+        },
     },
 ]
