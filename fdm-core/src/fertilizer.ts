@@ -10,6 +10,7 @@ import type {
     getFertilizerApplicationType,
     getFertilizerType,
 } from "./fertilizer.d"
+import { hashFertilizer } from "@svenvw/fdm-data"
 
 /**
  * Retrieves all fertilizers from the enabled catalogues for a farm.
@@ -72,9 +73,11 @@ export async function getFertilizersFromCatalogue(
 }
 
 /**
- * Adds a new fertilizer to the catalogue.
+ * Adds a new custom fertilizer to the catalogue of a farm.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id The ID of the principal making the request.
+ * @param b_id_farm The ID of the farm.
  * @param properties The properties of the fertilizer to add.
  * @returns A Promise that resolves when the fertilizer has been added.
  * @throws If adding the fertilizer fails.
@@ -82,9 +85,9 @@ export async function getFertilizersFromCatalogue(
  */
 export async function addFertilizerToCatalogue(
     fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     properties: {
-        p_id_catalogue: schema.fertilizersCatalogueTypeInsert["p_id_catalogue"]
-        p_source: schema.fertilizersCatalogueTypeInsert["p_source"]
         p_name_nl: schema.fertilizersCatalogueTypeInsert["p_name_nl"]
         p_name_en: schema.fertilizersCatalogueTypeInsert["p_name_en"]
         p_description: schema.fertilizersCatalogueTypeInsert["p_description"]
@@ -132,10 +135,30 @@ export async function addFertilizerToCatalogue(
         p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
         p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
     },
-): Promise<void> {
+): Promise<schema.fertilizersCatalogueTypeSelect["p_id_catalogue"]> {
     try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "addFertilizerToCatalogue",
+        )
+
+        const p_id_catalogue = createId()
+        const input: schema.fertilizersCatalogueTypeInsert = {
+            ...properties,
+            p_id_catalogue: p_id_catalogue,
+            p_source: b_id_farm,
+            hash: null,
+        }
+        input.hash = hashFertilizer(input)
+
         // Insert the farm in the db
-        await fdm.insert(schema.fertilizersCatalogue).values(properties)
+        await fdm.insert(schema.fertilizersCatalogue).values(input)
+
+        return p_id_catalogue
     } catch (err) {
         throw handleError(err, "Exception for addFertilizerToCatalogue", {
             properties,
