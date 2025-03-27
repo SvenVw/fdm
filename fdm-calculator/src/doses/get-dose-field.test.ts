@@ -57,10 +57,7 @@ describe("getDoseForField", () => {
             new Date(),
             "lease",
         )
-        p_id_catalogue = `p_test_fertilizer_${Math.round(Math.random() * 1000)}`
-        await addFertilizerToCatalogue(fdm, {
-            p_id_catalogue: p_id_catalogue,
-            p_source: "",
+        p_id_catalogue = await addFertilizerToCatalogue(fdm, principal_id, b_id_farm, {
             p_name_nl: "",
             p_name_en: "",
             p_description: "",
