@@ -1,4 +1,5 @@
 import type { CatalogueCultivation, CatalogueCultivationItem } from "../d"
+import { hashCultivation } from "../hash"
 import brp from "./brp.json"
 import xxhash from "xxhash-wasm"
 
@@ -40,7 +41,7 @@ export function getCatalogueBrp(): CatalogueCultivation {
         }
 
         // Hash the item
-        item.hash = h32ToString(JSON.stringify(item))
+        item.hash = hashCultivation(item)
 
         return item
     })
