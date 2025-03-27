@@ -1,4 +1,4 @@
-import { asc, desc, eq, inArray } from "drizzle-orm"
+import { and, asc, desc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 
 import { checkPermission } from "./authorization"
@@ -323,6 +323,118 @@ export async function getFertilizer(
     } catch (err) {
         throw handleError(err, "Exception for getFertilizer", {
             p_id,
+        })
+    }
+}
+
+/**
+ * Updates an existing fertilizer in the catalogue of a farm.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id The ID of the principal making the request.
+ * @param b_id_farm The ID of the farm.
+ * @param p_id_catalogue The ID of the fertilizer in the catalogue to update
+ * @param properties The properties of the fertilizer to update.
+ * @returns A Promise that resolves when the fertilizer has been updated.
+ * @throws If updating the fertilizer fails.
+ * @alpha
+ */
+export async function updateFertilizerFromCatalogue(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+    p_id_catalogue: schema.fertilizersCatalogueTypeInsert["p_id_catalogue"],
+    properties: Partial<{
+        p_name_nl: schema.fertilizersCatalogueTypeInsert["p_name_nl"]
+        p_name_en: schema.fertilizersCatalogueTypeInsert["p_name_en"]
+        p_description: schema.fertilizersCatalogueTypeInsert["p_description"]
+        p_dm: schema.fertilizersCatalogueTypeInsert["p_dm"]
+        p_density: schema.fertilizersCatalogueTypeInsert["p_density"]
+        p_om: schema.fertilizersCatalogueTypeInsert["p_om"]
+        p_a: schema.fertilizersCatalogueTypeInsert["p_a"]
+        p_hc: schema.fertilizersCatalogueTypeInsert["p_hc"]
+        p_eom: schema.fertilizersCatalogueTypeInsert["p_eom"]
+        p_eoc: schema.fertilizersCatalogueTypeInsert["p_eoc"]
+        p_c_rt: schema.fertilizersCatalogueTypeInsert["p_c_rt"]
+        p_c_of: schema.fertilizersCatalogueTypeInsert["p_c_of"]
+        p_c_if: schema.fertilizersCatalogueTypeInsert["p_c_if"]
+        p_c_fr: schema.fertilizersCatalogueTypeInsert["p_c_fr"]
+        p_cn_of: schema.fertilizersCatalogueTypeInsert["p_cn_of"]
+        p_n_rt: schema.fertilizersCatalogueTypeInsert["p_n_rt"]
+        p_n_if: schema.fertilizersCatalogueTypeInsert["p_n_if"]
+        p_n_of: schema.fertilizersCatalogueTypeInsert["p_n_of"]
+        p_n_wc: schema.fertilizersCatalogueTypeInsert["p_n_wc"]
+        p_p_rt: schema.fertilizersCatalogueTypeInsert["p_p_rt"]
+        p_k_rt: schema.fertilizersCatalogueTypeInsert["p_k_rt"]
+        p_mg_rt: schema.fertilizersCatalogueTypeInsert["p_mg_rt"]
+        p_ca_rt: schema.fertilizersCatalogueTypeInsert["p_ca_rt"]
+        p_ne: schema.fertilizersCatalogueTypeInsert["p_ne"]
+        p_s_rt: schema.fertilizersCatalogueTypeInsert["p_s_rt"]
+        p_s_wc: schema.fertilizersCatalogueTypeInsert["p_s_wc"]
+        p_cu_rt: schema.fertilizersCatalogueTypeInsert["p_cu_rt"]
+        p_zn_rt: schema.fertilizersCatalogueTypeInsert["p_zn_rt"]
+        p_na_rt: schema.fertilizersCatalogueTypeInsert["p_na_rt"]
+        p_si_rt: schema.fertilizersCatalogueTypeInsert["p_si_rt"]
+        p_b_rt: schema.fertilizersCatalogueTypeInsert["p_b_rt"]
+        p_mn_rt: schema.fertilizersCatalogueTypeInsert["p_mn_rt"]
+        p_ni_rt: schema.fertilizersCatalogueTypeInsert["p_ni_rt"]
+        p_fe_rt: schema.fertilizersCatalogueTypeInsert["p_fe_rt"]
+        p_mo_rt: schema.fertilizersCatalogueTypeInsert["p_mo_rt"]
+        p_co_rt: schema.fertilizersCatalogueTypeInsert["p_co_rt"]
+        p_as_rt: schema.fertilizersCatalogueTypeInsert["p_as_rt"]
+        p_cd_rt: schema.fertilizersCatalogueTypeInsert["p_cd_rt"]
+        pr_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
+        p_cr_vi: schema.fertilizersCatalogueTypeInsert["p_cr_vi"]
+        p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
+        p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
+        p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_cr"]
+        p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
+        p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
+        p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
+    }>,
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "updateFertilizerFromCatalogue",
+        )
+
+        const existingFertilizer = await fdm
+            .select()
+            .from(schema.fertilizersCatalogue)
+            .where(
+                and(
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        p_id_catalogue,
+                    ),
+                    eq(schema.fertilizersCatalogue.p_source, b_id_farm),
+                ),
+            )
+        if (existingFertilizer.length === 0) {
+            throw new Error("Fertilizer does not exist in catalogue")
+        }
+        const updatedProperties = {
+            ...existingFertilizer[0],
+            ...properties,
+            hash: null,
+        }
+        updatedProperties.hash = hashFertilizer(updatedProperties)
+
+        await fdm
+            .update(schema.fertilizersCatalogue)
+            .set(updatedProperties)
+            .where(
+                eq(schema.fertilizersCatalogue.p_id_catalogue, p_id_catalogue),
+            )
+    } catch (err) {
+        throw handleError(err, "Exception for updateFertilizerFromCatalogue", {
+            p_id_catalogue,
+            properties,
         })
     }
 }
