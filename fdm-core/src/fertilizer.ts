@@ -296,6 +296,9 @@ export async function getFertilizer(
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
                 p_cl_cr: schema.fertilizersCatalogue.p_cl_cr,
+                p_type_manure: schema.fertilizersCatalogue.p_type_manure,
+                p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
+                p_type_compost: schema.fertilizersCatalogue.p_type_compost,
             })
             .from(schema.fertilizers)
             .leftJoin(
