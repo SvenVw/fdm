@@ -658,7 +658,6 @@ describe("Catalogues syncing", () => {
             )
 
         expect(itemSynced[0].p_id_catalogue).toBeDefined()
-        expect(itemSynced[0].hash).toBe(item[0].hash)
     })
 
     it("should update cultivation catalogue", async () => {
