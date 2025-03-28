@@ -1,11 +1,14 @@
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { FormSchema } from "@/components/custom/fertilizer/formschema"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
@@ -326,6 +329,23 @@ export default function FarmFertilizerBlock() {
                                                 )}
                                             </div>
                                         </CardContent>
+                                        {loaderData.editable && (
+                                            <CardFooter className="w-full">
+                                                <Button
+                                                    type="submit"
+                                                    disabled={
+                                                        form.formState
+                                                            .isSubmitting
+                                                    }
+                                                >
+                                                    {form.formState
+                                                        .isSubmitting && (
+                                                        <LoadingSpinner />
+                                                    )}
+                                                    Opslaan
+                                                </Button>
+                                            </CardFooter>
+                                        )}
                                     </Card>
                                     <Card className="w-full">
                                         <CardHeader>
@@ -661,6 +681,23 @@ export default function FarmFertilizerBlock() {
                                                 </div>
                                             </div>
                                         </CardContent>
+                                        {loaderData.editable && (
+                                            <CardFooter className="w-full">
+                                                <Button
+                                                    type="submit"
+                                                    disabled={
+                                                        form.formState
+                                                            .isSubmitting
+                                                    }
+                                                >
+                                                    {form.formState
+                                                        .isSubmitting && (
+                                                        <LoadingSpinner />
+                                                    )}
+                                                    Opslaan
+                                                </Button>
+                                            </CardFooter>
+                                        )}
                                     </Card>
                                 </div>
                             </fieldset>
