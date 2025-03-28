@@ -9,28 +9,94 @@ export const FormSchema = z.object({
         required_error: "Type is verplicht",
         invalid_type_error: "Ongeldige waarde",
     }),
-    p_n_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_p_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_k_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_om: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_c_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_s_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_ca_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
-    p_mg_rt: z.coerce.number({
-        invalid_type_error: "Ongeldige waarde",
-    }),
+    p_n_rt: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(1000, {
+            message: "Waarde mag niet groter zijn dan 1000",
+        }),
+    p_n_wc: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(1, {
+            message: "Waarde mag niet groter zijn dan 1",
+        }),
+    p_p_rt: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(4583, {
+            message: "Waarde mag niet groter zijn dan 4583",
+        }),
+    p_k_rt: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(2409.2, {
+            message: "Waarde mag niet groter zijn dan 2409.2",
+        }),
+    p_om: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(1000, {
+            message: "Waarde mag niet groter zijn dan 1000",
+        }),
+    p_eoc: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(1000, {
+            message: "Waarde mag niet groter zijn dan 1000",
+        }),
+    p_s_rt: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(2497.2, {
+            message: "Waarde mag niet groter zijn dan 2497.2",
+        }),
+    p_ca_rt: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(1399.2, {
+            message: "Waarde mag niet groter zijn dan 1399.2",
+        }),
+    p_mg_rt: z.coerce
+        .number({
+            invalid_type_error: "Ongeldige waarde",
+        })
+        .min(0, {
+            message: "Waarde mag niet negatief zijn",
+        })
+        .max(1659, {
+            message: "Waarde mag niet groter zijn dan 1659",
+        }),
 })
