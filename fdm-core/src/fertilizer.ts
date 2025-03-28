@@ -153,7 +153,7 @@ export async function addFertilizerToCatalogue(
             p_source: b_id_farm,
             hash: null,
         }
-        input.hash = hashFertilizer(input)
+        input.hash = await hashFertilizer(input)
 
         // Insert the farm in the db
         await fdm.insert(schema.fertilizersCatalogue).values(input)
@@ -437,7 +437,7 @@ export async function updateFertilizerFromCatalogue(
             ...properties,
             hash: null,
         }
-        updatedProperties.hash = hashFertilizer(updatedProperties)
+        updatedProperties.hash = await hashFertilizer(updatedProperties)
 
         await fdm
             .update(schema.fertilizersCatalogue)
