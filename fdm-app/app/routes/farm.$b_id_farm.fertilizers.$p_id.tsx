@@ -92,11 +92,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        // Get the available fertilizers
+        // Get selected fertilizer
         const fertilizer = await getFertilizer(fdm, p_id)
 
+        // Get the available fertilizers
+        const fertilizers = await getFertilizers(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        const fertilizerOptions = fertilizers.map((fertilizer) => {
+            return {
+                p_id: fertilizer.p_id,
+                p_name_nl: fertilizer.p_name_nl,
+            }
+        })
+
         // Set editable status
-        let editable = false
+        let editable = true
         if (fertilizer.p_source === b_id_farm) {
             editable = true
         }
@@ -106,6 +119,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
+            fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
             editable: editable,
         }
@@ -176,6 +190,8 @@ export default function FarmFertilizerBlock() {
                     to: "../fertilizers",
                     label: "Terug naar overzicht",
                 }}
+                fertilizerOptions={loaderData.fertilizerOptions}
+                p_id={loaderData.fertilizer.p_id}
             />
             <main>
                 <FarmTitle

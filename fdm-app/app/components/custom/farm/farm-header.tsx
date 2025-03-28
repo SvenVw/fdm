@@ -20,6 +20,7 @@ import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
 import type {
     FarmOptions,
+    FertilizerOption,
     FieldOptions,
     HeaderAction,
     LayerKey,
@@ -33,6 +34,8 @@ interface FarmHeaderProps {
     b_id: string | undefined
     layerOptions: LayerOptions[]
     layerSelected: LayerKey | undefined
+    fertilizerOptions: FertilizerOption[] | undefined
+    p_id: string | undefined
     action: HeaderAction
 }
 
@@ -43,6 +46,8 @@ export function FarmHeader({
     b_id,
     layerOptions,
     layerSelected,
+    fertilizerOptions,
+    p_id,
     action,
 }: FarmHeaderProps) {
     return (
@@ -173,6 +178,58 @@ export function FarmHeader({
                                                         </NavLink>
                                                     </DropdownMenuCheckboxItem>
                                                 ))}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </BreadcrumbItem>
+                                </>
+                            ) : null}
+                            {fertilizerOptions &&
+                            fertilizerOptions.length > 0 ? (
+                                <>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbLink
+                                            href={`/farm/${b_id_farm}/fertilizers`}
+                                        >
+                                            Meststof
+                                        </BreadcrumbLink>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger className="flex items-center gap-1">
+                                                {p_id && fertilizerOptions
+                                                    ? (fertilizerOptions.find(
+                                                          (option) =>
+                                                              option.p_id ===
+                                                              p_id,
+                                                      )?.p_name_nl ??
+                                                      "Unknown fertilizer")
+                                                    : "Kies een meststof"}
+                                                <ChevronDown />
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="start">
+                                                {fertilizerOptions.map(
+                                                    (option) => (
+                                                        <DropdownMenuCheckboxItem
+                                                            checked={
+                                                                p_id ===
+                                                                option.p_id
+                                                            }
+                                                            key={
+                                                                option.p_name_nl
+                                                            }
+                                                        >
+                                                            <NavLink
+                                                                to={`/farm/${b_id_farm}/fertilizers/${option.p_id}`}
+                                                            >
+                                                                {
+                                                                    option.p_name_nl
+                                                                }
+                                                            </NavLink>
+                                                        </DropdownMenuCheckboxItem>
+                                                    ),
+                                                )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </BreadcrumbItem>
