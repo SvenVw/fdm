@@ -10,12 +10,7 @@ import { getSession } from "@/lib/auth.server"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
-import {
-    type LoaderFunctionArgs,
-    Outlet,
-    data,
-    useLoaderData,
-} from "react-router"
+import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -62,7 +57,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
-        // console.log(fertilizers)
 
         // Return user information from loader
         return {
@@ -89,11 +83,7 @@ export default function FarmFertilizersBlock() {
         <SidebarInset>
             <FarmHeader
                 farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}/fertilizers/new`,
-                    label: "Meststof toevoegen",
-                }}
+                b_id_farm={loaderData.b_id_farm}            
             />
             <main>
                 <FarmTitle

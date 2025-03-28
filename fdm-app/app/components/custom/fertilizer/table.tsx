@@ -18,6 +18,9 @@ import {
 } from "@/components/ui/table"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { NavLink } from "react-router"
+import { Plus } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -62,6 +65,14 @@ export function DataTable<TData, TValue>({
                     }
                     className="max-w-sm"
                 />
+                <div className="ml-auto">
+                    <NavLink to={"./new"}>
+                        <Button>
+                            <Plus />
+                            Meststof toevoegen
+                        </Button>
+                    </NavLink>
+                </div>
             </div>
             <div className="rounded-md border">
                 <Table>
