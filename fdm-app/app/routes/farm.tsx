@@ -15,6 +15,7 @@ import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import PostHogClient from "~/posthog"
 
 export const meta: MetaFunction = () => {
     return [
@@ -41,6 +42,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
         if (!session?.user) {
             return redirect("/signin")
+        }
+
+        // Identify user with posthog, if posthog is initialized
+        const phClient = PostHogClient()
+        if (phClient) {
+            phClient.identify(session.user.id, {
+                email: session.user.email,
+                name: session.user.name,
+            })
         }
 
         // Return user information from loader
