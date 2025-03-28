@@ -261,6 +261,7 @@ export async function getFertilizer(
         const fertilizer = await fdm
             .select({
                 p_id: schema.fertilizers.p_id,
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
                 p_source: schema.fertilizersCatalogue.p_source,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
@@ -484,6 +485,7 @@ export async function getFertilizers(
         const fertilizers = await fdm
             .select({
                 p_id: schema.fertilizers.p_id,
+                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
                 p_source: schema.fertilizersCatalogue.p_source,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
