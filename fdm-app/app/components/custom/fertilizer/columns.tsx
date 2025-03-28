@@ -13,9 +13,13 @@ import { Badge } from "@/components/ui/badge"
 export type Fertilizer = {
     p_id: string
     p_name_nl: string
-    p_n_rt: number | null
-    p_p_rt: number | null
-    p_k_rt: number | null
+    p_n_rt?: number | null
+    p_p_rt?: number | null
+    p_k_rt?: number | null
+    p_type_manure?: boolean
+    p_type_compost?: boolean
+    p_type_mineral?: boolean
+    p_eoc?: number | null
 }
 
 export const columns: ColumnDef<Fertilizer>[] = [
@@ -59,13 +63,28 @@ export const columns: ColumnDef<Fertilizer>[] = [
             return (
                 <span className="flex items-center gap-2">
                     {fertilizer.p_type_manure ? (
-                        <Badge className="bg-amber-600 text-white hover:bg-amber-700" variant="default">Mest</Badge>
+                        <Badge
+                            className="bg-amber-600 text-white hover:bg-amber-700"
+                            variant="default"
+                        >
+                            Mest
+                        </Badge>
                     ) : null}
                     {fertilizer.p_type_compost ? (
-                        <Badge className="bg-green-600 text-white hover:bg-green-700" variant="default">Compost</Badge>
+                        <Badge
+                            className="bg-green-600 text-white hover:bg-green-700"
+                            variant="default"
+                        >
+                            Compost
+                        </Badge>
                     ) : null}
                     {fertilizer.p_type_mineral ? (
-                        <Badge className="bg-blue-600 text-white hover:bg-blue-700" variant="default">Kunstmest</Badge>
+                        <Badge
+                            className="bg-blue-600 text-white hover:bg-blue-700"
+                            variant="default"
+                        >
+                            Kunstmest
+                        </Badge>
                     ) : null}
                 </span>
             )
