@@ -187,13 +187,9 @@ export default function FarmFertilizerBlock() {
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm
-        const p_id = params.p_id
 
         if (!b_id_farm) {
             throw new Error("missing: b_id_farm")
-        }
-        if (!p_id) {
-            throw new Error("missing: p_id")
         }
 
         const session = await getSession(request)
@@ -275,7 +271,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             p_cr_vi: undefined,
             p_pb_rt: undefined,
             p_hg_rt: undefined,
-            p_cl_rt: undefined
+            p_cl_rt: undefined,
         })
 
         return redirectWithSuccess("../fertilizers", {
