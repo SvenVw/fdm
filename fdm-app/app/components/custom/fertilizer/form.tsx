@@ -43,7 +43,10 @@ export function FertilizerForm({
         undefined
     >
     editable: boolean
-    farm: Farm
+    farm: {
+        b_id_farm: string
+        b_name_farm: string
+    }
 }) {
     return (
         <RemixFormProvider {...form}>
