@@ -21,6 +21,7 @@ import { toast as notify } from "sonner"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 import { ErrorBlock } from "./components/custom/error"
+import posthog from "posthog-js"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
@@ -60,6 +61,11 @@ export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
     const location = useLocation()
+
+    // Capture pagevies
+    useEffect(() => {
+        posthog.capture("$pageview")
+    }, [location])
 
     // Hook to show the toasts
     useEffect(() => {
