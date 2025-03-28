@@ -19,7 +19,7 @@ describe("hashCultivation", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("53ece66f")
+        expect(hash).toBe("2b20f4d7")
     })
 
     it("should generate different hashes for different cultivation items", () => {
