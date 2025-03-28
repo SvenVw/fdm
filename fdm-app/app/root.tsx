@@ -22,6 +22,7 @@ import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 import { ErrorBlock } from "./components/custom/error"
 import posthog from "posthog-js"
+import { Banner } from "./components/custom/banner"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
@@ -96,6 +97,7 @@ export function Layout() {
             </head>
             <body>
                 <Outlet />
+                <Banner />
                 <Toaster />
                 <ErrorBoundary error={null} params={{}} />
                 <ScrollRestoration
