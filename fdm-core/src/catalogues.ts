@@ -377,42 +377,46 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
 async function syncFertilizerCatalogue(fdm: FdmType) {
     const srmCatalogue = getFertilizersCatalogue("srm")
     await fdm.transaction(async (tx) => {
-        for (const item of srmCatalogue) {
-            const hash = hashFertilizer(item)
-            const existing = await tx
-                .select({ hash: schema.fertilizersCatalogue.hash })
-                .from(schema.fertilizersCatalogue)
-                .where(
-                    eq(
-                        schema.fertilizersCatalogue.p_id_catalogue,
-                        item.p_id_catalogue,
-                    ),
-                )
-                .limit(1)
-            if (existing.length === 0) {
-                //add the item if does not exist
-                await tx.insert(schema.fertilizersCatalogue).values({
-                    ...item,
-                    hash: hash,
-                })
-            } else {
-                // update the hash if it is undefined, null or different
-                if (
-                    existing[0].hash === null ||
-                    existing[0].hash === undefined ||
-                    existing[0].hash !== hash
-                ) {
-                    await tx
-                        .update(schema.fertilizersCatalogue)
-                        .set({ hash: hash })
-                        .where(
-                            eq(
-                                schema.fertilizersCatalogue.p_id_catalogue,
-                                item.p_id_catalogue,
-                            ),
-                        )
+        try {
+            for (const item of srmCatalogue) {
+                const hash = hashFertilizer(item)
+                const existing = await tx
+                    .select({ hash: schema.fertilizersCatalogue.hash })
+                    .from(schema.fertilizersCatalogue)
+                    .where(
+                        eq(
+                            schema.fertilizersCatalogue.p_id_catalogue,
+                            item.p_id_catalogue,
+                        ),
+                    )
+                    .limit(1)
+                if (existing.length === 0) {
+                    //add the item if does not exist
+                    await tx.insert(schema.fertilizersCatalogue).values({
+                        ...item,
+                        hash: hash,
+                    })
+                } else {
+                    // update the hash if it is undefined, null or different
+                    if (
+                        existing[0].hash === null ||
+                        existing[0].hash === undefined ||
+                        existing[0].hash !== hash
+                    ) {
+                        await tx
+                            .update(schema.fertilizersCatalogue)
+                            .set({ hash: hash })
+                            .where(
+                                eq(
+                                    schema.fertilizersCatalogue.p_id_catalogue,
+                                    item.p_id_catalogue,
+                                ),
+                            )
+                    }
                 }
             }
+        } catch (error) {
+            handleError(error, "Exception for syncFertilizerCatalogue")
         }
     })
 }
@@ -421,42 +425,46 @@ async function syncCultivationCatalogue(fdm: FdmType) {
     const brpCatalogue = getCultivationCatalogue("brp")
 
     await fdm.transaction(async (tx) => {
-        for (const item of brpCatalogue) {
-            const hash = hashCultivation(item)
-            const existing = await tx
-                .select({ hash: schema.cultivationsCatalogue.hash })
-                .from(schema.cultivationsCatalogue)
-                .where(
-                    eq(
-                        schema.cultivationsCatalogue.b_lu_catalogue,
-                        item.b_lu_catalogue,
-                    ),
-                )
-                .limit(1)
-            if (existing.length === 0) {
-                //add the item if does not exist
-                await tx.insert(schema.cultivationsCatalogue).values({
-                    ...item,
-                    hash: hash,
-                })
-            } else {
-                // update the hash if it is undefined, null or different
-                if (
-                    existing[0].hash === null ||
-                    existing[0].hash === undefined ||
-                    existing[0].hash !== hash
-                ) {
-                    await tx
-                        .update(schema.cultivationsCatalogue)
-                        .set({ hash: hash })
-                        .where(
-                            eq(
-                                schema.cultivationsCatalogue.b_lu_catalogue,
-                                item.b_lu_catalogue,
-                            ),
-                        )
+        try {
+            for (const item of brpCatalogue) {
+                const hash = hashCultivation(item)
+                const existing = await tx
+                    .select({ hash: schema.cultivationsCatalogue.hash })
+                    .from(schema.cultivationsCatalogue)
+                    .where(
+                        eq(
+                            schema.cultivationsCatalogue.b_lu_catalogue,
+                            item.b_lu_catalogue,
+                        ),
+                    )
+                    .limit(1)
+                if (existing.length === 0) {
+                    //add the item if does not exist
+                    await tx.insert(schema.cultivationsCatalogue).values({
+                        ...item,
+                        hash: hash,
+                    })
+                } else {
+                    // update the hash if it is undefined, null or different
+                    if (
+                        existing[0].hash === null ||
+                        existing[0].hash === undefined ||
+                        existing[0].hash !== hash
+                    ) {
+                        await tx
+                            .update(schema.cultivationsCatalogue)
+                            .set({ hash: hash })
+                            .where(
+                                eq(
+                                    schema.cultivationsCatalogue.b_lu_catalogue,
+                                    item.b_lu_catalogue,
+                                ),
+                            )
+                    }
                 }
             }
+        } catch (error) {
+            handleError(error, "Exception for syncCultivationCatalogue")
         }
     })
 }
