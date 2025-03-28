@@ -96,8 +96,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizer = await getFertilizer(fdm, p_id)
 
         // Set editable status
-        let editable = true
-        console.log(fertilizer.p_source)
+        let editable = false
         if (fertilizer.p_source === b_id_farm) {
             editable = true
         }
@@ -242,7 +241,7 @@ export default function FarmFertilizerBlock() {
                                                     Catalogus
                                                 </span>
                                                 <span className="flex items-center gap-2">
-                                                    {fertilizer.p_source !==
+                                                    {fertilizer.p_source ===
                                                     loaderData.b_id_farm ? (
                                                         <Badge variant="default">
                                                             {
