@@ -1,6 +1,5 @@
-import { type Farm, type Fertilizer } from "@svenvw/fdm-core"
-import { type z, type ZodType } from "zod"
-import { type UseFormReturn } from "react-hook-form"
+import type { z, ZodType } from "zod"
+import type { UseFormReturn } from "react-hook-form"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,7 +27,8 @@ import {
 } from "@/components/ui/select"
 import { Form } from "react-router"
 import { RemixFormProvider } from "remix-hook-form"
-import { LoadingSpinner } from "../loadingspinner"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import type { Fertilizer } from "./columns"
 
 export function FertilizerForm({
     fertilizer,
