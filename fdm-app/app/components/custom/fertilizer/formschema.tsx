@@ -1,6 +1,14 @@
 import { z } from "zod"
 
 export const FormSchema = z.object({
+    p_name_nl: z.string({
+        required_error: "Naam is verplicht",
+        invalid_type_error: "Ongeldige waarde",
+    }),
+    p_type: z.string({
+        required_error: "Type is verplicht",
+        invalid_type_error: "Ongeldige waarde",
+    }),
     p_n_rt: z.coerce.number({
         invalid_type_error: "Ongeldige waarde",
     }),
