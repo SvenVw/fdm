@@ -261,6 +261,7 @@ export async function getFertilizer(
         const fertilizer = await fdm
             .select({
                 p_id: schema.fertilizers.p_id,
+                p_source: schema.fertilizersCatalogue.p_source,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
@@ -471,6 +472,7 @@ export async function getFertilizers(
         const fertilizers = await fdm
             .select({
                 p_id: schema.fertilizers.p_id,
+                p_source: schema.fertilizersCatalogue.p_source,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
@@ -506,6 +508,9 @@ export async function getFertilizers(
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
                 p_cl_cr: schema.fertilizersCatalogue.p_cl_cr,
+                p_type_manure: schema.fertilizersCatalogue.p_type_manure,
+                p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
+                p_type_compost: schema.fertilizersCatalogue.p_type_compost,
             })
             .from(schema.fertilizers)
             .leftJoin(
