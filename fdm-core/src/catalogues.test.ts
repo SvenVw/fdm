@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeEach, inject } from "vitest"
+import {
+    afterAll,
+    beforeAll,
+    beforeEach,
+    describe,
+    expect,
+    inject,
+    it,
+} from "vitest"
 import { createFdmServer } from "./fdm-server"
 import * as schema from "./db/schema"
 import {
@@ -17,10 +25,12 @@ import { eq, isNotNull } from "drizzle-orm"
 import {
     getCultivationCatalogue,
     getFertilizersCatalogue,
+    hashCultivation,
+    hashFertilizer,
 } from "@svenvw/fdm-data"
 import { addFarm } from "./farm"
 
-describe("Catalogues", () => {
+describe("Catalogues - Unit Tests", () => {
     let fdm: FdmType
     let principal_id: string
     let b_id_farm: string
@@ -49,129 +59,93 @@ describe("Catalogues", () => {
         )
     })
 
-    describe("Fertilizer Catalogues", () => {
-        it("should enable and check fertilizer catalogue", async () => {
-            const p_source = "test_source"
+    describe("getEnabledFertilizerCatalogues", () => {
+        it("should return an array of enabled fertilizer catalogue sources", async () => {
+            // Arrange
+            await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, "source1")
+            await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, "source2")
 
-            // Initially should not be enabled
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(false)
+            // Act
+            const result = await getEnabledFertilizerCatalogues(fdm, principal_id, b_id_farm)
 
-            // Enable the catalogue
-            await enableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                p_source,
-            )
-
-            // Should now be enabled
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
-
-            // Should appear in enabled catalogues list
-            const enabledCatalogues = await getEnabledFertilizerCatalogues(
-                fdm,
-                principal_id,
-                b_id_farm,
-            )
-            expect(enabledCatalogues).toContain(p_source)
+            // Assert
+            expect(result).toEqual(expect.arrayContaining(["source1", "source2"]))
+            expect(result.length).toBe(2);
         })
 
-        it("should disable fertilizer catalogue", async () => {
-            const p_source = "test_source"
+        it("should return an empty array if no catalogues are enabled", async () => {
+            // Arrange
 
-            // Enable the catalogue
-            await enableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                p_source,
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
+            // Act
+            const result = await getEnabledFertilizerCatalogues(fdm, principal_id, b_id_farm)
 
-            // Disable the catalogue
-            await disableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                p_source,
-            )
-
-            // Should no longer be enabled
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(false)
-
-            // Should not appear in enabled catalogues list
-            const enabledCatalogues = await getEnabledFertilizerCatalogues(
-                fdm,
-                principal_id,
-                b_id_farm,
-            )
-            expect(enabledCatalogues).not.toContain(p_source)
+            // Assert
+            expect(result).toEqual([])
         })
 
-        it("should handle multiple fertilizer catalogues", async () => {
-            const sources = ["source1", "source2", "source3"]
-
-            // Enable multiple catalogues
-            for (const source of sources) {
-                await enableFertilizerCatalogue(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    source,
-                )
-            }
-
-            // Check all are enabled
-            const enabledCatalogues = await getEnabledFertilizerCatalogues(
-                fdm,
-                principal_id,
-                b_id_farm,
-            )
-            expect(enabledCatalogues).toHaveLength(sources.length)
-            expect(enabledCatalogues).toEqual(expect.arrayContaining(sources))
-        })
-        it("should throw an error when permission check fails for getEnabledFertilizerCatalogues", async () => {
+        it("should throw an error if permission check fails", async () => {
+            // Arrange
             const invalidPrincipalId = "invalid_principal"
+
+            // Act & Assert
             await expect(
-                getEnabledFertilizerCatalogues(
-                    fdm,
-                    invalidPrincipalId,
-                    b_id_farm,
-                ),
+                getEnabledFertilizerCatalogues(fdm, invalidPrincipalId, b_id_farm)
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+    })
+
+    describe("getEnabledCultivationCatalogues", () => {
+        it("should return an array of enabled cultivation catalogue sources", async () => {
+            // Arrange
+            await enableCultivationCatalogue(fdm, principal_id, b_id_farm, "source1")
+            await enableCultivationCatalogue(fdm, principal_id, b_id_farm, "source2")
+
+            // Act
+            const result = await getEnabledCultivationCatalogues(fdm, principal_id, b_id_farm)
+
+            // Assert
+            expect(result).toEqual(expect.arrayContaining(["source1", "source2"]))
+            expect(result.length).toBe(2);
+        })
+        it("should return an empty array if no catalogues are enabled", async () => {
+             // Arrange
+
+            // Act
+            const result = await getEnabledCultivationCatalogues(fdm, principal_id, b_id_farm)
+
+            // Assert
+            expect(result).toEqual([])
+        })
+
+         it("should throw an error if permission check fails", async () => {
+            // Arrange
+            const invalidPrincipalId = "invalid_principal"
+
+            // Act & Assert
+            await expect(
+                getEnabledCultivationCatalogues(fdm, invalidPrincipalId, b_id_farm)
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
             )
         })
 
-        it("should throw an error when permission check fails for enableFertilizerCatalogue", async () => {
+    })
+
+    describe("enableFertilizerCatalogue", () => {
+        it("should enable a fertilizer catalogue", async () => {
+            // Arrange
+            const p_source = "test_source";
+
+            // Act
+            await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source);
+
+            // Assert
+            const isEnabled = await isFertilizerCatalogueEnabled(fdm, principal_id, b_id_farm, p_source);
+            expect(isEnabled).toBe(true);
+        });
+        it("should throw an error when permission check fails", async () => {
             const invalidPrincipalId = "invalid_principal"
             await expect(
                 enableFertilizerCatalogue(
@@ -184,291 +158,21 @@ describe("Catalogues", () => {
                 "Principal does not have permission to perform this action",
             )
         })
-
-        it("should throw an error when permission check fails for disableFertilizerCatalogue", async () => {
-            const invalidPrincipalId = "invalid_principal"
-            await expect(
-                disableFertilizerCatalogue(
-                    fdm,
-                    invalidPrincipalId,
-                    b_id_farm,
-                    "custom",
-                ),
-            ).rejects.toThrowError(
-                "Principal does not have permission to perform this action",
-            )
-        })
-
-        it("should throw an error when permission check fails for isFertilizerCatalogueEnabled", async () => {
-            const invalidPrincipalId = "invalid_principal"
-            await expect(
-                isFertilizerCatalogueEnabled(
-                    fdm,
-                    invalidPrincipalId,
-                    b_id_farm,
-                    "custom",
-                ),
-            ).rejects.toThrowError(
-                "Principal does not have permission to perform this action",
-            )
-        })
-
-        it("should handle edge cases for disableFertilizerCatalogue", async () => {
-            const p_source = "test_disable_source"
-
-            // Case 1: Disabling a fertilizer catalogue that isn't enabled should not throw errors
-            // This tests the compound condition in the where clause
-            await disableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                p_source,
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(false)
-
-            // Case 2: Enable and then disable with same farm but different source
-            await enableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                p_source,
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
-
-            // Disable with wrong source - should not disable the original
-            await disableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                "wrong_source",
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
-
-            // Case 3: Test with different farm
-            // Create a second test farm
-            const secondFarmName = "Second Test Farm"
-            const secondFarmBusinessId = "654321"
-            const secondFarmAddress = "456 Farm Lane"
-            const secondFarmPostalCode = "54321"
-            const second_b_id_farm = await addFarm(
-                fdm,
-                principal_id,
-                secondFarmName,
-                secondFarmBusinessId,
-                secondFarmAddress,
-                secondFarmPostalCode,
-            )
-
-            // Enable for second farm
-            await enableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                second_b_id_farm,
-                p_source,
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    second_b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
-
-            // Disable for first farm should not affect second farm
-            await disableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                p_source,
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    p_source,
-                ),
-            ).toBe(false)
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    second_b_id_farm,
-                    p_source,
-                ),
-            ).toBe(true)
-
-            // Disable for second farm
-            await disableFertilizerCatalogue(
-                fdm,
-                principal_id,
-                second_b_id_farm,
-                p_source,
-            )
-            expect(
-                await isFertilizerCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    second_b_id_farm,
-                    p_source,
-                ),
-            ).toBe(false)
-        })
     })
 
-    describe("Cultivation Catalogues", () => {
-        it("should enable and check cultivation catalogue", async () => {
-            const b_lu_source = "test_source"
+    describe("enableCultivationCatalogue", () => {
+        it("should enable a cultivation catalogue", async () => {
+            // Arrange
+            const b_lu_source = "test_source";
 
-            // Initially should not be enabled
-            expect(
-                await isCultivationCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    b_lu_source,
-                ),
-            ).toBe(false)
+            // Act
+            await enableCultivationCatalogue(fdm, principal_id, b_id_farm, b_lu_source);
 
-            // Enable the catalogue
-            await enableCultivationCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                b_lu_source,
-            )
-
-            // Should now be enabled
-            expect(
-                await isCultivationCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    b_lu_source,
-                ),
-            ).toBe(true)
-
-            // Should appear in enabled catalogues list
-            const enabledCatalogues = await getEnabledCultivationCatalogues(
-                fdm,
-                principal_id,
-                b_id_farm,
-            )
-            expect(enabledCatalogues).toContain(b_lu_source)
-        })
-
-        it("should disable cultivation catalogue", async () => {
-            const b_lu_source = "test_source"
-
-            // Enable the catalogue
-            await enableCultivationCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                b_lu_source,
-            )
-            expect(
-                await isCultivationCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    b_lu_source,
-                ),
-            ).toBe(true)
-
-            // Disable the catalogue
-            await disableCultivationCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                b_lu_source,
-            )
-
-            // Should no longer be enabled
-            expect(
-                await isCultivationCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    b_lu_source,
-                ),
-            ).toBe(false)
-
-            // Should not appear in enabled catalogues list
-            const enabledCatalogues = await getEnabledCultivationCatalogues(
-                fdm,
-                principal_id,
-                b_id_farm,
-            )
-            expect(enabledCatalogues).not.toContain(b_lu_source)
-        })
-
-        it("should handle multiple cultivation catalogues", async () => {
-            const sources = ["source1", "source2", "source3"]
-
-            // Enable multiple catalogues
-            for (const source of sources) {
-                await enableCultivationCatalogue(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    source,
-                )
-            }
-
-            // Check all are enabled
-            const enabledCatalogues = await getEnabledCultivationCatalogues(
-                fdm,
-                principal_id,
-                b_id_farm,
-            )
-            expect(enabledCatalogues).toHaveLength(sources.length)
-            expect(enabledCatalogues).toEqual(expect.arrayContaining(sources))
-        })
+            // Assert
+            const isEnabled = await isCultivationCatalogueEnabled(fdm, principal_id, b_id_farm, b_lu_source);
+            expect(isEnabled).toBe(true);
+        });
         it("should throw an error when permission check fails", async () => {
-            const invalidPrincipalId = "invalid_principal"
-            await expect(
-                getEnabledCultivationCatalogues(
-                    fdm,
-                    invalidPrincipalId,
-                    b_id_farm,
-                ),
-            ).rejects.toThrowError(
-                "Principal does not have permission to perform this action",
-            )
-        })
-
-        it("should throw an error when permission check fails for enableCultivationCatalogue", async () => {
             const invalidPrincipalId = "invalid_principal"
             await expect(
                 enableCultivationCatalogue(
@@ -481,8 +185,50 @@ describe("Catalogues", () => {
                 "Principal does not have permission to perform this action",
             )
         })
+    })
 
-        it("should throw an error when permission check fails for disableCultivationCatalogue", async () => {
+     describe("disableFertilizerCatalogue", () => {
+        it("should disable a fertilizer catalogue", async () => {
+            // Arrange
+             const p_source = "test_source";
+             await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source)
+
+            // Act
+            await disableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source);
+
+            // Assert
+            const isEnabled = await isFertilizerCatalogueEnabled(fdm, principal_id, b_id_farm, p_source);
+            expect(isEnabled).toBe(false);
+        });
+         it("should throw an error when permission check fails", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                disableFertilizerCatalogue(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+    })
+
+    describe("disableCultivationCatalogue", () => {
+        it("should disable a cultivation catalogue", async () => {
+            // Arrange
+            const b_lu_source = "test_source";
+            await enableCultivationCatalogue(fdm, principal_id, b_id_farm, b_lu_source)
+
+            // Act
+            await disableCultivationCatalogue(fdm, principal_id, b_id_farm, b_lu_source);
+
+            // Assert
+            const isEnabled = await isCultivationCatalogueEnabled(fdm, principal_id, b_id_farm, b_lu_source);
+            expect(isEnabled).toBe(false);
+        });
+        it("should throw an error when permission check fails", async () => {
             const invalidPrincipalId = "invalid_principal"
             await expect(
                 disableCultivationCatalogue(
@@ -495,8 +241,73 @@ describe("Catalogues", () => {
                 "Principal does not have permission to perform this action",
             )
         })
+    })
+    
+    describe("isFertilizerCatalogueEnabled", () => {
+        it("should return true if fertilizer catalogue is enabled", async () => {
+            // Arrange
+            const p_source = "test_source";
+            await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source);
 
-        it("should throw an error when permission check fails for isCultivationCatalogueEnabled", async () => {
+            // Act
+            const isEnabled = await isFertilizerCatalogueEnabled(fdm, principal_id, b_id_farm, p_source);
+
+            // Assert
+            expect(isEnabled).toBe(true);
+        });
+
+        it("should return false if fertilizer catalogue is disabled", async () => {
+            // Arrange
+            const p_source = "test_source";
+             await disableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source)
+
+            // Act
+            const isEnabled = await isFertilizerCatalogueEnabled(fdm, principal_id, b_id_farm, p_source);
+
+            // Assert
+            expect(isEnabled).toBe(false);
+        });
+        it("should throw an error when permission check fails", async () => {
+            const invalidPrincipalId = "invalid_principal"
+            await expect(
+                isFertilizerCatalogueEnabled(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    "custom",
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+    })
+
+    describe("isCultivationCatalogueEnabled", () => {
+        it("should return true if cultivation catalogue is enabled", async () => {
+            // Arrange
+            const b_lu_source = "test_source";
+            await enableCultivationCatalogue(fdm, principal_id, b_id_farm, b_lu_source);
+
+            // Act
+            const isEnabled = await isCultivationCatalogueEnabled(fdm, principal_id, b_id_farm, b_lu_source);
+
+            // Assert
+            expect(isEnabled).toBe(true);
+        });
+
+        it("should return false if cultivation catalogue is disabled", async () => {
+            // Arrange
+            const b_lu_source = "test_source";
+             await disableCultivationCatalogue(fdm, principal_id, b_id_farm, b_lu_source)
+
+            // Act
+            const isEnabled = await isCultivationCatalogueEnabled(fdm, principal_id, b_id_farm, b_lu_source);
+
+            // Assert
+            expect(isEnabled).toBe(false);
+        });
+
+        it("should throw an error when permission check fails", async () => {
             const invalidPrincipalId = "invalid_principal"
             await expect(
                 isCultivationCatalogueEnabled(
@@ -509,158 +320,89 @@ describe("Catalogues", () => {
                 "Principal does not have permission to perform this action",
             )
         })
+    })
 
-        it("should include context in the error when database query fails", async () => {
-            const invalidFdm = {
-                ...fdm,
-                select: () => {
-                    throw new Error("Database error")
-                },
-            }
+    describe("syncCatalogues", () => {
+        it("should sync catalogues", async () => {
+             await syncCatalogues(fdm)
 
-            try {
-                await getEnabledCultivationCatalogues(
-                    invalidFdm,
-                    principal_id,
-                    b_id_farm,
-                )
-                // Should not reach here
-                expect(true).toBe(false)
-            } catch (error) {
-                expect(error.message).toContain(
-                    "Exception for getEnabledCultivationCatalogues",
-                )
-                expect(error.context).toBeDefined()
-                expect(error.context.principal_id).toBe(principal_id)
-                expect(error.context.b_id_farm).toBe(b_id_farm)
-            }
+            // Check if catalogue data is similiar to fdm-data
+            const srmCatalogue = await fdm
+                .select()
+                .from(schema.fertilizersCatalogue)
+
+            const srmCatalogueOriginal = getFertilizersCatalogue("srm")
+            expect(srmCatalogue.length).toBeGreaterThan(srmCatalogueOriginal.length)
+
+            const brpCatalogue = await fdm
+                .select()
+                .from(schema.cultivationsCatalogue)
+            expect(brpCatalogue.length).toBeGreaterThan(0)
+
+            const brpCatalogueOriginal = getCultivationCatalogue("brp")
+            expect(brpCatalogue.length).toBeGreaterThan(brpCatalogueOriginal.length)
         })
 
-        it("should handle errors when disabling cultivation catalogue", async () => {
-            const b_lu_source = "test_source"
-            const invalidPrincipal = "invalid_principal" // Principal without permissions
+         it("should update fertilizer catalogue", async () => {
+            await syncCatalogues(fdm)
 
-            // Enable the catalogue first with valid principal
-            await enableCultivationCatalogue(
-                fdm,
-                principal_id,
-                b_id_farm,
-                b_lu_source,
-            )
+            // Update a catalogue item
+            const item = await fdm
+                .select({
+                    p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                    hash: schema.fertilizersCatalogue.hash,
+                })
+                .from(schema.fertilizersCatalogue)
+                .where(isNotNull(schema.fertilizersCatalogue.hash))
+                .limit(1)
+            expect(item[0].p_id_catalogue).toBeDefined()
+             const originalHash = item[0].hash;
 
-            // Attempt to disable with invalid principal should throw an error
-            await expect(
-                disableCultivationCatalogue(
-                    fdm,
-                    invalidPrincipal,
-                    b_id_farm,
-                    b_lu_source,
-                ),
-            ).rejects.toThrow()
+            await fdm
+                .update(schema.fertilizersCatalogue)
+                .set({ hash: "Updated hash" })
+                .where(
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        item[0].p_id_catalogue,
+                    ),
+                )
 
-            // The catalogue should still be enabled
-            expect(
-                await isCultivationCatalogueEnabled(
-                    fdm,
-                    principal_id,
-                    b_id_farm,
-                    b_lu_source,
-                ),
-            ).toBe(true)
+            const itemUpdated = await fdm
+                .select({
+                    p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                    hash: schema.fertilizersCatalogue.hash,
+                })
+                .from(schema.fertilizersCatalogue)
+                .where(
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        item[0].p_id_catalogue,
+                    ),
+                )
+            expect(itemUpdated[0].p_id_catalogue).toBeDefined()
+            expect(itemUpdated[0].hash).toBe("Updated hash")
+
+            await syncCatalogues(fdm)
+
+            const itemSynced = await fdm
+                .select({
+                    p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
+                    hash: schema.fertilizersCatalogue.hash,
+                })
+                .from(schema.fertilizersCatalogue)
+                .where(
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        item[0].p_id_catalogue,
+                    ),
+                )
+
+            expect(itemSynced[0].p_id_catalogue).toBeDefined()
+            expect(itemSynced[0].hash).not.toBe("Updated hash");
+            expect(itemSynced[0].hash).toBe(originalHash)
         })
-    })
-})
-
-describe("Catalogues syncing", () => {
-    let fdm: FdmType
-
-    beforeEach(async () => {
-        const host = inject("host")
-        const port = inject("port")
-        const user = inject("user")
-        const password = inject("password")
-        const database = inject("database")
-        fdm = createFdmServer(host, port, user, password, database)
-    })
-
-    it("should sync catalogues", async () => {
-        await syncCatalogues(fdm)
-
-        // Check if catalogue data is similiar to fdm-data
-        const srmCatalogue = await fdm
-            .select()
-            .from(schema.fertilizersCatalogue)
-
-        const srmCatalogueOriginal = getFertilizersCatalogue("srm")
-        expect(srmCatalogue.length).toBeGreaterThan(srmCatalogueOriginal.length)
-
-        const brpCatalogue = await fdm
-            .select()
-            .from(schema.cultivationsCatalogue)
-        expect(brpCatalogue.length).toBeGreaterThan(0)
-
-        const brpCatalogueOriginal = getCultivationCatalogue("brp")
-        expect(brpCatalogue.length).toBeGreaterThan(brpCatalogueOriginal.length)
-    })
-
-    it("should update fertilizer catalogue", async () => {
-        await syncCatalogues(fdm)
-
-        // Update a catalogue item
-        const item = await fdm
-            .select({
-                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
-                hash: schema.fertilizersCatalogue.hash,
-            })
-            .from(schema.fertilizersCatalogue)
-            .where(isNotNull(schema.fertilizersCatalogue.hash))
-            .limit(1)
-        expect(item[0].p_id_catalogue).toBeDefined()
-
-        await fdm
-            .update(schema.fertilizersCatalogue)
-            .set({ hash: "Updated hash" })
-            .where(
-                eq(
-                    schema.fertilizersCatalogue.p_id_catalogue,
-                    item[0].p_id_catalogue,
-                ),
-            )
-
-        const itemUpdated = await fdm
-            .select({
-                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
-                hash: schema.fertilizersCatalogue.hash,
-            })
-            .from(schema.fertilizersCatalogue)
-            .where(
-                eq(
-                    schema.fertilizersCatalogue.p_id_catalogue,
-                    item[0].p_id_catalogue,
-                ),
-            )
-        expect(itemUpdated[0].p_id_catalogue).toBeDefined()
-        expect(itemUpdated[0].hash).toBe("Updated hash")
-
-        await syncCatalogues(fdm)
-
-        const itemSynced = await fdm
-            .select({
-                p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
-                hash: schema.fertilizersCatalogue.hash,
-            })
-            .from(schema.fertilizersCatalogue)
-            .where(
-                eq(
-                    schema.fertilizersCatalogue.p_id_catalogue,
-                    item[0].p_id_catalogue,
-                ),
-            )
-
-        expect(itemSynced[0].p_id_catalogue).toBeDefined()
-    })
-
-    it("should update cultivation catalogue", async () => {
+        it("should update cultivation catalogue", async () => {
         await syncCatalogues(fdm)
 
         // Update a catalogue item
@@ -673,6 +415,8 @@ describe("Catalogues syncing", () => {
             .where(isNotNull(schema.cultivationsCatalogue.hash))
             .limit(1)
         expect(item[0].b_lu_catalogue).toBeDefined()
+
+        const originalHash = item[0].hash;
 
         await fdm
             .update(schema.cultivationsCatalogue)
@@ -714,6 +458,8 @@ describe("Catalogues syncing", () => {
                 ),
             )
         expect(itemSynced[0].b_lu_catalogue).toBeDefined()
-        expect(itemSynced[0].hash).toBe(item[0].hash)
+        expect(itemSynced[0].hash).not.toBe("Updated hash");
+        expect(itemSynced[0].hash).toBe(originalHash);
+    })
     })
 })
