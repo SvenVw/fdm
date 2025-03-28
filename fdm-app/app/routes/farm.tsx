@@ -15,7 +15,8 @@ import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
-import PostHogClient from "~/posthog"
+import posthog from "posthog-js"
+import { id } from "date-fns/locale"
 
 export const meta: MetaFunction = () => {
     return [
@@ -42,15 +43,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
         if (!session?.user) {
             return redirect("/signin")
-        }
-
-        // Identify user with posthog, if posthog is initialized
-        const phClient = PostHogClient()
-        if (phClient) {
-            phClient.identify(session.user.id, {
-                email: session.user.email,
-                name: session.user.name,
-            })
         }
 
         // Return user information from loader
@@ -97,6 +89,17 @@ export default function App() {
             element: <Outlet />,
         },
     ])
+
+    useEffect(() => {
+        if (posthog && loaderData.user) {
+            console.log("Identifying user:", loaderData.user.id)
+            posthog.identify(loaderData.user.id, {
+                id: loaderData.user.id,
+                email: loaderData.user.email,
+                name: loaderData.user.name,
+            })
+        }
+    }, [posthog, loaderData.user])
 
     return (
         <FarmContext.Provider value={{ farmId, setFarmId }}>
