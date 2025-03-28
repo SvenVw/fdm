@@ -1,25 +1,57 @@
-import { type Farm, type Fertilizer } from "@svenvw/fdm-core";
-import { type z, type ZodType } from "zod";
-import { type UseFormReturn } from "react-hook-form";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { FormControl, FormDescription, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form } from "react-router";
-import { RemixFormProvider } from "remix-hook-form";
-import { LoadingSpinner } from "../loadingspinner";
+import { type Farm, type Fertilizer } from "@svenvw/fdm-core"
+import { type z, type ZodType } from "zod"
+import { type UseFormReturn } from "react-hook-form"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { Form } from "react-router"
+import { RemixFormProvider } from "remix-hook-form"
+import { LoadingSpinner } from "../loadingspinner"
 
 export function FertilizerForm({
     fertilizer,
     form,
     editable,
-    farm, }: { fertilizer: Fertilizer; form: UseFormReturn<z.infer<typeof import("./formschema").FormSchema>, ZodType, undefined>; editable: boolean; farm: Farm }) {
-
+    farm,
+}: {
+    fertilizer: Fertilizer
+    form: UseFormReturn<
+        z.infer<typeof import("./formschema").FormSchema>,
+        ZodType,
+        undefined
+    >
+    editable: boolean
+    farm: Farm
+}) {
     return (
         <RemixFormProvider {...form}>
-            <Form id="formFertilizer" onSubmit={form.handleSubmit} method="post">
+            <Form
+                id="formFertilizer"
+                onSubmit={form.handleSubmit}
+                method="post"
+            >
                 <fieldset disabled={form.formState.isSubmitting}>
                     <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                         <Card className="w-full">
@@ -86,9 +118,11 @@ export function FertilizerForm({
                                                         }
                                                         defaultValue={
                                                             field.value
-                                                        }                                                 
+                                                        }
                                                         name={field.name}
-                                                        disabled={field.disabled} 
+                                                        disabled={
+                                                            field.disabled
+                                                        }
                                                         className="w-full text-right"
                                                     >
                                                         <SelectTrigger>
@@ -115,17 +149,26 @@ export function FertilizerForm({
                                     ) : (
                                         <span className="flex items-center gap-2">
                                             {fertilizer.p_type_manure ? (
-                                                <Badge variant="default">
+                                                <Badge
+                                                    className="bg-amber-600 text-white hover:bg-amber-700"
+                                                    variant="default"
+                                                >
                                                     Mest
                                                 </Badge>
                                             ) : null}
                                             {fertilizer.p_type_compost ? (
-                                                <Badge variant="default">
+                                                <Badge
+                                                    className="bg-green-600 text-white hover:bg-green-700"
+                                                    variant="default"
+                                                >
                                                     Compost
                                                 </Badge>
                                             ) : null}
                                             {fertilizer.p_type_mineral ? (
-                                                <Badge variant="default">
+                                                <Badge
+                                                    className="bg-blue-600 text-white hover:bg-blue-700"
+                                                    variant="default"
+                                                >
                                                     Kunstmest
                                                 </Badge>
                                             ) : null}
