@@ -7,7 +7,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { NavLink } from "react-router"
+import { NavLink } from "react-router-dom"
 import { Badge } from "@/components/ui/badge"
 
 export type Fertilizer = {
