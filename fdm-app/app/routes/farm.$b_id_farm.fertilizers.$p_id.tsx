@@ -91,7 +91,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Set editable status
-        let editable = true
+        let editable = false
         if (fertilizer.p_source === b_id_farm) {
             editable = true
         }
