@@ -3,7 +3,7 @@ import { hashCultivation } from "./hash"
 import type { CatalogueCultivationItem } from "./d"
 
 describe("hashCultivation", () => {
-    it("should generate a hash for a cultivation item", () => {
+    it("should generate a hash for a cultivation item", async () => {
         const cultivation: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id",
@@ -15,14 +15,14 @@ describe("hashCultivation", () => {
             hash: null,
         }
 
-        const hash = hashCultivation(cultivation)
+        const hash = await hashCultivation(cultivation)
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
         expect(hash).toBe("2b20f4d7")
     })
 
-    it("should generate different hashes for different cultivation items", () => {
+    it("should generate different hashes for different cultivation items", async () => {
         const cultivation1: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id-1",
@@ -45,13 +45,13 @@ describe("hashCultivation", () => {
             hash: null,
         }
 
-        const hash1 = hashCultivation(cultivation1)
-        const hash2 = hashCultivation(cultivation2)
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
 
         expect(hash1).not.toBe(hash2)
     })
 
-    it("should generate the same hash for identical cultivation items", () => {
+    it("should generate the same hash for identical cultivation items", async () => {
         const cultivation1: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id-1",
@@ -67,13 +67,13 @@ describe("hashCultivation", () => {
             ...cultivation1,
         }
 
-        const hash1 = hashCultivation(cultivation1)
-        const hash2 = hashCultivation(cultivation2)
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
 
         expect(hash1).toBe(hash2)
     })
 
-    it("should generate different hashes when a string value changes", () => {
+    it("should generate different hashes when a string value changes", async () => {
         const cultivation1: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id-1",
@@ -90,12 +90,12 @@ describe("hashCultivation", () => {
             b_lu_name: "Updated Test Cultivation Name",
         }
 
-        const hash1 = hashCultivation(cultivation1)
-        const hash2 = hashCultivation(cultivation2)
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
 
         expect(hash1).not.toBe(hash2)
     })
-    it("should generate different hashes when a null string value is changed", () => {
+    it("should generate different hashes when a null string value is changed", async () => {
         const cultivation1: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id-1",
@@ -112,13 +112,13 @@ describe("hashCultivation", () => {
             b_lu_name_en: "Test Cultivation (EN)",
         }
 
-        const hash1 = hashCultivation(cultivation1)
-        const hash2 = hashCultivation(cultivation2)
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
 
         expect(hash1).not.toBe(hash2)
     })
 
-    it("should generate different hashes when a non null string value is changed", () => {
+    it("should generate different hashes when a non null string value is changed", async () => {
         const cultivation1: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id-1",
@@ -135,13 +135,13 @@ describe("hashCultivation", () => {
             b_lu_hcat3: null,
         }
 
-        const hash1 = hashCultivation(cultivation1)
-        const hash2 = hashCultivation(cultivation2)
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
 
         expect(hash1).not.toBe(hash2)
     })
 
-    it("should generate different hashes when a enum value changes", () => {
+    it("should generate different hashes when a enum value changes", async () => {
         const cultivation1: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: "test-id-1",
@@ -158,8 +158,8 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "multiple",
         }
 
-        const hash1 = hashCultivation(cultivation1)
-        const hash2 = hashCultivation(cultivation2)
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
 
         expect(hash1).not.toBe(hash2)
     })

@@ -379,7 +379,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
     await fdm.transaction(async (tx) => {
         try {
             for (const item of srmCatalogue) {
-                const hash = hashFertilizer(item)
+                const hash = await hashFertilizer(item)
                 const existing = await tx
                     .select({ hash: schema.fertilizersCatalogue.hash })
                     .from(schema.fertilizersCatalogue)
@@ -427,7 +427,7 @@ async function syncCultivationCatalogue(fdm: FdmType) {
     await fdm.transaction(async (tx) => {
         try {
             for (const item of brpCatalogue) {
-                const hash = hashCultivation(item)
+                const hash = await hashCultivation(item)
                 const existing = await tx
                     .select({ hash: schema.cultivationsCatalogue.hash })
                     .from(schema.cultivationsCatalogue)

@@ -1,9 +1,8 @@
+import { ensureInitialized, h32ToString } from "../hash"
 import type { CatalogueCultivationItem } from "./d"
-import xxhash from "xxhash-wasm"
 
-const { h32ToString } = await xxhash()
-
-export function hashCultivation(cultivation: CatalogueCultivationItem) {
+export async function hashCultivation(cultivation: CatalogueCultivationItem) {
+    await ensureInitialized()
     // Set hash to null for constistent hashing
     cultivation.hash = null
 

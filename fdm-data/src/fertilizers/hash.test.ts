@@ -3,7 +3,7 @@ import { hashFertilizer } from "./hash"
 import type { CatalogueFertilizerItem } from "./d"
 
 describe("hashFertilizer", () => {
-    it("should generate a hash for a fertilizer item", () => {
+    it("should generate a hash for a fertilizer item", async () => {
         const fertilizer: CatalogueFertilizerItem = {
             p_id_catalogue: "test-id",
             p_source: "test-source",
@@ -55,14 +55,14 @@ describe("hashFertilizer", () => {
             p_type_compost: false,
         }
 
-        const hash = hashFertilizer(fertilizer)
+        const hash = await hashFertilizer(fertilizer)
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
         expect(hash).toBe("d0cde132")
     })
 
-    it("should generate different hashes for different fertilizer items", () => {
+    it("should generate different hashes for different fertilizer items", async () => {
         const fertilizer1: CatalogueFertilizerItem = {
             p_id_catalogue: "test-id-1",
             p_source: "test-source",
@@ -165,13 +165,13 @@ describe("hashFertilizer", () => {
             p_type_compost: false,
         }
 
-        const hash1 = hashFertilizer(fertilizer1)
-        const hash2 = hashFertilizer(fertilizer2)
+        const hash1 = await hashFertilizer(fertilizer1)
+        const hash2 = await hashFertilizer(fertilizer2)
 
         expect(hash1).not.toBe(hash2)
     })
 
-    it("should generate the same hash for identical fertilizer items", () => {
+    it("should generate the same hash for identical fertilizer items", async () => {
         const fertilizer1: CatalogueFertilizerItem = {
             p_id_catalogue: "test-id-1",
             p_source: "test-source",
@@ -227,13 +227,13 @@ describe("hashFertilizer", () => {
             ...fertilizer1,
         }
 
-        const hash1 = hashFertilizer(fertilizer1)
-        const hash2 = hashFertilizer(fertilizer2)
+        const hash1 = await hashFertilizer(fertilizer1)
+        const hash2 = await hashFertilizer(fertilizer2)
 
         expect(hash1).toBe(hash2)
     })
 
-    it("should generate different hashes when a boolean value changes", () => {
+    it("should generate different hashes when a boolean value changes", async () => {
         const fertilizer1: CatalogueFertilizerItem = {
             p_id_catalogue: "test-id-1",
             p_source: "test-source",
@@ -290,12 +290,12 @@ describe("hashFertilizer", () => {
             p_type_manure: false,
         }
 
-        const hash1 = hashFertilizer(fertilizer1)
-        const hash2 = hashFertilizer(fertilizer2)
+        const hash1 = await hashFertilizer(fertilizer1)
+        const hash2 = await hashFertilizer(fertilizer2)
 
         expect(hash1).not.toBe(hash2)
     })
-    it("should generate different hashes when a numerical value changes", () => {
+    it("should generate different hashes when a numerical value changes", async () => {
         const fertilizer1: CatalogueFertilizerItem = {
             p_id_catalogue: "test-id-1",
             p_source: "test-source",
@@ -352,12 +352,12 @@ describe("hashFertilizer", () => {
             p_dm: 50,
         }
 
-        const hash1 = hashFertilizer(fertilizer1)
-        const hash2 = hashFertilizer(fertilizer2)
+        const hash1 = await hashFertilizer(fertilizer1)
+        const hash2 = await hashFertilizer(fertilizer2)
 
         expect(hash1).not.toBe(hash2)
     })
-    it("should generate different hashes when a string value changes", () => {
+    it("should generate different hashes when a string value changes", async () => {
         const fertilizer1: CatalogueFertilizerItem = {
             p_id_catalogue: "test-id-1",
             p_source: "test-source",
@@ -414,8 +414,8 @@ describe("hashFertilizer", () => {
             p_name_nl: "Updated Test Fertilizer Name",
         }
 
-        const hash1 = hashFertilizer(fertilizer1)
-        const hash2 = hashFertilizer(fertilizer2)
+        const hash1 = await hashFertilizer(fertilizer1)
+        const hash2 = await hashFertilizer(fertilizer2)
 
         expect(hash1).not.toBe(hash2)
     })
