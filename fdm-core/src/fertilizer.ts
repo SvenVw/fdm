@@ -443,7 +443,10 @@ export async function updateFertilizerFromCatalogue(
             .update(schema.fertilizersCatalogue)
             .set(updatedProperties)
             .where(
-                eq(schema.fertilizersCatalogue.p_id_catalogue, p_id_catalogue),
+                and(
+                    eq(schema.fertilizersCatalogue.p_id_catalogue, p_id_catalogue),
+                    eq(schema.fertilizersCatalogue.p_source, b_id_farm)
+                ),
             )
     } catch (err) {
         throw handleError(err, "Exception for updateFertilizerFromCatalogue", {
