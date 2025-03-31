@@ -614,8 +614,10 @@ describe("Catalogues syncing", () => {
             })
             .from(schema.fertilizersCatalogue)
             .where(isNotNull(schema.fertilizersCatalogue.hash))
+            .orderBy(schema.fertilizersCatalogue.p_id_catalogue)
             .limit(1)
         expect(item[0].p_id_catalogue).toBeDefined()
+        console.log(`Original hash: ${item[0].hash}`)
 
         await fdm
             .update(schema.fertilizersCatalogue)
@@ -658,6 +660,7 @@ describe("Catalogues syncing", () => {
             )
 
         expect(itemSynced[0].p_id_catalogue).toBeDefined()
+        console.log(`Synced hash: ${itemSynced[0].hash}`)
         expect(itemSynced[0].hash).toBe(item[0].hash)
     })
 
@@ -672,8 +675,10 @@ describe("Catalogues syncing", () => {
             })
             .from(schema.cultivationsCatalogue)
             .where(isNotNull(schema.cultivationsCatalogue.hash))
+            .orderBy(schema.cultivationsCatalogue.b_lu_catalogue)
             .limit(1)
         expect(item[0].b_lu_catalogue).toBeDefined()
+        console.log(`Original hash: ${item[0].hash}`)
 
         await fdm
             .update(schema.cultivationsCatalogue)
@@ -715,6 +720,7 @@ describe("Catalogues syncing", () => {
                 ),
             )
         expect(itemSynced[0].b_lu_catalogue).toBeDefined()
+        console.log(`Synced hash: ${itemSynced[0].hash}`)
         expect(itemSynced[0].hash).toBe(item[0].hash)
     })
 })
