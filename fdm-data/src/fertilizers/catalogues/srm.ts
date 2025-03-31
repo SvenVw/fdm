@@ -65,7 +65,7 @@ export function getCatalogueSrm(): CatalogueFertilizer {
             p_cr_vi: null,
             p_pb_rt: null,
             p_hg_rt: null,
-            p_cl_cr: null,
+            p_cl_rt: null,
             p_type_manure: fertilizer.p_type_manure,
             p_type_mineral: fertilizer.p_type_mineral,
             p_type_compost: fertilizer.p_type_compost,
