@@ -12,8 +12,8 @@ import srm from "./srm.json"
  * @returns An array of fertilizer catalogue entries conforming to the
  *          `CatalogueFertilizer` type.
  */
-export function getCatalogueSrm(): CatalogueFertilizer {
-    const catalogueSrm = srm.map((fertilizer) => {
+export async function getCatalogueSrm(): Promise<CatalogueFertilizer> {
+    const catalogueSrmPromises = srm.map(async (fertilizer) => {
         const item: CatalogueFertilizerItem = {
             p_source: "srm",
             p_id_catalogue: fertilizer.p_id_catalogue,
@@ -73,10 +73,11 @@ export function getCatalogueSrm(): CatalogueFertilizer {
         }
 
         // Hash the item
-        item.hash = hashFertilizer(item)
+        item.hash = await hashFertilizer(item)
 
         return item
     })
 
+    const catalogueSrm = await Promise.all(catalogueSrmPromises)
     return catalogueSrm
 }

@@ -20,12 +20,12 @@ import type { CatalogueFertilizer, CatalogueFertilizerName } from "./d"
  * console.log(srmCatalogue);
  * ```
  */
-export function getFertilizersCatalogue(
+export async function getFertilizersCatalogue(
     catalogueName: CatalogueFertilizerName,
-): CatalogueFertilizer {
+): Promise<CatalogueFertilizer> {
     // Get the specified catalogue
     if (catalogueName === "srm") {
-        return getCatalogueSrm()
+        return await getCatalogueSrm()
     }
     throw new Error(`catalogue ${catalogueName} is not recognized`)
 }

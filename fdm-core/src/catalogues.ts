@@ -375,7 +375,7 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
 }
 
 async function syncFertilizerCatalogue(fdm: FdmType) {
-    const srmCatalogue = getFertilizersCatalogue("srm")
+    const srmCatalogue = await getFertilizersCatalogue("srm")
     await fdm.transaction(async (tx) => {
         try {
             for (const item of srmCatalogue) {
@@ -422,7 +422,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
 }
 
 async function syncCultivationCatalogue(fdm: FdmType) {
-    const brpCatalogue = getCultivationCatalogue("brp")
+    const brpCatalogue = await getCultivationCatalogue("brp")
 
     await fdm.transaction(async (tx) => {
         try {

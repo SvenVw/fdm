@@ -20,12 +20,12 @@ import type { CatalogueCultivation, CatalogueCultivationName } from "./d"
  * console.log(brpCatalogue);
  * ```
  */
-export function getCultivationCatalogue(
+export async function getCultivationCatalogue(
     catalogueName: CatalogueCultivationName,
-): CatalogueCultivation {
+): Promise<CatalogueCultivation> {
     // Get the specified catalogue
     if (catalogueName === "brp") {
-        return getCatalogueBrp()
+        return await getCatalogueBrp()
     }
 
     throw new Error(`catalogue ${catalogueName} is not recognized`)
