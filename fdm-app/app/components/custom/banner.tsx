@@ -37,10 +37,14 @@ export function Banner() {
 
     useEffect(() => {
         if (consentGiven !== "undecided") {
-            posthog.set_config({
-                persistence:
-                    consentGiven === "yes" ? "localStorage+cookie" : "memory",
-            })
+            try {
+                posthog.set_config({
+                    persistence:
+                        consentGiven === "yes" ? "localStorage+cookie" : "memory",
+                })
+            } catch (error) {
+                console.error("Failed to configure PostHog:", error)
+            }
         }
     }, [consentGiven])
 
