@@ -191,7 +191,7 @@ export function SoilAnalysisForm(props: {
                                                 {...field}
                                                 type="number"
                                                 value={field.value}
-                                                placeholder="Bv. 14.5 mg P2O5/kg"
+                                                placeholder="Bv. 14.5 mg P2O5 / 100 g"
                                             />
                                         </FormControl>
                                         <FormDescription>
