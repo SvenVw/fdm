@@ -5,9 +5,10 @@
  */
 
 import * as Sentry from "@sentry/react"
-import { StrictMode, startTransition } from "react"
+import { StrictMode, startTransition, useEffect } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { HydratedRouter } from "react-router/dom"
+import posthog from "posthog-js"
 
 Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
@@ -60,11 +61,37 @@ Sentry.init({
         .VITE_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR,
 })
 
+function PosthogInit() {
+    const posthogHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST
+    const posthogKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY
+
+    if (posthogHost && posthogKey.startsWith("phc")) {
+        useEffect(() => {
+            try {
+                posthog.init(posthogKey, {
+                    api_host: posthogHost,
+                    person_profiles: "always",
+                    loaded: () => {},
+                })
+            } catch (error) {
+                console.error("Failed to initialize PostHog:", error)
+            }
+        }, [])
+    } else {
+        console.warn(
+            "PostHog not initialized - missing or invalid configuration",
+        )
+    }
+
+    return null
+}
+
 startTransition(() => {
     hydrateRoot(
         document,
         <StrictMode>
             <HydratedRouter />
+            <PosthogInit />
         </StrictMode>,
     )
 })
