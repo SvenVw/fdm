@@ -397,13 +397,11 @@ export async function updateFertilizerFromCatalogue(
         p_co_rt: schema.fertilizersCatalogueTypeInsert["p_co_rt"]
         p_as_rt: schema.fertilizersCatalogueTypeInsert["p_as_rt"]
         p_cd_rt: schema.fertilizersCatalogueTypeInsert["p_cd_rt"]
--        pr_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
-+        p_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
+        p_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
         p_cr_vi: schema.fertilizersCatalogueTypeInsert["p_cr_vi"]
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
--        p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_cr"]
-+        p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
+        p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
         p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
         p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
         p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
@@ -446,8 +444,11 @@ export async function updateFertilizerFromCatalogue(
             .set(updatedProperties)
             .where(
                 and(
-                    eq(schema.fertilizersCatalogue.p_id_catalogue, p_id_catalogue),
-                    eq(schema.fertilizersCatalogue.p_source, b_id_farm)
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        p_id_catalogue,
+                    ),
+                    eq(schema.fertilizersCatalogue.p_source, b_id_farm),
                 ),
             )
     } catch (err) {
