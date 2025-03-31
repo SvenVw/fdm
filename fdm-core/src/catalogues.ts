@@ -416,7 +416,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
                 }
             }
         } catch (error) {
-            handleError(error, "Exception for syncFertilizerCatalogue")
+            throw handleError(error, "Exception for syncFertilizerCatalogue")
         }
     })
 }
@@ -464,7 +464,7 @@ async function syncCultivationCatalogue(fdm: FdmType) {
                 }
             }
         } catch (error) {
-            handleError(error, "Exception for syncCultivationCatalogue")
+            throw handleError(error, "Exception for syncCultivationCatalogue")
         }
     })
 }
