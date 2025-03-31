@@ -32,6 +32,7 @@ import {
     Calendar,
     ChevronRight,
     ChevronsUpDown,
+    Cookie,
     GitPullRequestArrow,
     House,
     Languages,
@@ -59,6 +60,7 @@ import {
 import { useCalendarStore } from "@/store/calendar"
 import { useFarmStore } from "@/store/farm"
 import { getCalendarSelection } from "@/lib/calendar"
+import posthog from "posthog-js"
 
 interface SideBarAppType {
     user: {
@@ -161,6 +163,12 @@ export function SidebarApp(props: SideBarAppType) {
             toast.error(
                 "Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.",
             )
+        }
+    }
+
+    const openCookieSettings = () => {
+        if (typeof window !== "undefined" && window.openCookieSettings) {
+            window.openCookieSettings()
         }
     }
 
@@ -500,6 +508,12 @@ export function SidebarApp(props: SideBarAppType) {
                                             Account
                                         </NavLink>
                                     </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={openCookieSettings}
+                                    >
+                                        <Cookie className="mr-2 h-4 w-4" />
+                                        Cookies
+                                    </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         {/* <NavLink to="#">
                                             <Languages className="mr-2 h-4 w-4" />
@@ -531,10 +545,14 @@ export function SidebarApp(props: SideBarAppType) {
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <LogOut />
+                                <DropdownMenuItem asChild>
                                     <Form method="post" action="../farm">
-                                        <Button type="submit" variant="link">
+                                        <Button
+                                            type="submit"
+                                            variant="link"
+                                            onClick={() => posthog.reset()}
+                                        >
+                                            <LogOut />
                                             Uitloggen
                                         </Button>
                                     </Form>

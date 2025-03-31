@@ -339,11 +339,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     await addSoilAnalysis(
                         fdm,
                         session.principal_id,
-                        defaultDate,
+                        undefined,
                         "NMI",
                         b_id,
-                        30,
-                        defaultDate,
+                        0.3,
+                        undefined,
                         {
                             a_p_al: response.a_p_al,
                             a_p_cc: response.a_p_cc,

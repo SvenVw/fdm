@@ -16,6 +16,7 @@ import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
 import { useFarmStore } from "@/store/farm"
 import { useCalendarStore } from "@/store/calendar"
+import posthog from "posthog-js"
 
 export const meta: MetaFunction = () => {
     return [
@@ -98,6 +99,16 @@ export default function App() {
     useEffect(() => {
         setCalendar(initialCalendar)
     }, [initialCalendar, setCalendar])
+
+    useEffect(() => {
+        if (posthog && loaderData.user) {
+            posthog.identify(loaderData.user.id, {
+                id: loaderData.user.id,
+                email: loaderData.user.email,
+                name: loaderData.user.name,
+            })
+        }
+    }, [loaderData.user])
 
     return (
         <SidebarProvider>

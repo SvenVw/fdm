@@ -56,7 +56,10 @@ export {
     removeSoilAnalysis,
     getSoilAnalysis,
     getSoilAnalyses,
+    getCurrentSoilData,
+    getSoilParametersDescription,
 } from "./soil"
+export type { CurrentSoilData, SoilParameters, SoilParameterDescription } from "./soil.d"
 export {
     addHarvest,
     getHarvest,
