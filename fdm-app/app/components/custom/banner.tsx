@@ -17,9 +17,9 @@ export function cookieConsentGiven(): ConsentType {
 }
 
 export function resetCookieConsent(): ConsentType {
-   if (typeof window === "undefined" || !window.localStorage) {
-       return "undecided"
-   }
+    if (typeof window === "undefined" || !window.localStorage) {
+        return "undecided"
+    }
     localStorage.removeItem("cookie_consent")
     return "undecided"
 }
@@ -40,7 +40,9 @@ export function Banner() {
             try {
                 posthog.set_config({
                     persistence:
-                        consentGiven === "yes" ? "localStorage+cookie" : "memory",
+                        consentGiven === "yes"
+                            ? "localStorage+cookie"
+                            : "memory",
                 })
             } catch (error) {
                 console.error("Failed to configure PostHog:", error)
@@ -49,12 +51,18 @@ export function Banner() {
     }, [consentGiven])
 
     const handleAcceptCookies = () => {
+        if (typeof window === "undefined" || !window.localStorage) {
+            return
+        }
         localStorage.setItem("cookie_consent", "yes")
         setConsentGiven("yes")
         setIsVisible(false)
     }
 
     const handleDeclineCookies = () => {
+        if (typeof window === "undefined" || !window.localStorage) {
+            return
+        }
         localStorage.setItem("cookie_consent", "no")
         setConsentGiven("no")
         setIsVisible(false)
@@ -89,10 +97,10 @@ export function Banner() {
             window.openCookieSettings = () => {
                 window.dispatchEvent(new Event("openCookieSettings"))
             }
-            
+
             // Cleanup function to remove the method when component unmounts
             return () => {
-                delete window.openCookieSettings
+                window.openCookieSettings = undefined
             }
         }
     }, [])
@@ -115,6 +123,7 @@ export function Banner() {
                                     {(consentGiven === "yes" ||
                                         consentGiven === "no") && (
                                         <X
+                                            aria-label="Sluiten"
                                             className="h-[1.2rem] w-[1.2rem] cursor-pointer"
                                             onClick={handleCloseBanner}
                                         />
@@ -142,6 +151,9 @@ export function Banner() {
                                     <br />
                                     <a
                                         href="/privacy"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="Naar privacybeleid (opent in nieuw tabblad)"
                                         className="text-xs underline"
                                     >
                                         Meer over cookies.
