@@ -14,6 +14,9 @@ export function cookieConsentGiven(): ConsentType {
 }
 
 export function resetCookieConsent(): ConsentType {
+   if (typeof window === "undefined" || !window.localStorage) {
+       return "undecided"
+   }
     localStorage.removeItem("cookie_consent")
     return "undecided"
 }
