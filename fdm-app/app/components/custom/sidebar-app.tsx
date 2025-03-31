@@ -27,6 +27,7 @@ import {
     ArrowRightLeft,
     BadgeCheck,
     ChevronsUpDown,
+    Cookie,
     GitPullRequestArrow,
     House,
     Languages,
@@ -132,6 +133,12 @@ export function SidebarApp(props: SideBarAppType) {
             toast.error(
                 "Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.",
             )
+        }
+    }
+
+    const openCookieSettings = () => {
+        if (typeof window !== "undefined" && window.openCookieSettings) {
+            window.openCookieSettings()
         }
     }
 
@@ -378,6 +385,12 @@ export function SidebarApp(props: SideBarAppType) {
                                             <BadgeCheck className="mr-2 h-4 w-4" />
                                             Account
                                         </NavLink>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={openCookieSettings}
+                                    >
+                                        <Cookie className="mr-2 h-4 w-4" />
+                                        Cookies
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         {/* <NavLink to="#">

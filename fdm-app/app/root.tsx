@@ -22,7 +22,8 @@ import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 import { ErrorBlock } from "./components/custom/error"
 import posthog from "posthog-js"
-import { Banner } from "./components/custom/banner"
+import { Banner } from "@/components/custom/banner"
+import { CookieSettingsFooter } from "@/components/custom/cookie-settings-footer"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
