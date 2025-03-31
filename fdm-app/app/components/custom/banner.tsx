@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button"
 type ConsentType = "yes" | "no" | "undecided"
 
 export function cookieConsentGiven(): ConsentType {
+    if (typeof window === "undefined" || !window.localStorage) {
+        return "undecided"
+    }
     if (!localStorage.getItem("cookie_consent")) {
         return "undecided"
     }
