@@ -20,6 +20,12 @@ export type Fertilizer = {
     p_type_compost?: boolean
     p_type_mineral?: boolean
     p_eoc?: number | null
+    p_source?: string
+    p_n_wc?: number | null
+    p_om?: number | null
+    p_s_rt?: number | null
+    p_ca_rt?: number | null
+    p_mg_rt?: number | null
 }
 
 export const columns: ColumnDef<Fertilizer>[] = [
