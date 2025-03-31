@@ -11,12 +11,13 @@ import type { CatalogueCultivation, CatalogueCultivationName } from "./d"
  *                        Currently supported names are: "brp".
  * @returns An array of `CatalogueCultivationItem` objects representing the
  *          requested cultivation catalogue.
+ * @returns A Promise that resolves to an array of `CatalogueCultivationItem` objects.
  * @throws {Error} Throws an error if the provided `catalogueName` is not
  *                 recognized or supported.
  *
  * @example
  * ```typescript
- * const brpCatalogue = getCultivationCatalogue("brp");
+ * const brpCatalogue = await getCultivationCatalogue("brp");
  * console.log(brpCatalogue);
  * ```
  */

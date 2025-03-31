@@ -11,12 +11,13 @@ import type { CatalogueFertilizer, CatalogueFertilizerName } from "./d"
  *                        Currently supported names are: "srm".
  * @returns An array of `CatalogueFertilizerItem` objects representing the
  *          requested fertilizer catalogue.
+ * @returns A Promise that resolves to an array of `CatalogueFertilizerItem` objects.
  * @throws {Error} Throws an error if the provided `catalogueName` is not
  *                 recognized or supported.
  *
  * @example
  * ```typescript
- * const srmCatalogue = getFertilizersCatalogue("srm");
+ * const srmCatalogue = await getFertilizersCatalogue("srm");
  * console.log(srmCatalogue);
  * ```
  */
