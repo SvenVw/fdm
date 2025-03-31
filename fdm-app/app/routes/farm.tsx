@@ -16,7 +16,6 @@ import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
 import posthog from "posthog-js"
-import { id } from "date-fns/locale"
 
 export const meta: MetaFunction = () => {
     return [

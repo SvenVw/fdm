@@ -66,7 +66,7 @@ export function Layout() {
     // Capture pagevies
     useEffect(() => {
         posthog.capture("$pageview")
-    }, [location])
+    }, [location]) // Dependency on location ensures pageview is captured on every navigation
 
     // Hook to show the toasts
     useEffect(() => {

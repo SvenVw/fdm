@@ -67,14 +67,20 @@ function PosthogInit() {
 
     if (posthogHost && posthogKey.startsWith("phc")) {
         useEffect(() => {
-            posthog.init(posthogKey, {
-                api_host: posthogHost,
-                person_profiles: "always",
-                loaded: () => {},
-            })
+            try {
+                posthog.init(posthogKey, {
+                    api_host: posthogHost,
+                    person_profiles: "always",
+                    loaded: () => {},
+                })
+            } catch (error) {
+                console.error("Failed to initialize PostHog:", error)
+            }
         }, [])
     } else {
-        console.warn("Posthog not initialized")
+        console.warn(
+            "PostHog not initialized - missing or invalid configuration",
+        )
     }
 
     return null

@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react"
 import posthog from "posthog-js"
 import { CookieIcon } from "lucide-react"
-import { Button } from "../ui/button"
+import { Button } from "@/components/ui/button"
 
 export function cookieConsentGiven() {
+    type ConsentType = "yes" | "no" | "undecided"
+
     if (!localStorage.getItem("cookie_consent")) {
-        return "undecided"
+        return "undecided" as ConsentType
     }
-    return localStorage.getItem("cookie_consent") as "yes" | "no" | "undecided"
+    const consent = localStorage.getItem("cookie_consent")
+    return consent === "yes" || consent === "no"
+        ? consent
+        : ("undecided" as ConsentType)
 }
 
 export function Banner() {
@@ -52,9 +57,10 @@ export function Banner() {
                             </div>
                             <div className="p-4">
                                 <p className="text-sm font-normal text-start">
-                                    Wij gebruiken cookies enkel om FDM te verbeteren,
-                                    zodat we weten wat er goed en fout gaat.
-                                    <br />                                    
+                                    Wij gebruiken cookies enkel om FDM te
+                                    verbeteren, zodat we weten wat er goed en
+                                    fout gaat.
+                                    <br />
                                     Geen zorgen, we gebruiken ze niet voor
                                     advertenties en ook niet om je online te
                                     volgen.
