@@ -92,14 +92,13 @@ export default function App() {
 
     useEffect(() => {
         if (posthog && loaderData.user) {
-            console.log("Identifying user:", loaderData.user.id)
             posthog.identify(loaderData.user.id, {
                 id: loaderData.user.id,
                 email: loaderData.user.email,
                 name: loaderData.user.name,
             })
         }
-    }, [posthog, loaderData.user])
+    }, [loaderData.user])
 
     return (
         <FarmContext.Provider value={{ farmId, setFarmId }}>
