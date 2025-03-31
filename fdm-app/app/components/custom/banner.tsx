@@ -83,11 +83,19 @@ export function Banner() {
     }, [])
 
     // Export a function to trigger the cookie settings banner
-    if (typeof window !== "undefined") {
-        window.openCookieSettings = () => {
-            window.dispatchEvent(new Event("openCookieSettings"))
+    // Set up the global function in an effect with cleanup
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            window.openCookieSettings = () => {
+                window.dispatchEvent(new Event("openCookieSettings"))
+            }
+            
+            // Cleanup function to remove the method when component unmounts
+            return () => {
+                delete window.openCookieSettings
+            }
         }
-    }
+    }, [])
     const handleCloseBanner = () => {
         setIsVisible(false)
     }
