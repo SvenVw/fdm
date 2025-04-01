@@ -191,12 +191,18 @@ export function SidebarApp(props: SideBarAppType) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <NavLink to="/">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Sprout className="size-4" />
+                                <div
+                                    className="flex aspect-square size-8 items-center justify-center rounded-lg"
+                                    style={{ backgroundColor: "#122023" }}
+                                >
+                                    <img
+                                        className="size-6"
+                                        src="/fdm-high-resolution-logo-transparent-no-text.png"
+                                        alt="FDM"
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
                                     <span className="font-semibold">FDM</span>
-                                    {/* <span className="">2024</span> */}
                                 </div>
                             </NavLink>
                         </SidebarMenuButton>
