@@ -128,7 +128,7 @@ export async function addFertilizerToCatalogue(
         p_cr_vi: schema.fertilizersCatalogueTypeInsert["p_cr_vi"]
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
-        p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_cr"]
+        p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
         p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
         p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
         p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
@@ -273,7 +273,7 @@ export async function getFertilizer(
                 p_cr_vi: schema.fertilizersCatalogue.p_cr_vi,
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
-                p_cl_cr: schema.fertilizersCatalogue.p_cl_cr,
+                p_cl_rt: schema.fertilizersCatalogue.p_cl_rt,
             })
             .from(schema.fertilizers)
             .leftJoin(
@@ -368,7 +368,7 @@ export async function getFertilizers(
                 p_cr_vi: schema.fertilizersCatalogue.p_cr_vi,
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
-                p_cl_cr: schema.fertilizersCatalogue.p_cl_cr,
+                p_cl_rt: schema.fertilizersCatalogue.p_cl_rt,
             })
             .from(schema.fertilizers)
             .leftJoin(
