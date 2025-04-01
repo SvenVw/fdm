@@ -30,10 +30,6 @@ import {
     enableFertilizerCatalogue,
 } from "./catalogues"
 import { createId } from "./id"
-import {
-    disableFertilizerCatalogue,
-    enableFertilizerCatalogue,
-} from "./catalogues"
 
 describe("Fertilizer Data Model", () => {
     let fdm: FdmServerType
