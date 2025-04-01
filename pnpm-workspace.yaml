@@ -6,13 +6,13 @@ packages:
   - 'fdm-app'
 
 catalog:
-  better-auth: ^1.2.3
-  drizzle-orm: ^0.40.0
-  drizzle-kit: ^0.30.5
-  "@dotenvx/dotenvx": ^1.38.5
+  better-auth: ^1.2.5
+  drizzle-orm: ^0.41.0
+  drizzle-kit: ^0.30.6
+  "@dotenvx/dotenvx": ^1.39.0
   typescript: ^5.8.2
   vite: ^6.2.3
   vite-tsconfig-paths: ^5.1.4
-  vitest: ^3.0.8
-  "@vitest/coverage-v8": 3.0.8
+  vitest: ^3.1.1
+  "@vitest/coverage-v8": 3.1.1
   
