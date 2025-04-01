@@ -3,8 +3,10 @@ import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
+import { useCalendarStore } from "@/store/calendar"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -57,6 +59,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
 
@@ -77,7 +83,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Get the fields to be selected
-        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
         const fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")
@@ -104,27 +115,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Create the items for sidebar page
         const sidebarPageItems = [
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/overview`,
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/overview`,
                 title: "Overzicht",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/cultivation`,
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation`,
                 title: "Gewas",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/fertilizer`,
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
                 title: "Bemesting",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/soil`,
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/soil`,
                 title: "Bodem",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/norm`,
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/norm`,
                 title: "Gebruiksnormen",
             },
             {
-                to: `/farm/${b_id_farm}/field/${b_id}/atlas`,
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
                 title: "Kaart",
             },
         ]
@@ -155,6 +166,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
+    const calendar = useCalendarStore((state) => state.calendar)
 
     return (
         <>
@@ -165,7 +177,7 @@ export default function FarmFieldIndex() {
                     fieldOptions={loaderData.fieldOptions}
                     b_id={loaderData.b_id}
                     action={{
-                        to: `/farm/${loaderData.b_id_farm}/field/`,
+                        to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
                         label: "Terug naar percelen",
                     }}
                 />

@@ -1,6 +1,7 @@
 import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
@@ -12,16 +13,13 @@ import {
 } from "react-router"
 
 /**
- * Loads farm fields as a GeoJSON FeatureCollection along with a Mapbox token.
+ * Loads farm field data and a Mapbox token for the elevation feature.
  *
- * This function validates that the farm ID is present in the route parameters, retrieves the user session, and
- * fetches the farm's fields. It then converts each field into a GeoJSON feature with its area rounded to one
- * decimal place, assembles these features into a FeatureCollection, and obtains a Mapbox token. The returned
- * object includes both the token and the FeatureCollection.
+ * This asynchronous function checks for the presence of a farm ID in the route parameters. It retrieves the user session, fetches the fields associated with the specified farm, and maps them to a GeoJSON FeatureCollection. A Mapbox token is also obtained to enable map rendering on the client side. Errors during these processes, such as a missing farm ID or data retrieval issues, are caught and rethrown.
  *
- * @returns A promise that resolves to an object containing a Mapbox token and a GeoJSON FeatureCollection of farm fields.
+ * @throws {Error} If the farm ID is not provided (HTTP 400) or if an internal error occurs during data fetching.
  *
- * @throws {Response} If the farm ID is missing from the parameters or an error occurs during data fetching.
+ * @returns An object containing the Mapbox token and the GeoJSON FeatureCollection of farm fields.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -37,8 +35,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get the fields of the farm
-        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
         const features = fields.map((field) => {
             const feature = {
                 type: "Feature",
@@ -59,6 +65,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the Mapbox token
         const mapboxToken = getMapboxToken()
+
         // Return user information from loader
         return {
             mapboxToken: mapboxToken,
@@ -70,12 +77,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders a placeholder message indicating that the soil map is not available.
+ * Renders a placeholder UI for the farm elevation feature.
  *
- * This component displays a centered layout with an informative message and a navigation button
- * linking to the field map.
+ * This component displays a message informing the user that the elevation map is not yet available and provides a button that navigates to the field map.
  */
-export default function FarmAtlasSoilBlock() {
+export default function FarmAtlasElevationBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
@@ -83,14 +89,14 @@ export default function FarmAtlasSoilBlock() {
             <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                 <div className="flex flex-col space-y-2 text-center">
                     <h1 className="text-2xl font-semibold tracking-tight">
-                        Helaas, de bodemkaart is nog niet beschikbaar :(
+                        Helaas, de hoogtekaart is nog niet beschikbaar :(
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        We proberen de bodemkaart binnenkort toe te voegen. Hou
+                        We proberen de hoogtekaart binnenkort toe te voegen. Hou
                         de website in de gaten.
                     </p>
                 </div>
-                <Button asChild aria-label="Naar perceelkaart">
+                <Button asChild>
                     <NavLink to="../fields">Naar perceelkaart</NavLink>
                 </Button>
             </div>

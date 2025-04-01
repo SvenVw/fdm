@@ -1,6 +1,7 @@
 import { HarvestForm } from "@/components/custom/harvest/form"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import {
@@ -57,6 +58,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get the available cultivations
         let cultivationOptions = []
 
@@ -79,6 +83,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
         const cultivation = cultivationPlan.find(
             (x) => x.b_lu_catalogue === b_lu_catalogue,

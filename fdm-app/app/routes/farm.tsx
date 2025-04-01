@@ -9,12 +9,13 @@ import type {
 } from "react-router"
 import { redirect, useRoutes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
-import { FarmContext } from "@/context/farm-context"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import { useFarmStore } from "@/store/farm"
+import { useCalendarStore } from "@/store/calendar"
 import posthog from "posthog-js"
 
 export const meta: MetaFunction = () => {
@@ -68,11 +69,11 @@ export default function App() {
             match.pathname.startsWith("/farm/") && match.params.b_id_farm,
     )
     const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
-    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId)
+    const setFarmId = useFarmStore((state) => state.setFarmId)
 
     useEffect(() => {
         setFarmId(initialFarmId)
-    }, [initialFarmId])
+    }, [initialFarmId, setFarmId])
 
     const routes = useRoutes([
         {
@@ -89,6 +90,16 @@ export default function App() {
         },
     ])
 
+    const calendarMatch = matches.find(
+        (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
+    )
+    const initialCalendar = calendarMatch?.params.calendar as string | undefined
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+
+    useEffect(() => {
+        setCalendar(initialCalendar)
+    }, [initialCalendar, setCalendar])
+
     useEffect(() => {
         if (posthog && loaderData.user) {
             posthog.identify(loaderData.user.id, {
@@ -100,19 +111,17 @@ export default function App() {
     }, [loaderData.user])
 
     return (
-        <FarmContext.Provider value={{ farmId, setFarmId }}>
-            <SidebarProvider>
-                <SidebarApp
-                    user={loaderData.user}
-                    userName={loaderData.userName}
-                    initials={loaderData.initials}
-                />
-                <SidebarInset>
-                    <Outlet />
-                    {routes}
-                </SidebarInset>
-            </SidebarProvider>
-        </FarmContext.Provider>
+        <SidebarProvider>
+            <SidebarApp
+                user={loaderData.user}
+                userName={loaderData.userName}
+                initials={loaderData.initials}
+            />
+            <SidebarInset>
+                <Outlet />
+                {routes}
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
 

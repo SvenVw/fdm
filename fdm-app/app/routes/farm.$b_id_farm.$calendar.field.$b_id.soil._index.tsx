@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import {
@@ -11,6 +12,7 @@ import {
     getSoilAnalyses,
     getSoilParametersDescription,
     removeSoilAnalysis,
+    Timeframe,
 } from "@svenvw/fdm-core"
 import { getCurrentSoilData } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
@@ -63,6 +65,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -77,6 +82,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe
         )
 
         // Get current soil data
@@ -84,6 +90,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe
         )
 
         // Get soil parameter descriptions

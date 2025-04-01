@@ -5,6 +5,7 @@ import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -76,6 +77,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -86,7 +90,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get available cultivations for the farm
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         // Map cultivations to options for the combobox
         const cultivationsCatalogueOptions = cultivationsCatalogue.map(
             (cultivation) => {
@@ -108,7 +116,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get harvests
-        const harvests = await getHarvests(fdm, session.principal_id, b_lu)
+        const harvests = await getHarvests(
+            fdm,
+            session.principal_id,
+            b_lu,
+            timeframe,
+        )
 
         let b_lu_harvestable: HarvestableType = "none"
         const cultivationCatalogueItem = cultivationsCatalogue.find((item) => {

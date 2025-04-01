@@ -1,6 +1,8 @@
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
+import { useCalendarStore } from "@/store/calendar"
 import { getFields } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, redirect } from "react-router"
 
@@ -26,7 +28,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
-        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
         if (!fields.length) {
             throw new Error("No fields found for this farm")
         }

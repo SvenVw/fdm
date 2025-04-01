@@ -1,4 +1,15 @@
-import { and, asc, desc, eq, isNotNull, or, inArray } from "drizzle-orm"
+import {
+    and,
+    asc,
+    desc,
+    eq,
+    isNotNull,
+    or,
+    inArray,
+    gte,
+    lte,
+    type SQL,
+} from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
@@ -11,6 +22,7 @@ import {
     getHarvests,
 } from "./harvest"
 import { createId } from "./id"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Retrieves cultivations available in the enabled catalogues for a farm.
@@ -367,6 +379,8 @@ export async function getCultivation(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - Identifier of the principal requesting access.
  * @param b_id - Identifier of the field.
+ * @param timeframe - Optional timeframe to filter cultivations by start and end dates.
+ *
  * @returns A Promise resolving to an array of cultivation details.
  *
  * @throws {Error} If the principal does not have read permission or if the database query fails.
@@ -377,6 +391,7 @@ export async function getCultivations(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.cultivationStartingTypeSelect["b_id"],
+    timeframe?: Timeframe,
 ): Promise<getCultivationType[]> {
     try {
         await checkPermission(
@@ -387,6 +402,17 @@ export async function getCultivations(
             principal_id,
             "getCultivations",
         )
+
+        const startingDateCondition = buildDateRangeCondition(
+            timeframe?.start,
+            timeframe?.end,
+        )
+        const endingDateCondition = buildDateRangeConditionEnding(
+            timeframe?.start,
+            timeframe?.end,
+        )
+        const timeframeClause = or(startingDateCondition, endingDateCondition)
+
         const cultivations = await fdm
             .select({
                 b_lu: schema.cultivations.b_lu,
@@ -416,7 +442,9 @@ export async function getCultivations(
                     schema.cultivationsCatalogue.b_lu_catalogue,
                 ),
             )
-            .where(eq(schema.cultivationStarting.b_id, b_id))
+            .where(
+                and(eq(schema.cultivationStarting.b_id, b_id), timeframeClause),
+            )
             .orderBy(
                 desc(schema.cultivationStarting.b_lu_start),
                 asc(schema.cultivationsCatalogue.b_lu_name),
@@ -439,6 +467,8 @@ export async function getCultivations(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting access to the cultivation plan.
  * @param b_id_farm - The unique ID of the farm for which the cultivation plan is to be retrieved.
+ * @param timeframe - Optional timeframe to filter cultivations by start and end dates.
+ *
  * @returns A Promise that resolves to an array representing the cultivation plan. Each element in the array has the following structure:
  *
  * ```
@@ -506,6 +536,7 @@ export async function getCultivationPlan(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+    timeframe?: Timeframe,
 ): Promise<cultivationPlanType[]> {
     try {
         if (!b_id_farm) {
@@ -519,6 +550,16 @@ export async function getCultivationPlan(
             principal_id,
             "getCultivationPlan",
         )
+
+        const startingDateCondition = buildDateRangeCondition(
+            timeframe?.start,
+            timeframe?.end,
+        )
+        const endingDateCondition = buildDateRangeConditionEnding(
+            timeframe?.start,
+            timeframe?.end,
+        )
+        const timeframeClause = or(startingDateCondition, endingDateCondition)
 
         const cultivations = await fdm
             .select({
@@ -627,6 +668,8 @@ export async function getCultivationPlan(
                 and(
                     eq(schema.farms.b_id_farm, b_id_farm),
                     isNotNull(schema.cultivationsCatalogue.b_lu_catalogue),
+                    isNotNull(schema.cultivationStarting.b_id),
+                    timeframeClause,
                 ),
             )
 
@@ -642,6 +685,17 @@ export async function getCultivationPlan(
                 )
 
                 if (!existingCultivation) {
+                    if (timeframe) {
+                        if (
+                            !isCultivationWithinTimeframe(
+                                curr.b_lu_start,
+                                curr.b_lu_end,
+                                timeframe,
+                            )
+                        ) {
+                            return acc
+                        }
+                    }
                     existingCultivation = {
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
@@ -705,18 +759,33 @@ export async function getCultivationPlan(
                         ],
                     })
                 }
-
                 return acc
             },
             [],
         )
-
         return cultivationPlan
     } catch (err) {
         throw handleError(err, "Exception for getCultivationPlan", {
             b_id_farm,
         })
     }
+}
+
+export function isCultivationWithinTimeframe(
+    b_lu_start: Date | null,
+    b_lu_end: Date | null,
+    timeframe: Timeframe,
+): boolean {
+    if (!b_lu_start || !timeframe.start || !timeframe.end) return false
+
+    if (b_lu_end) {
+        return (
+            (b_lu_start >= timeframe.start && b_lu_start <= timeframe.end) ||
+            (b_lu_end >= timeframe.start && b_lu_end <= timeframe.end) ||
+            (b_lu_start <= timeframe.start && b_lu_end >= timeframe.end)
+        )
+    }
+    return b_lu_start >= timeframe.start && b_lu_start <= timeframe.end
 }
 
 /**
@@ -972,4 +1041,64 @@ export async function updateCultivation(
             b_lu_end,
         })
     }
+}
+
+// Helper function to build date range conditions
+export const buildDateRangeCondition = (
+    dateStart: Date | null | undefined,
+    dateEnd: Date | null | undefined,
+): SQL | undefined => {
+    if (!dateStart && !dateEnd) {
+        return undefined
+    }
+    const startCondition = dateStart
+        ? gte(schema.cultivationStarting.b_lu_start, dateStart)
+        : undefined
+    const endCondition = dateEnd
+        ? lte(schema.cultivationStarting.b_lu_start, dateEnd)
+        : undefined
+
+    if (startCondition && endCondition) {
+        return and(startCondition, endCondition)
+    }
+    if (startCondition) {
+        return startCondition
+    }
+    return endCondition
+}
+
+// Helper function to build date range conditions for ending
+export const buildDateRangeConditionEnding = (
+    dateStart: Date | null | undefined,
+    dateEnd: Date | null | undefined,
+): SQL | undefined => {
+    if (!dateStart && !dateEnd) {
+        return undefined
+    }
+    const startCondition = dateStart
+        ? or(
+              gte(schema.cultivationEnding.b_lu_end, dateStart),
+              and(
+                  isNotNull(schema.cultivationEnding.b_lu_end),
+                  gte(schema.cultivationStarting.b_lu_start, dateStart),
+              ),
+          )
+        : undefined
+    const endCondition = dateEnd
+        ? or(
+              lte(schema.cultivationEnding.b_lu_end, dateEnd),
+              and(
+                  isNotNull(schema.cultivationEnding.b_lu_end),
+                  lte(schema.cultivationStarting.b_lu_start, dateEnd),
+              ),
+          )
+        : undefined
+
+    if (startCondition && endCondition) {
+        return and(startCondition, endCondition)
+    }
+    if (startCondition) {
+        return startCondition
+    }
+    return endCondition
 }

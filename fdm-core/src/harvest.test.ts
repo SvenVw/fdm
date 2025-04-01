@@ -3,6 +3,7 @@ import {
     addCultivation,
     addCultivationToCatalogue,
     getCultivation,
+    updateCultivation,
 } from "./cultivation"
 import type * as schema from "./db/schema"
 import {
@@ -15,7 +16,6 @@ import {
 } from "./harvest"
 import { createId } from "./id"
 import { type FdmServerType, addFarm, addField, createFdmServer } from "./index"
-
 describe("harvest", () => {
     let fdm: FdmServerType
     let b_lu_once: schema.cultivationsTypeSelect["b_lu"]
@@ -216,19 +216,44 @@ describe("harvest", () => {
         )
     })
 
-    it("should get harvests", async () => {
-        const harvesting_date = terminating_date
-
+    it("should get harvests by cultivation", async () => {
+        const b_lu_harvest_date1 = new Date("2024-09-15")
+        const b_lu_yield1 = 10000
+        const b_lu_n_harvestable1 = 100
         await addHarvest(
             fdm,
             principal_id,
             b_lu_multiple,
-            harvesting_date,
-            1000,
+            b_lu_harvest_date1,
+            b_lu_yield1,
+            b_lu_n_harvestable1,
+        )
+        const b_lu_harvest_date2 = new Date("2024-09-30")
+        const b_lu_yield2 = 10000
+        const b_lu_n_harvestable2 = 120
+        await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            b_lu_harvest_date2,
+            b_lu_yield2,
+            b_lu_n_harvestable2,
         )
 
-        const harvests = await getHarvests(fdm, principal_id, b_lu_once)
-        expect(harvests.length).toBeGreaterThanOrEqual(1)
+        const harvests = await getHarvests(fdm, principal_id, b_lu_multiple)
+        expect(harvests.length).toBe(2)
+        expect(harvests.map((f) => f.b_lu_harvest_date)).toEqual(
+            expect.arrayContaining([b_lu_harvest_date1, b_lu_harvest_date2]),
+        )
+        expect(
+            harvests.map(
+                (f) =>
+                    f.harvestables[0].harvestable_analyses[0]
+                        .b_lu_n_harvestable,
+            ),
+        ).toEqual(
+            expect.arrayContaining([b_lu_n_harvestable1, b_lu_n_harvestable2]),
+        )
     })
 
     it("should remove a harvest", async () => {
@@ -251,6 +276,126 @@ describe("harvest", () => {
 
         const harvests = await getHarvests(fdm, principal_id, b_lu_once)
         expect(harvests.length).toEqual(1)
+    })
+
+    it("should get harvests within a timeframe", async () => {
+        const b_lu_start = new Date("2023-03-10")
+        const b_lu_end = new Date("2023-11-30")
+        await updateCultivation(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            undefined,
+            b_lu_start,
+            b_lu_end,
+        )
+        const b_lu_harvest_date1 = new Date("2023-09-15")
+        const b_lu_yield1 = 10000
+        await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            b_lu_harvest_date1,
+            b_lu_yield1,
+        )
+        const b_lu_harvest_date2 = new Date("2023-10-30")
+        const b_lu_yield2 = 12000
+        await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            b_lu_harvest_date2,
+            b_lu_yield2,
+        )
+
+        const b_lu_harvest_date3 = new Date("2023-11-15")
+        const b_lu_yield3 = 14000
+        await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            b_lu_harvest_date3,
+            b_lu_yield3,
+        )
+        // Test with a timeframe that includes only harvest 2
+        const timeframe1 = {
+            start: new Date("2023-10-01"),
+            end: new Date("2023-10-31"),
+        }
+        const harvests1 = await getHarvests(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            timeframe1,
+        )
+        // Expect all harvests within timeframe
+        harvests1.map((harvest) => {
+            expect(harvest.b_lu_harvest_date).toBeInstanceOf(Date)
+            expect(harvest.b_lu_harvest_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe1.start.getTime(),
+            )
+            expect(harvest.b_lu_harvest_date?.getTime()).toBeLessThanOrEqual(
+                timeframe1.end.getTime(),
+            )
+        })
+
+        // Test with a timeframe that includes harvest 1 and 2
+        const timeframe2 = {
+            start: new Date("2023-09-01"),
+            end: new Date("2023-10-31"),
+        }
+        const harvests2 = await getHarvests(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            timeframe2,
+        )
+        // Expect all harvests within timeframe
+        harvests2.map((harvest) => {
+            expect(harvest.b_lu_harvest_date).toBeInstanceOf(Date)
+            expect(harvest.b_lu_harvest_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe2.start.getTime(),
+            )
+            expect(harvest.b_lu_harvest_date?.getTime()).toBeLessThanOrEqual(
+                timeframe2.end.getTime(),
+            )
+        })
+        // Test with only start date
+        const timeframe3 = {
+            start: new Date("2023-10-01"),
+            end: undefined,
+        }
+        const harvests3 = await getHarvests(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            timeframe3,
+        )
+        // Expect all harvests within timeframe
+        harvests3.map((harvest) => {
+            expect(harvest.b_lu_harvest_date).toBeInstanceOf(Date)
+            expect(harvest.b_lu_harvest_date?.getTime()).toBeGreaterThanOrEqual(
+                timeframe3.start.getTime(),
+            )
+        })
+        // Test with only end date
+        const timeframe4 = {
+            start: undefined,
+            end: new Date("2023-10-31"),
+        }
+        const harvests4 = await getHarvests(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            timeframe4,
+        )
+        // Expect all harvests within timeframe
+        harvests4.map((harvest) => {
+            expect(harvest.b_lu_harvest_date).toBeInstanceOf(Date)
+            expect(harvest.b_lu_harvest_date?.getTime()).toBeLessThanOrEqual(
+                timeframe4.end.getTime(),
+            )
+        })
     })
 
     it("should throw error if harvest does not exist", async () => {

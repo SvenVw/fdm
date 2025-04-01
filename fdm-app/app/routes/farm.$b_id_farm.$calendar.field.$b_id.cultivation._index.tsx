@@ -3,6 +3,7 @@ import { CultivationList } from "@/components/custom/cultivation/list"
 import { FormSchema } from "@/components/custom/cultivation/schema"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
@@ -21,8 +22,7 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
-import { dataWithError, dataWithSuccess, dataWithWarning } from "remix-toast"
-import { toast } from "sonner"
+import { dataWithSuccess } from "remix-toast"
 
 /**
  * Loads data required for rendering the overview of a specific farm field.
@@ -63,6 +63,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -73,7 +76,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get available cultivations for the farm
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         // Map cultivations to options for the combobox
         const cultivationsCatalogueOptions = cultivationsCatalogue.map(
             (cultivation) => {
@@ -89,6 +96,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
 
         // Get the harvests of the cultivations
@@ -98,6 +106,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     fdm,
                     session.principal_id,
                     cultivation.b_lu,
+                    timeframe,
                 )
             }),
         )

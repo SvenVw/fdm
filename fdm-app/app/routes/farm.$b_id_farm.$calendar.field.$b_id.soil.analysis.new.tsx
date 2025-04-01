@@ -1,5 +1,5 @@
-import { SoilAnalysisForm } from "@/components/custom/soil/form"
 import { FormSchema } from "@/components/custom/soil/formschema"
+import { SoilAnalysisForm } from "@/components/custom/soil/form"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
@@ -7,10 +7,9 @@ import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import {
+    addSoilAnalysis,
     getField,
-    getSoilAnalysis,
     getSoilParametersDescription,
-    updateSoilAnalysis,
 } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
@@ -18,7 +17,6 @@ import {
     type LoaderFunctionArgs,
     NavLink,
     data,
-    useFetcher,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
@@ -59,15 +57,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the analysis id
-        const a_id = params.a_id
-        if (!a_id) {
-            throw data("Analysis ID is required", {
-                status: 400,
-                statusText: "Analysis ID is required",
-            })
-        }
-
         // Get the session
         const session = await getSession(request)
 
@@ -80,27 +69,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the soil analyses
-        const soilAnalysis = await getSoilAnalysis(
-            fdm,
-            session.principal_id,
-            a_id,
-        )
-
-        if (!soilAnalysis) {
-            throw data("Soil analysis not found", {
-                status: 404,
-                statusText: "Soil analysis not found",
-            })
-        }
-
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
+
         // Return user information from loader
         return {
             field: field,
             soilParameterDescription: soilParameterDescription,
-            soilAnalysis: soilAnalysis,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -108,10 +83,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Component that renders the soil analysis form.
+ * Component that renders the soil analysis creation form for a specific field.
  *
- * This component displays the soil analysis form
- *
+ * This component displays a page header with description, a back button,
+ * and the SoilAnalysisForm component for adding a new soil analysis.
+ * It uses data loaded by the loader function to provide soil parameter descriptions.
  */
 export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
@@ -122,7 +98,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 <div>
                     <h3 className="text-lg font-medium">Bodem</h3>
                     <p className="text-sm text-muted-foreground">
-                        Bekijk en bewerk de gegevens van deze bodemanalyse
+                        Voeg een nieuwe bodemanalyse toe
                     </p>
                 </div>
                 <Button asChild>
@@ -134,7 +110,7 @@ export default function FarmFieldSoilOverviewBlock() {
             </div>
             <Separator />
             <SoilAnalysisForm
-                soilAnalysis={loaderData.soilAnalysis}
+                soilAnalysis={undefined}
                 soilParameterDescription={loaderData.soilParameterDescription}
                 action="."
             />
@@ -174,15 +150,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         })
     }
 
-    // Get the analysis id
-    const a_id = params.a_id
-    if (!a_id) {
-        throw data("Analysis ID is required", {
-            status: 400,
-            statusText: "Analysis ID is required",
-        })
-    }
-
     try {
         // Get the session
         const session = await getSession(request)
@@ -193,11 +160,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        //update Soilanalysis
-        await updateSoilAnalysis(fdm, session.principal_id, a_id, formValues)
+        // add soil analysis
+        await addSoilAnalysis(
+            fdm,
+            session.principal_id,
+            undefined,
+            formValues.a_source,
+            b_id,
+            undefined,
+            formValues.b_sampling_date,
+            formValues,
+        )
 
         return redirectWithSuccess("../soil", {
-            message: "Bodemanalyse is bijgewerkt! 🎉",
+            message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {
         throw handleActionError(error)

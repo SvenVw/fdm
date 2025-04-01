@@ -11,6 +11,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getTimeBasedGreeting } from "@/lib/greetings"
@@ -54,6 +55,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
 
@@ -74,7 +78,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
 
         // Get the fields to be selected
-        const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
         const fieldOptions = fields.map((field) => {
             if (!field?.b_id || !field?.b_name) {
                 throw new Error("Invalid field data structure")

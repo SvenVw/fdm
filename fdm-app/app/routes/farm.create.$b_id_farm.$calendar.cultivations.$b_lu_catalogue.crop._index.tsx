@@ -4,9 +4,11 @@ import { HarvestsList } from "@/components/custom/harvest/list"
 import type { HarvestableType } from "@/components/custom/harvest/types"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { useCalendarStore } from "@/store/calendar"
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
@@ -51,10 +53,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get the available cultivations
         let cultivationOptions = []
         let b_lu_harvestable: HarvestableType = "none"
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(fdm, session.principal_id, b_id_farm)
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
         cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>
@@ -79,6 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
         const cultivation = cultivationPlan.find(
             (x) => x.b_lu_catalogue === b_lu_catalogue,
@@ -182,7 +192,7 @@ export default function FarmAFieldCultivationBlock() {
                 </p>
             </div>
             <Separator />
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid 2xl:grid-cols-2 gap-8">
                 <CultivationForm
                     b_lu_catalogue={loaderData.b_lu_catalogue}
                     b_lu_start={loaderData.b_lu_start}
@@ -225,12 +235,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         if (request.method === "POST") {
             // Get cultivation id's for this cultivation code
             const cultivationPlan = await getCultivationPlan(
                 fdm,
                 session.principal_id,
                 b_id_farm,
+                timeframe,
             )
             const cultivation = cultivationPlan.find(
                 (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,

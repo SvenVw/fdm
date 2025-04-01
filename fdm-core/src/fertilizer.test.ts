@@ -935,5 +935,106 @@ describe("Fertilizer Data Model", () => {
             )
             expect(fertilizerApplications.length).toBeGreaterThanOrEqual(2)
         })
+
+        it("should get fertilizer applications for a field within a timeframe", async () => {
+            await addFertilizerApplication(
+                fdm,
+                principal_id,
+                b_id,
+                p_id,
+                100,
+                "broadcasting",
+                new Date("2024-03-15"),
+            )
+            await addFertilizerApplication(
+                fdm,
+                principal_id,
+                b_id,
+                p_id,
+                150,
+                "injection",
+                new Date("2024-04-18"),
+            )
+            await addFertilizerApplication(
+                fdm,
+                principal_id,
+                b_id,
+                p_id,
+                200,
+                "injection",
+                new Date("2024-05-20"),
+            )
+
+            const timeframe = {
+                start: new Date("2024-04-01"),
+                end: new Date("2024-05-01"),
+            }
+            const fertilizerApplications = await getFertilizerApplications(
+                fdm,
+                principal_id,
+                b_id,
+                timeframe,
+            )
+            fertilizerApplications.map((application) => {
+                expect(
+                    application.p_app_date?.getTime(),
+                ).toBeGreaterThanOrEqual(timeframe.start.getTime())
+                expect(application.p_app_date?.getTime()).toBeLessThanOrEqual(
+                    timeframe.end.getTime(),
+                )
+            })
+        })
+
+        it("should return an empty array if no fertilizer applications are found within a timeframe", async () => {
+            await addFertilizerApplication(
+                fdm,
+                principal_id,
+                b_id,
+                p_id,
+                100,
+                "broadcasting",
+                new Date("2024-03-15"),
+            )
+
+            const fertilizerApplications = await getFertilizerApplications(
+                fdm,
+                principal_id,
+                b_id,
+                { start: new Date("2026-05-01"), end: new Date("2026-06-01") },
+            )
+            expect(fertilizerApplications.length).toBe(0)
+        })
+
+        it("should throw an error if trying to add a fertilizer application to a non-existing field", async () => {
+            const invalid_b_id = createId()
+            await expect(
+                addFertilizerApplication(
+                    fdm,
+                    principal_id,
+                    invalid_b_id,
+                    p_id,
+                    100,
+                    "broadcasting",
+                    new Date("2024-03-15"),
+                ),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should throw an error if trying to add a fertilizer application with a non-existing fertilizer", async () => {
+            const invalid_p_id = createId()
+            await expect(
+                addFertilizerApplication(
+                    fdm,
+                    principal_id,
+                    b_id,
+                    invalid_p_id,
+                    100,
+                    "broadcasting",
+                    new Date("2024-03-15"),
+                ),
+            ).rejects.toThrowError("Exception for addFertilizerApplication")
+        })
     })
 })

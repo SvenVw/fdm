@@ -26,6 +26,7 @@ import type {
     LayerKey,
     LayerOptions,
 } from "./farm.d"
+import { useCalendarStore } from "@/store/calendar"
 
 interface FarmHeaderProps {
     farmOptions: FarmOptions
@@ -50,6 +51,8 @@ export function FarmHeader({
     p_id,
     action,
 }: FarmHeaderProps) {
+    const calendar = useCalendarStore((state) => state.calendar)
+
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger className="-ml-1" />
@@ -98,7 +101,7 @@ export function FarmHeader({
                                     <BreadcrumbSeparator />
                                     <BreadcrumbItem className="hidden md:block">
                                         <BreadcrumbLink
-                                            href={`/farm/${b_id_farm}/field/`}
+                                            href={`/farm/${b_id_farm}/${calendar}/field/`}
                                         >
                                             Perceel
                                         </BreadcrumbLink>
@@ -126,7 +129,7 @@ export function FarmHeader({
                                                         key={option.b_id}
                                                     >
                                                         <NavLink
-                                                            to={`/farm/${b_id_farm}/field/${option.b_id}`}
+                                                            to={`/farm/${b_id_farm}/${calendar}/field/${option.b_id}`}
                                                         >
                                                             {option.b_name}
                                                         </NavLink>
@@ -142,7 +145,7 @@ export function FarmHeader({
                                     <BreadcrumbSeparator />
                                     <BreadcrumbItem className="hidden md:block">
                                         <BreadcrumbLink
-                                            href={`/farm/${b_id_farm}/atlas/`}
+                                            href={`/farm/${b_id_farm}/${calendar}/atlas/`}
                                         >
                                             Kaarten
                                         </BreadcrumbLink>
@@ -172,7 +175,7 @@ export function FarmHeader({
                                                         key={option.layerKey}
                                                     >
                                                         <NavLink
-                                                            to={`/farm/${b_id_farm}/atlas/${option.layerKey}`}
+                                                            to={`/farm/${b_id_farm}/${calendar}/atlas/${option.layerKey}`}
                                                         >
                                                             {option.layerName}
                                                         </NavLink>

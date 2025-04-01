@@ -1,4 +1,5 @@
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getCultivationPlan } from "@svenvw/fdm-core"
@@ -26,10 +27,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         const cultivationPlan = await getCultivationPlan(
             fdm,
             session.principal_id,
             b_id_farm,
+            timeframe,
         )
         if (!cultivationPlan.length) {
             throw new Error("No cultivations found for this farm")

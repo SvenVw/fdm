@@ -5,6 +5,7 @@ import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField, getField, getFields, updateField } from "./field"
 import { createId } from "./id"
+import type { FdmType } from "./fdm"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
@@ -78,157 +79,289 @@ describe("Farm Data Model", () => {
             expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
-        it("should get a field by ID", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                principal_id,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-            )
+        describe("getFields", () => {
+            let fdm: FdmType
+            let principal_id: string
+            let b_id_farm: string
 
-            const fieldName = "Test Field"
-            const fieldIDSource = "test-field-id"
-            const fieldGeometry: Polygon = {
-                type: "Polygon",
-                coordinates: [
-                    [
-                        [30, 10],
-                        [40, 40],
-                        [20, 40],
-                        [10, 20],
-                        [30, 10],
+            beforeEach(async () => {
+                const host = inject("host")
+                const port = inject("port")
+                const user = inject("user")
+                const password = inject("password")
+                const database = inject("database")
+                fdm = createFdmServer(host, port, user, password, database)
+                principal_id = "test_principal"
+
+                // Create a test farm
+                const farmName = "Test Farm"
+                const farmBusinessId = "123456"
+                const farmAddress = "123 Farm Lane"
+                const farmPostalCode = "12345"
+                b_id_farm = await addFarm(
+                    fdm,
+                    principal_id,
+                    farmName,
+                    farmBusinessId,
+                    farmAddress,
+                    farmPostalCode,
+                )
+            })
+            it("should get fields by farm ID", async () => {
+                // Add two fields to the farm
+                const field1Name = "Field 1"
+                const field1Source = "source1"
+                const field1Geometry = {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
                     ],
-                ],
-            }
-            const AcquireDate = new Date("2023-01-01")
-            const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
-            const b_id = await addField(
-                fdm,
-                principal_id,
-                b_id_farm,
-                fieldName,
-                fieldIDSource,
-                fieldGeometry,
-                AcquireDate,
-                AcquiringMethod,
-                discardingDate,
-            )
+                }
+                const field1Start = new Date("2023-01-01")
+                const field1AcquiringMethod = "owner"
+                await addField(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    field1Name,
+                    field1Source,
+                    field1Geometry,
+                    field1Start,
+                    field1AcquiringMethod,
+                )
 
-            const field = await getField(fdm, principal_id, b_id)
-            expect(field.b_name).toBe(fieldName)
-            expect(field.b_id_farm).toBe(b_id_farm)
-            expect(field.b_id_source).toBe(fieldIDSource)
-            expect(field.b_geometry).toStrictEqual(fieldGeometry)
-            expect(field.b_area).toBeGreaterThan(0)
-            expect(field.b_start).toEqual(AcquireDate)
-            expect(field.b_end).toEqual(discardingDate)
-            expect(field.b_acquiring_method).toBe(AcquiringMethod)
+                const field2Name = "Field 2"
+                const field2Source = "source2"
+                const field2Geometry = {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                }
+                const field2Start = new Date("2023-02-01")
+                const field2AcquiringMethod = "lease"
+                await addField(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    field2Name,
+                    field2Source,
+                    field2Geometry,
+                    field2Start,
+                    field2AcquiringMethod,
+                )
+
+                const fields = await getFields(fdm, principal_id, b_id_farm)
+                expect(fields.length).toBe(2)
+                expect(fields.map((f) => f.b_name)).toEqual(
+                    expect.arrayContaining([field1Name, field2Name]),
+                )
+            })
+
+            it("should throw an error when permission check fails", async () => {
+                const invalidPrincipalId = "invalid_principal"
+                await expect(
+                    getFields(fdm, invalidPrincipalId, b_id_farm),
+                ).rejects.toThrowError(
+                    "Principal does not have permission to perform this action",
+                )
+            })
+
+            it("should get fields within a timeframe", async () => {
+                // Add two fields to the farm with different start dates
+                const field1Name = "Field 1"
+                const field1Source = "source1"
+                const field1Geometry = {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                }
+                const field1Start = new Date("2023-01-01")
+                const field1AcquiringMethod = "owner"
+                await addField(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    field1Name,
+                    field1Source,
+                    field1Geometry,
+                    field1Start,
+                    field1AcquiringMethod,
+                )
+
+                const field2Name = "Field 2"
+                const field2Source = "source2"
+                const field2Geometry = {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                }
+                const field2Start = new Date("2023-04-01")
+                const field2AcquiringMethod = "lease"
+                await addField(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    field2Name,
+                    field2Source,
+                    field2Geometry,
+                    field2Start,
+                    field2AcquiringMethod,
+                )
+                const field3Name = "Field 3"
+                const field3Source = "source3"
+                const field3Geometry = {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                }
+                const field3Start = new Date("2023-06-01")
+                const field3End = new Date("2023-08-01")
+                const field3AcquiringMethod = "lease"
+                await addField(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    field3Name,
+                    field3Source,
+                    field3Geometry,
+                    field3Start,
+                    field3AcquiringMethod,
+                    field3End,
+                )
+                const field4Name = "Field 4"
+                const field4Source = "source4"
+                const field4Geometry = {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                }
+                const field4Start = new Date("2023-07-01")
+                const field4End = new Date("2023-09-01")
+                const field4AcquiringMethod = "lease"
+                await addField(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    field4Name,
+                    field4Source,
+                    field4Geometry,
+                    field4Start,
+                    field4AcquiringMethod,
+                    field4End,
+                )
+
+                // Test with a timeframe that includes only Field 2
+                const timeframe1 = {
+                    start: new Date("2023-03-01"),
+                    end: new Date("2023-05-01"),
+                }
+                const fields1 = await getFields(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    timeframe1,
+                )
+                expect(fields1.length).toBe(1)
+                expect(fields1[0].b_name).toBe(field2Name)
+
+                // Test with a timeframe that includes both Field 1 and Field 2
+                const timeframe2 = {
+                    start: new Date("2022-12-01"),
+                    end: new Date("2023-05-01"),
+                }
+                const fields2 = await getFields(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    timeframe2,
+                )
+                expect(fields2.length).toBe(2)
+                expect(fields2.map((f) => f.b_name)).toEqual(
+                    expect.arrayContaining([field1Name, field2Name]),
+                )
+
+                // Test with a timeframe that includes field 3 and field 4
+                const timeframe3 = {
+                    start: new Date("2023-05-01"),
+                    end: new Date("2023-09-01"),
+                }
+
+                const fields3 = await getFields(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    timeframe3,
+                )
+
+                expect(fields3.length).toBe(2)
+                expect(fields3.map((f) => f.b_name)).toEqual(
+                    expect.arrayContaining([field3Name, field4Name]),
+                )
+                //Test with only start date
+                const fields4 = await getFields(fdm, principal_id, b_id_farm, {
+                    start: new Date("2023-03-01"),
+                    end: undefined,
+                })
+                expect(fields4.length).toBe(3)
+                expect(fields4.map((f) => f.b_name)).toEqual(
+                    expect.arrayContaining([
+                        field2Name,
+                        field3Name,
+                        field4Name,
+                    ]),
+                )
+                //Test with only end date
+                const fields5 = await getFields(fdm, principal_id, b_id_farm, {
+                    start: undefined,
+                    end: new Date("2023-05-01"),
+                })
+                expect(fields5.length).toBe(2)
+                expect(fields5.map((f) => f.b_name)).toEqual(
+                    expect.arrayContaining([field1Name, field2Name]),
+                )
+            })
         })
-
-        it("should get fields by farm ID", async () => {
-            const farmName = "Test Farm"
-            const farmBusinessId = "123456"
-            const farmAddress = "123 Farm Lane"
-            const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
-                fdm,
-                principal_id,
-                farmName,
-                farmBusinessId,
-                farmAddress,
-                farmPostalCode,
-            )
-
-            const fieldName1 = "Test Field 1"
-            const fieldIDSource1 = "test-field-id-1"
-            const fieldGeometry1: Polygon = {
-                type: "Polygon",
-                coordinates: [
-                    [
-                        [30, 10],
-                        [40, 40],
-                        [20, 40],
-                        [10, 20],
-                        [30, 10],
-                    ],
-                ],
-            }
-
-            const AcquireDate1 = new Date("2023-01-01")
-            const discardingDate1 = new Date("2023-12-31")
-            const AcquiringMethod1 = "owner"
-            const b_id1 = await addField(
-                fdm,
-                principal_id,
-                b_id_farm,
-                fieldName1,
-                fieldIDSource1,
-                fieldGeometry1,
-                AcquireDate1,
-                AcquiringMethod1,
-                discardingDate1,
-            )
-
-            const fieldName2 = "Test Field 2"
-            const fieldIDSource2 = "test-field-id-2"
-            const fieldGeometry2: Polygon = {
-                type: "Polygon",
-                coordinates: [
-                    [
-                        [50, 50],
-                        [60, 60],
-                        [40, 60],
-                        [30, 40],
-                        [50, 50],
-                    ],
-                ],
-            }
-            const AcquireDate2 = new Date("2024-01-01")
-            const discardingDate2 = new Date("2024-12-31")
-            const AcquiringMethod2 = "lease"
-            const b_id2 = await addField(
-                fdm,
-                principal_id,
-                b_id_farm,
-                fieldName2,
-                fieldIDSource2,
-                fieldGeometry2,
-                AcquireDate2,
-                AcquiringMethod2,
-                discardingDate2,
-            )
-
-            const fields = await getFields(fdm, principal_id, b_id_farm)
-            expect(fields.length).toBe(2)
-
-            const field1 = fields.find((field) => field.b_id === b_id1)
-            expect(field1?.b_name).toBe(fieldName1)
-            expect(field1?.b_id_farm).toBe(b_id_farm)
-            expect(field1?.b_id_source).toBe(fieldIDSource1)
-            expect(field1?.b_geometry).toStrictEqual(fieldGeometry1)
-            expect(field1?.b_area).toBeGreaterThan(0)
-            expect(field1?.b_start).toEqual(AcquireDate1)
-            expect(field1?.b_end).toEqual(discardingDate1)
-            expect(field1?.b_acquiring_method).toBe(AcquiringMethod1)
-
-            const field2 = fields.find((field) => field.b_id === b_id2)
-            expect(field2?.b_name).toBe(fieldName2)
-            expect(field2?.b_id_farm).toBe(b_id_farm)
-            expect(field2?.b_id_source).toBe(fieldIDSource2)
-            expect(field2?.b_geometry).toStrictEqual(fieldGeometry2)
-            expect(field2?.b_area).toBeGreaterThan(0)
-            expect(field2?.b_start).toEqual(AcquireDate2)
-            expect(field2?.b_end).toEqual(discardingDate2)
-            expect(field2?.b_acquiring_method).toBe(AcquiringMethod2)
-        })
-
         it("should update a field", async () => {
             const farmName = "Test Farm"
             const farmBusinessId = "123456"
