@@ -4,7 +4,6 @@ import throttle from "lodash.throttle"
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl"
 import { generateFeatureClass } from "./atlas-functions"
-import type { fieldsAvailableUrlType } from "./atlas.d"
 
 export function FieldsSourceNotClickable({
     id,
@@ -37,7 +36,6 @@ export function FieldsSourceSelected({
 
     useEffect(() => {
         function clickOnMap(evt) {
-            console.log("jh")
             if (!map) return
 
             const features = map.queryRenderedFeatures(evt.point, {
