@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, lte, sql, type SQL } from "drizzle-orm"
+import { and, eq, gte, lte, sql, type SQL } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -12,7 +12,6 @@ import type {
     SoilParameterDescription,
     SoilParameters,
 } from "./soil.d"
-import type { getSoilAnalysisType } from "./soil.d"
 
 /**
  * Adds a new soil analysis record along with its soil sampling details.
