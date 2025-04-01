@@ -1,14 +1,14 @@
-import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight, Pencil, SquareArrowOutUpRight } from "lucide-react"
-import { DataTableColumnHeader } from "./column-header"
+import { Badge } from "@/components/ui/badge"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import type { ColumnDef } from "@tanstack/react-table"
+import { ArrowRight, Pencil, SquareArrowOutUpRight } from "lucide-react"
 import { NavLink } from "react-router-dom"
-import { Badge } from "@/components/ui/badge"
+import { DataTableColumnHeader } from "./column-header"
 
 export type Fertilizer = {
     p_id: string

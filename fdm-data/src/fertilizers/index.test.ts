@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest"
-import { getFertilizersCatalogue } from "./index"
+import { describe, expect, it } from "vitest"
 import { getCatalogueSrm } from "./catalogues/srm"
+import { getFertilizersCatalogue } from "./index"
 
 describe("getFertilizersCatalogue", () => {
     it("should return the SRM catalogue when catalogueName is 'srm'", async () => {
@@ -14,7 +14,6 @@ describe("getFertilizersCatalogue", () => {
             getFertilizersCatalogue("invalid-catalogue"),
         ).rejects.toThrowError("catalogue invalid-catalogue is not recognized")
     })
-
 
     it("should return a non-empty array for 'srm' catalogue", async () => {
         const catalogue = await getFertilizersCatalogue("srm")

@@ -3,7 +3,7 @@ import { format } from "date-fns/format"
 import { Eye, Trash2 } from "lucide-react"
 import { NavLink, useFetcher } from "react-router"
 import { LoadingSpinner } from "../loadingspinner"
-import type { HarvestableType, Harvest } from "./types"
+import type { Harvest, HarvestableType } from "./types"
 
 export function HarvestsList({
     harvests,

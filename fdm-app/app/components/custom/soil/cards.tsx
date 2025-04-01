@@ -1,20 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils"
 import type {
     CurrentSoilData,
     SoilParameterDescription,
 } from "@svenvw/fdm-core"
-import { Calendar, Microscope, Pencil, Sparkles, User } from "lucide-react"
-import { NavLink } from "react-router"
 import { format } from "date-fns/format"
 import { nl } from "date-fns/locale/nl"
+import { Calendar, Microscope, Pencil, Sparkles, User } from "lucide-react"
+import { NavLink } from "react-router"
 
 function SoilDataCard({
     title,

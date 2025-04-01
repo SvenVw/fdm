@@ -15,12 +15,12 @@ import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-source
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
-import { getTimeframe } from "@/lib/calendar"
 
 /**
  * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.

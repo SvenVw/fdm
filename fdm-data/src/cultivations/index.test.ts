@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest"
-import { getCultivationCatalogue } from "./index"
+import { describe, expect, it } from "vitest"
 import { getCatalogueBrp } from "./catalogues/brp"
+import { getCultivationCatalogue } from "./index"
 
 describe("getCultivationCatalogue", () => {
     it("should return the BRP catalogue when catalogueName is 'brp'", async () => {

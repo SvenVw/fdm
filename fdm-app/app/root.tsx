@@ -1,7 +1,10 @@
 import * as Sentry from "@sentry/react"
 
+import { Banner } from "@/components/custom/banner"
+import { CookieSettingsFooter } from "@/components/custom/cookie-settings-footer"
 import { Toaster } from "@/components/ui/sonner"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
+import posthog from "posthog-js"
 import { useEffect } from "react"
 import {
     Links,
@@ -21,9 +24,6 @@ import { toast as notify } from "sonner"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 import { ErrorBlock } from "./components/custom/error"
-import posthog from "posthog-js"
-import { Banner } from "@/components/custom/banner"
-import { CookieSettingsFooter } from "@/components/custom/cookie-settings-footer"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },

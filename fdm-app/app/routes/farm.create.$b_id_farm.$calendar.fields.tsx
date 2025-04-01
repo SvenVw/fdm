@@ -10,8 +10,10 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { getSession } from "@/lib/auth.server"
+import { getCalendar, getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { cn } from "@/lib/utils"
+import { useCalendarStore } from "@/store/calendar"
 import {
     getCultivationsFromCatalogue,
     getFarm,
@@ -27,8 +29,6 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { fdm } from "../lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

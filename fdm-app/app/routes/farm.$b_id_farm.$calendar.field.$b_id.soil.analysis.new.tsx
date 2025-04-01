@@ -1,5 +1,5 @@
-import { FormSchema } from "@/components/custom/soil/formschema"
 import { SoilAnalysisForm } from "@/components/custom/soil/form"
+import { FormSchema } from "@/components/custom/soil/formschema"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"

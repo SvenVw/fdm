@@ -27,8 +27,10 @@ import {
 } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { extractFormValuesFromRequest } from "@/lib/form"
+import { useCalendarStore } from "@/store/calendar"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addSoilAnalysis,
@@ -40,6 +42,7 @@ import {
     updateField,
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
+import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {
@@ -54,9 +57,6 @@ import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
-import { useEffect } from "react"
-import { useCalendarStore } from "@/store/calendar"
-import { getTimeframe } from "@/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

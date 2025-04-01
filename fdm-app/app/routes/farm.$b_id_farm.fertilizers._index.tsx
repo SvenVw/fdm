@@ -1,8 +1,8 @@
 import { FarmHeader } from "@/components/custom/farm/farm-header"
 import { FarmTitle } from "@/components/custom/farm/farm-title"
 import {
-    columns,
     type Fertilizer,
+    columns,
 } from "@/components/custom/fertilizer/columns"
 import { DataTable } from "@/components/custom/fertilizer/table"
 import { SidebarInset } from "@/components/ui/sidebar"
@@ -83,7 +83,7 @@ export default function FarmFertilizersBlock() {
         <SidebarInset>
             <FarmHeader
                 farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}            
+                b_id_farm={loaderData.b_id_farm}
             />
             <main>
                 <FarmTitle

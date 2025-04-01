@@ -1,4 +1,4 @@
-import type { SoilParameterDescription } from "@svenvw/fdm-core"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -15,16 +15,6 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { CalendarIcon } from "lucide-react"
-import { useEffect } from "react"
-import { Form } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import {
     Select,
     SelectContent,
@@ -32,9 +22,19 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { SoilParameterDescription } from "@svenvw/fdm-core"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import { CalendarIcon } from "lucide-react"
+import { useEffect } from "react"
+import { get } from "react-hook-form"
+import { Form } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
 import { FormSchema } from "./formschema"
 import type { SoilAnalysis } from "./types"
-import { get } from "react-hook-form"
 
 export function SoilAnalysisForm(props: {
     soilAnalysis: SoilAnalysis | undefined

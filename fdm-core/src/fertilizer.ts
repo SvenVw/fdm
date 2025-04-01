@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm"
 import { createId } from "./id"
 
+import { hashFertilizer } from "@svenvw/fdm-data"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -11,7 +12,6 @@ import type {
     getFertilizerType,
 } from "./fertilizer.d"
 import type { Timeframe } from "./timeframe"
-import { hashFertilizer } from "@svenvw/fdm-data"
 
 /**
  * Retrieves all fertilizers from the enabled catalogues for a farm.

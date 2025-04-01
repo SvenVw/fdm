@@ -36,7 +36,7 @@ function FertilizerApplicationsCard({
                                         !limit ? "invisible" : "",
                                     )}
                                 >
-                                    <Scale className="h-8 w-4"/>
+                                    <Scale className="h-8 w-4" />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${limit}`}</span>
                                     </p>
@@ -56,7 +56,7 @@ function FertilizerApplicationsCard({
                                         !advice ? "invisible" : "",
                                     )}
                                 >
-                                    <Lightbulb className="h-4 w-4"/>
+                                    <Lightbulb className="h-4 w-4" />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${advice}`}</span>
                                     </p>
