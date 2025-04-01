@@ -232,7 +232,11 @@ describe("Soil Analysis Functions", () => {
         expect(allAnalyses).toHaveLength(2)
 
         // get soil analysis for field
-        const latestAnalysis = await getSoilAnalysis(fdm, principal_id, allAnalyses[0].a_id)
+        const latestAnalysis = await getSoilAnalysis(
+            fdm,
+            principal_id,
+            allAnalyses[0].a_id,
+        )
         expect(latestAnalysis?.a_date).toEqual(a_date_old)
         expect(latestAnalysis?.b_sampling_date).toEqual(b_sampling_date_new)
         expect(latestAnalysis?.a_som_loi).toEqual(a_som_loi)
@@ -479,6 +483,163 @@ describe("Soil Analysis Functions", () => {
         )
         expect(gwlClassData?.value).toEqual(b_gwl_class_new)
         expect(gwlClassData?.b_sampling_date).toEqual(b_sampling_date_new)
+    })
+
+    it("should get current soil data within a timeframe", async () => {
+        const a_date_old = new Date("2024-01-02T00:00:00Z")
+        const a_source = "test source"
+        const a_som_loi_old = 5
+        const a_p_al_old = 10
+        const b_depth = 10
+        const b_sampling_date_old = new Date("2024-01-01T00:00:00Z")
+
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date_old,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date_old,
+            { a_som_loi: a_som_loi_old, a_p_al: a_p_al_old },
+        )
+
+        const b_sampling_date_new = new Date(
+            b_sampling_date_old.getTime() + 5000,
+        ) // Add 5 seconds
+        const a_som_loi_new = 7
+        const a_p_al_new = 12
+        const b_gwl_class_new = "III"
+
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date_old,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date_new,
+            {
+                a_som_loi: a_som_loi_new,
+                a_p_al: a_p_al_new,
+                b_gwl_class: b_gwl_class_new,
+            },
+        )
+
+        const timeframe = {
+            start: null,
+            end: new Date(b_sampling_date_new.getTime() - 1),
+        } // Exclude latest
+
+        const currentData: CurrentSoilData = await getCurrentSoilData(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(currentData.length).toBeGreaterThanOrEqual(2)
+
+        const somLoiData = currentData.find(
+            (item) => item.parameter === "a_som_loi",
+        )
+        expect(somLoiData?.value).toEqual(a_som_loi_old)
+        expect(somLoiData?.b_sampling_date).toEqual(b_sampling_date_old)
+
+        const pAlData = currentData.find((item) => item.parameter === "a_p_al")
+        expect(pAlData?.value).toEqual(a_p_al_old)
+        expect(pAlData?.b_sampling_date).toEqual(b_sampling_date_old)
+
+        const gwlClassData = currentData.find(
+            (item) => item.parameter === "b_gwl_class",
+        )
+        expect(gwlClassData).toBeUndefined()
+
+        const timeframe2 = {
+            start: null,
+            end: new Date(b_sampling_date_new.getTime() + 1000),
+        }
+
+        const currentData2: CurrentSoilData = await getCurrentSoilData(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe2,
+        )
+        expect(currentData2.length).toBeGreaterThanOrEqual(3)
+
+        const somLoiData2 = currentData2.find(
+            (item) => item.parameter === "a_som_loi",
+        )
+        expect(somLoiData2?.value).toEqual(a_som_loi_new)
+        expect(somLoiData2?.b_sampling_date).toEqual(b_sampling_date_new)
+
+        const pAlData2 = currentData2.find(
+            (item) => item.parameter === "a_p_al",
+        )
+        expect(pAlData2?.value).toEqual(a_p_al_new)
+        expect(pAlData2?.b_sampling_date).toEqual(b_sampling_date_new)
+
+        const gwlClassData2 = currentData2.find(
+            (item) => item.parameter === "b_gwl_class",
+        )
+        expect(gwlClassData2?.value).toEqual(b_gwl_class_new)
+        expect(gwlClassData2?.b_sampling_date).toEqual(b_sampling_date_new)
+    })
+
+    it("should return empty array if no soil data is present within timeframe", async () => {
+        const a_date_old = new Date("2024-01-02T00:00:00Z")
+        const a_source = "test source"
+        const a_som_loi_old = 5
+        const a_p_al_old = 10
+        const b_depth = 10
+        const b_sampling_date_old = new Date("2024-01-01T00:00:00Z")
+
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date_old,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date_old,
+            { a_som_loi: a_som_loi_old, a_p_al: a_p_al_old },
+        )
+        const timeframe = { start: null, end: new Date("2023-01-01T00:00:00Z") }
+        const currentData = await getCurrentSoilData(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(currentData.length).toEqual(0)
+    })
+
+    it("should return all data if timeframe has no end", async () => {
+        const a_date_old = new Date("2024-01-02T00:00:00Z")
+        const a_source = "test source"
+        const a_som_loi_old = 5
+        const a_p_al_old = 10
+        const b_depth = 10
+        const b_sampling_date_old = new Date("2024-01-01T00:00:00Z")
+
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date_old,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date_old,
+            { a_som_loi: a_som_loi_old, a_p_al: a_p_al_old },
+        )
+        const timeframe = { start: new Date("2023-01-01T00:00:00Z"), end: null }
+        const currentData = await getCurrentSoilData(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(currentData.length).toBeGreaterThanOrEqual(2)
     })
 
     it("should return empty array if no soil data is present", async () => {
