@@ -8,21 +8,21 @@ import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { fdm } from "@/lib/fdm.server"
 import {
+    Timeframe,
     getField,
     getSoilAnalyses,
     getSoilParametersDescription,
     removeSoilAnalysis,
-    Timeframe,
 } from "@svenvw/fdm-core"
 import { getCurrentSoilData } from "@svenvw/fdm-core"
 import { Plus } from "lucide-react"
 import {
+    type ActionFunctionArgs,
     type LoaderFunctionArgs,
     NavLink,
     data,
     useFetcher,
     useLoaderData,
-    type ActionFunctionArgs,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 
@@ -82,7 +82,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
-            timeframe
+            timeframe,
         )
 
         // Get current soil data
@@ -90,7 +90,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
-            timeframe
+            timeframe,
         )
 
         // Get soil parameter descriptions

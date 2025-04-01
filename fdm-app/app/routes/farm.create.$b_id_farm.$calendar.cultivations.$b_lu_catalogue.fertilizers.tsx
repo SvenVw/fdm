@@ -4,6 +4,7 @@ import { FormSchema } from "@/components/custom/fertilizer-applications/formsche
 import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
 import { Separator } from "@/components/ui/separator"
 import { getSession } from "@/lib/auth.server"
+import { getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { calculateDose } from "@svenvw/fdm-calculator"
@@ -23,7 +24,6 @@ import {
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 import { fdm } from "../lib/fdm.server"
-import { getTimeframe } from "@/lib/calendar"
 
 /**
  * Loads fertilizer and cultivation data for a given farm and cultivation catalogue.

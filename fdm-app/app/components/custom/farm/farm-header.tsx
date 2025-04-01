@@ -16,6 +16,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { useCalendarStore } from "@/store/calendar"
 import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
 import type {
@@ -26,7 +27,6 @@ import type {
     LayerKey,
     LayerOptions,
 } from "./farm.d"
-import { useCalendarStore } from "@/store/calendar"
 
 interface FarmHeaderProps {
     farmOptions: FarmOptions

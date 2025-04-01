@@ -1,5 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -25,11 +31,16 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { getCalendarSelection } from "@/lib/calendar"
+import { useCalendarStore } from "@/store/calendar"
+import { useFarmStore } from "@/store/farm"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
     BadgeCheck,
     Calendar,
+    Check,
     ChevronRight,
     ChevronsUpDown,
     Cookie,
@@ -46,22 +57,11 @@ import {
     Sparkles,
     Sprout,
     Square,
-    Check,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useIsMobile } from "@/hooks/use-mobile"
+import posthog from "posthog-js"
 import { useEffect, useState } from "react"
 import { Form, NavLink, useLocation } from "react-router"
 import { toast } from "sonner"
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import { useCalendarStore } from "@/store/calendar"
-import { useFarmStore } from "@/store/farm"
-import { getCalendarSelection } from "@/lib/calendar"
-import posthog from "posthog-js"
 
 interface SideBarAppType {
     user: {

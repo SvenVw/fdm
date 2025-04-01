@@ -95,7 +95,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get soil parameter descriptions
         const soilParameterDescription = getSoilParametersDescription()
-        
+
         // Return user information from loader
         return {
             field: field,

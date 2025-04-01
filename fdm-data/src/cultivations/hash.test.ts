@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest"
-import { hashCultivation } from "./hash"
+import { describe, expect, it } from "vitest"
 import type { CatalogueCultivationItem } from "./d"
+import { hashCultivation } from "./hash"
 
 describe("hashCultivation", () => {
     it("should generate a hash for a cultivation item", async () => {

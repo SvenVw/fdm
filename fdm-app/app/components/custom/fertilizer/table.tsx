@@ -1,13 +1,5 @@
-import {
-    type ColumnDef,
-    type ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getSortedRowModel,
-    type SortingState,
-    useReactTable,
-} from "@tanstack/react-table"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     Table,
     TableBody,
@@ -16,11 +8,19 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { NavLink } from "react-router"
+import {
+    type ColumnDef,
+    type ColumnFiltersState,
+    type SortingState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
 import { Plus } from "lucide-react"
+import { useState } from "react"
+import { NavLink } from "react-router"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

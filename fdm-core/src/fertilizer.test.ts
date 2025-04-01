@@ -7,6 +7,10 @@ import {
     inject,
     it,
 } from "vitest"
+import {
+    disableFertilizerCatalogue,
+    enableFertilizerCatalogue,
+} from "./catalogues"
 import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
@@ -25,10 +29,6 @@ import {
     updateFertilizerFromCatalogue,
 } from "./fertilizer"
 import { addField } from "./field"
-import {
-    disableFertilizerCatalogue,
-    enableFertilizerCatalogue,
-} from "./catalogues"
 import { createId } from "./id"
 
 describe("Fertilizer Data Model", () => {

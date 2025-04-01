@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
-import posthog from "posthog-js"
-import { Cookie, CookieIcon, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Cookie, CookieIcon, X } from "lucide-react"
+import posthog from "posthog-js"
+import { useEffect, useState } from "react"
 
 type ConsentType = "yes" | "no" | "undecided"
 

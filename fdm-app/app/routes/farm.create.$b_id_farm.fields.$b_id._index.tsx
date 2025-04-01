@@ -7,6 +7,7 @@ import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
 import { Combobox } from "@/components/custom/combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import { SoilDataCards } from "@/components/custom/soil/cards"
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -25,6 +26,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSession } from "@/lib/auth.server"
 import { handleActionError, handleLoaderError } from "@/lib/error"
@@ -40,8 +42,10 @@ import {
     updateField,
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
-import { Form } from "react-router"
+import { Plus } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import { Layer, Map as MapGL } from "react-map-gl"
+import { Form } from "react-router"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -55,10 +59,6 @@ import { dataWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "../lib/fdm.server"
-import { useEffect, useState, useRef } from "react"
-import { Plus } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
-import { SoilDataCards } from "@/components/custom/soil/cards"
 
 // Meta
 export const meta: MetaFunction = () => {

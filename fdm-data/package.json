@@ -48,12 +48,12 @@
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.35.0",
+        "rollup": "^4.38.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.4.1",
+    "packageManager": "pnpm@10.7.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },

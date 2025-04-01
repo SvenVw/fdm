@@ -1,17 +1,17 @@
-import { and, eq, gte, lte, sql, type SQL } from "drizzle-orm"
+import { type SQL, and, eq, gte, lte, sql } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { createId } from "./id"
-import type { Timeframe } from "./timeframe"
 import type {
     CurrentSoilData,
-    getSoilAnalysisType,
     SoilParameterDescription,
     SoilParameters,
+    getSoilAnalysisType,
 } from "./soil.d"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Adds a new soil analysis record along with its soil sampling details.
