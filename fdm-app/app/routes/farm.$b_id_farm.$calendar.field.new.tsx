@@ -11,6 +11,7 @@ import {
 } from "@/components/custom/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
+    FieldsSourceNotClickable,
     FieldsSourceSelected,
 } from "@/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
@@ -29,7 +30,13 @@ import { getSession } from "@/lib/auth.server"
 import { getCalendar, getTimeframe } from "@/lib/calendar"
 import { handleActionError, handleLoaderError } from "@/lib/error"
 import { useCalendarStore } from "@/store/calendar"
-import { addCultivation, addField, getFarm, getFarms } from "@svenvw/fdm-core"
+import {
+    addCultivation,
+    addField,
+    getFarm,
+    getFarms,
+    getFields,
+} from "@svenvw/fdm-core"
 import { centroid } from "@turf/centroid"
 import { useState } from "react"
 import {
@@ -50,6 +57,7 @@ import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 import FieldDetailsDialog from "@/components/custom/field/form"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
+import { FeatureCollection } from "geojson"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -82,6 +90,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
         const farmOptions = farms.map((farm) => {
@@ -103,6 +114,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        // Get the fields of the farm
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+        const features = fields.map((field) => {
+            const feature = {
+                type: "Feature",
+                properties: {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_lu_name: field.b_lu_name,
+                    b_id_source: field.b_id_source,
+                },
+                geometry: field.b_geometry,
+            }
+            return feature
+        })
+
+        const featureCollection: FeatureCollection = {
+            type: "FeatureCollection",
+            features: features,
+        }
+
         // Get the Mapbox token and style
         const mapboxToken = getMapboxToken()
         const mapboxStyle = getMapboxStyle()
@@ -111,6 +149,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmOptions: farmOptions,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
+            featureCollection: featureCollection,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
             fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
@@ -125,13 +164,16 @@ export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
     const calendar = useCalendarStore((state) => state.calendar)
 
+    const fieldsSavedId = "fieldsSaved"
+    const fieldsSaved = loaderData.featureCollection
+    const viewState = getViewState(fieldsSaved)
+    const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+
     const fieldsAvailableId = "fieldsAvailable"
-    // const fields = loaderData.savedFields
-    const viewState = getViewState(null)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
-    const fieldsSelectedId = "fieldsSelected"
-    const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
+    // const fieldsSelectedId = "fieldsSelected"
+    // const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
 
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(
@@ -141,8 +183,9 @@ export default function Index() {
     const [selectedField, setSelectedField] = useState<any | null>(null)
 
     const handleSelectField = (feature: any) => {
-        setSelectedField(feature)
-        setOpen(true)
+        // setSelectedField(feature)
+        // setOpen(true)
+        console.log("hoi")
     }
     const handleFieldAdded = () => {
         setOpen(false)
@@ -191,7 +234,7 @@ export default function Index() {
                                 mapboxAccessToken={loaderData.mapboxToken}
                                 interactiveLayerIds={[
                                     fieldsAvailableId,
-                                    fieldsSelectedId,
+                                    fieldsSavedId,
                                 ]}
                             >
                                 <GeolocateControl />
@@ -206,31 +249,35 @@ export default function Index() {
                                     <Layer {...fieldsAvailableStyle} />
                                 </FieldsSourceAvailable>
 
-                                <FieldsSourceSelected
+                                <FieldsSourceNotClickable
+                                    id={fieldsSavedId}
+                                    fieldsData={fieldsSaved}
+                                >
+                                    <Layer {...fieldsSavedStyle} />
+                                </FieldsSourceNotClickable>
+
+                                {/* <FieldsSourceSelected
                                     id={fieldsSelectedId}
                                     availableLayerId={fieldsAvailableId}
                                     fieldsData={selectedFieldsData}
                                     setFieldsData={setSelectedFieldsData}
                                 >
                                     <Layer {...fieldsSelectedStyle} />
-                                </FieldsSourceSelected>
+                                </FieldsSourceSelected> */}
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
-                                    <FieldsPanelSelection
-                                        fields={selectedFieldsData}
-                                    />
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     />
                                     <FieldsPanelHover
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                         layer={fieldsAvailableId}
-                                        layerExclude={fieldsSelectedId}
+                                        layerExclude={fieldsSavedId}
                                     />
-                                    <FieldsPanelHover
+                                    {/* <FieldsPanelHover
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                         layer={fieldsSelectedId}
-                                    />
+                                    /> */}
                                 </div>
                             </MapGL>
                         )}
