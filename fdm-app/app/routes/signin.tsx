@@ -78,12 +78,8 @@ export default function SignIn() {
             <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
                 <div className="flex h-screen items-center justify-center py-12">
                     <div className="mx-auto grid w-[350px] gap-6">
-                        {/* Logo and title fix */}
                         <div className="flex items-center justify-center gap-2">
-                            <div
-                                className="flex aspect-square size-16 items-center justify-center rounded-lg"
-                                style={{ backgroundColor: "#122023" }}
-                            >
+                            <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
                                 <img
                                     className="size-12"
                                     src="/fdm-high-resolution-logo-transparent-no-text.png"

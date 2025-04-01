@@ -191,10 +191,7 @@ export function SidebarApp(props: SideBarAppType) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <NavLink to="/">
-                                <div
-                                    className="flex aspect-square size-8 items-center justify-center rounded-lg"
-                                    style={{ backgroundColor: "#122023" }}
-                                >
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#122023]">
                                     <img
                                         className="size-6"
                                         src="/fdm-high-resolution-logo-transparent-no-text.png"
