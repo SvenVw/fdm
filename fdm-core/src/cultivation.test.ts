@@ -27,7 +27,7 @@ import {
     enableFertilizerCatalogue,
 } from "./catalogues"
 import { and, gte, isNotNull, lte, or } from "drizzle-orm"
-import type * as schema from "./db/schema"
+import * as schema from "./db/schema"
 import type { Timeframe } from "./timeframe"
 
 describe("Cultivation Data Model", () => {
