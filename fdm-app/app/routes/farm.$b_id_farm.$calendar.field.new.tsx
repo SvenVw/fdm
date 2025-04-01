@@ -172,24 +172,14 @@ export default function Index() {
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
-    // const fieldsSelectedId = "fieldsSelected"
-    // const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
-
-    // Set selected fields
-    const [selectedFieldsData, setSelectedFieldsData] = useState(
-        generateFeatureClass(),
-    )
     const [open, setOpen] = useState(false)
     const [selectedField, setSelectedField] = useState<any | null>(null)
 
     const handleSelectField = (feature: any) => {
-        // setSelectedField(feature)
-        // setOpen(true)
-        console.log("hoi")
+        setSelectedField(feature)
+        setOpen(true)
     }
-    const handleFieldAdded = () => {
-        setOpen(false)
-    }
+
     return (
         <SidebarInset>
             <FarmHeader
@@ -236,6 +226,15 @@ export default function Index() {
                                     fieldsAvailableId,
                                     fieldsSavedId,
                                 ]}
+                                onClick={(evt) => {
+                                    if (!evt.features) return
+                                    const features = evt.features.filter(
+                                        (f) => f.source === fieldsAvailableId,
+                                    )
+                                    if (features.length > 0) {
+                                        handleSelectField(features[0])
+                                    }
+                                }}
                             >
                                 <GeolocateControl />
                                 <NavigationControl />
@@ -244,7 +243,6 @@ export default function Index() {
                                     id={fieldsAvailableId}
                                     url={loaderData.fieldsAvailableUrl}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                                    onFeatureSelect={handleSelectField}
                                 >
                                     <Layer {...fieldsAvailableStyle} />
                                 </FieldsSourceAvailable>
@@ -256,15 +254,6 @@ export default function Index() {
                                     <Layer {...fieldsSavedStyle} />
                                 </FieldsSourceNotClickable>
 
-                                {/* <FieldsSourceSelected
-                                    id={fieldsSelectedId}
-                                    availableLayerId={fieldsAvailableId}
-                                    fieldsData={selectedFieldsData}
-                                    setFieldsData={setSelectedFieldsData}
-                                >
-                                    <Layer {...fieldsSelectedStyle} />
-                                </FieldsSourceSelected> */}
-
                                 <div className="fields-panel grid gap-4 w-[350px]">
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
@@ -274,10 +263,6 @@ export default function Index() {
                                         layer={fieldsAvailableId}
                                         layerExclude={fieldsSavedId}
                                     />
-                                    {/* <FieldsPanelHover
-                                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                                        layer={fieldsSelectedId}
-                                    /> */}
                                 </div>
                             </MapGL>
                         )}
@@ -288,8 +273,7 @@ export default function Index() {
                 <FieldDetailsDialog
                     open={open}
                     setOpen={setOpen}
-                    field={selectedField}
-                    onFieldAdded={handleFieldAdded}
+                    field={selectedField}                
                 />
             )}
         </SidebarInset>
