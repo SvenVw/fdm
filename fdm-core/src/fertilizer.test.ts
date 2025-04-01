@@ -22,17 +22,19 @@ import {
     removeFertilizer,
     removeFertilizerApplication,
     updateFertilizerApplication,
+    updateFertilizerFromCatalogue,
 } from "./fertilizer"
 import { addField } from "./field"
+import {
+    disableFertilizerCatalogue,
+    enableFertilizerCatalogue,
+} from "./catalogues"
 import { createId } from "./id"
-import { disableFertilizerCatalogue, enableFertilizerCatalogue } from "./catalogues"
 
 describe("Fertilizer Data Model", () => {
     let fdm: FdmServerType
-    let p_id_catalogue: string
     let principal_id: string
     let b_id_farm: string
-    let p_source: string
 
     beforeEach(async () => {
         const host = inject("host")
@@ -56,10 +58,7 @@ describe("Fertilizer Data Model", () => {
             farmPostalCode,
         )
 
-        p_source = "custom"
-        await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, p_source)
-
-        p_id_catalogue = createId()
+        await enableFertilizerCatalogue(fdm, principal_id, b_id_farm, b_id_farm)
     })
 
     afterAll(async () => {})
@@ -78,56 +77,59 @@ describe("Fertilizer Data Model", () => {
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
-            await addFertilizerToCatalogue(fdm, {
-                p_id_catalogue,
-                p_source,
-                p_name_nl,
-                p_name_en,
-                p_description,
-                p_dm: 37,
-                p_density: 20,
-                p_om: 20,
-                p_a: 30,
-                p_hc: 40,
-                p_eom: 50,
-                p_eoc: 60,
-                p_c_rt: 70,
-                p_c_of: 80,
-                p_c_if: 90,
-                p_c_fr: 100,
-                p_cn_of: 110,
-                p_n_rt: 120,
-                p_n_if: 130,
-                p_n_of: 140,
-                p_n_wc: 150,
-                p_p_rt: 160,
-                p_k_rt: 170,
-                p_mg_rt: 180,
-                p_ca_rt: 190,
-                p_ne: 200,
-                p_s_rt: 210,
-                p_s_wc: 220,
-                p_cu_rt: 230,
-                p_zn_rt: 240,
-                p_na_rt: 250,
-                p_si_rt: 260,
-                p_b_rt: 270,
-                p_mn_rt: 280,
-                p_ni_rt: 290,
-                p_fe_rt: 300,
-                p_mo_rt: 310,
-                p_co_rt: 320,
-                p_as_rt: 330,
-                p_cd_rt: 340,
-                pr_cr_rt: 350,
-                p_cr_vi: 360,
-                p_pb_rt: 370,
-                p_hg_rt: 380,
-                p_cl_rt: 390,
-                p_type_manure: true,
-                p_type_mineral: false,
-                p_type_compost: false,
-            })
+            const p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl,
+                    p_name_en,
+                    p_description,
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
 
             const fertilizers = await getFertilizersFromCatalogue(
                 fdm,
@@ -139,7 +141,7 @@ describe("Fertilizer Data Model", () => {
                 (f) => f.p_id_catalogue === p_id_catalogue,
             )
             expect(fertilizer).toBeDefined()
-            expect(fertilizer?.p_source).toBe(p_source)
+            expect(fertilizer?.p_source).toBe(b_id_farm)
             expect(fertilizer?.p_name_nl).toBe(p_name_nl)
             expect(fertilizer?.p_name_en).toBe(p_name_en)
             expect(fertilizer?.p_description).toBe(p_description)
@@ -150,56 +152,59 @@ describe("Fertilizer Data Model", () => {
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
-            await addFertilizerToCatalogue(fdm, {
-                p_id_catalogue,
-                p_source,
-                p_name_nl,
-                p_name_en,
-                p_description,
-                p_dm: 37,
-                p_density: 20,
-                p_om: 20,
-                p_a: 30,
-                p_hc: 40,
-                p_eom: 50,
-                p_eoc: 60,
-                p_c_rt: 70,
-                p_c_of: 80,
-                p_c_if: 90,
-                p_c_fr: 100,
-                p_cn_of: 110,
-                p_n_rt: 120,
-                p_n_if: 130,
-                p_n_of: 140,
-                p_n_wc: 150,
-                p_p_rt: 160,
-                p_k_rt: 170,
-                p_mg_rt: 180,
-                p_ca_rt: 190,
-                p_ne: 200,
-                p_s_rt: 210,
-                p_s_wc: 220,
-                p_cu_rt: 230,
-                p_zn_rt: 240,
-                p_na_rt: 250,
-                p_si_rt: 260,
-                p_b_rt: 270,
-                p_mn_rt: 280,
-                p_ni_rt: 290,
-                p_fe_rt: 300,
-                p_mo_rt: 310,
-                p_co_rt: 320,
-                p_as_rt: 330,
-                p_cd_rt: 340,
-                pr_cr_rt: 350,
-                p_cr_vi: 360,
-                p_pb_rt: 370,
-                p_hg_rt: 380,
-                p_cl_rt: 390,
-                p_type_manure: true,
-                p_type_mineral: false,
-                p_type_compost: false,
-            })
+            const p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl,
+                    p_name_en,
+                    p_description,
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
 
             const p_acquiring_amount = 1000
             const p_acquiring_date = new Date()
@@ -222,56 +227,59 @@ describe("Fertilizer Data Model", () => {
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
-            await addFertilizerToCatalogue(fdm, {
-                p_id_catalogue,
-                p_source,
-                p_name_nl,
-                p_name_en,
-                p_description,
-                p_dm: 37,
-                p_density: 20,
-                p_om: 20,
-                p_a: 30,
-                p_hc: 40,
-                p_eom: 50,
-                p_eoc: 60,
-                p_c_rt: 70,
-                p_c_of: 80,
-                p_c_if: 90,
-                p_c_fr: 100,
-                p_cn_of: 110,
-                p_n_rt: 120,
-                p_n_if: 130,
-                p_n_of: 140,
-                p_n_wc: 150,
-                p_p_rt: 160,
-                p_k_rt: 170,
-                p_mg_rt: 180,
-                p_ca_rt: 190,
-                p_ne: 200,
-                p_s_rt: 210,
-                p_s_wc: 220,
-                p_cu_rt: 230,
-                p_zn_rt: 240,
-                p_na_rt: 250,
-                p_si_rt: 260,
-                p_b_rt: 270,
-                p_mn_rt: 280,
-                p_ni_rt: 290,
-                p_fe_rt: 300,
-                p_mo_rt: 310,
-                p_co_rt: 320,
-                p_as_rt: 330,
-                p_cd_rt: 340,
-                pr_cr_rt: 350,
-                p_cr_vi: 360,
-                p_pb_rt: 370,
-                p_hg_rt: 380,
-                p_cl_rt: 390,
-                p_type_manure: true,
-                p_type_mineral: false,
-                p_type_compost: false,
-            })
+            const p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl,
+                    p_name_en,
+                    p_description,
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
 
             const p_acquiring_amount = 1000
             const p_acquiring_date = new Date()
@@ -307,56 +315,59 @@ describe("Fertilizer Data Model", () => {
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
-            await addFertilizerToCatalogue(fdm, {
-                p_id_catalogue,
-                p_source,
-                p_name_nl,
-                p_name_en,
-                p_description,
-                p_dm: 37,
-                p_density: 20,
-                p_om: 20,
-                p_a: 30,
-                p_hc: 40,
-                p_eom: 50,
-                p_eoc: 60,
-                p_c_rt: 70,
-                p_c_of: 80,
-                p_c_if: 90,
-                p_c_fr: 100,
-                p_cn_of: 110,
-                p_n_rt: 120,
-                p_n_if: 130,
-                p_n_of: 140,
-                p_n_wc: 150,
-                p_p_rt: 160,
-                p_k_rt: 170,
-                p_mg_rt: 180,
-                p_ca_rt: 190,
-                p_ne: 200,
-                p_s_rt: 210,
-                p_s_wc: 220,
-                p_cu_rt: 230,
-                p_zn_rt: 240,
-                p_na_rt: 250,
-                p_si_rt: 260,
-                p_b_rt: 270,
-                p_mn_rt: 280,
-                p_ni_rt: 290,
-                p_fe_rt: 300,
-                p_mo_rt: 310,
-                p_co_rt: 320,
-                p_as_rt: 330,
-                p_cd_rt: 340,
-                pr_cr_rt: 350,
-                p_cr_vi: 360,
-                p_pb_rt: 370,
-                p_hg_rt: 380,
-                p_cl_rt: 390,
-                p_type_manure: true,
-                p_type_mineral: false,
-                p_type_compost: false,
-            })
+            const p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl,
+                    p_name_en,
+                    p_description,
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
 
             const p_acquiring_amount = 1000
             const p_acquiring_date = new Date()
@@ -385,13 +396,300 @@ describe("Fertilizer Data Model", () => {
                 fdm,
                 principal_id,
                 b_id_farm,
-                p_source,
+                b_id_farm,
             )
 
             const fertilizersWithNoCatalogue =
                 await getFertilizersFromCatalogue(fdm, principal_id, b_id_farm)
             expect(fertilizersWithNoCatalogue).toEqual([])
             expect(fertilizersWithNoCatalogue.length).toBe(0)
+        })
+    })
+
+    describe("updateFertilizerFromCatalogue", () => {
+        let p_id_catalogue: string
+
+        beforeEach(async () => {
+            // Add a fertilizer to the catalogue
+            p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl: "Test Fertilizer",
+                    p_name_en: "Test Fertilizer (EN)",
+                    p_description: "This is a test fertilizer",
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
+        })
+
+        it("should update an existing fertilizer in the catalogue", async () => {
+            const updatedProperties = {
+                p_name_nl: "Updated Test Fertilizer",
+                p_description: "This is an updated test fertilizer",
+                p_dm: 50,
+            }
+
+            await updateFertilizerFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_id_catalogue,
+                updatedProperties,
+            )
+
+            const fertilizers = await getFertilizersFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+            const updatedFertilizer = fertilizers.find(
+                (f) => f.p_id_catalogue === p_id_catalogue,
+            )
+            expect(updatedFertilizer).toBeDefined()
+            expect(updatedFertilizer?.p_name_nl).toBe(
+                updatedProperties.p_name_nl,
+            )
+            expect(updatedFertilizer?.p_description).toBe(
+                updatedProperties.p_description,
+            )
+            expect(updatedFertilizer?.p_dm).toBe(updatedProperties.p_dm)
+        })
+
+        it("should throw an error if fertilizer does not exist in catalogue", async () => {
+            const nonExistingCatalogueId = createId()
+            const updatedProperties = {
+                p_name_nl: "Updated Test Fertilizer",
+            }
+
+            await expect(
+                updateFertilizerFromCatalogue(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    nonExistingCatalogueId,
+                    updatedProperties,
+                ),
+            ).rejects.toThrow("Exception for updateFertilizerFromCatalogue")
+        })
+
+        it("should update a fertilizer with a subset of properties", async () => {
+            const updatedProperties = {
+                p_name_nl: "Updated Name Only",
+            }
+
+            await updateFertilizerFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_id_catalogue,
+                updatedProperties,
+            )
+
+            const fertilizers = await getFertilizersFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+            const updatedFertilizer = fertilizers.find(
+                (f) => f.p_id_catalogue === p_id_catalogue,
+            )
+            expect(updatedFertilizer).toBeDefined()
+            expect(updatedFertilizer?.p_name_nl).toBe(
+                updatedProperties.p_name_nl,
+            )
+            // Check that other properties remain unchanged
+            expect(updatedFertilizer?.p_description).toBe(
+                "This is a test fertilizer",
+            )
+            expect(updatedFertilizer?.p_dm).toBe(37)
+        })
+
+        it("should throw an error when updating with invalid principal ID", async () => {
+            const updatedProperties = {
+                p_name_nl: "Updated Test Fertilizer",
+            }
+            const invalidPrincipalId = "invalid-principal-id"
+
+            await expect(
+                updateFertilizerFromCatalogue(
+                    fdm,
+                    invalidPrincipalId,
+                    b_id_farm,
+                    p_id_catalogue,
+                    updatedProperties,
+                ),
+            ).rejects.toThrow(
+                "Principal does not have permission to perform this action",
+            )
+        })
+        it("should update hash after updating a fertilizer", async () => {
+            const updatedProperties = {
+                p_name_nl: "Updated Test Fertilizer",
+                p_description: "This is an updated test fertilizer",
+                p_dm: 50,
+            }
+            const fertilizersBefore = await getFertilizersFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+            const fertilizerBefore = fertilizersBefore.find(
+                (f) => f.p_id_catalogue === p_id_catalogue,
+            )
+            expect(fertilizerBefore).toBeDefined()
+            const hashBefore = fertilizerBefore?.hash
+            expect(hashBefore).toBeDefined()
+            await updateFertilizerFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_id_catalogue,
+                updatedProperties,
+            )
+            const fertilizersAfter = await getFertilizersFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+            const fertilizerAfter = fertilizersAfter.find(
+                (f) => f.p_id_catalogue === p_id_catalogue,
+            )
+            expect(fertilizerAfter).toBeDefined()
+            const hashAfter = fertilizerAfter?.hash
+            expect(hashAfter).toBeDefined()
+
+            expect(hashBefore).not.toBe(hashAfter)
+        })
+        it("should throw an error if updating a fertilizer of another farm", async () => {
+            const farmName = "Test Farm 2"
+            const farmBusinessId = "98765"
+            const farmAddress = "456 Farm Lane"
+            const farmPostalCode = "54321"
+            const b_id_farm2 = await addFarm(
+                fdm,
+                principal_id,
+                farmName,
+                farmBusinessId,
+                farmAddress,
+                farmPostalCode,
+            )
+            await enableFertilizerCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm2,
+                b_id_farm2,
+            )
+
+            // Add a fertilizer to the catalogue
+            const p_id_catalogue2 = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm2,
+                {
+                    p_name_nl: "Test Fertilizer 2",
+                    p_name_en: "Test Fertilizer (EN) 2",
+                    p_description: "This is a test fertilizer 2",
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
+            const updatedProperties = {
+                p_name_nl: "Updated Test Fertilizer",
+            }
+            await expect(
+                updateFertilizerFromCatalogue(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    p_id_catalogue2,
+                    updatedProperties,
+                ),
+            ).rejects.toThrow("Exception for updateFertilizerFromCatalogue")
         })
     })
 
@@ -438,60 +736,62 @@ describe("Fertilizer Data Model", () => {
             )
 
             // Add fertilizer to catalogue
-            p_id_catalogue = createId()
             const p_name_nl = "Test Fertilizer"
             const p_name_en = "Test Fertilizer (EN)"
             const p_description = "This is a test fertilizer"
-            await addFertilizerToCatalogue(fdm, {
-                p_id_catalogue,
-                p_source,
-                p_name_nl,
-                p_name_en,
-                p_description,
-                p_dm: 37,
-                p_density: 20,
-                p_om: 20,
-                p_a: 30,
-                p_hc: 40,
-                p_eom: 50,
-                p_eoc: 60,
-                p_c_rt: 70,
-                p_c_of: 80,
-                p_c_if: 90,
-                p_c_fr: 100,
-                p_cn_of: 110,
-                p_n_rt: 120,
-                p_n_if: 130,
-                p_n_of: 140,
-                p_n_wc: 150,
-                p_p_rt: 160,
-                p_k_rt: 170,
-                p_mg_rt: 180,
-                p_ca_rt: 190,
-                p_ne: 200,
-                p_s_rt: 210,
-                p_s_wc: 220,
-                p_cu_rt: 230,
-                p_zn_rt: 240,
-                p_na_rt: 250,
-                p_si_rt: 260,
-                p_b_rt: 270,
-                p_mn_rt: 280,
-                p_ni_rt: 290,
-                p_fe_rt: 300,
-                p_mo_rt: 310,
-                p_co_rt: 320,
-                p_as_rt: 330,
-                p_cd_rt: 340,
-                pr_cr_rt: 350,
-                p_cr_vi: 360,
-                p_pb_rt: 370,
-                p_hg_rt: 380,
-                p_cl_rt: 390,
-                p_type_manure: true,
-                p_type_mineral: false,
-                p_type_compost: false,
-            })
+            const p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl,
+                    p_name_en,
+                    p_description,
+                    p_dm: 37,
+                    p_density: 20,
+                    p_om: 20,
+                    p_a: 30,
+                    p_hc: 40,
+                    p_eom: 50,
+                    p_eoc: 60,
+                    p_c_rt: 70,
+                    p_c_of: 80,
+                    p_c_if: 90,
+                    p_c_fr: 100,
+                    p_cn_of: 110,
+                    p_n_rt: 120,
+                    p_n_if: 130,
+                    p_n_of: 140,
+                    p_n_wc: 150,
+                    p_p_rt: 160,
+                    p_k_rt: 170,
+                    p_mg_rt: 180,
+                    p_ca_rt: 190,
+                    p_ne: 200,
+                    p_s_rt: 210,
+                    p_s_wc: 220,
+                    p_cu_rt: 230,
+                    p_zn_rt: 240,
+                    p_na_rt: 250,
+                    p_si_rt: 260,
+                    p_b_rt: 270,
+                    p_mn_rt: 280,
+                    p_ni_rt: 290,
+                    p_fe_rt: 300,
+                    p_mo_rt: 310,
+                    p_co_rt: 320,
+                    p_as_rt: 330,
+                    p_cd_rt: 340,
+                    pr_cr_rt: 350,
+                    p_cr_vi: 360,
+                    p_pb_rt: 370,
+                    p_hg_rt: 380,
+                    p_cl_rt: 390,
+                    p_type_manure: true,
+                    p_type_mineral: false,
+                    p_type_compost: false,
+                },
+            )
 
             const p_acquiring_amount = 1000
             const p_acquiring_date = new Date()

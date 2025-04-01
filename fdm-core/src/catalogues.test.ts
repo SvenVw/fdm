@@ -591,7 +591,7 @@ describe("Catalogues syncing", () => {
             .select()
             .from(schema.fertilizersCatalogue)
 
-        const srmCatalogueOriginal = getFertilizersCatalogue("srm")
+        const srmCatalogueOriginal = await getFertilizersCatalogue("srm")
         expect(srmCatalogue.length).toBeGreaterThan(srmCatalogueOriginal.length)
 
         const brpCatalogue = await fdm
@@ -599,7 +599,7 @@ describe("Catalogues syncing", () => {
             .from(schema.cultivationsCatalogue)
         expect(brpCatalogue.length).toBeGreaterThan(0)
 
-        const brpCatalogueOriginal = getCultivationCatalogue("brp")
+        const brpCatalogueOriginal = await getCultivationCatalogue("brp")
         expect(brpCatalogue.length).toBeGreaterThan(brpCatalogueOriginal.length)
     })
 
@@ -614,6 +614,7 @@ describe("Catalogues syncing", () => {
             })
             .from(schema.fertilizersCatalogue)
             .where(isNotNull(schema.fertilizersCatalogue.hash))
+            .orderBy(schema.fertilizersCatalogue.p_id_catalogue)
             .limit(1)
         expect(item[0].p_id_catalogue).toBeDefined()
 
@@ -672,6 +673,7 @@ describe("Catalogues syncing", () => {
             })
             .from(schema.cultivationsCatalogue)
             .where(isNotNull(schema.cultivationsCatalogue.hash))
+            .orderBy(schema.cultivationsCatalogue.b_lu_catalogue)
             .limit(1)
         expect(item[0].b_lu_catalogue).toBeDefined()
 
