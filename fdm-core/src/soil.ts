@@ -321,6 +321,7 @@ export async function getSoilAnalyses(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting the data.
  * @param b_id - The identifier of the field.
+ * @param timeframe - Optional timeframe to filter the soil analyses. Only analyses after `timeframe.end` are excluded.
  * @returns An object where each key is a soil parameter name and the value is an object containing the last available value,
  *          the a_id of the analysis record it was retrieved from, the b_sampling_date, and the a_source.
  *          Returns an empty object if no records are found.
@@ -331,6 +332,7 @@ export async function getCurrentSoilData(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
+    timeframe?: Timeframe,
 ): Promise<CurrentSoilData> {
     try {
         await checkPermission(
@@ -341,6 +343,17 @@ export async function getCurrentSoilData(
             principal_id,
             "getLastSoilParameters",
         )
+
+        // Filter out "future" analyes
+        let whereClause: SQL | undefined = undefined
+        if (timeframe?.end) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                lte(schema.soilSampling.b_sampling_date, timeframe.end),
+            )
+        } else {
+            whereClause = eq(schema.soilSampling.b_id, b_id)
+        }
 
         const soilAnalyses = await fdm
             .select({
@@ -358,7 +371,7 @@ export async function getCurrentSoilData(
                 schema.soilSampling,
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
-            .where(eq(schema.soilSampling.b_id, b_id))
+            .where(whereClause)
             .orderBy(
                 // Drizzle does not support NULL LAST argument yet
                 sql`${schema.soilSampling.b_sampling_date} DESC NULLS LAST`,
