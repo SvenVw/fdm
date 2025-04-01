@@ -4,6 +4,7 @@ import throttle from "lodash.throttle"
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl"
 import { generateFeatureClass } from "./atlas-functions"
+import type { FieldsAvailableUrlType } from "./atlas.d"
 
 export function FieldsSourceNotClickable({
     id,
@@ -106,7 +107,7 @@ export function FieldsSourceAvailable({
     children,
 }: {
     id: string
-    url: fieldsAvailableUrlType
+    url: FieldsAvailableUrlType
     zoomLevelFields: number
     children: JSX.Element
 }) {
