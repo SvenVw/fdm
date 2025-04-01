@@ -13,3 +13,5 @@
 
 export { getFertilizersCatalogue } from "./fertilizers"
 export { getCultivationCatalogue } from "./cultivations"
+export { hashFertilizer } from "./fertilizers/hash"
+export { hashCultivation } from "./cultivations/hash"

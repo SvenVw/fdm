@@ -42,6 +42,7 @@ import {
     Scale,
     Send,
     Settings,
+    Shapes,
     Sparkles,
     Sprout,
     Square,
@@ -127,6 +128,12 @@ export function SidebarApp(props: SideBarAppType) {
         atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
     } else {
         atlasLink = undefined
+    }
+    let fertilizersLink: string | undefined
+    if (farmId) {
+        fertilizersLink = `/farm/${farmId}/fertilizers`
+    } else {
+        fertilizersLink = undefined
     }
 
     const nutrienBalanceLink = undefined
@@ -339,14 +346,21 @@ export function SidebarApp(props: SideBarAppType) {
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem> */}
-                            {/* <SidebarMenuItem>
+                            <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./fertilizers">
-                                        <Shapes />
-                                        <span>Meststoffen</span>
-                                    </NavLink>
+                                    {fertilizersLink ? (
+                                        <NavLink to={fertilizersLink}>
+                                            <Shapes />
+                                            <span>Meststoffen</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Shapes />
+                                            <span>Meststoffen</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
-                            </SidebarMenuItem> */}
+                            </SidebarMenuItem>
                             {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./stable">

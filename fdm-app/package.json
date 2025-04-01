@@ -38,6 +38,7 @@
         "@sentry/vite-plugin": "^3.2.2",
         "@svenvw/fdm-calculator": "workspace:^",
         "@svenvw/fdm-core": "workspace:^",
+        "@tanstack/react-table": "^8.21.2",
         "@turf/centroid": "^7.2.0",
         "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",

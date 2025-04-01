@@ -22,6 +22,11 @@ export interface LayerOption {
 
 export type LayerOptions = LayerOption[]
 
+export interface FertilizerOption {
+    p_id: string
+    p_name_nl: string
+}
+
 export interface HeaderAction {
     label: string
     to: string

@@ -25,6 +25,7 @@ export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
 export {
     addFertilizerToCatalogue,
+    updateFertilizerFromCatalogue,
     getFertilizersFromCatalogue,
     addFertilizer,
     removeFertilizer,
