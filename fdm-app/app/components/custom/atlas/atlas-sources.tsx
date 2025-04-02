@@ -127,10 +127,10 @@ export function FieldsSourceAvailable({
                     if (bounds) {
                         const [[minX, minY], [maxX, maxY]] = bounds.toArray()
                         const bbox = {
-                            minX: 0.9999 * minX,
-                            maxX: 1.0001 * maxX,
-                            minY: 0.9999 * minY,
-                            maxY: 1.0001 * maxY,
+                            minX: 0.9995 * minX,
+                            maxX: 1.0005 * maxX,
+                            minY: 0.9995 * minY,
+                            maxY: 1.0005 * maxY,
                         }
                         try {
                             const iter = deserialize(url, bbox)
