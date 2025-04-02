@@ -11,12 +11,6 @@ const FormSchema = z.object({
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
-    b_id_source: z.string({
-        required_error: "Bron is verplicht",
-    }),
-    b_geometry: z.string({
-        required_error: "Geometrie is verplicht",
-    }),
 })
 
 export { FormSchema }
