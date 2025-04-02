@@ -16,6 +16,7 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
     Popover,
     PopoverContent,
@@ -158,6 +159,9 @@ export function Combobox({
                     </Popover>
                     <FormDescription />
                     <FormMessage />
+                    <FormControl>
+                        <Input type="hidden" {...field} />
+                    </FormControl>
                 </FormItem>
             )}
         />

@@ -33,6 +33,8 @@ import { useCalendarStore } from "@/store/calendar"
 import {
     addCultivation,
     addField,
+    addSoilAnalysis,
+    getCultivationsFromCatalogue,
     getFarm,
     getFarms,
     getFields,
@@ -52,12 +54,14 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
+import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 import FieldDetailsDialog from "@/components/custom/field/form"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FeatureCollection } from "geojson"
+import type { FeatureCollection, Polygon } from "geojson"
+import { extractFormValuesFromRequest } from "@/lib/form"
+import { FormSchema } from "@/components/custom/field/schema"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -141,6 +145,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             features: features,
         }
 
+        // Get the available cultivations
+        let cultivationOptions = []
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        cultivationOptions = cultivationsCatalogue
+            .filter(
+                (cultivation) =>
+                    cultivation?.b_lu_catalogue && cultivation?.b_lu_name,
+            )
+            .map((cultivation) => ({
+                value: cultivation.b_lu_catalogue,
+                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
+            }))
+
+        // Create default field name
+        const fieldNameDefault = `Perceel ${fields.length + 1}`
+
         // Get the Mapbox token and style
         const mapboxToken = getMapboxToken()
         const mapboxStyle = getMapboxStyle()
@@ -150,6 +174,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
             featureCollection: featureCollection,
+            fieldNameDefault: fieldNameDefault,
+            cultivationOptions: cultivationOptions,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
             fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
@@ -273,7 +299,9 @@ export default function Index() {
                 <FieldDetailsDialog
                     open={open}
                     setOpen={setOpen}
-                    field={selectedField}                
+                    field={selectedField}
+                    cultivationOptions={loaderData.cultivationOptions}
+                    fieldNameDefault={loaderData.fieldNameDefault}
                 />
             )}
         </SidebarInset>
@@ -281,6 +309,136 @@ export default function Index() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    //todo: implement add field
-    throw new Error("Not implemented")
+    console.log("hoi")
+    // Get the farm id
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
+        })
+    }
+
+    try {
+        // Get the session
+        const session = await getSession(request)
+
+        // Get the timeframe
+        const timeframe = getTimeframe(params)
+
+        // Get from values
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+        console.log(formValues)
+
+        // Check if cultivation is available
+        let cultivationOptions = []
+        const cultivationsCatalogue = await getCultivationsFromCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        cultivationOptions = cultivationsCatalogue
+            .filter(
+                (cultivation) =>
+                    cultivation?.b_lu_catalogue && cultivation?.b_lu_name,
+            )
+            .map((cultivation) => {
+                return cultivation.b_lu_catalogue
+            })
+        if (!cultivationOptions.includes(formValues.b_lu_catalogue)) {
+            return dataWithError(
+                `Cultivation ${formValues.b_lu_catalogue} is not available`,
+                "Gewas is onbekend. Kies een gewas uit de lijst",
+            )
+        }
+
+        const b_name = formValues.b_name
+        const b_id_source = formValues.b_id_source
+        const b_lu_catalogue = formValues.b_lu_catalogue
+        const b_geometry = formValues.b_geometry as Polygon
+        const currentYear = new Date().getFullYear()
+        const defaultDate = timeframe.start
+            ? timeframe.start
+            : `${currentYear}-01-01`
+        const b_start = defaultDate
+        const b_lu_start = defaultDate
+        const b_lu_end = undefined
+        const b_end = undefined
+        const b_acquiring_method = "unknown"
+
+        const b_id = await addField(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            b_name,
+            b_id_source,
+            b_geometry,
+            b_start,
+            b_acquiring_method,
+            b_end,
+        )
+        await addCultivation(
+            fdm,
+            session.principal_id,
+            b_lu_catalogue,
+            b_id,
+            b_lu_start,
+            b_lu_end,
+        )
+
+        if (process.env.NMI_API_KEY) {
+            const fieldCentroid = centroid(formValues.geometry)
+            const a_lon = fieldCentroid.geometry.coordinates[0]
+            const a_lat = fieldCentroid.geometry.coordinates[1]
+
+            const responseApi = await fetch(
+                `https://api.nmi-agro.nl/estimates?${new URLSearchParams({
+                    a_lat: a_lat.toString(),
+                    a_lon: a_lon.toString(),
+                })}`,
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${process.env.NMI_API_KEY}`,
+                    },
+                },
+            )
+
+            if (!responseApi.ok) {
+                throw data(responseApi.statusText, {
+                    status: responseApi.status,
+                    statusText: responseApi.statusText,
+                })
+            }
+
+            const result = await responseApi.json()
+            const response = result.data
+
+            await addSoilAnalysis(
+                fdm,
+                session.principal_id,
+                undefined,
+                "NMI",
+                b_id,
+                0.3,
+                undefined,
+                {
+                    a_p_al: response.a_p_al,
+                    a_p_cc: response.a_p_cc,
+                    a_som_loi: response.a_som_loi,
+                    b_soiltype_agr: response.b_soiltype_agr,
+                    b_gwl_class: response.b_gwl_class,
+                },
+            )
+        }
+
+        return redirectWithSuccess("./", {
+            message: `${b_name} is toegevoegd! 🎉`,
+        })
+    } catch (error) {
+        throw handleActionError(error)
+    }
 }
