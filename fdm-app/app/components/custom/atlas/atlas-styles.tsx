@@ -1,23 +1,38 @@
-import type { LayerProps } from "react-map-gl"
+import type {
+    FillLayerSpecification,
+    LayerProps,
+    SymbolLayerSpecification,
+} from "react-map-gl"
 
-export function getFieldsStyle(layerId: string): LayerProps & {
-    id: string
-    type: string
-    paint: {
-        "fill-color": string
-        "fill-opacity": number
-        "fill-outline-color": string
-    }
-} {
-    const fieldsStyle = {
-        id: layerId,
+export function getFieldsStyle(
+    layerId: string,
+): LayerProps &
+    (
+        | ({
+              id: string
+              type: "fill"
+              paint: FillLayerSpecification["paint"]
+          })
+        | {
+              id: string
+              type: "symbol"
+              layout: SymbolLayerSpecification["layout"]
+              paint: SymbolLayerSpecification["paint"]
+          }
+    ) {
+    const baseFieldsStyle: Omit<FillLayerSpecification, "id" | "source"> = {
         type: "fill",
         paint: {
-            "fill-color": "#3b82f6",
+            "fill-color": "#60a5fa",
             "fill-opacity": 0.5,
             "fill-outline-color": "#1e3a8a",
         },
-    }
+    } as FillLayerSpecification // Cast to FillLayerSpecification to allow modification of paint
+
+    const fieldsStyle = {
+        ...baseFieldsStyle,
+        id: layerId,
+    } as LayerProps & FillLayerSpecification // Cast to FillLayerSpecification to allow modification of paint
 
     if (layerId === "fieldsSelected") {
         fieldsStyle.paint["fill-color"] = "#f43f5e"
@@ -27,5 +42,6 @@ export function getFieldsStyle(layerId: string): LayerProps & {
         fieldsStyle.paint["fill-color"] = "#10b981"
         fieldsStyle.paint["fill-opacity"] = 0.8
     }
+
     return fieldsStyle
 }
