@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "react-router"
 import { FormSchema } from "./schema"
 import { Combobox } from "../combobox"
+import { LoadingSpinner } from "@/components/custom/loadingspinner"
 
 interface FieldDetailsDialogProps {
     open: boolean
@@ -122,7 +123,17 @@ export default function FieldDetailsDialog({
                             />
                         </div>
                         <DialogFooter>
-                            <Button type="submit">Opslaan</Button>
+                            <Button type="submit">
+                                {" "}
+                                {form.formState.isSubmitting ? (
+                                    <div className="flex items-center space-x-2">
+                                        <LoadingSpinner />
+                                        <span>Opslaan</span>
+                                    </div>
+                                ) : (
+                                    "Opslaan"
+                                )}
+                            </Button>
                         </DialogFooter>
                     </Form>
                 </RemixFormProvider>
