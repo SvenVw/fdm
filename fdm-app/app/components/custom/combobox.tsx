@@ -1,5 +1,4 @@
-import { type ReactNode, useMemo, useState } from "react"
-
+import { type ReactNode, useMemo, useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
     Command,
@@ -48,6 +47,7 @@ export function Combobox({
     disabled,
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
+    const listboxRef = useRef<HTMLDivElement>(null)
 
     /** Map of option values to their labels for efficient lookup */
     const optionsMap = useMemo(
@@ -67,6 +67,15 @@ export function Combobox({
         [defaultValue, optionsMap],
     )
 
+    useEffect(() => {
+         if (open) {
+            const activeElement = listboxRef.current?.querySelector('[data-active]') as HTMLElement | null
+            if (activeElement) {
+                activeElement.focus()
+            }
+        }
+    }, [open]);
+
     return (
         <FormField
             control={form.control}
@@ -74,20 +83,23 @@ export function Combobox({
             disabled={disabled}
             render={({ field }) => (
                 <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel id={`${name}-label`}>{label}</FormLabel>
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                             <FormControl>
                                 <Button
+                                    id={`${name}-button`}
                                     variant="outline"
                                     role="combobox"
                                     aria-expanded={open}
+                                    aria-autocomplete="list"
+                                    aria-labelledby={`${name}-label`}
                                     name={name}
                                     disabled={disabled}
                                     className="w-full justify-between truncate focus-visible:ring-2"
-                                    aria-label={`Selecteer ${options.find((option) => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
                                     aria-controls="combobox-options"
                                     aria-haspopup="listbox"
+                                    aria-label={`Selecteer ${options.find((option) => option.value === field.value)?.label || defaultLabel || "Klik om te begin met typen..."}`}
                                 >
                                     {options.find(
                                         (option) =>
@@ -108,13 +120,14 @@ export function Combobox({
                                     placeholder="Begin met typen..."
                                     className="h-9"
                                 />
-                                <CommandList>
+                                <CommandList role="listbox" ref={listboxRef}>
                                     <CommandEmpty>Niks gevonden</CommandEmpty>
                                     <CommandGroup>
                                         {options.map((option: optionType) => (
                                             <CommandItem
                                                 value={option.label}
                                                 key={option.value}
+                                                role="option"
                                                 disabled={disabled}
                                                 onSelect={() => {
                                                     form.setValue(
