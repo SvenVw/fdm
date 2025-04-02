@@ -13,14 +13,18 @@ export function getFieldsStyle(layerId: string): LayerProps & {
         id: layerId,
         type: "fill",
         paint: {
-            "fill-color": "#93c5fd",
+            "fill-color": "#3b82f6",
             "fill-opacity": 0.5,
             "fill-outline-color": "#1e3a8a",
         },
     }
 
     if (layerId === "fieldsSelected") {
-        fieldsStyle.paint["fill-color"] = "#fca5a5"
+        fieldsStyle.paint["fill-color"] = "#f43f5e"
+        fieldsStyle.paint["fill-opacity"] = 0.8
+    }
+    if (layerId === "fieldsSaved") {
+        fieldsStyle.paint["fill-color"] = "#10b981"
         fieldsStyle.paint["fill-opacity"] = 0.8
     }
     return fieldsStyle
