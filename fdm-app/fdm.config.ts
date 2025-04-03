@@ -16,18 +16,18 @@ const config: Config = {
             clientSecret: String(process.env.GOOGLE_CLIENT_SECRET),
         },
         microsoft: {
-            clientId: String(process.env.MICROSOFT_CLIENT_ID),
-            clientSecret: String(process.env.MICROSOFT_CLIENT_SECRET),
+            clientId: String(process.env.MS_CLIENT_ID),
+            clientSecret: String(process.env.MS_CLIENT_SECRET),
         },
     },
 
     // Database
     database: {
-        password: String(process.env.DB_PASSWORD),
-        user: String(process.env.DB_USER),
-        database: String(process.env.DB_DATABASE),
-        host: String(process.env.DB_HOST),
-        port: Number(process.env.DB_PORT),
+        password: String(process.env.POSTGRES_PASSWORD),
+        user: String(process.env.POSTGRES_USER),
+        database: String(process.env.POSTGRES_DATABASE),
+        host: String(process.env.POSTGRES_HOST),
+        port: Number(process.env.POSTGRES_PORT),
     },
 
     // Integrations
