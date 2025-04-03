@@ -393,7 +393,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         if (process.env.NMI_API_KEY) {
-            const fieldCentroid = centroid(formValues.geometry)
+            const fieldCentroid = centroid(formValues.b_geometry)
             const a_lon = fieldCentroid.geometry.coordinates[0]
             const a_lat = fieldCentroid.geometry.coordinates[1]
 

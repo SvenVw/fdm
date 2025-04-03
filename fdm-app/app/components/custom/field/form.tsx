@@ -31,8 +31,6 @@ interface FieldDetailsDialogProps {
     field: any
     cultivationOptions: any
     fieldNameDefault: string
-    b_source: string
-    b_geometry: string
 }
 
 export default function FieldDetailsDialog({
@@ -69,72 +67,86 @@ export default function FieldDetailsDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-[425px]">
                 <RemixFormProvider {...form}>
-                    <Form id="formField" method="post">
-                        <DialogHeader>
-                            <DialogTitle>Nieuw perceel</DialogTitle>
-                            <DialogDescription>
-                                Vul de details van dit perceel in
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <FormField
-                                control={form.control}
-                                name="b_name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Naam</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="text"
-                                                required
-                                            />
-                                        </FormControl>
-                                        <FormDescription />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <Combobox
-                                options={cultivationOptions}
-                                form={form}
-                                name="b_lu_catalogue"
-                                label={
-                                    <span>
-                                        Hoofdgewas
-                                        <span className="text-red-500">*</span>
-                                    </span>
-                                }
-                                // disabled={!!b_lu_catalogue}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="b_id_source"
-                                render={({ field }) => (
-                                    <Input {...field} type="hidden" required />
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="b_geometry"
-                                render={({ field }) => (
-                                    <Input {...field} type="hidden" required />
-                                )}
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit">
-                                {" "}
-                                {form.formState.isSubmitting ? (
-                                    <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
-                                        <span>Opslaan</span>
-                                    </div>
-                                ) : (
-                                    "Opslaan"
-                                )}
-                            </Button>
-                        </DialogFooter>
+                    <Form id="formField" method="post" onSubmit={form.handleSubmit}> 
+                        <fieldset disabled={form.formState.isSubmitting}> 
+                            <DialogHeader>
+                                <DialogTitle>Nieuw perceel</DialogTitle>
+                                <DialogDescription>
+                                    Vul de details van dit perceel in
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <FormField
+                                    control={form.control}
+                                    name="b_name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Naam</FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    type="text"
+                                                    required
+                                                    disabled={form.formState.isSubmitting}
+                                                />
+                                            </FormControl>
+                                            <FormDescription />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Combobox
+                                    options={cultivationOptions}
+                                    form={form}
+                                    name="b_lu_catalogue"
+                                    label={
+                                        <span>
+                                            Hoofdgewas
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </span>
+                                    }
+                                    disabled={form.formState.isSubmitting}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="b_id_source"
+                                    render={({ field }) => (
+                                        <Input
+                                            {...field}
+                                            type="hidden"
+                                            required
+                                            disabled={form.formState.isSubmitting}
+                                        />
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="b_geometry"
+                                    render={({ field }) => (
+                                        <Input
+                                            {...field}
+                                            type="hidden"
+                                            required
+                                            disabled={form.formState.isSubmitting} 
+                                        />
+                                    )}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" disabled={form.formState.isSubmitting}>
+                                    {form.formState.isSubmitting ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                            <span>Opslaan...</span>
+                                        </div>
+                                    ) : (
+                                        "Opslaan"
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </fieldset>
                     </Form>
                 </RemixFormProvider>
             </DialogContent>
