@@ -7,7 +7,6 @@ import {
 } from "~/components/ui/breadcrumb"
 import { Separator } from "~/components/ui/separator"
 import { SidebarTrigger } from "~/components/ui/sidebar"
-
 import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
@@ -16,7 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { cn } from "~/lib/utils"
-import { useCalendarStore } from "@/store/calendar"
+import { useCalendarStore } from "~/store/calendar"
 import { ChevronDown } from "lucide-react"
 import { NavLink } from "react-router"
 import type {

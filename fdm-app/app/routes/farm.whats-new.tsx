@@ -19,7 +19,6 @@ import {
 } from "~/components/ui/breadcrumb"
 import { SidebarTrigger } from "~/components/ui/sidebar"
 import ReactMarkdown from "react-markdown"
-import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import remarkGfm from "remark-gfm"
 import { clientConfig } from "~/lib/config"
 

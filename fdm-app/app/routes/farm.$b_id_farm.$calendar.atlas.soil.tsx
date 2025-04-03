@@ -1,9 +1,9 @@
-import { getMapboxToken } from "@/app/integrations/mapbox"
+import { getMapboxToken } from "~/integrations/mapbox"
 import { Button } from "~/components/ui/button"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getTimeframe } from "@/lib/calendar"
+import { getTimeframe } from "~/lib/calendar"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,

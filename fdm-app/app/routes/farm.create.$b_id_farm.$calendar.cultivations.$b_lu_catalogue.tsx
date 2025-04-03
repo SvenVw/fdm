@@ -6,8 +6,7 @@ import {
 } from "~/components/ui/pagination"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
-import { useCalendarStore } from "@/store/calendar"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { getCultivationPlan } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,

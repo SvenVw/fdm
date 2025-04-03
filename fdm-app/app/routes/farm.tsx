@@ -3,8 +3,8 @@ import { SidebarProvider } from "~/components/ui/sidebar"
 import { auth, getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import posthog from "posthog-js"
-import { useCalendarStore } from "@/store/calendar"
-import { useFarmStore } from "@/store/farm"
+import { useCalendarStore } from "~/store/calendar"
+import { useFarmStore } from "~/store/farm"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -12,7 +12,7 @@ import type {
 } from "react-router"
 import { redirect, useRoutes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "~/components/ui/sidebar"

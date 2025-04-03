@@ -24,9 +24,9 @@ import { useEffect } from "react"
 import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
-import { FormSchema } from "./fertilizer-applications/formschema"
-import type { FertilizerApplicationsFormProps } from "./fertilizer-applications/types.d"
-import { LoadingSpinner } from "./loadingspinner"
+import { FormSchema } from "~/components/custom/fertilizer-applications/formschema"
+import type { FertilizerApplicationsFormProps } from "~/components/custom/fertilizer-applications/types.d"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 
 export function FertilizerApplicationsForm(
     props: FertilizerApplicationsFormProps,

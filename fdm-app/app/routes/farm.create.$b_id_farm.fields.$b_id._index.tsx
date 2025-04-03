@@ -1,14 +1,14 @@
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { Combobox } from "@/components/custom/combobox"
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { SoilDataCards } from "@/components/custom/soil/cards"
-import { Button } from "@/components/ui/button"
+} from "~/components/custom/atlas/atlas-mapbox"
+import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { Combobox } from "~/components/custom/combobox"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { SoilDataCards } from "~/components/custom/soil/cards"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -16,7 +16,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "~/components/ui/card"
 import {
     FormControl,
     FormDescription,
@@ -24,13 +24,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { extractFormValuesFromRequest } from "@/lib/form"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { Separator } from "~/components/ui/separator"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getCultivations,
@@ -56,9 +56,8 @@ import {
 import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
-import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "~/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {

@@ -16,7 +16,7 @@ import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl"
 import type { MapBoxZoomEvent, MapEvent, MapMouseEvent } from "react-map-gl"
-import { useFetcher } from "react-router"
+import { data, useFetcher } from "react-router"
 
 export function FieldsPanelHover({
     zoomLevelFields,

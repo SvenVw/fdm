@@ -1,5 +1,5 @@
 import type { EntryContext } from "react-router"
-import { clientConfig } from "./config"
+import { clientConfig } from "~/lib/config"
 
 type CacheControl = {
     maxAge: number

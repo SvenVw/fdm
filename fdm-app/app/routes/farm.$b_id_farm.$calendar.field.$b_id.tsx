@@ -5,8 +5,8 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
+import { useCalendarStore } from "~/store/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,

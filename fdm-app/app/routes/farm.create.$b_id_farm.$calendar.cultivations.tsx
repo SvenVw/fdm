@@ -14,7 +14,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,

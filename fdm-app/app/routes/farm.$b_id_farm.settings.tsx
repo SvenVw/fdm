@@ -6,7 +6,7 @@ import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
+import { useCalendarStore } from "~/store/calendar"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,

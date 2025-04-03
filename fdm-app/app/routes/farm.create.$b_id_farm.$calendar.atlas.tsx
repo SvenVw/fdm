@@ -1,6 +1,6 @@
 import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
-import { getMapboxStyle, getMapboxToken } from "@/app/integrations/mapbox"
+import { getMapboxStyle, getMapboxToken } from "~/app/integrations/mapbox"
 import {
     FieldsPanelHover,
     FieldsPanelSelection,
@@ -24,15 +24,13 @@ import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { useCalendarStore } from "@/store/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import {
     addCultivation,
     addField,
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
-import { centroid } from "@turf/centroid"
 import { useState } from "react"
 import {
     GeolocateControl,

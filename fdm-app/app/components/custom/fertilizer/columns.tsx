@@ -1,10 +1,10 @@
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "~/components/ui/badge"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "~/components/ui/tooltip"
 import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowRight, Pencil, SquareArrowOutUpRight } from "lucide-react"
 import { NavLink } from "react-router-dom"

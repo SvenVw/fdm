@@ -1,11 +1,11 @@
-import { SoilAnalysisForm } from "@/components/custom/soil/form"
-import { FormSchema } from "@/components/custom/soil/formschema"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
+import { SoilAnalysisForm } from "~/components/custom/soil/form"
+import { FormSchema } from "~/components/custom/soil/formschema"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import {
     getField,
     getSoilAnalysis,

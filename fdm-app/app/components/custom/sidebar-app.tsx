@@ -4,7 +4,7 @@ import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "~/components/ui/collapsible"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,10 +26,13 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
-import { useFarmStore } from "@/store/farm"
-import { useCalendarStore } from "@/store/calendar"
-import { getCalendarSelection } from "@/lib/calendar"
+import { useFarmStore } from "~/store/farm"
+import { useCalendarStore } from "~/store/calendar"
+import { getCalendarSelection } from "~/lib/calendar"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
@@ -50,7 +53,6 @@ import {
     Settings,
     Shapes,
     Sparkles,
-    Sprout,
     Square,
 } from "lucide-react"
 import posthog from "posthog-js"
@@ -58,7 +60,8 @@ import { useIsMobile } from "~/hooks/use-mobile"
 import { useEffect, useState } from "react"
 import { Form, NavLink, useLocation } from "react-router"
 import { toast } from "sonner"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
+import { Button } from "~/components/ui/button"
 
 interface SideBarAppType {
     user: {
@@ -137,25 +140,28 @@ export function SidebarApp(props: SideBarAppType) {
     const omBalanceLink = undefined
     const baatLink = undefined
 
-    try {
-        Sentry.setUser({
-            fullName: user.name,
-            email: user.email,
-        })
-    } catch (error) {
-        Sentry.captureException(error)
+    if (clientConfig.analytics.sentry) {
+        try {
+            Sentry.setUser({
+                fullName: user.name,
+                email: user.email,
+            })
+        } catch (error) {
+            Sentry.captureException(error)
+        }
     }
+
     const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
     const [isLoading, setIsLoading] = useState(true)
+
+    if (isLoading) {
+        return null
+    }
 
     useEffect(() => {
         setFeedback(Sentry.getFeedback())
         setIsLoading(false)
     }, [])
-
-    if (isLoading) {
-        return null
-    }
 
     const openFeedbackForm = async () => {
         try {
@@ -192,14 +198,13 @@ export function SidebarApp(props: SideBarAppType) {
                                     <img
                                         className="size-6"
                                         src="/fdm-high-resolution-logo-transparent-no-text.png"
-                                        alt="FDM"
+                                        alt={clientConfig.name}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
                                     <span className="font-semibold">
-                                        {config.name}
+                                        {clientConfig.name}
                                     </span>
-                                    {/* <span className="">2024</span> */}
                                 </div>
                             </NavLink>
                         </SidebarMenuButton>
@@ -448,18 +453,20 @@ export function SidebarApp(props: SideBarAppType) {
                                     <span>Ondersteuning</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem key="feedback">
-                                <SidebarMenuButton
-                                    asChild
-                                    size="sm"
-                                    onClick={openFeedbackForm}
-                                >
-                                    <NavLink to="#">
-                                        <Send />
-                                        <span>Feedback</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            {clientConfig.analytics.sentry ? (
+                                <SidebarMenuItem key="feedback">
+                                    <SidebarMenuButton
+                                        asChild
+                                        size="sm"
+                                        onClick={openFeedbackForm}
+                                    >
+                                        <NavLink to="#">
+                                            <Send />
+                                            <span>Feedback</span>
+                                        </NavLink>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ) : null}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

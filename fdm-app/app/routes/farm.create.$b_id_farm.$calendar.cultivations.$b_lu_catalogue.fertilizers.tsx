@@ -6,7 +6,7 @@ import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getTimeframe } from "@/lib/calendar"
+import { getTimeframe } from "~/lib/calendar"
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,

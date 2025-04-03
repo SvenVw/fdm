@@ -1,14 +1,14 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
 import {
     type Fertilizer,
     columns,
-} from "@/components/custom/fertilizer/columns"
-import { DataTable } from "@/components/custom/fertilizer/table"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
+} from "~/components/custom/fertilizer/columns"
+import { DataTable } from "~/components/custom/fertilizer/table"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 
