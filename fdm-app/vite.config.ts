@@ -2,14 +2,15 @@ import { reactRouter } from "@react-router/dev/vite"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
-import { serverConfig } from "~/lib/config"
+import fdmConfig from "./fdm.config"
 
 let pluginSentry: any
-if (serverConfig.analytics.sentry) {
+if (fdmConfig.analytics.sentry) {
     pluginSentry = sentryVitePlugin({
-        org: serverConfig.analytics.sentry.organization,
-        authToken: serverConfig.analytics.sentry.auth_token,
-        project: serverConfig.analytics.sentry.project,
+        org: fdmConfig.analytics.sentry.organization,
+        authToken: fdmConfig.analytics.sentry.auth_token,
+        project: fdmConfig.analytics.sentry.project,
+        telemetry: false,
     })
 }
 
