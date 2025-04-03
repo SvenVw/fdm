@@ -5,35 +5,33 @@ import {
 } from "@svenvw/fdm-core"
 import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
-import { serverConfig } from "~/lib/config"
 
 // Get credentials to connect to db
 const host =
-    serverConfig.database.host ??
+    process.env.POSTGRES_HOST ??
     (() => {
         throw new Error("POSTGRES_HOST environment variable is required")
     })()
 const port =
-    serverConfig.database.port ||
+    Number(process.env.POSTGRES_PORT) ||
     (() => {
         throw new Error("POSTGRES_PORT environment variable is required")
     })()
 const user =
-    serverConfig.database.user ??
+    process.env.POSTGRES_USER ??
     (() => {
         throw new Error("POSTGRES_USER environment variable is required")
     })()
 const password =
-    serverConfig.database.password ??
+    process.env.POSTGRES_PASSWORD ??
     (() => {
         throw new Error("POSTGRES_PASSWORD environment variable is required")
     })()
 const database =
-    serverConfig.database.database ??
+    process.env.POSTGRES_DB ??
     (() => {
         throw new Error("POSTGRES_DB environment variable is required")
     })()
-
 const migrationsFolderPath = "node_modules/@svenvw/fdm-core/dist/db/migrations"
 
 const client = postgres({
