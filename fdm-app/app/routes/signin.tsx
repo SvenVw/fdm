@@ -1,4 +1,4 @@
-import { Check, Info, MoveDown } from "lucide-react"
+import { Check, Cookie, Info, MoveDown } from "lucide-react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import type { MetaFunction } from "react-router"
@@ -170,20 +170,20 @@ export default function SignIn() {
                                 </div>
                             </div>
                         </div>
-                    <Alert className="mb-4">
-                        <Info className="h-4 w-4" />
-                        <AlertTitle>
-                            <p className="text-sm text-left font-medium leading-none">
-                                Let op!
-                            </p>
-                        </AlertTitle>
-                        <AlertDescription>
-                            <p className="text-sm text-left text-muted-foreground">
-                                {`${clientConfig.name} is nog in ontwikkeling. Functionaliteiten
+                        <Alert className="mb-4">
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>
+                                <p className="text-sm text-left font-medium leading-none">
+                                    Let op!
+                                </p>
+                            </AlertTitle>
+                            <AlertDescription>
+                                <p className="text-sm text-left text-muted-foreground">
+                                    {`${clientConfig.name} is nog in ontwikkeling. Functionaliteiten
                                 kunnen nog ontbreken of veranderen.`}
-                            </p>
-                        </AlertDescription>
-                    </Alert>
+                                </p>
+                            </AlertDescription>
+                        </Alert>
                         <Card>
                             <CardHeader>
                                 <CardTitle>Aanmelden</CardTitle>
@@ -291,27 +291,29 @@ export default function SignIn() {
                                         </Button>
                                     </div>
                                 </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-center">
-                            <p className="text-sm font-medium text-muted-foreground text-center">
-                                Door verder te gaan, gaat u akkoord met het{" "}
-                                <a
-                                    href="/privacy"
-                                    aria-label="Lees ons privacybeleid"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                >
-                                    Privacybeleid
-                                </a>
-                            </p>
-                        </CardFooter>
-                    </Card>
-                    <div className="mb-4 text-center text-sm">
-                        <Button variant={"outline"}>
-                            {`Lees meer over ${clientConfig.name}`} <MoveDown />
-                        </Button>
+                            </CardContent>
+                            <CardFooter className="flex justify-center">
+                                <p className="text-sm font-medium text-muted-foreground text-center">
+                                    Door verder te gaan, gaat u akkoord met het{" "}
+                                    <a
+                                        href="/privacy"
+                                        aria-label="Lees ons privacybeleid"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="underline hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                    >
+                                        Privacybeleid
+                                    </a>
+                                </p>
+                            </CardFooter>
+                        </Card>
+                        <div className="mb-4 text-center text-sm">
+                            <Button variant={"outline"}>
+                                {`Lees meer over ${clientConfig.name}`} <MoveDown />
+                            </Button>
+                        </div>
                     </div>
+                    
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <img
@@ -336,5 +338,5 @@ export default function SignIn() {
                 </Button>
             </div>
         </div>
-    )
+    );
 }
