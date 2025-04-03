@@ -35,6 +35,21 @@ const config: Config = {
         // Sentry
         sentry: {
             dsn: String(process.env.SENTRY_DSN),
+            organization: String(process.env.VITE_SENTRY_ORG),
+            project: String(process.env.VITE_SENTRY_PROJECT),
+            auth_token: String(process.env.SENTRY_AUTH_TOKEN),
+            trace_sample_rate:
+                Number(process.env.VITE_SENTRY_TRACE_SAMPLE_RATE) || 1,
+            replay_sample_rate:
+                Number(process.env.VITE_SENTRY_REPLAY_SAMPLE_RATE) || 0,
+            replay_sample_rate_on_error:
+                Number(process.env.VITE_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR) ||
+                1,
+            profile_sample_rate:
+                Number(process.env.VITE_SENTRY_PROFILE_SAMPLE_RATE) || 1,
+            security_report_uri: String(
+                process.env.VITE_SENTRY_SECURITY_REPORT_URI,
+            ),
         },
     },
 }

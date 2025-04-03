@@ -10,7 +10,20 @@ export const clientConfig: ClientConfig = {
     logo: config.logo,
     analytics: {
         sentry: config.analytics.sentry
-            ? { dsn: config.analytics.sentry.dsn }
+            ? {
+                  dsn: config.analytics.sentry.dsn,
+                  organization: config.analytics.sentry.organization,
+                  project: config.analytics.sentry.project,
+                  trace_sample_rate: config.analytics.sentry.trace_sample_rate,
+                  replay_sample_rate:
+                      config.analytics.sentry.replay_sample_rate,
+                  replay_sample_rate_on_error:
+                      config.analytics.sentry.replay_sample_rate_on_error,
+                  profile_sample_rate:
+                      config.analytics.sentry.profile_sample_rate,
+                  security_report_uri:
+                      config.analytics.sentry.security_report_uri,
+              }
             : null,
     },
 }
@@ -41,6 +54,14 @@ export interface Config {
     analytics: {
         sentry?: {
             dsn: string
+            organization: string
+            project: string
+            auth_token: string
+            trace_sample_rate: number
+            replay_sample_rate: number
+            replay_sample_rate_on_error: number
+            profile_sample_rate: number
+            security_report_uri: string
         } | null
     }
 }
@@ -53,6 +74,13 @@ interface ClientConfig {
     analytics: {
         sentry?: {
             dsn: string
+            organization: string
+            project: string
+            trace_sample_rate: number
+            replay_sample_rate: number
+            replay_sample_rate_on_error: number
+            profile_sample_rate: number
+            security_report_uri: string
         } | null
     }
 }

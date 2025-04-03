@@ -2,17 +2,19 @@ import { reactRouter } from "@react-router/dev/vite"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
+import { serverConfig } from "~/lib/config"
+
+let pluginSentry: any
+if (serverConfig.analytics.sentry) {
+    pluginSentry = sentryVitePlugin({
+        org: serverConfig.analytics.sentry.organization,
+        authToken: serverConfig.analytics.sentry.auth_token,
+        project: serverConfig.analytics.sentry.project,
+    })
+}
 
 export default defineConfig({
-    plugins: [
-        reactRouter(),
-        tsconfigPaths(),
-        sentryVitePlugin({
-            org: process.env.SENTRY_ORG,
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            project: process.env.SENTRY_PROJECT,
-        }),
-    ],
+    plugins: [reactRouter(), tsconfigPaths(), pluginSentry],
     define: {
         global: {},
     },

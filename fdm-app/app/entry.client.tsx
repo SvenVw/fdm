@@ -8,11 +8,12 @@ import * as Sentry from "@sentry/react"
 import { StrictMode, startTransition } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { HydratedRouter } from "react-router/dom"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
-if (config.sentry) {
+if (clientConfig.analytics.sentry) {
+    const sentryConfig = clientConfig.analytics.sentry
     Sentry.init({
-        dsn: import.meta.env.VITE_SENTRY_DSN,
+        dsn: sentryConfig.dsn,
         environment: import.meta.env.NODE_ENV,
         integrations: [
             Sentry.browserTracingIntegration(),
@@ -53,14 +54,12 @@ if (config.sentry) {
         //     return event
         // },
 
-        tracesSampleRate: import.meta.env.VITE_SENTRY_TRACE_SAMPLE_RATE,
+        tracesSampleRate: sentryConfig.trace_sample_rate,
 
         tracePropagationTargets: [window.location.hostname],
 
-        replaysSessionSampleRate: import.meta.env
-            .VITE_SENTRY_REPLAY_SAMPLE_RATE,
-        replaysOnErrorSampleRate: import.meta.env
-            .VITE_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR,
+        replaysSessionSampleRate: sentryConfig.replay_sample_rate,
+        replaysOnErrorSampleRate: sentryConfig.replay_sample_rate_on_error,
     })
 }
 

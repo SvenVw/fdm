@@ -1,4 +1,5 @@
 import type { EntryContext } from "react-router"
+import { clientConfig } from "./config"
 
 type CacheControl = {
     maxAge: number
@@ -123,11 +124,11 @@ export function getCacheControlHeaders(
  * Add security headers to the response
  */
 export function addSecurityHeaders(headers: Headers): Headers {
-    const sentryReportUri = process.env.VITE_SENTRY_SECURITY_REPORT_URI
-    if (!sentryReportUri) {
-        throw new Error(
-            "VITE_SENTRY_SECURITY_REPORT_URI environment variable is required",
-        )
+    let reportUri = ""
+    if (clientConfig.analytics.sentry) {
+        reportUri = clientConfig.analytics.sentry.security_report_uri
+            .replace(/\s+/g, " ")
+            .trim()
     }
 
     headers.set(
@@ -145,9 +146,7 @@ export function addSecurityHeaders(headers: Headers): Headers {
         base-uri 'self';
         form-action 'self';
         frame-ancestors 'none';
-        report-uri ${sentryReportUri}`
-            .replace(/\s+/g, " ")
-            .trim(),
+        report-uri ${reportUri};`,
     )
     headers.set("X-Content-Type-Options", "nosniff")
     headers.set("X-Frame-Options", "DENY")
