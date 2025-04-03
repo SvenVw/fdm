@@ -192,8 +192,11 @@ export default function Index() {
 
     const fieldsSavedId = "fieldsSaved"
     const fieldsSaved = loaderData.featureCollection
-    const viewState = getViewState(fieldsSaved)
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+    let viewState = getViewState(null)
+    if (fieldsSaved.features.length > 0) {
+        viewState = getViewState(fieldsSaved)
+    }
 
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
