@@ -1,4 +1,4 @@
-import { data } from "react-router"
+import { data, redirect } from "react-router"
 import { dataWithError, dataWithWarning } from "remix-toast"
 
 export function handleLoaderError(error: unknown) {
@@ -23,9 +23,7 @@ export function handleLoaderError(error: unknown) {
                     userMessage = error.statusText
                     break
                 case 401:
-                    userMessage =
-                        "U bent niet geautoriseerd om deze actie uit te voeren."
-                    break
+                    return redirect("/signin")
                 case 403:
                     userMessage =
                         "U heeft geen rechten om deze actie uit te voeren."
@@ -124,7 +122,7 @@ export function handleActionError(error: unknown) {
             typeof error.status === "number" &&
             typeof error.statusText === "string"
         ) {
-            console.warn(`Loader error: ${error.status} - ${error.statusText}`)
+            console.warn(`Action error: ${error.status} - ${error.statusText}`)
 
             // Customize the user-facing message based on the status code
             let userMessage = "Er is iets fout gegaan." // Default message
@@ -135,10 +133,7 @@ export function handleActionError(error: unknown) {
                     dataStatus = "warning"
                     break
                 case 401:
-                    userMessage =
-                        "U bent niet geautoriseerd om deze actie uit te voeren."
-                    dataStatus = "warning"
-                    break
+                    return redirect("/signin")
                 case 403:
                     userMessage =
                         "U heeft geen rechten om deze actie uit te voeren."

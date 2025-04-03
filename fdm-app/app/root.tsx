@@ -1,7 +1,10 @@
 import * as Sentry from "@sentry/react"
 
+import { Banner } from "@/components/custom/banner"
+import { CookieSettingsFooter } from "@/components/custom/cookie-settings-footer"
 import { Toaster } from "~/components/ui/sonner"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
+import posthog from "posthog-js"
 import { useEffect } from "react"
 import {
     Links,
@@ -60,6 +63,11 @@ export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
 
+    // Capture pagevies
+    useEffect(() => {
+        posthog.capture("$pageview")
+    }, [location]) // Dependency on location ensures pageview is captured on every navigation
+
     // Hook to show the toasts
     useEffect(() => {
         if (toast && toast.type === "error") {
@@ -89,6 +97,7 @@ export function Layout() {
             </head>
             <body>
                 <Outlet />
+                <Banner />
                 <Toaster />
                 <ErrorBoundary error={null} params={{}} />
                 <ScrollRestoration

@@ -1,6 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
 import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible"
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
@@ -22,11 +27,18 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
+import { useFarmStore } from "@/store/farm"
+import { useCalendarStore } from "@/store/calendar"
+import { getCalendarSelection } from "@/lib/calendar"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
     BadgeCheck,
+    Calendar,
+    Check,
+    ChevronRight,
     ChevronsUpDown,
+    Cookie,
     GitPullRequestArrow,
     House,
     Languages,
@@ -36,16 +48,16 @@ import {
     Scale,
     Send,
     Settings,
+    Shapes,
     Sparkles,
     Sprout,
     Square,
 } from "lucide-react"
-import { Button } from "~/components/ui/button"
+import posthog from "posthog-js"
 import { useIsMobile } from "~/hooks/use-mobile"
 import { useEffect, useState } from "react"
-import { Form, NavLink } from "react-router"
+import { Form, NavLink, useLocation } from "react-router"
 import { toast } from "sonner"
-import { useFarm } from "~/context/farm-context"
 import config from "@/fdm.config"
 
 interface SideBarAppType {
@@ -72,11 +84,24 @@ export function SidebarApp(props: SideBarAppType) {
     const userName = props.userName
     const avatarInitials = props.initials
     const isMobile = useIsMobile()
-    const { farmId } = useFarm()
+    const farmId = useFarmStore((state) => state.farmId)
 
+    const selectedCalendar = useCalendarStore((state) => state.calendar)
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+    const calendarSelection = getCalendarSelection()
+
+    // Check if page contains `farm/create` in url
+    const location = useLocation()
+    const isCreateFarmWizard = location.pathname.includes("farm/create")
+
+    // Set the farm link
     let farmLink: string
     let farmLinkDisplay: string
-    if (farmId) {
+    if (isCreateFarmWizard) {
+        farmLink = "/farm"
+        farmLinkDisplay = "Terug naar bedrijven"
+    } else if (farmId) {
         farmLink = `/farm/${farmId}`
         farmLinkDisplay = "Bedrijf"
     } else {
@@ -85,17 +110,27 @@ export function SidebarApp(props: SideBarAppType) {
     }
 
     let fieldsLink: string | undefined
-    if (farmId) {
-        fieldsLink = `/farm/${farmId}/field`
+    if (isCreateFarmWizard) {
+        fieldsLink = undefined
+    } else if (farmId) {
+        fieldsLink = `/farm/${farmId}/${selectedCalendar}/field`
     } else {
         fieldsLink = undefined
     }
 
     let atlasLink: string | undefined
-    if (farmId) {
-        atlasLink = `/farm/${farmId}/atlas`
+    if (isCreateFarmWizard) {
+        atlasLink = undefined
+    } else if (farmId) {
+        atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
     } else {
         atlasLink = undefined
+    }
+    let fertilizersLink: string | undefined
+    if (farmId) {
+        fertilizersLink = `/farm/${farmId}/fertilizers`
+    } else {
+        fertilizersLink = undefined
     }
 
     const nutrienBalanceLink = undefined
@@ -135,6 +170,12 @@ export function SidebarApp(props: SideBarAppType) {
         }
     }
 
+    const openCookieSettings = () => {
+        if (typeof window !== "undefined" && window.openCookieSettings) {
+            window.openCookieSettings()
+        }
+    }
+
     const handleSupportClick = () => {
         const supportEmail = `support@${window.location.hostname}`
         window.location.href = `mailto:${supportEmail}`
@@ -147,8 +188,12 @@ export function SidebarApp(props: SideBarAppType) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <NavLink to="/">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Sprout className="size-4" />
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#122023]">
+                                    <img
+                                        className="size-6"
+                                        src="/fdm-high-resolution-logo-transparent-no-text.png"
+                                        alt="FDM"
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
                                     <span className="font-semibold">
@@ -163,7 +208,7 @@ export function SidebarApp(props: SideBarAppType) {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Mijn bedrijf</SidebarGroupLabel>
+                    <SidebarGroupLabel>Bedrijf</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
@@ -174,6 +219,98 @@ export function SidebarApp(props: SideBarAppType) {
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+                            {/* Conditionally render the Kalender item */}
+                            {farmId && !isCreateFarmWizard ? (
+                                <Collapsible
+                                    asChild
+                                    defaultOpen={false}
+                                    className="group/collapsible"
+                                    onOpenChange={setIsCalendarOpen}
+                                >
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton
+                                                tooltip={"Kalender"}
+                                                className="flex items-center"
+                                            >
+                                                <Calendar />
+                                                <span>Kalender </span>
+                                                {!isCalendarOpen && (
+                                                    <Badge className="ml-1">
+                                                        {selectedCalendar ===
+                                                        "all"
+                                                            ? "Alle jaren"
+                                                            : selectedCalendar}
+                                                    </Badge>
+                                                )}
+                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <SidebarMenuSub>
+                                                {calendarSelection?.map(
+                                                    (item) => {
+                                                        // Construct the new URL with the selected calendar
+                                                        const newUrl =
+                                                            location.pathname.replace(
+                                                                /\/(\d{4}|all)/,
+                                                                `/${item}`,
+                                                            )
+                                                        return (
+                                                            <SidebarMenuSubItem
+                                                                key={item}
+                                                                className={
+                                                                    selectedCalendar ===
+                                                                    item
+                                                                        ? "bg-accent text-accent-foreground"
+                                                                        : ""
+                                                                }
+                                                            >
+                                                                <SidebarMenuSubButton
+                                                                    asChild
+                                                                    onClick={() =>
+                                                                        setCalendar(
+                                                                            item,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <NavLink
+                                                                        to={
+                                                                            newUrl
+                                                                        }
+                                                                        className="flex items-center"
+                                                                    >
+                                                                        <span>
+                                                                            {item ===
+                                                                            "all"
+                                                                                ? "Alle jaren"
+                                                                                : item}
+                                                                        </span>
+                                                                        {selectedCalendar ===
+                                                                            item && (
+                                                                            <Check className="ml-auto h-4 w-4" />
+                                                                        )}
+                                                                    </NavLink>
+                                                                </SidebarMenuSubButton>
+                                                            </SidebarMenuSubItem>
+                                                        )
+                                                    },
+                                                )}
+                                            </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                    </SidebarMenuItem>
+                                </Collapsible>
+                            ) : (
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        tooltip={"Kalender"}
+                                        className="cursor-default text-muted-foreground"
+                                    >
+                                        <Calendar />
+                                        <span>Kalender</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            )}
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     {atlasLink ? (
@@ -212,14 +349,21 @@ export function SidebarApp(props: SideBarAppType) {
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem> */}
-                            {/* <SidebarMenuItem>
+                            <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./fertilizers">
-                                        <Shapes />
-                                        <span>Meststoffen</span>
-                                    </NavLink>
+                                    {fertilizersLink ? (
+                                        <NavLink to={fertilizersLink}>
+                                            <Shapes />
+                                            <span>Meststoffen</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Shapes />
+                                            <span>Meststoffen</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
-                            </SidebarMenuItem> */}
+                            </SidebarMenuItem>
                             {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./stable">
@@ -381,6 +525,12 @@ export function SidebarApp(props: SideBarAppType) {
                                             Account
                                         </NavLink>
                                     </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={openCookieSettings}
+                                    >
+                                        <Cookie className="mr-2 h-4 w-4" />
+                                        Cookies
+                                    </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         {/* <NavLink to="#">
                                             <Languages className="mr-2 h-4 w-4" />
@@ -412,10 +562,14 @@ export function SidebarApp(props: SideBarAppType) {
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <LogOut />
+                                <DropdownMenuItem asChild>
                                     <Form method="post" action="../farm">
-                                        <Button type="submit" variant="link">
+                                        <Button
+                                            type="submit"
+                                            variant="link"
+                                            onClick={() => posthog.reset()}
+                                        >
+                                            <LogOut />
                                             Uitloggen
                                         </Button>
                                     </Form>

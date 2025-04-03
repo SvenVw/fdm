@@ -2,6 +2,12 @@ import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { type LoaderFunctionArgs, type MetaFunction, useLoaderData } from "react-router"
 import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+} from "@/components/ui/breadcrumb"
+import {
     Card,
     CardContent,
     CardDescription,

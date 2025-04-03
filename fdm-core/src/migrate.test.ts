@@ -1,6 +1,6 @@
+import postgres from "postgres"
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 import { runMigration } from "./migrate"
-import postgres from "postgres"
 
 describe("runMigration", () => {
     let client: ReturnType<typeof postgres>

@@ -12,6 +12,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError } from "~/lib/error"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import {
+    PrincipalId,
     addFarm,
     addFertilizer,
     enableCultivationCatalogue,
@@ -129,6 +130,13 @@ export async function action({ request }: ActionFunctionArgs) {
             b_id_farm,
             "srm",
         )
+        // Enable catalogue with custom user fertilizers
+        await enableFertilizerCatalogue(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            b_id_farm,
+        )
         await enableCultivationCatalogue(
             fdm,
             session.principal_id,
@@ -152,7 +160,11 @@ export async function action({ request }: ActionFunctionArgs) {
                 ),
             ),
         )
-        return redirectWithSuccess(`./${b_id_farm}/atlas`, {
+
+        // Get current year
+        const year = new Date().getFullYear()
+
+        return redirectWithSuccess(`./${b_id_farm}/${year}/atlas`, {
             message: "Bedrijf is toegevoegd! 🎉",
         })
     } catch (error) {

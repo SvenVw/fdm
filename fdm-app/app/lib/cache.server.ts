@@ -134,14 +134,14 @@ export function addSecurityHeaders(headers: Headers): Headers {
     headers.set(
         "Content-Security-Policy",
         `default-src 'self';
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mapbox.com;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mapbox.com https://*.posthog.com;
         worker-src 'self' blob:;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        font-src 'self' https://fonts.gstatic.com data:;
-        img-src 'self' data: blob: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com;
-        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl https://storage.googleapis.com/fdm-public-data/ ws://localhost:* http://localhost:*;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.posthog.com;
+        font-src 'self' https://fonts.gstatic.com https://*.posthog.com data:;
+        img-src 'self' data: blob: https://*.mapbox.com https://*.public.blob.vercel-storage.com https://images.unsplash.com https://lh3.googleusercontent.com https://graph.microsoft.com https://*.posthog.com;
+        connect-src 'self' https://*.mapbox.com https://sentry.io https://*.sentry.io https://*.nmi-agro.nl https://storage.googleapis.com/fdm-public-data/ https://*.posthog.com ws://localhost:* http://localhost:*;
         frame-src 'self';
-        media-src 'self';
+        media-src 'self' https://*.posthog.com;
         object-src 'none';
         base-uri 'self';
         form-action 'self';

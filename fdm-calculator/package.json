@@ -23,15 +23,13 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
-        "build": "rollup -c",
+        "build": "dotenvx run -- rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -45,15 +43,16 @@
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.0",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
         "postgres": "^3.4.5",
-        "rollup": "^4.35.0",
+        "rollup": "^4.38.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.4.1"
+    "packageManager": "pnpm@10.7.0"
 }

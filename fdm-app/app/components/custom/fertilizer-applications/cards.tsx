@@ -36,7 +36,7 @@ function FertilizerApplicationsCard({
                                         !limit ? "invisible" : "",
                                     )}
                                 >
-                                    <Scale />
+                                    <Scale className="h-8 w-4" />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${limit}`}</span>
                                     </p>
@@ -56,7 +56,7 @@ function FertilizerApplicationsCard({
                                         !advice ? "invisible" : "",
                                     )}
                                 >
-                                    <Lightbulb />
+                                    <Lightbulb className="h-4 w-4" />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${advice}`}</span>
                                     </p>
@@ -101,7 +101,7 @@ function constructCards(dose: Dose) {
             shortname: "Ntot",
             value: dose.p_dose_n,
             unit: "kg/ha",
-            limit: undefined,
+            limit: 10,
             advice: undefined,
         },
         {

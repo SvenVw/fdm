@@ -32,7 +32,7 @@
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
-        "build": "rollup -c",
+        "build": "dotenvx run -- rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -41,17 +41,19 @@
         "watch": "vitest"
     },
     "devDependencies": {
+        "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "^28.0.3",
         "@rollup/plugin-json": "^6.1.0",
-        "@rollup/plugin-node-resolve": "^16.0.0",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.34.9",
+        "rollup": "^4.38.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.4.1",
+    "packageManager": "pnpm@10.7.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },

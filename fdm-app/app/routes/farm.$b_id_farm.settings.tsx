@@ -6,6 +6,7 @@ import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { useCalendarStore } from "@/store/calendar"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -116,6 +117,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const calendar = useCalendarStore((state) => state.calendar)
 
     return (
         <SidebarInset>
@@ -123,7 +125,7 @@ export default function FarmContentBlock() {
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}
                 action={{
-                    to: `/farm/${loaderData.b_id_farm}/field`,
+                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field`,
                     label: "Naar percelen",
                 }}
             />

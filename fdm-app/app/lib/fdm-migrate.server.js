@@ -1,7 +1,7 @@
 import {
     runMigration,
-    syncCatalogues,
     fdmSchema as schema,
+    syncCatalogues,
 } from "@svenvw/fdm-core"
 import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
