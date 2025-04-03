@@ -1,12 +1,3 @@
-import { FarmHeader } from "~/components/custom/farm/farm-header"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { FertilizerForm } from "~/components/custom/fertilizer/form"
-import { FormSchema } from "~/components/custom/fertilizer/formschema"
-import { SidebarInset } from "~/components/ui/sidebar"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addFertilizerToCatalogue,
@@ -24,6 +15,15 @@ import {
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import type { z } from "zod"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FertilizerForm } from "~/components/custom/fertilizer/form"
+import { FormSchema } from "~/components/custom/fertilizer/formschema"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

@@ -1,7 +1,7 @@
-import { getSession } from "~/lib/auth.server"
-import { handleActionError } from "~/lib/error"
 import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
+import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
+import { handleActionError } from "~/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {

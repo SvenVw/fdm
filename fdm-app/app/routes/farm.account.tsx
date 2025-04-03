@@ -1,10 +1,16 @@
-import { getSession } from "~/lib/auth.server"
-import { handleLoaderError } from "~/lib/error"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
 } from "react-router"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+} from "~/components/ui/breadcrumb"
 import {
     Card,
     CardContent,
@@ -14,15 +20,9 @@ import {
 } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { SidebarTrigger } from "~/components/ui/sidebar"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from "~/components/ui/breadcrumb"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {

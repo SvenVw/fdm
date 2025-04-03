@@ -1,6 +1,9 @@
+import { useToast } from "@/hooks/use-toast"
 import type { FeatureCollection } from "geojson"
+import { Check, ChevronsUpDown } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Form, useNavigation } from "react-router"
+import { ClientOnly } from "remix-utils/client-only"
 import { FieldMap } from "~/components/blocks/field-map"
 import { Button } from "~/components/ui/button"
 import {
@@ -33,10 +36,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
 import { cn } from "~/lib/utils"
-import { Check, ChevronsUpDown } from "lucide-react"
-import { ClientOnly } from "remix-utils/client-only"
 import { Skeleton } from "../ui/skeleton"
 
 interface CultivationOption {

@@ -1,3 +1,5 @@
+import type { Dose } from "@svenvw/fdm-calculator"
+import { Lightbulb, Scale } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
     Tooltip,
@@ -6,8 +8,6 @@ import {
     TooltipTrigger,
 } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
-import type { Dose } from "@svenvw/fdm-calculator"
-import { Lightbulb, Scale } from "lucide-react"
 import type { FertilizerApplicationsCardProps } from "./types.d"
 
 function FertilizerApplicationsCard({

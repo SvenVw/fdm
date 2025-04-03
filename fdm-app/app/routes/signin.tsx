@@ -1,3 +1,9 @@
+import { Check, Info, MoveDown } from "lucide-react"
+import type { LoaderFunctionArgs } from "react-router"
+import { redirect } from "react-router"
+import type { MetaFunction } from "react-router"
+import { toast } from "sonner"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -9,15 +15,9 @@ import {
 } from "~/components/ui/card"
 import { signIn } from "~/lib/auth-client"
 import { auth } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { cn } from "~/lib/utils"
-import { Check, MoveDown, Info } from "lucide-react"
-import type { LoaderFunctionArgs } from "react-router"
-import { redirect } from "react-router"
-import { toast } from "sonner"
-import type { MetaFunction } from "react-router"
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
-import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [

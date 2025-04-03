@@ -1,5 +1,5 @@
-import { Separator } from "~/components/ui/separator"
 import type { MetaFunction } from "react-router"
+import { Separator } from "~/components/ui/separator"
 import { clientConfig } from "~/lib/config"
 
 // Meta

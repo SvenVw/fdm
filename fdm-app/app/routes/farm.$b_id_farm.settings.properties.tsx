@@ -1,3 +1,18 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import { getFarm, updateFarm } from "@svenvw/fdm-core"
+import { useEffect } from "react"
+import { Form } from "react-hook-form"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    data,
+    useLoaderData,
+} from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { dataWithSuccess } from "remix-toast"
+import validator from "validator"
+import { z } from "zod"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -15,28 +30,15 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { getFarm, updateFarm } from "@svenvw/fdm-core"
-import { useEffect } from "react"
-import { Form } from "react-hook-form"
-import {
-    type ActionFunctionArgs,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    data,
-    useLoaderData,
-} from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithSuccess } from "remix-toast"
-import validator from "validator"
-import { z } from "zod"
 const { isPostalCode } = validator
 import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Eigenschappen - Instellingen - Bedrijf | ${clientConfig.name}` },
+        {
+            title: `Eigenschappen - Instellingen - Bedrijf | ${clientConfig.name}`,
+        },
         {
             name: "description",
             content: "Bekijk en bewerk de eigenschappen van je bedrijf.",

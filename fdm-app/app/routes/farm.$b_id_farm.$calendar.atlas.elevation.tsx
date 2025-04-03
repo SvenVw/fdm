@@ -1,9 +1,3 @@
-import { getMapboxToken } from "~/integrations/mapbox"
-import { Button } from "~/components/ui/button"
-import { getSession } from "~/lib/auth.server"
-import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { getTimeframe } from "~/lib/calendar"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -12,7 +6,13 @@ import {
     data,
     useLoaderData,
 } from "react-router"
+import { Button } from "~/components/ui/button"
+import { getMapboxToken } from "~/integrations/mapbox"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {

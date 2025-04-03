@@ -1,6 +1,6 @@
-import { fdm } from "~/lib/fdm.server"
 import { createFdmAuth } from "@svenvw/fdm-core"
 import type { Session, User } from "better-auth"
+import { fdm } from "~/lib/fdm.server"
 
 // Initialize better-auth instance for FDM
 export const auth = createFdmAuth(fdm)

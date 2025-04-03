@@ -1,3 +1,10 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import { format } from "date-fns/format"
+import { nl } from "date-fns/locale/nl"
+import { CalendarIcon } from "lucide-react"
+import { Form } from "react-hook-form"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
 import { Button } from "~/components/ui/button"
 import { Calendar } from "~/components/ui/calendar"
 import {
@@ -15,13 +22,6 @@ import {
     PopoverTrigger,
 } from "~/components/ui/popover"
 import { cn } from "~/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns/format"
-import { nl } from "date-fns/locale/nl"
-import { CalendarIcon } from "lucide-react"
-import { Form } from "react-hook-form"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
 import { LoadingSpinner } from "../loadingspinner"
 import { FormSchema } from "./schema"
 

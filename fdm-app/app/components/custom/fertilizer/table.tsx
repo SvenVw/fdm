@@ -1,13 +1,3 @@
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "~/components/ui/table"
 import {
     type ColumnDef,
     type ColumnFiltersState,
@@ -21,6 +11,16 @@ import {
 import { Plus } from "lucide-react"
 import { useState } from "react"
 import { NavLink } from "react-router"
+import { Button } from "~/components/ui/button"
+import { Input } from "~/components/ui/input"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "~/components/ui/table"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

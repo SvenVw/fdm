@@ -1,11 +1,3 @@
-import { SoilAnalysisForm } from "~/components/custom/soil/form"
-import { FormSchema } from "~/components/custom/soil/formschema"
-import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
 import {
     getField,
     getSoilAnalysis,
@@ -21,6 +13,14 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+import { SoilAnalysisForm } from "~/components/custom/soil/form"
+import { FormSchema } from "~/components/custom/soil/formschema"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 /**
  * Loader function for the soil data page of a specific farm field.

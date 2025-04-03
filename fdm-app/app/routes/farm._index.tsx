@@ -1,3 +1,10 @@
+import { getFarms } from "@svenvw/fdm-core"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    useLoaderData,
+} from "react-router"
 import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { Button } from "~/components/ui/button"
@@ -11,12 +18,10 @@ import {
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { getFarms } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, type MetaFunction, NavLink, useLoaderData } from "react-router"
-import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {

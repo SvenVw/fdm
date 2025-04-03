@@ -1,4 +1,29 @@
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+    addSoilAnalysis,
+    getCultivations,
+    getCultivationsFromCatalogue,
+    getField,
+    getSoilAnalysis,
+    updateCultivation,
+    updateField,
+} from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
+import { useEffect } from "react"
+import { useEffect } from "react"
+import { Form } from "react-hook-form"
+import { Layer, Map as MapGL } from "react-map-gl"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    data,
+} from "react-router"
+import { useLoaderData } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { dataWithSuccess } from "remix-toast"
+import { ClientOnly } from "remix-utils/client-only"
+import { z } from "zod"
 import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
 import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
@@ -23,38 +48,13 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { Skeleton } from "~/components/ui/skeleton"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { extractFormValuesFromRequest } from "~/lib/form"
 import { getTimeframe } from "~/lib/calendar"
-import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    addSoilAnalysis,
-    getCultivations,
-    getCultivationsFromCatalogue,
-    getField,
-    getSoilAnalysis,
-    updateCultivation,
-    updateField,
-} from "@svenvw/fdm-core"
-import type { FeatureCollection } from "geojson"
-import { useEffect } from "react"
-import { Form } from "react-hook-form"
-import { Layer, Map as MapGL } from "react-map-gl"
-import {
-    type ActionFunctionArgs,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    data,
-} from "react-router"
-import { useLoaderData } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithSuccess } from "remix-toast"
-import { ClientOnly } from "remix-utils/client-only"
-import { z } from "zod"
-import { fdm } from "~/lib/fdm.server"
-import { useEffect } from "react"
 import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 // Meta
 export const meta: MetaFunction = () => {

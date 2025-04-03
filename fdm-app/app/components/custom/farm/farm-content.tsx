@@ -1,9 +1,9 @@
+import type { ReactNode } from "react"
+import { Outlet } from "react-router"
 import {
     SidebarPage,
     type SidebarPageProps,
 } from "~/components/custom/sidebar-page"
-import type { ReactNode } from "react"
-import { Outlet } from "react-router"
 
 interface FarmContentProps {
     sidebarItems?: SidebarPageProps["items"]

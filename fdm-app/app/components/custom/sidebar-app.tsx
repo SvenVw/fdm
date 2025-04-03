@@ -1,5 +1,32 @@
+import * as Sentry from "@sentry/react"
+import {
+    ArrowRightLeft,
+    BadgeCheck,
+    Calendar,
+    Check,
+    ChevronRight,
+    ChevronsUpDown,
+    Cookie,
+    GitPullRequestArrow,
+    House,
+    Languages,
+    LifeBuoy,
+    LogOut,
+    Map as MapIcon,
+    Scale,
+    Send,
+    Settings,
+    Shapes,
+    Sparkles,
+    Square,
+} from "lucide-react"
+import posthog from "posthog-js"
+import { useEffect, useState } from "react"
+import { Form, NavLink, useLocation } from "react-router"
+import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
 import {
     Collapsible,
     CollapsibleContent,
@@ -30,38 +57,11 @@ import {
     SidebarMenuSubButton,
     SidebarMenuSubItem,
 } from "~/components/ui/sidebar"
-import { useFarmStore } from "~/store/farm"
-import { useCalendarStore } from "~/store/calendar"
-import { getCalendarSelection } from "~/lib/calendar"
-import * as Sentry from "@sentry/react"
-import {
-    ArrowRightLeft,
-    BadgeCheck,
-    Calendar,
-    Check,
-    ChevronRight,
-    ChevronsUpDown,
-    Cookie,
-    GitPullRequestArrow,
-    House,
-    Languages,
-    LifeBuoy,
-    LogOut,
-    Map as MapIcon,
-    Scale,
-    Send,
-    Settings,
-    Shapes,
-    Sparkles,
-    Square,
-} from "lucide-react"
-import posthog from "posthog-js"
 import { useIsMobile } from "~/hooks/use-mobile"
-import { useEffect, useState } from "react"
-import { Form, NavLink, useLocation } from "react-router"
-import { toast } from "sonner"
+import { getCalendarSelection } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { Button } from "~/components/ui/button"
+import { useCalendarStore } from "~/store/calendar"
+import { useFarmStore } from "~/store/farm"
 
 interface SideBarAppType {
     user: {

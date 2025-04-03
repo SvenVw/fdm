@@ -1,12 +1,3 @@
-import { CultivationForm } from "~/components/custom/cultivation/form"
-import { CultivationList } from "~/components/custom/cultivation/list"
-import { FormSchema } from "~/components/custom/cultivation/schema"
-import { Separator } from "~/components/ui/separator"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { getTimeframe } from "~/lib/calendar"
 import {
     addCultivation,
     getCultivations,
@@ -23,8 +14,17 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
-import {dataWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
+import { CultivationForm } from "~/components/custom/cultivation/form"
+import { CultivationList } from "~/components/custom/cultivation/list"
+import { FormSchema } from "~/components/custom/cultivation/schema"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -36,7 +36,6 @@ export const meta: MetaFunction = () => {
         },
     ]
 }
-
 
 /**
  * Loads data required for rendering the overview of a specific farm field.

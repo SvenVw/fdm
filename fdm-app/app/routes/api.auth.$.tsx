@@ -1,19 +1,18 @@
-import { auth } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
+import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 
 export const meta: MetaFunction = () => {
     return [
         { title: `Authenticatie | ${clientConfig.name}` },
         {
             name: "description",
-            content:
-                "Beveiligde authenticatie voor toegang tot het platform.",
+            content: "Beveiligde authenticatie voor toegang tot het platform.",
         },
     ]
 }

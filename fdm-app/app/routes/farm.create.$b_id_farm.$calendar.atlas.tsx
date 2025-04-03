@@ -1,30 +1,3 @@
-import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
-import { getMapboxStyle, getMapboxToken } from "~/app/integrations/mapbox"
-import {
-    FieldsPanelHover,
-    FieldsPanelSelection,
-    FieldsPanelZoom,
-} from "~/components/custom/atlas/atlas-panels"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceSelected,
-} from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
-import { Separator } from "~/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
-import { Skeleton } from "~/components/ui/skeleton"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
 import {
     addCultivation,
     addField,
@@ -47,8 +20,35 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { fdm } from "~/lib/fdm.server"
+import { getMapboxStyle, getMapboxToken } from "~/app/integrations/mapbox"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
+import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
+import {
+    FieldsPanelHover,
+    FieldsPanelSelection,
+    FieldsPanelZoom,
+} from "~/components/custom/atlas/atlas-panels"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceSelected,
+} from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
 
 // Meta

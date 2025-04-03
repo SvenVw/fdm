@@ -1,3 +1,11 @@
+import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+} from "react-router"
+import { Outlet, useLoaderData } from "react-router"
 import { SidebarPage } from "~/components/custom/sidebar-page"
 import {
     Breadcrumb,
@@ -11,19 +19,11 @@ import { Separator } from "~/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
 import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
-import {
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    NavLink,
-    data,
-} from "react-router"
-import { Outlet, useLoaderData } from "react-router"
-import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {

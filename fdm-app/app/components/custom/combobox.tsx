@@ -1,3 +1,4 @@
+import { Check, ChevronsUpDown } from "lucide-react"
 import { type ReactNode, useMemo, useState } from "react"
 import { Button } from "~/components/ui/button"
 import {
@@ -22,7 +23,6 @@ import {
     PopoverTrigger,
 } from "~/components/ui/popover"
 import { cn } from "~/lib/utils"
-import { Check, ChevronsUpDown } from "lucide-react"
 
 type optionType = {
     value: string

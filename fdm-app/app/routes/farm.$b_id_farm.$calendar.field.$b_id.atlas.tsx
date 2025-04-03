@@ -1,14 +1,5 @@
 import { Layer, Map as MapGL } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
-import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import { Separator } from "~/components/ui/separator"
-import { Skeleton } from "~/components/ui/skeleton"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import {
@@ -17,9 +8,18 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { ClientOnly } from "remix-utils/client-only"
 import type { MetaFunction } from "react-router"
+import { ClientOnly } from "remix-utils/client-only"
+import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { Separator } from "~/components/ui/separator"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
+import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [

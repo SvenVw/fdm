@@ -1,3 +1,29 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import {
+    getCultivations,
+    getCultivationsFromCatalogue,
+    getCurrentSoilData,
+    getField,
+    getSoilParametersDescription,
+    updateCultivation,
+    updateField,
+} from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
+import { Plus } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { Layer, Map as MapGL } from "react-map-gl"
+import { Form } from "react-router"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+} from "react-router"
+import { useLoaderData } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { dataWithSuccess } from "remix-toast"
+import { z } from "zod"
 import {
     getMapboxStyle,
     getMapboxToken,
@@ -30,34 +56,8 @@ import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    getCultivations,
-    getCultivationsFromCatalogue,
-    getCurrentSoilData,
-    getField,
-    getSoilParametersDescription,
-    updateCultivation,
-    updateField,
-} from "@svenvw/fdm-core"
-import type { FeatureCollection } from "geojson"
-import { Plus } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
-import { Layer, Map as MapGL } from "react-map-gl"
-import { Form } from "react-router"
-import {
-    type ActionFunctionArgs,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    NavLink,
-    data,
-} from "react-router"
-import { useLoaderData } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithSuccess } from "remix-toast"
-import { z } from "zod"
 import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 // Meta
 export const meta: MetaFunction = () => {

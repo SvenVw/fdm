@@ -4,11 +4,12 @@ import { clientConfig } from "~/lib/config"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Vanggewas - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
+        {
+            title: `Vanggewas - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}`,
+        },
         {
             name: "description",
-            content:
-                "Bekijk en selecteer het vanggewas uit je bouwplan.",
+            content: "Bekijk en selecteer het vanggewas uit je bouwplan.",
         },
     ]
 }

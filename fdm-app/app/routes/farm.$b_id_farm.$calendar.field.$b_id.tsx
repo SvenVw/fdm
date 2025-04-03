@@ -1,12 +1,3 @@
-import { FarmContent } from "~/components/custom/farm/farm-content"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { SidebarInset } from "~/components/ui/sidebar"
-import { getSession } from "~/lib/auth.server"
-import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "~/store/calendar"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -16,7 +7,16 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
+import { FarmContent } from "~/components/custom/farm/farm-content"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
