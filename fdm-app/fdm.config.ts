@@ -25,7 +25,7 @@ const config: Config = {
     database: {
         password: String(process.env.POSTGRES_PASSWORD),
         user: String(process.env.POSTGRES_USER),
-        database: String(process.env.POSTGRES_DATABASE),
+        database: String(process.env.POSTGRES_DB),
         host: String(process.env.POSTGRES_HOST),
         port: Number(process.env.POSTGRES_PORT),
     },
@@ -44,7 +44,7 @@ const config: Config = {
     analytics: {
         // Sentry
         sentry: {
-            dsn: String(process.env.SENTRY_DSN),
+            dsn: String(process.env.VITE_SENTRY_DSN),
             organization: String(process.env.VITE_SENTRY_ORG),
             project: String(process.env.VITE_SENTRY_PROJECT),
             auth_token: String(process.env.SENTRY_AUTH_TOKEN),

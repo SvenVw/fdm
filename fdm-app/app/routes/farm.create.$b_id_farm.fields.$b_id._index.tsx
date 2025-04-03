@@ -27,7 +27,7 @@ import { z } from "zod"
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "~/components/custom/atlas/atlas-mapbox"
+} from "~/integrations/mapbox"
 import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
 import { getViewState } from "~/components/custom/atlas/atlas-viewstate"

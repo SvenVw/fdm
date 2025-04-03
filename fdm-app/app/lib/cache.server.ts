@@ -126,14 +126,13 @@ export function getCacheControlHeaders(
 export function addSecurityHeaders(headers: Headers): Headers {
     let reportUri = ""
     if (clientConfig.analytics.sentry) {
-        reportUri = clientConfig.analytics.sentry.security_report_uri
-            .replace(/\s+/g, " ")
-            .trim()
+        reportUri = encodeURIComponent(
+            clientConfig.analytics.sentry.security_report_uri.trim(),
+        )
     }
 
-    headers.set(
-        "Content-Security-Policy",
-        `default-src 'self';
+    // Construct the Content-Security-Policy
+    let csp = `default-src 'self';
         script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mapbox.com https://*.posthog.com;
         worker-src 'self' blob:;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.posthog.com;
@@ -145,9 +144,14 @@ export function addSecurityHeaders(headers: Headers): Headers {
         object-src 'none';
         base-uri 'self';
         form-action 'self';
-        frame-ancestors 'none';
-        report-uri ${reportUri};`,
-    )
+        frame-ancestors 'none';`
+
+    // Add report-uri only if it exists
+    if (reportUri) {
+        csp += `report-uri ${reportUri};`
+    }
+
+    headers.set("Content-Security-Policy", csp.replace(/\s+/g, " ").trim()) // Removing all double spaces
     headers.set("X-Content-Type-Options", "nosniff")
     headers.set("X-Frame-Options", "DENY")
     headers.set("X-XSS-Protection", "1; mode=block")

@@ -10,7 +10,6 @@ import {
 } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { useEffect } from "react"
-import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import { Layer, Map as MapGL } from "react-map-gl"
 import {

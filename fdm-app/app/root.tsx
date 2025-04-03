@@ -60,11 +60,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
+    const location = useLocation()
 
     // Capture pagevies
     useEffect(() => {
-        posthog.capture("$pageview")
-    }, [location]) // Dependency on location ensures pageview is captured on every navigation
+        if (typeof window !== "undefined") {
+          posthog.capture("$pageview")
+        }
+    }, [location]);
 
     // Hook to show the toasts
     useEffect(() => {

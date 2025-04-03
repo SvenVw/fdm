@@ -20,7 +20,7 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { getMapboxStyle, getMapboxToken } from "~/app/integrations/mapbox"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
 import {
