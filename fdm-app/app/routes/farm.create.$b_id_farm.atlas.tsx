@@ -49,6 +49,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "~/lib/fdm.server"
 import { clientConfig } from "~/lib/config"
+import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -261,6 +262,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const nmiApiKey = getNmiApiKey()
+
         const selectedFields = JSON.parse(
             String(formData.get("selected_fields")),
         )
@@ -300,50 +303,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_lu_end,
                 )
 
-                if (process.env.NMI_API_KEY) {
-                    const fieldCentroid = centroid(field.geometry)
-                    const a_lon = fieldCentroid.geometry.coordinates[0]
-                    const a_lat = fieldCentroid.geometry.coordinates[1]
-
-                    const responseApi = await fetch(
-                        `https://api.nmi-agro.nl/estimates?${new URLSearchParams(
-                            {
-                                a_lat: a_lat.toString(),
-                                a_lon: a_lon.toString(),
-                            },
-                        )}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${process.env.NMI_API_KEY}`,
-                            },
-                        },
+                if (nmiApiKey) {
+                    const estimates = await getSoilParameterEstimates(
+                        field,
+                        nmiApiKey,
                     )
-
-                    if (!responseApi.ok) {
-                        throw data(responseApi.statusText, {
-                            status: responseApi.status,
-                            statusText: responseApi.statusText,
-                        })
-                    }
-
-                    const result = await responseApi.json()
-                    const response = result.data
 
                     await addSoilAnalysis(
                         fdm,
                         session.principal_id,
                         defaultDate,
-                        "NMI",
+                        estimates.a_source,
                         b_id,
-                        30,
+                        estimates.a_depth,
                         defaultDate,
                         {
-                            a_p_al: response.a_p_al,
-                            a_p_cc: response.a_p_cc,
-                            a_som_loi: response.a_som_loi,
-                            b_soiltype_agr: response.b_soiltype_agr,
-                            b_gwl_class: response.b_gwl_class,
+                            a_p_al: estimates.a_p_al,
+                            a_p_cc: estimates.a_p_cc,
+                            a_som_loi: estimates.a_som_loi,
+                            b_soiltype_agr: estimates.b_soiltype_agr,
+                            b_gwl_class: estimates.b_gwl_class,
                         },
                     )
                 }
