@@ -1,4 +1,4 @@
-import { getMapboxToken } from "~/components/custom/atlas/atlas-mapbox"
+import { getMapboxToken } from "@/app/integrations/mapbox"
 import { Button } from "~/components/ui/button"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"

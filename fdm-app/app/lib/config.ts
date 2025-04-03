@@ -51,6 +51,14 @@ export interface Config {
         host: string
         port: number
     }
+    integrations: {
+        mapbox: {
+            token: string
+        }
+        nmi?: {
+            api_key: string
+        }
+    }
     analytics: {
         sentry?: {
             dsn: string

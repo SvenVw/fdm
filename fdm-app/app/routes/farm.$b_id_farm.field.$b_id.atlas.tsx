@@ -1,9 +1,6 @@
 import { Layer, Map as MapGL } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "~/components/custom/atlas/atlas-mapbox"
+import { getMapboxStyle, getMapboxToken } from "@/app/integrations/mapbox"
 import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
 import { getViewState } from "~/components/custom/atlas/atlas-viewstate"

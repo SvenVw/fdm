@@ -6,10 +6,7 @@ import {
 } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "~/components/custom/atlas/atlas-mapbox"
+import { getMapboxStyle, getMapboxToken } from "@/app/integrations/mapbox"
 import { FieldsPanelHover } from "~/components/custom/atlas/atlas-panels"
 import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"

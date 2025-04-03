@@ -1,9 +1,6 @@
 import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "~/components/custom/atlas/atlas-mapbox"
+import { getMapboxStyle, getMapboxToken } from "@/app/integrations/mapbox"
 import {
     FieldsPanelHover,
     FieldsPanelSelection,

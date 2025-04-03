@@ -30,6 +30,16 @@ const config: Config = {
         port: Number(process.env.DB_PORT),
     },
 
+    // Integrations
+    integrations: {
+        mapbox: {
+            token: String(process.env.MAPBOX_TOKEN)
+        },
+        nmi: {
+            api_key: String(process.env.NMI_API_KEY)
+        }
+    },
+
     // Analytics
     analytics: {
         // Sentry
