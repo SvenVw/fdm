@@ -22,11 +22,11 @@ import {
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
 import type { MetaFunction } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Kaart - Perceel | ${config.name}` },
+        { title: `Kaart - Perceel | ${clientConfig.name}` },
         {
             name: "description",
             content:

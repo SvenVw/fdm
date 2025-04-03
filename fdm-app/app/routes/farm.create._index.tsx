@@ -27,12 +27,12 @@ import { useLoaderData } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { fdm } from "~/lib/fdm.server"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bedrijf toevoegen | ${config.name}` },
+        { title: `Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content:

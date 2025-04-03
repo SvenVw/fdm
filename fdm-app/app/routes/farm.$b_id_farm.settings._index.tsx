@@ -1,10 +1,10 @@
 import { type MetaFunction, redirect } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Instellingen  - Bedrijf | ${config.name}` },
+        { title: `Instellingen  - Bedrijf | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de instellingen van je bedrijf.",

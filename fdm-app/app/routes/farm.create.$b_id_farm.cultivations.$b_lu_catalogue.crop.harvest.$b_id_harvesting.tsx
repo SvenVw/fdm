@@ -14,12 +14,12 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Oogst - Bouwplan - Bedrijf toevoegen | ${config.name}` },
+        { title: `Oogst - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en selecteer de oogst van een gewas uit je bouwplan.",

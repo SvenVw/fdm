@@ -17,14 +17,14 @@ import { redirect } from "react-router"
 import { toast } from "sonner"
 import type { MetaFunction } from "react-router"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Aanmelden | ${config.name}` },
+        { title: `Aanmelden | ${clientConfig.name}` },
         {
             name: "description",
-            content: `Meld je aan bij ${config.name} om toegang te krijgen tot je dashboard en je bedrijfsgegevens te beheren.`,
+            content: `Meld je aan bij ${clientConfig.name} om toegang te krijgen tot je dashboard en je bedrijfsgegevens te beheren.`,
         },
     ]
 }
@@ -83,8 +83,8 @@ export default function SignIn() {
             <div className="flex h-screen items-center justify-center py-12">
                 <div className="mx-auto grid w-[350px] gap-6">
                     <div className="grid gap-2 text-center">
-                        {/* <img src="logo.png" alt="Logo ${config.name}"/> */}
-                        <h1 className="text-3xl font-bold">${config.name}</h1>
+                        {/* <img src="logo.png" alt="Logo ${clientConfig.name}"/> */}
+                        <h1 className="text-3xl font-bold">${clientConfig.name}</h1>
                         <p className="text-balance text-muted-foreground">
                             Maak een account aan en krijg toegang tot:
                         </p>
@@ -159,7 +159,7 @@ export default function SignIn() {
                         </AlertTitle>
                         <AlertDescription>
                             <p className="text-sm text-left text-muted-foreground">
-                                {`${config.name} is nog in ontwikkeling. Functionaliteiten
+                                {`${clientConfig.name} is nog in ontwikkeling. Functionaliteiten
                                 kunnen nog ontbreken of veranderen.`}
                             </p>
                         </AlertDescription>
@@ -289,7 +289,7 @@ export default function SignIn() {
                     </Card>
                     <div className="mb-4 text-center text-sm">
                         <Button variant={"outline"}>
-                            {`Lees meer over ${config.name}`} <MoveDown />
+                            {`Lees meer over ${clientConfig.name}`} <MoveDown />
                         </Button>
                     </div>
                 </div>

@@ -16,12 +16,12 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { fdm } from "~/lib/fdm.server"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bouwplan - Bedrijf toevoegen | ${config.name}` },
+        { title: `Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en selecteer een gewas uit je bouwplan.",

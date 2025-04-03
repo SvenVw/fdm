@@ -16,12 +16,12 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Oogst - Gewas - Perceel | ${config.name}` },
+        { title: `Oogst - Gewas - Perceel | ${clientConfig.name}` },
         {
             name: "description",
             

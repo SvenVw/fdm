@@ -55,12 +55,12 @@ import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
 import { fdm } from "~/lib/fdm.server"
 import { useEffect } from "react"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Perceel bewerken - Bedrijf toevoegen | ${config.name}` },
+        { title: `Perceel bewerken - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content:

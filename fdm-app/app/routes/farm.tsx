@@ -15,11 +15,11 @@ import WhatsNew from "./farm.whats-new"
 import Account from "./farm.account"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Dashboard | ${config.name}` },
+        { title: `Dashboard | ${clientConfig.name}` },
         {
             name: "description",
             content:

@@ -1,12 +1,12 @@
 import { getSession } from "~/lib/auth.server"
 import { handleActionError } from "~/lib/error"
 import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bedrijf | ${config.name}` },
+        { title: `Bedrijf | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gegevens van je bedrijf.",

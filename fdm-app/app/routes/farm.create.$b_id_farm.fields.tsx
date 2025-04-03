@@ -27,12 +27,12 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { fdm } from "~/lib/fdm.server"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Percelen beheren - Bedrijf toevoegen | ${config.name}` },
+        { title: `Percelen beheren - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content:

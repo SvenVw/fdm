@@ -5,11 +5,11 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Authenticatie | ${config.name}` },
+        { title: `Authenticatie | ${clientConfig.name}` },
         {
             name: "description",
             content:

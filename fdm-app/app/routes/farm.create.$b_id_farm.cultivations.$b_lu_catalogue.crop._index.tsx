@@ -22,12 +22,12 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gewas- Bouwplan - Bedrijf toevoegen | ${config.name}` },
+        { title: `Gewas- Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content:

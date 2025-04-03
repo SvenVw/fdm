@@ -16,12 +16,12 @@ import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
 import { getFarms } from "@svenvw/fdm-core"
 import { type LoaderFunctionArgs, type MetaFunction, NavLink, useLoaderData } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bedrijf | ${config.name}` },
+        { title: `Bedrijf | ${clientConfig.name}` },
         {
             name: "description",
             content: "Selecteer een bedrijf.",

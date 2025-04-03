@@ -25,12 +25,12 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bemesting - Perceel | ${config.name}` },
+        { title: `Bemesting - Perceel | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de bemestinggegevens van je perceel.",

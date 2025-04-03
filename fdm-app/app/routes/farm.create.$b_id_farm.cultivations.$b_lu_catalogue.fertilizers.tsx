@@ -24,12 +24,12 @@ import {
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 import { fdm } from "~/lib/fdm.server"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Bemesting - Bouwplan - Bedrijf toevoegen | ${config.name}` },
+        { title: `Bemesting - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en voeg bemestingen toe aan je bouwplan.",

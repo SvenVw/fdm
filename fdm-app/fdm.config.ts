@@ -2,7 +2,8 @@ import type { Config } from "~/lib/config"
 
 const config: Config = {
     // Site name
-    name: "FDM",
+    name: process.env.FDM_NAME || "FDM",
+    // Site logo
     favicon: "/favicon.ico",
     logo: "/logo.svg",
 

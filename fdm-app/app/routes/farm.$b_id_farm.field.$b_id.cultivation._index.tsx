@@ -23,12 +23,12 @@ import {
     useLocation,
 } from "react-router"
 import {dataWithSuccess } from "remix-toast"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gewas - Perceel | ${config.name}` },
+        { title: `Gewas - Perceel | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gewassen van je perceel.",

@@ -51,12 +51,12 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "~/lib/fdm.server"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Kaart - Bedrijf toevoegen | ${config.name}` },
+        { title: `Kaart - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content:

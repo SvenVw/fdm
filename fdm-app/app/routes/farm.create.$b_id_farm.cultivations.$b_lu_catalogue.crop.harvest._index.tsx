@@ -18,12 +18,12 @@ import {
     data,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Oogst- Bouwplan - Bedrijf toevoegen | ${config.name}` },
+        { title: `Oogst- Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
         {
             name: "description",
             content:

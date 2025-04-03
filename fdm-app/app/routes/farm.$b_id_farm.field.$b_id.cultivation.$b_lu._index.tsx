@@ -26,12 +26,12 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gewas - Perceel | ${config.name}` },
+        { title: `Gewas - Perceel | ${clientConfig.name}` },
         
         {
             name: "description",

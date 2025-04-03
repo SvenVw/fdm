@@ -23,11 +23,11 @@ import {
     useLoaderData,
 } from "react-router"
 import type { MetaFunction } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Perceel | ${config.name}` },
+        { title: `Perceel | ${clientConfig.name}` },
         {
             name: "description",
             content:

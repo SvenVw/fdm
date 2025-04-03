@@ -18,12 +18,12 @@ import {
 } from "~/components/ui/breadcrumb"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Account | ${config.name}` },
+        { title: `Account | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gegevens van je account.",

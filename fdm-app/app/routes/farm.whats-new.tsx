@@ -20,14 +20,14 @@ import {
 import { SidebarTrigger } from "~/components/ui/sidebar"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Wat is er nieuw? | ${config.name}` },
+        { title: `Wat is er nieuw? | ${clientConfig.name}` },
         {
             name: "description",
-            content: `Blijf op de hoogte van de laatste ontwikkelingen en verbeteringen van ${config.name}.`,
+            content: `Blijf op de hoogte van de laatste ontwikkelingen en verbeteringen van ${clientConfig.name}.`,
         },
     ]
 }
@@ -45,8 +45,8 @@ export interface UpdatePost {
 export const updatePosts: UpdatePost[] = [
     {
         id: "update-1",
-        title: `Lancering ${config.name} 🎉`,
-        description: `${config.name} is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 
+        title: `Lancering ${clientConfig.name} 🎉`,
+        description: `${clientConfig.name} is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 
 
 **Nieuwe features:**
 - Account aanmaken

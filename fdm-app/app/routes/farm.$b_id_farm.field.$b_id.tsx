@@ -14,12 +14,12 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Perceel | ${config.name}` },
+        { title: `Perceel | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de gegevens van je perceel.",

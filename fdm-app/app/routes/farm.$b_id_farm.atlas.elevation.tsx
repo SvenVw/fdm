@@ -11,12 +11,12 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import config from "@/fdm.config"
+import { clientConfig } from "~/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Hoogte - Kaart | ${config.name}` },
+        { title: `Hoogte - Kaart | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk hoogtegegevens op de kaart.",
