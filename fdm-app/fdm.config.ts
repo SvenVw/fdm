@@ -1,8 +1,10 @@
+import type { Config } from "~/lib/config"
+
 const config: Config = {
     // Site name
     name: "FDM",
     favicon: "/favicon.ico",
-    logo: "/logo.svg",   
+    logo: "/logo.svg",
 
     // Authentication
     auth: {
@@ -27,37 +29,13 @@ const config: Config = {
         port: Number(process.env.DB_PORT),
     },
 
-    // Sentry
-    sentry: {
-        dsn: String(process.env.SENTRY_DSN),
+    // Analytics
+    analytics: {
+        // Sentry
+        sentry: {
+            dsn: String(process.env.SENTRY_DSN),
+        },
     },
 }
 
 export default config
-interface Config {
-    name: string
-    favicon: string
-    logo: string
-    auth: {
-        fdm_session_secret: string
-        better_auth_secret: string
-        google?: {
-            clientId: string
-            clientSecret: string
-        } | null
-        microsoft?: {
-            clientId: string
-            clientSecret: string
-        } | null
-    }
-    database: {
-        password: string
-        user: string
-        database: string
-        host: string
-        port: number
-    }
-    sentry?: {
-        dsn: string
-    } | null
-}
