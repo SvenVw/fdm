@@ -1,6 +1,6 @@
-import { serverConfig } from "~/lib/config.server"
 import centroid from "@turf/centroid"
 import type { Feature } from "geojson"
+import { serverConfig } from "~/lib/config.server"
 
 export function getNmiApiKey() {
     if (!serverConfig.integrations.nmi) {

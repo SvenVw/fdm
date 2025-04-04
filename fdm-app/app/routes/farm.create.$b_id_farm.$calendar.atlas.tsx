@@ -20,7 +20,6 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
 import {
@@ -44,6 +43,7 @@ import {
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"

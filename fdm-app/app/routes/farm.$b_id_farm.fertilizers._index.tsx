@@ -14,9 +14,9 @@ import {
 import { DataTable } from "~/components/custom/fertilizer/table"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [

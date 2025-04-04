@@ -505,7 +505,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
                                         <AvatarImage
-                                            src={user.image ?? undefined} 
+                                            src={user.image ?? undefined}
                                             alt={user.name}
                                         />
                                         <AvatarFallback className="rounded-lg">
@@ -597,7 +597,10 @@ export function SidebarApp(props: SideBarAppType) {
                                             type="submit"
                                             variant="link"
                                             onClick={() => {
-                                                if (clientConfig.analytics.posthog) {
+                                                if (
+                                                    clientConfig.analytics
+                                                        .posthog
+                                                ) {
                                                     posthog.reset()
                                                 }
                                             }}

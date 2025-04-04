@@ -1,4 +1,15 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { SoilParameterDescription } from "@svenvw/fdm-core"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import { CalendarIcon } from "lucide-react"
+import { useEffect } from "react"
+import { Form } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { FormSchema } from "~/components/custom/soil/formschema"
+import type { SoilAnalysis } from "~/components/custom/soil/types"
 import { Button } from "~/components/ui/button"
 import { Calendar } from "~/components/ui/calendar"
 import {
@@ -23,17 +34,6 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { cn } from "~/lib/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
-import type { SoilParameterDescription } from "@svenvw/fdm-core"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { CalendarIcon } from "lucide-react"
-import { useEffect } from "react"
-import { Form } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
-import { FormSchema } from "~/components/custom/soil/formschema"
-import type { SoilAnalysis } from "~/components/custom/soil/types"
 
 export function SoilAnalysisForm(props: {
     soilAnalysis: SoilAnalysis | undefined

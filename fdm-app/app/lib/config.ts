@@ -36,7 +36,6 @@ const posthogConfig =
         ? { key: posthogKey, host: posthogHost }
         : null
 
-
 // Export the client-safe config object
 export const clientConfig: ClientConfig = {
     // Site name
@@ -46,7 +45,7 @@ export const clientConfig: ClientConfig = {
     logomark: "/fdm-high-resolution-logo-transparent-no-text.png",
 
     analytics: {
-        sentry: sentryConfig, 
-        posthog: posthogConfig, 
+        sentry: sentryConfig,
+        posthog: posthogConfig,
     },
 }

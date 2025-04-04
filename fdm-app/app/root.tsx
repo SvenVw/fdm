@@ -19,8 +19,8 @@ import { getToast } from "remix-toast"
 import { toast as notify } from "sonner"
 import { Banner } from "~/components/custom/banner"
 import { ErrorBlock } from "~/components/custom/error"
-import { clientConfig } from "~/lib/config" // Import clientConfig
 import { Toaster } from "~/components/ui/sonner"
+import { clientConfig } from "~/lib/config" // Import clientConfig
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 
@@ -65,7 +65,7 @@ export function Layout() {
 
     // Capture pageviews if PostHog is configured
     // biome-ignore lint/correctness/useExhaustiveDependencies: This is a false positive: the useEffect should run whenever the location changes to capture new pageviews correctly
-        useEffect(() => {
+    useEffect(() => {
         if (clientConfig.analytics.posthog && typeof window !== "undefined") {
             posthog.capture("$pageview")
         }

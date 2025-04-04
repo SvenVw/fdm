@@ -309,11 +309,11 @@ export default function SignIn() {
                         </Card>
                         <div className="mb-4 text-center text-sm">
                             <Button variant={"outline"}>
-                                {`Lees meer over ${clientConfig.name}`} <MoveDown />
+                                {`Lees meer over ${clientConfig.name}`}{" "}
+                                <MoveDown />
                             </Button>
                         </div>
                     </div>
-                    
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <img
@@ -338,5 +338,5 @@ export default function SignIn() {
                 </Button>
             </div>
         </div>
-    );
+    )
 }

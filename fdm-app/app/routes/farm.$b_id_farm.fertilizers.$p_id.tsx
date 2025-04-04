@@ -23,18 +23,17 @@ import { FertilizerForm } from "~/components/custom/fertilizer/form"
 import { FormSchema } from "~/components/custom/fertilizer/formschema"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { clientConfig } from "~/lib/config"
 
 export const meta: MetaFunction = () => {
     return [
         { title: `Meststof | ${clientConfig.name}` },
         {
             name: "description",
-            content:
-                "Bekij de details van deze meststof",
+            content: "Bekij de details van deze meststof",
         },
     ]
 }

@@ -1,8 +1,8 @@
 import { getFarms, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
-    NavLink,
     type MetaFunction,
+    NavLink,
     data,
     redirect,
     useLoaderData,
