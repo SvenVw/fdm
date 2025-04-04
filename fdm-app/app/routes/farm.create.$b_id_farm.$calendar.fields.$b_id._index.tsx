@@ -24,10 +24,7 @@ import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "~/integrations/mapbox"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
 import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
@@ -59,6 +56,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getTimeframe } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -84,7 +82,6 @@ const FormSchema = z.object({
         required_error: "Hoofdgewas is verplicht",
     }),
 })
-type FormSchemaType = z.infer<typeof FormSchema>
 
 /**
  * Retrieves and prepares data for rendering the field details page.
@@ -123,6 +120,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const timeframe = await getTimeframe(params)
+
         // Get the field data
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -160,6 +159,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         const soilParameterDescription = getSoilParametersDescription()
 
@@ -185,6 +185,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
@@ -434,6 +435,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const timeframe = getTimeframe(params)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -455,6 +458,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         if (cultivations && cultivations.length > 0) {
             await updateCultivation(
