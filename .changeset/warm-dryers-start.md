@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Rename `FDM` to `MINAS2`
+Make fdm-app configurable for various settings, including the name
