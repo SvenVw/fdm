@@ -6,7 +6,7 @@ import {
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "@/app/lib/config"
+import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 

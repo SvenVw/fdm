@@ -17,7 +17,6 @@ import {
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
-import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"

@@ -10,6 +10,7 @@ import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useLoaderData,
 } from "react-router"
@@ -25,6 +26,18 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { clientConfig } from "~/lib/config"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Meststof | ${clientConfig.name}` },
+        {
+            name: "description",
+            content:
+                "Bekij de details van deze meststof",
+        },
+    ]
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

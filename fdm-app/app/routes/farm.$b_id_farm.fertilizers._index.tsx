@@ -1,5 +1,10 @@
 import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    data,
+    useLoaderData,
+} from "react-router"
 import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import {
@@ -11,6 +16,17 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { clientConfig } from "~/lib/config"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Meststoffen | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekij de lijst van meststoffen beschikbaar.",
+        },
+    ]
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

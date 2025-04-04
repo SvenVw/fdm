@@ -2,11 +2,11 @@ import { getFarms, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     NavLink,
+    type MetaFunction,
     data,
     redirect,
     useLoaderData,
 } from "react-router"
-import type { MetaFunction } from "react-router"
 import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { Button } from "~/components/ui/button"

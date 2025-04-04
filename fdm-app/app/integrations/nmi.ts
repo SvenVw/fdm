@@ -1,4 +1,4 @@
-import { serverConfig } from "@/app/lib/config"
+import { serverConfig } from "~/lib/config.server"
 import centroid from "@turf/centroid"
 import type { Feature } from "geojson"
 

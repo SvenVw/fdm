@@ -24,7 +24,6 @@ export const meta: MetaFunction = () => {
         { title: `Oogst - Gewas - Perceel | ${clientConfig.name}` },
         {
             name: "description",
-
             content: "Bekijk en bewerk de oogst van je gewas.",
         },
     ]

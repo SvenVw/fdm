@@ -4,7 +4,7 @@ import { clientConfig } from "~/lib/config"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Instellingen  - Bedrijf | ${clientConfig.name}` },
+        { title: `Instellingen - Bedrijf | ${clientConfig.name}` },
         {
             name: "description",
             content: "Bekijk en bewerk de instellingen van je bedrijf.",

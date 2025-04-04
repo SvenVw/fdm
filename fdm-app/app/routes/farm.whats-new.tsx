@@ -41,7 +41,7 @@ export interface UpdatePost {
     isNew?: boolean
 }
 
-// Dta for update posts
+// Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
         id: "update-1",
