@@ -2,14 +2,17 @@ import { reactRouter } from "@react-router/dev/vite"
 import { sentryVitePlugin } from "@sentry/vite-plugin"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
-import fdmConfig from "./fdm.config"
 
+// Vite does not support loading config files from `/lib/config`...
+const org = process.env.VITE_SENTRY_ORG
+const authToken = process.env.SENTRY_AUTH_TOKEN
+const project = process.env.VITE_SENTRY_PROJECT
 let pluginSentry: any
-if (fdmConfig.analytics.sentry) {
+if (org && authToken && project) {
     pluginSentry = sentryVitePlugin({
-        org: fdmConfig.analytics.sentry.organization,
-        authToken: fdmConfig.analytics.sentry.auth_token,
-        project: fdmConfig.analytics.sentry.project,
+        org: org,
+        authToken: authToken,
+        project: project,
         telemetry: false,
     })
 }

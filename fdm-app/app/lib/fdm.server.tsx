@@ -1,6 +1,6 @@
 import { fdmSchema as schema } from "@svenvw/fdm-core"
 import { drizzle } from "drizzle-orm/postgres-js"
-import { serverConfig } from "~/lib/config"
+import { serverConfig } from "~/lib/config.server"
 
 // Get credentials to connect to db
 const host =

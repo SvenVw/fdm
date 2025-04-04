@@ -1,5 +1,5 @@
 import type { MetaFunction } from "react-router"
-import { clientConfig } from "~/lib/config"
+import { clientConfig } from "@/app/lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {

@@ -125,7 +125,7 @@ export function getCacheControlHeaders(
  */
 export function addSecurityHeaders(headers: Headers): Headers {
     let reportUri = ""
-    if (clientConfig.analytics.sentry) {
+    if (clientConfig.analytics?.sentry) {
         reportUri = encodeURIComponent(
             clientConfig.analytics.sentry.security_report_uri.trim(),
         )
