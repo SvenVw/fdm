@@ -151,19 +151,40 @@ export function SidebarApp(props: SideBarAppType) {
         }
     }
 
-    const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
+    const [feedback, setFeedback] = useState<ReturnType<
+        typeof Sentry.getFeedback
+    > | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        try {
+            const feedbackInstance = Sentry.getFeedback()
+            if (feedbackInstance) {
+                setFeedback(feedbackInstance)
+            } else {
+                console.warn("Sentry.getFeedback() returned null or undefined.")
+            }
+        } catch (error) {
+            console.error("Failed to initialize Sentry feedback:", error)
+        } finally {
+            setIsLoading(false)
+        }
+    }, [])
 
     if (isLoading) {
         return null
     }
 
-    useEffect(() => {
-        setFeedback(Sentry.getFeedback())
-        setIsLoading(false)
-    }, [])
-
     const openFeedbackForm = async () => {
+        if (!feedback || typeof feedback.createForm !== "function") {
+            console.error(
+                "Feedback object not available or missing createForm method.",
+            )
+            toast.error(
+                "Feedback formulier is nog niet beschikbaar. Probeer het opnieuw.",
+            )
+            return
+        }
         try {
             const form = await feedback.createForm()
             form.appendToDom()
