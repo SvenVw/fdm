@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react" // Add useRef import back
 import {
     FormControl,
     FormDescription,
@@ -22,14 +22,16 @@ import type { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "react-router"
 import { FormSchema } from "./schema"
-import { Combobox } from "../combobox"
+import { Combobox } from "../combobox" // Remove incorrect type import
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import type { Feature, Polygon } from "geojson"
 
 interface FieldDetailsDialogProps {
     open: boolean
     setOpen: (value: boolean) => void
-    field: any
-    cultivationOptions: any
+    field: Feature<Polygon>
+    // Use the inline type definition matching ComboboxProps
+    cultivationOptions: { value: string; label: string }[]
     fieldNameDefault: string
 }
 
@@ -41,7 +43,7 @@ export default function FieldDetailsDialog({
     fieldNameDefault,
 }: FieldDetailsDialogProps) {
     const b_geojson = JSON.stringify(field.geometry)
-    const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}`
+    const b_lu_catalogue = `nl_${field.properties?.b_lu_catalogue ?? ""}`
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -49,26 +51,37 @@ export default function FieldDetailsDialog({
         defaultValues: {
             b_name: fieldNameDefault,
             b_lu_catalogue: b_lu_catalogue,
-            b_id_source: field.properties.b_id_source,
+            b_id_source: field.properties?.b_id_source ?? "",
             b_geometry: b_geojson,
         },
     })
 
     useEffect(() => {
+        // Reset form when the field data changes
         form.reset({
             b_name: fieldNameDefault,
             b_lu_catalogue: b_lu_catalogue,
-            b_id_source: field.properties.b_id_source,
+            b_id_source: field.properties?.b_id_source ?? "",
             b_geometry: b_geojson,
         })
     }, [form, field, fieldNameDefault, b_lu_catalogue, b_geojson])
+
+    useEffect(() => {
+        if (form.formState.isSubmitSuccessful) {
+            form.reset
+        }
+    }, [form.formState, form.reset])
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-[425px]">
                 <RemixFormProvider {...form}>
-                    <Form id="formField" method="post" onSubmit={form.handleSubmit}> 
-                        <fieldset disabled={form.formState.isSubmitting}> 
+                    <Form
+                        id="formField"
+                        method="post"
+                        onSubmit={form.handleSubmit}
+                    >
+                        <fieldset disabled={form.formState.isSubmitting}>
                             <DialogHeader>
                                 <DialogTitle>Nieuw perceel</DialogTitle>
                                 <DialogDescription>
@@ -87,7 +100,10 @@ export default function FieldDetailsDialog({
                                                     {...field}
                                                     type="text"
                                                     required
-                                                    disabled={form.formState.isSubmitting}
+                                                    disabled={
+                                                        form.formState
+                                                            .isSubmitting
+                                                    }
                                                 />
                                             </FormControl>
                                             <FormDescription />
@@ -109,33 +125,12 @@ export default function FieldDetailsDialog({
                                     }
                                     disabled={form.formState.isSubmitting}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="b_id_source"
-                                    render={({ field }) => (
-                                        <Input
-                                            {...field}
-                                            type="hidden"
-                                            required
-                                            disabled={form.formState.isSubmitting}
-                                        />
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="b_geometry"
-                                    render={({ field }) => (
-                                        <Input
-                                            {...field}
-                                            type="hidden"
-                                            required
-                                            disabled={form.formState.isSubmitting} 
-                                        />
-                                    )}
-                                />
                             </div>
                             <DialogFooter>
-                                <Button type="submit" disabled={form.formState.isSubmitting}>
+                                <Button
+                                    type="submit"
+                                    disabled={form.formState.isSubmitting}
+                                >
                                     {form.formState.isSubmitting ? (
                                         <div className="flex items-center space-x-2">
                                             <LoadingSpinner />

@@ -1,4 +1,3 @@
-import { data } from "react-router"
 import type { ZodSchema, z } from "zod"
 import { handleActionError } from "./error"
 
@@ -26,10 +25,10 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
         // Note: Somewhere additional quotation marks are added, preferably that is not the case, but this workaround removes them
         for (const key of formData.keys()) {
             const value = formData.get(key)
-            if (typeof value === "string") {
+            if (typeof value === "string" && key !== "b_geometry") {
                 formData.set(key, value.replace(/['"]+/g, "").trim())
 
-                // Daypicker return 01 Jan 1970 if no date is selected. This workaround removes the date if it is 01 Jan 1970
+                // Daypicker returns 01 Jan 1970 if no date is selected. This workaround removes the date if it is 01 Jan 1970
                 if (value === "1970-01-01T00:00:00.000Z") {
                     formData.delete(key)
                 }

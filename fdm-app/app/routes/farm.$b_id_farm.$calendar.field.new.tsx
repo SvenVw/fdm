@@ -1,30 +1,20 @@
 import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
-import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
 import {
     getMapboxStyle,
     getMapboxToken,
 } from "@/components/custom/atlas/atlas-mapbox"
 import {
     FieldsPanelHover,
-    FieldsPanelSelection,
     FieldsPanelZoom,
 } from "@/components/custom/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceNotClickable,
-    FieldsSourceSelected,
 } from "@/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
 import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarInset } from "@/components/ui/sidebar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSession } from "@/lib/auth.server"
 import { getCalendar, getTimeframe } from "@/lib/calendar"
@@ -59,7 +49,7 @@ import { ClientOnly } from "remix-utils/client-only"
 import { fdm } from "../lib/fdm.server"
 import FieldDetailsDialog from "@/components/custom/field/form"
 import { FarmHeader } from "@/components/custom/farm/farm-header"
-import type { FeatureCollection, Polygon } from "geojson"
+import type { Feature, FeatureCollection, Polygon } from "geojson"
 import { extractFormValuesFromRequest } from "@/lib/form"
 import { FormSchema } from "@/components/custom/field/schema"
 
@@ -126,8 +116,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
         const features = fields.map((field) => {
-            const feature = {
-                type: "Feature",
+            const feature: Feature = {
+                type: "Feature" as const, 
                 properties: {
                     b_id: field.b_id,
                     b_name: field.b_name,
@@ -135,7 +125,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_lu_name: field.b_lu_name,
                     b_id_source: field.b_id_source,
                 },
-                geometry: field.b_geometry,
+                geometry: field.b_geometry, 
             }
             return feature
         })
@@ -202,9 +192,12 @@ export default function Index() {
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [open, setOpen] = useState(false)
-    const [selectedField, setSelectedField] = useState<any | null>(null)
 
-    const handleSelectField = (feature: any) => {
+    const [selectedField, setSelectedField] = useState<Feature<Polygon> | null>(
+        null,
+    )
+
+    const handleSelectField = (feature: Feature<Polygon>) => {
         setSelectedField(feature)
         setOpen(true)
     }
@@ -215,7 +208,11 @@ export default function Index() {
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}
                 fieldOptions={undefined}
-                b_id={undefined}
+                b_id={undefined}             
+                layerOptions={[]}
+                layerSelected={undefined}
+                fertilizerOptions={undefined}
+                p_id={undefined}
                 action={{
                     to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
                     label: "Terug naar percelen",
@@ -256,12 +253,16 @@ export default function Index() {
                                     fieldsSavedId,
                                 ]}
                                 onClick={(evt) => {
-                                    if (!evt.features) return
-                                    const features = evt.features.filter(
-                                        (f) => f.source === fieldsAvailableId,
+                                    if (!evt.features) return                        
+                                    const polygonFeature = evt.features.find(
+                                        (f) =>
+                                            f.source === fieldsAvailableId &&
+                                            f.geometry?.type === "Polygon",
                                     )
-                                    if (features.length > 0) {
-                                        handleSelectField(features[0])
+                                    if (polygonFeature) {                             
+                                        handleSelectField(
+                                            polygonFeature as Feature<Polygon>,
+                                        )
                                     }
                                 }}
                             >
@@ -302,7 +303,7 @@ export default function Index() {
                 <FieldDetailsDialog
                     open={open}
                     setOpen={setOpen}
-                    field={selectedField}
+                    field={selectedField as Feature<Polygon>}
                     cultivationOptions={loaderData.cultivationOptions}
                     fieldNameDefault={loaderData.fieldNameDefault}
                 />
@@ -312,7 +313,6 @@ export default function Index() {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    console.log("hoi")
     // Get the farm id
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
@@ -328,8 +328,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the timeframe
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
-        // Get from values
+        // Get form values
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -361,7 +362,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const b_name = formValues.b_name
         const b_id_source = formValues.b_id_source
         const b_lu_catalogue = formValues.b_lu_catalogue
-        const b_geometry = formValues.b_geometry as Polygon
+        // Parse the geometry string twice to get the actual GeoJSON object
+        const b_geometry = JSON.parse(
+            JSON.parse(formValues.b_geometry),
+        ) as Polygon
         const currentYear = new Date().getFullYear()
         const defaultDate = timeframe.start
             ? timeframe.start
@@ -393,7 +397,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         if (process.env.NMI_API_KEY) {
-            const fieldCentroid = centroid(formValues.b_geometry)
+            const fieldCentroid = centroid(b_geometry)
             const a_lon = fieldCentroid.geometry.coordinates[0]
             const a_lat = fieldCentroid.geometry.coordinates[1]
 
@@ -438,9 +442,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        return redirectWithSuccess("./", {
-            message: `${b_name} is toegevoegd! 🎉`,
-        })
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
+            `{
+                message: "${b_name} is toegevoegd! 🎉",
+            }
+            `,
+        )
     } catch (error) {
         throw handleActionError(error)
     }
