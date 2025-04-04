@@ -57,18 +57,8 @@ export default function FieldDetailsDialog({
     })
 
     useEffect(() => {
-        // Reset form when the field data changes
-        form.reset({
-            b_name: fieldNameDefault,
-            b_lu_catalogue: b_lu_catalogue,
-            b_id_source: field.properties?.b_id_source ?? "",
-            b_geometry: b_geojson,
-        })
-    }, [form, field, fieldNameDefault, b_lu_catalogue, b_geojson])
-
-    useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
-            form.reset
+            form.reset()
         }
     }, [form.formState, form.reset])
 
@@ -110,7 +100,7 @@ export default function FieldDetailsDialog({
                                             <FormMessage />
                                         </FormItem>
                                     )}
-                                />
+                                />                               
                                 <Combobox
                                     options={cultivationOptions}
                                     form={form}
@@ -122,7 +112,7 @@ export default function FieldDetailsDialog({
                                                 *
                                             </span>
                                         </span>
-                                    }
+                                    }                  
                                     disabled={form.formState.isSubmitting}
                                 />
                             </div>
