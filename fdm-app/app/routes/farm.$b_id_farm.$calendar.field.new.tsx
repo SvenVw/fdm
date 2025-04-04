@@ -125,7 +125,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_lu_name: field.b_lu_name,
                     b_id_source: field.b_id_source,
                 },
-                geometry: field.b_geometry, 
+                geometry: field.b_geometry,
             }
             return feature
         })
@@ -151,6 +151,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 value: cultivation.b_lu_catalogue,
                 label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
             }))
+        if (!cultivationOptions.length) {
+            throw dataWithError(
+                "No cultivations are available",
+                "Er zijn nog geen gewassen beschikbaar.",
+            )
+        }
 
         // Create default field name
         const fieldNameDefault = `Perceel ${fields.length + 1}`
@@ -208,7 +214,7 @@ export default function Index() {
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}
                 fieldOptions={undefined}
-                b_id={undefined}             
+                b_id={undefined}
                 layerOptions={[]}
                 layerSelected={undefined}
                 fertilizerOptions={undefined}
@@ -253,13 +259,13 @@ export default function Index() {
                                     fieldsSavedId,
                                 ]}
                                 onClick={(evt) => {
-                                    if (!evt.features) return                        
+                                    if (!evt.features) return
                                     const polygonFeature = evt.features.find(
                                         (f) =>
                                             f.source === fieldsAvailableId &&
                                             f.geometry?.type === "Polygon",
                                     )
-                                    if (polygonFeature) {                             
+                                    if (polygonFeature) {
                                         handleSelectField(
                                             polygonFeature as Feature<Polygon>,
                                         )
@@ -415,10 +421,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
 
             if (!responseApi.ok) {
-                throw data(responseApi.statusText, {
-                    status: responseApi.status,
-                    statusText: responseApi.statusText,
-                })
+                return dataWithError(
+                    null,
+                    "Helaas er is er wat misggegaan. Probeel later opnieuw.",
+                )
             }
 
             const result = await responseApi.json()
@@ -443,11 +449,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
-            `{
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}`,
+            {
                 message: "${b_name} is toegevoegd! 🎉",
-            }
-            `,
+            },
         )
     } catch (error) {
         throw handleActionError(error)
