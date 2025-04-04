@@ -6,8 +6,8 @@ export const serverConfig = config
 // Create the client-safe config object
 export const clientConfig: ClientConfig = {
     name: config.name,
-    favicon: config.favicon,
     logo: config.logo,
+    logomark: config.logomark,
     analytics: {
         sentry: config.analytics.sentry
             ? {
@@ -30,8 +30,8 @@ export const clientConfig: ClientConfig = {
 
 export interface Config {
     name: string
-    favicon: string
     logo: string
+    logomark: string
     auth: {
         fdm_session_secret: string
         better_auth_secret: string
@@ -77,8 +77,8 @@ export interface Config {
 // Define the structure for client-safe configuration
 interface ClientConfig {
     name: string
-    favicon: string
     logo: string
+    logomark: string
     analytics: {
         sentry?: {
             dsn: string

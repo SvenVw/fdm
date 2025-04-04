@@ -4,8 +4,8 @@ const config: Config = {
     // Site name
     name: process.env.FDM_NAME || "FDM",
     // Site logo
-    favicon: "/favicon.ico",
-    logo: "/logo.svg",
+    logo: "/fdm-high-resolution-logo-transparent.png",
+    logomark: "/fdm-high-resolution-logo-transparent-no-text.png",
 
     // Authentication
     auth: {
