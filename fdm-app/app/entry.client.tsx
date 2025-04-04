@@ -65,21 +65,20 @@ if (clientConfig.analytics.sentry) {
 }
 
 function PosthogInit() {
-    const posthogHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST
-    const posthogKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY
+    const posthogConfig = clientConfig.analytics.posthog
 
-    if (posthogHost && posthogKey.startsWith("phc")) {
+    if (posthogConfig) {
         useEffect(() => {
             try {
-                posthog.init(posthogKey, {
-                    api_host: posthogHost,
+                posthog.init(posthogConfig.key, {
+                    api_host: posthogConfig.host,
                     person_profiles: "always",
                     loaded: () => {},
                 })
             } catch (error) {
                 console.error("Failed to initialize PostHog:", error)
             }
-        }, [])
+        }, [posthogConfig])
     } else {
         console.warn(
             "PostHog not initialized - missing or invalid configuration",

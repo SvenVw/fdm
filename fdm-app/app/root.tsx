@@ -19,6 +19,7 @@ import { getToast } from "remix-toast"
 import { toast as notify } from "sonner"
 import { Banner } from "~/components/custom/banner"
 import { ErrorBlock } from "~/components/custom/error"
+import { clientConfig } from "~/lib/config" // Import clientConfig
 import { Toaster } from "~/components/ui/sonner"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
@@ -62,12 +63,12 @@ export function Layout() {
     const toast = loaderData?.toast
     const location = useLocation()
 
-    // Capture pagevies
+    // Capture pageviews if PostHog is configured
     useEffect(() => {
-        if (typeof window !== "undefined") {
-          posthog.capture("$pageview")
+        if (clientConfig.analytics.posthog && typeof window !== "undefined") {
+            posthog.capture("$pageview")
         }
-    }, [location]);
+    }, [location])
 
     // Hook to show the toasts
     useEffect(() => {

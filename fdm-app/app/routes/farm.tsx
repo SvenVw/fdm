@@ -105,8 +105,9 @@ export default function App() {
         setCalendar(initialCalendar)
     }, [initialCalendar, setCalendar])
 
+    // Identify user if PostHog is configured
     useEffect(() => {
-        if (posthog && loaderData.user) {
+        if (clientConfig.analytics.posthog && loaderData.user) {
             posthog.identify(loaderData.user.id, {
                 id: loaderData.user.id,
                 email: loaderData.user.email,

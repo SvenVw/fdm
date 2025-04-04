@@ -2,6 +2,7 @@ import { Cookie, X } from "lucide-react"
 import posthog from "posthog-js"
 import { useEffect, useState } from "react"
 import { Button } from "~/components/ui/button"
+import { clientConfig } from "~/lib/config"
 
 type ConsentType = "yes" | "no" | "undecided"
 
@@ -36,7 +37,8 @@ export function Banner() {
     }, [])
 
     useEffect(() => {
-        if (consentGiven !== "undecided") {
+        // Set PostHog persistence based on consent, if PostHog is configured
+        if (clientConfig.analytics.posthog && consentGiven !== "undecided") {
             try {
                 posthog.set_config({
                     persistence:

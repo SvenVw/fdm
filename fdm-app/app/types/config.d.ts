@@ -47,5 +47,9 @@ export interface ClientConfig {
             profile_sample_rate: number
             security_report_uri: string
         } | null
+        posthog?: {
+            key: string
+            host: string
+        } | null
     }
 }

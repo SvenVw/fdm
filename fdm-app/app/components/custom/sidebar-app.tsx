@@ -63,15 +63,17 @@ import { clientConfig } from "~/lib/config"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
 
+interface SideBarAppUserType {
+    id: string
+    name: string // Full name from session.user
+    email: string
+    image?: string | null | undefined
+    // Other properties from session.user might exist but are not needed here
+}
+
 interface SideBarAppType {
-    user: {
-        firstname: string
-        surname: string
-        name: string
-        email: string
-        image: string | undefined
-    }
-    userName: string
+    user: SideBarAppUserType
+    userName: string // Display name, potentially different from user.name
     initials: string
 }
 
@@ -503,7 +505,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
                                         <AvatarImage
-                                            src={user.image}
+                                            src={user.image ?? undefined} 
                                             alt={user.name}
                                         />
                                         <AvatarFallback className="rounded-lg">
@@ -512,7 +514,7 @@ export function SidebarApp(props: SideBarAppType) {
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">
-                                            {`${user.firstname} ${user.surname}`}
+                                            {userName}
                                         </span>
                                         <span className="truncate text-xs">
                                             {user.email}
@@ -530,7 +532,6 @@ export function SidebarApp(props: SideBarAppType) {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="h-8 w-8 rounded-lg">
-                                            {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
                                             <AvatarFallback className="rounded-lg">
                                                 {avatarInitials}
                                             </AvatarFallback>
@@ -595,7 +596,11 @@ export function SidebarApp(props: SideBarAppType) {
                                         <Button
                                             type="submit"
                                             variant="link"
-                                            onClick={() => posthog.reset()}
+                                            onClick={() => {
+                                                if (clientConfig.analytics.posthog) {
+                                                    posthog.reset()
+                                                }
+                                            }}
                                         >
                                             <LogOut />
                                             Uitloggen
