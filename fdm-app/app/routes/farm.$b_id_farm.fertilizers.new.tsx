@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
-    type MetaFunction
+    type MetaFunction,
     data,
     useLoaderData,
 } from "react-router"
