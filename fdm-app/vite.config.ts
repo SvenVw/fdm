@@ -7,7 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths"
 const org = process.env.VITE_SENTRY_ORG
 const authToken = process.env.SENTRY_AUTH_TOKEN
 const project = process.env.VITE_SENTRY_PROJECT
-let pluginSentry: any
+let pluginSentry: ReturnType<typeof sentryVitePlugin> | undefined
 if (org && authToken && project) {
     pluginSentry = sentryVitePlugin({
         org: org,
