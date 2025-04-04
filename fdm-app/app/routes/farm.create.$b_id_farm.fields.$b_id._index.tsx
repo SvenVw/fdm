@@ -55,6 +55,7 @@ import { Input } from "~/components/ui/input"
 import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
@@ -62,8 +63,8 @@ import { extractFormValuesFromRequest } from "~/lib/form"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `${clientConfig.name} App` },
+        { name: "description", content: `Welcome to ${clientConfig.name}!` },
     ]
 }
 
@@ -83,6 +84,7 @@ const FormSchema = z.object({
         required_error: "Hoofdgewas is verplicht",
     }),
 })
+type FormSchemaType = z.infer<typeof FormSchema>
 
 /**
  * Retrieves and prepares data for rendering the field details page.
@@ -221,7 +223,7 @@ export default function Index() {
     const fields = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(id)
 
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    const form = useRemixForm({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {

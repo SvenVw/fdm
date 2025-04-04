@@ -95,19 +95,19 @@ export default function SignIn() {
                             <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
                                 <img
                                     className="size-12"
-                                    src="/fdm-high-resolution-logo-transparent-no-text.png"
-                                    alt="FDM"
+                                    src={clientConfig.logomark}
+                                    alt={clientConfig.name}
                                 />
                             </div>
                             <div className="flex flex-col gap-0.5 leading-none">
                                 <span className="font-semibold text-4xl">
-                                    FDM
+                                    {clientConfig.name}
                                 </span>
                             </div>
                         </div>
                         {/* End logo and title fix */}
                         <p className="text-center text-muted-foreground">
-                            Maak een account aan bij FDM en krijg toegang tot:
+                            {`Maak een account aan bij ${clientConfig.name} en krijg toegang tot:`}
                         </p>
                         <div className="space-y-5">
                             <div>
