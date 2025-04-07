@@ -17,13 +17,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
-import type { FeatureCollection } from "geojson"
-import throttle from "lodash.throttle"
-import { Check, Info } from "lucide-react"
-import { useEffect, useState } from "react"
-import { useMap } from "react-map-gl"
-import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl"
-import { useFetcher } from "react-router"
 
 export function FieldsPanelHover({
     zoomLevelFields,

@@ -2,7 +2,7 @@ import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "~/components/custom/atlas/atlas-mapbox"
+} from "~/integrations/mapbox"
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
