@@ -427,53 +427,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_gwl_class: estimates.b_gwl_class,
                 },
             )
-        }
-
-        if (process.env.NMI_API_KEY) {
-            const fieldCentroid = centroid(b_geometry)
-            const a_lon = fieldCentroid.geometry.coordinates[0]
-            const a_lat = fieldCentroid.geometry.coordinates[1]
-
-            const responseApi = await fetch(
-                `https://api.nmi-agro.nl/estimates?${new URLSearchParams({
-                    a_lat: a_lat.toString(),
-                    a_lon: a_lon.toString(),
-                })}`,
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: `Bearer ${process.env.NMI_API_KEY}`,
-                    },
-                },
-            )
-
-            if (!responseApi.ok) {
-                return dataWithError(
-                    null,
-                    "Helaas er is er wat misggegaan. Probeel later opnieuw.",
-                )
-            }
-
-            const result = await responseApi.json()
-            const response = result.data
-
-            await addSoilAnalysis(
-                fdm,
-                session.principal_id,
-                undefined,
-                "NMI",
-                b_id,
-                0.3,
-                undefined,
-                {
-                    a_p_al: response.a_p_al,
-                    a_p_cc: response.a_p_cc,
-                    a_som_loi: response.a_som_loi,
-                    b_soiltype_agr: response.b_soiltype_agr,
-                    b_gwl_class: response.b_gwl_class,
-                },
-            )
-        }
+        }       
 
         return redirectWithSuccess(
             `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
