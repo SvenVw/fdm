@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { useEffect, useRef } from "react" // Add useRef import back
+import { useEffect, useState } from "react"
 import {
     FormControl,
     FormDescription,
@@ -20,17 +20,16 @@ import {
 import { Input } from "@/components/ui/input"
 import type { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form } from "react-router"
 import { FormSchema } from "./schema"
-import { Combobox } from "../combobox" // Remove incorrect type import
+import { Combobox } from "../combobox"
 import { LoadingSpinner } from "@/components/custom/loadingspinner"
 import type { Feature, Polygon } from "geojson"
+import { Form } from "react-router"
 
 interface FieldDetailsDialogProps {
     open: boolean
     setOpen: (value: boolean) => void
     field: Feature<Polygon>
-    // Use the inline type definition matching ComboboxProps
     cultivationOptions: { value: string; label: string }[]
     fieldNameDefault: string
 }
@@ -42,19 +41,25 @@ export default function FieldDetailsDialog({
     cultivationOptions,
     fieldNameDefault,
 }: FieldDetailsDialogProps) {
-    const b_geojson = JSON.stringify(field.geometry)
     const b_lu_catalogue = `nl_${field.properties?.b_lu_catalogue ?? ""}`
+    const [selectedCultivation, setSelectedCultivation] = useState<string>(b_lu_catalogue);
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: fieldNameDefault,
-            b_lu_catalogue: b_lu_catalogue,
-            b_id_source: field.properties?.b_id_source ?? "",
-            b_geometry: b_geojson,
+            b_lu_catalogue: selectedCultivation,
+        },
+        submitData: {
+            b_id_source: field.properties?.b_id_source,
+            b_geometry: JSON.stringify(field.geometry),
         },
     })
+
+    useEffect(() => {
+        form.setValue("b_lu_catalogue", selectedCultivation)
+    }, [selectedCultivation, form])
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
@@ -66,11 +71,7 @@ export default function FieldDetailsDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-[425px]">
                 <RemixFormProvider {...form}>
-                    <Form
-                        id="formField"
-                        method="post"
-                        onSubmit={form.handleSubmit}
-                    >
+                    <Form id="formField" onSubmit={form.handleSubmit} method="post">
                         <fieldset disabled={form.formState.isSubmitting}>
                             <DialogHeader>
                                 <DialogTitle>Nieuw perceel</DialogTitle>
@@ -100,10 +101,9 @@ export default function FieldDetailsDialog({
                                             <FormMessage />
                                         </FormItem>
                                     )}
-                                />                               
+                                />
                                 <Combobox
                                     options={cultivationOptions}
-                                    form={form}
                                     name="b_lu_catalogue"
                                     label={
                                         <span>
@@ -112,8 +112,10 @@ export default function FieldDetailsDialog({
                                                 *
                                             </span>
                                         </span>
-                                    }                  
+                                    }
+                                    defaultValue={selectedCultivation}
                                     disabled={form.formState.isSubmitting}
+                                    onChange={setSelectedCultivation}
                                 />
                             </div>
                             <DialogFooter>

@@ -13,10 +13,10 @@ const FormSchema = z.object({
     }),
     b_id_source: z.string({
         required_error: "ID van bron is verplicht",
-    }),
+    }).optional(),
     b_geometry: z.string({
         required_error: "Geometrie van perceel is verplicht",
-    }),
+    }).optional(),
 })
 
 export { FormSchema }

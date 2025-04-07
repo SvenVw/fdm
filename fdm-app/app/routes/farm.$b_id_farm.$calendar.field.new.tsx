@@ -117,7 +117,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
         const features = fields.map((field) => {
             const feature: Feature = {
-                type: "Feature" as const, 
+                type: "Feature" as const,
                 properties: {
                     b_id: field.b_id,
                     b_name: field.b_name,
@@ -320,6 +320,7 @@ export default function Index() {
 
 export async function action({ request, params }: ActionFunctionArgs) {
     // Get the farm id
+    console.log("Action!")
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
         throw data("Farm ID is required", {
@@ -370,7 +371,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const b_lu_catalogue = formValues.b_lu_catalogue
         // Parse the geometry string twice to get the actual GeoJSON object
         const b_geometry = JSON.parse(
-            JSON.parse(formValues.b_geometry),
+            JSON.parse(String(formValues.b_geometry)),
         ) as Polygon
         const currentYear = new Date().getFullYear()
         const defaultDate = timeframe.start
@@ -449,7 +450,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
 
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${b_id}`,
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
             {
                 message: "${b_name} is toegevoegd! 🎉",
             },
