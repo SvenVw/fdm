@@ -1,5 +1,5 @@
 import centroid from "@turf/centroid"
-import type { Feature } from "geojson"
+import type { Feature, Geometry, Polygon } from "geojson"
 import { serverConfig } from "~/lib/config.server"
 
 export function getNmiApiKey() {
@@ -12,7 +12,7 @@ export function getNmiApiKey() {
 }
 
 export async function getSoilParameterEstimates(
-    field: Feature,
+    field: Feature | Polygon,
     nmiApiKey: string | undefined,
 ): Promise<{
     a_p_al: number
@@ -27,7 +27,13 @@ export async function getSoilParameterEstimates(
         throw new Error("Please provide a NMI API key")
     }
 
-    const fieldCentroid = centroid(field.geometry)
+    let geometry: Geometry
+    if ("geometry" in field) {
+        geometry = field.geometry
+    } else {
+        geometry = field
+    }
+    const fieldCentroid = centroid(geometry)
     const a_lon = fieldCentroid.geometry.coordinates[0]
     const a_lat = fieldCentroid.geometry.coordinates[1]
 
