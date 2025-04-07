@@ -1,25 +1,25 @@
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
 import {
     getMapboxStyle,
     getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
+} from "~/components/custom/atlas/atlas-mapbox"
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
-} from "@/components/custom/atlas/atlas-panels"
+} from "~/components/custom/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceNotClickable,
-} from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { useCalendarStore } from "@/store/calendar"
+} from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { useCalendarStore } from "~/store/calendar"
 import {
     addCultivation,
     addField,
@@ -46,12 +46,13 @@ import {
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { fdm } from "../lib/fdm.server"
-import FieldDetailsDialog from "@/components/custom/field/form"
-import { FarmHeader } from "@/components/custom/farm/farm-header"
+import { fdm } from "~/lib/fdm.server"
+import FieldDetailsDialog from "~/components/custom/field/form"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
-import { extractFormValuesFromRequest } from "@/lib/form"
-import { FormSchema } from "@/components/custom/field/schema"
+import { extractFormValuesFromRequest } from "~/lib/form"
+import { FormSchema } from "~/components/custom/field/schema"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -337,6 +338,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
 
+        const nmiApiKey = getNmiApiKey()
+
         // Get form values
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -401,6 +404,30 @@ export async function action({ request, params }: ActionFunctionArgs) {
             b_lu_start,
             b_lu_end,
         )
+
+        if (nmiApiKey) {
+            const estimates = await getSoilParameterEstimates(
+                b_geometry,
+                nmiApiKey,
+            )
+
+            await addSoilAnalysis(
+                fdm,
+                session.principal_id,
+                undefined,
+                estimates.a_source,
+                b_id,
+                estimates.a_depth,
+                undefined,
+                {
+                    a_p_al: estimates.a_p_al,
+                    a_p_cc: estimates.a_p_cc,
+                    a_som_loi: estimates.a_som_loi,
+                    b_soiltype_agr: estimates.b_soiltype_agr,
+                    b_gwl_class: estimates.b_gwl_class,
+                },
+            )
+        }
 
         if (process.env.NMI_API_KEY) {
             const fieldCentroid = centroid(b_geometry)

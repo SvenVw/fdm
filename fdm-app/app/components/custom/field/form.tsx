@@ -5,8 +5,8 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "~/components/ui/dialog"
+import { Button } from "~/components/ui/button"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { useEffect, useState } from "react"
 import {
@@ -16,13 +16,13 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import type { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { FormSchema } from "./schema"
-import { Combobox } from "../combobox"
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
+import { Combobox } from "~/components/custom/combobox"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import type { Feature, Polygon } from "geojson"
 import { Form } from "react-router"
 
@@ -42,7 +42,8 @@ export default function FieldDetailsDialog({
     fieldNameDefault,
 }: FieldDetailsDialogProps) {
     const b_lu_catalogue = `nl_${field.properties?.b_lu_catalogue ?? ""}`
-    const [selectedCultivation, setSelectedCultivation] = useState<string>(b_lu_catalogue);
+    const [selectedCultivation, setSelectedCultivation] =
+        useState<string>(b_lu_catalogue)
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -71,7 +72,11 @@ export default function FieldDetailsDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-[425px]">
                 <RemixFormProvider {...form}>
-                    <Form id="formField" onSubmit={form.handleSubmit} method="post">
+                    <Form
+                        id="formField"
+                        onSubmit={form.handleSubmit}
+                        method="post"
+                    >
                         <fieldset disabled={form.formState.isSubmitting}>
                             <DialogHeader>
                                 <DialogTitle>Nieuw perceel</DialogTitle>
