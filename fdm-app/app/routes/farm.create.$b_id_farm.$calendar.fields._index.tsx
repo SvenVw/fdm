@@ -1,10 +1,28 @@
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
 import { getFields } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, redirect } from "react-router"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    redirect,
+} from "react-router"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        {
+            title: `Percelen beheren - Bedrijf toevoegen | ${clientConfig.name}`,
+        },
+        {
+            name: "description",
+            content:
+                "Beheer de percelen van je bedrijf. Pas namen aan en bekijk perceelsinformatie.",
+        },
+    ]
+}
 
 /**
  * Loads the user's session and associated fields for a specified farm, redirecting to the route of the first field.

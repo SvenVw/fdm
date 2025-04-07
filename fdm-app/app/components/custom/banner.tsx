@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button"
-import { Cookie, CookieIcon, X } from "lucide-react"
+import { Cookie, X } from "lucide-react"
 import posthog from "posthog-js"
 import { useEffect, useState } from "react"
+import { Button } from "~/components/ui/button"
+import { clientConfig } from "~/lib/config"
 
 type ConsentType = "yes" | "no" | "undecided"
 
@@ -36,7 +37,8 @@ export function Banner() {
     }, [])
 
     useEffect(() => {
-        if (consentGiven !== "undecided") {
+        // Set PostHog persistence based on consent, if PostHog is configured
+        if (clientConfig.analytics.posthog && consentGiven !== "undecided") {
             try {
                 posthog.set_config({
                     persistence:
@@ -116,7 +118,7 @@ export function Banner() {
                         <div className="grid gap-2">
                             <div className="border-b border-border h-14 flex items-center justify-between p-4">
                                 <h1 className="text-lg font-medium">
-                                    Cookies op FDM
+                                    {`Cookies op ${clientConfig.name}`}
                                 </h1>
                                 <div className="flex gap-2">
                                     <Cookie className="h-[1.2rem] w-[1.2rem]" />
@@ -132,9 +134,9 @@ export function Banner() {
                             </div>
                             <div className="p-4">
                                 <p className="text-sm font-normal text-start">
-                                    Wij gebruiken cookies enkel om FDM te
+                                    {`Wij gebruiken cookies enkel om ${clientConfig.name} te
                                     verbeteren, zodat we weten wat er goed en
-                                    fout gaat.
+                                    fout gaat.`}
                                     <br />
                                     Geen zorgen, we gebruiken ze niet voor
                                     advertenties en ook niet om je online te

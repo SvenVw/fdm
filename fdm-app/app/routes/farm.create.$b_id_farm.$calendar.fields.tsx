@@ -1,19 +1,3 @@
-import { SidebarPage } from "@/components/custom/sidebar-page"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { cn } from "@/lib/utils"
-import { useCalendarStore } from "@/store/calendar"
 import {
     getCultivationsFromCatalogue,
     getFarm,
@@ -28,13 +12,35 @@ import {
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { fdm } from "../lib/fdm.server"
+import { SidebarPage } from "~/components/custom/sidebar-page"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { cn } from "~/lib/utils"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        {
+            title: `Percelen beheren - Bedrijf toevoegen | ${clientConfig.name}`,
+        },
+        {
+            name: "description",
+            content:
+                "Beheer de percelen van je bedrijf. Pas namen aan en bekijk perceelsinformatie.",
+        },
     ]
 }
 

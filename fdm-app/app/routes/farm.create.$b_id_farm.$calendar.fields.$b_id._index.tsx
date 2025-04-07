@@ -1,36 +1,3 @@
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { Combobox } from "@/components/custom/combobox"
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { SoilDataCards } from "@/components/custom/soil/cards"
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getCultivations,
@@ -56,15 +23,46 @@ import {
 import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
-import { ClientOnly } from "remix-utils/client-only"
 import { z } from "zod"
-import { fdm } from "../lib/fdm.server"
+import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { Combobox } from "~/components/custom/combobox"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { SoilDataCards } from "~/components/custom/soil/cards"
+import { Button } from "~/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { Separator } from "~/components/ui/separator"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+import { getTimeframe } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `${clientConfig.name} App` },
+        { name: "description", content: `Welcome to ${clientConfig.name}!` },
     ]
 }
 
@@ -122,6 +120,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const timeframe = await getTimeframe(params)
+
         // Get the field data
         const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
@@ -159,6 +159,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         const soilParameterDescription = getSoilParametersDescription()
 
@@ -184,6 +185,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         const b_lu_catalogue = cultivations[0]?.b_lu_catalogue
 
@@ -222,7 +224,7 @@ export default function Index() {
     const fields = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(id)
 
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    const form = useRemixForm({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -433,6 +435,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const timeframe = getTimeframe(params)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -454,6 +458,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             fdm,
             session.principal_id,
             b_id,
+            timeframe,
         )
         if (cultivations && cultivations.length > 0) {
             await updateCultivation(

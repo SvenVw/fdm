@@ -1,6 +1,13 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
+import type { FeatureCollection } from "geojson"
+import throttle from "lodash.throttle"
+import { Check, Info } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useMap } from "react-map-gl"
+import type { MapBoxZoomEvent, MapEvent, MapMouseEvent } from "react-map-gl"
+import { data, useFetcher } from "react-router"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -8,15 +15,8 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import type { FeatureCollection } from "geojson"
-import throttle from "lodash.throttle"
-import { Check, Info } from "lucide-react"
-import { useEffect, useState } from "react"
-import { useMap } from "react-map-gl"
-import type { MapBoxZoomEvent, MapEvent, MapMouseEvent } from "react-map-gl"
-import { useFetcher } from "react-router"
+} from "~/components/ui/card"
+import { cn } from "~/lib/utils"
 
 export function FieldsPanelHover({
     zoomLevelFields,

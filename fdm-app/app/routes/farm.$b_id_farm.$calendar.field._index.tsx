@@ -1,33 +1,46 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Button } from "@/components/ui/button"
+import { getFarms, getFields } from "@svenvw/fdm-core"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+    redirect,
+    useLoaderData,
+} from "react-router"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
     CardFooter,
     CardHeader,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { getTimeBasedGreeting } from "@/lib/greetings"
-import { getFarms, getFields } from "@svenvw/fdm-core"
-import {
-    type LoaderFunctionArgs,
-    NavLink,
-    data,
-    redirect,
-    useLoaderData,
-} from "react-router"
+} from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { getTimeBasedGreeting } from "~/lib/greetings"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Perceel | ${clientConfig.name}` },
+        {
+            name: "description",
+            content:
+                "Beheer al uw percelen op één plek. Bekijk een overzicht van alle percelen binnen uw bedrijf met hun belangrijkste kenmerken.",
+        },
+    ]
+}
 
 /**
  * Retrieves and processes farm and field options for the specified farm ID based on the current user session.
  *
- * This loader function extracts the active farm ID from the route parameters and uses the user’s session to:
+ * This loader function extracts the active farm ID from the route parameters and uses the user's session to:
  * - Fetch all farms associated with the user, redirecting to the farms overview if none exist.
  * - Validate and map the farms into selectable options.
  * - Retrieve and validate the fields for the active farm, rounding each field's area and sorting the fields alphabetically.

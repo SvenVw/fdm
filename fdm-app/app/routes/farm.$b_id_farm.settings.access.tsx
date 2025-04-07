@@ -1,4 +1,17 @@
-import { Separator } from "@/components/ui/separator"
+import type { MetaFunction } from "react-router"
+import { Separator } from "~/components/ui/separator"
+import { clientConfig } from "~/lib/config"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Toegang - Instellingen - Bedrijf | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de toegang tot je bedrijf.",
+        },
+    ]
+}
 
 export default function FarmSettingsAccessBlock() {
     return (

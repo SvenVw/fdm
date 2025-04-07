@@ -1,20 +1,33 @@
-import { HarvestForm } from "@/components/custom/harvest/form"
-import { FormSchema } from "@/components/custom/harvest/schema"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
 import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+import { HarvestForm } from "~/components/custom/harvest/form"
+import { FormSchema } from "~/components/custom/harvest/schema"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Oogst - Gewas - Perceel | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de oogst van je gewas.",
+        },
+    ]
+}
 
 /**
  * Retrieves cultivation and harvest data based on provided URL parameters.

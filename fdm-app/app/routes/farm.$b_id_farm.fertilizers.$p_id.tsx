@@ -1,12 +1,3 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { FertilizerForm } from "@/components/custom/fertilizer/form"
-import { FormSchema } from "@/components/custom/fertilizer/formschema"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getFarm,
@@ -19,12 +10,33 @@ import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useLoaderData,
 } from "react-router"
 import { useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import type { z } from "zod"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FertilizerForm } from "~/components/custom/fertilizer/form"
+import { FormSchema } from "~/components/custom/fertilizer/formschema"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Meststof | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekij de details van deze meststof",
+        },
+    ]
+}
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {

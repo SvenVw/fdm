@@ -1,12 +1,3 @@
-import { SoilDataCards } from "@/components/custom/soil/cards"
-import { SoilAnalysesList } from "@/components/custom/soil/list"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
 import {
     Timeframe,
     getField,
@@ -25,6 +16,15 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
+import { SoilDataCards } from "~/components/custom/soil/cards"
+import { SoilAnalysesList } from "~/components/custom/soil/list"
+import { Button } from "~/components/ui/button"
+import { Separator } from "~/components/ui/separator"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 /**
  * Loader function for the soil data page of a specific farm field.

@@ -1,13 +1,3 @@
-import { FertilizerApplicationsCards } from "@/components/custom/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "@/components/custom/fertilizer-applications/form"
-import { FormSchema } from "@/components/custom/fertilizer-applications/formschema"
-import { FertilizerApplicationsList } from "@/components/custom/fertilizer-applications/list"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
@@ -19,12 +9,35 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useFetcher,
     useLoaderData,
     useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
+import { FertilizerApplicationsCards } from "~/components/custom/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "~/components/custom/fertilizer-applications/form"
+import { FormSchema } from "~/components/custom/fertilizer-applications/formschema"
+import { FertilizerApplicationsList } from "~/components/custom/fertilizer-applications/list"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Bemesting - Perceel | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de bemestinggegevens van je perceel.",
+        },
+    ]
+}
 
 /**
  * Loads data necessary for managing fertilizer applications for a specific field.

@@ -1,16 +1,29 @@
-import { getMapboxToken } from "@/components/custom/atlas/atlas-mapbox"
-import { Button } from "@/components/ui/button"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
+import { Button } from "~/components/ui/button"
+import { getMapboxToken } from "~/integrations/mapbox"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Hoogte - Kaart | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk hoogtegegevens op de kaart.",
+        },
+    ]
+}
 
 /**
  * Loads farm field data and a Mapbox token for the elevation feature.

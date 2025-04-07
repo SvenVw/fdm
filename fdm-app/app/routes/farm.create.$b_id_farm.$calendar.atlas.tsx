@@ -1,41 +1,9 @@
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
-import { generateFeatureClass } from "@/components/custom/atlas/atlas-functions"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import {
-    FieldsPanelHover,
-    FieldsPanelSelection,
-    FieldsPanelZoom,
-} from "@/components/custom/atlas/atlas-panels"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceSelected,
-} from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { useCalendarStore } from "@/store/calendar"
 import {
     addCultivation,
     addField,
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
-import { centroid } from "@turf/centroid"
 import { useState } from "react"
 import {
     GeolocateControl,
@@ -52,13 +20,46 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { fdm } from "../lib/fdm.server"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
+import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
+import {
+    FieldsPanelHover,
+    FieldsPanelSelection,
+    FieldsPanelZoom,
+} from "~/components/custom/atlas/atlas-panels"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceSelected,
+} from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `Kaart - Bedrijf toevoegen | ${clientConfig.name}` },
+        {
+            name: "description",
+            content:
+                "Bekijk en bewerk je percelen op een interactieve kaart. Pas perceelgrenzen aan en bekijk satellietbeelden.",
+        },
     ]
 }
 
@@ -265,6 +266,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
+        const nmiApiKey = getNmiApiKey()
+
         const selectedFields = JSON.parse(
             String(formData.get("selected_fields")),
         )
@@ -306,50 +309,26 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_lu_end,
                 )
 
-                if (process.env.NMI_API_KEY) {
-                    const fieldCentroid = centroid(field.geometry)
-                    const a_lon = fieldCentroid.geometry.coordinates[0]
-                    const a_lat = fieldCentroid.geometry.coordinates[1]
-
-                    const responseApi = await fetch(
-                        `https://api.nmi-agro.nl/estimates?${new URLSearchParams(
-                            {
-                                a_lat: a_lat.toString(),
-                                a_lon: a_lon.toString(),
-                            },
-                        )}`,
-                        {
-                            method: "GET",
-                            headers: {
-                                Authorization: `Bearer ${process.env.NMI_API_KEY}`,
-                            },
-                        },
+                if (nmiApiKey) {
+                    const estimates = await getSoilParameterEstimates(
+                        field,
+                        nmiApiKey,
                     )
-
-                    if (!responseApi.ok) {
-                        throw data(responseApi.statusText, {
-                            status: responseApi.status,
-                            statusText: responseApi.statusText,
-                        })
-                    }
-
-                    const result = await responseApi.json()
-                    const response = result.data
 
                     await addSoilAnalysis(
                         fdm,
                         session.principal_id,
                         undefined,
-                        "NMI",
+                        estimates.a_source,
                         b_id,
-                        0.3,
+                        estimates.a_depth,
                         undefined,
                         {
-                            a_p_al: response.a_p_al,
-                            a_p_cc: response.a_p_cc,
-                            a_som_loi: response.a_som_loi,
-                            b_soiltype_agr: response.b_soiltype_agr,
-                            b_gwl_class: response.b_gwl_class,
+                            a_p_al: estimates.a_p_al,
+                            a_p_cc: estimates.a_p_cc,
+                            a_som_loi: estimates.a_som_loi,
+                            b_soiltype_agr: estimates.b_soiltype_agr,
+                            b_gwl_class: estimates.b_gwl_class,
                         },
                     )
                 }

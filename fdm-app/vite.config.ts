@@ -3,17 +3,22 @@ import { sentryVitePlugin } from "@sentry/vite-plugin"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
+// Vite does not support loading config files from `/lib/config`...
+const org = process.env.VITE_SENTRY_ORG
+const authToken = process.env.SENTRY_AUTH_TOKEN
+const project = process.env.VITE_SENTRY_PROJECT
+let pluginSentry: ReturnType<typeof sentryVitePlugin> | undefined
+if (org && authToken && project) {
+    pluginSentry = sentryVitePlugin({
+        org: org,
+        authToken: authToken,
+        project: project,
+        telemetry: false,
+    })
+}
+
 export default defineConfig({
-    plugins: [
-        reactRouter(),
-        tsconfigPaths(),
-        sentryVitePlugin({
-            org: process.env.VITE_SENTRY_ORG,
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            project: process.env.VITE_SENTRY_PROJECT,
-            telemetry: false,
-        }),
-    ],
+    plugins: [reactRouter(), tsconfigPaths(), pluginSentry],
     define: {
         global: {},
     },

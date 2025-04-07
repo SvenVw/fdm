@@ -1,21 +1,36 @@
-import { FarmTitle } from "@/components/custom/farm/farm-title"
+import { formatDistanceToNow } from "date-fns"
+import { nl } from "date-fns/locale"
+import { Sparkles } from "lucide-react"
+import ReactMarkdown from "react-markdown"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    useLoaderData,
+} from "react-router"
+import remarkGfm from "remark-gfm"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
-} from "@/components/ui/breadcrumb"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { formatDistanceToNow } from "date-fns"
-import { nl } from "date-fns/locale"
-import { Sparkles } from "lucide-react"
-import ReactMarkdown from "react-markdown"
-import { type LoaderFunctionArgs, useLoaderData } from "react-router"
-import remarkGfm from "remark-gfm"
+} from "~/components/ui/breadcrumb"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarTrigger } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Wat is er nieuw? | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: `Blijf op de hoogte van de laatste ontwikkelingen en verbeteringen van ${clientConfig.name}.`,
+        },
+    ]
+}
 
 // Define the structure for a single update post
 export interface UpdatePost {
@@ -26,12 +41,12 @@ export interface UpdatePost {
     isNew?: boolean
 }
 
-// Sample data for update posts (replace with a database or CMS later)
+// Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
         id: "update-1",
-        title: "Lancering MINAS2 🎉",
-        description: `MINAS2 is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 
+        title: `Lancering ${clientConfig.name} 🎉`,
+        description: `${clientConfig.name} is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 
 
 **Nieuwe features:**
 - Account aanmaken

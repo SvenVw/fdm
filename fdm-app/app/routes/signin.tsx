@@ -1,4 +1,10 @@
-import { Button } from "@/components/ui/button"
+import { Check, Cookie, Info, MoveDown } from "lucide-react"
+import type { LoaderFunctionArgs } from "react-router"
+import { redirect } from "react-router"
+import type { MetaFunction } from "react-router"
+import { toast } from "sonner"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -6,15 +12,22 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { signIn } from "@/lib/auth-client"
-import { auth } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { cn } from "@/lib/utils"
-import { Check, Cookie, MoveDown } from "lucide-react"
-import type { LoaderFunctionArgs } from "react-router"
-import { redirect } from "react-router"
-import { toast } from "sonner"
+} from "~/components/ui/card"
+import { signIn } from "~/lib/auth-client"
+import { auth } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { cn } from "~/lib/utils"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Aanmelden | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: `Meld je aan bij ${clientConfig.name} om toegang te krijgen tot je dashboard en je bedrijfsgegevens te beheren.`,
+        },
+    ]
+}
 
 /**
  * Checks for an existing user session and redirects authenticated users.
@@ -59,7 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns A React element representing the sign-in page.
  */
 export default function SignIn() {
-    const handleSignInError = (provider: string, error: Error) => {
+    const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
         )
@@ -82,19 +95,19 @@ export default function SignIn() {
                             <div className="flex aspect-square size-16 items-center justify-center rounded-lg bg-[#122023]">
                                 <img
                                     className="size-12"
-                                    src="/fdm-high-resolution-logo-transparent-no-text.png"
-                                    alt="FDM"
+                                    src={clientConfig.logomark}
+                                    alt={clientConfig.name}
                                 />
                             </div>
                             <div className="flex flex-col gap-0.5 leading-none">
                                 <span className="font-semibold text-4xl">
-                                    FDM
+                                    {clientConfig.name}
                                 </span>
                             </div>
                         </div>
                         {/* End logo and title fix */}
                         <p className="text-center text-muted-foreground">
-                            Maak een account aan bij FDM en krijg toegang tot:
+                            {`Maak een account aan bij ${clientConfig.name} en krijg toegang tot:`}
                         </p>
                         <div className="space-y-5">
                             <div>
@@ -157,6 +170,20 @@ export default function SignIn() {
                                 </div>
                             </div>
                         </div>
+                        <Alert className="mb-4">
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>
+                                <p className="text-sm text-left font-medium leading-none">
+                                    Let op!
+                                </p>
+                            </AlertTitle>
+                            <AlertDescription>
+                                <p className="text-sm text-left text-muted-foreground">
+                                    {`${clientConfig.name} is nog in ontwikkeling. Functionaliteiten
+                                kunnen nog ontbreken of veranderen.`}
+                                </p>
+                            </AlertDescription>
+                        </Alert>
                         <Card>
                             <CardHeader>
                                 <CardTitle>Aanmelden</CardTitle>
@@ -282,7 +309,8 @@ export default function SignIn() {
                         </Card>
                         <div className="mb-4 text-center text-sm">
                             <Button variant={"outline"}>
-                                Lees meer over FDM <MoveDown />
+                                {`Lees meer over ${clientConfig.name}`}{" "}
+                                <MoveDown />
                             </Button>
                         </div>
                     </div>

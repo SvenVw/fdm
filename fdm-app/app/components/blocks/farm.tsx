@@ -2,8 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
-
-import { Button } from "@/components/ui/button"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -11,7 +10,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "~/components/ui/card"
 import {
     FormControl,
     FormDescription,
@@ -19,8 +18,8 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import { LoadingSpinner } from "../custom/loadingspinner"
 
 export interface fertilizersListType {
