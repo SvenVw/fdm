@@ -1,12 +1,3 @@
-import { CultivationForm } from "@/components/custom/cultivation/form"
-import { CultivationList } from "@/components/custom/cultivation/list"
-import { FormSchema } from "@/components/custom/cultivation/schema"
-import { Separator } from "@/components/ui/separator"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleActionError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
 import {
     addCultivation,
     getCultivations,
@@ -18,11 +9,33 @@ import {
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useLoaderData,
     useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
+import { CultivationForm } from "~/components/custom/cultivation/form"
+import { CultivationList } from "~/components/custom/cultivation/list"
+import { FormSchema } from "~/components/custom/cultivation/schema"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Gewas - Perceel | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gewassen van je perceel.",
+        },
+    ]
+}
 
 /**
  * Loads data required for rendering the overview of a specific farm field.

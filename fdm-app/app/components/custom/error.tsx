@@ -1,7 +1,7 @@
 import { ArrowLeft, Copy, Home } from "lucide-react"
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
-import { Button } from "../ui/button"
+import { Button } from "~/components/ui/button"
 
 /**
  * Displays a full-screen error block with tailored messaging and navigation options.

@@ -1,40 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarGroupLabel,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuBadge,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { getCalendarSelection } from "@/lib/calendar"
-import { useCalendarStore } from "@/store/calendar"
-import { useFarmStore } from "@/store/farm"
 import * as Sentry from "@sentry/react"
 import {
     ArrowRightLeft,
@@ -55,23 +18,62 @@ import {
     Settings,
     Shapes,
     Sparkles,
-    Sprout,
     Square,
 } from "lucide-react"
 import posthog from "posthog-js"
 import { useEffect, useState } from "react"
 import { Form, NavLink, useLocation } from "react-router"
 import { toast } from "sonner"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuBadge,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from "~/components/ui/sidebar"
+import { useIsMobile } from "~/hooks/use-mobile"
+import { getCalendarSelection } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { useCalendarStore } from "~/store/calendar"
+import { useFarmStore } from "~/store/farm"
+
+interface SideBarAppUserType {
+    id: string
+    name: string // Full name from session.user
+    email: string
+    image?: string | null | undefined
+    // Other properties from session.user might exist but are not needed here
+}
 
 interface SideBarAppType {
-    user: {
-        firstname: string
-        surname: string
-        name: string
-        email: string
-        image: string | undefined
-    }
-    userName: string
+    user: SideBarAppUserType
+    userName: string // Display name, potentially different from user.name
     initials: string
 }
 
@@ -140,20 +142,35 @@ export function SidebarApp(props: SideBarAppType) {
     const omBalanceLink = undefined
     const baatLink = undefined
 
-    try {
-        Sentry.setUser({
-            fullName: user.name,
-            email: user.email,
-        })
-    } catch (error) {
-        Sentry.captureException(error)
+    if (clientConfig.analytics.sentry) {
+        try {
+            Sentry.setUser({
+                fullName: user.name,
+                email: user.email,
+            })
+        } catch (error) {
+            Sentry.captureException(error)
+        }
     }
-    const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
+
+    const [feedback, setFeedback] = useState<ReturnType<
+        typeof Sentry.getFeedback
+    > | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        setFeedback(Sentry.getFeedback())
-        setIsLoading(false)
+        try {
+            const feedbackInstance = Sentry.getFeedback()
+            if (feedbackInstance) {
+                setFeedback(feedbackInstance)
+            } else {
+                console.warn("Sentry.getFeedback() returned null or undefined.")
+            }
+        } catch (error) {
+            console.error("Failed to initialize Sentry feedback:", error)
+        } finally {
+            setIsLoading(false)
+        }
     }, [])
 
     if (isLoading) {
@@ -161,6 +178,15 @@ export function SidebarApp(props: SideBarAppType) {
     }
 
     const openFeedbackForm = async () => {
+        if (!feedback || typeof feedback.createForm !== "function") {
+            console.error(
+                "Feedback object not available or missing createForm method.",
+            )
+            toast.error(
+                "Feedback formulier is nog niet beschikbaar. Probeer het opnieuw.",
+            )
+            return
+        }
         try {
             const form = await feedback.createForm()
             form.appendToDom()
@@ -195,11 +221,13 @@ export function SidebarApp(props: SideBarAppType) {
                                     <img
                                         className="size-6"
                                         src="/fdm-high-resolution-logo-transparent-no-text.png"
-                                        alt="FDM"
+                                        alt={clientConfig.name}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">FDM</span>
+                                    <span className="font-semibold">
+                                        {clientConfig.name}
+                                    </span>
                                 </div>
                             </NavLink>
                         </SidebarMenuButton>
@@ -448,18 +476,20 @@ export function SidebarApp(props: SideBarAppType) {
                                     <span>Ondersteuning</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem key="feedback">
-                                <SidebarMenuButton
-                                    asChild
-                                    size="sm"
-                                    onClick={openFeedbackForm}
-                                >
-                                    <NavLink to="#">
-                                        <Send />
-                                        <span>Feedback</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            {clientConfig.analytics.sentry ? (
+                                <SidebarMenuItem key="feedback">
+                                    <SidebarMenuButton
+                                        asChild
+                                        size="sm"
+                                        onClick={openFeedbackForm}
+                                    >
+                                        <NavLink to="#">
+                                            <Send />
+                                            <span>Feedback</span>
+                                        </NavLink>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ) : null}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -475,7 +505,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
                                         <AvatarImage
-                                            src={user.image}
+                                            src={user.image ?? undefined}
                                             alt={user.name}
                                         />
                                         <AvatarFallback className="rounded-lg">
@@ -484,7 +514,7 @@ export function SidebarApp(props: SideBarAppType) {
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">
-                                            {`${user.firstname} ${user.surname}`}
+                                            {userName}
                                         </span>
                                         <span className="truncate text-xs">
                                             {user.email}
@@ -502,7 +532,6 @@ export function SidebarApp(props: SideBarAppType) {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="h-8 w-8 rounded-lg">
-                                            {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
                                             <AvatarFallback className="rounded-lg">
                                                 {avatarInitials}
                                             </AvatarFallback>
@@ -567,7 +596,14 @@ export function SidebarApp(props: SideBarAppType) {
                                         <Button
                                             type="submit"
                                             variant="link"
-                                            onClick={() => posthog.reset()}
+                                            onClick={() => {
+                                                if (
+                                                    clientConfig.analytics
+                                                        .posthog
+                                                ) {
+                                                    posthog.reset()
+                                                }
+                                            }}
                                         >
                                             <LogOut />
                                             Uitloggen

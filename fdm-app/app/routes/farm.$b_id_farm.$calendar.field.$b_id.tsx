@@ -1,20 +1,33 @@
-import { FarmContent } from "@/components/custom/farm/farm-content"
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { useCalendarStore } from "@/store/calendar"
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     Outlet,
     data,
     redirect,
     useLoaderData,
 } from "react-router"
+import { FarmContent } from "~/components/custom/farm/farm-content"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { useCalendarStore } from "~/store/calendar"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Perceel | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gegevens van je perceel.",
+        },
+    ]
+}
 
 /**
  * Loads data required to render the farm field index page.

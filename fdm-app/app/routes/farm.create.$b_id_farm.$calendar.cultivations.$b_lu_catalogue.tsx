@@ -1,13 +1,3 @@
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-} from "@/components/ui/pagination"
-import { getSession } from "@/lib/auth.server"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { useCalendarStore } from "@/store/calendar"
 import { getCultivationPlan } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -17,13 +7,26 @@ import {
     useLocation,
 } from "react-router"
 import { useLoaderData } from "react-router"
-import { fdm } from "../lib/fdm.server"
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+} from "~/components/ui/pagination"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en selecteer een gewas uit je bouwplan.",
+        },
     ]
 }
 

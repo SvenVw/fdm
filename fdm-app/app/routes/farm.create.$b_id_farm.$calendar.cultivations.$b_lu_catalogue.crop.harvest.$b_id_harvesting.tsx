@@ -1,19 +1,35 @@
-import { HarvestForm } from "@/components/custom/harvest/form"
-import { Button } from "@/components/ui/button"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
+import { HarvestForm } from "~/components/custom/harvest/form"
+import { Button } from "~/components/ui/button"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        {
+            title: `Oogst - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}`,
+        },
+        {
+            name: "description",
+            content:
+                "Bekijk en selecteer de oogst van een gewas uit je bouwplan.",
+        },
+    ]
+}
 
 /**
  * Loads harvest details for a specific cultivation plan.

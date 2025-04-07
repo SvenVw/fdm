@@ -1,20 +1,3 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Button } from "@/components/ui/button"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { Textarea } from "@/components/ui/textarea"
-import { getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { extractFormValuesFromRequest } from "@/lib/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getFarm, updateFarm } from "@svenvw/fdm-core"
 import { useEffect } from "react"
@@ -22,6 +5,7 @@ import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
+    type MetaFunction,
     data,
     useLoaderData,
 } from "react-router"
@@ -29,7 +13,38 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import validator from "validator"
 import { z } from "zod"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { Separator } from "~/components/ui/separator"
+import { Textarea } from "~/components/ui/textarea"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 const { isPostalCode } = validator
+import { clientConfig } from "~/lib/config"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        {
+            title: `Eigenschappen - Instellingen - Bedrijf | ${clientConfig.name}`,
+        },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de eigenschappen van je bedrijf.",
+        },
+    ]
+}
 
 /**
  * Retrieves the details of a farm using the farm ID from the URL parameters and the user's session.

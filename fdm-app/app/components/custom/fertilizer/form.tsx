@@ -1,6 +1,10 @@
-import { LoadingSpinner } from "@/components/custom/loadingspinner"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import type { UseFormReturn } from "react-hook-form"
+import { Form } from "react-router"
+import { RemixFormProvider } from "remix-hook-form"
+import type { ZodType, z } from "zod"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -8,26 +12,22 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "~/components/ui/card"
 import {
     FormControl,
     FormDescription,
     FormField,
     FormItem,
     FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import type { UseFormReturn } from "react-hook-form"
-import { Form } from "react-router"
-import { RemixFormProvider } from "remix-hook-form"
-import type { ZodType, z } from "zod"
+} from "~/components/ui/select"
 import type { Fertilizer } from "./columns"
 
 export function FertilizerForm({

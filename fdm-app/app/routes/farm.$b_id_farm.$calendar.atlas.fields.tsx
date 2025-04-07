@@ -5,22 +5,32 @@ import {
     NavigationControl,
 } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import { ZOOM_LEVEL_FIELDS } from "@/components/custom/atlas/atlas"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import { FieldsPanelHover } from "@/components/custom/atlas/atlas-panels"
-import { FieldsSourceNotClickable } from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import { getSession } from "@/lib/auth.server"
-import { getTimeframe } from "@/lib/calendar"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
+import type { MetaFunction } from "react-router"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
+import { FieldsPanelHover } from "~/components/custom/atlas/atlas-panels"
+import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Percelen - Kaart | ${clientConfig.name}` },
+        {
+            name: "description",
+            content:
+                "Bekijk alle percelen van uw bedrijf op één interactieve kaart. Visualiseer de geografische spreiding en onderlinge relaties tussen uw percelen.",
+        },
+    ]
+}
 
 /**
  * Loads and processes farm field data along with Mapbox configuration for rendering the farm atlas.

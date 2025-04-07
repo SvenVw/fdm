@@ -1,22 +1,3 @@
-import { Combobox } from "@/components/custom/combobox"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { Separator } from "@/components/ui/separator"
-import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
@@ -24,9 +5,28 @@ import { useEffect } from "react"
 import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
-import { FormSchema } from "./fertilizer-applications/formschema"
-import type { FertilizerApplicationsFormProps } from "./fertilizer-applications/types.d"
-import { LoadingSpinner } from "./loadingspinner"
+import { Combobox } from "~/components/custom/combobox"
+import { FormSchema } from "~/components/custom/fertilizer-applications/formschema"
+import type { FertilizerApplicationsFormProps } from "~/components/custom/fertilizer-applications/types.d"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
+import { Calendar } from "~/components/ui/calendar"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "~/components/ui/popover"
+import { Separator } from "~/components/ui/separator"
+import { cn } from "~/lib/utils"
 
 export function FertilizerApplicationsForm(
     props: FertilizerApplicationsFormProps,

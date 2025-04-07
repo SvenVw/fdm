@@ -1,21 +1,38 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Button } from "@/components/ui/button"
+import { getFarms } from "@svenvw/fdm-core"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    useLoaderData,
+} from "react-router"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
     CardFooter,
     CardHeader,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
-import { getTimeBasedGreeting } from "@/lib/greetings"
-import { getFarms } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, NavLink, useLoaderData } from "react-router"
+} from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { getTimeBasedGreeting } from "~/lib/greetings"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Bedrijf | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Selecteer een bedrijf.",
+        },
+    ]
+}
 
 /**
  * Retrieves the user session and associated farms data.

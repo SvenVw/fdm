@@ -1,6 +1,6 @@
+import { Check, ChevronsUpDown } from "lucide-react"
 import { type ReactNode, useMemo, useState } from "react"
-
-import { Button } from "@/components/ui/button"
+import { Button } from "~/components/ui/button"
 import {
     Command,
     CommandEmpty,
@@ -8,21 +8,20 @@ import {
     CommandInput,
     CommandItem,
     CommandList,
-} from "@/components/ui/command"
+} from "~/components/ui/command"
 import {
     FormControl,
     FormDescription,
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
+} from "~/components/ui/form"
 import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { Check, ChevronsUpDown } from "lucide-react"
+} from "~/components/ui/popover"
+import { cn } from "~/lib/utils"
 
 type optionType = {
     value: string

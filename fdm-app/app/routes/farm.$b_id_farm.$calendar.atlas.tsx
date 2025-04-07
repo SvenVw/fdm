@@ -1,13 +1,7 @@
-import { FarmHeader } from "@/components/custom/farm/farm-header"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { fdm } from "@/lib/fdm.server"
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
+    type MetaFunction,
     Outlet,
     data,
     redirect,
@@ -15,6 +9,25 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
+import { FarmHeader } from "~/components/custom/farm/farm-header"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Kaarten | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk informatie op de kaart.",
+        },
+    ]
+}
 
 /**
  * Retrieves farm details, user farm options, and layer configuration based on the farm ID in the URL parameters.

@@ -1,24 +1,23 @@
+import { ChevronDown } from "lucide-react"
+import { NavLink } from "react-router"
 import {
     Breadcrumb,
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-
-import { Button } from "@/components/ui/button"
+} from "~/components/ui/breadcrumb"
+import { Button } from "~/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { cn } from "@/lib/utils"
-import { useCalendarStore } from "@/store/calendar"
-import { ChevronDown } from "lucide-react"
-import { NavLink } from "react-router"
+} from "~/components/ui/dropdown-menu"
+import { Separator } from "~/components/ui/separator"
+import { SidebarTrigger } from "~/components/ui/sidebar"
+import { cn } from "~/lib/utils"
+import { useCalendarStore } from "~/store/calendar"
 import type {
     FarmOptions,
     FertilizerOption,

@@ -1,10 +1,3 @@
-import { SidebarApp } from "@/components/custom/sidebar-app"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { SidebarInset } from "@/components/ui/sidebar"
-import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { useCalendarStore } from "@/store/calendar"
-import { useFarmStore } from "@/store/farm"
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type {
@@ -15,13 +8,25 @@ import type {
 import { redirect, useRoutes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
+import { SidebarApp } from "~/components/custom/sidebar-app"
+import { SidebarProvider } from "~/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { auth, getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { useCalendarStore } from "~/store/calendar"
+import { useFarmStore } from "~/store/farm"
 import Account from "./farm.account"
 import WhatsNew from "./farm.whats-new"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `Dashboard | ${clientConfig.name}` },
+        {
+            name: "description",
+            content:
+                "Beheer je bedrijfsgegevens, percelen en gewassen in één overzichtelijk dashboard.",
+        },
     ]
 }
 
@@ -100,8 +105,9 @@ export default function App() {
         setCalendar(initialCalendar)
     }, [initialCalendar, setCalendar])
 
+    // Identify user if PostHog is configured
     useEffect(() => {
-        if (posthog && loaderData.user) {
+        if (clientConfig.analytics.posthog && loaderData.user) {
             posthog.identify(loaderData.user.id, {
                 id: loaderData.user.id,
                 email: loaderData.user.email,
