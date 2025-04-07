@@ -342,7 +342,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        console.log(formValues)
 
         // Check if cultivation is available
         let cultivationOptions = []
@@ -452,7 +451,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return redirectWithSuccess(
             `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
             {
-                message: "${b_name} is toegevoegd! 🎉",
+                message: `${b_name} is toegevoegd! 🎉`,
             },
         )
     } catch (error) {
