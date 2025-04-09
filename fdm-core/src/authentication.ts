@@ -95,8 +95,22 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
             storage: "database",
         },
         plugins: [
-            organization()
-        ]
+            organization({
+                organizationCreation: {
+                    disabled: false, // Set to true to disable organization creation
+                    beforeCreate: async ({ organization }) => {
+                        return {
+                            data: {
+                                ...organization,
+                                metadata: {
+                                    isVerified: false,
+                                },
+                            },
+                        }
+                    },
+                },
+            }),
+        ],
     })
 
     return auth
