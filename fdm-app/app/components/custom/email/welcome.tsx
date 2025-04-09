@@ -9,7 +9,7 @@ import {
     Section,
     Text,
     Button,
-    Img, // Added Img for logo
+    Img,
 } from "@react-email/components"
 import { Tailwind } from "@react-email/tailwind"
 
@@ -18,6 +18,7 @@ interface WelcomeEmailProps {
     url: string
     appName: string
     appBaseUrl?: string // Optional base URL for logo path
+    logoFileName?: string // Optional logo file name
 }
 
 export function WelcomeEmail({
@@ -25,11 +26,12 @@ export function WelcomeEmail({
     url,
     appName,
     appBaseUrl = "",
+    logoFileName = "/fdm-high-resolution-logo-transparent.png",
 }: WelcomeEmailProps) {
     const previewText = `Welkom bij ${appName}! Krijg inzicht in je bedrijfsdata.`
-    const logoPath = `${appBaseUrl}/fdm-high-resolution-logo-transparent.png`
+    const logoPath = `${appBaseUrl}${logoFileName}`
 
-    const fontFamily = `"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif`;
+    const fontFamily = `"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif`
 
     return (
         <Html lang="nl">
