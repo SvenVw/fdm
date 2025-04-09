@@ -29,12 +29,24 @@ export function WelcomeEmail({
     const previewText = `Welkom bij ${appName}! Krijg inzicht in je bedrijfsdata.`
     const logoPath = `${appBaseUrl}/fdm-high-resolution-logo-transparent.png`
 
+    const fontFamily = `"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif`;
+
     return (
         <Html lang="nl">
-            <Head />
+            <Head>
+                <link
+                    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+                    rel="stylesheet"
+                />
+                <style>{`
+                    * {
+                        font-family: ${fontFamily};
+                    }
+                `}</style>
+            </Head>
             <Preview>{previewText}</Preview>
             <Tailwind>
-                <Body className="bg-white my-auto mx-auto font-sans">
+                <Body className="bg-white my-auto mx-auto">
                     <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
                         <Section className="mt-[32px] text-center">
                             <Img
