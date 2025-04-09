@@ -92,6 +92,9 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
             },
         },
         rateLimit: {
+            enabled: process.env.NODE_ENV === "production",
+            window: 10,
+            limit: 100,
             storage: "database",
         },
         plugins: [
