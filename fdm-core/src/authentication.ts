@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
+import { organization } from "better-auth/plugins"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
@@ -93,6 +94,9 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
         rateLimit: {
             storage: "database",
         },
+        plugins: [
+            organization()
+        ]
     })
 
     return auth
