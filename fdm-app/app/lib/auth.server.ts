@@ -1,9 +1,34 @@
 import { createFdmAuth } from "@svenvw/fdm-core"
 import type { Session, User } from "better-auth"
 import { fdm } from "~/lib/fdm.server"
+import type { GenericEndpointContext } from "better-auth"
 
 // Initialize better-auth instance for FDM
 export const auth = createFdmAuth(fdm)
+
+function sendWelcomeEmail(user: Session) {
+    console.log("Sending welcome email")
+    console.log(user)
+}
+
+// Extend database hooks with sending a welcome email after sign up
+const originalUserCreateAfter =
+    auth.options.databaseHooks?.session?.create?.after
+auth.options.databaseHooks = {
+    ...auth.options.databaseHooks,
+    session: {
+        ...auth.options.databaseHooks?.session,
+        create: {
+            ...auth.options.databaseHooks?.session?.create,
+            after: async (user, context?: GenericEndpointContext) => {
+                if (originalUserCreateAfter) {
+                    await originalUserCreateAfter(user, context)
+                }
+                await sendWelcomeEmail(user)
+            },
+        },
+    },
+}
 
 // Get the session
 export async function getSession(request: Request): Promise<FdmSession> {
