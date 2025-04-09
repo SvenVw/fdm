@@ -2,6 +2,9 @@ import type { ServerConfig } from "~/types/config.d"
 
 // Export the full config for server-side use
 export const serverConfig: ServerConfig = {
+    name: String(process.env.VITE_FDM_NAME),
+    url: String(process.env.VITE_FDM_URL),
+
     // Authentication
     auth: {
         fdm_session_secret: String(process.env.FDM_SESSION_SECRET),
@@ -38,6 +41,16 @@ export const serverConfig: ServerConfig = {
         // Sentry
         sentry: {
             auth_token: String(process.env.SENTRY_AUTH_TOKEN),
+        },
+    },
+
+    // Mail
+    mail: {
+        // Postmark
+        postmark: {
+            key: String(process.env.POSTMARK_API_KEY),
+            sender_address: String(process.env.POSTMARK_SENDER_ADDRESS),
+            sender_name: String(process.env.POSTMARK_SENDER_NAME),
         },
     },
 }
