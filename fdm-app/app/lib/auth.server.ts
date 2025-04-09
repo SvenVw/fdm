@@ -22,8 +22,12 @@ if (serverConfig.mail) {
                     if (originalUserCreateAfter) {
                         await originalUserCreateAfter(user, context)
                     }
-                    const email = await renderWelcomeEmail(user)
-                    await sendEmail(email)
+                    try {
+                        const email = await renderWelcomeEmail(user)
+                        await sendEmail(email)
+                    } catch (error) {
+                        console.error("Error sending welcome email:", error)
+                    }
                 },
             },
         },
