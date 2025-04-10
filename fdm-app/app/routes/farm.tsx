@@ -5,7 +5,7 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import { redirect, useRoutes } from "react-router"
+import { redirect, Route, Routes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
 import { SidebarApp } from "~/components/custom/sidebar-app"
@@ -80,20 +80,13 @@ export default function App() {
         setFarmId(initialFarmId)
     }, [initialFarmId, setFarmId])
 
-    const routes = useRoutes([
-        {
-            path: "/farm/whats-new",
-            element: <WhatsNew />,
-        },
-        {
-            path: "/farm/account",
-            element: <Account />,
-        },
-        {
-            path: "*",
-            element: <Outlet />,
-        },
-    ])
+    const routes = (
+        <Routes>
+            <Route path="whats-new" element={<WhatsNew />} />
+            <Route path="account" element={<Account />} />
+            <Route path="*" element={<Outlet />} />
+        </Routes>
+    )
 
     const calendarMatch = matches.find(
         (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
