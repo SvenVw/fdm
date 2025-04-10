@@ -1,4 +1,4 @@
-import { serverConfig } from "~/lib/config.server"
+import { serverConfig } from "@/app/lib/config.server"
 
 export function getMapboxToken() {
     const mapboxToken = serverConfig.integrations.mapbox.token

@@ -1,4 +1,6 @@
 export interface ServerConfig {
+    name: string
+    url: string
     auth: {
         fdm_session_secret: string
         better_auth_secret: string
@@ -29,6 +31,13 @@ export interface ServerConfig {
             auth_token: string
         } | null
     }
+    mail?: {
+        postmark: {
+            key: string
+            sender_address: string
+            sender_name: string
+        }
+    }
 }
 
 // Define the structure for client-safe configuration
@@ -36,6 +45,7 @@ export interface ClientConfig {
     name: string
     logo: string
     logomark: string
+    url: string
     analytics: {
         sentry?: {
             dsn: string

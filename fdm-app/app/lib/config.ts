@@ -43,6 +43,7 @@ export const clientConfig: ClientConfig = {
     // Site logo
     logo: "/fdm-high-resolution-logo-transparent.png",
     logomark: "/fdm-high-resolution-logo-transparent-no-text.png",
+    url: import.meta.env.VITE_FDM_URL,
 
     analytics: {
         sentry: sentryConfig,
