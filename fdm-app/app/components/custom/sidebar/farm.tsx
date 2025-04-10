@@ -1,4 +1,4 @@
-import { Calendar, Check, ChevronRight, House, MapIcon, Shapes, Square } from "lucide-react"
+import { Calendar, Check, ChevronRight, House, Shapes, Square } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
 import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "~/components/ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
@@ -43,14 +43,6 @@ export function SidebarFarm() {
         fieldsLink = undefined
     }
 
-    let atlasLink: string | undefined
-    if (isCreateFarmWizard) {
-        atlasLink = undefined
-    } else if (farmId) {
-        atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
-    } else {
-        atlasLink = undefined
-    }
     let fertilizersLink: string | undefined
     if (farmId) {
         fertilizersLink = `/farm/${farmId}/fertilizers`
@@ -154,22 +146,7 @@ export function SidebarFarm() {
                                 <span>Kalender</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
-                    )}
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {atlasLink ? (
-                                <NavLink to={atlasLink}>
-                                    <MapIcon />
-                                    <span>Kaart</span>
-                                </NavLink>
-                            ) : (
-                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <MapIcon />
-                                    <span>Kaart</span>
-                                </span>
-                            )}
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
+                    )}                   
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
                             {fieldsLink ? (

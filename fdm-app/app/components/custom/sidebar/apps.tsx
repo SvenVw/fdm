@@ -1,5 +1,5 @@
-import { ArrowRightLeft, GitPullRequestArrow, Scale } from "lucide-react"
-import { NavLink } from "react-router"
+import { ArrowRightLeft, GitPullRequestArrow, MapIcon, Scale } from "lucide-react"
+import { NavLink, useLocation } from "react-router"
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -10,17 +10,49 @@ import {
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
 import { Badge } from "~/components/ui/badge"
+import { useFarmStore } from "@/app/store/farm"
+import { useCalendarStore } from "@/app/store/calendar"
 
 export function SidebarApps() {
+    const farmId = useFarmStore((state) => state.farmId)
+    const selectedCalendar = useCalendarStore((state) => state.calendar)
+
+    // Check if page contains `farm/create` in url
+    const location = useLocation()
+    const isCreateFarmWizard = location.pathname.includes("farm/create")
+
+    let atlasLink: string | undefined
+    if (isCreateFarmWizard) {
+        atlasLink = undefined
+    } else if (farmId) {
+        atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
+    } else {
+        atlasLink = undefined
+    }
+
     const nutrienBalanceLink = undefined
     const omBalanceLink = undefined
     const baatLink = undefined
-
     return (
         <SidebarGroup>
             <SidebarGroupLabel>Apps</SidebarGroupLabel>
             <SidebarGroupContent>
                 <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild>
+                            {atlasLink ? (
+                                <NavLink to={atlasLink}>
+                                    <MapIcon />
+                                    <span>Atlas</span>
+                                </NavLink>
+                            ) : (
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <MapIcon />
+                                    <span>Atlas</span>
+                                </span>
+                            )}
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
                             {nutrienBalanceLink ? (
