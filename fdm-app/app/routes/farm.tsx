@@ -8,8 +8,11 @@ import type {
 import { redirect, Route, Routes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
-import { SidebarApp } from "~/components/custom/sidebar-app"
-import { SidebarProvider } from "~/components/ui/sidebar"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarProvider,
+} from "~/components/ui/sidebar"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -18,6 +21,11 @@ import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
 import Account from "./farm.account"
 import WhatsNew from "./farm.whats-new"
+import { SidebarTitle } from "~/components/custom/sidebar/title"
+import { SidebarFarm } from "~/components/custom/sidebar/farm"
+import { SidebarApps } from "~/components/custom/sidebar/apps"
+import { SidebarSupport } from "~/components/custom/sidebar/support"
+import { SidebarUser } from "~/components/custom/sidebar/user"
 
 export const meta: MetaFunction = () => {
     return [
@@ -111,11 +119,24 @@ export default function App() {
 
     return (
         <SidebarProvider>
-            <SidebarApp
-                user={loaderData.user}
-                userName={loaderData.userName}
-                initials={loaderData.initials}
-            />
+            <Sidebar>
+                <SidebarTitle />
+                <SidebarContent>
+                    <SidebarFarm />
+                    <SidebarApps />
+                </SidebarContent>
+                <SidebarSupport
+                    name={loaderData.userName}
+                    email={loaderData.user.email}
+                />
+                <SidebarUser
+                    name={loaderData.userName}
+                    email={loaderData.user.email}
+                    image={loaderData.user.image}
+                    avatarInitials={loaderData.initials}
+                    userName={loaderData.userName}
+                />
+            </Sidebar>
             <SidebarInset>
                 <Outlet />
                 {routes}
