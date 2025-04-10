@@ -141,7 +141,7 @@ export function SidebarUser({
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                                <Form method="post" action="../farm">
+                                <Form method="post" action="/logout">
                                     <Button
                                         type="submit"
                                         variant="link"
