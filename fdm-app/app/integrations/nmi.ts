@@ -80,4 +80,6 @@ const soilParameterEstimatesSchema = z.object({
     a_som_loi: z.number(),
     b_soiltype_agr: z.string(),
     b_gwl_class: z.string(),
+    a_source: z.string().optional(),
+    a_depth: z.number().optional(),
 })
