@@ -18,4 +18,4 @@ Key benefits of using the FDM include:
 * Data-Driven Decision-Making: Provides a structured framework for analyzing farm data, enabling informed decisions related to resource allocation, crop management, and overall farm productivity.
 * Scalability and Extensibility: The FDM is designed to handle large datasets and can be extended to accommodate new data types and farm practices.
 
-This introduction lays the groundwork for a deeper dive into specific components of the FDM schema. Subsequent sections will delve into the details of Assets and Actions, providing concrete examples and illustrating the practical applications of the FDM in various agricultural scenarios.
+This documentation site provides guides on core concepts, getting started with the FDM libraries, and contributing to the project. For detailed information on the functions and types exported by each package (`fdm-core`, `fdm-data`, `fdm-calculator`), please refer to the **API Reference** section. The **Architecture Overview** page in the Core Concepts section explains the different packages within the FDM monorepo and how they interact.

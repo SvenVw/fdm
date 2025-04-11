@@ -11,7 +11,7 @@ This document provides a comprehensive overview of the Farm Data Model (FDM) dat
 The FDM database is organized into three distinct PostgreSQL schemas:
 
 1.  **`fdm`**: Contains the core tables related to farm management, fields, cultivations, fertilizers, soil data, etc.
-2.  **`fdm-authn`**: Handles authentication, storing user accounts, sessions, and related information. This schema is largely managed by the [`better-auth`](https://www.better-auth.com/) library.
+2.  **`fdm-authn`**: Handles authentication, storing user accounts, sessions, and related information. This schema is largely managed by the [`better-auth`](https://github.com/BetterStackHQ/better-auth) library.
 3.  **`fdm-authz`**: Manages authorization, defining roles, permissions, and maintaining an audit trail.
 
 ---
@@ -368,7 +368,7 @@ This schema holds the primary data related to farm operations.
 
 This schema handles user authentication, sessions, accounts, and related functionalities.
 
-**Note:** This schema is largely defined and managed by the [`better-auth`](https://www.better-auth.com/) library. While the specific table structures are documented here for completeness, refer to the `better-auth` documentation for the most detailed information on its implementation and usage.
+**Note:** This schema is largely defined and managed by the [`better-auth`](https://github.com/BetterStackHQ/better-auth) library. While the specific table structures are documented here for completeness, refer to the `better-auth` documentation for the most detailed information on its implementation and usage.
 
 #### **`user`**
 **Purpose**: Stores user account information.

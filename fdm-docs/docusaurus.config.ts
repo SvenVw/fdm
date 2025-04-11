@@ -63,6 +63,43 @@ const config: Config = {
         ],
     ],
 
+    plugins: [
+        [
+            'docusaurus-plugin-typedoc',
+            {
+                // TypeDoc options
+                entryPoints: ['../fdm-core/src/index.ts', '../fdm-data/src/index.ts', '../fdm-calculator/src/index.ts'],
+                tsconfig: './tsconfig.json', // Use local tsconfig
+                out: 'api-reference', // Output directory relative to package root (fdm-docs)
+                sidebar: {
+                    categoryLabel: 'API Reference',
+                    position: 0,
+                    fullNames: true, // Use full names for classes/interfaces
+                },
+                // Markdown Plugin options
+                plugin: ['typedoc-plugin-markdown'],
+                readme: 'none', // Don't include root README
+                entryPointStrategy: 'resolve', // Use 'resolve' for file paths
+                // Docusaurus specific options
+                id: 'api', // Important: Used for the second docs instance
+                // Remove invalid options: docsRoot, hideBreadcrumbs, hidePageHeader, entryFileName
+                // Note: Further TypeDoc/Markdown plugin options can be added in typedoc.json
+            },
+        ],
+        // Second docs instance for API reference
+        [
+            '@docusaurus/plugin-content-docs',
+            {
+                id: 'api', // Must match the typedoc plugin id
+                path: 'api-reference', // Path to the generated API docs (relative to package root)
+                routeBasePath: 'api', // URL base path for this instance
+                sidebarPath: './sidebars-api.js', // Use the created sidebar file
+                // You might want to disable editing URLs for generated docs
+                // editUrl: undefined,
+            },
+        ],
+    ],
+
     themeConfig: {
         // Replace with your project's social card
         image: "img/fdm-high-resolution-logo.png",
@@ -78,6 +115,14 @@ const config: Config = {
                     sidebarId: "tutorialSidebar",
                     position: "left",
                     label: "Docs",
+                },
+                {
+                    to: '/api', // Link to the API reference base path
+                    label: 'API Reference',
+                    position: 'left',
+                    // Use docId or activeBasePath if needed for highlighting
+                    // docId: 'api/index', // Example if you have an index page
+                    // activeBasePath: 'api', 
                 },
                 { to: "/blog", label: "Blog", position: "left" },
                 {
