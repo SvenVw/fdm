@@ -1,5 +1,6 @@
 ---
 title: "Architecture Overview"
+sidebar_position: 4 
 ---
 
 # FDM Architecture Overview
