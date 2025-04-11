@@ -37,7 +37,7 @@ Once the schema is in place, you can initialize an instance of fdm-core to start
 ```typescript
 import { drizzle } from 'drizzle-orm/postgres-js'
 import { migrate } from 'drizzle-orm/postgres-js/migrator'
-import { fdmSchema as schema } from '@svenvw/fdm-core'
+import { fdmSchema as schema, syncCatalogues } from '@svenvw/fdm-core'
 
 // Get credentials to connect to db
 const host = process.env.POSTGRES_HOST ?? 
@@ -78,6 +78,17 @@ export const fdm = await (async () => {
 
 // Apply database migration if needed
 await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
+
+// Sync catalogues
+const fdm = drizzle(client, {
+    mode: "postgres",
+    logger: false,
+    schema: schema,
+})
+await syncCatalogues(fdm).catch((error) =>
+    console.error("Error in syncing catalogues 🚨:", error),
+)
+
 ```
 
 The fdm object now provides access to all the functionality offered by `fdm-core`, enabling you to create farms, add fields, manage cultivations, and more. Consult the specific documentation for each function to understand its usage and parameters.
