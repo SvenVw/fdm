@@ -646,6 +646,128 @@ describe("Soil Analysis Functions", () => {
         const currentData = await getCurrentSoilData(fdm, principal_id, b_id)
         expect(currentData.length).toEqual(0)
     })
+
+    it("should retrieve soil analyses including those with null b_sampling_date and order correctly", async () => {
+        const a_date = new Date()
+        const a_source = "test source"
+        const b_depth = 10
+
+        // Add analyses with valid b_sampling_date
+        const b_sampling_date1 = new Date("2024-01-01T00:00:00Z")
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date1,
+        )
+
+        const b_sampling_date2 = new Date("2024-01-05T00:00:00Z")
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date2,
+        )
+
+        // Add an analysis with null b_sampling_date
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            null,
+        )
+
+        // Retrieve all analyses
+        const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id)
+
+        expect(allAnalyses).toHaveLength(3)
+
+        // Check that the analysis with null date comes last
+        expect(allAnalyses[0].b_sampling_date).toEqual(b_sampling_date2)
+        expect(allAnalyses[1].b_sampling_date).toEqual(b_sampling_date1)
+        expect(allAnalyses[2].b_sampling_date).toBeNull()
+    })
+
+    it("should retrieve soil analyses including those with null b_sampling_date and order correctly with timeframe", async () => {
+        const a_date = new Date()
+        const a_source = "test source"
+        const b_depth = 10
+
+        // Add analyses with valid b_sampling_date
+        const b_sampling_date1 = new Date("2024-01-01T00:00:00Z")
+        const properties1 = { a_som_loi: 5 }
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date1,
+            properties1,
+        )
+
+        const b_sampling_date2 = new Date("2024-01-05T00:00:00Z")
+        const properties2 = { a_som_loi: 6 }
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            b_sampling_date2,
+            properties2,
+        )
+
+        // Add an analysis with null b_sampling_date
+        const properties3 = { a_som_loi: 7, a_p_al: 20 }
+        await addSoilAnalysis(
+            fdm,
+            principal_id,
+            a_date,
+            a_source,
+            b_id,
+            b_depth,
+            null,
+            properties3,
+        )
+
+        // Retrieve all analyses
+        const allAnalyses = await getSoilAnalyses(fdm, principal_id, b_id, {
+            start: new Date("2023-01-01"),
+            end: new Date("2025-01-01"),
+        })
+
+        expect(allAnalyses).toHaveLength(3)
+
+        // Check that the analysis with null date comes last
+        expect(allAnalyses[0].b_sampling_date).toEqual(b_sampling_date2)
+        expect(allAnalyses[1].b_sampling_date).toEqual(b_sampling_date1)
+        expect(allAnalyses[2].b_sampling_date).toBeNull()
+
+        const currentData = await getCurrentSoilData(fdm, principal_id, b_id, {
+            start: new Date("2023-01-01"),
+            end: new Date("2025-01-01"),
+        })
+
+        const somLoiData = currentData.find(
+            (item) => item.parameter === "a_som_loi",
+        )
+        expect(somLoiData?.value).toEqual(properties2.a_som_loi)
+
+        const palData = currentData.find((item) => item.parameter === "a_p_al")
+        expect(palData?.value).toEqual(properties3.a_p_al)
+    })
 })
 
 describe("getSoilParametersDescription", () => {

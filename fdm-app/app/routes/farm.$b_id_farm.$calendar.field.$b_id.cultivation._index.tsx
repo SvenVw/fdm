@@ -156,7 +156,7 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid xl2:grid-cols-2 gap-8">
                 <CultivationForm
                     b_lu_catalogue={undefined}
                     b_lu_start={undefined}
