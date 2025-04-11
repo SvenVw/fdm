@@ -1,5 +1,29 @@
 # Changelog fdm-core
 
+## 0.18.0
+
+### Minor Changes
+
+- c240486: Adapt function `addFertilizerToCatalogue` to add custom fertilizers for a farm
+- 82f4767: Add function `getSoilParameterDescription` to obtain a description of the soil parameters
+- a52796a: Add function `updateFertilizerFromCatalogue` to alter properties of custom fertilizer
+- 9ea6795: Change at `getSoilAnalysis` argument `b_id` to `a_id` to retrieve details of specific soil analysis
+- a259ff6: Add to the output of `getFertilizer` and `getFertilizers` the values for `p_type_*` and `p_source`
+- 0944ef1: Add `timeframe` argument to `getCultivations`, `getCultivationPlan`, `getFertilizerApplications`, `getFields`, `getHarvests` and `getSoilAnalyses`
+- 9f4d818: Add `getCurrentSoilData` to retrieve for every soil parameter the most recent value
+
+### Patch Changes
+
+- e9926cb: Rename `p_cl_cr` to `p_cl_rt` as the previous name was a typo
+- 01081b3: Rename db migration files to version tags
+- d693cdb: Fix that soil data without sampling date is not excluded
+- 175ea6a: Minify the code during rollup with terser
+- Updated dependencies [e9926cb]
+- Updated dependencies [7e66231]
+- Updated dependencies [1218ab7]
+- Updated dependencies [175ea6a]
+  - @svenvw/fdm-data@0.12.0
+
 ## 0.17.0
 
 ### Minor Changes

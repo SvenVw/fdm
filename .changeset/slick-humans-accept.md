@@ -1,5 +1,0 @@
----
-"@svenvw/fdm-core": minor
----
-
-Add `timeframe` argument to `getCultivations`, `getCultivationPlan`, `getFertilizerApplications`, `getFields`, `getHarvests` and `getSoilAnalyses`

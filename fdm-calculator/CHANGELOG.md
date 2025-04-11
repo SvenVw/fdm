@@ -1,5 +1,23 @@
 # fdm-calculator
 
+## 0.2.5
+
+### Patch Changes
+
+- 175ea6a: Minify the code during rollup with terser
+- Updated dependencies [c240486]
+- Updated dependencies [e9926cb]
+- Updated dependencies [82f4767]
+- Updated dependencies [a52796a]
+- Updated dependencies [9ea6795]
+- Updated dependencies [a259ff6]
+- Updated dependencies [01081b3]
+- Updated dependencies [d693cdb]
+- Updated dependencies [0944ef1]
+- Updated dependencies [175ea6a]
+- Updated dependencies [9f4d818]
+  - @svenvw/fdm-core@0.18.0
+
 ## 0.2.4
 
 ### Patch Changes
