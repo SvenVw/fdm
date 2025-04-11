@@ -7,24 +7,16 @@ const config: Config = {
     tagline: "Transforming Farm Data into Actionable Insights",
     favicon: "img/favicon.ico",
 
-    // Set the production url of your site here
     url: "https://svenvw.github.io",
-    // Set the /<baseUrl>/ pathname under which your site is served
-    // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: "/fdm/",
 
     // GitHub pages deployment config.
-    // If you aren't using GitHub pages, you don't need these.
-    organizationName: "SvenVw", // Usually your GitHub org/user name.
-    projectName: "fdm", // Usually your repo name.
+    organizationName: "SvenVw", 
+    projectName: "fdm", 
     deploymentBranch: "gh-pages",
 
     onBrokenLinks: "throw",
     onBrokenMarkdownLinks: "warn",
-
-    // Even if you don't use internationalization, you can use this field to set
-    // useful metadata like html lang. For example, if your site is Chinese, you
-    // may want to replace "en" with "zh-Hans".
     i18n: {
         defaultLocale: "en",
         locales: ["en"],
@@ -36,8 +28,6 @@ const config: Config = {
             {
                 docs: {
                     sidebarPath: "./sidebars.ts",
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
                     editUrl:
                         "https://github.com/SvenVw/fdm/tree/main/fdm-docs/docs/",
                 },
@@ -47,11 +37,8 @@ const config: Config = {
                         type: ["rss", "atom"],
                         xslt: true,
                     },
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
                     editUrl:
                         "https://github.com/SvenVw/fdm/tree/main/fdm-docs/blog/",
-                    // Useful options to enforce blogging best practices
                     onInlineTags: "warn",
                     onInlineAuthors: "warn",
                     onUntruncatedBlogPosts: "warn",
@@ -86,7 +73,6 @@ const config: Config = {
                 entryPointStrategy: "resolve", // Use 'resolve' for file paths
                 // Docusaurus specific options
                 id: "api", // Important: Used for the second docs instance
-                // Remove invalid options: docsRoot, hideBreadcrumbs, hidePageHeader, entryFileName
                 // Note: Further TypeDoc/Markdown plugin options can be added in typedoc.json
             },
         ],
@@ -98,14 +84,12 @@ const config: Config = {
                 path: "api-reference", // Path to the generated API docs (relative to package root)
                 routeBasePath: "api", // URL base path for this instance
                 sidebarPath: "./sidebars-api.js", // Use the created sidebar file
-                // You might want to disable editing URLs for generated docs
                 // editUrl: undefined,
             },
         ],
     ],
 
     themeConfig: {
-        // Replace with your project's social card
         image: "img/fdm-high-resolution-logo.png",
         navbar: {
             title: "FDM",
@@ -137,34 +121,40 @@ const config: Config = {
             ],
         },
         footer: {
-            style: "dark",
+            style: "light", 
+            logo: { 
+              alt: 'FDM Logo',
+              src: 'img/fdm-high-resolution-logo-transparent-no-text.png',
+              href: 'https://github.com/SvenVw/fdm', 
+              height: 50,
+            },
             links: [
                 {
-                    title: "Docs",
+                    title: "Docs", 
                     items: [
                         {
                             label: "Introduction",
                             to: "/docs/",
                         },
                         {
-                            label: "Installation",
-                            to: "/docs/Installation",
+                            label: "Getting Started",
+                            to: "/docs/getting-started/prerequisites", 
+                        },
+                         {
+                            label: "Core Concepts",
+                            to: "/docs/core-concepts/asset-action-model", 
                         },
                         {
-                            label: "Core concepts",
-                            to: "/docs/Core concepts/Asset Action Model",
-                        },
-                        {
-                            label: "Getting started",
-                            to: "/docs/Getting started/Prerequisites",
-                        },
-                        {
-                            label: "Reference",
+                            label: "API Reference",
                             to: "/api",
                         },
                         {
+                            label: "Installation",
+                            to: "/docs/installation", 
+                        },
+                        {
                             label: "Contributing",
-                            to: "/docs/Contributing",
+                            to: "/docs/contributing", 
                         },
                     ],
                 },
@@ -195,7 +185,7 @@ const config: Config = {
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} Nutriënten Management Instituut. Built with Docusaurus.`,
+            copyright: "Built by Nutriënten Management Instituut. Built with Docusaurus.",
         },
         prism: {
             theme: prismThemes.github,
