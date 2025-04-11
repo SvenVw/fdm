@@ -43,4 +43,4 @@ Typically, an application using FDM (like `fdm-app` or a custom application) wou
 3.  Optionally use `fdm-data` to populate selection lists or validate inputs against standardized catalogues (e.g., selecting a fertilizer from the catalogue).
 4.  Optionally use `fdm-calculator` to perform calculations based on the data stored via `fdm-core`.
 
-This modular architecture allows developers to pick and choose the components they need for their specific application.
+This modular architecture allows developers to select the components they need for their specific application.
