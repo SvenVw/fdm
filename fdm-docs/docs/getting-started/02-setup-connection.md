@@ -80,11 +80,6 @@ export const fdm = await (async () => {
 await migrate(fdm, { migrationsFolder: migrationsFolderPath, migrationsSchema: 'fdm-migrations' })
 
 // Sync catalogues
-const fdm = drizzle(client, {
-    mode: "postgres",
-    logger: false,
-    schema: schema,
-})
 await syncCatalogues(fdm).catch((error) =>
     console.error("Error in syncing catalogues 🚨:", error),
 )
