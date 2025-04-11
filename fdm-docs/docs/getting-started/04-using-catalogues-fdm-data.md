@@ -1,55 +1,83 @@
 ---
-title: "Using Catalogues (fdm-data)"
+title: "Using Catalogues (fdm-data & fdm-core)" 
 ---
 
-# Using Catalogues (`fdm-data`)
+# Using Catalogues (`fdm-data` & `fdm-core`)
 
-The `@svenvw/fdm-data` package provides standardized catalogues for common agricultural items like cultivations and fertilizers. Using these catalogues helps ensure data consistency and simplifies data entry by providing pre-defined, validated options.
+Standardized catalogues simplify data entry and ensure consistency. You can access catalogue data in two main ways:
 
-## Accessing Catalogue Data
+1.  **Directly from `@svenvw/fdm-data`:** For populating general UI elements or accessing the raw catalogue definitions.
+2.  **Via `@svenvw/fdm-core` functions:** For retrieving catalogue entries relevant to a specific farm context (e.g., only showing enabled catalogues).
 
-The `fdm-data` package typically exports arrays or objects containing the catalogue entries. You can import these directly into your application.
+## 1. Accessing Raw Catalogue Data (from `fdm-data`)
+
+The `@svenvw/fdm-data` package exports arrays containing the raw catalogue entries. Import these directly for general use.
 
 ```typescript
-// Example: Importing cultivation and fertilizer catalogues
+// Example: Importing raw cultivation and fertilizer catalogues
 import { 
-    cultivationsCatalogueBRPCrops, // Example: BRP crop catalogue
-    cultivationsCatalogueBRPCoverCrops, // Example: BRP cover crop catalogue
-    fertilizersCatalogueSRM // Example: SRM fertilizer catalogue
+    cultivationsCatalogueBRPCrops, 
+    fertilizersCatalogueSRM 
 } from '@svenvw/fdm-data';
 
-// You can now use these arrays, for example, to populate dropdown lists in a UI
-// or to validate user input against known catalogue IDs.
+console.log('Total BRP Crops in package:', cultivationsCatalogueBRPCrops.length);
+console.log('Total SRM Fertilizers in package:', fertilizersCatalogueSRM.length);
 
-console.log('Available BRP Crops:', cultivationsCatalogueBRPCrops.length);
-console.log('Available SRM Fertilizers:', fertilizersCatalogueSRM.length);
+// Example: Finding a specific entry's ID from the raw data
+const wheatEntry = cultivationsCatalogueBRPCrops.find(c => c.b_lu_name === 'Winter wheat');
+const wheatCatalogueId = wheatEntry?.b_lu_catalogue; 
+// Use wheatCatalogueId when calling fdm-core functions like addCultivation
 
-// Example: Finding a specific catalogue entry
-const wheatEntry = cultivationsCatalogueBRPCrops.find(
-    crop => crop.b_lu_name === 'Winter wheat' // Adjust property name if needed
-);
-
-if (wheatEntry) {
-    console.log('Found Winter Wheat:', wheatEntry.b_lu_catalogue);
-    // Use wheatEntry.b_lu_catalogue when creating a cultivation instance via fdm-core
-}
-
-const manureEntry = fertilizersCatalogueSRM.find(
-    fert => fert.p_name_nl === 'Rundveedrijfmest' // Adjust property name if needed
-);
-
-if (manureEntry) {
-    console.log('Found Cattle Slurry:', manureEntry.p_id_catalogue);
-    // Use manureEntry.p_id_catalogue when recording fertilizer actions via fdm-core
-}
-
+const manureEntry = fertilizersCatalogueSRM.find(f => f.p_name_nl === 'Rundveedrijfmest');
+const manureCatalogueId = manureEntry?.p_id_catalogue;
+// Use manureCatalogueId when calling fdm-core functions like addFertilizer
 ```
-*Note: The exact names of the exported catalogue variables (`cultivationsCatalogueBRPCrops`, `fertilizersCatalogueSRM`, etc.) might differ. Check the `fdm-data` package's exports or API reference for the correct names.*
+*Note: Check `fdm-data` exports for exact variable names.*
+
+## 2. Retrieving Contextual Catalogue Data (via `fdm-core`)
+
+`@svenvw/fdm-core` provides functions like `getCultivationsFromCatalogue` and `getFertilizersFromCatalogue`. These functions query the database and typically return catalogue entries that are relevant to the specific farm context, potentially considering which catalogues have been enabled for that farm (using the `cultivation_catalogue_selecting` and `fertilizer_catalogue_enabling` tables).
+
+```typescript
+import { 
+    createFdmServer, 
+    getCultivationsFromCatalogue, // Function from fdm-core
+    FdmServerType, 
+    PrincipalId 
+} from '@svenvw/fdm-core'; 
+
+// --- Assume Initialization ---
+declare const fdm: FdmServerType; 
+declare const principalId: PrincipalId; 
+declare const farmId: string; 
+// --- End Initialization ---
+
+async function getFarmEnabledCultivations() {
+    console.log(`Getting enabled/relevant cultivations for farm ${farmId}...`);
+    try {
+        // This function queries the DB catalogue tables, potentially filtered
+        const availableCultivations = await getCultivationsFromCatalogue(fdm, principalId, farmId);
+
+        console.log(`Found ${availableCultivations.length} cultivations relevant to the farm.`);
+        // Use this list to populate UI choices specific to the farm context
+        
+        // Example: Find wheat within the farm-specific list
+        const farmWheatEntry = availableCultivations.find(c => c.b_lu_name === 'Winter wheat');
+        if (farmWheatEntry) {
+             console.log('Farm-relevant Winter Wheat ID:', farmWheatEntry.b_lu_catalogue);
+             // Use this ID when calling addCultivation for this farm/field
+        }
+
+        return availableCultivations;
+
+    } catch (error) {
+        console.error('Error getting cultivations from catalogue:', error);
+    }
+}
+
+// getFarmEnabledCultivations();
+```
 
 ## Linking Actions to Catalogues
 
-When recording actions in `fdm-core` that relate to catalogued items (like starting a cultivation or applying fertilizer), you should use the appropriate ID from the `fdm-data` catalogue.
-
-See the `Cultivation Starting` example in the "Basic Usage (`fdm-core`)" section, where `catalogueId` (which would come from `fdm-data`) is used to link the `cultivations` record via the `b_lu_catalogue` foreign key. Similarly, when recording fertilizer applications, the `p_id_catalogue` from `fdm-data` would be used to link the `fertilizerPicking` record.
-
-Using these shared catalogue IDs ensures that data remains standardized and comparable, even if different applications or users are entering the information.
+Regardless of how you obtain the catalogue ID (directly from `fdm-data` or via `fdm-core` functions like `getCultivationsFromCatalogue`), you use this ID when recording related actions using `fdm-core` functions (e.g., `addCultivation`, `addFertilizer`). This ensures data consistency. See the "Basic Usage (`fdm-core`)" guide for examples of these action functions.
