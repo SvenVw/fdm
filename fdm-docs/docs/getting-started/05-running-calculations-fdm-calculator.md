@@ -8,7 +8,7 @@ The `@svenvw/fdm-calculator` package provides functions to perform various agron
 
 ## Overview
 
-The calculator package typically takes data retrieved using `fdm-core` as input or uses `fdm-core` functions internally to fetch data before performing calculations.
+The calculator package typically takes data retrieved using `fdm-core` as input, or uses `fdm-core` functions internally to fetch data before performing calculations.
 
 ## Example: Calculating Total Fertilizer Dose for a Field
 
