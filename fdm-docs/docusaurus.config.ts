@@ -11,8 +11,8 @@ const config: Config = {
     baseUrl: "/fdm/",
 
     // GitHub pages deployment config.
-    organizationName: "SvenVw", 
-    projectName: "fdm", 
+    organizationName: "SvenVw",
+    projectName: "fdm",
     deploymentBranch: "gh-pages",
 
     onBrokenLinks: "throw",
@@ -121,16 +121,16 @@ const config: Config = {
             ],
         },
         footer: {
-            style: "light", 
-            logo: { 
-              alt: 'FDM Logo',
-              src: 'img/fdm-high-resolution-logo-transparent-no-text.png',
-              href: 'https://github.com/SvenVw/fdm', 
-              height: 50,
+            style: "light",
+            logo: {
+                alt: "FDM Logo",
+                src: "img/fdm-high-resolution-logo-transparent-no-text.png",
+                href: "https://github.com/SvenVw/fdm",
+                height: 50,
             },
             links: [
                 {
-                    title: "Docs", 
+                    title: "Docs",
                     items: [
                         {
                             label: "Introduction",
@@ -138,11 +138,11 @@ const config: Config = {
                         },
                         {
                             label: "Getting Started",
-                            to: "/docs/getting-started/prerequisites", 
+                            to: "/docs/getting-started/prerequisites",
                         },
-                         {
+                        {
                             label: "Core Concepts",
-                            to: "/docs/core-concepts/asset-action-model", 
+                            to: "/docs/core-concepts/asset-action-model",
                         },
                         {
                             label: "API Reference",
@@ -150,11 +150,11 @@ const config: Config = {
                         },
                         {
                             label: "Installation",
-                            to: "/docs/installation", 
+                            to: "/docs/installation",
                         },
                         {
                             label: "Contributing",
-                            to: "/docs/contributing", 
+                            to: "/docs/contributing",
                         },
                     ],
                 },
@@ -185,7 +185,7 @@ const config: Config = {
                     ],
                 },
             ],
-            copyright: "Built by Nutriënten Management Instituut. Built with Docusaurus.",
+            copyright: `Developed by <a href="https://www.nmi-agro.nl/" target="_blank" rel="noopener noreferrer">Nutriënten Management Instituut</a>. Built with Docusaurus.`,
         },
         prism: {
             theme: prismThemes.github,
