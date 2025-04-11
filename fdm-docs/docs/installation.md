@@ -50,7 +50,7 @@ If you want to contribute to the development of FDM itself:
 ### Setup
 1.  **Fork & Clone:** Fork the main [SvenVw/fdm](https://github.com/SvenVw/fdm) repository and clone your fork.
     ```bash
-    git clone https://github.com/YOUR_USERNAME/fdm.git
+    git clone https://github.com/SvenVw/fdm.git
     cd fdm
     ```
 2.  **Install Dependencies:** Use pnpm from the monorepo root.

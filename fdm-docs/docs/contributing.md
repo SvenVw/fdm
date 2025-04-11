@@ -20,7 +20,7 @@ This guide focuses on contributions to the codebase and documentation within the
 ### Setup
 1.  **Fork & Clone:** Fork the main [SvenVw/fdm](https://github.com/SvenVw/fdm) repository on GitHub and clone your fork locally.
     ```bash
-    git clone https://github.com/YOUR_USERNAME/fdm.git
+    git clone https://github.com/SvenVw/fdm.git
     cd fdm
     ```
 2.  **Install Dependencies:** Install all dependencies for the entire monorepo using pnpm from the root directory.
@@ -64,7 +64,7 @@ Each package should have its own tests (usually using Vitest).
 Please add tests for any new features or bug fixes.
 
 ### Branching Strategy
-*   Create a new branch for your changes from the `main` branch.
+*   Create a new branch for your changes from the `main` or `development` branch.
 *   Use a descriptive branch name (e.g., `feat/add-soil-texture-calc`, `fix/farm-creation-bug`, `docs/update-contributing-guide`).
 
 ### Committing Changes & Changesets
@@ -72,7 +72,7 @@ Follow conventional commit message standards (e.g., `feat: ...`, `fix: ...`, `do
 
 If your changes affect any of the published packages (`fdm-core`, `fdm-data`, `fdm-calculator`, `fdm-app`, `fdm-docs`) and should trigger a version bump and changelog entry, you **must** add a changeset:
 
-1.  Run `pnpm changeset add` from the root directory.
+1.  Run `pnpm changeset` from the root directory.
 2.  Follow the prompts to select the packages that changed, the type of change (patch, minor, major), and write a concise summary of the change. This summary will be used in the changelogs.
 3.  Commit the generated Markdown file in the `.changeset` directory along with your code changes.
 
@@ -80,7 +80,7 @@ Changes that don't require a version bump (e.g., fixing typos in internal commen
 
 ### Creating a Pull Request
 1.  Push your branch to your fork on GitHub.
-2.  Create a Pull Request (PR) from your branch to the `main` branch of the `SvenVw/fdm` repository.
+2.  Create a Pull Request (PR) from your branch to the `development` branch of the `SvenVw/fdm` repository.
 3.  Fill in the PR template, clearly describing the changes, the motivation, and linking any relevant issues.
 4.  Ensure all automated checks (linting, testing, building) pass.
 5.  The maintainers will review your PR, provide feedback, and merge it once approved.
