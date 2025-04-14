@@ -5,11 +5,13 @@ export interface ServerConfig {
         fdm_session_secret: string
         better_auth_secret: string
         google?: {
+            clientId: string
             clientSecret: string
-        } | null
+        } | undefined
         microsoft?: {
+            clientId: string
             clientSecret: string
-        } | null
+        } | undefined
     }
     database: {
         password: string

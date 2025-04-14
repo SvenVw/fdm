@@ -6,7 +6,7 @@ import { serverConfig } from "./config.server"
 import { renderWelcomeEmail, sendEmail } from "./email.server"
 
 // Initialize better-auth instance for FDM
-export const auth = createFdmAuth(fdm)
+export const auth = createFdmAuth(fdm, serverConfig.auth.google, serverConfig.auth.microsoft)
 
 // Extend database hooks with sending a welcome email after sign up
 if (serverConfig.mail) {
