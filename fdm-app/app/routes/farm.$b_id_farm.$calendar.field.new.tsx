@@ -1,8 +1,5 @@
 import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "~/integrations/mapbox"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
@@ -321,7 +318,6 @@ export default function Index() {
 
 export async function action({ request, params }: ActionFunctionArgs) {
     // Get the farm id
-    console.log("Action!")
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
         throw data("Farm ID is required", {
@@ -427,7 +423,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     b_gwl_class: estimates.b_gwl_class,
                 },
             )
-        }       
+        }
 
         return redirectWithSuccess(
             `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
