@@ -44,7 +44,7 @@ export interface UpdatePost {
 // Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
-        id: "update-2025-04-11",
+        id: "update-2025-04-14",
         title: "Nieuwe Functies & Uitgebreide Verbeteringen (April 2025)",
         description: `Deze update introduceert een reeks nieuwe functies en significante verbeteringen, ontworpen om uw workflow binnen ${clientConfig.name} efficiënter en duidelijker te maken:
 
