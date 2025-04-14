@@ -1,15 +1,15 @@
 import {
-    Html,
     Body,
+    Button,
+    Container,
     Head,
     Heading,
     Hr,
-    Container,
+    Html,
+    Img,
     Preview,
     Section,
     Text,
-    Button,
-    Img,
 } from "@react-email/components"
 import { Tailwind } from "@react-email/tailwind"
 

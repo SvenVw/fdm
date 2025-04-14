@@ -1,22 +1,3 @@
-import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
-import {
-    FieldsPanelHover,
-    FieldsPanelZoom,
-} from "~/components/custom/atlas/atlas-panels"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceNotClickable,
-} from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import { Separator } from "~/components/ui/separator"
-import { SidebarInset } from "~/components/ui/sidebar"
-import { Skeleton } from "~/components/ui/skeleton"
-import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { useCalendarStore } from "~/store/calendar"
 import {
     addCultivation,
     addField,
@@ -27,6 +8,7 @@ import {
     getFields,
 } from "@svenvw/fdm-core"
 import { centroid } from "@turf/centroid"
+import type { Feature, FeatureCollection, Polygon } from "geojson"
 import { useState } from "react"
 import {
     GeolocateControl,
@@ -43,13 +25,31 @@ import {
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { fdm } from "~/lib/fdm.server"
-import FieldDetailsDialog from "~/components/custom/field/form"
+import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
+import {
+    FieldsPanelHover,
+    FieldsPanelZoom,
+} from "~/components/custom/atlas/atlas-panels"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceNotClickable,
+} from "~/components/custom/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
 import { FarmHeader } from "~/components/custom/farm/farm-header"
-import type { Feature, FeatureCollection, Polygon } from "geojson"
-import { extractFormValuesFromRequest } from "~/lib/form"
+import FieldDetailsDialog from "~/components/custom/field/form"
 import { FormSchema } from "~/components/custom/field/schema"
+import { Separator } from "~/components/ui/separator"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

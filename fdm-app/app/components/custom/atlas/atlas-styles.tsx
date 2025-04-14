@@ -4,15 +4,13 @@ import type {
     SymbolLayerSpecification,
 } from "react-map-gl"
 
-export function getFieldsStyle(
-    layerId: string,
-): LayerProps &
+export function getFieldsStyle(layerId: string): LayerProps &
     (
-        | ({
+        | {
               id: string
               type: "fill"
               paint: FillLayerSpecification["paint"]
-          })
+          }
         | {
               id: string
               type: "symbol"

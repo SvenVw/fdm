@@ -43,7 +43,7 @@ export function Combobox({
     label,
     defaultValue,
     disabled,
-    onChange
+    onChange,
 }: ComboboxProps) {
     const [open, setOpen] = useState(false)
     const [currentValue, setCurrentValue] = useState<string | undefined>(
@@ -100,10 +100,7 @@ export function Combobox({
                         </Button>
                     </FormControl>
                 </PopoverTrigger>
-                <PopoverContent
-                    id="combobox-options"
-                    className="w-full p-0"
-                >
+                <PopoverContent id="combobox-options" className="w-full p-0">
                     <Command>
                         <CommandInput
                             placeholder="Begin met typen..."
@@ -141,11 +138,7 @@ export function Combobox({
                     </Command>
                 </PopoverContent>
             </Popover>
-            <input
-                type="hidden"
-                name={name}
-                value={currentValue}
-            />
+            <input type="hidden" name={name} value={currentValue} />
             <FormDescription />
             <FormMessage />
         </FormItem>

@@ -11,7 +11,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
     {
         title: "Standardized Schema",
-        Svg: require("lucide-react/dist/cjs/lucide-react").Database, 
+        Svg: require("lucide-react/dist/cjs/lucide-react").Database,
         description: (
             <>
                 Based on the Asset-Action model, providing a consistent
@@ -32,7 +32,7 @@ const FeatureList: FeatureItem[] = [
     },
     {
         title: "Open & Extensible",
-        Svg: require("lucide-react/dist/cjs/lucide-react").GitMerge, 
+        Svg: require("lucide-react/dist/cjs/lucide-react").GitMerge,
         description: (
             <>
                 Open-source library built with TypeScript. Contribute new
@@ -62,7 +62,7 @@ export default function HomepageFeatures(): JSX.Element {
             <div className="container">
                 <div className="row">
                     {FeatureList.map((props) => (
-                        <Feature key={props.title} {...props} /> 
+                        <Feature key={props.title} {...props} />
                     ))}
                 </div>
             </div>

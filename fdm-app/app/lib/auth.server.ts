@@ -1,9 +1,9 @@
 import { createFdmAuth } from "@svenvw/fdm-core"
 import type { Session, User } from "better-auth"
-import { fdm } from "~/lib/fdm.server"
 import type { GenericEndpointContext } from "better-auth"
-import { renderWelcomeEmail, sendEmail } from "./email.server"
+import { fdm } from "~/lib/fdm.server"
 import { serverConfig } from "./config.server"
+import { renderWelcomeEmail, sendEmail } from "./email.server"
 
 // Initialize better-auth instance for FDM
 export const auth = createFdmAuth(fdm)
