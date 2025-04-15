@@ -1,5 +1,14 @@
 # Changelog fdm-app
 
+## 0.17.1
+
+### Patch Changes
+
+- 516784b: Fixes client side configuration by providing at build stage
+- Updated dependencies [eed1780]
+  - @svenvw/fdm-core@0.19.0
+  - @svenvw/fdm-calculator@0.2.6
+
 ## 0.17.0
 
 ### Minor Changes

@@ -49,4 +49,9 @@ export const clientConfig: ClientConfig = {
         sentry: sentryConfig,
         posthog: posthogConfig,
     },
+    integrations: {
+        mapbox: {
+            token: import.meta.env.VITE_MAPBOX_TOKEN,
+        },
+    },
 }

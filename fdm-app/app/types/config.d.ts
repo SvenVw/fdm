@@ -4,12 +4,18 @@ export interface ServerConfig {
     auth: {
         fdm_session_secret: string
         better_auth_secret: string
-        google?: {
-            clientSecret: string
-        } | null
-        microsoft?: {
-            clientSecret: string
-        } | null
+        google?:
+            | {
+                  clientId: string
+                  clientSecret: string
+              }
+            | undefined
+        microsoft?:
+            | {
+                  clientId: string
+                  clientSecret: string
+              }
+            | undefined
     }
     database: {
         password: string
@@ -61,5 +67,10 @@ export interface ClientConfig {
             key: string
             host: string
         } | null
+    }
+    integrations: {
+        mapbox: {
+            token: string
+        }
     }
 }
