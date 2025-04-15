@@ -54,6 +54,9 @@
             "core-js",
             "core-js-pure",
             "esbuild"
-        ]
+        ],
+        "overrides": {
+            "typedoc": "^0.28.2"
+        }
     }
 }

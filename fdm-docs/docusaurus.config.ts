@@ -7,24 +7,16 @@ const config: Config = {
     tagline: "Transforming Farm Data into Actionable Insights",
     favicon: "img/favicon.ico",
 
-    // Set the production url of your site here
     url: "https://svenvw.github.io",
-    // Set the /<baseUrl>/ pathname under which your site is served
-    // For GitHub pages deployment, it is often '/<projectName>/'
     baseUrl: "/fdm/",
 
     // GitHub pages deployment config.
-    // If you aren't using GitHub pages, you don't need these.
-    organizationName: "SvenVw", // Usually your GitHub org/user name.
-    projectName: "fdm", // Usually your repo name.
+    organizationName: "SvenVw",
+    projectName: "fdm",
     deploymentBranch: "gh-pages",
 
     onBrokenLinks: "throw",
     onBrokenMarkdownLinks: "warn",
-
-    // Even if you don't use internationalization, you can use this field to set
-    // useful metadata like html lang. For example, if your site is Chinese, you
-    // may want to replace "en" with "zh-Hans".
     i18n: {
         defaultLocale: "en",
         locales: ["en"],
@@ -36,8 +28,6 @@ const config: Config = {
             {
                 docs: {
                     sidebarPath: "./sidebars.ts",
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
                     editUrl:
                         "https://github.com/SvenVw/fdm/tree/main/fdm-docs/docs/",
                 },
@@ -47,11 +37,8 @@ const config: Config = {
                         type: ["rss", "atom"],
                         xslt: true,
                     },
-                    // Please change this to your repo.
-                    // Remove this to remove the "edit this page" links.
                     editUrl:
                         "https://github.com/SvenVw/fdm/tree/main/fdm-docs/blog/",
-                    // Useful options to enforce blogging best practices
                     onInlineTags: "warn",
                     onInlineAuthors: "warn",
                     onUntruncatedBlogPosts: "warn",
@@ -63,8 +50,46 @@ const config: Config = {
         ],
     ],
 
+    plugins: [
+        [
+            "docusaurus-plugin-typedoc",
+            {
+                // TypeDoc options
+                entryPoints: [
+                    "../fdm-core/src/index.ts",
+                    "../fdm-data/src/index.ts",
+                    "../fdm-calculator/src/index.ts",
+                ],
+                tsconfig: "./tsconfig.json", // Use local tsconfig
+                out: "api-reference", // Output directory relative to package root (fdm-docs)
+                sidebar: {
+                    categoryLabel: "Reference",
+                    position: 0,
+                    fullNames: true, // Use full names for classes/interfaces
+                },
+                // Markdown Plugin options
+                plugin: ["typedoc-plugin-markdown"],
+                readme: "none", // Don't include root README
+                entryPointStrategy: "resolve", // Use 'resolve' for file paths
+                // Docusaurus specific options
+                id: "api", // Important: Used for the second docs instance
+                // Note: Further TypeDoc/Markdown plugin options can be added in typedoc.json
+            },
+        ],
+        // Second docs instance for API reference
+        [
+            "@docusaurus/plugin-content-docs",
+            {
+                id: "api", // Must match the typedoc plugin id
+                path: "api-reference", // Path to the generated API docs (relative to package root)
+                routeBasePath: "api", // URL base path for this instance
+                sidebarPath: "./sidebars-api.js", // Use the created sidebar file
+                // editUrl: undefined,
+            },
+        ],
+    ],
+
     themeConfig: {
-        // Replace with your project's social card
         image: "img/fdm-high-resolution-logo.png",
         navbar: {
             title: "FDM",
@@ -79,6 +104,14 @@ const config: Config = {
                     position: "left",
                     label: "Docs",
                 },
+                {
+                    to: "/api", // Link to the API reference base path
+                    label: "Reference",
+                    position: "left",
+                    // Use docId or activeBasePath if needed for highlighting
+                    // docId: 'api/index', // Example if you have an index page
+                    // activeBasePath: 'api',
+                },
                 { to: "/blog", label: "Blog", position: "left" },
                 {
                     href: "https://github.com/SvenVw/fdm",
@@ -88,7 +121,13 @@ const config: Config = {
             ],
         },
         footer: {
-            style: "dark",
+            style: "light",
+            logo: {
+                alt: "FDM Logo",
+                src: "img/fdm-high-resolution-logo-transparent-no-text.png",
+                href: "https://github.com/SvenVw/fdm",
+                height: 50,
+            },
             links: [
                 {
                     title: "Docs",
@@ -98,20 +137,24 @@ const config: Config = {
                             to: "/docs/",
                         },
                         {
+                            label: "Getting Started",
+                            to: "/docs/getting-started/prerequisites",
+                        },
+                        {
+                            label: "Core Concepts",
+                            to: "/docs/core-concepts/asset-action-model",
+                        },
+                        {
+                            label: "API Reference",
+                            to: "/api",
+                        },
+                        {
                             label: "Installation",
-                            to: "/docs/Installation",
-                        },
-                        {
-                            label: "Core concepts",
-                            to: "/docs/Core concepts/Asset Action Model",
-                        },
-                        {
-                            label: "Getting started",
-                            to: "/docs/Getting started/Prerequisites",
+                            to: "/docs/installation",
                         },
                         {
                             label: "Contributing",
-                            to: "/docs/Contributing",
+                            to: "/docs/contributing",
                         },
                     ],
                 },
@@ -119,16 +162,12 @@ const config: Config = {
                     title: "Community",
                     items: [
                         {
-                            label: "Stack Overflow",
-                            href: "https://stackoverflow.com/questions/tagged/fdm",
+                            label: "Discussions",
+                            href: "https://github.com/SvenVw/fdm/discussions",
                         },
                         // {
-                        //   label: 'Discord',
-                        //   href: 'https://discordapp.com/invite/docusaurus',
-                        // },
-                        // {
-                        //   label: 'Twitter',
-                        //   href: 'https://twitter.com/docusaurus',
+                        //     label: "Stack Overflow",
+                        //     href: "https://stackoverflow.com/questions/tagged/fdm",
                         // },
                     ],
                 },
@@ -146,7 +185,7 @@ const config: Config = {
                     ],
                 },
             ],
-            copyright: `Copyright © ${new Date().getFullYear()} Nutriënten Management Instituut. Built with Docusaurus.`,
+            copyright: `Developed by <a href="https://www.nmi-agro.nl/" target="_blank" rel="noopener noreferrer">Nutriënten Management Instituut</a>. Built with Docusaurus.`,
         },
         prism: {
             theme: prismThemes.github,

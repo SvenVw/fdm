@@ -19,7 +19,7 @@ function HomepageHeader() {
                 <div className={styles.buttons}>
                     <Link
                         className="button button--secondary button--lg"
-                        to="http://localhost:3000/fdm/docs/"
+                        to="/fdm/docs/"
                     >
                         Learn more
                     </Link>
@@ -28,7 +28,7 @@ function HomepageHeader() {
                 <div className={styles.buttons}>
                     <Link
                         className="button button--secondary button--lg"
-                        to="docs/Getting started/Prerequisites"
+                        to="/fdm/docs/getting-started/prerequisites"
                     >
                         Get started
                     </Link>

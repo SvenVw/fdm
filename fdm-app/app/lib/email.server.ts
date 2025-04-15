@@ -1,5 +1,5 @@
-import type { User } from "better-auth"
 import { render } from "@react-email/components"
+import type { User } from "better-auth"
 import postmark from "postmark"
 import { WelcomeEmail } from "~/components/custom/email/welcome"
 import { serverConfig } from "~/lib/config.server"

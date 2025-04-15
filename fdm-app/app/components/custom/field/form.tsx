@@ -1,3 +1,12 @@
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { Feature, Polygon } from "geojson"
+import { useEffect, useState } from "react"
+import { Form } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
+import { Combobox } from "~/components/custom/combobox"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -6,9 +15,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "~/components/ui/dialog"
-import { Button } from "~/components/ui/button"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { useEffect, useState } from "react"
 import {
     FormControl,
     FormDescription,
@@ -18,13 +24,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import type { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { FormSchema } from "./schema"
-import { Combobox } from "~/components/custom/combobox"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import type { Feature, Polygon } from "geojson"
-import { Form } from "react-router"
 
 interface FieldDetailsDialogProps {
     open: boolean
