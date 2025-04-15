@@ -1,38 +1,38 @@
-import { describe, it, expect } from "vitest"
-import { getFertilizersCatalogue } from "./index"
+import { describe, expect, it } from "vitest"
 import { getCatalogueSrm } from "./catalogues/srm"
+import { getFertilizersCatalogue } from "./index"
 
 describe("getFertilizersCatalogue", () => {
-    it("should return the SRM catalogue when catalogueName is 'srm'", () => {
-        const expectedCatalogue = getCatalogueSrm()
-        const actualCatalogue = getFertilizersCatalogue("srm")
+    it("should return the SRM catalogue when catalogueName is 'srm'", async () => {
+        const expectedCatalogue = await getCatalogueSrm()
+        const actualCatalogue = await getFertilizersCatalogue("srm")
         expect(actualCatalogue).toEqual(expectedCatalogue)
     })
 
-    it("should throw an error when an invalid catalogueName is provided", () => {
-        expect(() => getFertilizersCatalogue("invalid-catalogue")).toThrowError(
-            "catalogue invalid-catalogue is not recognized",
-        )
+    it("should throw an error when an invalid catalogueName is provided", async () => {
+        await expect(
+            getFertilizersCatalogue("invalid-catalogue"),
+        ).rejects.toThrowError("catalogue invalid-catalogue is not recognized")
     })
 
-    it("should return a non-empty array for 'srm' catalogue", () => {
-        const catalogue = getFertilizersCatalogue("srm")
+    it("should return a non-empty array for 'srm' catalogue", async () => {
+        const catalogue = await getFertilizersCatalogue("srm")
         expect(Array.isArray(catalogue)).toBe(true)
         expect(catalogue.length).toBeGreaterThan(0)
     })
 
-    it("should check if all items in the srm catalogue have the correct source", () => {
-        const catalogue = getFertilizersCatalogue("srm")
+    it("should check if all items in the srm catalogue have the correct source", async () => {
+        const catalogue = await getFertilizersCatalogue("srm")
         for (const item of catalogue) {
             expect(item.p_source).toBe("srm")
         }
     })
 })
 
-describe("getCatalogueSrm", () => {
+describe("getCatalogueSrm", async () => {
     const originalSrm = require("./catalogues/srm.json")
-    it("should return an array of CatalogueFertilizerItem", () => {
-        const catalogue = getCatalogueSrm()
+    it("should return an array of CatalogueFertilizerItem", async () => {
+        const catalogue = await getCatalogueSrm()
         expect(Array.isArray(catalogue)).toBe(true)
         for (const item of catalogue) {
             expect(typeof item).toBe("object")
@@ -80,7 +80,7 @@ describe("getCatalogueSrm", () => {
             expect(item).toHaveProperty("p_cr_vi")
             expect(item).toHaveProperty("p_pb_rt")
             expect(item).toHaveProperty("p_hg_rt")
-            expect(item).toHaveProperty("p_cl_cr")
+            expect(item).toHaveProperty("p_cl_rt")
             expect(item).toHaveProperty("p_type_manure")
             expect(item).toHaveProperty("p_type_mineral")
             expect(item).toHaveProperty("p_type_compost")
@@ -88,8 +88,8 @@ describe("getCatalogueSrm", () => {
         }
     })
 
-    it("should return at least one item", () => {
-        const catalogue = getCatalogueSrm()
+    it("should return at least one item", async () => {
+        const catalogue = await getCatalogueSrm()
         expect(catalogue.length).toBeGreaterThan(0)
     })
 })

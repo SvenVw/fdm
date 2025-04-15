@@ -24,9 +24,25 @@ The `fdm-app` is a React application providing a user-friendly interface for vis
    pnpm add @svenvw/fdm-app
 ```
 
-3. **Configuration:** Set the required environment variables, including the database URL, API keys, and other relevant settings. Create a `.env` file in the root directory of your application and copy the values from the `.env.example` file.
+3.  **Configuration:**
+    Configure the application by setting environment variables. Create a `.env` file in the `fdm-app` directory by copying the provided `.env.example` file:
 
-4. **Running the App:** 
+    ```bash
+    cp .env.example .env
+    ```
+
+    Edit the `.env` file and provide values for the necessary variables. Key configuration areas include:
+    *   **General:** Application name (`VITE_FDM_NAME`), environment (`NODE_ENV`).
+    *   **Session:** A strong secret key (`FDM_SESSION_SECRET`).
+    *   **Database:** Connection details for your PostgreSQL database.
+    *   **Authentication:** Secrets and URLs for `better-auth` and optionally OAuth providers (Google, Microsoft).
+    *   **Mapbox:** API token for map rendering (`MAPBOX_TOKEN`).
+    *   **Data URLs:** Paths to external data files (`AVAILABLE_FIELDS_URL`).
+    *   **Analytics (Optional):** Configuration for Sentry and/or PostHog. These services are disabled by default. To enable them, provide the relevant keys/DSNs as described in `.env.example`.
+
+    Refer to the comments within the `.env.example` file for detailed explanations of each variable and whether it's required. **Never commit your `.env` file to version control.**
+
+4.  **Running the App:**
 ```bash
     # Development mode
     pnpm dev

@@ -3,7 +3,7 @@ import {
     PaginationContent,
     PaginationItem,
     PaginationLink,
-} from "@/components/ui/pagination"
+} from "~/components/ui/pagination"
 import type { PaginationItems } from "./farm.d"
 
 interface PaginationLayoutProps {

@@ -1,7 +1,5 @@
-import { SidebarApp } from "@/components/custom/sidebar-app"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { auth, getSession } from "@/lib/auth.server"
-import { handleActionError, handleLoaderError } from "@/lib/error"
+import posthog from "posthog-js"
+import { useEffect } from "react"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -9,17 +7,26 @@ import type {
 } from "react-router"
 import { redirect, useRoutes } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
-import { FarmContext } from "@/context/farm-context"
-import { useState, useEffect } from "react"
-import WhatsNew from "./farm.whats-new"
-import Account from "./farm.account"
-import { SidebarInset } from "@/components/ui/sidebar"
 import { Outlet } from "react-router-dom"
+import { SidebarApp } from "~/components/custom/sidebar-app"
+import { SidebarProvider } from "~/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { auth, getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { useCalendarStore } from "~/store/calendar"
+import { useFarmStore } from "~/store/farm"
+import Account from "./farm.account"
+import WhatsNew from "./farm.whats-new"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `Dashboard | ${clientConfig.name}` },
+        {
+            name: "description",
+            content:
+                "Beheer je bedrijfsgegevens, percelen en gewassen in één overzichtelijk dashboard.",
+        },
     ]
 }
 
@@ -67,11 +74,11 @@ export default function App() {
             match.pathname.startsWith("/farm/") && match.params.b_id_farm,
     )
     const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
-    const [farmId, setFarmId] = useState<string | undefined>(initialFarmId)
+    const setFarmId = useFarmStore((state) => state.setFarmId)
 
     useEffect(() => {
         setFarmId(initialFarmId)
-    }, [initialFarmId])
+    }, [initialFarmId, setFarmId])
 
     const routes = useRoutes([
         {
@@ -88,20 +95,39 @@ export default function App() {
         },
     ])
 
+    const calendarMatch = matches.find(
+        (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
+    )
+    const initialCalendar = calendarMatch?.params.calendar as string | undefined
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+
+    useEffect(() => {
+        setCalendar(initialCalendar)
+    }, [initialCalendar, setCalendar])
+
+    // Identify user if PostHog is configured
+    useEffect(() => {
+        if (clientConfig.analytics.posthog && loaderData.user) {
+            posthog.identify(loaderData.user.id, {
+                id: loaderData.user.id,
+                email: loaderData.user.email,
+                name: loaderData.user.name,
+            })
+        }
+    }, [loaderData.user])
+
     return (
-        <FarmContext.Provider value={{ farmId, setFarmId }}>
-            <SidebarProvider>
-                <SidebarApp
-                    user={loaderData.user}
-                    userName={loaderData.userName}
-                    initials={loaderData.initials}
-                />
-                <SidebarInset>
-                    <Outlet />
-                    {routes}
-                </SidebarInset>
-            </SidebarProvider>
-        </FarmContext.Provider>
+        <SidebarProvider>
+            <SidebarApp
+                user={loaderData.user}
+                userName={loaderData.userName}
+                initials={loaderData.initials}
+            />
+            <SidebarInset>
+                <Outlet />
+                {routes}
+            </SidebarInset>
+        </SidebarProvider>
     )
 }
 

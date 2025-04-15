@@ -1,11 +1,17 @@
-import { desc, eq } from "drizzle-orm"
+import { type SQL, and, eq, gte, isNull, lte, or, sql } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { createId } from "./id"
-import type { getSoilAnalysisType } from "./soil.d"
+import type {
+    CurrentSoilData,
+    SoilParameterDescription,
+    SoilParameters,
+    getSoilAnalysisType,
+} from "./soil.d"
+import type { Timeframe } from "./timeframe"
 
 /**
  * Adds a new soil analysis record along with its soil sampling details.
@@ -173,27 +179,27 @@ export async function removeSoilAnalysis(
 }
 
 /**
- * Retrieves the most recent soil analysis record for a specified field.
+ * Retrieves the soil analysis record for a specified analysis.
  *
- * This function validates that the requesting principal has the necessary read permissions for the field before querying for the latest soil analysis data based on the creation timestamp.
+ * This function validates that the requesting principal has the necessary read permissions for the soil analysis before querying for soil analysis data based on the id.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The unique ID of the principal requesting the soil analysis.
- * @param b_id - The identifier of the field.
- * @returns The latest soil analysis record for the field, or null if no record exists.
+ * @param a_id - The identifier of the analysis.
+ * @returns The soil analysis record for the field
  * @throws {Error} If an error occurs during permission verification or data retrieval.
  */
 export async function getSoilAnalysis(
     fdm: FdmType,
     principal_id: PrincipalId,
-    b_id: schema.soilSamplingTypeSelect["b_id"],
+    a_id: schema.soilAnalysisTypeSelect["a_id"],
 ): Promise<getSoilAnalysisType> {
     try {
         await checkPermission(
             fdm,
-            "field",
+            "soil_analysis",
             "read",
-            b_id,
+            a_id,
             principal_id,
             "getSoilAnalysis",
         )
@@ -213,17 +219,15 @@ export async function getSoilAnalysis(
                 // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
             })
             .from(schema.soilAnalysis)
-            .innerJoin(
+            .leftJoin(
                 schema.soilSampling,
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
-            .where(eq(schema.soilSampling.b_id, b_id))
-            .orderBy(desc(schema.soilAnalysis.created)) // TOOD add coalesce with column `updated` when drizzle supports it
-            .limit(1)
+            .where(eq(schema.soilAnalysis.a_id, a_id))
 
         return soilAnalysis[0] || null
     } catch (err) {
-        throw handleError(err, "Exception for getSoilAnalysis", { b_id })
+        throw handleError(err, "Exception for getSoilAnalysis", { a_id })
     }
 }
 
@@ -233,6 +237,7 @@ export async function getSoilAnalysis(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal requesting the data.
  * @param b_id - The identifier of the field.
+ * @param timeframe - Optional timeframe to filter the soil analyses.
  * @returns An array of soil analysis records with corresponding soil sampling details. Returns an empty array if no records are found.
  *
  * @throws {Error} If the principal lacks read permissions for the field or if the database query fails.
@@ -241,6 +246,7 @@ export async function getSoilAnalyses(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
+    timeframe?: Timeframe,
 ): Promise<getSoilAnalysisType[]> {
     try {
         await checkPermission(
@@ -251,6 +257,39 @@ export async function getSoilAnalyses(
             principal_id,
             "getSoilAnalyses",
         )
+
+        let whereClause: SQL | undefined = undefined
+        if (timeframe?.start && timeframe.end) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                or(
+                    gte(schema.soilSampling.b_sampling_date, timeframe.start),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
+                or(
+                    lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
+            )
+        } else if (timeframe?.start) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                or(
+                    gte(schema.soilSampling.b_sampling_date, timeframe.start),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
+            )
+        } else if (timeframe?.end) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                or(
+                    lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
+            )
+        } else {
+            whereClause = eq(schema.soilSampling.b_id, b_id)
+        }
 
         const soilAnalyses = await fdm
             .select({
@@ -272,11 +311,194 @@ export async function getSoilAnalyses(
                 schema.soilSampling,
                 eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
             )
-            .where(eq(schema.soilSampling.b_id, b_id))
-            .orderBy(desc(schema.soilSampling.b_sampling_date))
+            .where(whereClause)
+            .orderBy(
+                // Drizzle does not support NULL LAST argument yet
+                sql`${schema.soilSampling.b_sampling_date} DESC NULLS LAST`,
+            )
 
         return soilAnalyses
     } catch (err) {
         throw handleError(err, "Exception for getSoilAnalyses", { b_id })
     }
+}
+
+/**
+ * Retrieves the last available value for each soil parameter for a specified field.
+ *
+ * This function queries the database to find the most recent value for each soil parameter
+ * (e.g., a_p_al, a_p_cc, a_som_loi, etc.) within the soil analysis records associated with a given field.
+ * It also returns the a_id, b_sampling_date, and a_source for each retrieved value.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal requesting the data.
+ * @param b_id - The identifier of the field.
+ * @param timeframe - Optional timeframe to filter the soil analyses. Only analyses after `timeframe.end` are excluded.
+ * @returns An object where each key is a soil parameter name and the value is an object containing the last available value,
+ *          the a_id of the analysis record it was retrieved from, the b_sampling_date, and the a_source.
+ *          Returns an empty object if no records are found.
+ *
+ * @throws {Error} If the principal lacks read permissions for the field or if the database query fails.
+ */
+export async function getCurrentSoilData(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id: schema.soilSamplingTypeSelect["b_id"],
+    timeframe?: Timeframe,
+): Promise<CurrentSoilData> {
+    try {
+        await checkPermission(
+            fdm,
+            "field",
+            "read",
+            b_id,
+            principal_id,
+            "getLastSoilParameters",
+        )
+
+        // Filter out "future" analyes
+        let whereClause: SQL | undefined = undefined
+        if (timeframe?.end) {
+            whereClause = and(
+                eq(schema.soilSampling.b_id, b_id),
+                or(
+                    lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
+            )
+        } else {
+            whereClause = eq(schema.soilSampling.b_id, b_id)
+        }
+
+        const soilAnalyses = await fdm
+            .select({
+                a_id: schema.soilAnalysis.a_id,
+                a_source: schema.soilAnalysis.a_source,
+                a_p_al: schema.soilAnalysis.a_p_al,
+                a_p_cc: schema.soilAnalysis.a_p_cc,
+                a_som_loi: schema.soilAnalysis.a_som_loi,
+                b_gwl_class: schema.soilAnalysis.b_gwl_class,
+                b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
+                b_sampling_date: schema.soilSampling.b_sampling_date,
+            })
+            .from(schema.soilAnalysis)
+            .innerJoin(
+                schema.soilSampling,
+                eq(schema.soilAnalysis.a_id, schema.soilSampling.a_id),
+            )
+            .where(whereClause)
+            .orderBy(
+                // Drizzle does not support NULL LAST argument yet
+                sql`${schema.soilSampling.b_sampling_date} DESC NULLS LAST`,
+            )
+
+        const parameters: SoilParameters[] = [
+            "a_p_al",
+            "a_p_cc",
+            "a_som_loi",
+            "b_gwl_class",
+            "b_soiltype_agr",
+        ]
+
+        const currentSoilData: CurrentSoilData = parameters
+            .map((parameter) => {
+                const analysis = soilAnalyses.find(
+                    (a) => a[parameter as keyof typeof a] !== null,
+                )
+                if (!analysis) return null
+
+                return {
+                    parameter,
+                    value: analysis[parameter as keyof typeof analysis],
+                    a_id: analysis.a_id,
+                    b_sampling_date: analysis.b_sampling_date,
+                    a_source: analysis.a_source,
+                }
+            })
+            .filter(Boolean) as CurrentSoilData
+
+        return currentSoilData
+    } catch (err) {
+        throw handleError(err, "Exception for getCurrentSoilData", { b_id })
+    }
+}
+
+/**
+ * Retrieves a description of the available soil parameters.
+ *
+ * This function returns an array of objects, each describing a soil parameter.
+ * Each description includes the parameter's name, unit, type (numeric or enum),
+ * a human-readable name, a detailed description, and optional constraints like
+ * minimum and maximum values or a list of valid options for enum types.
+ *
+ * @param locale - The locale for which to retrieve the descriptions. Currently only 'NL-nl' is supported.
+ * @returns An array of SoilParameterDescriptionItem objects.
+ * @throws {Error} If an unsupported locale is provided.
+ */
+export function getSoilParametersDescription(
+    locale = "NL-nl",
+): SoilParameterDescription {
+    if (locale !== "NL-nl") throw new Error("Unsupported locale")
+    const soilParameterDescription: SoilParameterDescription = [
+        {
+            parameter: "a_source",
+            unit: "",
+            name: "Bron",
+            type: "text",
+            description: "Laboratorium of bron van analyse",
+        },
+        {
+            parameter: "a_id",
+            unit: "",
+            name: "ID",
+            type: "text",
+            description: "Analyse ID",
+        },
+        {
+            parameter: "b_sampling_date",
+            unit: "",
+            name: "Datum",
+            type: "date",
+            description: "Datum van monstername",
+        },
+        {
+            parameter: "a_p_al",
+            unit: "mg P2O5/100 g",
+            name: "P-AL",
+            type: "numeric",
+            description: "Totaal fosfaatgehalte",
+        },
+        {
+            parameter: "a_p_cc",
+            unit: "mg P/kg",
+            name: "P-plantbeschikbaar",
+            type: "numeric",
+            description: "Fosfor, plantbeschikbaar",
+        },
+        {
+            parameter: "a_som_loi",
+            unit: "%",
+            name: "OS",
+            type: "numeric",
+            description: "Organische stof",
+        },
+        {
+            parameter: "b_gwl_class",
+            unit: "",
+            name: "GWT",
+            type: "enum",
+            description: "Grondwatertrap",
+            options: schema.gwlClasses,
+        },
+        {
+            parameter: "b_soiltype_agr",
+            unit: "",
+            name: "Bodemtype",
+            type: "enum",
+            description: "Agrarisch bodemtype",
+            options: schema.soilTypes,
+        },
+    ]
+
+    return soilParameterDescription
 }

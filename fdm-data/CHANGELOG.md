@@ -1,5 +1,17 @@
 # fdm-data
 
+## 0.12.0
+
+### Minor Changes
+
+- 7e66231: Add function `hashFertilizer` to create hash for fertilizer
+- 1218ab7: Add `hashCultivation` to get the hash of a cultivation item
+
+### Patch Changes
+
+- e9926cb: Rename `p_cl_cr` to `p_cl_rt` as the previous name was a typo
+- 175ea6a: Minify the code during rollup with terser
+
 ## 0.11.0
 
 ### Minor Changes

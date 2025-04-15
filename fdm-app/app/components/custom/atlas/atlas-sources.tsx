@@ -4,7 +4,7 @@ import throttle from "lodash.throttle"
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl"
 import { generateFeatureClass } from "./atlas-functions"
-import type { fieldsAvailableUrlType } from "./atlas.d"
+import type { FieldsAvailableUrlType } from "./atlas.d"
 
 export function FieldsSourceNotClickable({
     id,
@@ -37,7 +37,6 @@ export function FieldsSourceSelected({
 
     useEffect(() => {
         function clickOnMap(evt) {
-            console.log("jh")
             if (!map) return
 
             const features = map.queryRenderedFeatures(evt.point, {
@@ -108,7 +107,7 @@ export function FieldsSourceAvailable({
     children,
 }: {
     id: string
-    url: fieldsAvailableUrlType
+    url: FieldsAvailableUrlType
     zoomLevelFields: number
     children: JSX.Element
 }) {
@@ -128,10 +127,10 @@ export function FieldsSourceAvailable({
                     if (bounds) {
                         const [[minX, minY], [maxX, maxY]] = bounds.toArray()
                         const bbox = {
-                            minX: 0.9999 * minX,
-                            maxX: 1.0001 * maxX,
-                            minY: 0.9999 * minY,
-                            maxY: 1.0001 * maxY,
+                            minX: 0.9995 * minX,
+                            maxX: 1.0005 * maxX,
+                            minY: 0.9995 * minY,
+                            maxY: 1.0005 * maxY,
                         }
                         try {
                             const iter = deserialize(url, bbox)

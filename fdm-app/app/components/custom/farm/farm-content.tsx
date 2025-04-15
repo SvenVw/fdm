@@ -1,9 +1,9 @@
+import type { ReactNode } from "react"
+import { Outlet } from "react-router"
 import {
     SidebarPage,
     type SidebarPageProps,
-} from "@/components/custom/sidebar-page"
-import type { ReactNode } from "react"
-import { Outlet } from "react-router"
+} from "~/components/custom/sidebar-page"
 
 interface FarmContentProps {
     sidebarItems?: SidebarPageProps["items"]
@@ -20,7 +20,7 @@ export function FarmContent({ sidebarItems, children }: FarmContentProps) {
                     </aside>
                 )}
 
-                <div className="flex-2">{children || <Outlet />}</div>
+                <div className="flex-1">{children || <Outlet />}</div>
             </div>
         </div>
     )

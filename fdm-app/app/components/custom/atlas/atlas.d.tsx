@@ -7,7 +7,7 @@ export interface MapFieldsProps {
     mapboxToken: string
     mapStyle: "mapbox://styles/mapbox/satellite-streets-v12"
     fieldsSelected: FeatureCollection | null
-    fieldsAvailableUrl: fieldsAvailableUrlType
+    fieldsAvailableUrl: FieldsAvailableUrlType
     fieldsSaved: FeatureCollection | null
 }
 

@@ -1,4 +1,34 @@
-hello:
-  label: Hello
-  permalink: /hello
-  description: Hello tag description
+release:
+  label: Release Notes
+  description: Updates and announcements about new FDM releases.
+  permalink: /release
+
+fdm-core:
+  label: fdm-core
+  description: Posts related to the core FDM library (@svenvw/fdm-core).
+  permalink: /fdm-core
+
+fdm-data:
+  label: fdm-data
+  description: Posts related to the FDM data handling library (@svenvw/fdm-data).
+  permalink: /fdm-data
+
+fdm-calculator:
+  label: fdm-calculator
+  description: Posts related to the FDM calculation engine (@svenvw/fdm-calculator).
+  permalink: /fdm-calculator
+
+fdm-docs:
+  label: fdm-docs
+  description: Posts related to the FDM documentation website (@svenvw/fdm-docs).
+  permalink: /fdm-docs
+
+update:
+  label: Update
+  description: General updates and improvements to the FDM ecosystem.
+  permalink: /update
+
+features:
+  label: Features
+  description: Posts highlighting new features added to FDM.
+  permalink: /features

@@ -1,8 +1,6 @@
 import type { CatalogueCultivation, CatalogueCultivationItem } from "../d"
+import { hashCultivation } from "../hash"
 import brp from "./brp.json"
-import xxhash from "xxhash-wasm"
-
-const { h32ToString } = await xxhash()
 
 /**
  * Retrieves the BRP (Basisregistratie Perceel) cultivation catalogue.
@@ -14,8 +12,8 @@ const { h32ToString } = await xxhash()
  * @returns An array of cultivation catalogue entries conforming to the `CatalogueCultivation` type.
  * @throws {Error} Throws an error if an invalid value is found for `b_lu_harvestable` in the JSON data.
  */
-export function getCatalogueBrp(): CatalogueCultivation {
-    const catalogueBrp = brp.map((cultivation) => {
+export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
+    const catalogueBrpPromises = brp.map(async (cultivation) => {
         // Validate b_lu_harvestable
         const harvestable =
             cultivation.b_lu_harvestable !== "once" &&
@@ -40,10 +38,11 @@ export function getCatalogueBrp(): CatalogueCultivation {
         }
 
         // Hash the item
-        item.hash = h32ToString(JSON.stringify(item))
+        item.hash = await hashCultivation(item)
 
         return item
     })
 
+    const catalogueBrp = await Promise.all(catalogueBrpPromises)
     return catalogueBrp
 }

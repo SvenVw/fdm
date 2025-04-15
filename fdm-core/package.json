@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.17.0",
+    "version": "0.18.0",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -27,15 +27,13 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
-        "build": "rollup -c",
+        "build": "dotenvx run -- rollup -c",
         "check-types": "tsc --noEmit",
         "preinstall": "npx only-allow pnpm",
         "preview": "vite preview",
@@ -46,15 +44,16 @@
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.0",
+        "@rollup/plugin-node-resolve": "^16.0.1",
+        "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
-        "@svenvw/fdm-data": "workspace:^0.11.0",
-        "@types/node": "^22.13.9",
+        "@svenvw/fdm-data": "workspace:^0.12.0",
+        "@types/node": "^22.13.16",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.0",
         "globals": "^16.0.0",
-        "rollup": "^4.34.9",
+        "rollup": "^4.38.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typedoc": "^0.26.11",
         "typedoc-plugin-missing-exports": "^3.1.0",
@@ -67,10 +66,10 @@
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
-        "nanoid": "^5.1.2",
+        "nanoid": "^5.1.5",
         "postgres": "^3.4.5"
     },
-    "packageManager": "pnpm@10.4.1",
+    "packageManager": "pnpm@10.7.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }

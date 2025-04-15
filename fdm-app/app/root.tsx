@@ -1,7 +1,6 @@
 import * as Sentry from "@sentry/react"
-
-import { Toaster } from "@/components/ui/sonner"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
+import posthog from "posthog-js"
 import { useEffect } from "react"
 import {
     Links,
@@ -18,9 +17,12 @@ import {
 import type { LinksFunction, LoaderFunctionArgs } from "react-router"
 import { getToast } from "remix-toast"
 import { toast as notify } from "sonner"
+import { Banner } from "~/components/custom/banner"
+import { ErrorBlock } from "~/components/custom/error"
+import { Toaster } from "~/components/ui/sonner"
+import { clientConfig } from "~/lib/config" // Import clientConfig
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
-import { ErrorBlock } from "./components/custom/error"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
@@ -61,6 +63,14 @@ export function Layout() {
     const toast = loaderData?.toast
     const location = useLocation()
 
+    // Capture pageviews if PostHog is configured
+    // biome-ignore lint/correctness/useExhaustiveDependencies: This is a false positive: the useEffect should run whenever the location changes to capture new pageviews correctly
+    useEffect(() => {
+        if (clientConfig.analytics.posthog && typeof window !== "undefined") {
+            posthog.capture("$pageview")
+        }
+    }, [location])
+
     // Hook to show the toasts
     useEffect(() => {
         if (toast && toast.type === "error") {
@@ -78,7 +88,7 @@ export function Layout() {
     }, [toast])
 
     return (
-        <html lang="en">
+        <html lang="nl">
             <head>
                 <meta charSet="utf-8" />
                 <meta
@@ -90,6 +100,7 @@ export function Layout() {
             </head>
             <body>
                 <Outlet />
+                <Banner />
                 <Toaster />
                 <ErrorBoundary error={null} params={{}} />
                 <ScrollRestoration

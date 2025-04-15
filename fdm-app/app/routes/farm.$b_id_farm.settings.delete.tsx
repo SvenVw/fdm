@@ -1,4 +1,19 @@
-import { Separator } from "@/components/ui/separator"
+import type { MetaFunction } from "react-router"
+import { Separator } from "~/components/ui/separator"
+import { clientConfig } from "~/lib/config"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        {
+            title: `Verwijderen - Instellingen - Bedrijf | ${clientConfig.name}`,
+        },
+        {
+            name: "description",
+            content: "Verwijder de gegevens van je bedrijf.",
+        },
+    ]
+}
 
 export default function FarmSettingsDeleteBlock() {
     return (

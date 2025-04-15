@@ -1,20 +1,3 @@
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns/format"
 import { nl } from "date-fns/locale/nl"
@@ -22,6 +5,23 @@ import { CalendarIcon } from "lucide-react"
 import { Form } from "react-hook-form"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { Button } from "~/components/ui/button"
+import { Calendar } from "~/components/ui/calendar"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "~/components/ui/popover"
+import { cn } from "~/lib/utils"
 import { LoadingSpinner } from "../loadingspinner"
 import { FormSchema } from "./schema"
 
@@ -79,14 +79,14 @@ export function HarvestForm({
                                         <FormLabel>Opbrengst</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="Bv. 37 ton ds / ha"
+                                                placeholder="Bv. 37500 kg ds / ha"
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            In ton droge stof per hectare
+                                            In kg droge stof per hectare
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

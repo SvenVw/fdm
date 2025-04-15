@@ -1,5 +1,6 @@
 // rollup.config.js
 import resolve from "@rollup/plugin-node-resolve"
+import terser from "@rollup/plugin-terser"
 import typescript from "@rollup/plugin-typescript"
 import { defineConfig } from "rollup"
 
@@ -11,6 +12,18 @@ export default defineConfig({
             format: "esm",
         },
     ],
-    plugins: [resolve(), typescript()],
+    plugins: [
+        resolve(),
+        typescript(),
+        terser({
+            sourceMap:
+                process.env.NODE_ENV === "production"
+                    ? {
+                          fileName: "dist/fdm-calculator.esm.js.map",
+                          url: "fdm-calculator.esm.js.map",
+                      }
+                    : false,
+        }), // Minifies the output
+    ],
     external: ["@svenvw/fdm-core"],
 })

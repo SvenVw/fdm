@@ -1,13 +1,13 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type { Dose } from "@svenvw/fdm-calculator"
+import { Lightbulb, Scale } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-import type { Dose } from "@svenvw/fdm-calculator"
-import { Lightbulb, Scale } from "lucide-react"
+} from "~/components/ui/tooltip"
+import { cn } from "~/lib/utils"
 import type { FertilizerApplicationsCardProps } from "./types.d"
 
 function FertilizerApplicationsCard({
@@ -36,7 +36,7 @@ function FertilizerApplicationsCard({
                                         !limit ? "invisible" : "",
                                     )}
                                 >
-                                    <Scale />
+                                    <Scale className="h-8 w-4" />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${limit}`}</span>
                                     </p>
@@ -56,7 +56,7 @@ function FertilizerApplicationsCard({
                                         !advice ? "invisible" : "",
                                     )}
                                 >
-                                    <Lightbulb />
+                                    <Lightbulb className="h-4 w-4" />
                                     <p className="flex text-xs text-muted-foreground">
                                         <span>{`${advice}`}</span>
                                     </p>
@@ -101,7 +101,7 @@ function constructCards(dose: Dose) {
             shortname: "Ntot",
             value: dose.p_dose_n,
             unit: "kg/ha",
-            limit: undefined,
+            limit: 10,
             advice: undefined,
         },
         {

@@ -25,6 +25,7 @@ export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
 export {
     addFertilizerToCatalogue,
+    updateFertilizerFromCatalogue,
     getFertilizersFromCatalogue,
     addFertilizer,
     removeFertilizer,
@@ -56,7 +57,14 @@ export {
     removeSoilAnalysis,
     getSoilAnalysis,
     getSoilAnalyses,
+    getCurrentSoilData,
+    getSoilParametersDescription,
 } from "./soil"
+export type {
+    CurrentSoilData,
+    SoilParameters,
+    SoilParameterDescription,
+} from "./soil.d"
 export {
     addHarvest,
     getHarvest,
@@ -74,4 +82,5 @@ export {
     isCultivationCatalogueEnabled,
     syncCatalogues,
 } from "./catalogues"
+export type { Timeframe } from "./timeframe.d"
 export { runMigration } from "./migrate"

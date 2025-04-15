@@ -1,23 +1,39 @@
-import { getSession } from "@/lib/auth.server"
-import { handleLoaderError } from "@/lib/error"
-import { type LoaderFunctionArgs, useLoaderData } from "react-router"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    useLoaderData,
+} from "react-router"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+} from "~/components/ui/breadcrumb"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from "@/components/ui/breadcrumb"
-import { FarmTitle } from "@/components/custom/farm/farm-title"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarTrigger } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+
+// Meta
+export const meta: MetaFunction = () => {
+    return [
+        { title: `Account | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Bekijk en bewerk de gegevens van je account.",
+        },
+    ]
+}
 
 /**
  * Retrieves the user session data.
@@ -36,7 +52,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             user: session.user,
-            initials: session.initials
+            initials: session.initials,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -101,10 +117,16 @@ export default function Account() {
                         <Separator />
                         <div className="space-y-2">
                             <p className="text-sm font-medium">
-                                Voornaam: <span className="font-normal text-muted-foreground">{user.firstname}</span>
+                                Voornaam:{" "}
+                                <span className="font-normal text-muted-foreground">
+                                    {user.firstname}
+                                </span>
                             </p>
                             <p className="text-sm font-medium">
-                                Achternaam: <span className="font-normal text-muted-foreground">{user.surname}</span>
+                                Achternaam:{" "}
+                                <span className="font-normal text-muted-foreground">
+                                    {user.surname}
+                                </span>
                             </p>
                         </div>
                     </CardContent>

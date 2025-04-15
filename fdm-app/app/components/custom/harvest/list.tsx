@@ -1,15 +1,15 @@
-import { Button } from "@/components/ui/button"
 import { format } from "date-fns/format"
 import { Eye, Trash2 } from "lucide-react"
 import { NavLink, useFetcher } from "react-router"
+import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
-import type { HarverstableType, Harvest } from "./types"
+import type { Harvest, HarvestableType } from "./types"
 
 export function HarvestsList({
     harvests,
     b_lu_harvestable,
     state,
-}: { harvests: Harvest[]; b_lu_harvestable: HarverstableType; state: string }) {
+}: { harvests: Harvest[]; b_lu_harvestable: HarvestableType; state: string }) {
     const fetcher = useFetcher()
 
     const handleDelete = (b_id_harvesting: string | string[]) => {
@@ -48,7 +48,7 @@ export function HarvestsList({
                                     </div>
                                     <div className="col-span-2">
                                         <p className="text-sm font-light leading-none">
-                                            {`${harvest.harvestables[0].harvestable_analyses[0].b_lu_yield} ton DS/ha`}
+                                            {`${harvest.harvestables[0].harvestable_analyses[0].b_lu_yield} kg DS/ha`}
                                         </p>
                                         {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
                                     </div>

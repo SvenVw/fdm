@@ -1,5 +1,37 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import * as Sentry from "@sentry/react"
+import {
+    ArrowRightLeft,
+    BadgeCheck,
+    Calendar,
+    Check,
+    ChevronRight,
+    ChevronsUpDown,
+    Cookie,
+    GitPullRequestArrow,
+    House,
+    Languages,
+    LifeBuoy,
+    LogOut,
+    Map as MapIcon,
+    Scale,
+    Send,
+    Settings,
+    Shapes,
+    Sparkles,
+    Square,
+} from "lucide-react"
+import posthog from "posthog-js"
+import { useEffect, useState } from "react"
+import { Form, NavLink, useLocation } from "react-router"
+import { toast } from "sonner"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Badge } from "~/components/ui/badge"
+import { Button } from "~/components/ui/button"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -8,7 +40,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "~/components/ui/dropdown-menu"
 import {
     Sidebar,
     SidebarContent,
@@ -21,42 +53,27 @@ import {
     SidebarMenuBadge,
     SidebarMenuButton,
     SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import * as Sentry from "@sentry/react"
-import {
-    ArrowRightLeft,
-    BadgeCheck,
-    ChevronsUpDown,
-    GitPullRequestArrow,
-    House,
-    Languages,
-    LifeBuoy,
-    LogOut,
-    Map as MapIcon,
-    Scale,
-    Send,
-    Settings,
-    Sparkles,
-    Sprout,
-    Square,
-} from "lucide-react"
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from "~/components/ui/sidebar"
+import { useIsMobile } from "~/hooks/use-mobile"
+import { getCalendarSelection } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { useCalendarStore } from "~/store/calendar"
+import { useFarmStore } from "~/store/farm"
 
-import { Button } from "@/components/ui/button"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { useEffect, useState } from "react"
-import { Form, NavLink } from "react-router"
-import { toast } from "sonner"
-import { useFarm } from "@/context/farm-context"
+interface SideBarAppUserType {
+    id: string
+    name: string // Full name from session.user
+    email: string
+    image?: string | null | undefined
+    // Other properties from session.user might exist but are not needed here
+}
 
 interface SideBarAppType {
-    user: {
-        firstname: string
-        surname: string
-        name: string
-        email: string
-        image: string | undefined
-    }
-    userName: string
+    user: SideBarAppUserType
+    userName: string // Display name, potentially different from user.name
     initials: string
 }
 
@@ -72,11 +89,24 @@ export function SidebarApp(props: SideBarAppType) {
     const userName = props.userName
     const avatarInitials = props.initials
     const isMobile = useIsMobile()
-    const { farmId } = useFarm()
+    const farmId = useFarmStore((state) => state.farmId)
 
+    const selectedCalendar = useCalendarStore((state) => state.calendar)
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+    const calendarSelection = getCalendarSelection()
+
+    // Check if page contains `farm/create` in url
+    const location = useLocation()
+    const isCreateFarmWizard = location.pathname.includes("farm/create")
+
+    // Set the farm link
     let farmLink: string
     let farmLinkDisplay: string
-    if (farmId) {
+    if (isCreateFarmWizard) {
+        farmLink = "/farm"
+        farmLinkDisplay = "Terug naar bedrijven"
+    } else if (farmId) {
         farmLink = `/farm/${farmId}`
         farmLinkDisplay = "Bedrijf"
     } else {
@@ -85,37 +115,62 @@ export function SidebarApp(props: SideBarAppType) {
     }
 
     let fieldsLink: string | undefined
-    if (farmId) {
-        fieldsLink = `/farm/${farmId}/field`
+    if (isCreateFarmWizard) {
+        fieldsLink = undefined
+    } else if (farmId) {
+        fieldsLink = `/farm/${farmId}/${selectedCalendar}/field`
     } else {
         fieldsLink = undefined
     }
 
     let atlasLink: string | undefined
-    if (farmId) {
-        atlasLink = `/farm/${farmId}/atlas`
+    if (isCreateFarmWizard) {
+        atlasLink = undefined
+    } else if (farmId) {
+        atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
     } else {
         atlasLink = undefined
+    }
+    let fertilizersLink: string | undefined
+    if (farmId) {
+        fertilizersLink = `/farm/${farmId}/fertilizers`
+    } else {
+        fertilizersLink = undefined
     }
 
     const nutrienBalanceLink = undefined
     const omBalanceLink = undefined
     const baatLink = undefined
 
-    try {
-        Sentry.setUser({
-            fullName: user.name,
-            email: user.email,
-        })
-    } catch (error) {
-        Sentry.captureException(error)
+    if (clientConfig.analytics.sentry) {
+        try {
+            Sentry.setUser({
+                fullName: user.name,
+                email: user.email,
+            })
+        } catch (error) {
+            Sentry.captureException(error)
+        }
     }
-    const [feedback, setFeedback] = useState<Sentry.Feedback | undefined>()
+
+    const [feedback, setFeedback] = useState<ReturnType<
+        typeof Sentry.getFeedback
+    > | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
-        setFeedback(Sentry.getFeedback())
-        setIsLoading(false)
+        try {
+            const feedbackInstance = Sentry.getFeedback()
+            if (feedbackInstance) {
+                setFeedback(feedbackInstance)
+            } else {
+                console.warn("Sentry.getFeedback() returned null or undefined.")
+            }
+        } catch (error) {
+            console.error("Failed to initialize Sentry feedback:", error)
+        } finally {
+            setIsLoading(false)
+        }
     }, [])
 
     if (isLoading) {
@@ -123,6 +178,15 @@ export function SidebarApp(props: SideBarAppType) {
     }
 
     const openFeedbackForm = async () => {
+        if (!feedback || typeof feedback.createForm !== "function") {
+            console.error(
+                "Feedback object not available or missing createForm method.",
+            )
+            toast.error(
+                "Feedback formulier is nog niet beschikbaar. Probeer het opnieuw.",
+            )
+            return
+        }
         try {
             const form = await feedback.createForm()
             form.appendToDom()
@@ -132,6 +196,12 @@ export function SidebarApp(props: SideBarAppType) {
             toast.error(
                 "Er is een fout opgetreden bij het openen van het feedbackformulier. Probeer het later opnieuw.",
             )
+        }
+    }
+
+    const openCookieSettings = () => {
+        if (typeof window !== "undefined" && window.openCookieSettings) {
+            window.openCookieSettings()
         }
     }
 
@@ -147,12 +217,17 @@ export function SidebarApp(props: SideBarAppType) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <NavLink to="/">
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Sprout className="size-4" />
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-[#122023]">
+                                    <img
+                                        className="size-6"
+                                        src="/fdm-high-resolution-logo-transparent-no-text.png"
+                                        alt={clientConfig.name}
+                                    />
                                 </div>
                                 <div className="flex flex-col gap-0.5 leading-none">
-                                    <span className="font-semibold">FDM</span>
-                                    {/* <span className="">2024</span> */}
+                                    <span className="font-semibold">
+                                        {clientConfig.name}
+                                    </span>
                                 </div>
                             </NavLink>
                         </SidebarMenuButton>
@@ -161,7 +236,7 @@ export function SidebarApp(props: SideBarAppType) {
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Mijn bedrijf</SidebarGroupLabel>
+                    <SidebarGroupLabel>Bedrijf</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             <SidebarMenuItem>
@@ -172,6 +247,98 @@ export function SidebarApp(props: SideBarAppType) {
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
+                            {/* Conditionally render the Kalender item */}
+                            {farmId && !isCreateFarmWizard ? (
+                                <Collapsible
+                                    asChild
+                                    defaultOpen={false}
+                                    className="group/collapsible"
+                                    onOpenChange={setIsCalendarOpen}
+                                >
+                                    <SidebarMenuItem>
+                                        <CollapsibleTrigger asChild>
+                                            <SidebarMenuButton
+                                                tooltip={"Kalender"}
+                                                className="flex items-center"
+                                            >
+                                                <Calendar />
+                                                <span>Kalender </span>
+                                                {!isCalendarOpen && (
+                                                    <Badge className="ml-1">
+                                                        {selectedCalendar ===
+                                                        "all"
+                                                            ? "Alle jaren"
+                                                            : selectedCalendar}
+                                                    </Badge>
+                                                )}
+                                                <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                            </SidebarMenuButton>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent>
+                                            <SidebarMenuSub>
+                                                {calendarSelection?.map(
+                                                    (item) => {
+                                                        // Construct the new URL with the selected calendar
+                                                        const newUrl =
+                                                            location.pathname.replace(
+                                                                /\/(\d{4}|all)/,
+                                                                `/${item}`,
+                                                            )
+                                                        return (
+                                                            <SidebarMenuSubItem
+                                                                key={item}
+                                                                className={
+                                                                    selectedCalendar ===
+                                                                    item
+                                                                        ? "bg-accent text-accent-foreground"
+                                                                        : ""
+                                                                }
+                                                            >
+                                                                <SidebarMenuSubButton
+                                                                    asChild
+                                                                    onClick={() =>
+                                                                        setCalendar(
+                                                                            item,
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <NavLink
+                                                                        to={
+                                                                            newUrl
+                                                                        }
+                                                                        className="flex items-center"
+                                                                    >
+                                                                        <span>
+                                                                            {item ===
+                                                                            "all"
+                                                                                ? "Alle jaren"
+                                                                                : item}
+                                                                        </span>
+                                                                        {selectedCalendar ===
+                                                                            item && (
+                                                                            <Check className="ml-auto h-4 w-4" />
+                                                                        )}
+                                                                    </NavLink>
+                                                                </SidebarMenuSubButton>
+                                                            </SidebarMenuSubItem>
+                                                        )
+                                                    },
+                                                )}
+                                            </SidebarMenuSub>
+                                        </CollapsibleContent>
+                                    </SidebarMenuItem>
+                                </Collapsible>
+                            ) : (
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton
+                                        tooltip={"Kalender"}
+                                        className="cursor-default text-muted-foreground"
+                                    >
+                                        <Calendar />
+                                        <span>Kalender</span>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            )}
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     {atlasLink ? (
@@ -210,14 +377,21 @@ export function SidebarApp(props: SideBarAppType) {
                                     </NavLink>
                                 </SidebarMenuButton>
                             </SidebarMenuItem> */}
-                            {/* <SidebarMenuItem>
+                            <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <NavLink to="./fertilizers">
-                                        <Shapes />
-                                        <span>Meststoffen</span>
-                                    </NavLink>
+                                    {fertilizersLink ? (
+                                        <NavLink to={fertilizersLink}>
+                                            <Shapes />
+                                            <span>Meststoffen</span>
+                                        </NavLink>
+                                    ) : (
+                                        <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                            <Shapes />
+                                            <span>Meststoffen</span>
+                                        </span>
+                                    )}
                                 </SidebarMenuButton>
-                            </SidebarMenuItem> */}
+                            </SidebarMenuItem>
                             {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
                                     <NavLink to="./stable">
@@ -302,18 +476,20 @@ export function SidebarApp(props: SideBarAppType) {
                                     <span>Ondersteuning</span>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
-                            <SidebarMenuItem key="feedback">
-                                <SidebarMenuButton
-                                    asChild
-                                    size="sm"
-                                    onClick={openFeedbackForm}
-                                >
-                                    <NavLink to="#">
-                                        <Send />
-                                        <span>Feedback</span>
-                                    </NavLink>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
+                            {clientConfig.analytics.sentry ? (
+                                <SidebarMenuItem key="feedback">
+                                    <SidebarMenuButton
+                                        asChild
+                                        size="sm"
+                                        onClick={openFeedbackForm}
+                                    >
+                                        <NavLink to="#">
+                                            <Send />
+                                            <span>Feedback</span>
+                                        </NavLink>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ) : null}
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -329,7 +505,7 @@ export function SidebarApp(props: SideBarAppType) {
                                 >
                                     <Avatar className="h-8 w-8 rounded-lg">
                                         <AvatarImage
-                                            src={user.image}
+                                            src={user.image ?? undefined}
                                             alt={user.name}
                                         />
                                         <AvatarFallback className="rounded-lg">
@@ -338,7 +514,7 @@ export function SidebarApp(props: SideBarAppType) {
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">
-                                            {`${user.firstname} ${user.surname}`}
+                                            {userName}
                                         </span>
                                         <span className="truncate text-xs">
                                             {user.email}
@@ -356,7 +532,6 @@ export function SidebarApp(props: SideBarAppType) {
                                 <DropdownMenuLabel className="p-0 font-normal">
                                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                         <Avatar className="h-8 w-8 rounded-lg">
-                                            {/* <AvatarImage src={avatarInitials} alt={user.name} /> */}
                                             <AvatarFallback className="rounded-lg">
                                                 {avatarInitials}
                                             </AvatarFallback>
@@ -378,6 +553,12 @@ export function SidebarApp(props: SideBarAppType) {
                                             <BadgeCheck className="mr-2 h-4 w-4" />
                                             Account
                                         </NavLink>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={openCookieSettings}
+                                    >
+                                        <Cookie className="mr-2 h-4 w-4" />
+                                        Cookies
                                     </DropdownMenuItem>
                                     <DropdownMenuItem asChild>
                                         {/* <NavLink to="#">
@@ -410,10 +591,21 @@ export function SidebarApp(props: SideBarAppType) {
                                     </DropdownMenuItem>
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <LogOut />
+                                <DropdownMenuItem asChild>
                                     <Form method="post" action="../farm">
-                                        <Button type="submit" variant="link">
+                                        <Button
+                                            type="submit"
+                                            variant="link"
+                                            onClick={() => {
+                                                if (
+                                                    clientConfig.analytics
+                                                        .posthog
+                                                ) {
+                                                    posthog.reset()
+                                                }
+                                            }}
+                                        >
+                                            <LogOut />
                                             Uitloggen
                                         </Button>
                                     </Form>

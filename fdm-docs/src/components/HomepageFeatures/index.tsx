@@ -10,25 +10,34 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
     {
-        title: "Flexible & Complete",
-        Svg: require("lucide-react/dist/cjs/lucide-react").Check,
-        description: <>Designed to store data of all kinds of farms</>,
-    },
-    {
-        title: "Local & Server",
-        Svg: require("lucide-react/dist/cjs/lucide-react").MonitorCheck,
+        title: "Standardized Schema",
+        Svg: require("lucide-react/dist/cjs/lucide-react").Database,
         description: (
             <>
-                Thanks to PGLite FDM is available to be run locally in the
-                browser. Of course using a PostgreSQL server is also possible.
+                Based on the Asset-Action model, providing a consistent
+                structure for diverse agricultural data.
             </>
         ),
     },
     {
-        title: "Open Source",
-        Svg: require("lucide-react/dist/cjs/lucide-react").Rocket,
+        title: "Modular Packages",
+        Svg: require("lucide-react/dist/cjs/lucide-react").Puzzle,
         description: (
-            <>FDM is available Open Source. Contribute to the project!</>
+            <>
+                Use <code>fdm-core</code> for core interactions,{" "}
+                <code>fdm-data</code> for catalogues, and{" "}
+                <code>fdm-calculator</code> for analysis – pick what you need.
+            </>
+        ),
+    },
+    {
+        title: "Open & Extensible",
+        Svg: require("lucide-react/dist/cjs/lucide-react").GitMerge,
+        description: (
+            <>
+                Open-source library built with TypeScript. Contribute new
+                features, data sources, or calculations.
+            </>
         ),
     },
 ]
@@ -52,8 +61,8 @@ export default function HomepageFeatures(): JSX.Element {
         <section className={styles.features}>
             <div className="container">
                 <div className="row">
-                    {FeatureList.map((props, idx) => (
-                        <Feature key={idx} {...props} />
+                    {FeatureList.map((props) => (
+                        <Feature key={props.title} {...props} />
                     ))}
                 </div>
             </div>
