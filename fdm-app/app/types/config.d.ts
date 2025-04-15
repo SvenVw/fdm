@@ -64,4 +64,9 @@ export interface ClientConfig {
             host: string
         } | null
     }
+    integrations: {
+        mapbox: {
+            token: string
+        }
+    }
 }

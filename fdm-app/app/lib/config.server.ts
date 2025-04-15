@@ -31,7 +31,7 @@ export const serverConfig: ServerConfig = {
     // Integrations
     integrations: {
         mapbox: {
-            token: String(process.env.MAPBOX_TOKEN),
+            token: String(process.env.VITE_MAPBOX_TOKEN),
         },
         nmi: {
             api_key: String(process.env.NMI_API_KEY),
