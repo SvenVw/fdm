@@ -10,9 +10,11 @@ export const serverConfig: ServerConfig = {
         fdm_session_secret: String(process.env.FDM_SESSION_SECRET),
         better_auth_secret: String(process.env.BETTER_AUTH_SECRET),
         google: {
+            clientId: String(process.env.GOOGLE_CLIENT_ID),
             clientSecret: String(process.env.GOOGLE_CLIENT_SECRET),
         },
         microsoft: {
+            clientId: String(process.env.MS_CLIENT_ID),
             clientSecret: String(process.env.MS_CLIENT_SECRET),
         },
     },
@@ -29,7 +31,7 @@ export const serverConfig: ServerConfig = {
     // Integrations
     integrations: {
         mapbox: {
-            token: String(process.env.MAPBOX_TOKEN),
+            token: String(process.env.VITE_MAPBOX_TOKEN),
         },
         nmi: {
             api_key: String(process.env.NMI_API_KEY),

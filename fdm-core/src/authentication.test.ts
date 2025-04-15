@@ -6,13 +6,19 @@ import { createFdmServer } from "./fdm-server"
 describe("createFdmAuth", () => {
     let fdm: FdmType
     let fdmAuth: BetterAuth
+    let googleAuth: { clientSecret: string; clientId: string }
+    let microsoftAuth: { clientSecret: string; clientId: string }
 
     beforeEach(() => {
         // Mock environment variables
-        process.env.GOOGLE_CLIENT_ID = "mock_google_client_id"
-        process.env.GOOGLE_CLIENT_SECRET = "mock_google_client_secret"
-        process.env.MS_CLIENT_ID = "mock_ms_client_id"
-        process.env.MS_CLIENT_SECRET = "mock_ms_client_secret"
+        googleAuth = {
+            clientId: "mock_google_client_id",
+            clientSecret: "mock_google_client_secret",
+        }
+        microsoftAuth = {
+            clientId: "mock_ms_client_id",
+            clientSecret: "mock_ms_client_secret",
+        }
 
         // Create a mock FdmServer instance
         const host = inject("host")
@@ -25,7 +31,7 @@ describe("createFdmAuth", () => {
 
     it("should create an auth instance with the correct database adapter", () => {
         // Create the auth server using the mock FdmServer instance
-        fdmAuth = createFdmAuth(fdm)
+        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth)
         expect(fdmAuth).toBeDefined()
 
         // Verify auth providers are correctly configured

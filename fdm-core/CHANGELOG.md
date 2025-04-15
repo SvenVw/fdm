@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.19.0
+
+### Minor Changes
+
+- eed1780: Provide the auth settings as input argument instead of environmental variables
+
 ## 0.18.0
 
 ### Minor Changes

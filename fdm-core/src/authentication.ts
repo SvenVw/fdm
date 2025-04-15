@@ -19,12 +19,58 @@ export type BetterAuth = ReturnType<typeof betterAuth>
  *
  * @throws {Error} If required environment variables are missing or if role assignment fails.
  */
-export function createFdmAuth(fdm: FdmType): BetterAuth {
-    // Validate all required environment variables upfront
-    const googleClientId = getRequiredEnvVar("GOOGLE_CLIENT_ID")
-    const googleClientSecret = getRequiredEnvVar("GOOGLE_CLIENT_SECRET")
-    const msClientId = getRequiredEnvVar("MS_CLIENT_ID")
-    const msClientSecret = getRequiredEnvVar("MS_CLIENT_SECRET")
+export function createFdmAuth(
+    fdm: FdmType,
+    google?: { clientSecret: string; clientId: string },
+    microsoft?: { clientSecret: string; clientId: string },
+): BetterAuth {
+    // Setup social auth providers
+    let googleAuth = undefined
+    if (google) {
+        googleAuth = {
+            clientId: google?.clientId,
+            clientSecret: google?.clientSecret,
+            mapProfileToUser: (profile: {
+                name: string
+                email: string
+                picture: string
+                given_name: string
+                family_name: string
+            }) => {
+                return {
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                    firstname: profile.given_name,
+                    surname: profile.family_name,
+                }
+            },
+        }
+    }
+
+    let microsoftAuth = undefined
+    if (microsoft) {
+        microsoftAuth = {
+            clientId: microsoft.clientId,
+            clientSecret: microsoft.clientSecret,
+            tenantId: "common",
+            requireSelectAccount: true,
+            mapProfileToUser: (profile: {
+                name: string | undefined
+                email: string
+                picture: string
+            }) => {
+                const { firstname, surname } = splitFullName(profile.name)
+                return {
+                    name: profile.name,
+                    email: profile.email,
+                    image: profile.picture,
+                    firstname: firstname,
+                    surname: surname,
+                }
+            },
+        }
+    }
 
     const auth: BetterAuth = betterAuth({
         database: drizzleAdapter(fdm, {
@@ -60,35 +106,8 @@ export function createFdmAuth(fdm: FdmType): BetterAuth {
             updateAge: 60 * 60 * 24, // 1 day (every 1 day the session expiration is updated)
         },
         socialProviders: {
-            google: {
-                clientId: googleClientId,
-                clientSecret: googleClientSecret,
-                mapProfileToUser: (profile) => {
-                    return {
-                        name: profile.name,
-                        email: profile.email,
-                        image: profile.picture,
-                        firstname: profile.given_name,
-                        surname: profile.family_name,
-                    }
-                },
-            },
-            microsoft: {
-                clientId: msClientId,
-                clientSecret: msClientSecret,
-                tenantId: "common",
-                requireSelectAccount: true,
-                mapProfileToUser: (profile) => {
-                    const { firstname, surname } = splitFullName(profile.name)
-                    return {
-                        name: profile.name,
-                        email: profile.email,
-                        image: profile.picture,
-                        firstname: firstname,
-                        surname: surname,
-                    }
-                },
-            },
+            google: googleAuth,
+            microsoft: microsoftAuth,
         },
         rateLimit: {
             storage: "database",
@@ -132,19 +151,4 @@ export function splitFullName(fullName: string | undefined): {
     const firstname = names[0]
     const surname = names.slice(-1)[0] // Get the last name
     return { firstname, surname }
-}
-
-/**
- * Retrieves the value of an environment variable.
- *
- * @param name - The name of the environment variable to retrieve.
- * @returns The value of the environment variable.
- * @throws {Error} If the environment variable is not set.
- */
-function getRequiredEnvVar(name: string): string {
-    const value = process.env[name]
-    if (!value) {
-        throw new Error(`Required environment variable ${name} is not set`)
-    }
-    return value
 }
