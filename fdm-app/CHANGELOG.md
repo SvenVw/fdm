@@ -1,5 +1,55 @@
 # Changelog fdm-app
 
+## 0.17.0
+
+### Minor Changes
+
+- 05bc116: Add titles and descriptions to pages
+- 694fff5: Replace placeholder with FDM logo
+- 694fff5: Use FDM logo for favicon
+- 901be37: Redesigned the soil component on the field page of the Create Farm Wizard
+- b5afe8b: Add page to show the list of fertilizers available on the farm
+- 800feaa: Add `Kalender` to sidebar. This enables users to filter assets and actions based on the selected year or to show all of them.
+- 199cba4: Add a message at signin page that the app is still in development
+- b5afe8b: Add page to show details of a fertilizer, and if applicable, to update the values
+- 542f55b: When farm is created enable fertilizer catalogue with custom fertilizers for that specific farm
+- 34113b1: Add page to add a field to a farm
+- cc66860: Add ability to perform a new soil analysis in the Create Farm Wizard
+- dedef47: After registration send the user a welcome email
+- b5afe8b: Add page to add new fertilizer for a farm
+- 8e17182: Make fdm-app configurable for various settings, including the name
+- 901be37: Improve layout of the fields page in the Create Farm Wizard
+- 33434c6: Add analytics by integrating posthog
+
+### Patch Changes
+
+- 5f81d42: Allow display of Microsoft profile picture
+- b06b809: Do not build sourcemaps at production
+- 7b86f47: Fix rendering harvest list page and harvest detail page at create farm wizard
+- 7d8527c: Allow display of Google profile picture
+- 0318a4c: Users are now automatically redirected to the sign-in page when encountering a 401 error.
+- 4d049ce: Fixes unit of `b_lu_yield` to be same as in `fdm-core`, i.e. kg DS / ha
+- 917b36b: Improve bundle by manually chunking
+- d380f66: Refactored farm context into using a zustand store
+- be9bf5b: Disable sidebar links during create farm wizard
+- dedef47: Add email integration with Postmark, including:
+  - New environment variables for Postmark configuration
+  - Integration with Postmark API for sending transactional emails
+  - Support for HTML email templates
+- Updated dependencies [c240486]
+- Updated dependencies [e9926cb]
+- Updated dependencies [82f4767]
+- Updated dependencies [a52796a]
+- Updated dependencies [9ea6795]
+- Updated dependencies [a259ff6]
+- Updated dependencies [01081b3]
+- Updated dependencies [d693cdb]
+- Updated dependencies [0944ef1]
+- Updated dependencies [175ea6a]
+- Updated dependencies [9f4d818]
+  - @svenvw/fdm-core@0.18.0
+  - @svenvw/fdm-calculator@0.2.5
+
 ## 0.16.0
 
 ### Minor Changes

@@ -163,17 +163,11 @@ export default function FarmFieldIndex() {
                                     Het lijkt erop dat je nog geen perceel hebt
                                     :(
                                 </h1>
-                                <p className="text-sm text-muted-foreground">
-                                    Het aanmaken van een perceel is binnenkort
-                                    beschikbaar.
-                                </p>
                             </div>
                             <div className="flex flex-col items-center relative">
-                                <Button disabled>
-                                    Maak een perceel
-                                    <br />
-                                    (nog niet beschikbaar)
-                                </Button>
+                                <NavLink to="./new">
+                                    <Button>Maak een perceel</Button>
+                                </NavLink>
                             </div>
                             {/* <p className="px-8 text-center text-sm text-muted-foreground">
                             </p> */}
@@ -243,12 +237,10 @@ export default function FarmFieldIndex() {
                                     <p className="text-muted-foreground text-sm">
                                         Of maak een nieuw perceel aan:
                                     </p>
-                                    <div className="flex flex-col items-center w-full">
-                                        <Button disabled>
-                                            Maak een perceel
-                                            <br />
-                                            (nog niet beschikbaar)
-                                        </Button>
+                                    <div className="flex flex-col items-center relative">
+                                        <NavLink to="./new">
+                                            <Button>Maak een perceel</Button>
+                                        </NavLink>
                                     </div>
                                 </CardFooter>
                             </Card>

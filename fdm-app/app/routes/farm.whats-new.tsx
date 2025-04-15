@@ -44,6 +44,34 @@ export interface UpdatePost {
 // Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
+        id: "update-2025-04-14",
+        title: "Nieuwe Functies & Uitgebreide Verbeteringen (April 2025)",
+        description: `Deze update introduceert een reeks nieuwe functies en significante verbeteringen, ontworpen om uw workflow binnen ${clientConfig.name} efficiënter en duidelijker te maken:
+
+**Nieuwe Pagina's & Functies voor Beter Beheer:**
+*   **Uitgebreid Meststoffen Beheer:** We hebben het beheer van meststoffen aanzienlijk uitgebreid. U kunt nu via een speciale pagina een overzicht krijgen van alle beschikbare meststoffen voor uw bedrijf. Daarnaast kunt u de details van elke meststof bekijken en, belangrijker nog, de waarden van *eigen* meststoffen (die u zelf heeft toegevoegd of aangepast) direct bijwerken. Ook is er een nieuwe pagina om eenvoudig nieuwe, bedrijfsspecifieke meststoffen toe te voegen aan uw catalogus, wat zorgt voor een nauwkeurigere registratie van uw bemesting.
+*   **Vereenvoudigd Percelen Toevoegen:** Het toevoegen van nieuwe percelen aan uw bedrijf is gestroomlijnd met een toegewijde nieuwe pagina, wat het proces sneller en intuïtiever maakt.
+*   **Flexibel Filteren met de Kalender:** In de zijbalk vindt u nu een 'Kalender' optie. Deze e functie stelt u in staat om uw data (zoals percelen, bemestingen, oogsten) te filteren op een specifiek jaar. Dit is ideaal voor jaarlijkse overzichten of analyses. U kunt er ook voor kiezen om alle data ongefilterd te tonen.
+*   **Welkomstmail:** Om nieuwe gebruikers welkom te heten, wordt er nu automatisch een welkomstmail verstuurd na succesvolle registratie.
+
+**Verbeteringen in de 'Bedrijf Aanmaken' Wizard:**
+*   **Direct bodemanalyse Toevoegen:** U hoeft de wizard niet meer te verlaten om een nieuwe bodemanalyse toe te voegen. Dit kan nu direct tijdens het configureren van een perceel binnen de wizard, wat tijd bespaart.
+*   **Duidelijkere Bodem Component:** De manier waarop bodemgegevens worden gepresenteerd en hoe u ermee interacteert op de perceelpagina binnen de wizard, is volledig herzien. Dit zorgt voor een beter overzicht en minder kans op fouten bij het invoeren van bodemdata.
+*   **Overzichtelijkere Percelen Pagina:** De layout van de pagina voor het beheren van percelen binnen de wizard is verbeterd voor een betere workflow en duidelijkheid.
+*   **Opgeloste Weergaveproblemen Oogst:** Eerdere problemen met het correct weergeven van de oogstlijst en de bijbehorende detailpagina's binnen de wizard zijn verholpen.
+*   **Voorkomen van Navigatiefouten:** Om te voorkomen dat u per ongeluk de wizard verlaat, worden de links in de zijbalk nu tijdelijk uitgeschakeld (niet klikbaar) terwijl u bezig bent met het aanmaken van een bedrijf.
+
+**Algemene UI & UX Verbeteringen voor Prettiger Gebruik:**
+*   **Verbeterde Paginatitels en Beschrijvingen:** Om de navigatie te vergemakkelijken, hebben veel pagina's nu duidelijkere titels en informatieve beschrijvingen gekregen.
+*   **Professionele Uitstraling met Logo:** Het logo wordt nu consistent door de hele applicatie gebruikt, inclusief als website-icoon (favicon) en op plaatsen waar voorheen placeholders stonden. 
+*   **Integratie Profielfoto's:** Voor een persoonlijkere ervaring worden nu de profielfoto's van uw gekoppelde Microsoft en Google accounts correct weergegeven in uw gebruikersprofiel.
+*   **Transparantie over Ontwikkeling:** Een duidelijke melding op de inlogpagina informeert gebruikers dat de applicatie nog actief in ontwikkeling is en er regelmatig updates plaatsvinden.
+*   **Soepelere Sessie Afhandeling:** Mocht uw sessie verlopen of ongeldig worden (bijvoorbeeld door een time-out), dan wordt u nu automatisch en zonder foutmeldingen teruggestuurd naar de inlogpagina.
+*   **Consistente Eenheden:** De eenheid voor gewasopbrengst ('b_lu_yield') wordt nu overal correct en consistent weergegeven als kilogram droge stof per hectare (kg DS / ha).`,
+        date: new Date("2025-04-11"),
+        isNew: true,
+    },
+    {
         id: "update-1",
         title: `Lancering ${clientConfig.name} 🎉`,
         description: `${clientConfig.name} is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen. 

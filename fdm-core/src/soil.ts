@@ -1,4 +1,4 @@
-import { type SQL, and, eq, gte, lte, sql } from "drizzle-orm"
+import { type SQL, and, eq, gte, isNull, lte, or, sql } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -262,18 +262,30 @@ export async function getSoilAnalyses(
         if (timeframe?.start && timeframe.end) {
             whereClause = and(
                 eq(schema.soilSampling.b_id, b_id),
-                gte(schema.soilSampling.b_sampling_date, timeframe.start),
-                lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                or(
+                    gte(schema.soilSampling.b_sampling_date, timeframe.start),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
+                or(
+                    lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
             )
         } else if (timeframe?.start) {
             whereClause = and(
                 eq(schema.soilSampling.b_id, b_id),
-                gte(schema.soilSampling.b_sampling_date, timeframe.start),
+                or(
+                    gte(schema.soilSampling.b_sampling_date, timeframe.start),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
             )
         } else if (timeframe?.end) {
             whereClause = and(
                 eq(schema.soilSampling.b_id, b_id),
-                lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                or(
+                    lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
             )
         } else {
             whereClause = eq(schema.soilSampling.b_id, b_id)
@@ -349,7 +361,10 @@ export async function getCurrentSoilData(
         if (timeframe?.end) {
             whereClause = and(
                 eq(schema.soilSampling.b_id, b_id),
-                lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                or(
+                    lte(schema.soilSampling.b_sampling_date, timeframe.end),
+                    isNull(schema.soilSampling.b_sampling_date),
+                ),
             )
         } else {
             whereClause = eq(schema.soilSampling.b_id, b_id)
