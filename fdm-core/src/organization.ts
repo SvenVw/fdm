@@ -8,7 +8,7 @@ import { handleError } from "./error"
  * Creates a new organization and assigns the creating user as the owner.
  *
  * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user creating the organization.
+ * @param owner_id - The ID of the user creating the organization.
  * @param name - The name of the organization.
  * @param slug - The unique slug for the organization.
  * @param description - A description of the organization.
@@ -17,7 +17,7 @@ import { handleError } from "./error"
  */
 export async function createOrganization(
     fdm: FdmType,
-    user_id: string,
+    owner_id: string,
     name: string,
     slug: string,
     description: string,
@@ -45,7 +45,7 @@ export async function createOrganization(
             const memberData = {
                 id: createId(),
                 organizationId: organization_id,
-                userId: user_id,
+                userId: owner_id,
                 role: "owner",
                 createdAt: new Date(),
             }
@@ -59,7 +59,7 @@ export async function createOrganization(
             name,
             slug,
             description,
-            user_id,
+            owner_id,
         })
     }
 }
@@ -188,7 +188,7 @@ export async function getUsersInOrganization(
  * Invites a user to an organization.
  *
  * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user initiating the invitation (must be owner or admin).
+ * @param inviter_id - The ID of the user initiating the invitation (must be owner or admin).
  * @param email - The email address of the user being invited.
  * @param role - The role to assign to the invited user in the organization.
  * @param organization_id - The ID of the organization to which the user is being invited.
@@ -197,7 +197,7 @@ export async function getUsersInOrganization(
  */
 export async function inviteUserToOrganization(
     fdm: FdmType,
-    user_id: string,
+    inviter_id: string,
     email: string,
     role: "owner" | "admin" | "member",
     organization_id: string,
@@ -210,7 +210,7 @@ export async function inviteUserToOrganization(
                 .from(authNSchema.member)
                 .where(
                     and(
-                        eq(authNSchema.member.userId, user_id),
+                        eq(authNSchema.member.userId, inviter_id),
                         eq(authNSchema.member.organizationId, organization_id),
                     ),
                 )
@@ -234,7 +234,7 @@ export async function inviteUserToOrganization(
                 role: role,
                 status: "pending",
                 expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days
-                inviterId: user_id,
+                inviterId: inviter_id,
             }
             await tx.insert(authNSchema.invitation).values(invitationData)
 
@@ -242,7 +242,7 @@ export async function inviteUserToOrganization(
         })
     } catch (err) {
         throw handleError(err, "Exception for inviteUserToOrganization", {
-            user_id,
+            inviter_id,
             email,
             role,
             organization_id,
@@ -513,14 +513,14 @@ export async function rejectInvitation(
  * Removes a user from an organization.
  *
  * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user initiating the removal (must be owner or admin).
+ * @param admin_id - The ID of the user initiating the removal (must be owner or admin).
  * @param organization_id - The ID of the organization from which the user is being removed.
  * @param email - The email address of the user being removed.
  * @throws {Error} Throws an error if any database operation fails, if the user initiating the removal does not have permissions, or if the user to be removed is not found.
  */
 export async function removeUserFromOrganization(
     fdm: FdmType,
-    user_id: string,
+    admin_id: string,
     organization_id: string,
     email: string,
 ): Promise<void> {
@@ -532,7 +532,7 @@ export async function removeUserFromOrganization(
                 .from(authNSchema.member)
                 .where(
                     and(
-                        eq(authNSchema.member.userId, user_id),
+                        eq(authNSchema.member.userId, admin_id),
                         eq(authNSchema.member.organizationId, organization_id),
                     ),
                 )
@@ -566,7 +566,7 @@ export async function removeUserFromOrganization(
         })
     } catch (err) {
         throw handleError(err, "Exception for removeUserFromOrganization", {
-            user_id,
+            admin_id,
             organization_id,
             email,
         })
@@ -577,7 +577,7 @@ export async function removeUserFromOrganization(
  * Updates the role of a user within an organization.
  *
  * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user initiating the update (must be owner or admin).
+ * @param admin_id - The ID of the user initiating the update (must be owner or admin).
  * @param organization_id - The ID of the organization in which the user's role is being updated.
  * @param email - The email address of the user whose role is being updated.
  * @param role - The new role to assign to the user.
@@ -585,7 +585,7 @@ export async function removeUserFromOrganization(
  */
 export async function updateRoleOfUserAtOrganization(
     fdm: FdmType,
-    user_id: string,
+    admin_id: string,
     organization_id: string,
     email: string,
     role: "owner" | "admin" | "member",
@@ -598,7 +598,7 @@ export async function updateRoleOfUserAtOrganization(
                 .from(authNSchema.member)
                 .where(
                     and(
-                        eq(authNSchema.member.userId, user_id),
+                        eq(authNSchema.member.userId, admin_id),
                         eq(authNSchema.member.organizationId, organization_id),
                     ),
                 )
@@ -633,7 +633,7 @@ export async function updateRoleOfUserAtOrganization(
         })
     } catch (err) {
         throw handleError(err, "Exception for removeUserFromOrganization", {
-            user_id,
+            admin_id,
             organization_id,
             email,
             role,
@@ -645,13 +645,13 @@ export async function updateRoleOfUserAtOrganization(
  * Deletes an organization.
  *
  * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user initiating the deletion (must be the owner).
+ * @param owner_id - The ID of the user initiating the deletion (must be the owner).
  * @param organization_id - The ID of the organization to delete.
  * @throws {Error} Throws an error if any database operation fails, if the user initiating the deletion is not the owner, or if the organization is not found.
  */
 export async function deleteOrganization(
     fdm: FdmType,
-    user_id: string,
+    owner_id: string,
     organization_id: string,
 ): Promise<void> {
     try {
@@ -662,7 +662,7 @@ export async function deleteOrganization(
                 .from(authNSchema.member)
                 .where(
                     and(
-                        eq(authNSchema.member.userId, user_id),
+                        eq(authNSchema.member.userId, owner_id),
                         eq(authNSchema.member.organizationId, organization_id),
                     ),
                 )
@@ -681,7 +681,7 @@ export async function deleteOrganization(
         })
     } catch (err) {
         throw handleError(err, "Exception for deleteOrganization", {
-            user_id,
+            owner_id,
             organization_id,
         })
     }
