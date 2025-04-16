@@ -113,7 +113,7 @@ export function createFdmAuth(
         rateLimit: {
             enabled: process.env.NODE_ENV === "production",
             window: 10,
-            limit: 100,
+            max: 100,
             storage: "database",
         },
         plugins: [
