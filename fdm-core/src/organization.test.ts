@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm"
 import {
     afterAll,
     beforeAll,
-    beforeEach,
     describe,
     expect,
     inject,
@@ -25,9 +24,7 @@ import {
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import * as authNSchema from "./db/schema-authn"
-import { createId } from "./id"
 import { type BetterAuth, createFdmAuth } from "./authentication"
-import { afterEach } from "node:test"
 
 describe("Organization Data Model", () => {
     let fdm: FdmServerType
@@ -126,7 +123,7 @@ describe("Organization Data Model", () => {
             const name = "Test Organization 2"
             const slug = "test-organization-2"
             const description = "This is a test organization"
-            const organization_id = await createOrganization(
+            await createOrganization(
                 fdm,
                 user1_id,
                 name,
