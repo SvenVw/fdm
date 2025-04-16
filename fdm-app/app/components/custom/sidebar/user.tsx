@@ -100,7 +100,7 @@ export function SidebarUser({
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
                                 <DropdownMenuItem asChild>
-                                    <NavLink to="/farm/account">
+                                    <NavLink to="/user">
                                         <BadgeCheck className="mr-2 h-4 w-4" />
                                         Account
                                     </NavLink>
@@ -133,7 +133,7 @@ export function SidebarUser({
                                     </span>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem asChild>
-                                    <NavLink to="/farm/whats-new">
+                                    <NavLink to="/about/whats-new">
                                         <Sparkles className="mr-2 h-4 w-4" />
                                         Wat is er nieuw?
                                     </NavLink>
