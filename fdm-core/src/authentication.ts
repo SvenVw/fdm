@@ -126,6 +126,7 @@ export function createFdmAuth(
                                 ...organization,
                                 metadata: {
                                     isVerified: false,
+                                    description: "",
                                 },
                             },
                         }
