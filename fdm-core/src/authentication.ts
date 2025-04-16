@@ -24,6 +24,7 @@ export function createFdmAuth(
     fdm: FdmType,
     google?: { clientSecret: string; clientId: string },
     microsoft?: { clientSecret: string; clientId: string },
+    emailAndPassword?: boolean,
 ): BetterAuth {
     // Setup social auth providers
     let googleAuth = undefined
@@ -115,6 +116,9 @@ export function createFdmAuth(
             window: 10,
             max: 100,
             storage: "database",
+        },
+        emailAndPassword: {
+            enabled: emailAndPassword || false,
         },
         plugins: [
             organization({
