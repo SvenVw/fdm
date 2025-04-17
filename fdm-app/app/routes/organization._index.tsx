@@ -40,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     return { organizations }
 }
 
-export default function OrganizationIndex() {
+export default function OrganizationsIndex() {
     const { organizations } = useLoaderData<{
         organizations: OrganizationType[]
     }>()
