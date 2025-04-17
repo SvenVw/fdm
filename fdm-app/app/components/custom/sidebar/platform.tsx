@@ -77,7 +77,7 @@ export function SidebarPlatform() {
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
-                                <NavLink to={"#"}>
+                                <NavLink to={"/organization"}>
                                     <Users />
                                     <span>Overzicht</span>
                                 </NavLink>
