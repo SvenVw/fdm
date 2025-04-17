@@ -1,12 +1,5 @@
 import { eq } from "drizzle-orm"
-import {
-    afterAll,
-    beforeAll,
-    describe,
-    expect,
-    inject,
-    it,
-} from "vitest"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import {
     acceptInvitation,
     checkOrganizationSlugForAvailabilty,
@@ -69,8 +62,8 @@ describe("Organization Data Model", () => {
                 body: {
                     email: "user2@example.com",
                     name: "user2",
-                    firstname: "user1",
-                    surname: "user1",
+                    firstname: "user2",
+                    surname: "user2",
                     password: "password",
                 },
             })
@@ -123,13 +116,7 @@ describe("Organization Data Model", () => {
             const name = "Test Organization 2"
             const slug = "test-organization-2"
             const description = "This is a test organization"
-            await createOrganization(
-                fdm,
-                user1_id,
-                name,
-                slug,
-                description,
-            )
+            await createOrganization(fdm, user1_id, name, slug, description)
 
             const organizations = await getOrganizationsForUser(fdm, user1_id)
             expect(organizations).toBeDefined()
@@ -149,7 +136,8 @@ describe("Organization Data Model", () => {
 
             const users = await getUsersInOrganization(fdm, slug)
             expect(users).toBeDefined()
-            expect(users.length).toBeGreaterThanOrEqual(0)
+            expect(users.length).toBe(1)
+            expect(users[0].firstname).toEqual("user1")
         })
 
         it("should check organization slug for availability", async () => {
@@ -169,6 +157,12 @@ describe("Organization Data Model", () => {
                 "test-organization-43",
             )
             expect(isAvailable2).toBe(true)
+
+            await expect(
+                checkOrganizationSlugForAvailabilty(fdm, "INVALID_SLUG"),
+            ).rejects.toThrow(
+                "Exception for checkOrganizationSlugForAvailabilty",
+            )
         })
 
         it("should invite user to organization", async () => {
@@ -238,6 +232,10 @@ describe("Organization Data Model", () => {
                 .limit(1)
 
             expect(invitation[0].status).toBe("rejected")
+
+            await expect(
+                rejectInvitation(fdm, invitationId, user2_id),
+            ).rejects.toThrow("Exception for rejectInvitation")
         })
 
         it("should remove user from organization", async () => {
@@ -275,6 +273,15 @@ describe("Organization Data Model", () => {
             expect(
                 organizations.find((org) => org.slug === slug),
             ).toBeUndefined()
+
+            await expect(
+                removeUserFromOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    "user3@example.com",
+                ),
+            ).rejects.toThrow("Exception for removeUserFromOrganization")
         })
 
         it("should update role of user at organization", async () => {
@@ -299,7 +306,7 @@ describe("Organization Data Model", () => {
             )
             expect(invitationId).toBeDefined()
 
-            await acceptInvitation(fdm, invitationId, user2_id)           
+            await acceptInvitation(fdm, invitationId, user2_id)
 
             await updateRoleOfUserAtOrganization(
                 fdm,
@@ -317,6 +324,16 @@ describe("Organization Data Model", () => {
             expect(organizations.find((org) => org.slug === slug)?.role).toBe(
                 "admin",
             )
+
+            await expect(
+                updateRoleOfUserAtOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    "user3@example.com",
+                    "admin",
+                ),
+            ).rejects.toThrow("Exception for removeUserFromOrganization")
         })
 
         it("should delete an organization", async () => {
@@ -339,6 +356,85 @@ describe("Organization Data Model", () => {
                 .where(eq(authNSchema.organization.id, organization_id))
                 .limit(1)
             expect(organization).toHaveLength(0)
+
+            await expect(
+                deleteOrganization(fdm, user1_id, organization_id),
+            ).rejects.toThrow("Exception for deleteOrganization")
+        })
+
+        it("should accept invitation", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-101"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+
+            const invitationId = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                "user2@example.com",
+                "member",
+                organization_id,
+            )
+            expect(invitationId).toBeDefined()
+
+            await acceptInvitation(fdm, invitationId, user2_id)
+
+            const member = await getUsersInOrganization(fdm, slug)
+            expect(member).toBeDefined()
+            expect(member.find(x => x.firstname === "user2")?.role).toBe("member")
+
+            await expect(
+                acceptInvitation(fdm, invitationId, user2_id),
+            ).rejects.toThrow("Exception for acceptInvitation")
+        })
+
+        it("should throw an error if user is not owner or admin when inviting", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-102"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+
+            const invitationId = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                "user2@example.com",
+                "member",
+                organization_id,
+            )
+            await acceptInvitation(fdm, invitationId, user2_id)
+            await expect(
+                inviteUserToOrganization(
+                    fdm,
+                    user2_id,
+                    "user3@example.com",
+                    "member",
+                    organization_id,
+                ),
+            ).rejects.toThrow("Exception for inviteUserToOrganization")
+        })
+        it("should handle invalid organization slug", async () => {
+            await expect(
+                checkOrganizationSlugForAvailabilty(fdm, ""),
+            ).rejects.toThrow(
+                "Exception for checkOrganizationSlugForAvailabilty",
+            )
+            await expect(
+                checkOrganizationSlugForAvailabilty(fdm, "Invalid Slug"),
+            ).rejects.toThrow(
+                "Exception for checkOrganizationSlugForAvailabilty",
+            )
         })
     })
 })
