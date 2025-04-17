@@ -258,7 +258,7 @@ export async function inviteUserToOrganization(
  * @returns A promise that resolves with an array of pending invitation details.
  * @throws {Error} Throws an error if any database operation fails.
  */
-export async function getPendingInvitationsforUser(
+export async function getPendingInvitationsForUser(
     fdm: FdmType,
     user_id: string,
 ): Promise<
@@ -319,7 +319,7 @@ export async function getPendingInvitationsforUser(
 
         return invitations
     } catch (err) {
-        throw handleError(err, "Exception for getPendingInvitationsforUser", {
+        throw handleError(err, "Exception for getPendingInvitationsForUser", {
             user_id,
         })
     }

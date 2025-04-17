@@ -94,7 +94,7 @@ export {
     removeUserFromOrganization,
     updateRoleOfUserAtOrganization,
     deleteOrganization,
-    getPendingInvitationsforUser,
+    getPendingInvitationsForUser,
     getPendingInvitation,
     acceptInvitation,
 } from "./organization"

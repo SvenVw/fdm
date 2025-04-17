@@ -7,7 +7,7 @@ import {
     deleteOrganization,
     getOrganizationsForUser,
     getPendingInvitation,
-    getPendingInvitationsforUser,
+    getPendingInvitationsForUser,
     getUsersInOrganization,
     inviteUserToOrganization,
     rejectInvitation,
@@ -244,7 +244,7 @@ describe("Organization Data Model", () => {
             )
             expect(invitationId).toBeDefined()
 
-            const invitations = await getPendingInvitationsforUser(
+            const invitations = await getPendingInvitationsForUser(
                 fdm,
                 user2_id,
             )
@@ -284,7 +284,7 @@ describe("Organization Data Model", () => {
         })
 
         it("should return empty array when no pending invitations", async () => {
-            const invitations = await getPendingInvitationsforUser(
+            const invitations = await getPendingInvitationsForUser(
                 fdm,
                 user3_id,
             )
@@ -292,10 +292,10 @@ describe("Organization Data Model", () => {
             expect(invitations.length).toBe(0)
         })
 
-        it("should throw an error if getPendingInvitationsforUser fails", async () => {
+        it("should throw an error if getPendingInvitationsForUser fails", async () => {
             // Create a error condition for the database
             await fdm.delete(authNSchema.invitation).execute()
-            const invitations = await getPendingInvitationsforUser(
+            const invitations = await getPendingInvitationsForUser(
                 fdm,
                 user2_id,
             )
