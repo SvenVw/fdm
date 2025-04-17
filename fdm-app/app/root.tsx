@@ -74,7 +74,9 @@ export function Layout() {
     // Hook to show the toasts
     useEffect(() => {
         if (toast && toast.type === "error") {
-            notify.error(toast.message)
+            notify.error(toast.message, {
+                duration: 30000,
+            })
         }
         if (toast && toast.type === "warning") {
             notify.warning(toast.message)
