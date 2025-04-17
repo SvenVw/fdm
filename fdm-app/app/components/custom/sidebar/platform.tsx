@@ -5,6 +5,7 @@ import {
     Cookie,
     House,
     Languages,
+    Mail,
     Sparkles,
     User,
     Users,
@@ -43,21 +44,15 @@ export function SidebarPlatform() {
                 </SidebarGroupContent>
             </SidebarGroup>
             <SidebarGroup>
-                <SidebarGroupLabel>Mijn account</SidebarGroupLabel>
+                <SidebarGroupLabel>Account</SidebarGroupLabel>
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
                                 <NavLink to={"/user"}>
                                     <User />
-                                    <span>Gegevens</span>
+                                    <span>Profiel</span>
                                 </NavLink>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton onClick={openCookieSettings}>
-                                <Cookie />
-                                <span>Cookies</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
@@ -68,11 +63,17 @@ export function SidebarPlatform() {
                                 </NavLink>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton onClick={openCookieSettings}>
+                                <Cookie />
+                                <span>Cookies</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarGroup>
             <SidebarGroup>
-                <SidebarGroupLabel>Mijn organisaties</SidebarGroupLabel>
+                <SidebarGroupLabel>Organisaties</SidebarGroupLabel>
                 <SidebarGroupContent>
                     <SidebarMenu>
                         <SidebarMenuItem>
@@ -80,6 +81,14 @@ export function SidebarPlatform() {
                                 <NavLink to={"/organization"}>
                                     <Users />
                                     <span>Overzicht</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild>
+                                <NavLink to={"/organization/invites"}>
+                                    <Mail />
+                                    <span>Uitnodigingen</span>
                                 </NavLink>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
