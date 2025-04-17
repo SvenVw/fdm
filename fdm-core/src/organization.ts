@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm"
+import { and, asc, desc, eq, gt } from "drizzle-orm"
 import { createId } from "./id"
 import type { FdmType } from "./fdm"
 import * as authNSchema from "./db/schema-authn"
@@ -251,6 +251,72 @@ export async function inviteUserToOrganization(
 }
 
 /**
+ * Retrieves a list of pending invitations for a specific organization.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param organization_id - The id of the organization.
+ * @returns A promise that resolves with an array of pending invitation details, including the email, role, expiration date, and inviter's name.
+ * @throws {Error} Throws an error if any database operation fails.
+ */
+export async function getPendingInvitationsForOrganization(
+    fdm: FdmType,
+    organization_id: string,
+): Promise<
+    {
+        email: string
+        role: string
+        expires_at: Date
+        inviter_firstname: string
+        inviter_surname: string
+    }[]
+> {
+    try {
+        const invitations = await fdm
+            .select({
+                email: authNSchema.invitation.email,
+                role: authNSchema.invitation.role,
+                expires_at: authNSchema.invitation.expiresAt,
+                inviter_firstname: authNSchema.user.firstname,
+                inviter_surname: authNSchema.user.surname,
+            })
+            .from(authNSchema.organization)
+            .leftJoin(
+                authNSchema.invitation,
+                eq(
+                    authNSchema.organization.id,
+                    authNSchema.invitation.organizationId,
+                ),
+            )
+            .leftJoin(
+                authNSchema.user,
+                eq(authNSchema.invitation.inviterId, authNSchema.user.id),
+            )
+            .where(
+                and(
+                    eq(authNSchema.organization.id, organization_id),
+                    eq(authNSchema.invitation.status, "pending"),
+                    gt(authNSchema.invitation.expiresAt, new Date()),
+                ),
+            )
+            .orderBy(asc(authNSchema.invitation.expiresAt))
+
+        if (invitations.length === 0) {
+            return []
+        }
+
+        return invitations
+    } catch (err) {
+        throw handleError(
+            err,
+            "Exception for getPendingInvitationsForOrganization",
+            {
+                organization_id,
+            },
+        )
+    }
+}
+
+/**
  * Retrieves a list of pending invitations for a specific user.
  *
  * @param fdm - The FDM instance providing the connection to the database.
@@ -309,6 +375,7 @@ export async function getPendingInvitationsForUser(
                             .where(eq(authNSchema.user.id, user_id)),
                     ),
                     eq(authNSchema.invitation.status, "pending"),
+                    gt(authNSchema.invitation.expiresAt, new Date()),
                 ),
             )
             .orderBy(desc(authNSchema.invitation.expiresAt))

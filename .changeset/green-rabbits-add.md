@@ -16,3 +16,4 @@ This change introduces a suite of helper functions within `fdm-core` to facilita
 *   `getPendingInvitation`: Retrieves a specific pending invitation.
 *   `acceptInvitation`: Accepts a pending invitation to join an organization.
 *   `rejectInvitation`: Rejects a pending invitation to join an organization.
+*   `getPendingInvitationsForOrganization`: Retrieves a list of pending invitations for an organization.

@@ -7,6 +7,7 @@ import {
     deleteOrganization,
     getOrganizationsForUser,
     getPendingInvitation,
+    getPendingInvitationsForOrganization,
     getPendingInvitationsForUser,
     getUsersInOrganization,
     inviteUserToOrganization,
@@ -301,7 +302,7 @@ describe("Organization Data Model", () => {
             )
             await expect(invitations).toBeDefined()
             expect(invitations.length).toBe(0)
-            
+
             // add the invitation again
             const name = "Test Organization"
             const slug = "test-organization-83"
@@ -361,6 +362,98 @@ describe("Organization Data Model", () => {
             await expect(
                 rejectInvitation(fdm, invitationId, user2_id),
             ).rejects.toThrow("Exception for rejectInvitation")
+        })
+        it("should return an empty array if there are no pending invitations", async () => {
+            const slug = "test-organization-97"
+
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                "Test Org",
+                slug,
+                "Test Description",
+            )
+            const invitations = await getPendingInvitationsForOrganization(
+                fdm,
+                organization_id,
+            )
+            expect(invitations).toEqual([])
+        })
+
+        it("should return a list of pending invitations for the organization", async () => {
+            const email2 = "test2@example.com"
+            const role = "member"
+            const slug = "test-organization-94"
+
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                "Test Org",
+                slug,
+                "Test Description",
+            )
+
+            await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                email2,
+                role,
+                organization_id,
+            )
+
+            const invitations = await getPendingInvitationsForOrganization(
+                fdm,
+                organization_id,
+            )
+
+            expect(invitations.length).toBe(1)
+            expect(invitations.map((invitation) => invitation.email)).toEqual(
+                expect.arrayContaining([email2]),
+            )
+        })
+
+        it("should not return rejected invitations", async () => {
+            const email2 = "user2@example.com"
+            const role = "member"
+            const slug = "test-organization-89"
+
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                "Test Org",
+                slug,
+                "Test Description",
+            )
+
+            const invitation_id = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                email2,
+                role,
+                organization_id,
+            )
+
+            // Reject one invitation
+            console.log(invitation_id)
+            console.log(user2_id)
+            await rejectInvitation(fdm, invitation_id, user2_id)
+
+            const invitations = await getPendingInvitationsForOrganization(
+                fdm,
+                organization_id,
+            )
+
+            expect(invitations.length).toBe(0)
+        })
+
+        it("should throw an error if the organization does not exist", async () => {
+            const nonExistentSlug = "non-existent-org"
+
+            const invitations = await getPendingInvitationsForOrganization(
+                fdm,
+                nonExistentSlug,
+            )
+            expect(invitations).toEqual([])
         })
 
         it("should remove user from organization", async () => {
@@ -449,7 +542,6 @@ describe("Organization Data Model", () => {
             expect(organizations.find((org) => org.slug === slug)?.role).toBe(
                 "admin",
             )
-
 
             await expect(
                 updateRoleOfUserAtOrganization(
