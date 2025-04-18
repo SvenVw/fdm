@@ -36,7 +36,7 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Retrieves the user session data.
+ * Retrieves the user data.
  *
  * @param request - The HTTP request object used to retrieve session information.
  * @returns An object containing:
@@ -60,11 +60,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the user interface for the Account page.
+ * Renders the user interface for the user page.
  *
- * This component uses data from the loader to display the user's account details.
+ * This component uses data from the loader to display the user's user details.
  */
-export default function Account() {
+export default function User() {
     const loaderData = useLoaderData<typeof loader>()
     const user = loaderData.user
 
@@ -78,7 +78,7 @@ export default function Account() {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="/farm/account">
+                            <BreadcrumbLink href="/user">
                                 Account
                             </BreadcrumbLink>
                         </BreadcrumbItem>

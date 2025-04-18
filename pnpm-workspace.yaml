@@ -6,7 +6,7 @@ packages:
   - 'fdm-app'
 
 catalog:
-  better-auth: ^1.2.5
+  better-auth: ^1.2.7
   drizzle-orm: ^0.41.0
   drizzle-kit: ^0.30.6
   "@dotenvx/dotenvx": ^1.39.0
