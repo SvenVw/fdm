@@ -1,9 +1,9 @@
-import { type ActionFunctionArgs, type LoaderFunctionArgs } from "react-router"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import {
-    acceptPendingInvitation,
+    acceptInvitation,
     getPendingInvitationsForUser,
-    rejectPendingInvitation,
+    rejectInvitation,
 } from "@svenvw/fdm-core"
 import { Button } from "~/components/ui/button"
 import {
@@ -24,13 +24,9 @@ import {
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "../components/ui/breadcrumb"
+} from "~/components/ui/breadcrumb"
 import { FarmTitle } from "../components/custom/farm/farm-title"
-import {
-    dataWithError,
-    dataWithSuccess,
-    redirectWithSuccess,
-} from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { z } from "zod"
@@ -45,7 +41,7 @@ type InvitationType = {
     inviter_firstname: string
     inviter_surname: string
     role: string
-    expires_at: Date // Add the expiration date
+    expires_at: Date
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -55,7 +51,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
             fdm,
             session.user.id,
         )
-        return { invitations }       
+        return { invitations }
     } catch (error) {
         throw handleLoaderError(error)
     }
@@ -210,7 +206,7 @@ export async function action({ request }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         if (formValues.intent === "accept") {
-            await acceptPendingInvitation(
+            await acceptInvitation(
                 fdm,
                 formValues.invitation_id,
                 session.user.id,
@@ -220,7 +216,7 @@ export async function action({ request }: ActionFunctionArgs) {
             })
         }
         if (formValues.intent === "reject") {
-            await rejectPendingInvitation(
+            await rejectInvitation(
                 fdm,
                 formValues.invitation_id,
                 session.user.id,

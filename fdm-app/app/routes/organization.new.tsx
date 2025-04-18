@@ -4,7 +4,6 @@ import {
     Form,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useLoaderData,
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -32,20 +31,20 @@ import {
     BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbSeparator,
-} from "../components/ui/breadcrumb"
-import { FarmTitle } from "../components/custom/farm/farm-title"
+} from "~/components/ui/breadcrumb"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "../components/ui/card"
+} from "~/components/ui/card"
 import { useEffect } from "react"
-import { Textarea } from "../components/ui/textarea"
-import { extractFormValuesFromRequest } from "../lib/form"
+import { Textarea } from "~/components/ui/textarea"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import {
-    checkOrganizationSlugForAvailabilty,
+    checkOrganizationSlugForAvailability,
     createOrganization,
 } from "@svenvw/fdm-core"
 
@@ -270,7 +269,7 @@ export async function action({ request }: ActionFunctionArgs) {
         const description = formValues.description || ""
 
         // Check if slug is available
-        const slugIsAvailable = await checkOrganizationSlugForAvailabilty(
+        const slugIsAvailable = await checkOrganizationSlugForAvailability(
             fdm,
             slug,
         )
