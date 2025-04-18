@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs } from "react-router"
+import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import { Button } from "~/components/ui/button"
@@ -23,6 +23,7 @@ import {
     BreadcrumbSeparator,
 } from "../components/ui/breadcrumb"
 import { FarmTitle } from "../components/custom/farm/farm-title"
+import { handleLoaderError } from "../lib/error"
 
 // Define the type for a single organization based on getOrganizationsForUser return type
 type OrganizationType = {
