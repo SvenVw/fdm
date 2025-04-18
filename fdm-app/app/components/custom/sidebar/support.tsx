@@ -16,16 +16,18 @@ export function SidebarSupport({
     name,
     email,
 }: { name: string | undefined; email: string | undefined }) {
-    if (clientConfig.analytics.sentry) {
-        try {
-            Sentry.setUser({
-                fullName: name,
-                email: email,
-            })
-        } catch (error) {
-            Sentry.captureException(error)
+    useEffect(() => {
+        if (clientConfig.analytics.sentry) {
+            try {
+                Sentry.setUser({
+                    fullName: name,
+                    email: email,
+                })
+            } catch (error) {
+                Sentry.captureException(error)
+            }
         }
-    }
+    }, [name, email])
 
     const [feedback, setFeedback] = useState<ReturnType<
         typeof Sentry.getFeedback
