@@ -120,7 +120,7 @@ export default function OrganizationsIndex() {
                                     <CardDescription />
                                 </CardHeader>
                                 <CardContent>
-                                    <p className="text-sm text-muted-foreground text-clip">
+                                    <p className="text-sm text-muted-foreground truncate">
                                         {org.description}
                                     </p>
                                 </CardContent>
