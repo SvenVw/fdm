@@ -506,7 +506,44 @@ export async function getPendingInvitationsForUser(
                 inviter_surname: authNSchema.user.surname,
                 inviter_image: authNSchema.user.image,
             })
-            // …
+            .from(authNSchema.invitation)
+            .leftJoin(
+                authNSchema.organization,
+                eq(
+                    authNSchema.invitation.organizationId,
+                    authNSchema.organization.id,
+                ),
+            )
+            .leftJoin(
+                authNSchema.user,
+                eq(authNSchema.invitation.inviterId, authNSchema.user.id),
+            )
+            .where(
+                and(
+                    eq(
+                        authNSchema.invitation.email,
+                        fdm
+                            .select({ email: authNSchema.user.email })
+                            .from(authNSchema.user)
+                            .where(eq(authNSchema.user.id, user_id)),
+                    ),
+                    eq(authNSchema.invitation.status, "pending"),
+                    gt(authNSchema.invitation.expiresAt, new Date()),
+                ),
+            )
+            .orderBy(desc(authNSchema.invitation.expiresAt))
+
+        if (invitations.length === 0) {
+            return []
+        }
+
+        return invitations
+    } catch (err) {
+        throw handleError(err, "Exception for getPendingInvitationsForUser", {
+            user_id,
+        })
+    }
+}
 
 /**
  * Retrieves the details of a specific pending invitation.
