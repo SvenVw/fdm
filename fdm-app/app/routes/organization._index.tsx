@@ -91,7 +91,7 @@ export default function OrganizationsIndex() {
                             </p>
                         </div>
                         <Button asChild>
-                            <NavLink to="./organization/invites">
+                            <NavLink to="/organization/invitations">
                                 Bekijk uitnodigingen
                             </NavLink>
                         </Button>
