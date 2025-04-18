@@ -1,17 +1,9 @@
 import { eq } from "drizzle-orm"
-import {
-    afterAll,
-    beforeAll,
-    beforeEach,
-    describe,
-    expect,
-    inject,
-    it,
-} from "vitest"
+import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import {
     acceptInvitation,
     cancelPendingInvitation,
-    checkOrganizationSlugForAvailabilty,
+    checkOrganizationSlugForAvailability,
     createOrganization,
     deleteOrganization,
     getOrganization,
@@ -216,22 +208,22 @@ describe("Organization Data Model", () => {
             const description = "This is a test organization"
             await createOrganization(fdm, user1_id, name, slug, description)
 
-            const isAvailable = await checkOrganizationSlugForAvailabilty(
+            const isAvailable = await checkOrganizationSlugForAvailability(
                 fdm,
                 slug,
             )
             expect(isAvailable).toBe(false)
 
-            const isAvailable2 = await checkOrganizationSlugForAvailabilty(
+            const isAvailable2 = await checkOrganizationSlugForAvailability(
                 fdm,
                 "test-organization-43",
             )
             expect(isAvailable2).toBe(true)
 
             await expect(
-                checkOrganizationSlugForAvailabilty(fdm, "INVALID_SLUG"),
+                checkOrganizationSlugForAvailability(fdm, "INVALID_SLUG"),
             ).rejects.toThrow(
-                "Exception for checkOrganizationSlugForAvailabilty",
+                "Exception for checkOrganizationSlugForAvailability",
             )
         })
 
@@ -711,14 +703,14 @@ describe("Organization Data Model", () => {
         })
         it("should handle invalid organization slug", async () => {
             await expect(
-                checkOrganizationSlugForAvailabilty(fdm, ""),
+                checkOrganizationSlugForAvailability(fdm, ""),
             ).rejects.toThrow(
-                "Exception for checkOrganizationSlugForAvailabilty",
+                "Exception for checkOrganizationSlugForAvailability",
             )
             await expect(
-                checkOrganizationSlugForAvailabilty(fdm, "Invalid Slug"),
+                checkOrganizationSlugForAvailability(fdm, "Invalid Slug"),
             ).rejects.toThrow(
-                "Exception for checkOrganizationSlugForAvailabilty",
+                "Exception for checkOrganizationSlugForAvailability",
             )
         })
 

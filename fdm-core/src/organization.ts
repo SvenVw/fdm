@@ -910,7 +910,7 @@ export async function deleteOrganization(
  * @returns A promise that resolves with a boolean indicating whether the slug is available. True if available, false if not.
  * @throws {Error} Throws an error if any database operation fails or if the slug is invalid
  */
-export async function checkOrganizationSlugForAvailabilty(
+export async function checkOrganizationSlugForAvailability(
     fdm: FdmType,
     organization_slug: string,
 ): Promise<boolean> {
@@ -931,7 +931,7 @@ export async function checkOrganizationSlugForAvailabilty(
     } catch (err) {
         throw handleError(
             err,
-            "Exception for checkOrganizationSlugForAvailabilty",
+            "Exception for checkOrganizationSlugForAvailability",
             {
                 organization_slug,
             },

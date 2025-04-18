@@ -88,7 +88,7 @@ export {
     createOrganization,
     getOrganizationsForUser,
     getUsersInOrganization,
-    checkOrganizationSlugForAvailabilty,
+    checkOrganizationSlugForAvailability,
     inviteUserToOrganization,
     rejectInvitation,
     removeUserFromOrganization,
