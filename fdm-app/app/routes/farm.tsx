@@ -138,7 +138,6 @@ export default function App() {
             </Sidebar>
             <SidebarInset>
                 <Outlet />
-                {routes}
             </SidebarInset>
         </SidebarProvider>
     )
