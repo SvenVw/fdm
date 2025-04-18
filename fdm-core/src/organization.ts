@@ -90,25 +90,16 @@ export async function updateOrganization(
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
-            // Check if user is owner or admin of organization
-            const member = await tx
-                .select({ role: authNSchema.member.role })
-                .from(authNSchema.member)
-                .where(
-                    and(
-                        eq(authNSchema.member.userId, admin_id),
-                        eq(authNSchema.member.organizationId, organization_id),
-                    ),
-                )
-                .limit(1)
-            if (member.length === 0) {
-                throw new Error("User is not a member of the organization")
+            // Check if user has permission to update organization
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                admin_id,
+                organization_id,
+            )
+            if (!permissions.canEdit) {
+                throw new Error("User has no permission to update organization")
             }
-            if (member[0].role !== "owner" && member[0].role !== "admin") {
-                throw new Error(
-                    "User is not an owner or admin of the organization",
-                )
-            }
+
             const updatedMetadata = await tx
                 .select({ metadata: authNSchema.organization.metadata })
                 .from(authNSchema.organization)
@@ -183,81 +174,44 @@ export async function getOrganization(
     logo: string | null
     isVerified: boolean
     description: string
-    permissions: {
-        canEdit: boolean
-        canDelete: boolean
-        canInvite: boolean
-        canUpdateRoleUser: boolean
-        canRemoveUser: boolean
-    }
+    permissions: OrganizationPermissions
 } | null> {
     try {
-        const organization = await fdm
-            .select({
-                id: authNSchema.organization.id,
-                name: authNSchema.organization.name,
-                slug: authNSchema.organization.slug,
-                logo: authNSchema.organization.logo,
-                metadata: authNSchema.organization.metadata,
-            })
-            .from(authNSchema.organization)
-            .where(eq(authNSchema.organization.slug, organization_slug))
-            .limit(1)
+        return await fdm.transaction(async (tx: FdmType) => {
+            const organization = await tx
+                .select({
+                    id: authNSchema.organization.id,
+                    name: authNSchema.organization.name,
+                    slug: authNSchema.organization.slug,
+                    logo: authNSchema.organization.logo,
+                    metadata: authNSchema.organization.metadata,
+                })
+                .from(authNSchema.organization)
+                .where(eq(authNSchema.organization.slug, organization_slug))
+                .limit(1)
 
-        if (organization.length === 0) {
-            return null
-        }
+            if (organization.length === 0) {
+                return null
+            }
 
-        const member = await fdm
-            .select({
-                role: authNSchema.member.role,
-            })
-            .from(authNSchema.user)
-            .innerJoin(
-                authNSchema.member,
-                eq(
-                    authNSchema.user.id,
-                    authNSchema.member.userId,
-                ),
+            // Get permissions for this organization
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                user_id,
+                organization[0].id,
             )
-            .leftJoin(
-                authNSchema.organization,
-                eq(
-                    authNSchema.member.organizationId,
-                    authNSchema.organization.id,
-                ),
-            )
-            .where(
-                and(
-                    eq(authNSchema.organization.slug, organization_slug),
-                    eq(authNSchema.member.userId, user_id),
-                ),
-            )
-            .limit(1)
-        let role = "viewer"
-        if (member.length > 0) {
-            role = member[0].role
-        }
 
-        // Get permissions for this organization
-        const permissions = {
-            canEdit: role === "owner" || role === "admin",
-            canDelete: role === "owner",
-            canInvite: role === "owner" || role === "admin",
-            canUpdateRoleUser: role === "owner" || role === "admin",
-            canRemoveUser: role === "owner" || role === "admin",
-        }
-
-        const metadata = JSON.parse(organization[0].metadata)
-        return {
-            id: organization[0].id,
-            name: organization[0].name,
-            slug: organization[0].slug,
-            logo: organization[0].logo,
-            isVerified: metadata.isVerified,
-            description: metadata.description,
-            permissions: permissions,
-        }
+            const metadata = JSON.parse(organization[0].metadata)
+            return {
+                id: organization[0].id,
+                name: organization[0].name,
+                slug: organization[0].slug,
+                logo: organization[0].logo,
+                isVerified: metadata.isVerified,
+                description: metadata.description,
+                permissions: permissions,
+            }
+        })
     } catch (err) {
         throw handleError(err, "Exception for getOrganization", {
             organization_slug,
@@ -405,24 +359,14 @@ export async function inviteUserToOrganization(
 ): Promise<string> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
-            // Check if user is owner or admin of organization
-            const member = await tx
-                .select({ role: authNSchema.member.role })
-                .from(authNSchema.member)
-                .where(
-                    and(
-                        eq(authNSchema.member.userId, inviter_id),
-                        eq(authNSchema.member.organizationId, organization_id),
-                    ),
-                )
-                .limit(1)
-            if (member.length === 0) {
-                throw new Error("User is not a member of the organization")
-            }
-            if (member[0].role !== "owner" && member[0].role !== "admin") {
-                throw new Error(
-                    "User is not an owner or admin of the organization",
-                )
+            // Check if user has permission to invite
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                inviter_id,
+                organization_id,
+            )
+            if (!permissions.canInvite) {
+                throw new Error("User has no permission to invite")
             }
 
             // Generate an ID for the invitation
@@ -796,24 +740,14 @@ export async function removeUserFromOrganization(
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
-            // Check if user is owner or admin of organization
-            const member = await tx
-                .select({ role: authNSchema.member.role })
-                .from(authNSchema.member)
-                .where(
-                    and(
-                        eq(authNSchema.member.userId, admin_id),
-                        eq(authNSchema.member.organizationId, organization_id),
-                    ),
-                )
-                .limit(1)
-            if (member.length === 0) {
-                throw new Error("User is not a member of the organization")
-            }
-            if (member[0].role !== "owner" && member[0].role !== "admin") {
-                throw new Error(
-                    "User is not an owner or admin of the organization",
-                )
+            // Check if user has permission to remove user
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                admin_id,
+                organization_id,
+            )
+            if (!permissions.canRemoveUser) {
+                throw new Error("User has no permission to remove user")
             }
 
             // Remove user from organization based on email
@@ -862,23 +796,15 @@ export async function updateRoleOfUserAtOrganization(
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
-            // Check if user is owner or admin of organization
-            const member = await tx
-                .select({ role: authNSchema.member.role })
-                .from(authNSchema.member)
-                .where(
-                    and(
-                        eq(authNSchema.member.userId, admin_id),
-                        eq(authNSchema.member.organizationId, organization_id),
-                    ),
-                )
-                .limit(1)
-            if (member.length === 0) {
-                throw new Error("User is not a member of the organization")
-            }
-            if (member[0].role !== "owner" && member[0].role !== "admin") {
+            // Check if user has permission to update organization
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                admin_id,
+                organization_id,
+            )
+            if (!permissions.canUpdateRoleUser) {
                 throw new Error(
-                    "User is not an owner or admin of the organization",
+                    "User has no permission to update role of user in the organization",
                 )
             }
 
@@ -926,22 +852,14 @@ export async function deleteOrganization(
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
-            // Check if user is owner of organization
-            const member = await tx
-                .select({ role: authNSchema.member.role })
-                .from(authNSchema.member)
-                .where(
-                    and(
-                        eq(authNSchema.member.userId, owner_id),
-                        eq(authNSchema.member.organizationId, organization_id),
-                    ),
-                )
-                .limit(1)
-            if (member.length === 0) {
-                throw new Error("User is not a member of the organization")
-            }
-            if (member[0].role !== "owner") {
-                throw new Error("User is not an owner of the organization")
+            // Check if user has permission to delete organization
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                owner_id,
+                organization_id,
+            )
+            if (!permissions.canDelete) {
+                throw new Error("User has no permission to delete organization")
             }
 
             // Delete organization
@@ -1012,7 +930,7 @@ export async function cancelPendingInvitation(
             // Check if invitation exists
             const invitation = await tx
                 .select({
-                    organizationId: authNSchema.invitation.organizationId,
+                    organization_id: authNSchema.invitation.organizationId,
                     status: authNSchema.invitation.status,
                 })
                 .from(authNSchema.invitation)
@@ -1026,26 +944,15 @@ export async function cancelPendingInvitation(
                 throw new Error("Invitation is not pending")
             }
 
-            // Check if user is owner or admin of organization
-            const member = await tx
-                .select({ role: authNSchema.member.role })
-                .from(authNSchema.member)
-                .where(
-                    and(
-                        eq(authNSchema.member.userId, admin_id),
-                        eq(
-                            authNSchema.member.organizationId,
-                            invitation[0].organizationId,
-                        ),
-                    ),
-                )
-                .limit(1)
-            if (member.length === 0) {
-                throw new Error("User is not a member of the organization")
-            }
-            if (member[0].role !== "owner" && member[0].role !== "admin") {
+            // Check if user has permission to invite users
+            const permissions = await getUserOrganizationPermissions(
+                tx,
+                admin_id,
+                invitation[0].organization_id,
+            )
+            if (!permissions.canInvite) {
                 throw new Error(
-                    "User is not an owner or admin of the organization",
+                    "User has no permission to cancel invitation to organization",
                 )
             }
 
@@ -1061,4 +968,65 @@ export async function cancelPendingInvitation(
             admin_id,
         })
     }
+}
+
+/**
+ * Defines the structure of the permissions object.
+ */
+interface OrganizationPermissions {
+    canView: boolean
+    canEdit: boolean
+    canDelete: boolean
+    canInvite: boolean
+    canUpdateRoleUser: boolean
+    canRemoveUser: boolean
+}
+
+type OrganizationRole = "owner" | "admin" | "member" | "viewer"
+
+/**
+ * Retrieves the permissions of a user within a specified organization.
+ *
+ * @param tx - The database transaction object.
+ * @param user_id - The ID of the user.
+ * @param organization_id - The ID of the organization.
+ * @returns A promise that resolves to an OrganizationPermissions object.
+ * @throws {Error} Throws an error if the user is not a member of the organization.
+ */
+async function getUserOrganizationPermissions(
+    tx: FdmType,
+    user_id: string,
+    organization_id: string,
+): Promise<OrganizationPermissions> {
+    const member = await tx
+        .select({ role: authNSchema.member.role })
+        .from(authNSchema.member)
+        .where(
+            and(
+                eq(authNSchema.member.userId, user_id),
+                eq(authNSchema.member.organizationId, organization_id),
+            ),
+        )
+        .limit(1)
+
+    let role: OrganizationRole = "viewer"
+    if (member.length !== 0) {
+        role = member[0].role
+    }
+
+    // Define permissions based on role
+    const permissions: OrganizationPermissions = {
+        canView:
+            role === "viewer" ||
+            role === "member" ||
+            role === "admin" ||
+            role === "owner",
+        canEdit: role === "owner" || role === "admin",
+        canDelete: role === "owner",
+        canInvite: role === "owner" || role === "admin",
+        canUpdateRoleUser: role === "owner" || role === "admin",
+        canRemoveUser: role === "owner" || role === "admin",
+    }
+
+    return permissions
 }
