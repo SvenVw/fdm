@@ -211,7 +211,10 @@ const MemberRow = ({
     }
 }) => {
     return (
-        <div className="flex items-center justify-between space-x-4">
+        <div
+            key={member.email}
+            className="flex items-center justify-between space-x-4"
+        >
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarImage src={member.image} />
