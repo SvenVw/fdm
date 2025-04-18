@@ -22,9 +22,12 @@ export async function action({ request }: ActionFunctionArgs) {
         // Revoke the session
         await auth.api.revokeSession({
             headers: request.headers,
-            body: {
-                token: session?.session.token,
-            },
+await auth.api.revokeSession({
+    headers: request.headers,
+    body: {
+        token: session?.session?.token || undefined,
+    },
+})
         })
         return redirect("/signin")
     } catch (error) {
