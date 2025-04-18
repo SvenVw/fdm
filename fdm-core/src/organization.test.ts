@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm"
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
 import {
     acceptInvitation,
+    cancelPendingInvitation,
     checkOrganizationSlugForAvailabilty,
     createOrganization,
     deleteOrganization,
@@ -655,6 +656,93 @@ describe("Organization Data Model", () => {
             ).rejects.toThrow(
                 "Exception for checkOrganizationSlugForAvailabilty",
             )
+        })
+
+        it("should cancel a pending invitation", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-cancel-1"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+
+            const invitationId = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                "user2@example.com",
+                "member",
+                organization_id,
+            )
+            expect(invitationId).toBeDefined()
+
+            await cancelPendingInvitation(fdm, invitationId, user1_id)
+
+            const invitation = await fdm
+                .select()
+                .from(authNSchema.invitation)
+                .where(eq(authNSchema.invitation.id, invitationId))
+                .limit(1)
+
+            expect(invitation[0].status).toBe("cancelled")
+        })
+
+        it("should throw an error if invitation does not exist", async () => {
+            await expect(
+                cancelPendingInvitation(fdm, createId(), user1_id),
+            ).rejects.toThrow("Exception for cancelPendingInvitation")
+        })
+
+        it("should throw an error if user is not admin or owner of organization", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-cancel-2"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+
+            const invitationId = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                "user2@example.com",
+                "member",
+                organization_id,
+            )
+
+            await expect(
+                cancelPendingInvitation(fdm, invitationId, user3_id),
+            ).rejects.toThrow("Exception for cancelPendingInvitation")
+        })
+        it("should throw an error if user is not member of organization", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-cancel-3"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+            const invitationId = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                "user2@example.com",
+                "member",
+                organization_id,
+            )
+            const user_not_member = createId()
+
+            await expect(
+                cancelPendingInvitation(fdm, invitationId, user_not_member),
+            ).rejects.toThrow("Exception for cancelPendingInvitation")
         })
     })
 })

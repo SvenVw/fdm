@@ -792,3 +792,72 @@ export async function checkOrganizationSlugForAvailabilty(
         )
     }
 }
+
+/**
+ * Cancels a pending invitation to join an organization.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param invitation_id - The ID of the invitation to cancel.
+ * @param admin_id - The ID of the user initiating the cancellation (must be owner or admin).
+ * @throws {Error} Throws an error if any database operation fails, if the inviter does not have permissions, or if the invitation is not found.
+ */
+export async function cancelPendingInvitation(
+    fdm: FdmType,
+    invitation_id: string,
+    admin_id: string,
+): Promise<void> {
+    try {
+        await fdm.transaction(async (tx: FdmType) => {
+            // Check if invitation exists
+            const invitation = await tx
+                .select({
+                    organizationId: authNSchema.invitation.organizationId,
+                    status: authNSchema.invitation.status,
+                })
+                .from(authNSchema.invitation)
+                .where(eq(authNSchema.invitation.id, invitation_id))
+                .limit(1)
+
+            if (invitation.length === 0) {
+                throw new Error("Invitation not found")
+            }
+            if (invitation[0].status !== "pending") {
+                throw new Error("Invitation is not pending")
+            }
+
+            // Check if user is owner or admin of organization
+            const member = await tx
+                .select({ role: authNSchema.member.role })
+                .from(authNSchema.member)
+                .where(
+                    and(
+                        eq(authNSchema.member.userId, admin_id),
+                        eq(
+                            authNSchema.member.organizationId,
+                            invitation[0].organizationId,
+                        ),
+                    ),
+                )
+                .limit(1)
+            if (member.length === 0) {
+                throw new Error("User is not a member of the organization")
+            }
+            if (member[0].role !== "owner" && member[0].role !== "admin") {
+                throw new Error(
+                    "User is not an owner or admin of the organization",
+                )
+            }
+
+            // Set status of invitation to cancelled
+            await tx
+                .update(authNSchema.invitation)
+                .set({ status: "cancelled" })
+                .where(eq(authNSchema.invitation.id, invitation_id))
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for cancelPendingInvitation", {
+            invitation_id,
+            admin_id,
+        })
+    }
+}
