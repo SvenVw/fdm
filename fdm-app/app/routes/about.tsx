@@ -16,7 +16,7 @@ import { handleLoaderError } from "~/lib/error"
 import { SidebarTitle } from "~/components/custom/sidebar/title"
 import { SidebarSupport } from "~/components/custom/sidebar/support"
 import { SidebarUser } from "~/components/custom/sidebar/user"
-import { SidebarPlatform } from "@/app/components/custom/sidebar/platform"
+import { SidebarPlatform } from "~/components/custom/sidebar/platform"
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
