@@ -263,6 +263,7 @@ export async function getPendingInvitationsForOrganization(
     organization_id: string,
 ): Promise<
     {
+        invitation_id: string
         email: string
         role: string
         expires_at: Date
@@ -273,6 +274,7 @@ export async function getPendingInvitationsForOrganization(
     try {
         const invitations = await fdm
             .select({
+                invitation_id: authNSchema.invitation.id,
                 email: authNSchema.invitation.email,
                 role: authNSchema.invitation.role,
                 expires_at: authNSchema.invitation.expiresAt,
