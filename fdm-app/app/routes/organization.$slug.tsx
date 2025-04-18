@@ -258,7 +258,7 @@ const MemberAction = ({
 }) => {
     return (
         <form method="post" className="flex items-center space-x-4">
-            <input type="hidden" name="user_id" value={member.id} />
+            <input type="hidden" name="email" value={member.email} />
             <Select defaultValue={member.role} name="role">
                 <SelectTrigger className="ml-auto w-[110px]">
                     <SelectValue placeholder="Select" />
