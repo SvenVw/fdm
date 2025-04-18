@@ -140,7 +140,7 @@ describe("Organization Data Model", () => {
 
         it("should throw an error if createOrganization fails", async () => {
             const name = "Test Organization"
-            const slug = "test-organization-24"
+            const slug = "test-organization-28"
             const description = "This is a test organization"
             // Create an unique constraint violation
             await createOrganization(fdm, user1_id, name, slug, description)
