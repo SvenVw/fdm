@@ -159,15 +159,26 @@ export default function OrganizationIndex() {
                                     <div className="text-sm font-medium">
                                         Openstaande uitnodigingen:
                                     </div>
-                                    <div className="grid gap-6">
-                                        {invitations.map((invitation) => (
-                                            <InvitationRow
-                                                key={invitation.invitation_id}
-                                                invitation={invitation}
-                                                permissions={permissions}
-                                            />
-                                        ))}
-                                    </div>
+                                    {invitations.length === 0 ? (
+                                        <div className="text-sm text-muted-foreground">
+                                            <p className="text-sm text-center text-muted-foreground">
+                                                Er zijn op dit moment geen
+                                                openstaande uitnodigingen.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div className="grid gap-6">
+                                            {invitations.map((invitation) => (
+                                                <InvitationRow
+                                                    key={
+                                                        invitation.invitation_id
+                                                    }
+                                                    invitation={invitation}
+                                                    permissions={permissions}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
