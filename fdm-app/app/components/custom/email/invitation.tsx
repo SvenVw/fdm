@@ -47,7 +47,7 @@ export const InvitationEmail = ({
             `}</style>
             </Head>
             <Preview>
-                {`${inviterName} heeft je uitgenodigd om lid te worden van ${organizationName} in ${appName}.}`}
+                {`${inviterName} heeft je uitgenodigd om lid te worden van ${organizationName} in ${appName}.`}
             </Preview>
             <Tailwind>
                 <Body className="bg-white my-auto mx-auto font-sans">
