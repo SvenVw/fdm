@@ -6,6 +6,7 @@ This change introduces a suite of helper functions within `fdm-core` to facilita
 
 *   `createOrganization`: Creates a new organization.
 *   `updateOrganization`: Updates an existing organization.
+*   `getOrganization`: Retrieves information about a specific organization.
 *   `checkOrganizationSlugForAvailability`: Checks if a given organization slug is available for use.
 *   `getOrganizationsForUser`: Retrieves a list of organizations a user belongs to.
 *   `deleteOrganization`: Deletes an organization.

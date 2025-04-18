@@ -14,6 +14,7 @@ import {
     checkOrganizationSlugForAvailabilty,
     createOrganization,
     deleteOrganization,
+    getOrganization,
     getOrganizationsForUser,
     getPendingInvitation,
     getPendingInvitationsForOrganization,
@@ -917,6 +918,109 @@ describe("Organization Data Model", () => {
                     .where(eq(authNSchema.organization.id, organization_id))
                     .limit(1)
                 expect(organization[0].logo).toBe(updatedLogo)
+            })
+        })
+        describe("getOrganization", () => {
+            it("should get an organization", async () => {
+                const name = "Test Organization"
+                const slug = "test-organization-get-1"
+                const description = "This is a test organization"
+                const organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
+                const organization = await getOrganization(fdm, slug, user1_id)
+
+                expect(organization).toBeDefined()
+                expect(organization?.id).toBe(organization_id)
+                expect(organization?.name).toBe(name)
+                expect(organization?.slug).toBe(slug)
+                expect(organization?.description).toBe(description)
+            })
+
+            it("should return null if organization does not exist", async () => {
+                const organization = await getOrganization(
+                    fdm,
+                    createId(),
+                    user1_id,
+                )
+                expect(organization).toBeNull()
+            })
+
+            it("should retrieve permissions", async () => {
+                const name = "Test Organization"
+                const slug = "test-organization-permission-get"
+                const description = "This is a test organization"
+                const organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
+                const organizationOwner = await getOrganization(
+                    fdm,
+                    slug,
+                    user1_id,
+                )
+                expect(organizationOwner).toBeDefined()
+                expect(organizationOwner?.permissions.canEdit).toBe(true)
+                expect(organizationOwner?.permissions.canDelete).toBe(true)
+                expect(organizationOwner?.permissions.canInvite).toBe(true)
+                expect(organizationOwner?.permissions.canUpdateRoleUser).toBe(
+                    true,
+                )
+                expect(organizationOwner?.permissions.canRemoveUser).toBe(true)
+
+                const invitationId = await inviteUserToOrganization(
+                    fdm,
+                    user1_id,
+                    "user2@example.com",
+                    "member",
+                    organization_id,
+                )
+                await acceptInvitation(fdm, invitationId, user2_id)
+
+                const organizationMember = await getOrganization(
+                    fdm,
+                    slug,
+                    user2_id,
+                )
+                expect(organizationMember).toBeDefined()
+                expect(organizationMember?.permissions.canEdit).toBe(false)
+                expect(organizationMember?.permissions.canDelete).toBe(false)
+                expect(organizationMember?.permissions.canInvite).toBe(false)
+                expect(organizationMember?.permissions.canUpdateRoleUser).toBe(
+                    false,
+                )
+                expect(organizationMember?.permissions.canRemoveUser).toBe(
+                    false,
+                )
+
+                await updateRoleOfUserAtOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    "user2@example.com",
+                    "admin",
+                )
+
+                const organizationAdmin = await getOrganization(
+                    fdm,
+                    slug,
+                    user2_id,
+                )
+                expect(organizationAdmin).toBeDefined()
+                expect(organizationAdmin?.permissions.canEdit).toBe(true)
+                expect(organizationAdmin?.permissions.canDelete).toBe(false)
+                expect(organizationAdmin?.permissions.canInvite).toBe(true)
+                expect(organizationAdmin?.permissions.canUpdateRoleUser).toBe(
+                    true,
+                )
+                expect(organizationAdmin?.permissions.canRemoveUser).toBe(true)
             })
         })
     })

@@ -121,7 +121,9 @@ export async function updateOrganization(
                 metadata = {}
             }
 
-            const updatedFields: Partial<typeof authNSchema.organization.$inferInsert> = {}
+            const updatedFields: Partial<
+                typeof authNSchema.organization.$inferInsert
+            > = {}
             if (name !== undefined) {
                 updatedFields.name = name
             }
@@ -157,6 +159,108 @@ export async function updateOrganization(
             description,
             logo,
             isVerified,
+        })
+    }
+}
+
+/**
+ * Retrieves an organization by its ID.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param organization_slug - The slug of the organization to retrieve.
+ * @param user_id - The ID of the user for whom to retrieve organizations.
+ * @returns A promise that resolves with the organization details and permisssions of user, or null if not found.
+ * @throws {Error} Throws an error if any database operation fails.
+ */
+export async function getOrganization(
+    fdm: FdmType,
+    organization_slug: string,
+    user_id: string,
+): Promise<{
+    id: string
+    name: string
+    slug: string
+    logo: string | null
+    isVerified: boolean
+    description: string
+    permissions: {
+        canEdit: boolean
+        canDelete: boolean
+        canInvite: boolean
+        canUpdateRoleUser: boolean
+        canRemoveUser: boolean
+    }
+} | null> {
+    try {
+        const organization = await fdm
+            .select({
+                id: authNSchema.organization.id,
+                name: authNSchema.organization.name,
+                slug: authNSchema.organization.slug,
+                logo: authNSchema.organization.logo,
+                metadata: authNSchema.organization.metadata,
+            })
+            .from(authNSchema.organization)
+            .where(eq(authNSchema.organization.slug, organization_slug))
+            .limit(1)
+
+        if (organization.length === 0) {
+            return null
+        }
+
+        const member = await fdm
+            .select({
+                role: authNSchema.member.role,
+            })
+            .from(authNSchema.user)
+            .innerJoin(
+                authNSchema.member,
+                eq(
+                    authNSchema.user.id,
+                    authNSchema.member.userId,
+                ),
+            )
+            .leftJoin(
+                authNSchema.organization,
+                eq(
+                    authNSchema.member.organizationId,
+                    authNSchema.organization.id,
+                ),
+            )
+            .where(
+                and(
+                    eq(authNSchema.organization.slug, organization_slug),
+                    eq(authNSchema.member.userId, user_id),
+                ),
+            )
+            .limit(1)
+        let role = "viewer"
+        if (member.length > 0) {
+            role = member[0].role
+        }
+
+        // Get permissions for this organization
+        const permissions = {
+            canEdit: role === "owner" || role === "admin",
+            canDelete: role === "owner",
+            canInvite: role === "owner" || role === "admin",
+            canUpdateRoleUser: role === "owner" || role === "admin",
+            canRemoveUser: role === "owner" || role === "admin",
+        }
+
+        const metadata = JSON.parse(organization[0].metadata)
+        return {
+            id: organization[0].id,
+            name: organization[0].name,
+            slug: organization[0].slug,
+            logo: organization[0].logo,
+            isVerified: metadata.isVerified,
+            description: metadata.description,
+            permissions: permissions,
+        }
+    } catch (err) {
+        throw handleError(err, "Exception for getOrganization", {
+            organization_slug,
         })
     }
 }
