@@ -1,5 +1,13 @@
 import { eq } from "drizzle-orm"
-import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
+import {
+    afterAll,
+    beforeAll,
+    beforeEach,
+    describe,
+    expect,
+    inject,
+    it,
+} from "vitest"
 import {
     acceptInvitation,
     cancelPendingInvitation,
@@ -14,6 +22,7 @@ import {
     inviteUserToOrganization,
     rejectInvitation,
     removeUserFromOrganization,
+    updateOrganization,
     updateRoleOfUserAtOrganization,
 } from "./organization"
 import { createFdmServer } from "./fdm-server"
@@ -658,91 +667,257 @@ describe("Organization Data Model", () => {
             )
         })
 
-        it("should cancel a pending invitation", async () => {
-            const name = "Test Organization"
-            const slug = "test-organization-cancel-1"
-            const description = "This is a test organization"
-            const organization_id = await createOrganization(
-                fdm,
-                user1_id,
-                name,
-                slug,
-                description,
-            )
+        describe("cancelPendingInvitation", () => {
+            it("should cancel a pending invitation", async () => {
+                const name = "Test Organization"
+                const slug = "test-organization-cancel-1"
+                const description = "This is a test organization"
+                const organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
 
-            const invitationId = await inviteUserToOrganization(
-                fdm,
-                user1_id,
-                "user2@example.com",
-                "member",
-                organization_id,
-            )
-            expect(invitationId).toBeDefined()
+                const invitationId = await inviteUserToOrganization(
+                    fdm,
+                    user1_id,
+                    "user2@example.com",
+                    "member",
+                    organization_id,
+                )
+                expect(invitationId).toBeDefined()
 
-            await cancelPendingInvitation(fdm, invitationId, user1_id)
+                await cancelPendingInvitation(fdm, invitationId, user1_id)
 
-            const invitation = await fdm
-                .select()
-                .from(authNSchema.invitation)
-                .where(eq(authNSchema.invitation.id, invitationId))
-                .limit(1)
+                const invitation = await fdm
+                    .select()
+                    .from(authNSchema.invitation)
+                    .where(eq(authNSchema.invitation.id, invitationId))
+                    .limit(1)
 
-            expect(invitation[0].status).toBe("cancelled")
+                expect(invitation[0].status).toBe("cancelled")
+            })
+
+            it("should throw an error if invitation does not exist", async () => {
+                await expect(
+                    cancelPendingInvitation(fdm, createId(), user1_id),
+                ).rejects.toThrow("Exception for cancelPendingInvitation")
+            })
+
+            it("should throw an error if user is not admin or owner of organization", async () => {
+                const name = "Test Organization"
+                const slug = "test-organization-cancel-2"
+                const description = "This is a test organization"
+                const organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
+
+                const invitationId = await inviteUserToOrganization(
+                    fdm,
+                    user1_id,
+                    "user2@example.com",
+                    "member",
+                    organization_id,
+                )
+
+                await expect(
+                    cancelPendingInvitation(fdm, invitationId, user3_id),
+                ).rejects.toThrow("Exception for cancelPendingInvitation")
+            })
+            it("should throw an error if user is not member of organization", async () => {
+                const name = "Test Organization"
+                const slug = "test-organization-cancel-3"
+                const description = "This is a test organization"
+                const organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
+                const invitationId = await inviteUserToOrganization(
+                    fdm,
+                    user1_id,
+                    "user2@example.com",
+                    "member",
+                    organization_id,
+                )
+                const user_not_member = createId()
+
+                await expect(
+                    cancelPendingInvitation(fdm, invitationId, user_not_member),
+                ).rejects.toThrow("Exception for cancelPendingInvitation")
+            })
         })
 
-        it("should throw an error if invitation does not exist", async () => {
-            await expect(
-                cancelPendingInvitation(fdm, createId(), user1_id),
-            ).rejects.toThrow("Exception for cancelPendingInvitation")
-        })
+        describe("updateOrganization", () => {
+            let organization_id: string
 
-        it("should throw an error if user is not admin or owner of organization", async () => {
-            const name = "Test Organization"
-            const slug = "test-organization-cancel-2"
-            const description = "This is a test organization"
-            const organization_id = await createOrganization(
-                fdm,
-                user1_id,
-                name,
-                slug,
-                description,
-            )
+            beforeAll(async () => {
+                // Create an organization before a test
+                const name = "Test Organization"
+                const slug = "test-organization-update-62"
+                const description = "This is a test organization"
+                organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
+            })
 
-            const invitationId = await inviteUserToOrganization(
-                fdm,
-                user1_id,
-                "user2@example.com",
-                "member",
-                organization_id,
-            )
+            it("should allow partial updates", async () => {
+                const updatedName = "Partially Updated Org"
+                const updatedDescription = "Updated Description only"
+                const oldLogo = "/old-logo.png"
+                await updateOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    undefined,
+                    undefined,
+                    updatedDescription,
+                    oldLogo,
+                    undefined,
+                )
 
-            await expect(
-                cancelPendingInvitation(fdm, invitationId, user3_id),
-            ).rejects.toThrow("Exception for cancelPendingInvitation")
-        })
-        it("should throw an error if user is not member of organization", async () => {
-            const name = "Test Organization"
-            const slug = "test-organization-cancel-3"
-            const description = "This is a test organization"
-            const organization_id = await createOrganization(
-                fdm,
-                user1_id,
-                name,
-                slug,
-                description,
-            )
-            const invitationId = await inviteUserToOrganization(
-                fdm,
-                user1_id,
-                "user2@example.com",
-                "member",
-                organization_id,
-            )
-            const user_not_member = createId()
+                await updateOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    updatedName,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                )
 
-            await expect(
-                cancelPendingInvitation(fdm, invitationId, user_not_member),
-            ).rejects.toThrow("Exception for cancelPendingInvitation")
+                const organization = await fdm
+                    .select()
+                    .from(authNSchema.organization)
+                    .where(eq(authNSchema.organization.id, organization_id))
+                    .limit(1)
+
+                expect(organization[0].name).toBe(updatedName)
+                const metadata = JSON.parse(organization[0].metadata)
+                expect(metadata.description).toBe(updatedDescription)
+                expect(organization[0].logo).toBe(oldLogo)
+            })
+
+            it("should throw an error if user is not an owner or admin", async () => {
+                const name = "Test Organization"
+                const slug = "test-organization-77"
+                const description = "This is a test organization"
+                const organization_id = await createOrganization(
+                    fdm,
+                    user1_id,
+                    name,
+                    slug,
+                    description,
+                )
+                const invitationId = await inviteUserToOrganization(
+                    fdm,
+                    user1_id,
+                    "user2@example.com",
+                    "member",
+                    organization_id,
+                )
+                await acceptInvitation(fdm, invitationId, user2_id)
+                await expect(
+                    updateOrganization(
+                        fdm,
+                        user2_id,
+                        organization_id,
+                        "New Name",
+                        "new-slug",
+                        "New description",
+                        null,
+                        false,
+                    ),
+                ).rejects.toThrow("Exception for updateOrganization")
+            })
+
+            it("should throw an error if user is not a member of the organization", async () => {
+                const new_user_id = createId()
+                await expect(
+                    updateOrganization(
+                        fdm,
+                        new_user_id,
+                        organization_id,
+                        "New Name",
+                        "new-slug",
+                        "New description",
+                        null,
+                        false,
+                    ),
+                ).rejects.toThrow("Exception for updateOrganization")
+            })
+            it("should update organization logo", async () => {
+                const updatedLogo = "/new-logo.png"
+                await updateOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    undefined,
+                    undefined,
+                    undefined,
+                    updatedLogo,
+                    undefined,
+                )
+                const organization = await fdm
+                    .select()
+                    .from(authNSchema.organization)
+                    .where(eq(authNSchema.organization.id, organization_id))
+                    .limit(1)
+                expect(organization[0].logo).toBe(updatedLogo)
+            })
+            it("should update isVerified boolean", async () => {
+                const updatedIsVerified = true
+                await updateOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    updatedIsVerified,
+                )
+                const organization = await fdm
+                    .select()
+                    .from(authNSchema.organization)
+                    .where(eq(authNSchema.organization.id, organization_id))
+                    .limit(1)
+                const metadata = JSON.parse(organization[0].metadata)
+                expect(metadata.isVerified).toBe(updatedIsVerified)
+            })
+
+            it("should set null as logo", async () => {
+                const updatedLogo = null
+                await updateOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    undefined,
+                    undefined,
+                    undefined,
+                    updatedLogo,
+                    undefined,
+                )
+                const organization = await fdm
+                    .select()
+                    .from(authNSchema.organization)
+                    .where(eq(authNSchema.organization.id, organization_id))
+                    .limit(1)
+                expect(organization[0].logo).toBe(updatedLogo)
+            })
         })
     })
 })

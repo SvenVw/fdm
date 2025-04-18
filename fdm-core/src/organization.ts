@@ -65,6 +65,103 @@ export async function createOrganization(
 }
 
 /**
+ * Updates an existing organization.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param admin_id - The ID of the user initiating the update (must be owner or admin).
+ * @param organization_id - The ID of the organization to update.
+ * @param name - (Optional) The new name of the organization.
+ * @param slug - (Optional) The new unique slug for the organization.
+ * @param description - (Optional) The new description of the organization.
+ * @param logo - (Optional) The new logo of the organization.
+ * @param isVerified - (Optional) set isVerified boolean.
+ * @returns A promise that resolves when the organization has been updated.
+ * @throws {Error} Throws an error if any database operation fails, if the user does not have permissions, or if input data is invalid.
+ */
+export async function updateOrganization(
+    fdm: FdmType,
+    admin_id: string,
+    organization_id: string,
+    name?: string,
+    slug?: string,
+    description?: string,
+    logo?: string | null,
+    isVerified?: boolean,
+): Promise<void> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Check if user is owner or admin of organization
+            const member = await tx
+                .select({ role: authNSchema.member.role })
+                .from(authNSchema.member)
+                .where(
+                    and(
+                        eq(authNSchema.member.userId, admin_id),
+                        eq(authNSchema.member.organizationId, organization_id),
+                    ),
+                )
+                .limit(1)
+            if (member.length === 0) {
+                throw new Error("User is not a member of the organization")
+            }
+            if (member[0].role !== "owner" && member[0].role !== "admin") {
+                throw new Error(
+                    "User is not an owner or admin of the organization",
+                )
+            }
+            const updatedMetadata = await tx
+                .select({ metadata: authNSchema.organization.metadata })
+                .from(authNSchema.organization)
+                .where(eq(authNSchema.organization.id, organization_id))
+                .limit(1)
+            let metadata
+            if (updatedMetadata.length > 0) {
+                metadata = JSON.parse(updatedMetadata[0].metadata)
+            } else {
+                metadata = {}
+            }
+
+            const updatedFields: Partial<typeof authNSchema.organization.$inferInsert> = {}
+            if (name !== undefined) {
+                updatedFields.name = name
+            }
+            if (slug !== undefined) {
+                updatedFields.slug = slug
+            }
+            if (logo !== undefined) {
+                updatedFields.logo = logo
+            }
+
+            if (description !== undefined) {
+                metadata.description = description
+            }
+            if (isVerified !== undefined) {
+                metadata.isVerified = isVerified
+            }
+
+            if (Object.keys(metadata).length > 0) {
+                updatedFields.metadata = JSON.stringify(metadata)
+            }
+
+            await tx
+                .update(authNSchema.organization)
+                .set(updatedFields)
+                .where(eq(authNSchema.organization.id, organization_id))
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for updateOrganization", {
+            admin_id,
+            organization_id,
+            name,
+            slug,
+            description,
+            logo,
+            isVerified,
+        })
+    }
+}
+
+/**
  * Retrieves a list of organizations that a user is a part of.
  *
  * @param fdm - The FDM instance providing the connection to the database.

@@ -5,6 +5,7 @@
 This change introduces a suite of helper functions within `fdm-core` to facilitate comprehensive organization management and user interaction as `better-auth` does not provide server functions to interact with organizations. These functions enable users and administrators to manage organizations, invite members, and control access.
 
 *   `createOrganization`: Creates a new organization.
+*   `updateOrganization`: Updates an existing organization.
 *   `checkOrganizationSlugForAvailability`: Checks if a given organization slug is available for use.
 *   `getOrganizationsForUser`: Retrieves a list of organizations a user belongs to.
 *   `deleteOrganization`: Deletes an organization.
