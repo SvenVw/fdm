@@ -40,6 +40,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../components/ui/select"
+import { formatDistanceToNow } from "date-fns"
+import { nl } from "date-fns/locale"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const session = await getSession(request)
@@ -70,6 +72,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         fdm,
         organization.organization_id,
     )
+
+    // Mock up invitations
+    if (invitations.length === 0) {
+        invitations.push({
+            invitation_id: "1",
+            email: "test@test.nl",
+            role: "member",
+            inviter_firstname: "Test",
+            inviter_surname: "Test",
+            expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        })
+    }
 
     return {
         organization: organization,
@@ -144,33 +158,43 @@ export default function OrganizationIndex() {
                                                         {member.firstname}{" "}
                                                         {member.surname}
                                                     </p>
-                                                    {/* <p className="text-sm text-muted-foreground"></p> */}
+                                                    {!permissions.canUpdateRoleUser ? (
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {member.role}
+                                                        </p>
+                                                    ) : null}
                                                 </div>
                                             </div>
-                                            {!permissions.canUpdateRoleUser ? (
-                                                <Select
-                                                    defaultValue={member.role}
-                                                >
-                                                    <SelectTrigger className="ml-auto w-[110px]">
-                                                        <SelectValue placeholder="Select" />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="owner">
-                                                            Owner
-                                                        </SelectItem>
-                                                        <SelectItem value="admin">
-                                                            Admin
-                                                        </SelectItem>
-                                                        <SelectItem value="member">
-                                                            Member
-                                                        </SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            ) : (
-                                                <Badge variant="secondary">
-                                                    {member.role}
-                                                </Badge>
-                                            )}
+                                            {permissions.canUpdateRoleUser ? (
+                                                <div className="flex items-center space-x-4">
+                                                    <Select
+                                                        defaultValue={
+                                                            member.role
+                                                        }
+                                                    >
+                                                        <SelectTrigger className="ml-auto w-[110px]">
+                                                            <SelectValue placeholder="Select" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="owner">
+                                                                Owner
+                                                            </SelectItem>
+                                                            <SelectItem value="admin">
+                                                                Admin
+                                                            </SelectItem>
+                                                            <SelectItem value="member">
+                                                                Member
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <Button
+                                                        variant="destructive"
+                                                        className="shrink-0"
+                                                    >
+                                                        Verwijder
+                                                    </Button>
+                                                </div>
+                                            ) : null}
                                         </div>
                                     ))}
                                 </div>
@@ -182,8 +206,8 @@ export default function OrganizationIndex() {
                             <CardHeader>
                                 <CardTitle>Uitnodigingen</CardTitle>
                                 <CardDescription>
-                                    Zie wie er is uitgenodigd voor de
-                                    organisatie.
+                                    Nodig nieuwe leden uit en zie welke
+                                    uitnodigingen nog open staan.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent>
@@ -218,12 +242,12 @@ export default function OrganizationIndex() {
                                 <Separator className="my-4" />
                                 <div className="space-y-4">
                                     <div className="text-sm font-medium">
-                                        People with access
+                                        Openstaande uitnodigingen:
                                     </div>
                                     <div className="grid gap-6">
                                         {invitations.map((invitation) => (
                                             <div
-                                                key={invitation.id}
+                                                key={invitation.invitation_id}
                                                 className="flex items-center justify-between space-x-4"
                                             >
                                                 <div className="flex items-center space-x-4">
@@ -244,9 +268,26 @@ export default function OrganizationIndex() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                {invitation.expires_at}
-                                                <Button>
-                                                    Annuleer uitnodiging
+                                                <div>
+                                                    <p className="text-sm font-medium leading-none">
+                                                        Verloopt{" "}
+                                                        {formatDistanceToNow(
+                                                            invitation.expires_at,
+                                                            {
+                                                                addSuffix: true,
+                                                                locale: nl,
+                                                            },
+                                                        )}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {`Uitgenodigd door: ${invitation.inviter_firstname} ${invitation.inviter_surname}`}
+                                                    </p>
+                                                </div>
+                                                <Button
+                                                    variant="destructive"
+                                                    className="shrink-0"
+                                                >
+                                                    Annuleer
                                                 </Button>
                                             </div>
                                         ))}
