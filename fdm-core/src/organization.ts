@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt } from "drizzle-orm"
+import { and, asc, count, desc, eq, gt } from "drizzle-orm"
 import { createId } from "./id"
 import type { FdmType } from "./fdm"
 import * as authNSchema from "./db/schema-authn"
@@ -49,7 +49,6 @@ export async function createOrganization(
                 role: "owner",
                 createdAt: new Date(),
             }
-            // console.log(memberData)
             await tx.insert(authNSchema.member).values(memberData)
 
             return organization_id
@@ -767,6 +766,20 @@ export async function removeUserFromOrganization(
                         eq(authNSchema.member.organizationId, organization_id),
                     ),
                 )
+
+            // Check that at least 1 user is owner of the organization
+            const ownerCount = await tx
+                .select({ count: count(authNSchema.member.id) })
+                .from(authNSchema.member)
+                .where(
+                    and(
+                        eq(authNSchema.member.organizationId, organization_id),
+                        eq(authNSchema.member.role, "owner"),
+                    ),
+                )
+            if (ownerCount.length === 0 || ownerCount[0].count === 0) {
+                throw new Error("Organization must have at least 1 owner")
+            }
         })
     } catch (err) {
         throw handleError(err, "Exception for removeUserFromOrganization", {
@@ -826,6 +839,20 @@ export async function updateRoleOfUserAtOrganization(
                         eq(authNSchema.member.organizationId, organization_id),
                     ),
                 )
+
+            // Check that at least 1 user is owner of the organization
+            const ownerCount = await tx
+                .select({ count: count(authNSchema.member.id) })
+                .from(authNSchema.member)
+                .where(
+                    and(
+                        eq(authNSchema.member.organizationId, organization_id),
+                        eq(authNSchema.member.role, "owner"),
+                    ),
+                )
+            if (ownerCount.length === 0 || ownerCount[0].count === 0) {
+                throw new Error("Organization must have at least 1 owner")
+            }
         })
     } catch (err) {
         throw handleError(err, "Exception for removeUserFromOrganization", {

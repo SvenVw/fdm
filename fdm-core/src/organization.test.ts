@@ -445,8 +445,6 @@ describe("Organization Data Model", () => {
             )
 
             // Reject one invitation
-            console.log(invitation_id)
-            console.log(user2_id)
             await rejectInvitation(fdm, invitation_id, user2_id)
 
             const invitations = await getPendingInvitationsForOrganization(
@@ -512,6 +510,27 @@ describe("Organization Data Model", () => {
                 ),
             ).resolves.toBeUndefined()
         })
+        it("should throw an error if removing last owner", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-remove-owner"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+
+            await expect(
+                removeUserFromOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    "user1@example.com",
+                ),
+            ).rejects.toThrow("Exception for removeUserFromOrganization")
+        })
 
         it("should update role of user at organization", async () => {
             const name = "Test Organization"
@@ -563,6 +582,41 @@ describe("Organization Data Model", () => {
                     "admin",
                 ),
             ).resolves.toBeUndefined()
+        })
+
+        it("should throw an error if updating user role results in no owners", async () => {
+            const name = "Test Organization"
+            const slug = "test-organization-no-owner"
+            const description = "This is a test organization"
+            const organization_id = await createOrganization(
+                fdm,
+                user1_id,
+                name,
+                slug,
+                description,
+            )
+
+            const newUserEmail = "user2@example.com"
+            const invitationId = await inviteUserToOrganization(
+                fdm,
+                user1_id,
+                newUserEmail,
+                "member",
+                organization_id,
+            )
+            expect(invitationId).toBeDefined()
+
+            await acceptInvitation(fdm, invitationId, user2_id)
+
+            await expect(
+                updateRoleOfUserAtOrganization(
+                    fdm,
+                    user1_id,
+                    organization_id,
+                    "user1@example.com",
+                    "admin",
+                ),
+            ).rejects.toThrow("Exception for removeUserFromOrganization")
         })
 
         it("should delete an organization", async () => {
