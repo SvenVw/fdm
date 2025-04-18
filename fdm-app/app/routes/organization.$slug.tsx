@@ -243,7 +243,6 @@ const MemberAction = ({
     permissions,
 }: {
     member: {
-        id: string
         firstname: string
         surname: string
         email: string

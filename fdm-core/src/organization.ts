@@ -301,11 +301,18 @@ export async function getUsersInOrganization(
     fdm: FdmType,
     organization_slug: string,
 ): Promise<
-    { firstname: string; surname: string; image: string; role: string }[]
+    {
+        eamil: string
+        firstname: string
+        surname: string
+        image: string
+        role: string
+    }[]
 > {
     try {
         const users = await fdm
             .select({
+                email: authNSchema.user.email,
                 firstname: authNSchema.user.firstname,
                 surname: authNSchema.user.surname,
                 image: authNSchema.user.image,
