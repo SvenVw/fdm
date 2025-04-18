@@ -35,9 +35,13 @@ type OrganizationType = {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-    const session = await getSession(request)
-    const organizations = await getOrganizationsForUser(fdm, session.user.id)
-    return { organizations }
+    try {
+        const session = await getSession(request)
+        const organizations = await getOrganizationsForUser(fdm, session.user.id)
+        return { organizations }
+    } catch (error) {
+        throw handleLoaderError(error)
+    }
 }
 
 export default function OrganizationsIndex() {
