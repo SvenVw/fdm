@@ -16,7 +16,7 @@ import { handleLoaderError } from "~/lib/error"
 import { SidebarTitle } from "~/components/custom/sidebar/title"
 import { SidebarSupport } from "~/components/custom/sidebar/support"
 import { SidebarUser } from "~/components/custom/sidebar/user"
-import { SidebarPlatform} from "@/app/components/custom/sidebar/platform"
+import { SidebarPlatform } from "@/app/components/custom/sidebar/platform"
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
@@ -35,7 +35,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         if (!session?.user) {
-            return redirect("/signin")
+            // Get the original URL the user tried to access
+            const currentPath = new URL(request.url).pathname
+            // Construct the sign-in URL with the redirectTo parameter
+            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+            // Perform the redirect
+            return redirect(signInUrl)
         }
 
         // Return user information from loader
@@ -45,6 +50,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
             initials: session.initials,
         }
     } catch (error) {
+        // If getSession throws (e.g., invalid token), it might result in a 401
+        // We need to handle that case here as well, similar to the ErrorBoundary
+        if (error instanceof Response && error.status === 401) {
+            const currentPath = new URL(request.url).pathname
+            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+            return redirect(signInUrl)
+        }
+        // Re-throw other errors to be handled by the ErrorBoundary or default handling
         throw handleLoaderError(error)
     }
 }

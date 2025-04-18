@@ -35,7 +35,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         if (!session?.user) {
-            return redirect("/signin")
+            // Get the original URL the user tried to access
+            const currentPath = new URL(request.url).pathname
+            // Construct the sign-in URL with the redirectTo parameter
+            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+            // Perform the redirect
+            return redirect(signInUrl)
         }
 
         // Return user information from loader
@@ -45,6 +50,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
             initials: session.initials,
         }
     } catch (error) {
+        // If getSession throws (e.g., invalid token), it might result in a 401
+        // We need to handle that case here as well, similar to the ErrorBoundary
+        if (error instanceof Response && error.status === 401) {
+            const currentPath = new URL(request.url).pathname
+            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+            return redirect(signInUrl)
+        }
+        // Re-throw other errors to be handled by the ErrorBoundary or default handling
         throw handleLoaderError(error)
     }
 }
