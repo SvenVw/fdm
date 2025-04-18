@@ -56,7 +56,7 @@ export function SidebarPlatform() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton disabled asChild>
                                 <NavLink to={"#"}>
                                     <Languages />
                                     <span>Taal</span>
