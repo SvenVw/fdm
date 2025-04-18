@@ -1,11 +1,7 @@
 import posthog from "posthog-js"
 import { useEffect } from "react"
-import type {
-    ActionFunctionArgs,
-    LoaderFunctionArgs,
-    MetaFunction,
-} from "react-router"
-import { redirect, Route, Routes } from "react-router"
+import type { LoaderFunctionArgs, MetaFunction } from "react-router"
+import { redirect } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
 import {
@@ -14,13 +10,11 @@ import {
     SidebarProvider,
 } from "~/components/ui/sidebar"
 import { SidebarInset } from "~/components/ui/sidebar"
-import { auth, getSession } from "~/lib/auth.server"
+import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
-import Account from "./user._index"
-import About from "./about"
 import { SidebarTitle } from "~/components/custom/sidebar/title"
 import { SidebarFarm } from "~/components/custom/sidebar/farm"
 import { SidebarApps } from "~/components/custom/sidebar/apps"
@@ -100,14 +94,6 @@ export default function App() {
     useEffect(() => {
         setFarmId(initialFarmId)
     }, [initialFarmId, setFarmId])
-
-    const routes = (
-        <Routes>
-            <Route path="about" element={<About />} />
-            <Route path="account" element={<Account />} />
-            <Route path="*" element={<Outlet />} />
-        </Routes>
-    )
 
     const calendarMatch = matches.find(
         (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
