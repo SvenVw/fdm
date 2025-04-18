@@ -86,7 +86,7 @@ export function SidebarPlatform() {
                         </SidebarMenuItem>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild>
-                                <NavLink to={"/organization/invites"}>
+                                <NavLink to={"/organization/invitations"}>
                                     <Mail />
                                     <span>Uitnodigingen</span>
                                 </NavLink>
