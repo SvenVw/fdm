@@ -1,16 +1,14 @@
-// Show on this page the details of an organization. Start with the name and description, which might later be expanded with other information. Add a section that show the users that are part of the organization and their role. If the user is the admin or owner of the organization it should be able to alter the role of the user or to remove the user from the organization. Add another section that shows the current invites that are pending for this organization. Make it also possible to invite a new user by providing their email
-
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import {
     getOrganizationsForUser,
     getPendingInvitationsForOrganization,
-    getPendingInvitationsforUser,
     getUsersInOrganization,
     inviteUserToOrganization,
-    updateRoleInOrganization,
+    updateRoleOfUserAtOrganization,
     removeUserFromOrganization,
-    revokeInvitation,
+    cancelPendingInvitation,
+    getOrganization,
 } from "@svenvw/fdm-core"
 import { Button } from "~/components/ui/button"
 import {
@@ -47,51 +45,46 @@ import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { z } from "zod"
-import { dataWithSuccess } from "remix-toast"
+import { dataWithError, dataWithSuccess } from "remix-toast"
 import { renderInvitationEmail, sendEmail } from "../lib/email.server"
 import { serverConfig } from "../lib/config.server"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const session = await getSession(request)
-    const organizations = await getOrganizationsForUser(fdm, session.user.id)
-    const organization = organizations.find((x) => x.slug === params.slug)
+    if (!params.slug) {
+        throw handleLoaderError("not found: organization")
+    }
 
-    if (!organization || !params.slug) {
+    const session = await getSession(request)
+    const organization = await getOrganization(
+        fdm,
+        params.slug,
+        session.user.id,
+    )
+
+    if (!organization) {
         throw handleLoaderError("not found: organization")
     }
 
     // Get members of organization
     const members = await getUsersInOrganization(fdm, params.slug)
 
-    // Check organization permissions
-    const permissions = {
-        canEdit: organization.role === "owner" || organization.role === "admin",
-        canDelete: organization.role === "owner",
-        canInvite:
-            organization.role === "owner" || organization.role === "admin",
-        canUpdateRoleUser:
-            organization.role === "owner" || organization.role === "admin",
-        canRemoveUser:
-            organization.role === "owner" || organization.role === "admin",
-    }
-
     // Get pending invitations of organization
     const invitations = await getPendingInvitationsForOrganization(
         fdm,
-        organization.organization_id,
+        organization.id,
     )
 
     return {
         organization: organization,
         invitations: invitations,
         members: members,
-        permissions: permissions,
     }
 }
 
 export default function OrganizationIndex() {
-    const { organization, invitations, members, permissions } =
+    const { organization, invitations, members } =
         useLoaderData<typeof loader>()
+    const permissions = organization.permissions
 
     return (
         <main className="container">
@@ -159,9 +152,7 @@ export default function OrganizationIndex() {
                             </CardHeader>
                             <CardContent>
                                 <InvitationForm
-                                    organizationId={
-                                        organization.organization_id
-                                    }
+                                    organizationId={organization.id}
                                 />
                                 <Separator className="my-4" />
                                 <div className="space-y-4">
@@ -302,7 +293,10 @@ const InvitationRow = ({
     }
 }) => {
     return (
-        <div className="flex items-center justify-between space-x-4">
+        <div
+            key={invitation.invitation_id}
+            className="flex items-center justify-between space-x-4"
+        >
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarFallback>
@@ -340,7 +334,7 @@ const InvitationRow = ({
                     variant="destructive"
                     className="shrink-0"
                     name="intent"
-                    value="revoke_invite"
+                    value="cancel_invite"
                 >
                     Annuleer
                 </Button>
@@ -385,45 +379,57 @@ const InvitationForm = ({ organizationId }: { organizationId: string }) => {
 }
 
 const FormSchema = z.object({
-    email: z.string().email(),
-    role: z.enum(["owner", "admin", "member"]),
+    email: z.string().email().optional(),
+    role: z.enum(["owner", "admin", "member"]).optional(),
     user_id: z.string().optional(),
     invitation_id: z.string().optional(),
-    organization_id: z.string(),
+    organization_id: z.string().optional(),
     intent: z.enum([
         "invite_user",
         "update_role",
         "remove_user",
-        "revoke_invite",
+        "cancel_invite",
     ]),
 })
 
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
+        if (!params.slug) {
+            throw handleActionError("not found: organization")
+        }
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
         const session = await getSession(request)
-        const organizations = await getOrganizationsForUser(
+        const organization = await getOrganization(
             fdm,
+            params.slug,
             session.user.id,
         )
-        const organization = organizations.find((x) => x.slug === params.slug)
-        if (!organization || !params.slug) {
+        if (!organization) {
             throw handleActionError("not found: organization")
         }
 
         if (formValues.intent === "invite_user") {
+            if (!formValues.email) {
+                return dataWithError(
+                    null,
+                    "Vul een e-mailadres in om iemand uit te nodigen",
+                )
+            }
+            if (!formValues.role) {
+                return handleActionError("missing: role")
+            }
             const invitation_id = await inviteUserToOrganization(
                 fdm,
                 session.user.id,
                 formValues.email,
                 formValues.role,
-                formValues.organization_id,
+                organization.id,
             )
             const acceptUrl = `${serverConfig.url}/organization/${params.slug}/invitation/${invitation_id}`
-            const rejectUrl = `${serverConfig.url}/organization/${params.slug}/invitation/${invitation_id}/reject`
+            const rejectUrl = `${serverConfig.url}/organization/${params.slug}/invitation/${invitation_id}`
 
             const invitationEmail = await renderInvitationEmail(
                 formValues.email,
@@ -442,10 +448,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
         if (formValues.intent === "update_role") {
-            await updateRoleInOrganization(
+            if (!formValues.email) {
+                return handleActionError("missing: email")
+            }
+            if (!formValues.role) {
+                return handleActionError("missing: role")
+            }
+            await updateRoleOfUserAtOrganization(
                 fdm,
-                params.slug,
-                formValues.user_id,
+                session.user.id,
+                organization.id,
+                formValues.email,
                 formValues.role,
             )
             return dataWithSuccess(null, {
@@ -453,18 +466,27 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
         if (formValues.intent === "remove_user") {
+            if (!formValues.email) {
+                return handleActionError("missing: email")
+            }
             await removeUserFromOrganization(
                 fdm,
                 session.user.id,
-                formValues.organization_id,
+                organization.id,
                 formValues.email,
             )
             return dataWithSuccess(null, {
                 message: `Gebruiker ${formValues.email} is verwijderd`,
             })
         }
-        if (formValues.intent === "revoke_invite") {
-            await revokeInvitation(fdm, formValues.invitation_id)
+        if (formValues.intent === "cancel_invite") {
+            if (!formValues.invitation_id)
+                throw new Error("invalid invitation_id")
+            await cancelPendingInvitation(
+                fdm,
+                formValues.invitation_id,
+                session.user.id,
+            )
             return dataWithSuccess(null, {
                 message: `Uitnodiging voor ${formValues.email} is ingetrokken`,
             })
