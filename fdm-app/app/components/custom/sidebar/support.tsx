@@ -73,6 +73,11 @@ export function SidebarSupport({
         }
     }
 
+    const handleSupportClick = () => {
+        const supportEmail = `support@${window.location.hostname}`
+        window.location.href = `mailto:${supportEmail}`
+    }
+
     return (
         <SidebarGroup className="mt-auto">
             <SidebarGroupContent>
@@ -104,9 +109,4 @@ export function SidebarSupport({
             </SidebarGroupContent>
         </SidebarGroup>
     )
-}
-
-const handleSupportClick = () => {
-    const supportEmail = `support@${window.location.hostname}`
-    window.location.href = `mailto:${supportEmail}`
 }
