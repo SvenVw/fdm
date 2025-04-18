@@ -104,7 +104,7 @@ export async function updateOrganization(
                 .from(authNSchema.organization)
                 .where(eq(authNSchema.organization.id, organization_id))
                 .limit(1)
-            let metadata
+            let metadata: { isVerified?: boolean; description?: string }
             if (updatedMetadata.length > 0) {
                 metadata = JSON.parse(updatedMetadata[0].metadata)
             } else {
