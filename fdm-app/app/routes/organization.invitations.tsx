@@ -108,7 +108,7 @@ export default function OrganizationsIndex() {
                             </p>
                         </div>
                         <Button asChild>
-                            <NavLink to="./organization/">
+                            <NavLink to="/organization">
                                 Terug naar organisaties
                             </NavLink>
                         </Button>
@@ -215,7 +215,7 @@ export async function action({ request }: ActionFunctionArgs) {
                 formValues.invitation_id,
                 session.user.id,
             )
-            return redirectWithSuccess("./organization", {
+            return redirectWithSuccess("/organization", {
                 message: "Uitnodiging geaccepteerd! 🎉",
             })
         }
@@ -225,7 +225,7 @@ export async function action({ request }: ActionFunctionArgs) {
                 formValues.invitation_id,
                 session.user.id,
             )
-            return redirectWithSuccess("./organization", {
+            return redirectWithSuccess("/organization", {
                 message: "Uitnodiging afgewezen",
             })
         }
