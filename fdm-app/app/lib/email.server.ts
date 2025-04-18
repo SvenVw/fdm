@@ -38,16 +38,12 @@ export async function renderInvitationEmail(
     inviteeEmail: string,
     inviter: User,
     organizationName: string,
-    acceptUrl: string,
-    rejectUrl: string,
 ): Promise<Email> {
     const emailHtml = await render(
         InvitationEmail({
             inviteeEmail: inviteeEmail,
             inviterName: `${inviter.firstname} ${inviter.surname}`,
             organizationName: organizationName,
-            acceptUrl: acceptUrl,
-            rejectUrl: rejectUrl,
             appName: serverConfig.name,
             appBaseUrl: serverConfig.url,
         }),

@@ -421,16 +421,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!formValues.role) {
                 return handleActionError("missing: role")
             }
-            const invitation_id = await inviteUserToOrganization(
+            await inviteUserToOrganization(
                 fdm,
                 session.user.id,
                 formValues.email,
                 formValues.role,
                 organization.id,
             )
-            const acceptUrl = `${serverConfig.url}/organization/${params.slug}/invitation/${invitation_id}`
-            const rejectUrl = `${serverConfig.url}/organization/${params.slug}/invitation/${invitation_id}`
-
             const invitationEmail = await renderInvitationEmail(
                 formValues.email,
                 {
@@ -438,8 +435,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     surname: session.user.surname,
                 },
                 organization.name,
-                acceptUrl,
-                rejectUrl,
             )
             await sendEmail(invitationEmail)
 

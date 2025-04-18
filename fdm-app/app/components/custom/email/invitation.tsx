@@ -16,8 +16,6 @@ interface InvitationEmailProps {
     organizationName: string
     inviterName: string
     inviteeEmail: string
-    acceptUrl: string
-    rejectUrl: string
     appName: string
     appBaseUrl?: string // Optional base URL for logo path
     logoFileName?: string // Optional logo file name
@@ -27,8 +25,6 @@ export const InvitationEmail = ({
     organizationName,
     inviterName,
     inviteeEmail,
-    acceptUrl,
-    rejectUrl,
     appName,
     appBaseUrl = "",
     logoFileName = "/fdm-high-resolution-logo-transparent.png",
@@ -84,26 +80,17 @@ export const InvitationEmail = ({
                         </Text>
                         <Section className="mt-[32px] mb-[32px]">
                             <Button
-                                href={acceptUrl}
+                                href={`${appBaseUrl}/organization/invitations`}
                                 className="bg-[#0070f3] text-white rounded px-[12px] py-[12px] text-[14px] font-semibold no-underline"
                             >
-                                Uitnodiging accepteren
+                                Uitnodiging bekijken
                             </Button>
                         </Section>
                         <Text className="text-black text-[14px] leading-[24px]">
                             Als je deze uitnodiging niet wilt accepteren, kun je
-                            deze e-mail negeren, of op de onderstaande link
-                            klikken om de uitnodiging te weigeren.
+                            deze e-mail negeren, of op bovenstaande knop klikken
+                            om de uitnodiging te weigeren.
                         </Text>
-                        <Section className="mt-[32px] mb-[32px]">
-                            <Button
-                                href={rejectUrl}
-                                className="bg-[#dc2626] text-white rounded px-[12px] py-[12px] text-[14px] font-semibold no-underline"
-                            >
-                                Uitnodiging Weigeren
-                            </Button>
-                        </Section>
-
                         <Text className="text-black text-[14px] leading-[24px] mt-[32px]">
                             Met vriendelijke groet, <br /> Het {appName} team
                         </Text>
