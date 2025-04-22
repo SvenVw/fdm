@@ -1,6 +1,6 @@
+import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
-import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -12,9 +12,8 @@ import {
 } from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
+import { FarmTitle } from "../components/custom/farm/farm-title"
 import { Badge } from "../components/ui/badge"
-import { SidebarTrigger } from "../components/ui/sidebar"
-import { Separator } from "../components/ui/separator"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -22,7 +21,8 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "../components/ui/breadcrumb"
-import { FarmTitle } from "../components/custom/farm/farm-title"
+import { Separator } from "../components/ui/separator"
+import { SidebarTrigger } from "../components/ui/sidebar"
 import { handleLoaderError } from "../lib/error"
 
 // Define the type for a single organization based on getOrganizationsForUser return type
@@ -38,7 +38,10 @@ type OrganizationType = {
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         const session = await getSession(request)
-        const organizations = await getOrganizationsForUser(fdm, session.user.id)
+        const organizations = await getOrganizationsForUser(
+            fdm,
+            session.user.id,
+        )
         return { organizations }
     } catch (error) {
         throw handleLoaderError(error)

@@ -144,7 +144,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         // Redirect to signin page if authentication is not provided
         if (error.status === 401) {
             // Get the current path the user tried to access
-            const currentPath = location.pathname + location.search + location.hash
+            const currentPath =
+                location.pathname + location.search + location.hash
             // Construct the sign-in URL with the redirectTo parameter
             const signInUrl = `./signin?redirectTo=${encodeURIComponent(currentPath)}`
             // Throw the redirect response to be caught by React Router

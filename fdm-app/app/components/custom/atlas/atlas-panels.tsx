@@ -3,7 +3,11 @@ import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useMap } from "react-map-gl/mapbox"
-import type { MapBoxZoomEvent, MapEvent, MapMouseEvent } from "react-map-gl/mapbox"
+import type {
+    MapBoxZoomEvent,
+    MapEvent,
+    MapMouseEvent,
+} from "react-map-gl/mapbox"
 import { data, useFetcher } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"

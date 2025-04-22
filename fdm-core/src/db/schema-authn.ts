@@ -1,10 +1,10 @@
 import {
-    text,
-    integer,
     bigint,
-    timestamp,
     boolean,
+    integer,
     pgSchema,
+    text,
+    timestamp,
 } from "drizzle-orm/pg-core"
 
 // Define postgres schema

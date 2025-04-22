@@ -4,6 +4,11 @@ import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { redirect } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
+import { SidebarApps } from "~/components/custom/sidebar/apps"
+import { SidebarFarm } from "~/components/custom/sidebar/farm"
+import { SidebarSupport } from "~/components/custom/sidebar/support"
+import { SidebarTitle } from "~/components/custom/sidebar/title"
+import { SidebarUser } from "~/components/custom/sidebar/user"
 import {
     Sidebar,
     SidebarContent,
@@ -15,11 +20,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
-import { SidebarTitle } from "~/components/custom/sidebar/title"
-import { SidebarFarm } from "~/components/custom/sidebar/farm"
-import { SidebarApps } from "~/components/custom/sidebar/apps"
-import { SidebarSupport } from "~/components/custom/sidebar/support"
-import { SidebarUser } from "~/components/custom/sidebar/user"
 
 export const meta: MetaFunction = () => {
     return [

@@ -4,6 +4,10 @@ import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import { useLoaderData } from "react-router"
 import { Outlet } from "react-router-dom"
+import { SidebarPlatform } from "~/components/custom/sidebar/platform"
+import { SidebarSupport } from "~/components/custom/sidebar/support"
+import { SidebarTitle } from "~/components/custom/sidebar/title"
+import { SidebarUser } from "~/components/custom/sidebar/user"
 import {
     Sidebar,
     SidebarContent,
@@ -13,10 +17,6 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { SidebarTitle } from "~/components/custom/sidebar/title"
-import { SidebarSupport } from "~/components/custom/sidebar/support"
-import { SidebarUser } from "~/components/custom/sidebar/user"
-import { SidebarPlatform } from "~/components/custom/sidebar/platform"
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.

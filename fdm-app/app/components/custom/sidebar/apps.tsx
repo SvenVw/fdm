@@ -1,5 +1,13 @@
-import { ArrowRightLeft, GitPullRequestArrow, MapIcon, Scale } from "lucide-react"
+import { useCalendarStore } from "@/app/store/calendar"
+import { useFarmStore } from "@/app/store/farm"
+import {
+    ArrowRightLeft,
+    GitPullRequestArrow,
+    MapIcon,
+    Scale,
+} from "lucide-react"
 import { NavLink, useLocation } from "react-router"
+import { Badge } from "~/components/ui/badge"
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -9,9 +17,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
-import { Badge } from "~/components/ui/badge"
-import { useFarmStore } from "@/app/store/farm"
-import { useCalendarStore } from "@/app/store/calendar"
 
 export function SidebarApps() {
     const farmId = useFarmStore((state) => state.farmId)

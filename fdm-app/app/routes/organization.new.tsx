@@ -1,15 +1,35 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+    checkOrganizationSlugForAvailability,
+    createOrganization,
+} from "@svenvw/fdm-core"
+import { useEffect } from "react"
+import {
     type ActionFunctionArgs,
     Form,
     type LoaderFunctionArgs,
     type MetaFunction,
 } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { useRemixForm, RemixFormProvider } from "remix-hook-form"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import {
     FormControl,
     FormDescription,
@@ -19,34 +39,14 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Textarea } from "~/components/ui/textarea"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { SidebarTrigger } from "../components/ui/sidebar"
-import { Separator } from "../components/ui/separator"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import { useEffect } from "react"
-import { Textarea } from "~/components/ui/textarea"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import {
-    checkOrganizationSlugForAvailability,
-    createOrganization,
-} from "@svenvw/fdm-core"
+import { Separator } from "../components/ui/separator"
+import { SidebarTrigger } from "../components/ui/sidebar"
 
 export const meta: MetaFunction = () => {
     return [
