@@ -866,7 +866,7 @@ export async function updateRoleOfUserAtOrganization(
             }
         })
     } catch (err) {
-        throw handleError(err, "Exception for removeUserFromOrganization", {
+        throw handleError(err, "Exception for updateRoleOfUserAtOrganization", {
             admin_id,
             organization_id,
             email,
