@@ -69,7 +69,7 @@
         "nanoid": "^5.1.5",
         "postgres": "^3.4.5"
     },
-    "packageManager": "pnpm@10.7.0",
+    "packageManager": "pnpm@10.9.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }
