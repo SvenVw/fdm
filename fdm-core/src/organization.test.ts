@@ -608,7 +608,7 @@ describe("Organization Data Model", () => {
                     "user1@example.com",
                     "admin",
                 ),
-            ).rejects.toThrow("Exception for removeUserFromOrganization")
+            ).rejects.toThrow("Exception for updateRoleOfUserAtOrganization")
         })
 
         it("should delete an organization", async () => {
