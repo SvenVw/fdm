@@ -300,7 +300,7 @@ export default function SignIn() {
                                 <p className="text-sm font-medium text-muted-foreground text-center">
                                     Door verder te gaan, gaat u akkoord met het{" "}
                                     <a
-                                        href="/privacy"
+                                        href={clientConfig.privacy_url}
                                         aria-label="Lees ons privacybeleid"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -311,12 +311,12 @@ export default function SignIn() {
                                 </p>
                             </CardFooter>
                         </Card>
-                        <div className="mb-4 text-center text-sm">
+                        {/* <div className="mb-4 text-center text-sm">
                             <Button variant={"outline"}>
                                 {`Lees meer over ${clientConfig.name}`}{" "}
                                 <MoveDown />
                             </Button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className="hidden bg-muted lg:block">
