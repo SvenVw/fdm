@@ -302,7 +302,8 @@ export async function getUsersInOrganization(
     organization_slug: string,
 ): Promise<
     {
-        eamil: string
+        id: string
+        email: string
         firstname: string
         surname: string
         image: string
@@ -312,6 +313,7 @@ export async function getUsersInOrganization(
     try {
         const users = await fdm
             .select({
+                id: authNSchema.member.id,
                 email: authNSchema.user.email,
                 firstname: authNSchema.user.firstname,
                 surname: authNSchema.user.surname,

@@ -200,7 +200,6 @@ const MemberRow = ({
         email: string
         role: string
         image: string
-        initials: string
     }
     permissions: {
         canEdit: boolean
@@ -210,6 +209,7 @@ const MemberRow = ({
         canRemoveUser: boolean
     }
 }) => {
+    const initials = member.firstname.charAt(0) + member.surname.charAt(0)
     return (
         <div
             key={member.email}
@@ -218,7 +218,7 @@ const MemberRow = ({
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarImage src={member.image} />
-                    <AvatarFallback>{member.initials}</AvatarFallback>
+                    <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
                 <div>
                     <p className="text-sm font-medium leading-none">
@@ -248,7 +248,6 @@ const MemberAction = ({
         email: string
         role: string
         image: string
-        initials: string
     }
     permissions: {
         canEdit: boolean
