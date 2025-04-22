@@ -208,8 +208,8 @@ export async function getOrganization(
                 name: organization[0].name,
                 slug: organization[0].slug,
                 logo: organization[0].logo,
-                isVerified: metadata.isVerified,
-                description: metadata.description,
+                isVerified: metadata.isVerified ?? false,
+                description: metadata.description ?? "",
                 permissions: permissions,
             }
         })
