@@ -32,6 +32,15 @@ import { extractFormValuesFromRequest } from "~/lib/form"
 import { z } from "zod"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "~/components/ui/dialog"
 
 // Define the type for a single invitation
 type InvitationType = {
@@ -165,21 +174,50 @@ export default function OrganizationsIndex() {
                                                 Accepteren
                                             </Button>
                                         </form>
-                                        <form method="post">
-                                            <input
-                                                type="hidden"
-                                                name="invitation_id"
-                                                value={invitation.invitation_id}
-                                            />
-                                            <Button
-                                                variant="outline"
-                                                name="intent"
-                                                value="reject"
-                                                size="sm"
-                                            >
-                                                Afwijzen
-                                            </Button>
-                                        </form>
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                >
+                                                    Afwijzen
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogHeader>
+                                                    <DialogTitle>
+                                                        Uitnodiging afwijzen
+                                                    </DialogTitle>
+                                                    <DialogDescription>
+                                                        Weet je zeker dat je de
+                                                        uitnodiging van{" "}
+                                                        {
+                                                            invitation.organization_name
+                                                        }{" "}
+                                                        wilt afwijzen?
+                                                    </DialogDescription>
+                                                </DialogHeader>
+                                                <DialogFooter>
+                                                    <form method="post">
+                                                        <input
+                                                            type="hidden"
+                                                            name="invitation_id"
+                                                            value={
+                                                                invitation.invitation_id
+                                                            }
+                                                        />
+                                                        <Button
+                                                            variant="default"
+                                                            name="intent"
+                                                            value="reject"
+                                                            size="sm"
+                                                        >
+                                                            Ja, afwijzen
+                                                        </Button>
+                                                    </form>
+                                                </DialogFooter>
+                                            </DialogContent>
+                                        </Dialog>
                                     </div>
                                 </CardFooter>
                             </Card>
