@@ -7,7 +7,6 @@ import {
     getFarms,
     getFields,
 } from "@svenvw/fdm-core"
-import { centroid } from "@turf/centroid"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
 import { useState } from "react"
 import {
@@ -15,7 +14,7 @@ import {
     Layer,
     Map as MapGL,
     NavigationControl,
-} from "react-map-gl"
+} from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,

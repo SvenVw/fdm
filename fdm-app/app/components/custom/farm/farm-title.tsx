@@ -1,6 +1,6 @@
+import { NavLink } from "react-router"
 import { Separator } from "~/components/ui/separator"
 import { Button } from "../../ui/button"
-import { NavLink } from "react-router"
 
 interface FarmTitleProps {
     title: string

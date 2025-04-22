@@ -1,9 +1,9 @@
 import { render } from "@react-email/components"
 import type { User } from "better-auth"
 import postmark from "postmark"
+import { InvitationEmail } from "~/components/custom/email/invitation"
 import { WelcomeEmail } from "~/components/custom/email/welcome"
 import { serverConfig } from "~/lib/config.server"
-import { InvitationEmail } from "~/components/custom/email/invitation"
 
 const client = new postmark.ServerClient(String(process.env.POSTMARK_API_KEY))
 

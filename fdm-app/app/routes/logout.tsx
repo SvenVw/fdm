@@ -20,13 +20,13 @@ export async function action({ request }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         // Revoke the session
-// Revoke the session
-await auth.api.revokeSession({
-    headers: request.headers,
-    body: {
-        token: session?.session?.token || undefined,
-    },
-})
+        // Revoke the session
+        await auth.api.revokeSession({
+            headers: request.headers,
+            body: {
+                token: session?.session?.token || undefined,
+            },
+        })
         return redirect("/signin")
     } catch (error) {
         throw handleActionError(error)

@@ -49,10 +49,10 @@
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
         "postgres": "^3.4.5",
-        "rollup": "^4.38.0",
+        "rollup": "^4.40.0",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.7.0"
+    "packageManager": "pnpm@10.9.0"
 }

@@ -1,33 +1,4 @@
 import {
-    getMapboxStyle,
-    getMapboxToken,
-} from "@/components/custom/atlas/atlas-mapbox"
-import {
-    FieldsPanelHover,
-    FieldsPanelSelection,
-    FieldsPanelZoom,
-} from "@/components/custom/atlas/atlas-panels"
-import {
-    FieldsSourceAvailable,
-    FieldsSourceSelected,
-} from "@/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "@/components/custom/atlas/atlas-styles"
-import { getViewState } from "@/components/custom/atlas/atlas-viewstate"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/auth.server"
-import { getCalendar, getTimeframe } from "@/lib/calendar"
-import { handleActionError, handleLoaderError } from "@/lib/error"
-import { useCalendarStore } from "@/store/calendar"
-import {
     addCultivation,
     addField,
     addSoilAnalysis,
@@ -39,7 +10,7 @@ import {
     Layer,
     Map as MapGL,
     NavigationControl,
-} from "react-map-gl"
+} from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -95,11 +66,11 @@ export const meta: MetaFunction = () => {
 /**
  * Retrieves farm details and map configurations for rendering the farm map.
  *
- * This loader function extracts the farm ID from route parameters, validates its presence, and uses the current session to fetch the corresponding farm details. It then retrieves the Mapbox token and style configuration, and returns these along with the farm's display name and a URL for available fields. Any errors encountered during processing are transformed using {@link handleLoaderError}.
+ * This loader function extracts the farm ID from route parameters, validates its presence, and uses the current session to fetch the corresponding farm details. It then retrieves the Mapbox token and style configuration, and returns these along with the farm's display name and a URL for available fields. Any errors encountered during processing are transformed using {~link handleLoaderError}.
  *
- * @throws {Response} When the farm ID is missing, the specified farm is not found, or another error occurs during data retrieval.
+ * ~throws {Response} When the farm ID is missing, the specified farm is not found, or another error occurs during data retrieval.
  *
- * @returns An object containing the farm name, Mapbox token, Mapbox style, and the URL for available fields.
+ * ~returns An object containing the farm name, Mapbox token, Mapbox style, and the URL for available fields.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -274,9 +245,9 @@ export default function Index() {
  * creates the corresponding cultivation entry, and conditionally performs soil analysis if an API key is present.
  * Upon successful processing, it redirects to the farm fields page with a success message.
  *
- * @returns A redirect response to the farm fields page with a success message.
+ * ~returns A redirect response to the farm fields page with a success message.
  *
- * @throws {Error} If the farm identifier is missing or if an operation (such as adding a field, cultivation,
+ * ~throws {Error} If the farm identifier is missing or if an operation (such as adding a field, cultivation,
  * or soil analysis) fails.
  */
 export async function action({ request, params }: ActionFunctionArgs) {

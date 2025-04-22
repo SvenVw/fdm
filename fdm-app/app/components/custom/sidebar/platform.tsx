@@ -11,6 +11,7 @@ import {
     Users,
 } from "lucide-react"
 import { NavLink } from "react-router"
+import { Button } from "~/components/ui/button"
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -19,7 +20,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
-import { Button } from "~/components/ui/button"
 
 export function SidebarPlatform() {
     return (

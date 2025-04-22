@@ -1,5 +1,10 @@
 import { eq } from "drizzle-orm"
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
+import { type BetterAuth, createFdmAuth } from "./authentication"
+import * as authNSchema from "./db/schema-authn"
+import { createFdmServer } from "./fdm-server"
+import type { FdmServerType } from "./fdm-server.d"
+import { createId } from "./id"
 import {
     acceptInvitation,
     cancelPendingInvitation,
@@ -18,11 +23,6 @@ import {
     updateOrganization,
     updateRoleOfUserAtOrganization,
 } from "./organization"
-import { createFdmServer } from "./fdm-server"
-import type { FdmServerType } from "./fdm-server.d"
-import * as authNSchema from "./db/schema-authn"
-import { type BetterAuth, createFdmAuth } from "./authentication"
-import { createId } from "./id"
 
 describe("Organization Data Model", () => {
     let fdm: FdmServerType

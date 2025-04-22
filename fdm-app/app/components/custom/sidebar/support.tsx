@@ -1,6 +1,7 @@
-import * as Sentry from "@sentry/react"
 import { clientConfig } from "@/app/lib/config"
+import * as Sentry from "@sentry/react"
 import { LifeBuoy, Send } from "lucide-react"
+import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
 import { toast } from "sonner"
 import {
@@ -10,7 +11,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
-import { useEffect, useState } from "react"
 
 export function SidebarSupport({
     name,

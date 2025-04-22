@@ -1,12 +1,33 @@
-import { Calendar, Check, ChevronRight, House, Shapes, Square } from "lucide-react"
-import { NavLink, useLocation } from "react-router"
-import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "~/components/ui/sidebar"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
-import { Badge } from "~/components/ui/badge"
-import { useFarmStore } from "@/app/store/farm"
-import { useCalendarStore } from "@/app/store/calendar"
 import { getCalendarSelection } from "@/app/lib/calendar"
+import { useCalendarStore } from "@/app/store/calendar"
+import { useFarmStore } from "@/app/store/farm"
+import {
+    Calendar,
+    Check,
+    ChevronRight,
+    House,
+    Shapes,
+    Square,
+} from "lucide-react"
 import { useState } from "react"
+import { NavLink, useLocation } from "react-router"
+import { Badge } from "~/components/ui/badge"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
+import {
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
+} from "~/components/ui/sidebar"
 
 export function SidebarFarm() {
     const farmId = useFarmStore((state) => state.farmId)
@@ -146,7 +167,7 @@ export function SidebarFarm() {
                                 <span>Kalender</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
-                    )}                   
+                    )}
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
                             {fieldsLink ? (

@@ -1,19 +1,5 @@
-import {
-    SidebarFooter,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "~/components/ui/sidebar"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { useIsMobile } from "@/app/hooks/use-mobile"
+import { clientConfig } from "@/app/lib/config"
 import {
     BadgeCheck,
     ChevronsUpDown,
@@ -23,11 +9,25 @@ import {
     Settings,
     Sparkles,
 } from "lucide-react"
-import { Form, NavLink } from "react-router"
-import { Button } from "~/components/ui/button"
-import { clientConfig } from "@/app/lib/config"
 import posthog from "posthog-js"
-import { useIsMobile } from "@/app/hooks/use-mobile"
+import { Form, NavLink } from "react-router"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Button } from "~/components/ui/button"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
+import {
+    SidebarFooter,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from "~/components/ui/sidebar"
 
 export function SidebarUser({
     name,
