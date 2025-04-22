@@ -1,6 +1,7 @@
 export interface ServerConfig {
     name: string
     url: string
+    privacy_url: string
     auth: {
         fdm_session_secret: string
         better_auth_secret: string
@@ -52,6 +53,7 @@ export interface ClientConfig {
     logo: string
     logomark: string
     url: string
+    privacy_url: string
     analytics: {
         sentry?: {
             dsn: string

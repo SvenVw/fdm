@@ -300,7 +300,7 @@ export default function SignIn() {
                                 <p className="text-sm font-medium text-muted-foreground text-center">
                                     Door verder te gaan, gaat u akkoord met het{" "}
                                     <a
-                                        href="/privacy"
+                                        href={clientConfig.privacy_url}
                                         aria-label="Lees ons privacybeleid"
                                         target="_blank"
                                         rel="noopener noreferrer"
