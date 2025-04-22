@@ -1,6 +1,15 @@
 import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
+import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Badge } from "~/components/ui/badge"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -10,20 +19,11 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmTitle } from "../components/custom/farm/farm-title"
-import { Badge } from "../components/ui/badge"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "../components/ui/breadcrumb"
-import { Separator } from "../components/ui/separator"
-import { SidebarTrigger } from "../components/ui/sidebar"
-import { handleLoaderError } from "../lib/error"
 
 // Define the type for a single organization based on getOrganizationsForUser return type
 type OrganizationType = {
