@@ -135,10 +135,12 @@ export async function updateOrganization(
                 updatedFields.metadata = JSON.stringify(metadata)
             }
 
-            await tx
-                .update(authNSchema.organization)
-                .set(updatedFields)
-                .where(eq(authNSchema.organization.id, organization_id))
+            if (Object.keys(updatedFields).length > 0) {
+                await tx
+                    .update(authNSchema.organization)
+                    .set(updatedFields)
+                    .where(eq(authNSchema.organization.id, organization_id))
+            }
         })
     } catch (err) {
         throw handleError(err, "Exception for updateOrganization", {
