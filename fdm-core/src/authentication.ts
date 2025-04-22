@@ -2,27 +2,31 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
+import { organization } from "better-auth/plugins"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
 /**
- * Initializes and configures the authentication system for the farm management application.
+ * Initializes and configures the authentication system for the FDM application using Better Auth.
  *
- * This function sets up the better-auth system with a PostgreSQL database adapter and a custom schema.
- * It validates that required environment variables for Google and Microsoft authentication are set,
- * configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
+ * This function sets up the Better Auth system with a PostgreSQL database adapter and a custom schema,
+ * allowing users to authenticate via social providers like Google and Microsoft, or optionally with email and password.
+ * It configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
  * with a 30-day expiration and daily update. It also defines mappings from social provider profiles to user
- * formats.
+ * formats, extracting relevant user information.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param google Optional configuration for Google authentication. If provided, users can sign up and sign in with their Google accounts.
+ * @param microsoft Optional configuration for Microsoft authentication. If provided, users can sign up and sign in with their Microsoft accounts.
+ * @param emailAndPassword Optional boolean indicating whether to enable email and password authentication. Defaults to false.
  * @returns The configured authentication instance.
- *
  * @throws {Error} If required environment variables are missing or if role assignment fails.
  */
 export function createFdmAuth(
     fdm: FdmType,
     google?: { clientSecret: string; clientId: string },
     microsoft?: { clientSecret: string; clientId: string },
+    emailAndPassword?: boolean,
 ): BetterAuth {
     // Setup social auth providers
     let googleAuth = undefined
@@ -110,8 +114,32 @@ export function createFdmAuth(
             microsoft: microsoftAuth,
         },
         rateLimit: {
+            enabled: process.env.NODE_ENV === "production",
+            window: 10,
+            max: 100,
             storage: "database",
         },
+        emailAndPassword: {
+            enabled: emailAndPassword || false,
+        },
+        plugins: [
+            organization({
+                organizationCreation: {
+                    disabled: false, // Set to true to disable organization creation
+                    beforeCreate: async ({ organization }) => {
+                        return {
+                            data: {
+                                ...organization,
+                                metadata: {
+                                    isVerified: false,
+                                    description: "",
+                                },
+                            },
+                        }
+                    },
+                },
+            }),
+        ],
     })
 
     return auth

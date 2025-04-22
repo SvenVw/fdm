@@ -1,8 +1,8 @@
 import posthog from "posthog-js"
 import { useEffect } from "react"
-import type { LoaderFunctionArgs, MetaFunction } from "react-router"
+import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
-import { useLoaderData, useMatches } from "react-router"
+import { useLoaderData } from "react-router"
 import { Outlet } from "react-router-dom"
 import {
     Sidebar,
@@ -13,24 +13,10 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { useCalendarStore } from "~/store/calendar"
-import { useFarmStore } from "~/store/farm"
 import { SidebarTitle } from "~/components/custom/sidebar/title"
-import { SidebarFarm } from "~/components/custom/sidebar/farm"
-import { SidebarApps } from "~/components/custom/sidebar/apps"
 import { SidebarSupport } from "~/components/custom/sidebar/support"
 import { SidebarUser } from "~/components/custom/sidebar/user"
-
-export const meta: MetaFunction = () => {
-    return [
-        { title: `Dashboard | ${clientConfig.name}` },
-        {
-            name: "description",
-            content:
-                "Beheer je bedrijfsgegevens, percelen en gewassen in één overzichtelijk dashboard.",
-        },
-    ]
-}
+import { SidebarPlatform } from "~/components/custom/sidebar/platform"
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
@@ -49,12 +35,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         if (!session?.user) {
-            // Get the original URL the user tried to access
-            const currentPath = new URL(request.url).pathname
-            // Construct the sign-in URL with the redirectTo parameter
-            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
-            // Perform the redirect
-            return redirect(signInUrl)
+            return redirect("/signin")
         }
 
         // Return user information from loader
@@ -64,14 +45,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
             initials: session.initials,
         }
     } catch (error) {
-        // If getSession throws (e.g., invalid token), it might result in a 401
-        // We need to handle that case here as well, similar to the ErrorBoundary
-        if (error instanceof Response && error.status === 401) {
-            const currentPath = new URL(request.url).pathname
-            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
-            return redirect(signInUrl)
-        }
-        // Re-throw other errors to be handled by the ErrorBoundary or default handling
         throw handleLoaderError(error)
     }
 }
@@ -83,27 +56,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function App() {
     const loaderData = useLoaderData<typeof loader>()
-    const matches = useMatches()
-    const farmMatch = matches.find(
-        (match) =>
-            match.pathname.startsWith("/farm/") && match.params.b_id_farm,
-    )
-    const initialFarmId = farmMatch?.params.b_id_farm as string | undefined
-    const setFarmId = useFarmStore((state) => state.setFarmId)
-
-    useEffect(() => {
-        setFarmId(initialFarmId)
-    }, [initialFarmId, setFarmId])
-
-    const calendarMatch = matches.find(
-        (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
-    )
-    const initialCalendar = calendarMatch?.params.calendar as string | undefined
-    const setCalendar = useCalendarStore((state) => state.setCalendar)
-
-    useEffect(() => {
-        setCalendar(initialCalendar)
-    }, [initialCalendar, setCalendar])
 
     // Identify user if PostHog is configured
     useEffect(() => {
@@ -121,8 +73,7 @@ export default function App() {
             <Sidebar>
                 <SidebarTitle />
                 <SidebarContent>
-                    <SidebarFarm />
-                    <SidebarApps />
+                    <SidebarPlatform />
                 </SidebarContent>
                 <SidebarSupport
                     name={loaderData.userName}
