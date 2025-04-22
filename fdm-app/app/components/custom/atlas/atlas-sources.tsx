@@ -2,7 +2,7 @@ import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
-import { Source, useMap } from "react-map-gl"
+import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import type { FieldsAvailableUrlType } from "./atlas.d"
 

@@ -17,6 +17,7 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { useCalendarStore } from "../store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -118,6 +119,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
+    const calendar = useCalendarStore((state) => state.calendar)
 
     // Get the current layer
     const pathname = location.pathname
@@ -132,7 +134,7 @@ export default function FarmContentBlock() {
                 layerOptions={loaderData.layerOptions}
                 layerSelected={layerSelected}
                 action={{
-                    to: `/farm/${loaderData.b_id_farm}/field`,
+                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field`,
                     label: "Naar percelen",
                 }}
             />

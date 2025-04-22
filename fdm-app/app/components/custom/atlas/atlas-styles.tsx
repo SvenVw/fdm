@@ -2,7 +2,7 @@ import type {
     FillLayerSpecification,
     LayerProps,
     SymbolLayerSpecification,
-} from "react-map-gl"
+} from "react-map-gl/mapbox"
 
 export function getFieldsStyle(layerId: string): LayerProps &
     (
