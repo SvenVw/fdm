@@ -279,8 +279,6 @@ export async function grantRole(
                 role: role,
             }
             await tx.insert(authZSchema.role).values(roleData)
-
-            return role_id
         })
     } catch (err) {
         throw handleError(err, "Exception for granting role", {
