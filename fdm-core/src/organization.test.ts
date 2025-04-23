@@ -58,6 +58,7 @@ describe("Organization Data Model", () => {
                     name: "user1",
                     firstname: "user1",
                     surname: "user1",
+                    username: "user1",
                     password: "password",
                 },
             })
@@ -70,6 +71,7 @@ describe("Organization Data Model", () => {
                     name: "user2",
                     firstname: "user2",
                     surname: "user2",
+                    username: "user2",
                     password: "password",
                 },
             })
@@ -82,6 +84,7 @@ describe("Organization Data Model", () => {
                     name: "user3",
                     firstname: "user3",
                     surname: "user3",
+                    username: "user3",
                     password: "password",
                 },
             })
@@ -470,7 +473,7 @@ describe("Organization Data Model", () => {
                 fdm,
                 user1_id,
                 organization_id,
-                "user2@example.com",
+                "user2",
             )
 
             const organizations = await getOrganizationsForUser(fdm, user2_id)
@@ -484,7 +487,7 @@ describe("Organization Data Model", () => {
                     fdm,
                     user1_id,
                     organization_id,
-                    "user3@example.com",
+                    "user3",
                 ),
             ).resolves.toBeUndefined()
         })
@@ -538,7 +541,7 @@ describe("Organization Data Model", () => {
                 fdm,
                 user1_id,
                 organization_id,
-                newUserEmail,
+                "user2",
                 "admin",
             )
 
@@ -556,7 +559,7 @@ describe("Organization Data Model", () => {
                     fdm,
                     user1_id,
                     organization_id,
-                    "user3@example.com",
+                    "user3",
                     "admin",
                 ),
             ).resolves.toBeUndefined()
@@ -591,7 +594,7 @@ describe("Organization Data Model", () => {
                     fdm,
                     user1_id,
                     organization_id,
-                    "user1@example.com",
+                    "user1",
                     "admin",
                 ),
             ).rejects.toThrow("Exception for updateRoleOfUserAtOrganization")
@@ -1036,7 +1039,7 @@ describe("Organization Data Model", () => {
                     fdm,
                     user1_id,
                     organization_id,
-                    "user2@example.com",
+                    "user2",
                     "admin",
                 )
 
