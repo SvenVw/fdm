@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
+import { beforeAll, describe, expect, inject, it } from "vitest"
 import { type BetterAuth, createFdmAuth } from "./authentication"
 import * as authNSchema from "./db/schema-authn"
 import { createFdmServer } from "./fdm-server"
@@ -89,20 +89,6 @@ describe("Organization Data Model", () => {
         } catch (error) {
             console.error("Error creating user:", error)
             throw error // Re-throw the error after logging
-        }
-    })
-
-    afterAll(async () => {
-        // Clean up authN tables
-        try {
-            await fdm.delete(authNSchema.session).execute()
-            await fdm.delete(authNSchema.user).execute()
-            await fdm.delete(authNSchema.verification).execute()
-            await fdm.delete(authNSchema.invitation).execute()
-            await fdm.delete(authNSchema.member).execute()
-            await fdm.delete(authNSchema.organization).execute()
-        } catch (error) {
-            console.error("Error cleaning up authN tables:", error)
         }
     })
 

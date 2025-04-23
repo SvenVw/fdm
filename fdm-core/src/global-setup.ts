@@ -1,12 +1,15 @@
 import postgres from "postgres"
 import type { TestProject } from "vitest/node"
 import { runMigration } from "./migrate"
+import * as authNSchema from "./db/schema-authn"
+import { drizzle } from "drizzle-orm/postgres-js"
+import { createFdmServer } from "./fdm-server"
 
 let client: ReturnType<typeof postgres>
 
 export let migrationsRun = false
 
-export default async function setup(project: TestProject) {
+export async function setup(project: TestProject) {
     const requiredEnvVars = [
         "POSTGRES_HOST",
         "POSTGRES_PORT",
@@ -62,5 +65,43 @@ declare module "vitest" {
 }
 
 export async function teardown() {
+    const requiredEnvVars = [
+        "POSTGRES_HOST",
+        "POSTGRES_PORT",
+        "POSTGRES_USER",
+        "POSTGRES_PASSWORD",
+        "POSTGRES_DB",
+    ]
+    for (const envVar of requiredEnvVars) {
+        if (!process.env[envVar]) {
+            throw new Error(`Missing required environment variable: ${envVar}`)
+        }
+    }
+
+    const host = String(process.env.POSTGRES_HOST)
+    const port = Number(process.env.POSTGRES_PORT)
+    if (Number.isNaN(port)) {
+        throw new Error("POSTGRES_PORT must be a valid number")
+    }
+    const user = String(process.env.POSTGRES_USER)
+    const password = String(process.env.POSTGRES_PASSWORD)
+    const database = String(process.env.POSTGRES_DB)
+
+    const fdm = createFdmServer(host, port, user, password, database)
+    // Clean up all database tables
+    try {
+        await fdm.transaction(async () => {
+            await fdm.delete(authNSchema.session).execute()
+            await fdm.delete(authNSchema.verification).execute()
+            await fdm.delete(authNSchema.invitation).execute()
+            await fdm.delete(authNSchema.member).execute()
+            await fdm.delete(authNSchema.organization).execute()
+            await fdm.delete(authNSchema.user).execute()
+        })
+    } catch (error) {
+        console.error("Error cleaning up database tables:", error)
+    }
+
+    // Close the database connection
     await client.end()
 }
