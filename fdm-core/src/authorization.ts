@@ -324,6 +324,7 @@ export async function revokeRole(
                 throw new Error("Invalid role")
             }
 
+            // Revoke the role
             await tx
                 .update(authZSchema.role)
                 .set({ deleted: new Date() })
