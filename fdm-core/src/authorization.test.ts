@@ -1,5 +1,5 @@
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     actions,
     checkPermission,
@@ -21,16 +21,23 @@ describe("Authorization Functions", () => {
     let fdm: FdmServerType
     let principal_id: string
     let farm_id: string
+    let host: string
+    let port: number
+    let user: string
+    let password: string
+    let database: string
+
+    beforeAll(async () => {
+        host = inject("host")
+        port = inject("port")
+        user = inject("user")
+        password = inject("password")
+        database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database, 10) // allow some connections
+        principal_id = createId()
+    })
 
     beforeEach(async () => {
-        const host = inject("host")
-        const port = inject("port")
-        const user = inject("user")
-        const password = inject("password")
-        const database = inject("database")
-        fdm = createFdmServer(host, port, user, password, database)
-
-        principal_id = createId()
         farm_id = createId()
         // Create a test farm
         const farmName = "Test Farm"
