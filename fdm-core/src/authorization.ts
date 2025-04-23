@@ -4,6 +4,7 @@ import type {
     Permission,
     PrincipalId,
     Resource,
+    ResourceBead,
     ResourceChain,
     ResourceId,
     Role,
@@ -601,9 +602,9 @@ async function getResourceChain(
             "fertilizer_application",
             "soil_analysis",
         ]
-        const chain = []
+        const chain: ResourceBead[] = []
         if (resource === "farm") {
-            const bead = {
+            const bead: ResourceBead = {
                 resource: "farm",
                 resource_id: resource_id,
             }
@@ -623,7 +624,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -659,7 +660,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -708,7 +709,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -738,7 +739,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -771,7 +772,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
