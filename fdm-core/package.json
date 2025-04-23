@@ -27,9 +27,12 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "coverage": "dotenvx run -- vitest run --coverage",
+        "db:generate-authn": "pnpm dlx @better-auth/cli generate --config /src/db/generator/authn.ts --output ./src/db/schema-authn.ts --y",
         "db:generate": "npx drizzle-kit generate",
         "document": "npx typedoc src --plugin typedoc-plugin-missing-exports",
         "dotenvx": "dotenvx",
@@ -67,7 +70,8 @@
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.5",
-        "postgres": "^3.4.5"
+        "postgres": "^3.4.5",
+        "unique-username-generator": "^1.4.0"
     },
     "packageManager": "pnpm@10.9.0",
     "publishConfig": {

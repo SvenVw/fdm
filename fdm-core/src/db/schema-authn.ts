@@ -1,17 +1,16 @@
 import {
+    text,
     bigint,
+    timestamp,
     boolean,
     integer,
     pgSchema,
-    text,
-    timestamp,
 } from "drizzle-orm/pg-core"
 
-// Define postgres schema
-export const fdmAuthnSchema = pgSchema("fdm-authn")
-export type fdmSchemaAuthNTypeSelect = typeof fdmAuthnSchema
+export const fdmAuthNSchema = pgSchema("fdm-authn")
+export type fdmSchemaAuthNTypeSelect = typeof fdmAuthNSchema.table
 
-export const user = fdmAuthnSchema.table("user", {
+export const user = fdmAuthNSchema.table("user", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
@@ -19,13 +18,15 @@ export const user = fdmAuthnSchema.table("user", {
     image: text("image"),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
+    username: text("username").unique(),
+    displayUsername: text("display_username"),
     firstname: text("firstname"),
     surname: text("surname"),
     lang: text("lang").notNull(),
     farm_active: text("farm_active"),
 })
 
-export const session = fdmAuthnSchema.table("session", {
+export const session = fdmAuthNSchema.table("session", {
     id: text("id").primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
@@ -39,7 +40,7 @@ export const session = fdmAuthnSchema.table("session", {
     activeOrganizationId: text("active_organization_id"),
 })
 
-export const account = fdmAuthnSchema.table("account", {
+export const account = fdmAuthNSchema.table("account", {
     id: text("id").primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
@@ -57,7 +58,7 @@ export const account = fdmAuthnSchema.table("account", {
     updatedAt: timestamp("updated_at").notNull(),
 })
 
-export const verification = fdmAuthnSchema.table("verification", {
+export const verification = fdmAuthNSchema.table("verification", {
     id: text("id").primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
@@ -66,7 +67,7 @@ export const verification = fdmAuthnSchema.table("verification", {
     updatedAt: timestamp("updated_at"),
 })
 
-export const organization = fdmAuthnSchema.table("organization", {
+export const organization = fdmAuthNSchema.table("organization", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     slug: text("slug").unique(),
@@ -75,7 +76,7 @@ export const organization = fdmAuthnSchema.table("organization", {
     metadata: text("metadata"),
 })
 
-export const member = fdmAuthnSchema.table("member", {
+export const member = fdmAuthNSchema.table("member", {
     id: text("id").primaryKey(),
     organizationId: text("organization_id")
         .notNull()
@@ -87,7 +88,7 @@ export const member = fdmAuthnSchema.table("member", {
     createdAt: timestamp("created_at").notNull(),
 })
 
-export const invitation = fdmAuthnSchema.table("invitation", {
+export const invitation = fdmAuthNSchema.table("invitation", {
     id: text("id").primaryKey(),
     organizationId: text("organization_id")
         .notNull()
@@ -101,7 +102,7 @@ export const invitation = fdmAuthnSchema.table("invitation", {
         .references(() => user.id, { onDelete: "cascade" }),
 })
 
-export const rateLimit = fdmAuthnSchema.table("rate_limit", {
+export const rateLimit = fdmAuthNSchema.table("rate_limit", {
     id: text("id").primaryKey(),
     key: text("key"),
     count: integer("count"),

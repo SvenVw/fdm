@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { organization } from "better-auth/plugins"
+import { organization, username } from "better-auth/plugins"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
+import { generateFromEmail } from "unique-username-generator"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
@@ -47,6 +48,11 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: profile.given_name,
                     surname: profile.family_name,
+                    username: createUsername(profile.email),
+                    displayUsername: createDisplayUsername(
+                        profile.given_name,
+                        profile.family_name,
+                    ),
                 }
             },
         }
@@ -71,6 +77,8 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: firstname,
                     surname: surname,
+                    username: createUsername(profile.email),
+                    displayUsername: createDisplayUsername(firstname, surname),
                 }
             },
         }
@@ -123,6 +131,7 @@ export function createFdmAuth(
             enabled: emailAndPassword || false,
         },
         plugins: [
+            username(),
             organization({
                 organizationCreation: {
                     disabled: false, // Set to true to disable organization creation
@@ -179,4 +188,24 @@ export function splitFullName(fullName: string | undefined): {
     const firstname = names[0]
     const surname = names.slice(-1)[0] // Get the last name
     return { firstname, surname }
+}
+
+function createUsername(email: string): string {
+    const username = generateFromEmail(email, 3)
+    return username
+}
+
+function createDisplayUsername(
+    firstname: string | null,
+    surname: string | null,
+): string | null {
+    // Combine firstname and surname
+    const name = `${firstname} ${surname}`
+
+    // If no name is given return null
+    if (!name || name === "") {
+        return null
+    }
+
+    return name
 }
