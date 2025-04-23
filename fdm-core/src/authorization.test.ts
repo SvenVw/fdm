@@ -8,6 +8,7 @@ import {
     resources,
     revokeRole,
     roles,
+    updateRole,
 } from "./authorization"
 import * as authZSchema from "./db/schema-authz"
 import { addFarm } from "./farm"
@@ -274,6 +275,159 @@ describe("Authorization Functions", () => {
                     principal_id,
                 ),
             ).rejects.toThrowError()
+        })
+    })
+
+    describe("updateRole", () => {
+        it("should update the role of a principal for a resource", async () => {
+            // Grant initial role
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            // Update the role
+            await updateRole(fdm, "farm", "advisor", farm_id, principal_id)
+
+            // Verify the new role
+            const newRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "advisor"),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+            expect(newRole.length).toBe(1)
+
+            // Verify the old role is revoked
+            const oldRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "owner"),
+                    ),
+                )
+            console.log(oldRole)
+            expect(oldRole.length).toBe(1)
+            expect(oldRole[0].deleted).not.toBeNull()
+        })
+
+        it("should throw an error for invalid resource", async () => {
+            await expect(
+                updateRole(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    "advisor",
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError("Exception for updateRole")
+        })
+
+        it("should throw an error for invalid role", async () => {
+            await expect(
+                updateRole(
+                    fdm,
+                    "farm",
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_role" as any,
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError("Exception for updateRole")
+        })
+
+        it("should throw an error if the database transaction fails", async () => {
+            // Mock the transaction function to throw an error
+            const mockTx = async () => {
+                throw new Error("Database transaction failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                transaction: mockTx,
+            }
+            // Act & Assert
+            await expect(
+                updateRole(fdmMock, "farm", "advisor", farm_id, principal_id),
+            ).rejects.toThrowError("Exception for updateRole")
+        })
+
+        it("should handle case when no old role to revoke", async () => {
+            // Update the role
+            await updateRole(fdm, "farm", "advisor", farm_id, principal_id)
+
+            // Verify the new role
+            const newRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "advisor"),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+            expect(newRole.length).toBe(1)
+
+            // Verify no old role is revoked
+            const oldRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "owner"),
+                    ),
+                )
+            expect(oldRole.length).toBe(0)
+        })
+        it("should handle updating the role to a non existing role", async () => {
+            // Grant initial role
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            // Update the role
+            await updateRole(fdm, "farm", "researcher", farm_id, principal_id)
+
+            // Verify the new role
+            const newRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "researcher"),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+            expect(newRole.length).toBe(1)
+
+            // Verify the old role is revoked
+            const oldRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "owner"),
+                    ),
+                )
+            expect(oldRole.length).toBe(1)
+            expect(oldRole[0].deleted).not.toBeNull()
         })
     })
 

@@ -347,6 +347,78 @@ export async function revokeRole(
 }
 
 /**
+ * Updates the role of a principal for a specific resource.
+ *
+ * This function revokes the existing role of the principal on the resource and then grants a new role. It first validates
+ * that the provided resource and role are valid. Both the revocation and granting operations are performed within a single
+ * transaction to maintain database consistency.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param resource - The type of the resource for which the role should be updated.
+ * @param role - The new role to assign.
+ * @param resource_id - The identifier of the specific resource.
+ * @param principal_id - The identifier of the principal whose role is being updated.
+ * @returns A promise that resolves when the role has been updated
+ * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
+ *
+ * @example
+ * ```typescript
+ * // Example usage of updateRole
+ * await updateRole(fdm, "farm", "advisor", "farm123", "user456");
+ * ```
+ */
+export async function updateRole(
+    fdm: FdmType,
+    resource: Resource,
+    role: Role,
+    resource_id: ResourceId,
+    principal_id: string,
+): Promise<string> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+            if (!roles.includes(role)) {
+                throw new Error("Invalid role")
+            }
+
+            // Revoke the current role
+            await tx
+                .update(authZSchema.role)
+                .set({ deleted: new Date() })
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+
+            // Grant the new role
+            const role_id = createId()
+            const roleData = {
+                role_id: role_id,
+                resource: resource,
+                resource_id: resource_id,
+                principal_id: principal_id,
+                role: role,
+            }
+            await tx.insert(authZSchema.role).values(roleData)
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for updateRole", {
+            resource: resource,
+            role: role,
+            resource_id: resource_id,
+            principal_id: principal_id,
+        })
+    }
+}
+
+/**
  * Retrieves a list of resource IDs accessible by a principal for a specified action.
  *
  * This function validates the provided resource and action, retrieves the roles allowed
