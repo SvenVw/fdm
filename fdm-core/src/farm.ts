@@ -1,11 +1,19 @@
 import { asc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
-
-import { checkPermission, grantRole, listResources } from "./authorization"
+import {
+    checkPermission,
+    grantRole,
+    listPrincipalsForResource,
+    listResources,
+    revokePrincipal,
+    updateRole,
+} from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import { getPrincipal } from "./principal"
+import type { Principal } from "./principal.d"
 
 /**
  * Creates a new farm record and assigns the "owner" role to the specified principal.
@@ -197,5 +205,202 @@ export async function updateFarm(
             b_address_farm,
             b_postalcode_farm,
         })
+    }
+}
+
+/**
+ * Grants a specified role to a principal for a given farm.
+ *
+ * This function checks if the acting principal has 'share' permission on the farm, then grants the specified role to the grantee.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal performing the grant (must have 'share' permission).
+ * @param grantee_id - The identifier of the principal receiving the role.
+ * @param b_id_farm - The identifier of the farm.
+ * @param role - The role to be granted ('owner', 'advisor', or 'researcher').
+ *
+ * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
+ */
+export async function grantRoleToFarm(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    grantee_id: string,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+    role: "owner" | "advisor" | "researcher",
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "share",
+            b_id_farm,
+            principal_id,
+            "grantRoleToFarm",
+        )
+        await grantRole(fdm, "farm", role, b_id_farm, grantee_id)
+    } catch (err) {
+        throw handleError(err, "Exception for grantRoleToFarm", {
+            b_id_farm,
+            grantee_id,
+            role,
+        })
+    }
+}
+
+/**
+ * Updates the role of a principal for a given farm.
+ *
+ * This function checks if the acting principal has 'share' permission on the farm, then updates the specified role of the grantee.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal performing the update (must have 'share' permission).
+ * @param grantee_id - The identifier of the principal whose role is being updated.
+ * @param b_id_farm - The identifier of the farm.
+ * @param role - The new role to assign ('owner', 'advisor', or 'researcher').
+ *
+ * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
+ */
+export async function updateRoleToFarm(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    grantee_id: string,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+    role: "owner" | "advisor" | "researcher",
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "share",
+            b_id_farm,
+            principal_id,
+            "updateRoleToFarm",
+        )
+        await updateRole(fdm, "farm", role, b_id_farm, grantee_id)
+    } catch (err) {
+        throw handleError(err, "Exception for updateRoleToFarm", {
+            b_id_farm,
+            grantee_id,
+            role,
+        })
+    }
+}
+
+/**
+ * Revokes a specified role from a principal for a given farm.
+ *
+ * This function checks if the acting principal has 'share' permission on the farm, then revokes the specified role from the revokee.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal performing the revoke (must have 'share' permission).
+ * @param revokee_id - The identifier of the principal whose role is being revoked.
+ * @param b_id_farm - The identifier of the farm.
+ * @param role - The role to be revoked ('owner', 'advisor', or 'researcher').
+ *
+ * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
+ */
+export async function revokePrincipalFromFarm(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    revokee_id: string,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+    role: "owner" | "advisor" | "researcher",
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "share",
+            b_id_farm,
+            principal_id,
+            "revokePrincipalFromFarm",
+        )
+        await revokePrincipal(fdm, "farm", b_id_farm, revokee_id)
+    } catch (err) {
+        throw handleError(err, "Exception for revokePrincipalFromFarm", {
+            b_id_farm,
+            revokee_id,
+            role,
+        })
+    }
+}
+
+/**
+ * Lists all principals (users or organizations) associated with a specific farm.
+ *
+ * This function checks if the acting principal has 'read' permission on the farm, then retrieves a list of all principals that have any role on the farm.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal requesting the list (must have 'read' permission).
+ * @param b_id_farm - The identifier of the farm.
+ *
+ * @returns A Promise that resolves to an array of Principal objects, each representing a principal associated with the farm.
+ *
+ * @throws {Error} If the acting principal does not have 'read' permission, or if any other error occurs during the operation.
+ */
+export async function listPrincipalsForFarm(
+    fdm: FdmType,
+    principal_id: string,
+    b_id_farm: string,
+): Promise<Principal[]> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "listPrincipalsForFarm",
+        )
+        const principals = await listPrincipalsForResource(
+            fdm,
+            "farm",
+            b_id_farm,
+        )
+
+        // Collect details of principals
+        const principalsDetails = await Promise.all(
+            principals.map(async (principal) => {
+                const details = await getPrincipal(fdm, principal.principal_id)
+                return details
+            }),
+        )
+
+        return principalsDetails
+    } catch (err) {
+        throw handleError(err, "Exception for listPrincipalsForFarm", {
+            b_id_farm,
+        })
+    }
+}
+
+/**
+ * Checks if the specified principal is allowed to share a given farm.
+ *
+ * This function verifies if the acting principal has 'share' permission on the farm.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal whose permissions are being checked.
+ * @param b_id_farm - The identifier of the farm.
+ *
+ * @returns A Promise that resolves to true if the principal has 'share' permission, false otherwise.
+ */
+export async function isAllowedToShareFarm(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+): Promise<boolean> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "share",
+            b_id_farm,
+            principal_id,
+            "isAllowedToShareFarm",
+        )
+        return true
+    } catch (err) {
+        return false
     }
 }

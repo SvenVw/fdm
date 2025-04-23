@@ -21,7 +21,17 @@ export { createFdmServer } from "./fdm-server"
 // export { createFdmLocal } from './fdm-local'
 export { createFdmAuth } from "./authentication"
 export type { PrincipalId } from "./authorization.d"
-export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
+export {
+    addFarm,
+    getFarm,
+    getFarms,
+    updateFarm,
+    grantRoleToFarm,
+    isAllowedToShareFarm,
+    listPrincipalsForFarm,
+    revokePrincipalFromFarm,
+    updateRoleToFarm,
+} from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
 export {
     addFertilizerToCatalogue,

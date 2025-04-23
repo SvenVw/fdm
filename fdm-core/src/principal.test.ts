@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { afterAll, beforeAll, describe, expect, inject, it } from "vitest"
+import { beforeAll, describe, expect, inject, it } from "vitest"
 import { getPrincipal } from "./principal"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
@@ -34,15 +34,18 @@ describe("getPrincipal", () => {
         }
 
         fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, true)
+        userName = "testuser"
+        userEmail = "user5@example.com"
 
         user_id = (
             await fdmAuth.api.signUpEmail({
                 headers: undefined,
                 body: {
-                    email: "user5@example.com",
+                    email: userEmail,
                     name: "Test User",
                     firstname: "Test",
                     surname: "User",
+                    username: userName,
                     password: "password",
                 },
             })
@@ -56,15 +59,12 @@ describe("getPrincipal", () => {
             "test-org",
             "Test description",
         )
-
-        userName = "Test User"
-        userEmail = "user5@example.com"
     })
 
     it("should retrieve user details when principal_id is a user ID", async () => {
         const principal = await getPrincipal(fdm, user_id)
         expect(principal).toBeDefined()
-        expect(principal.name).toBe(userName)
+        expect(principal.username).toBe(userName)
         expect(principal.type).toBe("user")
         expect(principal.image).toBeNull()
         expect(principal.isVerified).toBe(false)
@@ -73,7 +73,7 @@ describe("getPrincipal", () => {
     it("should retrieve organization details when principal_id is an organization ID", async () => {
         const principal = await getPrincipal(fdm, organization_id)
         expect(principal).toBeDefined()
-        expect(principal.name).toBe(organizationName)
+        expect(principal.username).toBe(organizationName)
         expect(principal.type).toBe("organization")
         expect(principal.image).toBeNull()
         expect(principal.isVerified).toBe(false)
@@ -110,7 +110,7 @@ describe("getPrincipal", () => {
         const principal = await getPrincipal(fdm, user_id)
 
         expect(principal).toBeDefined()
-        expect(principal.name).toBe(userName)
+        expect(principal.username).toBe(userName)
         expect(principal.type).toBe("user")
         expect(principal.image).toBeNull()
         expect(principal.isVerified).toBe(false)
@@ -126,7 +126,7 @@ describe("getPrincipal", () => {
         const principal = await getPrincipal(fdm, organization_id)
 
         expect(principal).toBeDefined()
-        expect(principal.name).toBe(organizationName)
+        expect(principal.username).toBe(organizationName)
         expect(principal.type).toBe("organization")
         expect(principal.image).toBeNull()
         expect(principal.isVerified).toBe(false)
@@ -140,25 +140,9 @@ describe("getPrincipal", () => {
             .where(eq(authNSchema.organization.id, organization_id))
         const principal = await getPrincipal(fdm, organization_id)
         expect(principal).toBeDefined()
-        expect(principal.name).toBe(organizationName)
+        expect(principal.username).toBe(organizationName)
         expect(principal.type).toBe("organization")
         expect(principal.image).toBeNull()
         expect(principal.isVerified).toBe(false)
     })
-
-    // afterAll(async () => {
-    //     // Clean up authN tables
-    //     try {
-    //         await fdm.transaction(async () => {
-    //             await fdm.delete(authNSchema.session).execute()
-    //             await fdm.delete(authNSchema.verification).execute()
-    //             await fdm.delete(authNSchema.invitation).execute()
-    //             await fdm.delete(authNSchema.member).execute()
-    //             await fdm.delete(authNSchema.organization).execute()
-    //             await fdm.delete(authNSchema.user).execute()
-    //         })
-    //     } catch (error) {
-    //         console.error("Error cleaning up authN tables:", error)
-    //     }
-    // })
 })

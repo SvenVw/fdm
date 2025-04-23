@@ -39,7 +39,8 @@ export async function getPrincipal(
             // If principal is an user get the details of the user
             const user = await tx
                 .select({
-                    name: authNSchema.user.name,
+                    username: authNSchema.user.username,
+                    displayUserName: authNSchema.user.displayUsername,
                     image: authNSchema.user.image,
                     isVerified: authNSchema.user.emailVerified,
                 })
@@ -49,7 +50,8 @@ export async function getPrincipal(
 
             if (user.length > 0) {
                 return {
-                    name: user[0].name,
+                    username: user[0].username,
+                    displayUserName: user[0].displayUserName,
                     image: user[0].image,
                     type: "user",
                     isVerified: user[0].isVerified,
@@ -74,7 +76,8 @@ export async function getPrincipal(
             const metadata = JSON.parse(organization[0].metadata)
 
             return {
-                name: organization[0].name,
+                username: organization[0].name,
+                displayUserName: organization[0].slug,
                 image: organization[0].logo,
                 type: "organization",
                 isVerified: metadata ? metadata.isVerified : false,

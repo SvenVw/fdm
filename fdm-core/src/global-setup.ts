@@ -2,7 +2,6 @@ import postgres from "postgres"
 import type { TestProject } from "vitest/node"
 import { runMigration } from "./migrate"
 import * as authNSchema from "./db/schema-authn"
-import { drizzle } from "drizzle-orm/postgres-js"
 import { createFdmServer } from "./fdm-server"
 
 let client: ReturnType<typeof postgres>

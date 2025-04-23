@@ -250,7 +250,7 @@ export async function checkPermission(
  * @param resource - The target resource type for which the role is being assigned.
  * @param role - The role to be granted.
  * @param resource_id - The identifier of the resource.
- * @param principal_id - The identifier of the principal receiving the role.
+ * @param grantee_id - The identifier of the principal receiving the role.
  *
  * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
  */
@@ -259,7 +259,7 @@ export async function grantRole(
     resource: Resource,
     role: Role,
     resource_id: ResourceId,
-    principal_id: string,
+    grantee_id: string,
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -276,7 +276,7 @@ export async function grantRole(
                 role_id: role_id,
                 resource: resource,
                 resource_id: resource_id,
-                principal_id: principal_id,
+                principal_id: grantee_id,
                 role: role,
             }
             await tx.insert(authZSchema.role).values(roleData)
@@ -286,7 +286,7 @@ export async function grantRole(
             resource: resource,
             role: role,
             resource_id: resource_id,
-            principal_id: principal_id,
+            grantee_id: grantee_id,
         })
     }
 }
@@ -301,7 +301,7 @@ export async function grantRole(
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of the resource from which the role should be revoked.
  * @param resource_id - The identifier of the resource instance.
- * @param principal_id - The identifier of the principal whose role is being revoked.
+ * @param revokee_id - The identifier of the principal whose role is being revoked.
  *
  * @throws {Error} If the resource is invalid, or if the revocation operation fails.
  */
@@ -309,7 +309,7 @@ export async function revokePrincipal(
     fdm: FdmType,
     resource: Resource,
     resource_id: ResourceId,
-    principal_id: string,
+    revokee_id: string,
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -326,7 +326,7 @@ export async function revokePrincipal(
                     and(
                         eq(authZSchema.role.resource, resource),
                         eq(authZSchema.role.resource_id, resource_id),
-                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.principal_id, revokee_id),
                         isNull(authZSchema.role.deleted),
                     ),
                 )
@@ -335,7 +335,7 @@ export async function revokePrincipal(
         throw handleError(err, "Exception for revokePrincipal", {
             resource: resource,
             resource_id: resource_id,
-            principal_id: principal_id,
+            principal_id: revokee_id,
         })
     }
 }
@@ -351,7 +351,7 @@ export async function revokePrincipal(
  * @param resource - The type of the resource for which the role should be updated.
  * @param role - The new role to assign.
  * @param resource_id - The identifier of the specific resource.
- * @param principal_id - The identifier of the principal whose role is being updated.
+ * @param grantee_id - The identifier of the principal whose role is being updated.
  * @returns A promise that resolves when the role has been updated
  * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
  *
@@ -366,7 +366,7 @@ export async function updateRole(
     resource: Resource,
     role: Role,
     resource_id: ResourceId,
-    principal_id: string,
+    grantee_id: string,
 ): Promise<string> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -386,7 +386,7 @@ export async function updateRole(
                     and(
                         eq(authZSchema.role.resource, resource),
                         eq(authZSchema.role.resource_id, resource_id),
-                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.principal_id, grantee_id),
                         isNull(authZSchema.role.deleted),
                     ),
                 )
@@ -397,7 +397,7 @@ export async function updateRole(
                 role_id: role_id,
                 resource: resource,
                 resource_id: resource_id,
-                principal_id: principal_id,
+                principal_id: grantee_id,
                 role: role,
             }
             await tx.insert(authZSchema.role).values(roleData)
@@ -407,7 +407,7 @@ export async function updateRole(
             resource: resource,
             role: role,
             resource_id: resource_id,
-            principal_id: principal_id,
+            grantee_id: grantee_id,
         })
     }
 }
