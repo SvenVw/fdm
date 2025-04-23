@@ -478,6 +478,74 @@ export async function listResources(
 }
 
 /**
+ * Retrieves a list of principals associated with a specific resource along with their roles.
+ *
+ * This function queries the database to find all principals that have been granted
+ * any role on the given resource. It returns an array of objects, each containing the
+ * principal's identifier and the role they possess for that resource.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param resource - The type of the resource to query for associated principals.
+ * @param resource_id - The identifier of the specific resource instance.
+ * @returns A promise that resolves to an array of objects, each with `principal_id` and `role` properties.
+ *   Returns an empty array if no principals are associated with the resource.
+ *
+ * @throws {Error} If the resource type is invalid or if the database operation fails.
+ *
+ * @example
+ * ```typescript
+ * // Example usage to list principals for a specific farm
+ * const principals = await listPrincipalsForResource(fdm, "farm", "farm123");
+ * if (principals.length > 0) {
+ *   console.log("Principals associated with farm123:", principals);
+ *   principals.forEach((principal) => {
+ *     console.log(`- Principal ID: ${principal.principal_id}, Role: ${principal.role}`);
+ *   });
+ * } else {
+ *   console.log("No principals associated with farm123.");
+ * }
+ * ```
+ */
+export async function listPrincipalsForResource(
+    fdm: FdmType,
+    resource: Resource,
+    resource_id: ResourceId,
+): Promise<
+    {
+        principal_id: string
+        role: string
+    }[]
+> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+
+            return await tx
+                .select({
+                    principal_id: authZSchema.role.principal_id,
+                    role: authZSchema.role.role,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for listPrincipalsForResource", {
+            resource: resource,
+            resource_id: resource_id,
+        })
+    }
+}
+
+/**
  * Retrieves the roles authorized to perform a specific action on a given resource.
  *
  * This function filters the global permissions array for entries that match the specified

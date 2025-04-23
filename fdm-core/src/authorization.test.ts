@@ -4,6 +4,7 @@ import {
     actions,
     checkPermission,
     grantRole,
+    listPrincipalsForResource,
     listResources,
     resources,
     revokePrincipal,
@@ -480,6 +481,149 @@ describe("Authorization Functions", () => {
         })
     })
 
+    describe("listPrincipalsForResource", () => {
+        let principal_id2: string
+
+        beforeEach(async () => {
+            principal_id2 = createId()
+        })
+
+        it("should list principals associated with a resource", async () => {
+            // Grant roles to two principals
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await grantRole(fdm, "farm", "advisor", farm_id, principal_id2)
+
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+
+            expect(principals.length).toBe(2)
+            expect(principals).toContainEqual({
+                principal_id: principal_id,
+                role: "owner",
+            })
+            expect(principals).toContainEqual({
+                principal_id: principal_id2,
+                role: "advisor",
+            })
+        })
+
+        it("should return an empty array if no principals are associated with the resource", async () => {
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+            expect(principals).toEqual([])
+        })
+
+        it("should throw an error for an invalid resource type", async () => {
+            await expect(
+                listPrincipalsForResource(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "invalid_resource" as any,
+                    farm_id,
+                ),
+            ).rejects.toThrowError("Exception for listPrincipalsForResource")
+        })
+
+        it("should handle revoked principals correctly", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
+
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+            expect(principals).toEqual([])
+        })
+
+        it("should correctly handle multiple roles for one principal", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await grantRole(fdm, "farm", "advisor", farm_id, principal_id)
+
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+
+            expect(principals.length).toBe(2)
+            expect(principals).toContainEqual({
+                principal_id: principal_id,
+                role: "owner",
+            })
+            expect(principals).toContainEqual({
+                principal_id: principal_id,
+                role: "advisor",
+            })
+        })
+
+        it("should not list revoked roles", async () => {
+            // Grant and then revoke the role
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
+
+            // Now check if the role is present in the list
+            const result = await listPrincipalsForResource(fdm, "farm", farm_id)
+            expect(result.length).toBe(0)
+        })
+
+        it("should throw an error if the database transaction fails", async () => {
+            // Mock the transaction function to throw an error
+            const mockTx = async () => {
+                throw new Error("Database transaction failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                transaction: mockTx,
+            }
+            // Act & Assert
+            await expect(
+                listPrincipalsForResource(fdmMock, "farm", farm_id),
+            ).rejects.toThrowError("Exception for listPrincipalsForResource")
+        })
+
+        it("should handle different resources", async () => {
+            for (const resource of resources) {
+                if (resource === "user" || resource === "organization") continue // these resources are not added by the code
+                const testResourceId = createId()
+                await grantRole(
+                    fdm,
+                    resource,
+                    "owner",
+                    testResourceId,
+                    principal_id,
+                )
+                const principals = await listPrincipalsForResource(
+                    fdm,
+                    resource,
+                    testResourceId,
+                )
+
+                expect(principals.length).toBe(1)
+                expect(principals).toContainEqual({
+                    principal_id: principal_id,
+                    role: "owner",
+                })
+            }
+        })
+
+        it("should have the correct properties on the result object", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            const result = await listPrincipalsForResource(fdm, "farm", farm_id)
+
+            expect(result.length).toBe(1)
+            expect(result[0]).toHaveProperty("principal_id")
+            expect(result[0]).toHaveProperty("role")
+            expect(typeof result[0].principal_id).toBe("string")
+            expect(typeof result[0].role).toBe("string")
+        })
+    })
     describe("Authorization Constants", () => {
         it("should have the correct resources", () => {
             expect(resources).toEqual([
