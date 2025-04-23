@@ -6,7 +6,7 @@ import {
     grantRole,
     listResources,
     resources,
-    revokeRole,
+    revokePrincipal,
     roles,
     updateRole,
 } from "./authorization"
@@ -214,10 +214,10 @@ describe("Authorization Functions", () => {
         })
     })
 
-    describe("revokeRole", () => {
+    describe("revokePrincipal", () => {
         it("should revoke a role from a principal for a resource", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await revokeRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
 
             const roles = await fdm
                 .select()
@@ -235,7 +235,7 @@ describe("Authorization Functions", () => {
         })
 
         it("should not throw an error when revoking a non-existing role", async () => {
-            await revokeRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
             const roles = await fdm
                 .select()
                 .from(authZSchema.role)
@@ -253,24 +253,10 @@ describe("Authorization Functions", () => {
 
         it("should throw an error for invalid resource", async () => {
             await expect(
-                revokeRole(
+                revokePrincipal(
                     fdm,
                     // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_resource" as any,
-                    "owner",
-                    farm_id,
-                    principal_id,
-                ),
-            ).rejects.toThrowError()
-        })
-
-        it("should throw an error for invalid role", async () => {
-            await expect(
-                revokeRole(
-                    fdm,
-                    "farm",
-                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
-                    "unknown_role" as any,
                     farm_id,
                     principal_id,
                 ),
@@ -313,7 +299,6 @@ describe("Authorization Functions", () => {
                         eq(authZSchema.role.role, "owner"),
                     ),
                 )
-            console.log(oldRole)
             expect(oldRole.length).toBe(1)
             expect(oldRole[0].deleted).not.toBeNull()
         })

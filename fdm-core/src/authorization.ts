@@ -291,24 +291,22 @@ export async function grantRole(
 }
 
 /**
- * Revokes a role from a principal for a specified resource.
+ * Revokes the principal from a specified resource.
  *
- * This function revokes a role by marking the corresponding record as deleted in the database. It validates
- * that the provided resource and role are valid, and executes the update within a transaction. If the input
+ * This function revokes the role of a principal by marking the corresponding record as deleted in the database. It validates
+ * that the provided resource is valid, and executes the update within a transaction. If the input
  * values are invalid or if the operation fails, an error is thrown.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of the resource from which the role should be revoked.
- * @param role - The role to revoke.
  * @param resource_id - The identifier of the resource instance.
  * @param principal_id - The identifier of the principal whose role is being revoked.
  *
- * @throws {Error} If the resource or role is invalid, or if the revocation operation fails.
+ * @throws {Error} If the resource is invalid, or if the revocation operation fails.
  */
-export async function revokeRole(
+export async function revokePrincipal(
     fdm: FdmType,
     resource: Resource,
-    role: Role,
     resource_id: ResourceId,
     principal_id: string,
 ): Promise<void> {
@@ -317,9 +315,6 @@ export async function revokeRole(
             // Validate input
             if (!resources.includes(resource)) {
                 throw new Error("Invalid resource")
-            }
-            if (!roles.includes(role)) {
-                throw new Error("Invalid role")
             }
 
             // Revoke the role
@@ -331,15 +326,13 @@ export async function revokeRole(
                         eq(authZSchema.role.resource, resource),
                         eq(authZSchema.role.resource_id, resource_id),
                         eq(authZSchema.role.principal_id, principal_id),
-                        eq(authZSchema.role.role, role),
                         isNull(authZSchema.role.deleted),
                     ),
                 )
         })
     } catch (err) {
-        throw handleError(err, "Exception for revoking role", {
+        throw handleError(err, "Exception for revokePrincipal", {
             resource: resource,
-            role: role,
             resource_id: resource_id,
             principal_id: principal_id,
         })
