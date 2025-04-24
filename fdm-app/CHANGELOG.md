@@ -1,5 +1,12 @@
 # Changelog fdm-app
 
+## 0.17.2
+
+### Patch Changes
+
+- e569e34: Fix loading of `farm/create/$b_id_farm/$calendar/fields` page
+- b2ae7ad: Change behavior so that hitting the enter button at `farm/create` submits the form instead of navigating back
+
 ## 0.17.1
 
 ### Patch Changes
