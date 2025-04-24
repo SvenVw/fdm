@@ -238,9 +238,6 @@ export async function grantRoleToFarm(
             "grantRoleToFarm",
         )
 
-
-
-
         await grantRole(fdm, "farm", role, b_id_farm, target_id)
     } catch (err) {
         throw handleError(err, "Exception for grantRoleToFarm", {
@@ -272,15 +269,28 @@ export async function updateRoleToFarm(
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
     try {
-        await checkPermission(
-            fdm,
-            "farm",
-            "share",
-            b_id_farm,
-            principal_id,
-            "updateRoleToFarm",
-        )
-        await updateRole(fdm, "farm", role, b_id_farm, target_id)
+        return await fdm.transaction(async (tx: FdmType) => {
+            await checkPermission(
+                tx,
+                "farm",
+                "share",
+                b_id_farm,
+                principal_id,
+                "updateRoleToFarm",
+            )
+            await updateRole(tx, "farm", role, b_id_farm, target_id)
+
+            // Check if at least 1 ownwer is still prestent on this farm
+            const owners = await listPrincipalsForResource(
+                tx,
+                "farm",
+                b_id_farm,
+            )
+            const ownerCount = owners.filter((x) => x.role === "owner").length
+            if (ownerCount === 0) {
+                throw new Error("Farm should have at least 1 owner")
+            }
+        })
     } catch (err) {
         throw handleError(err, "Exception for updateRoleToFarm", {
             b_id_farm,
@@ -311,15 +321,28 @@ export async function revokePrincipalFromFarm(
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
     try {
-        await checkPermission(
-            fdm,
-            "farm",
-            "share",
-            b_id_farm,
-            principal_id,
-            "revokePrincipalFromFarm",
-        )
-        await revokePrincipal(fdm, "farm", b_id_farm, target_id)
+        return await fdm.transaction(async (tx: FdmType) => {
+            await checkPermission(
+                tx,
+                "farm",
+                "share",
+                b_id_farm,
+                principal_id,
+                "revokePrincipalFromFarm",
+            )
+            await revokePrincipal(tx, "farm", b_id_farm, target_id)
+
+            // Check if at least 1 ownwer is still prestent on this farm
+            const owners = await listPrincipalsForResource(
+                tx,
+                "farm",
+                b_id_farm,
+            )
+            const ownerCount = owners.filter((x) => x.role === "owner").length
+            if (ownerCount === 0) {
+                throw new Error("Farm should have at least 1 owner")
+            }
+        })
     } catch (err) {
         throw handleError(err, "Exception for revokePrincipalFromFarm", {
             b_id_farm,
