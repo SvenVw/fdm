@@ -477,7 +477,6 @@ describe("Farm Functions", () => {
                 principal_id,
                 b_id_farm,
             )
-            console.log(principals)
             expect(principals).toBeDefined()
             expect(principals.length).toBeGreaterThanOrEqual(1)
 
