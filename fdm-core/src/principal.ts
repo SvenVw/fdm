@@ -3,6 +3,7 @@ import type { FdmType } from "./fdm"
 import type { Principal } from "./principal.d"
 import * as authNSchema from "./db/schema-authn"
 import { eq } from "drizzle-orm"
+import { init } from "better-auth"
 
 /**
  * Retrieves details of a principal (either a user or an organization) by ID.
@@ -43,14 +44,50 @@ export async function getPrincipal(
                     displayUserName: authNSchema.user.displayUsername,
                     image: authNSchema.user.image,
                     isVerified: authNSchema.user.emailVerified,
+                    firstname: authNSchema.user.firstname,
+                    surname: authNSchema.user.surname,
+                    email: authNSchema.user.email,
+                    name: authNSchema.user.name,
                 })
                 .from(authNSchema.user)
                 .where(eq(authNSchema.user.id, principal_id))
                 .limit(1)
 
             if (user.length > 0) {
+                // Determine avatar initials
+                let initials = user[0].email
+                if (user[0].firstname && user[0].surname) {
+                    // Select only the first capital letter of firstname and surname
+                    initials = user[0].firstname.charAt(0).toUpperCase()
+
+                    // Find the first capital letter in the surname
+                    const surnameParts = user[0].surname.split(/\s+/) // Split by one or more spaces
+                    let firstCapitalLetterInSurname = ""
+
+                    for (const part of surnameParts) {
+                        if (part.length > 0) {
+                            const firstChar = part.charAt(0)
+                            if (
+                                firstChar === firstChar.toUpperCase() &&
+                                firstChar.match(/[a-zA-Z]/)
+                            ) {
+                                firstCapitalLetterInSurname =
+                                    firstChar.toUpperCase()
+                                break // Stop at the first capital letter found
+                            }
+                        }
+                    }
+
+                    initials += firstCapitalLetterInSurname
+                } else if (user[0].firstname) {
+                    initials = user[0].firstname[0]
+                } else if (user[0].name) {
+                    initials = user[0].name[0]
+                }
+
                 return {
                     username: user[0].username,
+                    initials: initials.toUpperCase(),
                     displayUserName: user[0].displayUserName,
                     image: user[0].image,
                     type: "user",
@@ -77,6 +114,7 @@ export async function getPrincipal(
 
             return {
                 username: organization[0].name,
+                initials: organization[0].name.charAt(0).toUpperCase(),
                 displayUserName: organization[0].slug,
                 image: organization[0].logo,
                 type: "organization",
