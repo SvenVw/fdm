@@ -2,8 +2,7 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { Principal } from "./principal.d"
 import * as authNSchema from "./db/schema-authn"
-import { eq } from "drizzle-orm"
-import { init } from "better-auth"
+import { eq, or } from "drizzle-orm"
 
 /**
  * Retrieves details of a principal (either a user or an organization) by ID.
@@ -124,6 +123,83 @@ export async function getPrincipal(
     } catch (err) {
         throw handleError(err, "Exception for getPrincipal", {
             principal_id: principal_id,
+        })
+    }
+}
+
+/**
+ * Identifies a principal (either a user or an organization) based on a username or email.
+ *
+ * This function searches for a principal, first by checking the user table for a matching username or email,
+ * and then, if not found, by checking the organization table for a matching slug. If a principal is found,
+ * its details are retrieved and returned.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param identifier - The username, email, or organization slug to search for.
+ * @returns A promise that resolves to an array of LookupPrincipal objects. If a principal is found, the array contains a single object with the principal's details. If no principal is found, the array is empty.
+ *
+ * @throws {Error} - Throws an error if any database operation fails.
+ *   The error includes a message and context information about the failed operation.
+ *
+ * @example
+ * ```typescript
+ * // Example usage:
+ * const principalDetails = await identifyPrincipal(fdm, "john.doe@example.com");
+ * if (principalDetails.length > 0) {
+ *   console.log("Principal Details:", principalDetails[0]);
+ * } else {
+ *   console.log("Principal not found.");
+ * }
+ * ```
+ */
+export async function identifyPrincipal(
+    fdm: FdmType,
+    identifier: string,
+): Promise<
+    | ({
+          id: string
+      } & Principal)
+    | undefined
+> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Check if principal is an user
+            let principal_id = await tx
+                .select({ id: authNSchema.user.id })
+                .from(authNSchema.user)
+                .where(
+                    or(
+                        eq(authNSchema.user.username, identifier),
+                        eq(authNSchema.user.email, identifier),
+                    ),
+                )
+                .limit(1)
+
+            if (principal_id.length === 0) {
+                // Check if principal is an organization
+                principal_id = await tx
+                    .select({ id: authNSchema.organization.id })
+                    .from(authNSchema.organization)
+                    .where(eq(authNSchema.organization.slug, identifier))
+                    .limit(1)
+            }
+
+            if (principal_id.length === 0) {
+                return undefined
+            }
+
+            // Get the type of the principal
+            const principalDetails = await getPrincipal(tx, principal_id[0].id)
+            // console.log(principalDetails)
+
+            return {
+                id: principal_id[0].id,
+                ...principalDetails,
+            }
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for identifyPrincipal", {
+            identifier: identifier,
         })
     }
 }
