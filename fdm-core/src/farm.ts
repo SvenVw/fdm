@@ -12,7 +12,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import { getPrincipal } from "./principal"
+import { getPrincipal, identifyPrincipal } from "./principal"
 import type { Principal } from "./principal.d"
 
 /**
@@ -255,7 +255,7 @@ export async function grantRoleToFarm(
  *
  * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the update (must have 'share' permission).
- * @param target_id - The identifier of the principal whose role is being updated.
+ * @param target - The username, email or slug of the principal whose role is being updated.
  * @param b_id_farm - The identifier of the farm.
  * @param role - The new role to assign ('owner', 'advisor', or 'researcher').
  *
@@ -264,7 +264,7 @@ export async function grantRoleToFarm(
 export async function updateRoleToFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
-    target_id: string,
+    target: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
@@ -278,7 +278,13 @@ export async function updateRoleToFarm(
                 principal_id,
                 "updateRoleToFarm",
             )
-            await updateRole(tx, "farm", role, b_id_farm, target_id)
+
+            const targetDetails = await identifyPrincipal(tx, target)
+            if (!targetDetails) {
+                throw new Error("Target not found")
+            }
+
+            await updateRole(tx, "farm", role, b_id_farm, targetDetails.id)
 
             // Check if at least 1 ownwer is still prestent on this farm
             const owners = await listPrincipalsForResource(
@@ -294,7 +300,7 @@ export async function updateRoleToFarm(
     } catch (err) {
         throw handleError(err, "Exception for updateRoleToFarm", {
             b_id_farm,
-            target_id,
+            target,
             role,
         })
     }
@@ -307,7 +313,7 @@ export async function updateRoleToFarm(
  *
  * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the revoke (must have 'share' permission).
- * @param target_id - The identifier of the principal whose role is being revoked.
+ * @param target -The username, email or slug of the principal whose role is being revoked.
  * @param b_id_farm - The identifier of the farm.
  * @param role - The role to be revoked ('owner', 'advisor', or 'researcher').
  *
@@ -316,7 +322,7 @@ export async function updateRoleToFarm(
 export async function revokePrincipalFromFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
-    target_id: string,
+    target: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
@@ -330,7 +336,12 @@ export async function revokePrincipalFromFarm(
                 principal_id,
                 "revokePrincipalFromFarm",
             )
-            await revokePrincipal(tx, "farm", b_id_farm, target_id)
+            const targetDetails = await identifyPrincipal(tx, target)
+            if (!targetDetails) {
+                throw new Error("Target not found")
+            }
+
+            await revokePrincipal(tx, "farm", b_id_farm, targetDetails.id)
 
             // Check if at least 1 ownwer is still prestent on this farm
             const owners = await listPrincipalsForResource(
@@ -346,7 +357,7 @@ export async function revokePrincipalFromFarm(
     } catch (err) {
         throw handleError(err, "Exception for revokePrincipalFromFarm", {
             b_id_farm,
-            target_id,
+            target,
             role,
         })
     }

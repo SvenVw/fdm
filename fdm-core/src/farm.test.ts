@@ -20,7 +20,7 @@ import { getPrincipal } from "./principal"
 describe("Farm Functions", () => {
     let fdm: FdmServerType
     let principal_id: string
-    let target_id: string
+    let target_username: string
     let b_id_farm: string
     let farmName: string
     let farmBusinessId: string
@@ -55,13 +55,13 @@ describe("Farm Functions", () => {
                 name: "user10",
                 firstname: "user10",
                 surname: "user10",
-                username: createId(),
+                username: "user10",
                 password: "password",
             },
         })
         principal_id = user1.user.id
 
-        // Create target_id
+        // Create target_username
         const user2 = await fdmAuth.api.signUpEmail({
             headers: undefined,
             body: {
@@ -69,11 +69,11 @@ describe("Farm Functions", () => {
                 name: "user11",
                 firstname: "user11",
                 surname: "user11",
-                username: createId(),
+                username: "user11",
                 password: "password",
             },
         })
-        target_id = user2.user.id
+        target_username = "user11" // Changed to username
 
         // Create a test farm
         farmName = "Test Farm"
@@ -233,7 +233,7 @@ describe("Farm Functions", () => {
 
     describe("grantRoleToFarm", () => {
         it("should grant a role to a principal for a given farm", async () => {
-            const target_id = createId()
+            const target_id =  createId()
             await grantRoleToFarm(
                 fdm,
                 principal_id,
@@ -260,13 +260,12 @@ describe("Farm Functions", () => {
         })
 
         it("should throw an error if the principal does not have share permission", async () => {
-            const target_id = createId()
             const other_principal_id = createId()
             await expect(
                 grantRoleToFarm(
                     fdm,
                     other_principal_id,
-                    target_id,
+                    target_username,
                     b_id_farm,
                     "advisor",
                 ),
@@ -276,7 +275,6 @@ describe("Farm Functions", () => {
         })
 
         it("should handle errors during the grant role process", async () => {
-            const target_id = createId()
             // Mock the checkPermission function to throw an error
             const mockCheckPermission = async () => {
                 throw new Error("Permission check failed")
@@ -290,7 +288,7 @@ describe("Farm Functions", () => {
                 grantRoleToFarm(
                     fdmMock,
                     principal_id,
-                    target_id,
+                    target_username,
                     b_id_farm,
                     "advisor",
                 ),
@@ -311,7 +309,7 @@ describe("Farm Functions", () => {
             await updateRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "researcher",
             )
@@ -320,27 +318,26 @@ describe("Farm Functions", () => {
                 fdm,
                 "farm",
                 b_id_farm,
-            )
+            )          
             const researcher = principals.find(
-                (p) => p.principal_id === target_id,
+                (p) => p.role === "researcher",
             )
 
             expect(researcher).toEqual(
                 expect.objectContaining({
-                    principal_id: target_id,
+                    principal_id: researcher?.principal_id,
                     role: "researcher",
                 }),
             )
         })
 
         it("should throw an error if the principal does not have share permission", async () => {
-            const target_id = createId()
             const other_principal_id = createId()
             await expect(
                 updateRoleToFarm(
                     fdm,
                     other_principal_id,
-                    target_id,
+                    target_username,
                     b_id_farm,
                     "researcher",
                 ),
@@ -350,7 +347,6 @@ describe("Farm Functions", () => {
         })
 
         it("should handle errors during the update role process", async () => {
-            const target_id = createId()
             // Mock the updateRole function to throw an error
             const mockUpdateRole = async () => {
                 throw new Error("Update role failed")
@@ -362,7 +358,7 @@ describe("Farm Functions", () => {
             await grantRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
@@ -371,7 +367,7 @@ describe("Farm Functions", () => {
                 updateRoleToFarm(
                     fdmMock,
                     principal_id,
-                    target_id,
+                    target_username,
                     b_id_farm,
                     "researcher",
                 ),
@@ -381,21 +377,22 @@ describe("Farm Functions", () => {
 
     describe("revokePrincipalFromFarm", () => {
         it("should revoke a principal from a given farm", async () => {
-            const target_id = createId()
             await grantRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
             await revokePrincipalFromFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
+
+            const targetPrincipal = await getPrincipal(fdm, target_username)
 
             const principals = await listPrincipalsForResource(
                 fdm,
@@ -403,20 +400,19 @@ describe("Farm Functions", () => {
                 b_id_farm,
             )
             const revokee = principals.find(
-                (p) => p.principal_id === target_id,
+                (p) => p.principal_id === targetPrincipal?.id,
             )
 
             expect(revokee).toBeUndefined()
         })
 
         it("should throw an error if the principal does not have share permission", async () => {
-            const target_id = createId()
             const other_principal_id = createId()
             await expect(
                 revokePrincipalFromFarm(
                     fdm,
                     other_principal_id,
-                    target_id,
+                    target_username,
                     b_id_farm,
                     "advisor",
                 ),
@@ -426,11 +422,10 @@ describe("Farm Functions", () => {
         })
 
         it("should handle errors during the revoke principal process", async () => {
-            const target_id = createId()
             await grantRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
@@ -445,7 +440,7 @@ describe("Farm Functions", () => {
             await grantRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
@@ -454,7 +449,7 @@ describe("Farm Functions", () => {
                 revokePrincipalFromFarm(
                     fdmMock,
                     principal_id,
-                    target_id,
+                    target_username,
                     b_id_farm,
                     "advisor",
                 ),
@@ -467,7 +462,7 @@ describe("Farm Functions", () => {
             await grantRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
@@ -481,7 +476,7 @@ describe("Farm Functions", () => {
             expect(principals.length).toBeGreaterThanOrEqual(1)
 
             const ownerPrincipal = await getPrincipal(fdm, principal_id)
-            const advisorPrincipal = await getPrincipal(fdm, target_id)
+            const targetPrincipal = await getPrincipal(fdm, target_username)
 
             const owner = principals.find(
                 (p) => p?.username === ownerPrincipal?.username,
@@ -492,12 +487,12 @@ describe("Farm Functions", () => {
             expect(owner?.isVerified).toBe(ownerPrincipal?.isVerified)
 
             const advisor = principals.find(
-                (p) => p?.username === advisorPrincipal?.username,
+                (p) => p?.username === targetPrincipal?.username,
             )
             expect(advisor).toBeDefined()
-            expect(advisor?.username).toBe(advisorPrincipal?.username)
-            expect(advisor?.type).toBe(advisorPrincipal?.type)
-            expect(advisor?.isVerified).toBe(advisorPrincipal?.isVerified)
+            expect(advisor?.username).toBe(targetPrincipal?.username)
+            expect(advisor?.type).toBe(targetPrincipal?.type)
+            expect(advisor?.isVerified).toBe(targetPrincipal?.isVerified)
         })
 
         it("should handle errors during the list principals process", async () => {
