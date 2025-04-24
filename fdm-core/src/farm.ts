@@ -215,7 +215,7 @@ export async function updateFarm(
  *
  * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the grant (must have 'share' permission).
- * @param grantee_id - The identifier of the principal receiving the role.
+ * @param target_id - The identifier of the principal receiving the role.
  * @param b_id_farm - The identifier of the farm.
  * @param role - The role to be granted ('owner', 'advisor', or 'researcher').
  *
@@ -224,7 +224,7 @@ export async function updateFarm(
 export async function grantRoleToFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
-    grantee_id: string,
+    target_id: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
@@ -237,11 +237,15 @@ export async function grantRoleToFarm(
             principal_id,
             "grantRoleToFarm",
         )
-        await grantRole(fdm, "farm", role, b_id_farm, grantee_id)
+
+
+
+
+        await grantRole(fdm, "farm", role, b_id_farm, target_id)
     } catch (err) {
         throw handleError(err, "Exception for grantRoleToFarm", {
             b_id_farm,
-            grantee_id,
+            target_id,
             role,
         })
     }
@@ -254,7 +258,7 @@ export async function grantRoleToFarm(
  *
  * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the update (must have 'share' permission).
- * @param grantee_id - The identifier of the principal whose role is being updated.
+ * @param target_id - The identifier of the principal whose role is being updated.
  * @param b_id_farm - The identifier of the farm.
  * @param role - The new role to assign ('owner', 'advisor', or 'researcher').
  *
@@ -263,7 +267,7 @@ export async function grantRoleToFarm(
 export async function updateRoleToFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
-    grantee_id: string,
+    target_id: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
@@ -276,11 +280,11 @@ export async function updateRoleToFarm(
             principal_id,
             "updateRoleToFarm",
         )
-        await updateRole(fdm, "farm", role, b_id_farm, grantee_id)
+        await updateRole(fdm, "farm", role, b_id_farm, target_id)
     } catch (err) {
         throw handleError(err, "Exception for updateRoleToFarm", {
             b_id_farm,
-            grantee_id,
+            target_id,
             role,
         })
     }
@@ -293,7 +297,7 @@ export async function updateRoleToFarm(
  *
  * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the revoke (must have 'share' permission).
- * @param revokee_id - The identifier of the principal whose role is being revoked.
+ * @param target_id - The identifier of the principal whose role is being revoked.
  * @param b_id_farm - The identifier of the farm.
  * @param role - The role to be revoked ('owner', 'advisor', or 'researcher').
  *
@@ -302,7 +306,7 @@ export async function updateRoleToFarm(
 export async function revokePrincipalFromFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
-    revokee_id: string,
+    target_id: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
@@ -315,11 +319,11 @@ export async function revokePrincipalFromFarm(
             principal_id,
             "revokePrincipalFromFarm",
         )
-        await revokePrincipal(fdm, "farm", b_id_farm, revokee_id)
+        await revokePrincipal(fdm, "farm", b_id_farm, target_id)
     } catch (err) {
         throw handleError(err, "Exception for revokePrincipalFromFarm", {
             b_id_farm,
-            revokee_id,
+            target_id,
             role,
         })
     }
