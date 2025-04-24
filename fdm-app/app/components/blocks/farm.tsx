@@ -97,6 +97,7 @@ export function Farm(props: farmType) {
                             <CardFooter className="flex justify-between">
                                 <Button
                                     variant="outline"
+                                    type="button"
                                     onClick={() => window.history.back()}
                                 >
                                     Terug

@@ -92,32 +92,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Sort by name
         fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
 
-        // Get the Mapbox Token
-        const mapboxToken = process.env.MAPBOX_TOKEN
-        if (!mapboxToken) {
-            throw data("MAPBOX_TOKEN environment variable is not set", {
-                status: 500,
-                statusText: "MAPBOX_TOKEN environment variable is not set",
-            })
-        }
-
-        // Get the available cultivations
-        let cultivationOptions = []
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        cultivationOptions = cultivationsCatalogue
-            .filter(
-                (cultivation) =>
-                    cultivation?.b_lu_catalogue && cultivation?.b_lu_name,
-            )
-            .map((cultivation) => ({
-                value: cultivation.b_lu_catalogue,
-                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-            }))
-
         // Create the sidenav
         const sidebarPageItems = fields.map((field) => {
             return {
@@ -128,12 +102,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return {
             sidebarPageItems: sidebarPageItems,
-            cultivationOptions: cultivationOptions,
-            mapboxToken: mapboxToken,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
             calendar: calendar,
-            action: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -212,49 +183,4 @@ export default function Index() {
             </main>
         </SidebarInset>
     )
-}
-
-/**
- * Processes a form submission to update a field.
- *
- * Extracts the field ID ("b_id") and name ("b_name") from the request's form data, validates their presence,
- * retrieves the user session, and applies the update using the updateField service. Returns an object containing
- * the updated field data.
- *
- * @returns An object with a "field" property holding the updated field information.
- *
- * @throws {Error} If the form data is missing the "b_id" or "b_name" field.
- * @throws {Error} If an error occurs during the field update process.
- */
-export async function action({ request }: LoaderFunctionArgs) {
-    try {
-        const formData = await request.formData()
-        const b_id = formData.get("b_id")?.toString()
-        const b_name = formData.get("b_name")?.toString()
-
-        if (!b_id) {
-            throw new Error("missing: b_id")
-        }
-        if (!b_name) {
-            throw new Error("missing: b_name")
-        }
-
-        // Get the session
-        const session = await getSession(request)
-
-        const updatedField = await updateField(
-            fdm,
-            session.principal_id,
-            b_id,
-            b_name,
-            undefined, // b_id_source
-            undefined, // b_geometry
-            undefined, // b_acquiring_date
-            undefined, // b_lu_end
-            undefined, // b_acquiring_method
-        )
-        return { field: updatedField }
-    } catch (error) {
-        throw handleActionError(error)
-    }
 }
