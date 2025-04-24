@@ -936,7 +936,16 @@ export async function checkOrganizationSlugForAvailability(
             .where(eq(authNSchema.organization.slug, organization_slug))
             .limit(1)
 
-        return existingOrganization.length === 0
+        // Check if slug is not already an username
+        const existingUsername = await fdm
+            .select({ id: authNSchema.user.id })
+            .from(authNSchema.user)
+            .where(eq(authNSchema.user.username, organization_slug))
+            .limit(1)
+
+        return (
+            existingOrganization.length === 0 && existingUsername.length === 0
+        )
     } catch (err) {
         throw handleError(
             err,
