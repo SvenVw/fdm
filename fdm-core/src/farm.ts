@@ -362,7 +362,10 @@ export async function listPrincipalsForFarm(
         const principalsDetails = await Promise.all(
             principals.map(async (principal) => {
                 const details = await getPrincipal(fdm, principal.principal_id)
-                return details
+                return {
+                    ...details,
+                    role: principal.role,
+                }
             }),
         )
 
