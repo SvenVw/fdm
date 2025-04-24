@@ -1,5 +1,12 @@
 # Changelog fdm-app
 
+## 0.17.2
+
+### Patch Changes
+
+- e569e34: Fix loading fields page at create farm wizard
+- b2ae7ad: Change that hitting the enter button at `farm/create` results in submit instead of go back
+
 ## 0.17.1
 
 ### Patch Changes
