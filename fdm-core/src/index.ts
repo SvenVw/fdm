@@ -112,3 +112,4 @@ export {
     updateOrganization,
     getOrganization,
 } from "./organization"
+export { lookupPrincipal } from "./principal"

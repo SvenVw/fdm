@@ -2,7 +2,7 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { Principal } from "./principal.d"
 import * as authNSchema from "./db/schema-authn"
-import { eq, or } from "drizzle-orm"
+import { eq, ilike, or } from "drizzle-orm"
 
 /**
  * Retrieves details of a principal (either a user or an organization) by ID.
@@ -199,6 +199,110 @@ export async function identifyPrincipal(
         })
     } catch (err) {
         throw handleError(err, "Exception for identifyPrincipal", {
+            identifier: identifier,
+        })
+    }
+}
+
+/**
+ * Looks up principals (users or organizations) based on a partial or complete identifier.
+ *
+ * This function searches for principals by matching the provided identifier against user emails,
+ * and also performs a fuzzy search against organization names and slugs, as well as user usernames,
+ * firstnames, surnames and names. It then returns a list of Principal objects representing the matching entities.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param identifier - The string to search for within principal identifiers (email, username, name or slug). Should have at least 3 characters
+ * @returns A promise that resolves to an array of Principal objects that match the identifier.
+ *
+ * @throws {Error} - Throws an error if any database operation fails.
+ *   The error includes a message and context information about the failed operation.
+ *
+ * @example
+ * ```typescript
+ * // Example usage:
+ * const searchResults = await lookupPrincipal(fdm, "john");
+ * if (searchResults.length > 0) {
+ *   console.log("Found Principals:", searchResults);
+ * } else {
+ *   console.log("No principals found matching the identifier.");
+ * }
+ * ```
+ */
+export async function lookupPrincipal(
+    fdm: FdmType,
+    identifier: string,
+): Promise<Principal[]> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Lookup if identifier is 3 or more characters
+            if (identifier.length < 3) {
+                return []
+            }
+
+            // Check if identifier is email of user
+            const principals = await tx
+                .select({ id: authNSchema.user.id })
+                .from(authNSchema.user)
+                .where(or(eq(authNSchema.user.email, identifier)))
+                .limit(1)
+            // console.log(principals)
+
+            if (principals.length === 0) {
+                // Check if identifier is close to organization name or slug
+                const principalOrganizations = await tx
+                    .select({ id: authNSchema.organization.id })
+                    .from(authNSchema.organization)
+                    .where(
+                        or(
+                            ilike(
+                                authNSchema.organization.name,
+                                `%${identifier}%`,
+                            ),
+                            ilike(
+                                authNSchema.organization.slug,
+                                `%${identifier}%`,
+                            ),
+                        ),
+                    )
+                    .limit(5)
+
+                principals.push(...principalOrganizations)
+
+                // Check if identifier is close to name of user
+                const principalUsers = await tx
+                    .select({ id: authNSchema.user.id })
+                    .from(authNSchema.user)
+                    .where(
+                        or(
+                            ilike(authNSchema.user.username, `%${identifier}%`),
+                            ilike(
+                                authNSchema.user.firstname,
+                                `%${identifier}%`,
+                            ),
+                            ilike(authNSchema.user.surname, `%${identifier}%`),
+                            ilike(authNSchema.user.name, `%${identifier}%`),
+                        ),
+                    )
+                    .limit(5)
+                principals.push(...principalUsers)
+            }
+
+            // Collect details of principals
+            if (principals.length > 0) {
+                const principalsDetails = await Promise.all(
+                    principals.map(async (principal) => {
+                        const details = await getPrincipal(fdm, principal.id)
+                        return details
+                    }),
+                )
+                return principalsDetails
+            }
+
+            return []
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for LookupPrincipal", {
             identifier: identifier,
         })
     }

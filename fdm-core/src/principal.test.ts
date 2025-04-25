@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { getPrincipal, identifyPrincipal } from "./principal"
+import { getPrincipal, identifyPrincipal, lookupPrincipal } from "./principal"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import * as authNSchema from "./db/schema-authn"
@@ -67,19 +67,19 @@ describe("Principals", () => {
         it("should retrieve user details when principal_id is a user ID", async () => {
             const principal = await getPrincipal(fdm, user_id)
             expect(principal).toBeDefined()
-            expect(principal.username).toBe(userName)
-            expect(principal.type).toBe("user")
-            expect(principal.image).toBeNull()
-            expect(principal.isVerified).toBe(false)
+            expect(principal?.username).toBe(userName)
+            expect(principal?.type).toBe("user")
+            expect(principal?.image).toBeNull()
+            expect(principal?.isVerified).toBe(false)
         })
 
         it("should retrieve organization details when principal_id is an organization ID", async () => {
             const principal = await getPrincipal(fdm, organization_id)
             expect(principal).toBeDefined()
-            expect(principal.username).toBe(organizationName)
-            expect(principal.type).toBe("organization")
-            expect(principal.image).toBeNull()
-            expect(principal.isVerified).toBe(false)
+            expect(principal?.username).toBe(organizationName)
+            expect(principal?.type).toBe("organization")
+            expect(principal?.image).toBeNull()
+            expect(principal?.isVerified).toBe(false)
         })
 
         it("should return null if principal_id does not exist in either user or organization table", async () => {
@@ -90,15 +90,15 @@ describe("Principals", () => {
 
         it("should handle database errors and throw an error", async () => {
             // Mock the transaction function to throw an error
-            const mockTx = async () => {
-                throw new Error("Database transaction failed")
-            }
-            const fdmMock = {
+            const mockFdm = {
                 ...fdm,
-                transaction: mockTx,
-            }
+                transaction: async () => {
+                    throw new Error("Database transaction failed")
+                },
+            } as unknown as FdmType
+
             // Act & Assert
-            await expect(getPrincipal(fdmMock, user_id)).rejects.toThrowError(
+            await expect(getPrincipal(mockFdm, user_id)).rejects.toThrowError(
                 "Exception for getPrincipal",
             )
         })
@@ -113,10 +113,10 @@ describe("Principals", () => {
             const principal = await getPrincipal(fdm, user_id)
 
             expect(principal).toBeDefined()
-            expect(principal.username).toBe(userName)
-            expect(principal.type).toBe("user")
-            expect(principal.image).toBeNull()
-            expect(principal.isVerified).toBe(false)
+            expect(principal?.username).toBe(userName)
+            expect(principal?.type).toBe("user")
+            expect(principal?.image).toBeNull()
+            expect(principal?.isVerified).toBe(false)
         })
 
         it("should retrieve organization details even when logo is null", async () => {
@@ -129,10 +129,10 @@ describe("Principals", () => {
             const principal = await getPrincipal(fdm, organization_id)
 
             expect(principal).toBeDefined()
-            expect(principal.username).toBe(organizationName)
-            expect(principal.type).toBe("organization")
-            expect(principal.image).toBeNull()
-            expect(principal.isVerified).toBe(false)
+            expect(principal?.username).toBe(organizationName)
+            expect(principal?.type).toBe("organization")
+            expect(principal?.image).toBeNull()
+            expect(principal?.isVerified).toBe(false)
         })
 
         it("should handle organization with missing metadata", async () => {
@@ -143,16 +143,16 @@ describe("Principals", () => {
                 .where(eq(authNSchema.organization.id, organization_id))
             const principal = await getPrincipal(fdm, organization_id)
             expect(principal).toBeDefined()
-            expect(principal.username).toBe(organizationName)
-            expect(principal.type).toBe("organization")
-            expect(principal.image).toBeNull()
-            expect(principal.isVerified).toBe(false)
+            expect(principal?.username).toBe(organizationName)
+            expect(principal?.type).toBe("organization")
+            expect(principal?.image).toBeNull()
+            expect(principal?.isVerified).toBe(false)
         })
     })
 
     describe("identifyPrincipal", () => {
         it("should identify a principal by username", async () => {
-            const principalDetails = await identifyPrincipal(fdm, userName)            
+            const principalDetails = await identifyPrincipal(fdm, userName)
             expect(principalDetails).toBeDefined()
             expect(principalDetails?.id).toEqual(user_id)
             expect(principalDetails?.username).toBe(userName)
@@ -161,9 +161,8 @@ describe("Principals", () => {
 
         it("should identify a principal by email", async () => {
             const principalDetails = await identifyPrincipal(fdm, userEmail)
-            console.log(principalDetails)
             expect(principalDetails).toBeDefined()
-            expect(principalDetails?.id).toEqual( user_id)
+            expect(principalDetails?.id).toEqual(user_id)
             expect(principalDetails?.username).toBe(userName)
             expect(principalDetails?.type).toBe("user")
         })
@@ -172,10 +171,10 @@ describe("Principals", () => {
             const principalDetails = await identifyPrincipal(
                 fdm,
                 organizationSlug,
-            )            
+            )
             expect(principalDetails).toBeDefined()
             expect(principalDetails?.id).toEqual(organization_id)
-            expect(principalDetails?.username).toBe("Test Organization")
+            expect(principalDetails?.username).toBe(organizationName)
             expect(principalDetails?.type).toBe("organization")
         })
 
@@ -190,17 +189,16 @@ describe("Principals", () => {
 
         it("should handle database errors and throw an error", async () => {
             // Mock the transaction function to throw an error
-            const mockTx = async () => {
-                throw new Error("Database transaction failed")
-            }
-            const fdmMock = {
+            const mockFdm = {
                 ...fdm,
-                transaction: mockTx,
-            } as unknown as FdmType // Type assertion to FdmType
+                transaction: async () => {
+                    throw new Error("Database transaction failed")
+                },
+            } as unknown as FdmType
 
             // Act & Assert
             await expect(
-                identifyPrincipal(fdmMock, userName),
+                identifyPrincipal(mockFdm, userName),
             ).rejects.toThrowError("Exception for identifyPrincipal")
         })
 
@@ -226,14 +224,147 @@ describe("Principals", () => {
             expect(principalDetails?.id).toEqual(user_id)
             expect(principalDetails?.username).toBe(userName)
             expect(principalDetails?.type).toBe("user")
-            
+
             //Clean up conflicting organization
             await fdm
                 .delete(authNSchema.organization)
                 .where(
-                    eq(authNSchema.organization.id, conflictingOrganization_id),
+                    eq(
+                        authNSchema.organization.id,
+                        conflictingOrganization_id,
+                    ),
                 )
                 .execute()
+        })
+    })
+
+    describe("lookupPrincipal", () => {
+        it("should find a user by email", async () => {
+            const identifier = userEmail
+            const results = await lookupPrincipal(fdm, identifier)
+            console.log(results)
+
+            expect(results).toBeDefined()
+            expect(results.length).toBe(1)
+            expect(results[0].username).toBe(userName)
+            expect(results[0].type).toBe("user")
+        })
+
+        it("should return an empty array when no principal matches identifier", async () => {
+            const identifier = "nonexistent"
+            const results = await lookupPrincipal(fdm, identifier)
+            expect(results).toBeDefined()
+            expect(results.length).toBe(0)
+        })
+
+        it("should find organizations by partial name", async () => {
+            const identifier = "Organ"
+            const results = await lookupPrincipal(fdm, identifier)
+
+            expect(results).toBeDefined()
+            expect(results.some((r) => r.username === organizationName)).toBe(
+                true,
+            )
+            expect(results.some((r) => r.type === "organization")).toBe(true)
+        })
+
+        it("should find organizations by partial slug", async () => {
+            const identifier = "test-org"
+            const results = await lookupPrincipal(fdm, identifier)
+
+            expect(results).toBeDefined()
+            expect(results.some((r) => r.username === organizationName)).toBe(
+                true,
+            )
+            expect(results.some((r) => r.type === "organization")).toBe(true)
+        })
+
+        it("should find users by partial name", async () => {
+            const identifier = "Test"
+            const results = await lookupPrincipal(fdm, identifier)
+
+            expect(results).toBeDefined()
+            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
+            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(results.some((r) => r.type === "user")).toBe(true)
+        })
+
+        it("should find users by partial username", async () => {
+            const identifier = "testuser"
+            const results = await lookupPrincipal(fdm, identifier)
+
+            expect(results).toBeDefined()
+            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
+            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(results.some((r) => r.type === "user")).toBe(true)
+        })
+
+        it("should find users by firstname", async () => {
+            const identifier = "Test"
+            const results = await lookupPrincipal(fdm, identifier)
+            expect(results).toBeDefined()
+            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
+            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(results.some((r) => r.type === "user")).toBe(true)
+        })
+
+        it("should find users by surname", async () => {
+            const identifier = "User"
+            const results = await lookupPrincipal(fdm, identifier)
+            expect(results).toBeDefined()
+            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
+            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(results.some((r) => r.type === "user")).toBe(true)
+        })
+
+        it("should handle database errors and throw an error", async () => {
+            const mockFdm = {
+                ...fdm,
+                transaction: async () => {
+                    throw new Error("Database transaction failed")
+                },
+            } as unknown as FdmType // Type assertion to FdmType
+
+            await expect(lookupPrincipal(mockFdm, "test")).rejects.toThrowError(
+                "Exception for LookupPrincipal",
+            )
+        })
+
+        it("should prioritize email match of user over slug match of organization", async () => {
+            // Create an organization with slug same as one of the user email
+            const conflicting_organization_id = await createOrganization(
+                fdm,
+                user_id,
+                "Conflicting Organization",
+                userEmail,
+                "Test description",
+            )
+
+            const identifier = userEmail
+            const results = await lookupPrincipal(fdm, identifier)
+
+            expect(results).toBeDefined()
+            expect(results.length).toBe(1)
+            expect(results[0].username).toBe(userName) // Should prioritize the user.
+
+            // Clean up conflicting organization
+            await fdm
+                .delete(authNSchema.organization)
+                .where(
+                    eq(
+                        authNSchema.organization.id,
+                        conflicting_organization_id,
+                    ),
+                )
+                .execute()
+        })
+
+        it("should handle empty identifier", async () => {
+            const identifier = ""
+            const results = await lookupPrincipal(fdm, identifier)
+            console.log(results)
+            expect(results).toBeDefined()
+            expect(results.length).toBe(0)
         })
     })
 })
