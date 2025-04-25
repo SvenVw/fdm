@@ -211,42 +211,49 @@ const InvitationForm = ({ principals }: { principals: any }) => {
 
     return (
         <RemixFormProvider {...form}>
-            <Form method="post" className="flex space-x-2">
-                <AutoComplete
-                    selectedValue={selectedValue}
-                    onSelectedValueChange={setSelectedValue}
-                    searchValue={searchValue}
-                    onSearchValueChange={setSearchValue}
-                    items={items ?? []}
-                    isLoading={isLoading}
-                    emptyMessage="Geen gebruikers gevonden"
-                    placeholder="Zoek naar een gebruiker of vul een e-mailadres in"
-                    form={form}
-                    name="username"
-                />
-                <Select
-                    defaultValue="advisor"
-                    name="role"
-                    onValueChange={form.setValue("role")}
+            <Form method="post">
+                <fieldset
+                    disabled={form.formState.isSubmitting}
+                    className="flex space-x-2"
                 >
-                    <SelectTrigger className="ml-auto w-[110px]">
-                        <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="owner">Eigenaar</SelectItem>
-                        <SelectItem value="advisor">Adviseur</SelectItem>
-                        <SelectItem value="researcher">Onderzoeker</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Button
-                    variant="default"
-                    className="shrink-0"
-                    name="intent"
-                    value="invite_user"
-                    type="submit"
-                >
-                    Uitnodigen
-                </Button>
+                    <AutoComplete
+                        selectedValue={selectedValue}
+                        onSelectedValueChange={setSelectedValue}
+                        searchValue={searchValue}
+                        onSearchValueChange={setSearchValue}
+                        items={items ?? []}
+                        isLoading={isLoading}
+                        emptyMessage="Geen gebruikers gevonden"
+                        placeholder="Zoek naar een gebruiker of vul een e-mailadres in"
+                        form={form}
+                        name="username"
+                    />
+                    <Select
+                        defaultValue="advisor"
+                        name="role"
+                        onValueChange={form.setValue("role")}
+                    >
+                        <SelectTrigger className="ml-auto w-[110px]">
+                            <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="owner">Eigenaar</SelectItem>
+                            <SelectItem value="advisor">Adviseur</SelectItem>
+                            <SelectItem value="researcher">
+                                Onderzoeker
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Button
+                        variant="default"
+                        className="shrink-0"
+                        name="intent"
+                        value="invite_user"
+                        type="submit"
+                    >
+                        Uitnodigen
+                    </Button>
+                </fieldset>
             </Form>
         </RemixFormProvider>
     )
@@ -297,93 +304,100 @@ const PrincipalRow = ({
     }
 
     return (
-        <div
-            key={username}
-            className="flex items-center justify-between space-x-4"
-        >
-            <div className="flex items-center space-x-4">
-                <Avatar>
-                    <AvatarImage src={image} />
-                    <AvatarFallback>{initials}</AvatarFallback>
-                </Avatar>
-                <div>
-                    <p className="text-sm font-medium leading-none">
-                        {displayUserName}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                        {type === "user"
-                            ? "Gebruiker"
-                            : type === "organization"
-                              ? "Organisatie"
-                              : "Onbekend"}
-                    </p>
+        <fieldset disabled={form.formState.isSubmitting}>
+            <div
+                key={username}
+                className="flex items-center justify-between space-x-4"
+            >
+                <div className="flex items-center space-x-4">
+                    <Avatar>
+                        <AvatarImage src={image} />
+                        <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="text-sm font-medium leading-none">
+                            {displayUserName}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                            {type === "user"
+                                ? "Gebruiker"
+                                : type === "organization"
+                                  ? "Organisatie"
+                                  : "Onbekend"}
+                        </p>
+                    </div>
                 </div>
+                {hasSharePermission ? (
+                    <RemixFormProvider {...form}>
+                        <Form
+                            method="post"
+                            className="flex items-center space-x-4"
+                        >
+                            <input
+                                type="hidden"
+                                value={username}
+                                {...form.register("username")}
+                            />
+                            <input
+                                type="hidden"
+                                name="intent"
+                                value="update_role"
+                            />
+                            <input
+                                type="hidden"
+                                name="remove_user"
+                                value="remove_user"
+                            />
+
+                            <Select
+                                defaultValue={role}
+                                name="role"
+                                onValueChange={handleSelectChange}
+                            >
+                                <SelectTrigger className="ml-auto w-[110px]">
+                                    <SelectValue placeholder="Select" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="owner">
+                                        Eigenaar
+                                    </SelectItem>
+                                    <SelectItem value="advisor">
+                                        Adviseur
+                                    </SelectItem>
+                                    <SelectItem value="researcher">
+                                        Onderzoeker
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+
+                            <Button
+                                type="submit"
+                                variant="destructive"
+                                className="shrink-0"
+                                name="intent"
+                                value="remove_user"
+                                onClick={handleRemove}
+                            >
+                                Verwijder
+                            </Button>
+                        </Form>
+                    </RemixFormProvider>
+                ) : (
+                    <p className="text-sm font-medium leading-none">
+                        <Badge>
+                            {" "}
+                            {role === "owner"
+                                ? "Eigenaar"
+                                : role === "advisor"
+                                  ? "Adviseur"
+                                  : role === "researcher"
+                                    ? "Onderzoeker"
+                                    : "Onbekend"}
+                        </Badge>
+                    </p>
+                )}
             </div>
-            {hasSharePermission ? (
-                <RemixFormProvider {...form}>
-                    <Form method="post" className="flex items-center space-x-4">
-                        <input
-                            type="hidden"
-                            value={username}
-                            {...form.register("username")}
-                        />
-                        <input
-                            type="hidden"
-                            name="intent"
-                            value="update_role"
-                        />
-                        <input
-                            type="hidden"
-                            name="remove_user"
-                            value="remove_user"
-                        />
-
-                        <Select
-                            defaultValue={role}
-                            name="role"
-                            onValueChange={handleSelectChange}
-                        >
-                            <SelectTrigger className="ml-auto w-[110px]">
-                                <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="owner">Eigenaar</SelectItem>
-                                <SelectItem value="advisor">
-                                    Adviseur
-                                </SelectItem>
-                                <SelectItem value="researcher">
-                                    Onderzoeker
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-
-                        <Button
-                            type="submit"
-                            variant="destructive"
-                            className="shrink-0"
-                            name="intent"
-                            value="remove_user"
-                            onClick={handleRemove}
-                        >
-                            Verwijder
-                        </Button>
-                    </Form>
-                </RemixFormProvider>
-            ) : (
-                <p className="text-sm font-medium leading-none">
-                    <Badge>
-                        {" "}
-                        {role === "owner"
-                            ? "Eigenaar"
-                            : role === "advisor"
-                              ? "Adviseur"
-                              : role === "researcher"
-                                ? "Onderzoeker"
-                                : "Onbekend"}
-                    </Badge>
-                </p>
-            )}
-        </div>
+        </fieldset>
     )
 }
 
