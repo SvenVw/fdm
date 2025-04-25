@@ -218,17 +218,15 @@ const InvitationForm = ({ principals }: { principals: any }) => {
     useEffect(() => {
         if (fetcher.data) {
             if (fetcher.data.length > 0) {
+                const principalUsernames = principals.map(
+                    (principal: { username: string }) => principal.username,
+                )
                 setItems(
                     fetcher.data
                         // Do not return principals that already have access
                         .filter((item) => {
-                            return !principals.some(
-                                (principal: { username: string }) =>
-                                    principal.username === item.value,
-                            )
+                            return !principalUsernames.includes(item.username)                            
                         })
-                        // Do not return the user itself
-                        // .filter((item) => item.value !== session.user.username)
                         .map(
                             (item: {
                                 username: string
