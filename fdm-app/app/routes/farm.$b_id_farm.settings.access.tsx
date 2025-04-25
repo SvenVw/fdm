@@ -113,13 +113,14 @@ export default function FarmSettingsAccessBlock() {
         useLoaderData<typeof loader>()
 
     return (
-        <div className="space-y-6">
-            <Card>
+        <div className="grid md:grid-cols-3 space-x-4 space-y-6 items-">
+            <Card className="md:col-span-2">
                 <CardHeader>
                     <CardTitle>Toegang</CardTitle>
                     <CardDescription>
-                        Nodig nieuwe leden uit en zie welke uitnodigingen nog
-                        open staan.
+                        {hasSharePermission
+                            ? "Beheer welke gebruikers en organisaties toegang hebben tot dit bedrijf"
+                            : "U heeft geen rechten om de toegang tot dit bedrijf te beheren."}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -148,6 +149,43 @@ export default function FarmSettingsAccessBlock() {
                             ))}
                         </div>
                     </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Hoe werkt toegang tot een bedrijf?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">
+                        Bij het beheren van de toegang tot een bedrijf, zijn er
+                        verschillende rollen die toegewezen kunnen worden.
+                        Hieronder een overzicht van deze rollen en hun
+                        bevoegdheden:
+                    </p>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground mt-2">
+                        <li>
+                            <b>Eigenaar:</b> Deze rol heeft volledige toegang
+                            tot het bedrijf. Eigenaren kunnen gebruikers
+                            uitnodigen, hun rol aanpassen en gebruikers
+                            verwijderen. Ze kunnen alle gegevens bekijken en
+                            bewerken.
+                        </li>
+                        <li>
+                            <b>Adviseur:</b> Adviseurs hebben toegang tot alle
+                            gegevens en kunnen deze bewerken. Ze kunnen echter
+                            geen gebruikers uitnodigen, rollen aanpassen of
+                            gebruikers verwijderen.
+                        </li>
+                        <li>
+                            <b>Onderzoeker:</b> Onderzoekers hebben leesrechten
+                            tot alle gegevens. Ze kunnen geen gegevens wijzigen
+                            en geen gebruikers beheren.
+                        </li>
+                    </ul>
+                    <br/>
+                    <p className="text-sm text-muted-foreground">
+                        <b>Let op:</b> Een bedrijf heeft minimaal één <i>Eigenaar</i> nodig. 
+                    </p>
                 </CardContent>
             </Card>
         </div>
@@ -282,7 +320,7 @@ const PrincipalRow = ({
     hasSharePermission: boolean
     b_id_farm: string
 }) => {
-    let fetcher = useFetcher()
+    const fetcher = useFetcher()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
