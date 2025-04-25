@@ -215,7 +215,7 @@ export async function updateFarm(
  *
  * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param principal_id - The identifier of the principal performing the grant (must have 'share' permission).
- * @param target_id - The identifier of the principal receiving the role.
+ * @param target - The username, email or slug of the principal whose role is being updated.
  * @param b_id_farm - The identifier of the farm.
  * @param role - The role to be granted ('owner', 'advisor', or 'researcher').
  *
@@ -224,25 +224,43 @@ export async function updateFarm(
 export async function grantRoleToFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
-    target_id: string,
+    target: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
     try {
-        await checkPermission(
-            fdm,
-            "farm",
-            "share",
-            b_id_farm,
-            principal_id,
-            "grantRoleToFarm",
-        )
+        return await fdm.transaction(async (tx: FdmType) => {
+            await checkPermission(
+                tx,
+                "farm",
+                "share",
+                b_id_farm,
+                principal_id,
+                "grantRoleToFarm",
+            )
 
-        await grantRole(fdm, "farm", role, b_id_farm, target_id)
+            const targetDetails = await identifyPrincipal(tx, target)
+            if (!targetDetails) {
+                throw new Error("Target not found")
+            }
+
+            await grantRole(tx, "farm", role, b_id_farm, targetDetails.id)
+
+            // Check if at least 1 ownwer is still prestent on this farm
+            const owners = await listPrincipalsForResource(
+                tx,
+                "farm",
+                b_id_farm,
+            )
+            const ownerCount = owners.filter((x) => x.role === "owner").length
+            if (ownerCount === 0) {
+                throw new Error("Farm should have at least 1 owner")
+            }
+        })
     } catch (err) {
         throw handleError(err, "Exception for grantRoleToFarm", {
             b_id_farm,
-            target_id,
+            target,
             role,
         })
     }

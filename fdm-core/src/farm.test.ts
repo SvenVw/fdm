@@ -233,11 +233,11 @@ describe("Farm Functions", () => {
 
     describe("grantRoleToFarm", () => {
         it("should grant a role to a principal for a given farm", async () => {
-            const target_id =  createId()
+            const target_id = createId()
             await grantRoleToFarm(
                 fdm,
                 principal_id,
-                target_id,
+                target_username,
                 b_id_farm,
                 "advisor",
             )
@@ -247,9 +247,7 @@ describe("Farm Functions", () => {
                 "farm",
                 b_id_farm,
             )
-            const advisor = principals.find(
-                (p) => p.principal_id === target_id,
-            )
+            const advisor = principals.find((p) => p.principal_id === target_id)
 
             expect(advisor).toEqual(
                 expect.objectContaining({
@@ -318,10 +316,8 @@ describe("Farm Functions", () => {
                 fdm,
                 "farm",
                 b_id_farm,
-            )          
-            const researcher = principals.find(
-                (p) => p.role === "researcher",
             )
+            const researcher = principals.find((p) => p.role === "researcher")
 
             expect(researcher).toEqual(
                 expect.objectContaining({
@@ -389,7 +385,6 @@ describe("Farm Functions", () => {
                 principal_id,
                 target_username,
                 b_id_farm,
-                "advisor",
             )
 
             const targetPrincipal = await getPrincipal(fdm, target_username)
@@ -414,7 +409,6 @@ describe("Farm Functions", () => {
                     other_principal_id,
                     target_username,
                     b_id_farm,
-                    "advisor",
                 ),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
@@ -451,7 +445,6 @@ describe("Farm Functions", () => {
                     principal_id,
                     target_username,
                     b_id_farm,
-                    "advisor",
                 ),
             ).rejects.toThrowError("Exception for revokePrincipalFromFarm")
         })
