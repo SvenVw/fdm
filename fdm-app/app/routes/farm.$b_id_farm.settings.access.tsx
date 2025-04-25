@@ -4,6 +4,8 @@ import {
     useLoaderData,
     useParams,
     type MetaFunction,
+    ActionFunctionArgs,
+    Form,
 } from "react-router"
 import { Separator } from "~/components/ui/separator"
 import { clientConfig } from "~/lib/config"
@@ -23,12 +25,25 @@ import {
     SelectValue,
 } from "../components/ui/select"
 import { Button } from "../components/ui/button"
-import { handleLoaderError } from "../lib/error"
+import { handleLoaderError, handleActionError } from "../lib/error"
 import { getSession } from "../lib/auth.server"
-import { isAllowedToShareFarm, listPrincipalsForFarm } from "@svenvw/fdm-core"
+import {
+    getFarm,
+    isAllowedToShareFarm,
+    listPrincipalsForFarm,
+    grantRoleToFarm,
+    updateRoleOfPrincipalAtFarm,
+    revokePrincipalFromFarm,
+} from "@svenvw/fdm-core"
 import { fdm } from "../lib/fdm.server"
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
 import { Badge } from "../components/ui/badge"
+import { extractFormValuesFromRequest } from "../lib/form"
+import { z } from "zod"
+import { dataWithSuccess, dataWithError } from "remix-toast"
+import { useEffect, useRef } from "react"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -55,16 +70,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get the farm details ( to check if has access to farm)
+        const farm = getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("Farm is not found", {
+                status: 404,
+                statusText: "Farm is not found",
+            })
+        }
+
         // Get principals with access to this farm
         const principals = await listPrincipalsForFarm(
             fdm,
             session.principal_id,
             b_id_farm,
         )
-        console.log(principals)
 
         // Check if user has share permission
-        const hasSharePermission = isAllowedToShareFarm(
+        const hasSharePermission = await isAllowedToShareFarm(
             fdm,
             session.principal_id,
             b_id_farm,
@@ -82,18 +105,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function FarmSettingsAccessBlock() {
-    const { b_id_farm, principals, hasSharePermission } = useLoaderData()
+    const { b_id_farm, principals, hasSharePermission } =
+        useLoaderData<typeof loader>()
 
     return (
         <div className="space-y-6">
-            {/* <div>
-                <h3 className="text-lg font-medium">Toegang</h3>
-                <p className="text-sm text-muted-foreground">
-                    Helaas, je hebt geen rechten om de toegang van dit bedrijf
-                    te beheren
-                </p>
-            </div> */}
-            {/* <Separator /> */}
             <Card>
                 <CardHeader>
                     <CardTitle>Toegang</CardTitle>
@@ -123,6 +139,7 @@ export default function FarmSettingsAccessBlock() {
                                     role={principal.role}
                                     type={principal.type}
                                     hasSharePermission={hasSharePermission}
+                                    b_id_farm={b_id_farm}
                                 />
                             ))}
                         </div>
@@ -134,38 +151,50 @@ export default function FarmSettingsAccessBlock() {
 }
 
 const InvitationForm = ({ b_id_farm }: { b_id_farm: string }) => {
+    const form = useRemixForm<z.infer<typeof FormSchema>>({
+        mode: "onTouched",
+        resolver: zodResolver(FormSchema),
+    })
+
     return (
-        <form method="post" className="flex space-x-2">
-            <input type="hidden" name="organization_id" value={b_id_farm} />
-            <Input
-                type="email"
-                placeholder="Vul een emailadres in"
-                name="email"
-            />
-            <Select defaultValue="advisor" name="role">
-                <SelectTrigger className="ml-auto w-[110px]">
-                    <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="owner">Eigenaar</SelectItem>
-                    <SelectItem value="advisor">Adviseur</SelectItem>
-                    <SelectItem value="onderzoeker">Onderzoeker</SelectItem>
-                </SelectContent>
-            </Select>
-            <Button
-                variant="default"
-                className="shrink-0"
-                name="intent"
-                value="invite_user"
-            >
-                Uitnodigen
-            </Button>
-        </form>
+        <RemixFormProvider {...form}>
+            <Form method="post" className="flex space-x-2">
+                <input type="hidden" name="organization_id" value={b_id_farm} />
+                <Input
+                    type="email"
+                    placeholder="Vul een emailadres in"
+                    name="email"
+                    {...form.register("email")}
+                />
+                <Select
+                    defaultValue="advisor"
+                    name="role"
+                    onValueChange={form.setValue("role")}
+                >
+                    <SelectTrigger className="ml-auto w-[110px]">
+                        <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="owner">Eigenaar</SelectItem>
+                        <SelectItem value="advisor">Adviseur</SelectItem>
+                        <SelectItem value="researcher">Onderzoeker</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button
+                    variant="default"
+                    className="shrink-0"
+                    name="intent"
+                    value="invite_user"
+                    type="submit"
+                >
+                    Uitnodigen
+                </Button>
+            </Form>
+        </RemixFormProvider>
     )
 }
 
 const PrincipalRow = ({
-    key,
     username,
     displayUserName,
     image,
@@ -174,7 +203,6 @@ const PrincipalRow = ({
     type,
     hasSharePermission,
 }: {
-    key: string
     username: string
     displayUserName: string
     image: string | undefined
@@ -182,9 +210,39 @@ const PrincipalRow = ({
     role: "owner" | "advisor" | "researcher"
     type: "user" | "organization"
     hasSharePermission: boolean
+    b_id_farm: string
 }) => {
+    const form = useRemixForm<z.infer<typeof FormSchema>>({
+        mode: "onTouched",
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            role: role,
+            intent: "update_role",
+        },
+    })
+
+    const handleRemove = async (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault()
+        await form.handleSubmit(() => {})(
+            new SubmitEvent("submit", {
+                submitter: {
+                    name: "remove_user",
+                    value: "remove_user",
+                } as HTMLButtonElement,
+            }),
+        )
+    }
+
+    const handleSelectChange = async (value: string) => {
+        form.setValue("role", value)
+        await form.handleSubmit(() => {})(new SubmitEvent("submit"))
+    }
+
     return (
-        <div key={key} className="flex items-center justify-between space-x-4">
+        <div
+            key={username}
+            className="flex items-center justify-between space-x-4"
+        >
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarImage src={image} />
@@ -204,39 +262,55 @@ const PrincipalRow = ({
                 </div>
             </div>
             {hasSharePermission ? (
-                <form method="post" className="flex items-center space-x-4">
-                    <input type="hidden" name="username" value={username} />
-                    <Select defaultValue={role} name="role">
-                        <SelectTrigger className="ml-auto w-[110px]">
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="owner">Eigenaar</SelectItem>
-                            <SelectItem value="advisor">Adviseur</SelectItem>
-                            <SelectItem value="researcher">
-                                Onderzoeker
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Button
-                        type="submit"
-                        className="shrink-0"
-                        name="intent"
-                        value="update_role"
-                    >
-                        Bijwerken
-                    </Button>
-                    {/* {permissions.canRemoveUser ? ( */}
-                    <Button
-                        variant="destructive"
-                        className="shrink-0"
-                        name="intent"
-                        value="remove_user"
-                    >
-                        Verwijder
-                    </Button>
-                    {/* ) : null} */}
-                </form>
+                <RemixFormProvider {...form}>
+                    <Form method="post" className="flex items-center space-x-4">
+                        <input
+                            type="hidden"
+                            value={username}
+                            {...form.register("username")}
+                        />
+                        <input
+                            type="hidden"
+                            name="intent"
+                            value="update_role"
+                        />
+                        <input
+                            type="hidden"
+                            name="remove_user"
+                            value="remove_user"
+                        />
+
+                        <Select
+                            defaultValue={role}
+                            name="role"
+                            onValueChange={handleSelectChange}
+                        >
+                            <SelectTrigger className="ml-auto w-[110px]">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="owner">Eigenaar</SelectItem>
+                                <SelectItem value="advisor">
+                                    Adviseur
+                                </SelectItem>
+                                <SelectItem value="researcher">
+                                    Onderzoeker
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        <Button
+                            type="submit"
+                            variant="destructive"
+                            className="shrink-0"
+                            name="intent"
+                            value="remove_user"
+                            onClick={handleRemove}
+                        >
+                            Verwijder
+                        </Button>
+                    </Form>
+                </RemixFormProvider>
             ) : (
                 <p className="text-sm font-medium leading-none">
                     <Badge>
@@ -253,4 +327,88 @@ const PrincipalRow = ({
             )}
         </div>
     )
+}
+
+const FormSchema = z.object({
+    email: z.string().email().optional(),
+    username: z.string().optional(),
+    role: z.enum(["owner", "advisor", "researcher"]).optional(),
+    intent: z.enum(["invite_user", "update_role", "remove_user"]),
+})
+
+export async function action({ request, params }: ActionFunctionArgs) {
+    try {
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw new Error("missing: b_id_farm")
+        }
+        const formValues = await extractFormValuesFromRequest(
+            request,
+            FormSchema,
+        )
+
+        const session = await getSession(request)
+
+        if (formValues.intent === "invite_user") {
+            if (!formValues.email) {
+                return dataWithError(
+                    null,
+                    "Vul een e-mailadres in om iemand uit te nodigen",
+                )
+            }
+            if (!formValues.role) {
+                return handleActionError("missing: role")
+            }
+            await grantRoleToFarm(
+                fdm,
+                session.user.id,
+                formValues.email,
+                b_id_farm,
+                formValues.role,
+            )
+
+            return dataWithSuccess(null, {
+                message: `Gebruiker ${formValues.email} is uitgenodigd! 🎉`,
+            })
+        }
+
+        if (formValues.intent === "update_role") {
+            if (!formValues.username) {
+                return handleActionError("missing: email")
+            }
+            if (!formValues.role) {
+                return handleActionError("missing: role")
+            }
+            await updateRoleOfPrincipalAtFarm(
+                fdm,
+                session.user.id,
+                b_id_farm,
+                formValues.username,
+                formValues.role,
+            )
+            return dataWithSuccess(null, {
+                message: "Rol is bijgewerkt! 🎉",
+            })
+        }
+
+        if (formValues.intent === "remove_user") {
+            if (!formValues.username) {
+                return handleActionError("missing: username")
+            }
+            await revokePrincipalFromFarm(
+                fdm,
+                session.user.id,
+                b_id_farm,
+                formValues.username,
+            )
+            return dataWithSuccess(null, {
+                message: `Gebruiker ${formValues.username} is verwijderd`,
+            })
+        }
+        throw new Error("invalid intent")
+    } catch (error) {
+        console.error(error)
+        return dataWithError(null, "Er is iets misgegaan")
+        // throw handleActionError(error)
+    }
 }
