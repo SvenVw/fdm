@@ -182,9 +182,10 @@ export default function FarmSettingsAccessBlock() {
                             en geen gebruikers beheren.
                         </li>
                     </ul>
-                    <br/>
+                    <br />
                     <p className="text-sm text-muted-foreground">
-                        <b>Let op:</b> Een bedrijf heeft minimaal één <i>Eigenaar</i> nodig. 
+                        <b>Let op:</b> Een bedrijf heeft minimaal één{" "}
+                        <i>Eigenaar</i> nodig.
                     </p>
                 </CardContent>
             </Card>
@@ -253,7 +254,7 @@ const InvitationForm = ({ principals }: { principals: any }) => {
             <Form method="post">
                 <fieldset
                     disabled={form.formState.isSubmitting}
-                    className="flex space-x-2"
+                    className="flex items-center justify-between space-x-4"
                 >
                     <AutoComplete
                         selectedValue={selectedValue}
@@ -267,35 +268,38 @@ const InvitationForm = ({ principals }: { principals: any }) => {
                         form={form}
                         name="username"
                     />
-                    <Select
-                        defaultValue="advisor"
-                        name="role"
-                        onValueChange={form.setValue("role")}
-                    >
-                        <SelectTrigger className="ml-auto w-[110px]">
-                            <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="owner">Eigenaar</SelectItem>
-                            <SelectItem value="advisor">Adviseur</SelectItem>
-                            <SelectItem value="researcher">
-                                Onderzoeker
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <Button
-                        variant="default"
-                        className="shrink-0"
-                        name="intent"
-                        value="invite_user"
-                        type="submit"
-                    >
-                        {form.formState.isSubmitting ? (
-                            <LoadingSpinner />
-                        ) : null}
-                        Uitnodigen
-                    </Button>
-                    {form.formState.isSubmitting ? <LoadingSpinner /> : null}
+                    <div className="flex items-center space-x-2 justify-end">
+                        <Select
+                            defaultValue="advisor"
+                            name="role"
+                            onValueChange={form.setValue("role")}
+                        >
+                            <SelectTrigger className="ml-auto w-[150px]">
+                                <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="owner">Eigenaar</SelectItem>
+                                <SelectItem value="advisor">
+                                    Adviseur
+                                </SelectItem>
+                                <SelectItem value="researcher">
+                                    Onderzoeker
+                                </SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Button
+                            variant="default"
+                            className="shrink-0"
+                            name="intent"
+                            value="invite_user"
+                            type="submit"
+                        >
+                            {form.formState.isSubmitting ? (
+                                <LoadingSpinner />
+                            ) : null}
+                            Uitnodigen
+                        </Button>
+                    </div>
                 </fieldset>
             </Form>
         </RemixFormProvider>
@@ -398,7 +402,7 @@ const PrincipalRow = ({
                                 name="role"
                                 onValueChange={handleSelectChange}
                             >
-                                <SelectTrigger className="ml-auto w-[110px]">
+                                <SelectTrigger className="ml-auto w-[150px]">
                                     <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent>
