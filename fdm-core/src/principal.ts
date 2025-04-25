@@ -212,7 +212,7 @@ export async function identifyPrincipal(
  * firstnames, surnames and names. It then returns a list of Principal objects representing the matching entities.
  *
  * @param fdm - The FDM instance providing the connection to the database.
- * @param identifier - The string to search for within principal identifiers (email, username, name or slug). Should have at least 3 characters
+ * @param identifier - The string to search for within principal identifiers (email, username, name or slug). Should have at least 1 character
  * @returns A promise that resolves to an array of Principal objects that match the identifier.
  *
  * @throws {Error} - Throws an error if any database operation fails.
@@ -235,8 +235,8 @@ export async function lookupPrincipal(
 ): Promise<Principal[]> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
-            // Lookup if identifier is 3 or more characters
-            if (identifier.length < 3) {
+            // Lookup if identifier is 1 or more characters
+            if (identifier.length <= 1) {
                 return []
             }
 
