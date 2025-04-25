@@ -47,6 +47,7 @@ import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AutoComplete } from "../components/custom/autocomplete"
 import { User, Users } from "lucide-react"
+import { LoadingSpinner } from "../components/custom/loadingspinner"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -251,8 +252,12 @@ const InvitationForm = ({ principals }: { principals: any }) => {
                         value="invite_user"
                         type="submit"
                     >
+                        {form.formState.isSubmitting ? (
+                            <LoadingSpinner />
+                        ) : null}
                         Uitnodigen
                     </Button>
+                    {form.formState.isSubmitting ? <LoadingSpinner /> : null}
                 </fieldset>
             </Form>
         </RemixFormProvider>
@@ -304,33 +309,33 @@ const PrincipalRow = ({
     }
 
     return (
-        <fieldset disabled={form.formState.isSubmitting}>
-            <div
-                key={username}
-                className="flex items-center justify-between space-x-4"
-            >
-                <div className="flex items-center space-x-4">
-                    <Avatar>
-                        <AvatarImage src={image} />
-                        <AvatarFallback>{initials}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <p className="text-sm font-medium leading-none">
-                            {displayUserName}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            {type === "user"
-                                ? "Gebruiker"
-                                : type === "organization"
-                                  ? "Organisatie"
-                                  : "Onbekend"}
-                        </p>
-                    </div>
+        <div
+            key={username}
+            className="flex items-center justify-between space-x-4"
+        >
+            <div className="flex items-center space-x-4">
+                <Avatar>
+                    <AvatarImage src={image} />
+                    <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
+                <div>
+                    <p className="text-sm font-medium leading-none">
+                        {displayUserName}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                        {type === "user"
+                            ? "Gebruiker"
+                            : type === "organization"
+                              ? "Organisatie"
+                              : "Onbekend"}
+                    </p>
                 </div>
-                {hasSharePermission ? (
-                    <RemixFormProvider {...form}>
-                        <Form
-                            method="post"
+            </div>
+            {hasSharePermission ? (
+                <RemixFormProvider {...form}>
+                    <Form method="post">
+                        <fieldset
+                            disabled={form.formState.isSubmitting}
                             className="flex items-center space-x-4"
                         >
                             <input
@@ -348,7 +353,9 @@ const PrincipalRow = ({
                                 name="remove_user"
                                 value="remove_user"
                             />
-
+                            {form.formState.isSubmitting ? (
+                                <LoadingSpinner />
+                            ) : null}
                             <Select
                                 defaultValue={role}
                                 name="role"
@@ -380,24 +387,24 @@ const PrincipalRow = ({
                             >
                                 Verwijder
                             </Button>
-                        </Form>
-                    </RemixFormProvider>
-                ) : (
-                    <p className="text-sm font-medium leading-none">
-                        <Badge>
-                            {" "}
-                            {role === "owner"
-                                ? "Eigenaar"
-                                : role === "advisor"
-                                  ? "Adviseur"
-                                  : role === "researcher"
-                                    ? "Onderzoeker"
-                                    : "Onbekend"}
-                        </Badge>
-                    </p>
-                )}
-            </div>
-        </fieldset>
+                        </fieldset>
+                    </Form>
+                </RemixFormProvider>
+            ) : (
+                <p className="text-sm font-medium leading-none">
+                    <Badge>
+                        {" "}
+                        {role === "owner"
+                            ? "Eigenaar"
+                            : role === "advisor"
+                              ? "Adviseur"
+                              : role === "researcher"
+                                ? "Onderzoeker"
+                                : "Onbekend"}
+                    </Badge>
+                </p>
+            )}
+        </div>
     )
 }
 
