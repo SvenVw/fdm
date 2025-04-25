@@ -112,9 +112,9 @@ export async function getPrincipal(
             const metadata = JSON.parse(organization[0].metadata)
 
             return {
-                username: organization[0].name,
+                username: organization[0].slug,
                 initials: organization[0].name.charAt(0).toUpperCase(),
-                displayUserName: organization[0].slug,
+                displayUserName: organization[0].name,
                 image: organization[0].logo,
                 type: "organization",
                 isVerified: metadata ? metadata.isVerified : false,
