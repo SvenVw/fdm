@@ -11,8 +11,9 @@ import {
 } from "~/components/ui/command"
 import { Input } from "~/components/ui/input"
 import { Popover, PopoverAnchor, PopoverContent } from "~/components/ui/popover"
-import { Skeleton } from "~/components/ui/skeleton"
 import { LoadingSpinner } from "./loadingspinner"
+import type { UseFormReturn } from "remix-hook-form"
+import type { z } from "zod"
 
 type Props<T extends string> = {
     selectedValue: T
@@ -27,6 +28,8 @@ type Props<T extends string> = {
     isLoading?: boolean
     emptyMessage?: string
     placeholder?: string
+    form?: UseFormReturn<z.infer<any>>
+    name?: string
 }
 
 export function AutoComplete<T extends string>({
@@ -38,6 +41,8 @@ export function AutoComplete<T extends string>({
     isLoading,
     emptyMessage = "No items.",
     placeholder = "Search...",
+    form,
+    name,
 }: Props<T>) {
     const [open, setOpen] = useState(false)
 
@@ -73,6 +78,7 @@ export function AutoComplete<T extends string>({
         } else {
             onSelectedValueChange(inputValue as T)
             onSearchValueChange(labels[inputValue] ?? "")
+            form?.setValue(name, inputValue) 
         }
         setOpen(false)
     }
@@ -133,13 +139,13 @@ export function AutoComplete<T extends string>({
                                                 }
                                                 onSelect={onSelectItem}
                                             >
-                                                <Icon
+                                                <Icon // Icon is rendered as a component
                                                     className={cn(
                                                         "mr-2 h-4 w-4",
                                                         selectedValue ===
                                                             option.value
                                                             ? "opacity-100"
-                                                            : "opacity-100",
+                                                            : "opacity-0",
                                                     )}
                                                 />
                                                 {option.label}
@@ -157,6 +163,7 @@ export function AutoComplete<T extends string>({
                     </PopoverContent>
                 </Command>
             </Popover>
+            <input type="hidden" {...form?.register(name)} value={selectedValue} />
         </div>
     )
 }

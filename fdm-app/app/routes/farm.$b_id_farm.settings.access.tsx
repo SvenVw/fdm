@@ -196,8 +196,7 @@ const InvitationForm = ({ principals }: { principals: any }) => {
                                 type: "user" | "organization"
                             }) => ({
                                 label: item.displayUserName,
-                                icon:
-                                    item.type === "user" ? User : Users,
+                                icon: item.type === "user" ? User : Users,
                                 value: item.username,
                             }),
                         ),
@@ -222,6 +221,8 @@ const InvitationForm = ({ principals }: { principals: any }) => {
                     isLoading={isLoading}
                     emptyMessage="Geen gebruikers gevonden"
                     placeholder="Zoek naar een gebruiker of vul een e-mailadres in"
+                    form={form}
+                    name="username"
                 />
                 <Select
                     defaultValue="advisor"
@@ -407,10 +408,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         if (formValues.intent === "invite_user") {
-            if (!formValues.email) {
+            if (!formValues.username) {
                 return dataWithError(
                     null,
-                    "Vul een e-mailadres in om iemand uit te nodigen",
+                    "Vul een gebruikers- of organisatieanaam in om uit te nodigen",
                 )
             }
             if (!formValues.role) {
@@ -419,13 +420,13 @@ export async function action({ request, params }: ActionFunctionArgs) {
             await grantRoleToFarm(
                 fdm,
                 session.user.id,
-                formValues.email,
+                formValues.username,
                 b_id_farm,
                 formValues.role,
             )
 
             return dataWithSuccess(null, {
-                message: `Gebruiker ${formValues.email} is uitgenodigd! 🎉`,
+                message: `${formValues.username} is uitgenodigd! 🎉`,
             })
         }
 
