@@ -6,6 +6,7 @@ import {
     type MetaFunction,
     ActionFunctionArgs,
     Form,
+    useFetcher,
 } from "react-router"
 import { Separator } from "~/components/ui/separator"
 import { clientConfig } from "~/lib/config"
@@ -41,9 +42,11 @@ import { Badge } from "../components/ui/badge"
 import { extractFormValuesFromRequest } from "../lib/form"
 import { z } from "zod"
 import { dataWithSuccess, dataWithError } from "remix-toast"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { AutoComplete } from "../components/custom/autocomplete"
+import { User, Users } from "lucide-react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -120,7 +123,7 @@ export default function FarmSettingsAccessBlock() {
                 </CardHeader>
                 <CardContent>
                     {hasSharePermission ? (
-                        <InvitationForm b_id_farm={b_id_farm} />
+                        <InvitationForm principals={principals} />
                     ) : null}
                     <Separator className="my-4" />
                     <div className="space-y-4">
@@ -150,21 +153,75 @@ export default function FarmSettingsAccessBlock() {
     )
 }
 
-const InvitationForm = ({ b_id_farm }: { b_id_farm: string }) => {
+const InvitationForm = ({ principals }: { principals: any }) => {
+    const fetcher = useFetcher()
+    const [searchValue, setSearchValue] = useState<string>("")
+    const [selectedValue, setSelectedValue] = useState<string>("")
+    const [items, setItems] = useState<{ value: string; label: string }[]>([])
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
     })
 
+    useEffect(() => {
+        if (searchValue.length >= 1) {
+            setIsLoading(true)
+        }
+        fetcher.submit(
+            { identifier: searchValue },
+            { method: "post", action: "/api/lookup/principal" },
+        )
+    }, [searchValue, fetcher.submit])
+
+    useEffect(() => {
+        if (fetcher.data) {
+            if (fetcher.data.length > 0) {
+                setItems(
+                    fetcher.data
+                        // Do not return principals that already have access
+                        .filter((item) => {
+                            return !principals.some(
+                                (principal: { username: string }) =>
+                                    principal.username === item.value,
+                            )
+                        })
+                        // Do not return the user itself
+                        // .filter((item) => item.value !== session.user.username)
+                        .map(
+                            (item: {
+                                username: string
+                                displayUserName: string
+                                type: "user" | "organization"
+                            }) => ({
+                                label: item.displayUserName,
+                                icon:
+                                    item.type === "user" ? User : Users,
+                                value: item.username,
+                            }),
+                        ),
+                )
+                setIsLoading(false)
+            } else {
+                setItems([])
+                setIsLoading(false)
+            }
+        }
+    }, [fetcher.data, principals])
+
     return (
         <RemixFormProvider {...form}>
             <Form method="post" className="flex space-x-2">
-                <input type="hidden" name="organization_id" value={b_id_farm} />
-                <Input
-                    type="email"
-                    placeholder="Vul een emailadres in"
-                    name="email"
-                    {...form.register("email")}
+                <AutoComplete
+                    selectedValue={selectedValue}
+                    onSelectedValueChange={setSelectedValue}
+                    searchValue={searchValue}
+                    onSearchValueChange={setSearchValue}
+                    items={items ?? []}
+                    isLoading={isLoading}
+                    emptyMessage="Geen gebruikers gevonden"
+                    placeholder="Zoek naar een gebruiker of vul een e-mailadres in"
                 />
                 <Select
                     defaultValue="advisor"
@@ -223,7 +280,7 @@ const PrincipalRow = ({
 
     const handleRemove = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
-        await form.handleSubmit(() => {})(
+        await form.handleSubmit((e) => {})(
             new SubmitEvent("submit", {
                 submitter: {
                     name: "remove_user",
@@ -235,7 +292,7 @@ const PrincipalRow = ({
 
     const handleSelectChange = async (value: string) => {
         form.setValue("role", value)
-        await form.handleSubmit(() => {})(new SubmitEvent("submit"))
+        await form.handleSubmit((e) => {})(new SubmitEvent("submit"))
     }
 
     return (
