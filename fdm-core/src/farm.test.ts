@@ -9,7 +9,7 @@ import {
     listPrincipalsForFarm,
     revokePrincipalFromFarm,
     updateFarm,
-    updateRoleToFarm,
+    updateRoleOfPrincipalAtFarm,
 } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
@@ -296,7 +296,7 @@ describe("Farm Functions", () => {
         })
     })
 
-    describe("updateRoleToFarm", () => {
+    describe("updateRoleOfPrincipalAtFarm", () => {
         it("should update a role to a principal for a given farm", async () => {
             const target_id = createId()
             await grantRoleToFarm(
@@ -306,7 +306,7 @@ describe("Farm Functions", () => {
                 b_id_farm,
                 "advisor",
             )
-            await updateRoleToFarm(
+            await updateRoleOfPrincipalAtFarm(
                 fdm,
                 principal_id,
                 target_username,
@@ -334,7 +334,7 @@ describe("Farm Functions", () => {
         it("should throw an error if the principal does not have share permission", async () => {
             const other_principal_id = createId()
             await expect(
-                updateRoleToFarm(
+                updateRoleOfPrincipalAtFarm(
                     fdm,
                     other_principal_id,
                     target_username,
@@ -364,14 +364,14 @@ describe("Farm Functions", () => {
             )
 
             await expect(
-                updateRoleToFarm(
+                updateRoleOfPrincipalAtFarm(
                     fdmMock,
                     principal_id,
                     target_username,
                     b_id_farm,
                     "researcher",
                 ),
-            ).rejects.toThrowError("Exception for updateRoleToFarm")
+            ).rejects.toThrowError("Exception for updateRoleOfPrincipalAtFarm")
         })
     })
 

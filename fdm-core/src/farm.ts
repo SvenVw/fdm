@@ -261,7 +261,7 @@ export async function grantRoleToFarm(
  *
  * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
  */
-export async function updateRoleToFarm(
+export async function updateRoleOfPrincipalAtFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
     target: string,
@@ -276,7 +276,7 @@ export async function updateRoleToFarm(
                 "share",
                 b_id_farm,
                 principal_id,
-                "updateRoleToFarm",
+                "updateRoleOfPrincipalAtFarm",
             )
 
             const targetDetails = await identifyPrincipal(tx, target)
@@ -298,7 +298,7 @@ export async function updateRoleToFarm(
             }
         })
     } catch (err) {
-        throw handleError(err, "Exception for updateRoleToFarm", {
+        throw handleError(err, "Exception for updateRoleOfPrincipalAtFarm", {
             b_id_farm,
             target,
             role,
@@ -315,7 +315,6 @@ export async function updateRoleToFarm(
  * @param principal_id - The identifier of the principal performing the revoke (must have 'share' permission).
  * @param target -The username, email or slug of the principal whose role is being revoked.
  * @param b_id_farm - The identifier of the farm.
- * @param role - The role to be revoked ('owner', 'advisor', or 'researcher').
  *
  * @throws {Error} If the acting principal does not have 'share' permission, or if any other error occurs during the operation.
  */
@@ -324,7 +323,6 @@ export async function revokePrincipalFromFarm(
     principal_id: PrincipalId,
     target: string,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
-    role: "owner" | "advisor" | "researcher",
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -358,7 +356,6 @@ export async function revokePrincipalFromFarm(
         throw handleError(err, "Exception for revokePrincipalFromFarm", {
             b_id_farm,
             target,
-            role,
         })
     }
 }

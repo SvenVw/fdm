@@ -30,7 +30,7 @@ export {
     isAllowedToShareFarm,
     listPrincipalsForFarm,
     revokePrincipalFromFarm,
-    updateRoleToFarm,
+    updateRoleOfPrincipalAtFarm,
 } from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
 export {
