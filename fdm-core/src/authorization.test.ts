@@ -220,6 +220,14 @@ describe("Authorization Functions", () => {
                 grantRole(fdm, "farm", "owner", farm_id, null as any),
             ).rejects.toThrowError()
         })
+
+        it("should throw an error if the principal already has a non-deleted role", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            await expect(
+                grantRole(fdm, "farm", "advisor", farm_id, principal_id),
+            ).rejects.toThrowError("Exception for grantRole")
+        })
     })
 
     describe("revokePrincipal", () => {

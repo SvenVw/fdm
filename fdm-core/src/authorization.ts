@@ -271,6 +271,26 @@ export async function grantRole(
                 throw new Error("Invalid role")
             }
 
+            // Check if principal has already a role on this resource
+            const existingRole = await tx
+                .select({
+                    role_id: authZSchema.role.role_id,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        eq(authZSchema.role.principal_id, target_id),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+                .limit(1)
+
+            if (existingRole.length > 0) {
+                throw new Error("Principal already has a role on this resource")
+            }
+
             const role_id = createId()
             const roleData = {
                 role_id: role_id,
