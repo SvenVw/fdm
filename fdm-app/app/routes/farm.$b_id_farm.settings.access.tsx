@@ -282,6 +282,8 @@ const PrincipalRow = ({
     hasSharePermission: boolean
     b_id_farm: string
 }) => {
+    let fetcher = useFetcher()
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -293,13 +295,9 @@ const PrincipalRow = ({
 
     const handleRemove = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
-        await form.handleSubmit((e) => {})(
-            new SubmitEvent("submit", {
-                submitter: {
-                    name: "remove_user",
-                    value: "remove_user",
-                } as HTMLButtonElement,
-            }),
+        await fetcher.submit(
+            { username: username, intent: "remove_user" },
+            { method: "post" },
         )
     }
 
@@ -353,7 +351,8 @@ const PrincipalRow = ({
                                 name="remove_user"
                                 value="remove_user"
                             />
-                            {form.formState.isSubmitting ? (
+                            {form.formState.isSubmitting ||
+                            fetcher.state === "submitting" ? (
                                 <LoadingSpinner />
                             ) : null}
                             <Select
@@ -461,8 +460,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
             await updateRoleOfPrincipalAtFarm(
                 fdm,
                 session.user.id,
-                b_id_farm,
                 formValues.username,
+                b_id_farm,
                 formValues.role,
             )
             return dataWithSuccess(null, {
@@ -477,8 +476,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
             await revokePrincipalFromFarm(
                 fdm,
                 session.user.id,
-                b_id_farm,
                 formValues.username,
+                b_id_farm,
             )
             return dataWithSuccess(null, {
                 message: `Gebruiker ${formValues.username} is verwijderd`,
