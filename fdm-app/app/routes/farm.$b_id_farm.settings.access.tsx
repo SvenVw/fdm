@@ -113,7 +113,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!formValues.username) {
                 return dataWithError(
                     null,
-                    "Vul een gebruikers- of organisatieanaam in om uit te nodigen",
+                    "Vul een gebruikers- of organisatienaam in om uit te nodigen",
                 )
             }
             if (!formValues.role) {
