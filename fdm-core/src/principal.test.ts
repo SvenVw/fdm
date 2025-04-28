@@ -76,7 +76,7 @@ describe("Principals", () => {
         it("should retrieve organization details when principal_id is an organization ID", async () => {
             const principal = await getPrincipal(fdm, organization_id)
             expect(principal).toBeDefined()
-            expect(principal?.username).toBe(organizationName)
+            expect(principal?.username).toBe(organizationSlug)
             expect(principal?.type).toBe("organization")
             expect(principal?.image).toBeNull()
             expect(principal?.isVerified).toBe(false)
@@ -129,7 +129,7 @@ describe("Principals", () => {
             const principal = await getPrincipal(fdm, organization_id)
 
             expect(principal).toBeDefined()
-            expect(principal?.username).toBe(organizationName)
+            expect(principal?.username).toBe(organizationSlug)
             expect(principal?.type).toBe("organization")
             expect(principal?.image).toBeNull()
             expect(principal?.isVerified).toBe(false)
@@ -143,7 +143,7 @@ describe("Principals", () => {
                 .where(eq(authNSchema.organization.id, organization_id))
             const principal = await getPrincipal(fdm, organization_id)
             expect(principal).toBeDefined()
-            expect(principal?.username).toBe(organizationName)
+            expect(principal?.username).toBe(organizationSlug)
             expect(principal?.type).toBe("organization")
             expect(principal?.image).toBeNull()
             expect(principal?.isVerified).toBe(false)
@@ -174,7 +174,7 @@ describe("Principals", () => {
             )
             expect(principalDetails).toBeDefined()
             expect(principalDetails?.id).toEqual(organization_id)
-            expect(principalDetails?.username).toBe(organizationName)
+            expect(principalDetails?.username).toBe(organizationSlug)
             expect(principalDetails?.type).toBe("organization")
         })
 
@@ -262,7 +262,7 @@ describe("Principals", () => {
             const results = await lookupPrincipal(fdm, identifier)
 
             expect(results).toBeDefined()
-            expect(results.some((r) => r.username === organizationName)).toBe(
+            expect(results.some((r) => r.username === organizationSlug)).toBe(
                 true,
             )
             expect(results.some((r) => r.type === "organization")).toBe(true)
@@ -273,7 +273,7 @@ describe("Principals", () => {
             const results = await lookupPrincipal(fdm, identifier)
 
             expect(results).toBeDefined()
-            expect(results.some((r) => r.username === organizationName)).toBe(
+            expect(results.some((r) => r.username === organizationSlug)).toBe(
                 true,
             )
             expect(results.some((r) => r.type === "organization")).toBe(true)
