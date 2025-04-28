@@ -10,7 +10,7 @@
 export type Principal = {
     username: string
     initials: string
-    displayUsername: string | null
+    displayUserName: string | null
     image: string | null
     type: "user" | "organization"
     isVerified: boolean
