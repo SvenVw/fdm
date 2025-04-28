@@ -296,7 +296,7 @@ export async function lookupPrincipal(
                         return details
                     }),
                 )
-                return principalsDetails
+                return principalsDetails.filter(Boolean)
             }
 
             return []
