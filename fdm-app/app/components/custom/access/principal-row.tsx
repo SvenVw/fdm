@@ -135,6 +135,7 @@ export const PrincipalRow = ({
                             value="remove_user"
                             // Disable button while submitting
                             disabled={fetcher.state !== "idle"}
+                            onClick={handleRemove}
                         >
                             Verwijder
                         </Button>
