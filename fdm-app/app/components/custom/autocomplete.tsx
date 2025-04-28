@@ -30,6 +30,7 @@ type Props<T extends string> = {
     placeholder?: string
     form?: UseFormReturn<z.infer<any>>
     name?: string
+    className?: string
 }
 
 export function AutoComplete<T extends string>({
@@ -43,6 +44,7 @@ export function AutoComplete<T extends string>({
     placeholder = "Search...",
     form,
     name,
+    className,
 }: Props<T>) {
     const [open, setOpen] = useState(false)
 
@@ -78,15 +80,15 @@ export function AutoComplete<T extends string>({
         } else {
             onSelectedValueChange(inputValue as T)
             onSearchValueChange(labels[inputValue] ?? "")
-            form?.setValue(name, inputValue) 
+            form?.setValue(name, inputValue)
         }
         setOpen(false)
     }
 
     return (
-        <div className="flex items-center">
+        <div className={cn("flex items-center", className)}>
             <Popover open={open} onOpenChange={setOpen}>
-                <Command shouldFilter={false}>
+                <Command shouldFilter={false} className="w-full">
                     <PopoverAnchor asChild>
                         <CommandPrimitive.Input
                             asChild
@@ -99,7 +101,10 @@ export function AutoComplete<T extends string>({
                             onFocus={() => setOpen(true)}
                             onBlur={onInputBlur}
                         >
-                            <Input placeholder={placeholder} />
+                            <Input
+                                placeholder={placeholder}
+                                className="w-full"
+                            />
                         </CommandPrimitive.Input>
                     </PopoverAnchor>
                     {!open && (
@@ -140,13 +145,7 @@ export function AutoComplete<T extends string>({
                                                 onSelect={onSelectItem}
                                             >
                                                 <Icon // Icon is rendered as a component
-                                                    className={cn(
-                                                        "mr-2 h-4 w-4",
-                                                        selectedValue ===
-                                                            option.value
-                                                            ? "opacity-100"
-                                                            : "opacity-0",
-                                                    )}
+                                                    className={"mr-2 h-4 w-4"}
                                                 />
                                                 {option.label}
                                             </CommandItem>
@@ -163,7 +162,11 @@ export function AutoComplete<T extends string>({
                     </PopoverContent>
                 </Command>
             </Popover>
-            <input type="hidden" {...form?.register(name)} value={selectedValue} />
+            <input
+                type="hidden"
+                {...form?.register(name)}
+                value={selectedValue}
+            />
         </div>
     )
 }
