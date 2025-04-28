@@ -2,6 +2,7 @@ import postgres from "postgres"
 import type { TestProject } from "vitest/node"
 import { runMigration } from "./migrate"
 import * as authNSchema from "./db/schema-authn"
+import * as authZSchema from "./db/schema-authz"
 import { createFdmServer } from "./fdm-server"
 
 let client: ReturnType<typeof postgres>
@@ -96,6 +97,9 @@ export async function teardown() {
             await fdm.delete(authNSchema.member).execute()
             await fdm.delete(authNSchema.organization).execute()
             await fdm.delete(authNSchema.user).execute()
+
+            await fdm.delete(authZSchema.role).execute()
+            await fdm.delete(authZSchema.audit).execute()
         })
     } catch (error) {
         console.error("Error cleaning up database tables:", error)

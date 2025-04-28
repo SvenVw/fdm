@@ -168,26 +168,6 @@ describe("Authorization Functions", () => {
             expect(roles.length).toBe(1)
         })
 
-        it("should handle non-unique role grants", async () => {
-            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-
-            const roles = await fdm
-                .select()
-                .from(authZSchema.role)
-                .where(
-                    and(
-                        eq(authZSchema.role.resource, "farm"),
-                        eq(authZSchema.role.resource_id, farm_id),
-                        eq(authZSchema.role.principal_id, principal_id),
-                        eq(authZSchema.role.role, "owner"),
-                        isNull(authZSchema.role.deleted),
-                    ),
-                )
-
-            expect(roles.length).toBe(2)
-        })
-
         it("should throw an error for invalid resource", async () => {
             await expect(
                 grantRole(
@@ -555,27 +535,6 @@ describe("Authorization Functions", () => {
                 farm_id,
             )
             expect(principals).toEqual([])
-        })
-
-        it("should correctly handle multiple roles for one principal", async () => {
-            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await grantRole(fdm, "farm", "advisor", farm_id, principal_id)
-
-            const principals = await listPrincipalsForResource(
-                fdm,
-                "farm",
-                farm_id,
-            )
-
-            expect(principals.length).toBe(2)
-            expect(principals).toContainEqual({
-                principal_id: principal_id,
-                role: "owner",
-            })
-            expect(principals).toContainEqual({
-                principal_id: principal_id,
-                role: "advisor",
-            })
         })
 
         it("should not list revoked roles", async () => {

@@ -242,7 +242,6 @@ describe("Principals", () => {
         it("should find a user by email", async () => {
             const identifier = userEmail
             const results = await lookupPrincipal(fdm, identifier)
-            console.log(results)
 
             expect(results).toBeDefined()
             expect(results.length).toBe(1)
@@ -362,7 +361,6 @@ describe("Principals", () => {
         it("should handle empty identifier", async () => {
             const identifier = ""
             const results = await lookupPrincipal(fdm, identifier)
-            console.log(results)
             expect(results).toBeDefined()
             expect(results.length).toBe(0)
         })

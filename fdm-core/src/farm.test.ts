@@ -21,6 +21,7 @@ describe("Farm Functions", () => {
     let fdm: FdmServerType
     let principal_id: string
     let target_username: string
+    let target_id: string
     let b_id_farm: string
     let farmName: string
     let farmBusinessId: string
@@ -62,18 +63,19 @@ describe("Farm Functions", () => {
         principal_id = user1.user.id
 
         // Create target_username
-        const user2 = await fdmAuth.api.signUpEmail({
+        target_username = "user15"
+        const target = await fdmAuth.api.signUpEmail({
             headers: undefined,
             body: {
-                email: "user11@example.com",
-                name: "user11",
-                firstname: "user11",
-                surname: "user11",
-                username: "user11",
+                email: "user15@example.com",
+                name: "user15",
+                firstname: "user15",
+                surname: "user15",
+                username: target_username,
                 password: "password",
             },
         })
-        target_username = "user11" // Changed to username
+        target_id = target.user.id
 
         // Create a test farm
         farmName = "Test Farm"
@@ -233,7 +235,6 @@ describe("Farm Functions", () => {
 
     describe("grantRoleToFarm", () => {
         it("should grant a role to a principal for a given farm", async () => {
-            const target_id = createId()
             await grantRoleToFarm(
                 fdm,
                 principal_id,
@@ -296,14 +297,6 @@ describe("Farm Functions", () => {
 
     describe("updateRoleOfPrincipalAtFarm", () => {
         it("should update a role to a principal for a given farm", async () => {
-            const target_id = createId()
-            await grantRoleToFarm(
-                fdm,
-                principal_id,
-                target_id,
-                b_id_farm,
-                "advisor",
-            )
             await updateRoleOfPrincipalAtFarm(
                 fdm,
                 principal_id,
@@ -351,13 +344,6 @@ describe("Farm Functions", () => {
                 ...fdm,
                 updateRole: mockUpdateRole,
             }
-            await grantRoleToFarm(
-                fdm,
-                principal_id,
-                target_username,
-                b_id_farm,
-                "advisor",
-            )
 
             await expect(
                 updateRoleOfPrincipalAtFarm(
@@ -373,13 +359,6 @@ describe("Farm Functions", () => {
 
     describe("revokePrincipalFromFarm", () => {
         it("should revoke a principal from a given farm", async () => {
-            await grantRoleToFarm(
-                fdm,
-                principal_id,
-                target_username,
-                b_id_farm,
-                "advisor",
-            )
             await revokePrincipalFromFarm(
                 fdm,
                 principal_id,
@@ -416,13 +395,6 @@ describe("Farm Functions", () => {
         })
 
         it("should handle errors during the revoke principal process", async () => {
-            await grantRoleToFarm(
-                fdm,
-                principal_id,
-                target_username,
-                b_id_farm,
-                "advisor",
-            )
             // Mock the revokePrincipal function to throw an error
             const mockRevokePrincipal = async () => {
                 throw new Error("Revoke principal failed")
@@ -452,14 +424,6 @@ describe("Farm Functions", () => {
 
     describe("listPrincipalsForFarm", () => {
         it("should list principals associated with a farm", async () => {
-            await grantRoleToFarm(
-                fdm,
-                principal_id,
-                target_username,
-                b_id_farm,
-                "advisor",
-            )
-
             const principals = await listPrincipalsForFarm(
                 fdm,
                 principal_id,
@@ -469,7 +433,7 @@ describe("Farm Functions", () => {
             expect(principals.length).toBeGreaterThanOrEqual(1)
 
             const ownerPrincipal = await getPrincipal(fdm, principal_id)
-            const targetPrincipal = await getPrincipal(fdm, target_username)
+            const targetPrincipal = await getPrincipal(fdm, target_id)
 
             const owner = principals.find(
                 (p) => p?.username === ownerPrincipal?.username,
