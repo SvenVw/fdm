@@ -1,8 +1,8 @@
 import { lookupPrincipal } from "@svenvw/fdm-core"
 import type { ActionFunctionArgs } from "react-router"
-import { handleActionError } from "../lib/error"
-import { getSession } from "../lib/auth.server"
-import { extractFormValuesFromRequest } from "../lib/form"
+import { handleActionError } from "~/lib/error"
+import { getSession } from "~/lib/auth.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 import { fdm } from "../lib/fdm.server"
 import { z } from "zod"
 
