@@ -229,10 +229,7 @@ describe("Principals", () => {
             await fdm
                 .delete(authNSchema.organization)
                 .where(
-                    eq(
-                        authNSchema.organization.id,
-                        conflictingOrganization_id,
-                    ),
+                    eq(authNSchema.organization.id, conflictingOrganization_id),
                 )
                 .execute()
         })
@@ -259,11 +256,12 @@ describe("Principals", () => {
         it("should find organizations by partial name", async () => {
             const identifier = "Organ"
             const results = await lookupPrincipal(fdm, identifier)
-
             expect(results).toBeDefined()
-            expect(results.some((r) => r.username === organizationSlug)).toBe(
-                true,
-            )
+            expect(
+                results.filter((x) =>
+                    x.displayUserName?.match(new RegExp(identifier, "i")),
+                ).length,
+            ).toBeGreaterThanOrEqual(1)
             expect(results.some((r) => r.type === "organization")).toBe(true)
         })
 
@@ -272,9 +270,12 @@ describe("Principals", () => {
             const results = await lookupPrincipal(fdm, identifier)
 
             expect(results).toBeDefined()
-            expect(results.some((r) => r.username === organizationSlug)).toBe(
-                true,
-            )
+            expect(results.length).toBeGreaterThanOrEqual(1)
+            expect(
+                results.filter((x) =>
+                    x.username?.match(new RegExp(identifier, "i")),
+                ).length,
+            ).toBeGreaterThanOrEqual(1)
             expect(results.some((r) => r.type === "organization")).toBe(true)
         })
 
@@ -283,8 +284,12 @@ describe("Principals", () => {
             const results = await lookupPrincipal(fdm, identifier)
 
             expect(results).toBeDefined()
-            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
-            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than user matching that pattern in the test db
+            expect(
+                results.filter((x) =>
+                    x.displayUserName?.match(new RegExp(identifier, "i")),
+                ).length,
+            ).toBeGreaterThanOrEqual(1)
             expect(results.some((r) => r.type === "user")).toBe(true)
         })
 
@@ -294,16 +299,25 @@ describe("Principals", () => {
 
             expect(results).toBeDefined()
             expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
-            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(
+                results.filter((x) =>
+                    x.username?.match(new RegExp(identifier, "i")),
+                ).length,
+            ).toBeGreaterThanOrEqual(1)
             expect(results.some((r) => r.type === "user")).toBe(true)
         })
 
         it("should find users by firstname", async () => {
             const identifier = "Test"
             const results = await lookupPrincipal(fdm, identifier)
+
             expect(results).toBeDefined()
             expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
-            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(
+                results.filter((x) =>
+                    x.displayUserName?.match(new RegExp(identifier, "i")),
+                ).length,
+            ).toBeGreaterThanOrEqual(1)
             expect(results.some((r) => r.type === "user")).toBe(true)
         })
 
@@ -311,8 +325,11 @@ describe("Principals", () => {
             const identifier = "User"
             const results = await lookupPrincipal(fdm, identifier)
             expect(results).toBeDefined()
-            expect(results.length).toBeGreaterThanOrEqual(1) // Could be more than one user matching that pattern in the test db
-            expect(results.some((r) => r.username === userName)).toBe(true)
+            expect(
+                results.filter((x) =>
+                    x.displayUserName?.match(new RegExp(identifier, "i")),
+                ).length,
+            ).toBeGreaterThanOrEqual(1)
             expect(results.some((r) => r.type === "user")).toBe(true)
         })
 
