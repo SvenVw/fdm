@@ -1,5 +1,5 @@
 import { Form, useFetcher } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
@@ -32,18 +32,18 @@ type InvitationFormProps = {
 }
 
 export const InvitationForm = ({ principals }: InvitationFormProps) => {
-    const fetcher =
-        useFetcher<
-            {
-                username: string
-                displayUserName: string
-                type: "user" | "organization"
-            }[]
-        >() // Add type hint for fetcher data
+    const fetcher = useFetcher<{
+        username: string
+        displayUserName: string
+        type: "user" | "organization"
+    }[]>() // Add type hint for fetcher data
     const [searchValue, setSearchValue] = useState<string>("")
     const [selectedValue, setSelectedValue] = useState<string>("")
     const [items, setItems] = useState<{ value: string; label: string }[]>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const [debounceTimeout, setDebounceTimeout] =
+        useState<NodeJS.Timeout | null>(null)
+    const prevSearchValue = useRef<string | null>(null) // Ref for previous search value
 
     const form = useRemixForm<z.infer<typeof AccessFormSchema>>({
         mode: "onTouched",
@@ -54,21 +54,35 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
         },
     })
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: Dependency on searchValue causes autocomplete to become unusable by continously reloading
     useEffect(() => {
-        if (searchValue.length >= 1) {
-            setIsLoading(true)
-            // Submit only when search value is present
-            fetcher.submit(
-                { identifier: searchValue },
-                { method: "post", action: "/api/lookup/principal" },
-            )
-        } else {
-            // Clear items and stop loading if search is empty
-            setItems([])
-            setIsLoading(false)
+        console.log(searchValue)
+        if (debounceTimeout) {
+            clearTimeout(debounceTimeout)
         }
-    }, [fetcher])
+        // Only make the API call if the search value has actually changed
+        if (
+            searchValue.length >= 1 &&
+            prevSearchValue.current !== searchValue
+        ) {
+            setDebounceTimeout(
+                setTimeout(() => {
+                    prevSearchValue.current = searchValue // Update the ref
+                    setIsLoading(true)
+                    fetcher.submit(
+                        { identifier: searchValue },
+                        { method: "post", action: "/api/lookup/principal" },
+                    )
+                }, 300),
+            )
+        } else if (searchValue.length < 1 && !isLoading) {
+            setItems([])
+        }
+        return () => {
+            if (debounceTimeout) {
+                clearTimeout(debounceTimeout)
+            }
+        }
+    }, [searchValue, debounceTimeout])
 
     useEffect(() => {
         if (fetcher.data) {
@@ -83,9 +97,6 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
                     value: item.username,
                 }))
             setItems(filteredItems)
-        } else {
-            // Ensure items are cleared if fetcher.data becomes null/undefined
-            setItems([])
         }
         // Stop loading regardless of whether data was found
         setIsLoading(false)
