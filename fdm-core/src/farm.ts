@@ -99,9 +99,15 @@ export async function getFarm(
         )
 
         const farm = await fdm
-            .select()
+            .select({
+                b_id_farm: schema.farms.b_id_farm,
+                b_name_farm: schema.farms.b_name_farm,
+                b_businessid_farm: schema.farms.b_businessid_farm,
+                b_address_farm: schema.farms.b_address_farm,
+                b_postalcode_farm: schema.farms.b_postalcode_farm,
+            })
             .from(schema.farms)
-            .where(eq(schema.farms.b_id_farm, b_id_farm))
+            .where(eq(schema.farms.b_id_farm, b_id_farm))            
             .limit(1)
 
         return farm[0]
