@@ -1,10 +1,9 @@
-import { Form, useFetcher } from "react-router-dom"
-import { useEffect, useState, useRef } from "react"
+import { Form } from "react-router-dom"
+import { useState } from "react" 
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
 import { User, Users } from "lucide-react"
-
 import {
     Select,
     SelectContent,
@@ -28,23 +27,11 @@ type Principal = {
 }
 
 type InvitationFormProps = {
-    principals: Principal[]
+    principals: Principal[] 
 }
 
 export const InvitationForm = ({ principals }: InvitationFormProps) => {
-    const fetcher = useFetcher<{
-        username: string
-        displayUserName: string
-        type: "user" | "organization"
-    }[]>() // Add type hint for fetcher data
-    const [searchValue, setSearchValue] = useState<string>("")
     const [selectedValue, setSelectedValue] = useState<string>("")
-    const [items, setItems] = useState<{ value: string; label: string }[]>([])
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [debounceTimeout, setDebounceTimeout] =
-        useState<NodeJS.Timeout | null>(null)
-    const prevSearchValue = useRef<string | null>(null) // Ref for previous search value
-
     const form = useRemixForm<z.infer<typeof AccessFormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(AccessFormSchema),
@@ -54,66 +41,21 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
         },
     })
 
-    useEffect(() => {
-        console.log(searchValue)
-        if (debounceTimeout) {
-            clearTimeout(debounceTimeout)
-        }
-        // Only make the API call if the search value has actually changed
-        if (
-            searchValue.length >= 1 &&
-            prevSearchValue.current !== searchValue
-        ) {
-            setDebounceTimeout(
-                setTimeout(() => {
-                    prevSearchValue.current = searchValue // Update the ref
-                    setIsLoading(true)
-                    fetcher.submit(
-                        { identifier: searchValue },
-                        { method: "post", action: "/api/lookup/principal" },
-                    )
-                }, 300),
-            )
-        } else if (searchValue.length < 1 && !isLoading) {
-            setItems([])
-        }
-        return () => {
-            if (debounceTimeout) {
-                clearTimeout(debounceTimeout)
-            }
-        }
-    }, [searchValue, debounceTimeout])
-
-    useEffect(() => {
-        if (fetcher.data) {
-            const principalUsernames = principals.map(
-                (principal) => principal.username,
-            )
-            const filteredItems = fetcher.data
-                .filter((item) => !principalUsernames.includes(item.username))
-                .map((item) => ({
-                    label: item.displayUserName,
-                    icon: item.type === "user" ? User : Users,
-                    value: item.username,
-                }))
-            setItems(filteredItems)
-        }
-        // Stop loading regardless of whether data was found
-        setIsLoading(false)
-        // Add principals to dependency array as it affects filtering
-    }, [fetcher.data, principals])
+    // Define icon map for AutoComplete
+    const iconMap = { user: User, organization: Users }
 
     return (
         <RemixFormProvider {...form}>
             <Form method="post">
                 <fieldset
-                    disabled={
-                        form.formState.isSubmitting || fetcher.state !== "idle"
-                    }
+                    disabled={form.formState.isSubmitting} 
                     className="flex items-center justify-between space-x-4"
                 >
                     <AutoComplete
                         className="flex-1"
+                        lookupUrl="/api/lookup/principal"
+                        excludeValues={principals.map((p) => p.username)}
+                        iconMap={iconMap} 
                         selectedValue={selectedValue}
                         onSelectedValueChange={(value) => {
                             setSelectedValue(value)
@@ -122,14 +64,10 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
                                 shouldTouch: true,
                             })
                         }}
-                        searchValue={searchValue}
-                        onSearchValueChange={setSearchValue}
-                        items={items ?? []}
-                        isLoading={isLoading}
                         emptyMessage="Geen gebruikers gevonden"
                         placeholder="Zoek naar een gebruiker of organisatie"
                         form={form} // Pass the form instance
-                        name="username" // Name for react-hook-form registration
+                        name="username" // Name for remix-hook-form registration
                     />
                     <div className="flex items-center space-x-2 justify-end">
                         <Select
