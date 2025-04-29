@@ -805,7 +805,7 @@ export async function removeUserFromOrganization(
  * @param fdm - The FDM instance providing the connection to the database.
  * @param admin_id - The ID of the user initiating the update (must be owner or admin).
  * @param organization_id - The ID of the organization in which the user's role is being updated.
- * @param usrname - The username of the user whose role is being updated.
+ * @param username - The username of the user whose role is being updated.
  * @param role - The new role to assign to the user.
  * @throws {Error} Throws an error if any database operation fails, if the user initiating the update does not have permissions, or if the user to be updated is not found.
  */
@@ -830,7 +830,7 @@ export async function updateRoleOfUserAtOrganization(
                 )
             }
 
-            // Update user at organization based on email
+            // Update user at organization based on username
             const userToUpdate = await tx
                 .select({ id: authNSchema.user.id })
                 .from(authNSchema.user)
