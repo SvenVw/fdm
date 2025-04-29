@@ -23,9 +23,8 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { Badge } from "../components/ui/badge"
+import { Badge } from "~/components/ui/badge"
 import { House } from "lucide-react"
-
 // Meta
 export const meta: MetaFunction = () => {
     return [
