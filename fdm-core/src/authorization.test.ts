@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     actions,
     checkPermission,
+    getRolesOfPrincipalForResource,
     grantRole,
     listPrincipalsForResource,
     listResources,
@@ -473,6 +474,139 @@ describe("Authorization Functions", () => {
                     principal_id,
                 ),
             ).rejects.toThrowError()
+        })
+    })
+
+    describe("getRolesOfPrincipalForResource", () => {
+        it("should get direct roles", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            const roles = await getRolesOfPrincipalForResource(
+                fdm,
+                "farm",
+                farm_id,
+                principal_id,
+            )
+            expect(roles).toEqual(["owner"])
+        })
+
+        // it("should get inherited roles", async () => {
+        //     const field_id = await addField(
+        //         fdm,
+        //         principal_id,
+        //         farm_id,
+        //         "Test Field",
+        //         "test source",
+        //         {
+        //             type: "Polygon",
+        //             coordinates: [
+        //                 [
+        //                     [30, 10],
+        //                     [40, 40],
+        //                     [20, 40],
+        //                     [10, 20],
+        //                     [30, 10],
+        //                 ],
+        //             ],
+        //         },
+        //         new Date("2023-01-01"),
+        //         "owner",
+        //         new Date("2024-01-01"),
+        //     )
+        //     await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+        //     await grantRole(fdm, "field", "advisor", field_id, principal_id)
+
+        //     const roles = await getRolesOfPrincipalForResource(
+        //         fdm,
+        //         "field",
+        //         field_id,
+        //         principal_id,
+        //     )
+        //     expect(roles).toEqual(["advisor", "owner"])
+        // })
+
+        // it("should get direct roles without inherited roles", async () => {
+        //     const field_id = await addField(
+        //         fdm,
+        //         principal_id,
+        //         farm_id,
+        //         "Test Field",
+        //         "test source",
+        //         {
+        //             type: "Polygon",
+        //             coordinates: [
+        //                 [
+        //                     [30, 10],
+        //                     [40, 40],
+        //                     [20, 40],
+        //                     [10, 20],
+        //                     [30, 10],
+        //                 ],
+        //             ],
+        //         },
+        //         new Date("2023-01-01"),
+        //         "owner",
+        //         new Date("2024-01-01"),
+        //     )
+
+        //     await grantRole(fdm, "farm", "advisor", farm_id, principal_id)
+        //     await grantRole(fdm, "field", "advisor", field_id, principal_id)
+
+        //     const roles = await getRolesOfPrincipalForResource(
+        //         fdm,
+        //         "field",
+        //         field_id,
+        //         principal_id,
+        //     )
+        //     expect(roles).toEqual(["advisor"])
+        // })
+
+        it("should return an empty array if the principal has no roles for the resource", async () => {
+            const other_principal_id = createId()
+
+            const roles = await getRolesOfPrincipalForResource(
+                fdm,
+                "farm",
+                farm_id,
+                other_principal_id,
+            )
+            expect(roles).toEqual([])
+        })
+
+        it("should throw error with invalid resource", async () => {
+            await expect(
+                getRolesOfPrincipalForResource(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError(
+                "Exception for getRolesOfPrincipalForResource",
+            )
+        })
+
+        it("should throw an error if the database transaction fails", async () => {
+            // Mock the transaction function to throw an error
+            const mockTx = async () => {
+                throw new Error("Database transaction failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                transaction: mockTx,
+            }
+            // Act & Assert
+            await expect(
+                getRolesOfPrincipalForResource(
+                    fdmMock,
+                    "farm",
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError(
+                "Exception for getRolesOfPrincipalForResource",
+            )
         })
     })
 

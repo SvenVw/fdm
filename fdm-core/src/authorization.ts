@@ -240,6 +240,67 @@ export async function checkPermission(
 }
 
 /**
+ * Retrieves a list of roles a principal has for a specific resource.
+ *
+ * This function queries the database to find all roles that a principal has been granted for the given resource.
+ * It returns an array of role strings.
+ * CAUTION: This function does not return inherited roles yet.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param resource - The type of the resource to query for the principal's roles.
+ * @param resource_id - The identifier of the specific resource instance.
+ * @param principal_id - The identifier of the principal.
+ * @returns A promise that resolves to an array of roles (strings) that the principal has for the given resource.
+ *   Returns an empty array if the principal has no roles for the resource.
+ * @throws {Error} If the resource type is invalid or if the database operation fails.
+ */
+export async function getRolesOfPrincipalForResource(
+    fdm: FdmType,
+    resource: Resource,
+    resource_id: ResourceId,
+    principal_id: PrincipalId,
+): Promise<Role[]> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+
+            // Convert principal_id to array
+            const principal_ids = Array.isArray(principal_id)
+                ? principal_id
+                : [principal_id]
+
+            const result = await tx
+                .select({
+                    role: authZSchema.role.role,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        inArray(authZSchema.role.principal_id, principal_ids),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+
+            const roles = result.map((item: { role: string }) => item.role)
+
+            // Make sure no duplicate roles are present
+            return [...new Set(roles)]
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for getRolesOfPrincipalForResource", {
+            resource: resource,
+            resource_id: resource_id,
+            principal_id: principal_id,
+        })
+    }
+}
+
+/**
  * Grants a specified role to a principal for a given resource.
  *
  * This function validates that the provided resource and role are allowed. It then generates a unique role identifier and
