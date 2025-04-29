@@ -15,7 +15,6 @@ import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { getPrincipal, identifyPrincipal } from "./principal"
 import type { Principal } from "./principal.d"
-import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js"
 
 /**
  * Creates a new farm record and assigns the "owner" role to the specified principal.
