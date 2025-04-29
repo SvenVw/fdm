@@ -23,6 +23,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request);
 
+        // Verify user is authenticated
+        if (!session.userId) {
+            throw new Response("Unauthorized", { status: 401 });
+        }
+
         // Get identifier from URL query parameters
         const url = new URL(request.url)
         const identifier = url.searchParams.get("identifier") // Read 'identifier' param
