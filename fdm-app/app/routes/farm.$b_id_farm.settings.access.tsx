@@ -49,7 +49,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get the farm details ( to check if has access to farm)
-        const farm = getFarm(fdm, session.principal_id, b_id_farm)
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
         if (!farm) {
             throw data("Farm is not found", {
                 status: 404,
