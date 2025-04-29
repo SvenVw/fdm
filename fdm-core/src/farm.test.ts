@@ -490,19 +490,13 @@ describe("Farm Functions", () => {
 
         it("should return false if principal is not allowed to share the farm", async () => {
             const other_principal_id = createId()
-            // Mock the checkPermission function to throw an error (simulating no share permission)
-            const mockCheckPermission = async () => {
-                throw new Error("Permission check failed")
-            }
-            const fdmMock = {
-                ...fdm,
-                checkPermission: mockCheckPermission,
-            }
+
             const isAllowed = await isAllowedToShareFarm(
-                fdmMock,
+                fdm,
                 other_principal_id,
                 b_id_farm,
             )
+
             expect(isAllowed).toBe(false)
         })
     })
