@@ -9,7 +9,7 @@ let client: ReturnType<typeof postgres>
 
 export let migrationsRun = false
 
-export async function setup(project: TestProject) {
+function validateEnvironment() {
     const requiredEnvVars = [
         "POSTGRES_HOST",
         "POSTGRES_PORT",
@@ -31,6 +31,12 @@ export async function setup(project: TestProject) {
     const user = String(process.env.POSTGRES_USER)
     const password = String(process.env.POSTGRES_PASSWORD)
     const database = String(process.env.POSTGRES_DB)
+
+    return { host, port, user, password, database }
+}
+
+export async function setup(project: TestProject) {
+    const { host, port, user, password, database } = validateEnvironment()
     const migrationsFolderPath = "src/db/migrations"
 
     client = postgres({
@@ -65,27 +71,7 @@ declare module "vitest" {
 }
 
 export async function teardown() {
-    const requiredEnvVars = [
-        "POSTGRES_HOST",
-        "POSTGRES_PORT",
-        "POSTGRES_USER",
-        "POSTGRES_PASSWORD",
-        "POSTGRES_DB",
-    ]
-    for (const envVar of requiredEnvVars) {
-        if (!process.env[envVar]) {
-            throw new Error(`Missing required environment variable: ${envVar}`)
-        }
-    }
-
-    const host = String(process.env.POSTGRES_HOST)
-    const port = Number(process.env.POSTGRES_PORT)
-    if (Number.isNaN(port)) {
-        throw new Error("POSTGRES_PORT must be a valid number")
-    }
-    const user = String(process.env.POSTGRES_USER)
-    const password = String(process.env.POSTGRES_PASSWORD)
-    const database = String(process.env.POSTGRES_DB)
+    const { host, port, user, password, database } = validateEnvironment()
 
     const fdm = createFdmServer(host, port, user, password, database)
     // Clean up all database tables
