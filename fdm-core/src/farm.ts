@@ -2,18 +2,20 @@ import { asc, eq, inArray } from "drizzle-orm"
 import { createId } from "./id"
 import {
     checkPermission,
+    getRolesOfPrincipalForResource,
     grantRole,
     listPrincipalsForResource,
     listResources,
     revokePrincipal,
     updateRole,
 } from "./authorization"
-import type { PrincipalId } from "./authorization.d"
+import type { PrincipalId, Role } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import { getPrincipal, identifyPrincipal } from "./principal"
 import type { Principal } from "./principal.d"
+import { a } from "vitest/dist/chunks/suite.d.FvehnV49.js"
 
 /**
  * Creates a new farm record and assigns the "owner" role to the specified principal.
@@ -87,30 +89,52 @@ export async function getFarm(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
-): Promise<schema.farmsTypeSelect> {
+): Promise<{
+    b_id_farm: schema.farmsTypeSelect["b_id_farm"]
+    b_name_farm: schema.farmsTypeSelect["b_name_farm"]
+    b_businessid_farm: schema.farmsTypeSelect["b_businessid_farm"]
+    b_address_farm: schema.farmsTypeSelect["b_address_farm"]
+    b_postalcode_farm: schema.farmsTypeSelect["b_postalcode_farm"]
+    roles: Role[]
+}> {
     try {
-        await checkPermission(
-            fdm,
-            "farm",
-            "read",
-            b_id_farm,
-            principal_id,
-            "getFarm",
-        )
+        return await fdm.transaction(async (tx: FdmType) => {
+            await checkPermission(
+                tx,
+                "farm",
+                "read",
+                b_id_farm,
+                principal_id,
+                "getFarm",
+            )
 
-        const farm = await fdm
-            .select({
-                b_id_farm: schema.farms.b_id_farm,
-                b_name_farm: schema.farms.b_name_farm,
-                b_businessid_farm: schema.farms.b_businessid_farm,
-                b_address_farm: schema.farms.b_address_farm,
-                b_postalcode_farm: schema.farms.b_postalcode_farm,
-            })
-            .from(schema.farms)
-            .where(eq(schema.farms.b_id_farm, b_id_farm))            
-            .limit(1)
+            const results = await tx
+                .select({
+                    b_id_farm: schema.farms.b_id_farm,
+                    b_name_farm: schema.farms.b_name_farm,
+                    b_businessid_farm: schema.farms.b_businessid_farm,
+                    b_address_farm: schema.farms.b_address_farm,
+                    b_postalcode_farm: schema.farms.b_postalcode_farm,
+                })
+                .from(schema.farms)
+                .where(eq(schema.farms.b_id_farm, b_id_farm))
+                .limit(1)
 
-        return farm[0]
+            // Get roles on farm
+            const roles = await getRolesOfPrincipalForResource(
+                tx,
+                "farm",
+                b_id_farm,
+                principal_id,
+            )
+
+            const farm = {
+                ...results[0],
+                roles: roles,
+            }
+
+            return farm
+        })
     } catch (err) {
         throw handleError(err, "Exception for getFarm", { b_id_farm })
     }
@@ -129,23 +153,60 @@ export async function getFarm(
 export async function getFarms(
     fdm: FdmType,
     principal_id: PrincipalId,
-): Promise<schema.farmsTypeSelect[]> {
+): Promise<
+    {
+        b_id_farm: schema.farmsTypeSelect["b_id_farm"]
+        b_name_farm: schema.farmsTypeSelect["b_name_farm"]
+        b_businessid_farm: schema.farmsTypeSelect["b_businessid_farm"]
+        b_address_farm: schema.farmsTypeSelect["b_address_farm"]
+        b_postalcode_farm: schema.farmsTypeSelect["b_postalcode_farm"]
+        roles: Role[]
+    }[]
+> {
     try {
-        const resources = await listResources(fdm, "farm", "read", principal_id)
+        return await fdm.transaction(async (tx: FdmType) => {
+            const resources = await listResources(
+                tx,
+                "farm",
+                "read",
+                principal_id,
+            )
 
-        const farm = await fdm
-            .select({
-                b_id_farm: schema.farms.b_id_farm,
-                b_name_farm: schema.farms.b_name_farm,
-                b_businessid_farm: schema.farms.b_businessid_farm,
-                b_address_farm: schema.farms.b_address_farm,
-                b_postalcode_farm: schema.farms.b_postalcode_farm,
-            })
-            .from(schema.farms)
-            .where(inArray(schema.farms.b_id_farm, resources))
-            .orderBy(asc(schema.farms.b_name_farm))
+            const results = await tx
+                .select({
+                    b_id_farm: schema.farms.b_id_farm,
+                    b_name_farm: schema.farms.b_name_farm,
+                    b_businessid_farm: schema.farms.b_businessid_farm,
+                    b_address_farm: schema.farms.b_address_farm,
+                    b_postalcode_farm: schema.farms.b_postalcode_farm,
+                })
+                .from(schema.farms)
+                .where(inArray(schema.farms.b_id_farm, resources))
+                .orderBy(asc(schema.farms.b_name_farm))
 
-        return farm
+            const farms = await Promise.all(
+                results.map(
+                    async (farm: {
+                        b_id_farm: schema.farmsTypeSelect["b_id_farm"]
+                    }) => {
+                        // Get roles on farm
+                        const roles = await getRolesOfPrincipalForResource(
+                            tx,
+                            "farm",
+                            farm.b_id_farm,
+                            principal_id,
+                        )
+
+                        return {
+                            ...farm,
+                            roles: roles,
+                        }
+                    },
+                ),
+            )
+
+            return farms
+        })
     } catch (err) {
         throw handleError(err, "Exception for getFarms")
     }

@@ -101,6 +101,7 @@ describe("Farm Functions", () => {
                     b_businessid_farm: farmBusinessId,
                     b_address_farm: farmAddress,
                     b_postalcode_farm: farmPostalCode,
+                    roles: ["owner"],
                 }),
             )
         })
