@@ -473,32 +473,37 @@ export async function listPrincipalsForFarm(
     b_id_farm: string,
 ): Promise<Principal[]> {
     try {
-        await checkPermission(
-            fdm,
-            "farm",
-            "read",
-            b_id_farm,
-            principal_id,
-            "listPrincipalsForFarm",
-        )
-        const principals = await listPrincipalsForResource(
-            fdm,
-            "farm",
-            b_id_farm,
-        )
+        return await fdm.transaction(async (tx: FdmType) => {
+            await checkPermission(
+                tx,
+                "farm",
+                "read",
+                b_id_farm,
+                principal_id,
+                "listPrincipalsForFarm",
+            )
+            const principals = await listPrincipalsForResource(
+                tx,
+                "farm",
+                b_id_farm,
+            )
 
-        // Collect details of principals
-        const principalsDetails = await Promise.all(
-            principals.map(async (principal) => {
-                const details = await getPrincipal(fdm, principal.principal_id)
-                return {
-                    ...details,
-                    role: principal.role,
-                }
-            }),
-        )
+            // Collect details of principals
+            const principalsDetails = await Promise.all(
+                principals.map(async (principal) => {
+                    const details = await getPrincipal(
+                        tx,
+                        principal.principal_id,
+                    )
+                    return {
+                        ...details,
+                        role: principal.role,
+                    }
+                }),
+            )
 
-        return principalsDetails
+            return principalsDetails
+        })
     } catch (err) {
         throw handleError(err, "Exception for listPrincipalsForFarm", {
             b_id_farm,
