@@ -244,9 +244,8 @@ export async function lookupPrincipal(
             const principals = await tx
                 .select({ id: authNSchema.user.id })
                 .from(authNSchema.user)
-                .where(or(eq(authNSchema.user.email, identifier)))
+                .where(eq(authNSchema.user.email, identifier))
                 .limit(1)
-            // console.log(principals)
 
             if (principals.length === 0) {
                 // Check if identifier is close to organization name or slug
@@ -292,7 +291,7 @@ export async function lookupPrincipal(
             if (principals.length > 0) {
                 const principalsDetails = await Promise.all(
                     principals.map(async (principal) => {
-                        const details = await getPrincipal(fdm, principal.id)
+                        const details = await getPrincipal(tx, principal.id)
                         return details
                     }),
                 )

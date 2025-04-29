@@ -23,6 +23,7 @@ import {
     updateOrganization,
     updateRoleOfUserAtOrganization,
 } from "./organization"
+import { username } from "better-auth/plugins"
 
 describe("Organization Data Model", () => {
     let fdm: FdmServerType
@@ -508,7 +509,7 @@ describe("Organization Data Model", () => {
                     fdm,
                     user1_id,
                     organization_id,
-                    "user1@example.com",
+                    "user1",
                 ),
             ).rejects.toThrow("Exception for removeUserFromOrganization")
         })

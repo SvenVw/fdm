@@ -7,12 +7,12 @@ import {
 
 export const AccessInfoCard = () => {
     return (
-        <Card>
+        <Card aria-labelledby="access-roles-title" aria-describedby="access-roles-description">
             <CardHeader>
-                <CardTitle>Hoe werkt toegang tot een bedrijf?</CardTitle>
+                <CardTitle id="access-roles-title">Hoe werkt toegang tot een bedrijf?</CardTitle>
             </CardHeader>
             <CardContent>
-                <p className="text-sm text-muted-foreground">
+                <p  id="access-roles-description" className="text-sm text-muted-foreground">
                     Bij het beheren van de toegang tot een bedrijf, zijn er
                     verschillende rollen die toegewezen kunnen worden.
                     Hieronder een overzicht van deze rollen en hun

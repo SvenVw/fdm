@@ -74,7 +74,6 @@ export const PrincipalRow = ({
 
     return (
         <div
-            key={username}
             className="flex items-center justify-between space-x-4"
         >
             <div className="flex items-center space-x-4">

@@ -89,6 +89,7 @@ export async function teardown() {
         })
     } catch (error) {
         console.error("Error cleaning up database tables:", error)
+        throw error // Re-throw to signal teardown failure
     }
 
     // Close the database connection

@@ -21,11 +21,11 @@ type AutocompletePrincipal = {
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
-        const session = await getSession(request);
+        const session = await getSession(request)
 
         // Verify user is authenticated
         if (!session.userId) {
-            throw new Response("Unauthorized", { status: 401 });
+            throw new Response("Unauthorized", { status: 401 })
         }
 
         // Get identifier from URL query parameters
@@ -34,6 +34,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
         if (!identifier) {
             return [] // Return empty array directly
+        }
+
+        // Basic validation to prevent malicious input
+        // Only allow alphanumeric characters, underscores, and hyphens
+        if (!/^[a-zA-Z0-9_-]+$/.test(identifier)) {
+            return []
+        }        
+        if (identifier.length < 2 || identifier.length > 100) {
+            return [] // Return empty for too short or too long inputs
         }
 
         const principals: CorePrincipal[] = await lookupPrincipal(

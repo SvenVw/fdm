@@ -219,11 +219,12 @@ function createDisplayUsername(
     firstname: string | null,
     surname: string | null,
 ): string | null {
-    // Combine firstname and surname
-    const name = `${firstname} ${surname}`
+    // Filter out null or empty name parts and join with a space
+    const nameParts = [firstname, surname].filter((part) => part?.trim())
+    const name = nameParts.join(" ")
 
     // If no name is given return null
-    if (!name || name === "") {
+    if (!name || name.trim() === "") {
         return null
     }
 

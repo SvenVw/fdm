@@ -36,15 +36,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-// Define a type for farm with added role property
-type Farm = {
-    b_id_farm: string
-    b_name_farm: string
-    b_businessid_farm: string
-    b_address_farm: string
-    b_postalcode_farm: string
-}
-
 /**
  * Retrieves the user session and associated farms data, including the user's role.
  *

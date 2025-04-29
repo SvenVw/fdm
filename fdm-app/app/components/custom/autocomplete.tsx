@@ -56,7 +56,7 @@ export function AutoComplete<T extends string>({
     const [inputValue, setInputValue] = useState("") // Internal input state
     const [items, setItems] = useState<LookupItem<T>[]>([])
     const [isLoading, setIsLoading] = useState(false)
-    const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+    const debounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
     const prevInputValue = useRef<string | null>(null)
     const inputRef = useRef<HTMLInputElement>(null) // Ref for the input element
 
@@ -223,7 +223,7 @@ export function AutoComplete<T extends string>({
                                     {items.map((option) => {
                                         // Use iconMap to get the component, default to Check
                                         const IconComponent = option.icon
-                                            ? iconMap[option.icon] ?? Check
+                                            ? (iconMap[option.icon] ?? Check)
                                             : Check
                                         return (
                                             <CommandItem
@@ -261,7 +261,7 @@ export function AutoComplete<T extends string>({
                 <input
                     type="hidden"
                     {...form.register(name)}
-                    value={selectedValue}
+                    defaultValue={selectedValue}
                 />
             )}
         </div>
