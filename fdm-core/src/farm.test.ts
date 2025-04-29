@@ -374,6 +374,19 @@ describe("Farm Functions", () => {
                 ),
             ).rejects.toThrowError("Exception for updateRoleOfPrincipalAtFarm")
         })
+
+        it("should throw an error if target principal does not exist", async () => {
+            const nonExistentUsername = "nonexistentuser"
+            await expect(
+                updateRoleOfPrincipalAtFarm(
+                    fdm,
+                    principal_id,
+                    nonExistentUsername,
+                    b_id_farm,
+                    "advisor",
+                ),
+            ).rejects.toThrowError("Exception for updateRoleOfPrincipalAtFarm")
+        })
     })
 
     describe("revokePrincipalFromFarm", () => {
