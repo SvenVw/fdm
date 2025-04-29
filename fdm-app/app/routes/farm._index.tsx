@@ -24,6 +24,7 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
 import { Badge } from "../components/ui/badge"
+import { House } from "lucide-react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -137,8 +138,9 @@ export default function AppIndex() {
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {loaderData.farms.map((farm) => (
                                         <Card key={farm.b_id_farm}>
-                                            <CardHeader>
-                                                <CardTitle>
+                                            <CardHeader className="flex flex-row items-center space-x-2">
+                                                <House className="text-muted-foreground" />
+                                                <CardTitle className="p-0">
                                                     {farm.b_name_farm}
                                                 </CardTitle>
                                                 <CardDescription />
