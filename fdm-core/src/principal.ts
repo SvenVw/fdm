@@ -13,7 +13,7 @@ import { eq, ilike, or } from "drizzle-orm"
  * @param fdm - The FDM instance providing the connection to the database.
  * @param principal_id - The unique identifier of the principal.
  * @returns A promise that resolves to an object containing the principal's details,
- *   or null if the principal is not found. The resolved object includes the name, image, type,
+ *   or undefined if the principal is not found. The resolved object includes the name, image, type,
  *   and verification status of the principal.
  *
  * @throws {Error} - Throws an error if any database operation fails.
@@ -33,7 +33,7 @@ import { eq, ilike, or } from "drizzle-orm"
 export async function getPrincipal(
     fdm: FdmType,
     principal_id: string,
-): Promise<Principal> {
+): Promise<Principal | undefined> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
             // If principal is an user get the details of the user
@@ -107,7 +107,7 @@ export async function getPrincipal(
                 .limit(1)
 
             if (organization.length === 0) {
-                throw new Error("Principal does not exist")
+                return undefined
             }
             const metadata = JSON.parse(organization[0].metadata)
 

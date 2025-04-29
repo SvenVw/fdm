@@ -82,10 +82,10 @@ describe("Principals", () => {
             expect(principal?.isVerified).toBe(false)
         })
 
-        it("should return null if principal_id does not exist in either user or organization table", async () => {
+        it("should return undefinedif principal_id does not exist in either user or organization table", async () => {
             const nonExistentId = createId()
             const principal = await getPrincipal(fdm, nonExistentId)
-            expect(principal).toBeNull()
+            expect(principal).toBeUndefined()
         })
 
         it("should handle database errors and throw an error", async () => {
