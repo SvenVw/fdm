@@ -458,7 +458,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
         if (formValues.intent === "update_role") {
             if (!formValues.username) {
-                return handleActionError("missing: email")
+                return handleActionError("missing: username")
             }
             if (!formValues.role) {
                 return handleActionError("missing: role")
