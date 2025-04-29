@@ -107,7 +107,7 @@ export async function getPrincipal(
                 .limit(1)
 
             if (organization.length === 0) {
-                return null
+                throw new Error("Principal does not exist")
             }
             const metadata = JSON.parse(organization[0].metadata)
 
