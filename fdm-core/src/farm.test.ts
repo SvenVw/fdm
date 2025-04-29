@@ -16,7 +16,7 @@ import type { FdmServerType } from "./fdm-server.d"
 import { type BetterAuth, createFdmAuth } from "./authentication"
 import { createId } from "./id"
 import { getPrincipal } from "./principal"
-import { FdmType } from "./fdm"
+import type { FdmType } from "./fdm"
 
 describe("Farm Functions", () => {
     let fdm: FdmServerType
@@ -294,6 +294,19 @@ describe("Farm Functions", () => {
                     fdmMock,
                     principal_id,
                     target_username,
+                    b_id_farm,
+                    "advisor",
+                ),
+            ).rejects.toThrowError("Exception for grantRoleToFarm")
+        })
+
+        it("should throw an error if the target principal does not exist", async () => {
+            const nonExistentUsername = "nonexistentuser"
+            await expect(
+                grantRoleToFarm(
+                    fdm,
+                    principal_id,
+                    nonExistentUsername,
                     b_id_farm,
                     "advisor",
                 ),
