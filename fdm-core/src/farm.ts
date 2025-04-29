@@ -171,6 +171,10 @@ export async function getFarms(
                 principal_id,
             )
 
+            if (resources.length === 0) {
+                return []
+            }
+
             const results = await tx
                 .select({
                     b_id_farm: schema.farms.b_id_farm,
