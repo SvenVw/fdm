@@ -16,6 +16,7 @@ import type { FdmServerType } from "./fdm-server.d"
 import { type BetterAuth, createFdmAuth } from "./authentication"
 import { createId } from "./id"
 import { getPrincipal } from "./principal"
+import { FdmType } from "./fdm"
 
 describe("Farm Functions", () => {
     let fdm: FdmServerType
@@ -122,8 +123,12 @@ describe("Farm Functions", () => {
             }
             const fdmMock = {
                 ...fdm,
-                select: mockSelect,
-            }
+                transaction: async (cb: (tx: FdmType) => Promise<FdmType>) => {
+                    // provide a tx object whose select throws
+                    const tx = { select: mockSelect }
+                    return cb(tx)
+                },
+            } as unknown as FdmType
             await expect(
                 getFarm(fdmMock, principal_id, b_id_farm),
             ).rejects.toThrowError("Exception for getFarm")
