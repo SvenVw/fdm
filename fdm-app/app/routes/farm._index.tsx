@@ -138,10 +138,34 @@ export default function AppIndex() {
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {loaderData.farms.map((farm) => (
                                         <Card key={farm.b_id_farm}>
-                                            <CardHeader className="flex flex-row items-center space-x-2">
-                                                <House className="text-muted-foreground" />
-                                                <CardTitle className="p-0">
-                                                    {farm.b_name_farm}
+                                            <CardHeader>
+                                                <CardTitle className="flex items-center">
+                                                    <div className="flex items-center gap-2">
+                                                        <House className="text-muted-foreground" />
+                                                        {farm.b_name_farm}
+                                                    </div>
+                                                    <div className="ml-auto flex space-x-2">
+                                                        {farm.roles.map(
+                                                            (role) => (
+                                                                <Badge
+                                                                    key={role}
+                                                                    variant="outline"
+                                                                    // className="ml-auto"
+                                                                >
+                                                                    {role ===
+                                                                    "owner"
+                                                                        ? "Eigenaar"
+                                                                        : role ===
+                                                                            "advisor"
+                                                                          ? "Adviseur"
+                                                                          : role ===
+                                                                              "researcher"
+                                                                            ? "Onderzoeker"
+                                                                            : "Onbekend"}
+                                                                </Badge>
+                                                            ),
+                                                        )}
+                                                    </div>
                                                 </CardTitle>
                                                 <CardDescription />
                                             </CardHeader>
