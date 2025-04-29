@@ -35,7 +35,7 @@ export function createFdmAuth(
         googleAuth = {
             clientId: google?.clientId,
             clientSecret: google?.clientSecret,
-            mapProfileToUser: (profile: {
+            mapProfileToUser: async (profile: {
                 name: string
                 email: string
                 picture: string
@@ -48,7 +48,7 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: profile.given_name,
                     surname: profile.family_name,
-                    username: createUsername(profile.email),
+                    username: await createUsername(fdm, profile.email),
                     displayUsername: createDisplayUsername(
                         profile.given_name,
                         profile.family_name,
@@ -65,7 +65,7 @@ export function createFdmAuth(
             clientSecret: microsoft.clientSecret,
             tenantId: "common",
             requireSelectAccount: true,
-            mapProfileToUser: (profile: {
+            mapProfileToUser: async (profile: {
                 name: string | undefined
                 email: string
                 picture: string
@@ -77,7 +77,7 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: firstname,
                     surname: surname,
-                    username: createUsername(profile.email),
+                    username: await createUsername(fdm, profile.email),
                     displayUsername: createDisplayUsername(firstname, surname),
                 }
             },
@@ -190,8 +190,28 @@ export function splitFullName(fullName: string | undefined): {
     return { firstname, surname }
 }
 
-function createUsername(email: string): string {
-    const username = generateFromEmail(email, 3)
+async function createUsername(fdm: FdmType, email: string): Promise<string> {
+    const digits = 3
+
+    // Create username from email
+    let username = generateFromEmail(email, digits)
+
+    // Check if username already exists
+    const existingUser = await fdm.query.authN.user.findFirst({
+        where: { username: { equals: username } },
+    })
+
+    // If username exists, append random digits until we find a unique one
+    if (existingUser) {
+        while (existingUser) {
+            username = generateFromEmail(email, digits)
+            const checkUser = await fdm.query.authN.user.findFirst({
+                where: { username: { equals: username } },
+            })
+            if (!checkUser) break
+        }
+    }
+
     return username
 }
 
