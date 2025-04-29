@@ -426,6 +426,31 @@ describe("Farm Functions", () => {
                 ),
             ).rejects.toThrowError("Exception for revokePrincipalFromFarm")
         })
+
+        it("should throw an error if the target principal does not exist", async () => {
+            const nonExistentUsername = "nonexistentuser"
+
+            await expect(
+                revokePrincipalFromFarm(
+                    fdm,
+                    principal_id,
+                    nonExistentUsername,
+                    b_id_farm,
+                ),
+            ).rejects.toThrowError("Exception for revokePrincipalFromFarm")
+        })
+
+        it("should throw an error if trying to revoke the last owner", async () => {
+            // revoke current user from owner role
+            await expect(
+                revokePrincipalFromFarm(
+                    fdm,
+                    principal_id,
+                    principal_id,
+                    b_id_farm,
+                ),
+            ).rejects.toThrowError("Exception for revokePrincipalFromFarm")
+        })
     })
 
     describe("listPrincipalsForFarm", () => {
