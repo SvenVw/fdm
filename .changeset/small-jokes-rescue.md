@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": patch
 ---
 
-Make type `Cultivation` and `CultivationPlan` available
+Make types `Cultivation`, `CultivationPlan`, `CultivationCatalogue` available

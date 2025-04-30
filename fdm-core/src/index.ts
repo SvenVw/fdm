@@ -52,7 +52,7 @@ export {
     getCultivations,
     getCultivationPlan,
 } from "./cultivation"
-export type { Cultivation, CultivationPlan } from "./cultivation.d"
+export type { Cultivation, CultivationPlan, CultivationCatalogue } from "./cultivation.d"
 export {
     addSoilAnalysis,
     updateSoilAnalysis,

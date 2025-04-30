@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
-import type { CultivationPlan, Cultivation } from "./cultivation.d"
+import type { CultivationPlan, Cultivation, CultivationCatalogue } from "./cultivation.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
@@ -37,7 +37,7 @@ export async function getCultivationsFromCatalogue(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
-): Promise<schema.cultivationsCatalogueTypeSelect[]> {
+): Promise<CultivationCatalogue[]> {
     try {
         await checkPermission(
             fdm,

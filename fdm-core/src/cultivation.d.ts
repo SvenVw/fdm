@@ -48,3 +48,5 @@ export interface CultivationPlan {
         }>
     }>
 }
+
+export type CultivationCatalogue = schema.cultivationsCatalogueTypeSelect
