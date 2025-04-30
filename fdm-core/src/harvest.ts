@@ -9,7 +9,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { HarvestType } from "./harvest.d"
+import type { Harvest } from "./harvest.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
@@ -156,7 +156,7 @@ export async function getHarvest(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
-): Promise<HarvestType> {
+): Promise<Harvest> {
     try {
         await checkPermission(
             fdm,
@@ -194,7 +194,7 @@ export async function getHarvests(
     principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"],
     timeframe?: Timeframe,
-): Promise<HarvestType[]> {
+): Promise<Harvest[]> {
     try {
         await checkPermission(
             fdm,
@@ -251,7 +251,7 @@ export async function getHarvests(
 
         // Get details of each harvest
         const result = await Promise.all(
-            harvests.map(async (harvest: HarvestType) => {
+            harvests.map(async (harvest: Harvest) => {
                 const harvestDetails = getHarvestSimplified(
                     fdm,
                     harvest.b_id_harvesting,

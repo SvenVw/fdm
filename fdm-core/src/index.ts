@@ -73,6 +73,11 @@ export {
     getHarvests,
     removeHarvest,
 } from "./harvest"
+export type {
+    Harvest,
+    Harvestable,
+    HarvestableAnalysis,
+} from "./harvest.d"
 export {
     getEnabledFertilizerCatalogues,
     getEnabledCultivationCatalogues,
