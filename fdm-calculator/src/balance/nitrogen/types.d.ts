@@ -34,15 +34,15 @@ export interface NitrogenSupplyFertilizers {
         applications: { id: string; value: Decimal }[]
     }
     /**
-     * The nitrogen supply specifically from organic fertilizers (excluding compost).
+     * The nitrogen supply specifically from manure.
      */
-    organic: {
+    manure: {
         /**
-         * The total amount of nitrogen supplied by organic fertilizers (excluding compost).
+         * The total amount of nitrogen supplied by manure.
          */
         total: Decimal
         /**
-         * A detailed list of individual organic fertilizer applications.
+         * A detailed list of individual manure applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
         applications: { id: string; value: Decimal }[]
@@ -163,15 +163,15 @@ export interface NitrogenEmissionAmmoniaFertilizers {
         applications: { id: string; value: Decimal }[]
     }
     /**
-     * Ammonia nitrogen emissions specifically from organic fertilizers.
+     * Ammonia nitrogen emissions specifically from manure.
      */
-    organic: {
+    manure: {
         /**
-         * The total amount of ammonia nitrogen emitted from organic fertilizers.
+         * The total amount of ammonia nitrogen emitted from manure.
          */
         total: Decimal
         /**
-         * A detailed list of individual organic fertilizer applications.
+         * A detailed list of individual manure applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
          */
         applications: { id: string; value: Decimal }[]

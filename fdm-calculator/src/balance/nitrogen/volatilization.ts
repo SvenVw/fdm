@@ -12,7 +12,7 @@ export function calculateNitrogenVolatilization(): NitrogenVolatilization {
                     total: Decimal(0),
                     applications: [],
                 },
-                organic: {
+                manure: {
                     total: Decimal(0),
                     applications: [],
                 },

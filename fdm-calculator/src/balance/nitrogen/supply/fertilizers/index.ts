@@ -23,7 +23,7 @@ export function calculateNitrogenSupplyByFertilizers(
     const fertilizers = {
         total: fertilizersTotal,
         mineral: fertilizersSupplyMineral,
-        organic: {
+        manure: {
             total: Decimal(0),
             applications: [],
         },
