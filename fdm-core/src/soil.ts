@@ -9,7 +9,7 @@ import type {
     CurrentSoilData,
     SoilParameterDescription,
     SoilParameters,
-    getSoilAnalysisType,
+    SoilAnalysis,
 } from "./soil.d"
 import type { Timeframe } from "./timeframe"
 
@@ -193,7 +193,7 @@ export async function getSoilAnalysis(
     fdm: FdmType,
     principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
-): Promise<getSoilAnalysisType> {
+): Promise<SoilAnalysis> {
     try {
         await checkPermission(
             fdm,
@@ -247,7 +247,7 @@ export async function getSoilAnalyses(
     principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
     timeframe?: Timeframe,
-): Promise<getSoilAnalysisType[]> {
+): Promise<SoilAnalysis[]> {
     try {
         await checkPermission(
             fdm,

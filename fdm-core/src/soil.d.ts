@@ -1,6 +1,6 @@
 import type * as schema from "./db/schema"
 
-export interface getSoilAnalysisType {
+export interface SoilAnalysis {
     a_id: schema.soilAnalysisTypeSelect["a_id"]
     a_date: schema.soilAnalysisTypeSelect["a_date"]
     a_source: schema.soilAnalysisTypeSelect["a_source"]

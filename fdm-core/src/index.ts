@@ -63,6 +63,7 @@ export {
     getSoilParametersDescription,
 } from "./soil"
 export type {
+    SoilAnalysis,
     CurrentSoilData,
     SoilParameters,
     SoilParameterDescription,
