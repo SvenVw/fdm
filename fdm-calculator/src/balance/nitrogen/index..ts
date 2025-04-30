@@ -1,12 +1,13 @@
 import { Decimal } from "decimal.js"
 import type {
-    Field,
+    cultivationDetails,
+    FertilizerDetails,
     FieldInput,
     NitrogenBalance,
     NitrogenBalanceField,
     NitrogenBalanceInput,
 } from "./types"
-import { calculateNitrogenSupply } from "./supply/fertilizers"
+import { calculateNitrogenSupply } from "./supply"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenVolatilization } from "./volatilization"
 
@@ -20,13 +21,15 @@ export function calculateNitrogenBalance(
 
         // Calculate for each field the nitrogen balance
         const fieldsWithBalance = fields.map((field: FieldInput) => {
-            return calculateNitrogenBalanceField({
-                field: field.field,
-                cultivations: field.cultivations,
-                harvests: field.harvests,
-                soilAnalyses: field.soilAnalyses,
-                fertilizerApplications: field.fertilizerApplications,
-            })
+            return calculateNitrogenBalanceField(
+                field.field,
+                // cultivations: field.cultivations,
+                // harvests: field.harvests,
+                // soilAnalyses: field.soilAnalyses,
+                field.fertilizerApplications,
+                fertilizerDetails,
+                cultivationDetails,
+            )
         })
 
         // Aggregate the field balances to farm level
@@ -42,11 +45,24 @@ export function calculateNitrogenBalance(
 }
 
 export function calculateNitrogenBalanceField(
-    field: FieldInput & { field: Pick<Field, "b_id" | "b_area"> },
+    field: Pick<FieldInput, "b_id" | "b_area">,
+    fertilizerApplications: FieldInput["fertilizerApplications"],
+    fertilizerDetails: FertilizerDetails[],
+    cultivationDetails: cultivationDetails[],
 ): NitrogenBalanceField {
+    // Get the details of the field
     const fieldDetails = field.field
-    const supply = calculateNitrogenSupply()
+
+    // Calculate the amount of Nitrogen supplied
+    const supply = calculateNitrogenSupply(
+        fertilizerApplications,
+        fertilizerDetails,
+    )
+
+    // Calculate the amount of Nitrogen removed
     const removal = calculateNitrogenRemoval()
+
+    // Calculate the amount of Nitrogen that is volatilized
     const volatilization = calculateNitrogenVolatilization()
 
     return {
