@@ -23,7 +23,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
@@ -38,7 +40,8 @@
         "watch": "dotenvx run -- vitest"
     },
     "dependencies": {
-        "@svenvw/fdm-core": "workspace:^"
+        "@svenvw/fdm-core": "workspace:^",
+        "decimal.js": "^10.5.0"
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
