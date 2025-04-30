@@ -5,6 +5,7 @@ import type {
     NitrogenSupplyFertilizers,
 } from "../../types"
 import { calculateNitrogenSupplyByMineralFertilizers } from "./mineral"
+import { calculateNitrogenSupplyByManure } from "./manure"
 
 export function calculateNitrogenSupplyByFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
@@ -17,16 +18,21 @@ export function calculateNitrogenSupplyByFertilizers(
             fertilizerDetails,
         )
 
+    // Calculate the amount of Nitrogen supplied by manure
+    const fertilizersSupplyManure = calculateNitrogenSupplyByManure(
+        fertilizerApplications,
+        fertilizerDetails,
+    )
+
     // Calculate the total amount of Nitrogen supplied by fertilizers
-    const fertilizersTotal = fertilizersSupplyMineral.total
+    const fertilizersTotal = fertilizersSupplyMineral.total.add(
+        fertilizersSupplyManure.total,
+    )
 
     const fertilizers = {
         total: fertilizersTotal,
         mineral: fertilizersSupplyMineral,
-        manure: {
-            total: Decimal(0),
-            applications: [],
-        },
+        manure: fertilizersSupplyManure,
         compost: {
             total: Decimal(0),
             applications: [],
