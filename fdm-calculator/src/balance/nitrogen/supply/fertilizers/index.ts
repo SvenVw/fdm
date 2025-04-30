@@ -1,4 +1,3 @@
-import { Decimal } from "decimal.js"
 import type {
     FertilizerDetails,
     FieldInput,
@@ -6,6 +5,7 @@ import type {
 } from "../../types"
 import { calculateNitrogenSupplyByMineralFertilizers } from "./mineral"
 import { calculateNitrogenSupplyByManure } from "./manure"
+import { calculateNitrogenSupplyByCompost } from "./compost"
 
 export function calculateNitrogenSupplyByFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
@@ -24,19 +24,22 @@ export function calculateNitrogenSupplyByFertilizers(
         fertilizerDetails,
     )
 
-    // Calculate the total amount of Nitrogen supplied by fertilizers
-    const fertilizersTotal = fertilizersSupplyMineral.total.add(
-        fertilizersSupplyManure.total,
+    // Calculate the amount of Nitrogen supplied by compost
+    const fertilizersSupplyCompost = calculateNitrogenSupplyByCompost(
+        fertilizerApplications,
+        fertilizerDetails,
     )
+
+    // Calculate the total amount of Nitrogen supplied by fertilizers
+    const fertilizersTotal = fertilizersSupplyMineral.total
+        .add(fertilizersSupplyManure.total)
+        .add(fertilizersSupplyCompost.total)
 
     const fertilizers = {
         total: fertilizersTotal,
         mineral: fertilizersSupplyMineral,
         manure: fertilizersSupplyManure,
-        compost: {
-            total: Decimal(0),
-            applications: [],
-        },
+        compost: fertilizersSupplyCompost,
     }
     return fertilizers
 }
