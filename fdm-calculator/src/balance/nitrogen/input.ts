@@ -1,12 +1,10 @@
 import type {
-    type PrincipalId,
-    type FdmType,
-    type Timeframe,
-    type fdmSchema,
+    PrincipalId,
+    FdmType,
+    Timeframe,
+    fdmSchema,
 } from "@svenvw/fdm-core"
-import type {
-    NitrogenBalanceInput,
-} from "./types"
+import type { NitrogenBalanceInput } from "./types"
 import {
     getFields,
     getCultivations,
