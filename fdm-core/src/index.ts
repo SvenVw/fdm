@@ -39,8 +39,8 @@ export {
     getFertilizerApplications,
 } from "./fertilizer"
 export type {
-    getFertilizerType,
-    getFertilizerApplicationType,
+    Fertilizer,
+    FertilizerApplication,
 } from "./fertilizer.d"
 export {
     addCultivationToCatalogue,
