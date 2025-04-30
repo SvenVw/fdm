@@ -23,6 +23,7 @@ export { createFdmAuth } from "./authentication"
 export type { PrincipalId } from "./authorization.d"
 export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
+export type { Field } from "./field.d"
 export {
     addFertilizerToCatalogue,
     updateFertilizerFromCatalogue,

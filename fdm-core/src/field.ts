@@ -17,7 +17,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { getFieldType } from "./field.d"
+import type { Field } from "./field.d"
 import type { Timeframe } from "./timeframe"
 
 /**
@@ -131,7 +131,7 @@ export async function getField(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.fieldsTypeSelect["b_id"],
-): Promise<getFieldType> {
+): Promise<Field> {
     try {
         await checkPermission(
             fdm,
@@ -154,8 +154,6 @@ export async function getField(
                 b_start: schema.fieldAcquiring.b_start,
                 b_end: schema.fieldDiscarding.b_end,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
-                created: schema.fields.created,
-                updated: schema.fields.updated,
             })
             .from(schema.fields)
             .innerJoin(
@@ -195,7 +193,7 @@ export async function getFields(
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
     timeframe?: Timeframe,
-): Promise<getFieldType[]> {
+): Promise<Field[]> {
     try {
         await checkPermission(
             fdm,
@@ -256,8 +254,6 @@ export async function getFields(
                 b_start: schema.fieldAcquiring.b_start,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
                 b_end: schema.fieldDiscarding.b_end,
-                created: schema.fields.created,
-                updated: schema.fields.updated,
             })
             .from(schema.fields)
             .innerJoin(
@@ -307,7 +303,7 @@ export async function updateField(
     b_start?: schema.fieldAcquiringTypeInsert["b_start"],
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_end?: schema.fieldDiscardingTypeInsert["b_end"],
-): Promise<getFieldType> {
+): Promise<Field> {
     return await fdm.transaction(async (tx: FdmType) => {
         try {
             await checkPermission(

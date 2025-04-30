@@ -1,6 +1,6 @@
 import type * as schema from "./db/schema"
 
-export interface getFieldType {
+export interface Field {
     b_id: schema.fieldsTypeSelect["b_id"]
     b_name: schema.fieldsTypeSelect["b_name"]
     b_id_farm: schema.fieldAcquiringTypeSelect["b_id_farm"]
@@ -10,6 +10,4 @@ export interface getFieldType {
     b_start: schema.fieldAcquiringTypeSelect["b_start"]
     b_end: schema.fieldDiscardingTypeSelect["b_end"]
     b_acquiring_method: schema.fieldAcquiringTypeSelect["b_acquiring_method"]
-    created: Date | null
-    updated: Date | null
 }
