@@ -7,8 +7,8 @@ import type {
     Fertilizer,
     CultivationCatalogue,
     Field,
-    SoilAnalysis
 } from "@svenvw/fdm-core"
+import type { Decimal } from "decimal.js"
 
 /**
  * Represents the nitrogen supply derived from various fertilizer applications.
@@ -18,7 +18,7 @@ export interface NitrogenSupplyFertilizers {
     /**
      * The total amount of nitrogen supplied by all types of fertilizers combined.
      */
-    total: number
+    total: Decimal
     /**
      * The nitrogen supply specifically from mineral fertilizers.
      */
@@ -26,12 +26,12 @@ export interface NitrogenSupplyFertilizers {
         /**
          * The total amount of nitrogen supplied by all mineral fertilizers.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual mineral fertilizer applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
-        applications: { id: string; value: number }[]
+        applications: { id: string; value: Decimal }[]
     }
     /**
      * The nitrogen supply specifically from organic fertilizers.
@@ -40,12 +40,12 @@ export interface NitrogenSupplyFertilizers {
         /**
          * The total amount of nitrogen supplied by all organic fertilizers.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual organic fertilizer applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
-        applications: { id: string; value: number }[]
+        applications: { id: string; value: Decimal }[]
     }
     /**
      * The nitrogen supply specifically from manure (excluding compost).
@@ -54,12 +54,12 @@ export interface NitrogenSupplyFertilizers {
         /**
          * The total amount of nitrogen supplied by all manure applications.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual manure applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
-        applications: { id: string; value: number }[]
+        applications: { id: string; value: Decimal }[]
     }
     /**
      * The nitrogen supply specifically from compost.
@@ -68,12 +68,12 @@ export interface NitrogenSupplyFertilizers {
         /**
          * The total amount of nitrogen supplied by all compost applications.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual compost applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
-        applications: { id: string; value: number }[]
+        applications: { id: string; value: Decimal }[]
     }
 }
 
@@ -85,7 +85,7 @@ export interface NitrogenSupply {
     /**
      * The total amount of nitrogen supplied to the field, encompassing all sources (fertilizers, fixation, deposition, and mineralization).
      */
-    total: number
+    total: Decimal
     /**
      * The nitrogen supplied specifically from fertilizer applications.
      */
@@ -97,21 +97,21 @@ export interface NitrogenSupply {
         /**
          * The total amount of nitrogen fixed by all crops on the field.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of cultivations that fix nitrogen.
          * Each entry includes the cultivation's unique identifier (`id`) and the amount of nitrogen fixed (`value`).
          */
-        cultivations: { id: string; value: number }[]
+        cultivations: { id: string; value: Decimal }[]
     }
     /**
      * The amount of nitrogen supplied through atmospheric deposition.
      */
-    deposition: number
+    deposition: Decimal
     /**
      * The amount of nitrogen supplied through mineralization of organic matter in the soil.
      */
-    mineralisation: number
+    mineralisation: Decimal
 }
 
 /**
@@ -122,7 +122,7 @@ export interface NitrogenRemoval {
     /**
      * The total amount of nitrogen removed from the field through all means (harvested crops and residues).
      */
-    total: number
+    total: Decimal
     /**
      * The nitrogen removed specifically through harvested crops.
      */
@@ -130,12 +130,12 @@ export interface NitrogenRemoval {
         /**
          * The total amount of nitrogen removed by all harvested crops.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual harvested crops.
          * Each entry includes the crop's unique identifier (`id`) and the amount of nitrogen removed (`value`).
          */
-        harvestables: { id: string; value: number }[]
+        harvestables: { id: string; value: Decimal }[]
     }
     /**
      * The nitrogen removed specifically through crop residues.
@@ -144,12 +144,12 @@ export interface NitrogenRemoval {
         /**
          * The total amount of nitrogen removed by all crop residues.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of crop residues.
          * Each entry includes the residue's unique identifier (`id`) and the amount of nitrogen removed (`value`).
          */
-        harvestables: { id: string; value: number }[]
+        harvestables: { id: string; value: Decimal }[]
     }
 }
 
@@ -161,7 +161,7 @@ export interface NitrogenEmissionAmmoniaFertilizers {
     /**
      * The total amount of ammonia nitrogen emitted from all fertilizer sources.
      */
-    total: number
+    total: Decimal
     /**
      * Ammonia nitrogen emissions specifically from mineral fertilizers.
      */
@@ -169,12 +169,12 @@ export interface NitrogenEmissionAmmoniaFertilizers {
         /**
          * The total amount of ammonia nitrogen emitted from mineral fertilizers.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual mineral fertilizer applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
          */
-        applications: { id: string; value: number }[]
+        applications: { id: string; value: Decimal }[]
     }
     /**
      * Ammonia nitrogen emissions specifically from organic fertilizers.
@@ -183,12 +183,12 @@ export interface NitrogenEmissionAmmoniaFertilizers {
         /**
          * The total amount of ammonia nitrogen emitted from organic fertilizers.
          */
-        total: number
+        total: Decimal
         /**
          * A detailed list of individual organic fertilizer applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
          */
-        applications: { id: string; value: number }[]
+        applications: { id: string; value: Decimal }[]
     }
 }
 
@@ -200,12 +200,12 @@ export interface NitrogenEmissionAmmoniaResidues {
     /**
      * The total amount of ammonia nitrogen emitted from all crop residues.
      */
-    total: number
+    total: Decimal
     /**
      * A detailed list of crop residues.
      * Each entry includes the residue's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
      */
-    harvestables: { id: string; value: number }[]
+    harvestables: { id: string; value: Decimal }[]
 }
 
 /**
@@ -216,7 +216,7 @@ export interface NitrogenEmissionAmmonia {
     /**
      * The total amount of ammonia nitrogen emitted from the field, encompassing all sources (fertilizers and residues).
      */
-    total: number
+    total: Decimal
     /**
      * Ammonia nitrogen emissions specifically from fertilizer applications.
      */
@@ -236,6 +236,7 @@ export interface NitrogenEmissionAmmonia {
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
 export interface NitrogenVolatilization {
+    total: Decimal
     /**
      * The total amount of nitrogen volatilized as ammonia.
      */
@@ -254,7 +255,7 @@ export interface NitrogenBalanceField {
     /**
      * The overall nitrogen balance for the field, calculated as supply minus removal minus volatilization.
      */
-    balance: number
+    balance: Decimal
     /**
      * The total nitrogen supply for the field.
      */
@@ -277,19 +278,19 @@ export interface NitrogenBalance {
     /**
      * The overall nitrogen balance across all fields, likely a sum or average of individual field balances.
      */
-    balance: number
+    balance: Decimal
     /**
      * The total nitrogen supply across all fields.
      */
-    supply: number
+    supply: Decimal
     /**
      * The total nitrogen removal across all fields.
      */
-    removal: number
+    removal: Decimal
     /**
      * The total nitrogen volatilization across all fields.
      */
-    volatilization: number
+    volatilization: Decimal
     /**
      * A detailed breakdown of the nitrogen balance for each individual field.
      */
@@ -330,7 +331,7 @@ export type FertilizerDetails = Pick<
  */
 export interface NitrogenBalanceInput {
     fields: {
-        field: Fields
+        field: Pick<Field, "b_id" | "b_area">
         cultivations: Cultivation[]
         harvests: Harvest[]
         soilAnalyses: soilAnalysis[]
