@@ -300,14 +300,13 @@ export interface NitrogenBalance {
 /**
  * Represents the structure of fields with related entities for nitrogen balance calculation
  */
-export interface Fields {
+export interface FieldInput {
     field: Pick<Field, "b_id" | "b_area">
     cultivations: Cultivation[]
     harvests: Harvest[]
     soilAnalyses: SoilAnalysis[]
     fertilizerApplications: FertilizerApplication[]
 }
-;[]
 
 /**
  * Represents cultivation details, specifically the cultivation catalogue identifier.
@@ -330,13 +329,7 @@ export type FertilizerDetails = Pick<
  * Represents the overall input structure required for nitrogen balance calculation.
  */
 export interface NitrogenBalanceInput {
-    fields: {
-        field: Pick<Field, "b_id" | "b_area">
-        cultivations: Cultivation[]
-        harvests: Harvest[]
-        soilAnalyses: soilAnalysis[]
-        fertilizerApplications: fertilizerApplication[]
-    }[]
+    fields: FieldInput[]
     fertilizerDetails: FertilizerDetails[]
     cultivationDetails: CultivationCatalogue[]
 }
