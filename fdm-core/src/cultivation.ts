@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
-import type { cultivationPlanType, getCultivationType } from "./cultivation.d"
+import type { CultivationPlan, Cultivation } from "./cultivation.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
@@ -315,7 +315,7 @@ export async function getCultivation(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_lu: schema.cultivationsTypeSelect["b_lu"],
-): Promise<getCultivationType> {
+): Promise<Cultivation> {
     try {
         await checkPermission(
             fdm,
@@ -392,7 +392,7 @@ export async function getCultivations(
     principal_id: PrincipalId,
     b_id: schema.cultivationStartingTypeSelect["b_id"],
     timeframe?: Timeframe,
-): Promise<getCultivationType[]> {
+): Promise<Cultivation[]> {
     try {
         await checkPermission(
             fdm,
@@ -537,7 +537,7 @@ export async function getCultivationPlan(
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
     timeframe?: Timeframe,
-): Promise<cultivationPlanType[]> {
+): Promise<CultivationPlan[]> {
     try {
         if (!b_id_farm) {
             throw new Error("Farm ID is required")
@@ -674,7 +674,7 @@ export async function getCultivationPlan(
             )
 
         const cultivationPlan = cultivations.reduce(
-            (acc: cultivationPlanType[], curr: any) => {
+            (acc: CultivationPlan[], curr: any) => {
                 let existingCultivation = acc.find(
                     (item) =>
                         item.b_lu_catalogue === curr.b_lu_catalogue &&

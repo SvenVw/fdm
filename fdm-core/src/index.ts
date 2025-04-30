@@ -51,6 +51,7 @@ export {
     getCultivations,
     getCultivationPlan,
 } from "./cultivation"
+export type { Cultivation, CultivationPlan } from "./cultivation.d"
 export {
     addSoilAnalysis,
     updateSoilAnalysis,

@@ -1,6 +1,6 @@
 import type * as schema from "./db/schema"
 
-export interface getCultivationType {
+export interface Cultivation {
     b_lu: schema.cultivationsTypeSelect["b_lu"]
     b_lu_catalogue: schema.cultivationsTypeSelect["b_lu_catalogue"]
     b_lu_source: schema.cultivationsCatalogueTypeSelect["b_lu_source"]
@@ -13,7 +13,7 @@ export interface getCultivationType {
     b_id: schema.cultivationStartingTypeSelect["b_id"]
 }
 
-export interface cultivationPlanType {
+export interface CultivationPlan {
     b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"]
     b_lu_name: schema.cultivationsCatalogueTypeSelect["b_lu_name"]
     b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
