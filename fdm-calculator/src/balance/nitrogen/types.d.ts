@@ -34,29 +34,15 @@ export interface NitrogenSupplyFertilizers {
         applications: { id: string; value: Decimal }[]
     }
     /**
-     * The nitrogen supply specifically from organic fertilizers.
+     * The nitrogen supply specifically from organic fertilizers (excluding compost).
      */
     organic: {
         /**
-         * The total amount of nitrogen supplied by all organic fertilizers.
+         * The total amount of nitrogen supplied by organic fertilizers (excluding compost).
          */
         total: Decimal
         /**
          * A detailed list of individual organic fertilizer applications.
-         * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
-         */
-        applications: { id: string; value: Decimal }[]
-    }
-    /**
-     * The nitrogen supply specifically from manure (excluding compost).
-     */
-    manure: {
-        /**
-         * The total amount of nitrogen supplied by all manure applications.
-         */
-        total: Decimal
-        /**
-         * A detailed list of individual manure applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
         applications: { id: string; value: Decimal }[]
@@ -331,5 +317,5 @@ export type FertilizerDetails = Pick<
 export interface NitrogenBalanceInput {
     fields: FieldInput[]
     fertilizerDetails: FertilizerDetails[]
-    cultivationDetails: CultivationCatalogue[]
+    cultivationDetails: cultivationDetails[]
 }
