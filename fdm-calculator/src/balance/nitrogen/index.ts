@@ -86,39 +86,60 @@ export function calculateNitrogenBalancesFieldToFarm(
     fieldsWithBalance: NitrogenBalanceField[],
     fields: FieldInput[],
 ) {
-    // Calculate the farm area, so it can be used to correct the values for field size
-    const farmArea = fields
-        .map((field) => field.field.b_area)
-        .reduce((a, b) => new Decimal(a).add(new Decimal(b)), Decimal(0))
+    // Calculate the total farm area
+    const totalFarmArea = fields.reduce(
+        (sum, field) => sum.add(new Decimal(field.field.b_area)),
+        Decimal(0),
+    )
 
-    // Aggregate the supply, removal and volatilization
-    const farmSupply = fieldsWithBalance
-        .reduce((acc, field) => {
-            return acc.add(field.supply.total.times(farmArea))
-        }, Decimal(0))
-        .dividedBy(farmArea)
+    // Calculate total weighted supply, removal, and volatilization across the farm
+    let totalFarmSupply = Decimal(0);
+    let totalFarmRemoval = Decimal(0);
+    let totalFarmVolatilization = Decimal(0);
 
-    const farmRemoval = fieldsWithBalance
-        .reduce((acc, field) => {
-            return acc.add(field.removal.total.times(farmArea))
-        }, Decimal(0))
-        .dividedBy(farmArea)
+    for (const fieldBalance of fieldsWithBalance) {
+        const fieldInput = fields.find((f) => f.field.b_id === fieldBalance.b_id);
 
-    const farmVolatilization = fieldsWithBalance
-        .reduce((acc, field) => {
-            return acc.add(field.volatilization.ammonia.total.times(farmArea))
-        }, Decimal(0))
-        .dividedBy(farmArea)
+        if (!fieldInput) {
+            // Should not happen if inputs are consistent, but good to handle
+            console.warn(`Could not find field input for field balance ${fieldBalance.b_id}`)
+            continue // Skip this iteration if fieldInput is not found
+        }
+        const fieldArea = new Decimal(fieldInput.field.b_area)
 
-    // Calculat the balance at farm level
-    const farmBalance = farmSupply.minus(farmRemoval).minus(farmVolatilization)
+        totalFarmSupply = totalFarmSupply.add(
+            fieldBalance.supply.total.times(fieldArea),
+        )
+        totalFarmRemoval = totalFarmRemoval.add(
+            fieldBalance.removal.total.times(fieldArea),
+        )
+        totalFarmVolatilization = totalFarmVolatilization.add(
+            fieldBalance.volatilization.total.times(fieldArea),
+        )
+    }
 
-    // Return the farm with balances
+    // Calculate average values per hectare for the farm
+    const avgFarmSupply = totalFarmArea.isZero()
+        ? Decimal(0)
+        : totalFarmSupply.dividedBy(totalFarmArea)
+    const avgFarmRemoval = totalFarmArea.isZero()
+        ? Decimal(0)
+        : totalFarmRemoval.dividedBy(totalFarmArea)
+    const avgFarmVolatilization = totalFarmArea.isZero()
+        ? Decimal(0)
+        : totalFarmVolatilization.dividedBy(totalFarmArea)
+
+    // Calculate the average balance at farm level (Supply + Removal + Volatilization)
+    const avgFarmBalance = avgFarmSupply
+        .add(avgFarmRemoval)
+        .add(avgFarmVolatilization)
+
+    // Return the farm with average balances per hectare
     const farmWithBalance = {
-        balance: farmBalance,
-        supply: farmSupply,
-        removal: farmRemoval,
-        volatilization: farmVolatilization,
+        balance: avgFarmBalance,
+        supply: avgFarmSupply,
+        removal: avgFarmRemoval,
+        volatilization: avgFarmVolatilization,
         fields: fieldsWithBalance,
     }
 
