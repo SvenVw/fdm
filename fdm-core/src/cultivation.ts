@@ -149,6 +149,7 @@ export async function addCultivationToCatalogue(
  * @param b_id - The identifier of the field to which the cultivation is added.
  * @param b_lu_start - The sowing date of the cultivation.
  * @param b_lu_end - The optional termination date of the cultivation.
+ * @param m_cropresidue - (Optional) Whether crop residues are left on the field or not after termination of the cultivation.
  * @returns A promise that resolves with the unique ID of the newly added cultivation.
  * @throws {Error} If the sowing date is invalid, the termination date is invalid or not after the sowing date, the field or catalogue entry does not exist, or a duplicate cultivation is detected.
  * @alpha
@@ -160,6 +161,7 @@ export async function addCultivation(
     b_id: schema.cultivationStartingTypeInsert["b_id"],
     b_lu_start: schema.cultivationStartingTypeInsert["b_lu_start"],
     b_lu_end?: schema.cultivationEndingTypeInsert["b_lu_end"],
+    m_cropresidue?: schema.cultivationEndingTypeInsert["m_cropresidue"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
         await checkPermission(
@@ -268,6 +270,7 @@ export async function addCultivation(
             await tx.insert(schema.cultivationEnding).values({
                 b_lu: b_lu,
                 b_lu_end: b_lu_end,
+                m_cropresidue: m_cropresidue,
             })
 
             if (b_lu_end) {
@@ -342,6 +345,7 @@ export async function getCultivation(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
+                m_cropresidue: schema.cultivationEnding.m_cropresidue,
                 b_id: schema.cultivationStarting.b_id,
             })
             .from(schema.cultivations)
@@ -428,6 +432,7 @@ export async function getCultivations(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
+                m_cropresidue: schema.cultivationEnding.m_cropresidue,
                 b_id: schema.cultivationStarting.b_id,
             })
             .from(schema.cultivations)
@@ -481,6 +486,7 @@ export async function getCultivations(
  *   b_lu_name: string;        // Name of the cultivation
  *   b_lu_start: Date;      // Sowing date for the cultivation (if available)
  *   b_lu_end: Date; // Termination date for the cultivation (if available)
+ *   m_cropresidue: boolean // Whether crop residues are left on the field or not after termination of the cultivation
  *   fields: [
  *     {
  *       b_lu: string;        // Unique ID of the cultivation record
@@ -572,6 +578,7 @@ export async function getCultivationPlan(
                 b_name: schema.fields.b_name,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
+                m_cropresidue: schema.cultivationEnding.m_cropresidue,
                 p_id_catalogue: schema.fertilizersCatalogue.p_id_catalogue,
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_app_amount: schema.fertilizerApplication.p_app_amount,
@@ -691,7 +698,7 @@ export async function getCultivationPlan(
                         if (
                             !isCultivationWithinTimeframe(
                                 curr.b_lu_start,
-                                curr.b_lu_end,
+                                curr.b_lu_end,                                
                                 timeframe,
                             )
                         ) {
@@ -703,6 +710,7 @@ export async function getCultivationPlan(
                         b_lu_name: curr.b_lu_name,
                         b_lu_start: curr.b_lu_start,
                         b_lu_end: curr.b_lu_end,
+                        m_cropresidue: curr.m_cropresidue,
                         fields: [],
                     }
                     acc.push(existingCultivation)
@@ -854,6 +862,7 @@ export async function removeCultivation(
  * @param b_lu_catalogue - (Optional) The new catalogue ID; if provided, it must correspond to an existing catalogue entry.
  * @param b_lu_start - (Optional) The updated sowing date; when provided with a termination date, it must precede it.
  * @param b_lu_end - (Optional) The updated termination date; if provided, it must be later than the sowing date.
+ * @param m_cropresidue - (Optional) Whether crop residues are left on the field or not after termination of the cultivation.
  * @returns A Promise that resolves upon successful completion of the update.
  *
  * @throws {Error} If the cultivation does not exist, if date validations fail, or if the update operation encounters an issue.
@@ -867,6 +876,7 @@ export async function updateCultivation(
     b_lu_catalogue?: schema.cultivationsTypeInsert["b_lu_catalogue"],
     b_lu_start?: schema.cultivationStartingTypeInsert["b_lu_start"],
     b_lu_end?: schema.cultivationEndingTypeInsert["b_lu_end"],
+    m_cropresidue?: schema.cultivationEndingTypeInsert["m_cropresidue"],
 ): Promise<void> {
     try {
         const updated = new Date()
@@ -989,6 +999,7 @@ export async function updateCultivation(
                     .set({
                         updated: updated,
                         b_lu_end: b_lu_end,
+                        m_cropresidue: m_cropresidue,
                     })
                     .where(eq(schema.cultivationEnding.b_lu, b_lu))
 

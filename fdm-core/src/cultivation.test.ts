@@ -417,6 +417,7 @@ describe("Cultivation Data Model", () => {
                 newCatalogueId,
                 newSowingDate,
                 newTerminateDate,
+                true,
             )
 
             const updatedCultivation = await getCultivation(
@@ -427,6 +428,7 @@ describe("Cultivation Data Model", () => {
             expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
             expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
+            expect(updatedCultivation.m_cropresidue).toEqual(true)
         })
 
         it("should update a cultivation with only the catalogue ID", async () => {
@@ -449,6 +451,8 @@ describe("Cultivation Data Model", () => {
                 b_lu,
             )
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
+            expect(updatedCultivation.b_lu_end).toBeNull()
+            expect(updatedCultivation.m_cropresidue).toBeNull()
         })
 
         it("should update a cultivation with only the sowing date", async () => {
@@ -480,6 +484,7 @@ describe("Cultivation Data Model", () => {
                 undefined,
                 undefined,
                 newTerminateDate,
+                false,
             )
 
             const updatedCultivation = await getCultivation(
@@ -488,6 +493,7 @@ describe("Cultivation Data Model", () => {
                 b_lu,
             )
             expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
+            expect(updatedCultivation.m_cropresidue).toEqual(false)
         })
 
         it("should throw an error when updating with invalid sowing date - before termination date", async () => {
@@ -1134,9 +1140,9 @@ describe("buildDateRangeConditionEnding", () => {
         const result = buildDateRangeConditionEnding(dateStart, null)
         expect(result).toEqual(
             or(
-                gte(schema.cultivationEnding.b_lu_end, dateStart),
+                gte(schema.cultivationEnding.harvestable, dateStart),
                 and(
-                    isNotNull(schema.cultivationEnding.b_lu_end),
+                    isNotNull(schema.cultivationEnding.harvestable),
                     gte(schema.cultivationStarting.b_lu_start, dateStart),
                 ),
             ),
@@ -1148,9 +1154,9 @@ describe("buildDateRangeConditionEnding", () => {
         const result = buildDateRangeConditionEnding(null, dateEnd)
         expect(result).toEqual(
             or(
-                lte(schema.cultivationEnding.b_lu_end, dateEnd),
+                lte(schema.cultivationEnding.harvestable, dateEnd),
                 and(
-                    isNotNull(schema.cultivationEnding.b_lu_end),
+                    isNotNull(schema.cultivationEnding.harvestable),
                     lte(schema.cultivationStarting.b_lu_start, dateEnd),
                 ),
             ),

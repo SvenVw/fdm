@@ -434,6 +434,7 @@ export const cultivationEnding = fdmSchema.table(
             .notNull()
             .references(() => cultivations.b_lu),
         b_lu_end: timestamp({ withTimezone: true }),
+        m_cropresidue: boolean(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
