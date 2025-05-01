@@ -33,7 +33,7 @@ export interface CultivationPlan {
         harvests: Array<{
             b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_"]
             b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
-            harvestables: Array<{
+            harvestable: {
                 b_id_harvestable: schema.harvestableAnalysesTypeSelect["b_id_harvestable"]
                 harvestable_analyses: Array<{
                     b_lu_yield: schema.harvestableAnalysesTypeSelect["b_lu_yield"]
@@ -44,7 +44,7 @@ export interface CultivationPlan {
                     b_lu_k_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_k_harvestable"]
                     b_lu_k_residue: schema.harvestableAnalysesTypeSelect["b_lu_k_residue"]
                 }>
-            }>
+            }
         }>
     }>
 }

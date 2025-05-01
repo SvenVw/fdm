@@ -4,7 +4,7 @@ export interface Harvest {
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"]
     b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"]
-    harvestables: Harvestable[]
+    harvestable: Harvestable
 }
 
 export interface Harvestable {

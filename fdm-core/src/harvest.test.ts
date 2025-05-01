@@ -188,7 +188,7 @@ describe("harvest", () => {
         expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
         expect(harvest.b_lu_harvest_date).toEqual(harvesting_date)
         expect(
-            harvest.harvestables[0].harvestable_analyses[0].b_lu_yield,
+            harvest.harvestable.harvestable_analyses[0].b_lu_yield,
         ).toEqual(1000)
     })
 
@@ -204,7 +204,7 @@ describe("harvest", () => {
         )
         expect(harvests[0].b_lu_harvest_date).toEqual(harvesting_date)
         expect(
-            harvests[0].harvestables[0].harvestable_analyses[0].b_lu_yield,
+            harvests[0].harvestable.harvestable_analyses[0].b_lu_yield,
         ).toEqual(null)
     })
 
@@ -248,7 +248,7 @@ describe("harvest", () => {
         expect(
             harvests.map(
                 (f) =>
-                    f.harvestables[0].harvestable_analyses[0]
+                    f.harvestable.harvestable_analyses[0]
                         .b_lu_n_harvestable,
             ),
         ).toEqual(
