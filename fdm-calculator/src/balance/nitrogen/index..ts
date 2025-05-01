@@ -24,7 +24,7 @@ export function calculateNitrogenBalance(
             return calculateNitrogenBalanceField(
                 field.field,
                 field.cultivations,
-                // harvests: field.harvests,
+                field.harvests,
                 // soilAnalyses: field.soilAnalyses,
                 field.fertilizerApplications,
                 fertilizerDetails,
@@ -47,6 +47,7 @@ export function calculateNitrogenBalance(
 export function calculateNitrogenBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
+    harvests: FieldInput["harvests"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetails: FertilizerDetail[],
     cultivationDetails: CultivationDetail[],
@@ -63,7 +64,11 @@ export function calculateNitrogenBalanceField(
     )
 
     // Calculate the amount of Nitrogen removed
-    const removal = calculateNitrogenRemoval()
+    const removal = calculateNitrogenRemoval(
+        cultivations,
+        harvests,
+        cultivationDetails,
+    )
 
     // Calculate the amount of Nitrogen that is volatilized
     const volatilization = calculateNitrogenVolatilization()

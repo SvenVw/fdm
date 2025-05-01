@@ -107,6 +107,21 @@ export interface NitrogenSupply {
 }
 
 /**
+ * The nitrogen removed specifically through harvested crops.
+ */
+export interface NitrogenRemovalHarvests {
+    /**
+     * The total amount of nitrogen removed by all harvested crops.
+     */
+    total: Decimal
+    /**
+     * A detailed list of individual harvested crops.
+     * Each entry includes the crop's unique identifier (`id`) and the amount of nitrogen removed (`value`).
+     */
+    harvests: { id: string; value: Decimal }[]
+}
+
+/**
  * Represents the total nitrogen removal from a field.
  * All units are in kg N / ha.
  */
@@ -118,17 +133,7 @@ export interface NitrogenRemoval {
     /**
      * The nitrogen removed specifically through harvested crops.
      */
-    harvestables: {
-        /**
-         * The total amount of nitrogen removed by all harvested crops.
-         */
-        total: Decimal
-        /**
-         * A detailed list of individual harvested crops.
-         * Each entry includes the crop's unique identifier (`id`) and the amount of nitrogen removed (`value`).
-         */
-        harvestables: { id: string; value: Decimal }[]
-    }
+    harvests: NitrogenRemovalHarvests
     /**
      * The nitrogen removed specifically through crop residues.
      */
@@ -305,7 +310,8 @@ export interface FieldInput {
  */
 export type CultivationDetail = Pick<
     CultivationCatalogue,
-    "b_lu_catalogue" | "b_n_fixation"
+    "b_lu_catalogue" | "b_lu_yield",
+    "b_lu_n_harvestable" | "b_n_fixation"
 >
 
 /**
