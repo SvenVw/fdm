@@ -318,6 +318,8 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_harvestable: harvestableEnum().notNull(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
+        b_lu_yield: numericCasted(),
+        b_lu_n_harvestable: numericCasted(),
         b_n_fixation: numericCasted(),
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
