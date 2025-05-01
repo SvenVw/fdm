@@ -3,7 +3,7 @@ import type {
     CultivationDetail,
     FieldInput,
     NitrogenRemovalHarvests,
-} from "../../types"
+} from "../types"
 import Decimal from "decimal.js"
 
 export function calculateNitrogenRemovalByHarvests(

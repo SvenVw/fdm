@@ -2,7 +2,7 @@ import type {
     CultivationDetail,
     FieldInput,
     NitrogenSupplyFixation,
-} from "../../types"
+} from "../types"
 import { Decimal } from "decimal.js"
 
 export function calculateNitrogenFixation(
