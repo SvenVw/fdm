@@ -21,7 +21,7 @@ export function calculateNitrogenFixation(
             )
         }
 
-        // Calculate for this cultivation the amount of Nitrogen that is fixated
+        // If this cultivation does not fixate Nitrogen set it to 0
         if (!cultivationDetail.b_n_fixation) {
             return {
                 id: cultivation.b_lu,
@@ -29,6 +29,7 @@ export function calculateNitrogenFixation(
             }
         }
 
+        // Return the amount of Nitrogen fixated by the cultivation
         return {
             id: cultivation.b_lu,
             value: new Decimal(cultivationDetail.b_n_fixation),
