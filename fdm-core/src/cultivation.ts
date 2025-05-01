@@ -108,6 +108,11 @@ export async function addCultivationToCatalogue(
         b_lu_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_harvestable"]
         b_lu_hcat3: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3"]
         b_lu_hcat3_name: schema.cultivationsCatalogueTypeInsert["b_lu_hcat3_name"]
+        b_lu_yield: schema.cultivationsCatalogueTypeInsert["b_lu_yield"]
+        b_lu_hi: schema.cultivationsCatalogueTypeInsert["b_lu_hi"],        
+        b_lu_n_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_n_harvestable"]
+        b_lu_n_residue: schema.cultivationsCatalogueTypeInsert["b_lu_n_residue"]
+        b_n_fixation: schema.cultivationsCatalogueTypeInsert["b_n_fixation"]
     },
 ): Promise<void> {
     try {
@@ -698,7 +703,7 @@ export async function getCultivationPlan(
                         if (
                             !isCultivationWithinTimeframe(
                                 curr.b_lu_start,
-                                curr.b_lu_end,                                
+                                curr.b_lu_end,
                                 timeframe,
                             )
                         ) {
