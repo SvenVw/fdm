@@ -303,7 +303,7 @@ export interface FieldInput {
 /**
  * Represents cultivation details, specifically the cultivation catalogue identifier.
  */
-export type cultivationDetails = Pick<
+export type CultivationDetail = Pick<
     CultivationCatalogue,
     "b_lu_catalogue" | "b_n_fixation"
 >
@@ -311,7 +311,7 @@ export type cultivationDetails = Pick<
 /**
  * Represents fertilizer details needed for nitrogen balance calculation.
  */
-export type FertilizerDetails = Pick<
+export type FertilizerDetail = Pick<
     Fertilizer,
     | "p_id_catalogue"
     | "p_n_rt"
@@ -325,6 +325,6 @@ export type FertilizerDetails = Pick<
  */
 export interface NitrogenBalanceInput {
     fields: FieldInput[]
-    fertilizerDetails: FertilizerDetails[]
-    cultivationDetails: cultivationDetails[]
+    fertilizerDetails: FertilizerDetail[]
+    cultivationDetails: CultivationDetail[]
 }

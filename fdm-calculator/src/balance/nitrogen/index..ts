@@ -1,7 +1,7 @@
 import { Decimal } from "decimal.js"
 import type {
-    cultivationDetails,
-    FertilizerDetails,
+    CultivationDetail,
+    FertilizerDetail,
     FieldInput,
     NitrogenBalance,
     NitrogenBalanceField,
@@ -48,8 +48,8 @@ export function calculateNitrogenBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetails[],
-    cultivationDetails: cultivationDetails[],
+    fertilizerDetails: FertilizerDetail[],
+    cultivationDetails: CultivationDetail[],
 ): NitrogenBalanceField {
     // Get the details of the field
     const fieldDetails = field

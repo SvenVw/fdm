@@ -1,5 +1,5 @@
 import type {
-    FertilizerDetails,
+    FertilizerDetail,
     FieldInput,
     NitrogenSupplyFertilizers,
 } from "../../types"
@@ -9,7 +9,7 @@ import { calculateNitrogenSupplyByCompost } from "./compost"
 
 export function calculateNitrogenSupplyByFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetails[],
+    fertilizerDetails: FertilizerDetail[],
 ): NitrogenSupplyFertilizers {
     // Calculate the amount of Nitrogen supplied by mineral fertilizers
     const fertilizersSupplyMineral =

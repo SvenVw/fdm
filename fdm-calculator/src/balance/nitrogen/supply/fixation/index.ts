@@ -1,5 +1,5 @@
 import type {
-    cultivationDetails,
+    CultivationDetail,
     FieldInput,
     NitrogenSupplyFixation,
 } from "../../types"
@@ -7,7 +7,7 @@ import { Decimal } from "decimal.js"
 
 export function calculateNitrogenFixation(
     cultivations: FieldInput["cultivations"],
-    cultivationDetails: cultivationDetails[],
+    cultivationDetails: CultivationDetail[],
 ): NitrogenSupplyFixation {
     const fixations = cultivations.map((cultivation) => {
         // Get details of cultivation

@@ -1,13 +1,13 @@
 import { Decimal } from "decimal.js"
 import type {
-    FertilizerDetails,
+    FertilizerDetail,
     FieldInput,
     NitrogenSupplyFertilizers,
 } from "../../types"
 
 export function calculateNitrogenSupplyByMineralFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetails[],
+    fertilizerDetails: FertilizerDetail[],
 ): NitrogenSupplyFertilizers["mineral"] {
     const applications = fertilizerApplications.map((application) => {
         // Get fertilizerDetails of application
