@@ -64,6 +64,22 @@ export interface NitrogenSupplyFertilizers {
 }
 
 /**
+ * Represents the nitrogen supply derived from fixation by cultivations.
+ * All values are in kilograms of nitrogen per hectare (kg N / ha).
+ */
+export interface NitrogenSupplyFixation {
+    /**
+     * The total amount of nitrogen fixed by all crops on the field.
+     */
+    total: Decimal
+    /**
+     * A detailed list of cultivations that fix nitrogen.
+     * Each entry includes the cultivation's unique identifier (`id`) and the amount of nitrogen fixed (`value`).
+     */
+    cultivations: { id: string; value: Decimal }[]
+}
+
+/**
  * Represents the total nitrogen supply for a field, considering all sources.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
@@ -79,17 +95,7 @@ export interface NitrogenSupply {
     /**
      * The nitrogen supplied through biological fixation by crops.
      */
-    fixation: {
-        /**
-         * The total amount of nitrogen fixed by all crops on the field.
-         */
-        total: Decimal
-        /**
-         * A detailed list of cultivations that fix nitrogen.
-         * Each entry includes the cultivation's unique identifier (`id`) and the amount of nitrogen fixed (`value`).
-         */
-        cultivations: { id: string; value: Decimal }[]
-    }
+    fixation: NitrogenSupplyFixation
     /**
      * The amount of nitrogen supplied through atmospheric deposition.
      */
@@ -288,7 +294,7 @@ export interface NitrogenBalance {
  */
 export interface FieldInput {
     field: Pick<Field, "b_id" | "b_area">
-    cultivations: Cultivation[]
+    cultivations: Pick<Cultivation, "b_lu" | "b_lu_catalogue">[]
     harvests: Harvest[]
     soilAnalyses: SoilAnalysis[]
     fertilizerApplications: FertilizerApplication[]
@@ -297,7 +303,10 @@ export interface FieldInput {
 /**
  * Represents cultivation details, specifically the cultivation catalogue identifier.
  */
-export type cultivationDetails = Pick<CultivationCatalogue, "b_lu_catalogue">
+export type cultivationDetails = Pick<
+    CultivationCatalogue,
+    "b_lu_catalogue" | "b_n_fixation"
+>
 
 /**
  * Represents fertilizer details needed for nitrogen balance calculation.

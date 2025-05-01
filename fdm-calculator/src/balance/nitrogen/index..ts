@@ -23,7 +23,7 @@ export function calculateNitrogenBalance(
         const fieldsWithBalance = fields.map((field: FieldInput) => {
             return calculateNitrogenBalanceField(
                 field.field,
-                // cultivations: field.cultivations,
+                field.cultivations,
                 // harvests: field.harvests,
                 // soilAnalyses: field.soilAnalyses,
                 field.fertilizerApplications,
@@ -45,17 +45,20 @@ export function calculateNitrogenBalance(
 }
 
 export function calculateNitrogenBalanceField(
-    field: Pick<FieldInput, "b_id" | "b_area">,
+    field: FieldInput["field"],
+    cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetails: FertilizerDetails[],
     cultivationDetails: cultivationDetails[],
 ): NitrogenBalanceField {
     // Get the details of the field
-    const fieldDetails = field.field
+    const fieldDetails = field
 
     // Calculate the amount of Nitrogen supplied
     const supply = calculateNitrogenSupply(
+        cultivations,
         fertilizerApplications,
+        cultivationDetails,
         fertilizerDetails,
     )
 
