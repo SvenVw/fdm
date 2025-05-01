@@ -122,6 +122,21 @@ export interface NitrogenRemovalHarvests {
 }
 
 /**
+ * The nitrogen removed specifically through crop residues.
+ */
+export interface NitrogenRemovalResidues {
+    /**
+     * The total amount of nitrogen removed by all crop residues.
+     */
+    total: Decimal
+    /**
+     * A detailed list of crop residues.
+     * Each entry includes the residue's unique identifier (`id`) and the amount of nitrogen removed (`value`).
+     */
+    cultivations: { id: string; value: Decimal }[]
+}
+
+/**
  * Represents the total nitrogen removal from a field.
  * All units are in kg N / ha.
  */
@@ -137,17 +152,7 @@ export interface NitrogenRemoval {
     /**
      * The nitrogen removed specifically through crop residues.
      */
-    residues: {
-        /**
-         * The total amount of nitrogen removed by all crop residues.
-         */
-        total: Decimal
-        /**
-         * A detailed list of crop residues.
-         * Each entry includes the residue's unique identifier (`id`) and the amount of nitrogen removed (`value`).
-         */
-        harvestables: { id: string; value: Decimal }[]
-    }
+    residues: NitrogenRemovalResidues
 }
 
 /**
@@ -299,7 +304,10 @@ export interface NitrogenBalance {
  */
 export interface FieldInput {
     field: Pick<Field, "b_id" | "b_area">
-    cultivations: Pick<Cultivation, "b_lu" | "b_lu_catalogue">[]
+    cultivations: Pick<
+        Cultivation,
+        "b_lu" | "b_lu_catalogue" | "m_cropresidue"
+    >[]
     harvests: Harvest[]
     soilAnalyses: SoilAnalysis[]
     fertilizerApplications: FertilizerApplication[]
@@ -310,8 +318,12 @@ export interface FieldInput {
  */
 export type CultivationDetail = Pick<
     CultivationCatalogue,
-    "b_lu_catalogue" | "b_lu_yield",
-    "b_lu_n_harvestable" | "b_n_fixation"
+    | "b_lu_catalogue"
+    | "b_lu_yield"
+    | "b_lu_hi"
+    | "b_lu_n_harvestable"
+    | "b_lu_n_residue"
+    | "b_n_fixation"
 >
 
 /**
