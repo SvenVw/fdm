@@ -14,7 +14,7 @@ import type { Decimal } from "decimal.js"
  * Represents the nitrogen supply derived from various fertilizer applications.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenSupplyFertilizers {
+export type NitrogenSupplyFertilizers = {
     /**
      * The total amount of nitrogen supplied by all types of fertilizers combined.
      */
@@ -67,7 +67,7 @@ export interface NitrogenSupplyFertilizers {
  * Represents the nitrogen supply derived from fixation by cultivations.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenSupplyFixation {
+export type NitrogenSupplyFixation = {
     /**
      * The total amount of nitrogen fixed by all crops on the field.
      */
@@ -83,7 +83,7 @@ export interface NitrogenSupplyFixation {
  * Represents the total nitrogen supply for a field, considering all sources.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenSupply {
+export type NitrogenSupply = {
     /**
      * The total amount of nitrogen supplied to the field, encompassing all sources (fertilizers, fixation, deposition, and mineralization).
      */
@@ -99,7 +99,7 @@ export interface NitrogenSupply {
     /**
      * The amount of nitrogen supplied through atmospheric deposition.
      */
-    deposition: Decimal
+    deposition: { total: Decimal }
     /**
      * The amount of nitrogen supplied through mineralization of organic matter in the soil.
      */
@@ -109,7 +109,7 @@ export interface NitrogenSupply {
 /**
  * The nitrogen removed specifically through harvested crops.
  */
-export interface NitrogenRemovalHarvests {
+export type NitrogenRemovalHarvests = {
     /**
      * The total amount of nitrogen removed by all harvested crops.
      */
@@ -124,7 +124,7 @@ export interface NitrogenRemovalHarvests {
 /**
  * The nitrogen removed specifically through crop residues.
  */
-export interface NitrogenRemovalResidues {
+export type NitrogenRemovalResidues = {
     /**
      * The total amount of nitrogen removed by all crop residues.
      */
@@ -140,7 +140,7 @@ export interface NitrogenRemovalResidues {
  * Represents the total nitrogen removal from a field.
  * All units are in kg N / ha.
  */
-export interface NitrogenRemoval {
+export type NitrogenRemoval = {
     /**
      * The total amount of nitrogen removed from the field through all means (harvested crops and residues).
      */
@@ -159,7 +159,7 @@ export interface NitrogenRemoval {
  * Represents the ammonia nitrogen emissions from various fertilizer sources.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenEmissionAmmoniaFertilizers {
+export type NitrogenEmissionAmmoniaFertilizers = {
     /**
      * The total amount of ammonia nitrogen emitted from all fertilizer sources.
      */
@@ -198,7 +198,7 @@ export interface NitrogenEmissionAmmoniaFertilizers {
  * Represents the ammonia nitrogen emissions specifically from crop residues.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenEmissionAmmoniaResidues {
+export type NitrogenEmissionAmmoniaResidues = {
     /**
      * The total amount of ammonia nitrogen emitted from all crop residues.
      */
@@ -214,7 +214,7 @@ export interface NitrogenEmissionAmmoniaResidues {
  * Represents the total ammonia nitrogen emissions for a field, considering all sources.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenEmissionAmmonia {
+export type NitrogenEmissionAmmonia = {
     /**
      * The total amount of ammonia nitrogen emitted from the field, encompassing all sources (fertilizers and residues).
      */
@@ -237,7 +237,7 @@ export interface NitrogenEmissionAmmonia {
  * Represents the total nitrogen volatilization for a field, specifically through ammonia emissions.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenVolatilization {
+export type NitrogenVolatilization = {
     total: Decimal
     /**
      * The total amount of nitrogen volatilized as ammonia.
@@ -249,7 +249,7 @@ export interface NitrogenVolatilization {
  * Represents the nitrogen balance for a single field, including supply, removal, and volatilization.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenBalanceField {
+export type NitrogenBalanceField = {
     /**
      * The unique identifier for the field.
      */
@@ -276,7 +276,7 @@ export interface NitrogenBalanceField {
  * Represents the total nitrogen balance across all fields.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export interface NitrogenBalance {
+export type NitrogenBalance = {
     /**
      * The overall nitrogen balance across all fields, likely a sum or average of individual field balances.
      */
@@ -302,8 +302,8 @@ export interface NitrogenBalance {
 /**
  * Represents the structure of fields with related entities for nitrogen balance calculation
  */
-export interface FieldInput {
-    field: Pick<Field, "b_id" | "b_area">
+export type FieldInput = {
+    field: Pick<Field, "b_id" | "b_centroid" | "b_area">
     cultivations: Pick<
         Cultivation,
         "b_lu" | "b_lu_catalogue" | "m_cropresidue"
