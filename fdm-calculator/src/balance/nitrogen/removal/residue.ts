@@ -82,6 +82,7 @@ export function calculateNitrogenRemovalByResidue(
             .times(b_lu_hi_res)
             .times(b_lu_n_residue)
             .dividedBy(new Decimal(1000)) // Convert from g N / ha to kg N / ha
+            .times(-1) // Return negative value
 
         return {
             id: cultivation.b_lu,

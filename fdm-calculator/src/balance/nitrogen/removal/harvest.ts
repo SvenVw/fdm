@@ -50,6 +50,7 @@ export function calculateNitrogenRemovalByHarvests(
                 const removalHarvest = new Decimal(b_lu_yield)
                     .times(new Decimal(b_lu_n_harvestable))
                     .dividedBy(new Decimal(1000)) // Convert from g N / ha to kg N / ha
+                    .times(-1) // Return negative value
 
                 return removalHarvest
             },
