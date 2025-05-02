@@ -34,7 +34,21 @@ export function calculateNitrogenSupplyBySoilMineralization(
             (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>
                 x.a_n_rt,
         )[0].a_n_rt
+        const a_c_of = soilAnalyses.filter(
+            (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
+                x.a_c_of,
+        )[0].a_c_of
+        const a_cn_fr = soilAnalyses.filter(
+            (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
+                x.a_cn_fr,
+        )[0].a_cn_fr
+        const a_density_sa = soilAnalyses.filter(
+            (x: {
+                a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"]
+            }) => x.a_density_sa,
+        )[0].a_density_sa
 
+        // Calculate the amount of Nitrogen mineralized by the soil
         let mineralization = Decimal(0)
         if (isGrassland) {
             mineralization =
