@@ -308,6 +308,20 @@ export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [
     "once",
     "multiple",
 ])
+export const rotationEnum = fdmSchema.enum("b_lu_croprotation", [
+    "other",
+    "clover",
+    "nature",
+    "potato",
+    "grass",
+    "rapeseed",
+    "starch",
+    "maize",
+    "cereal",
+    "sugarbeet",
+    "alfalfa",
+    "catchcrop",
+])
 export const cultivationsCatalogue = fdmSchema.table(
     "cultivations_catalogue",
     {
@@ -318,6 +332,7 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_harvestable: harvestableEnum().notNull(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
+        b_lu_croprotation: rotationEnum(),
         b_lu_yield: numericCasted(),
         b_lu_hi: numericCasted(),
         b_lu_n_harvestable: numericCasted(),

@@ -434,13 +434,19 @@ describe("Cultivation Data Model", () => {
         it("should update a cultivation with only the catalogue ID", async () => {
             const newCatalogueId = createId()
             await addCultivationToCatalogue(fdm, {
-                b_lu_catalogue: newCatalogueId,
-                b_lu_source: b_lu_source,
-                b_lu_name: "new-name",
-                b_lu_name_en: "new-name-en",
-                b_lu_harvestable: "none",
-                b_lu_hcat3: "new-hcat3",
-                b_lu_hcat3_name: "new-hcat3-name",
+                b_lu_catalogue,
+                b_lu_source,
+                b_lu_name: "test",
+                b_lu_name_en: "test",
+                b_lu_harvestable: "single",
+                b_lu_hcat3: "00000",
+                b_lu_hcat3_name: "test",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 10000,
+                b_lu_hi: 0.35,
+                b_lu_n_harvestable: 8,
+                b_lu_n_residue: 5,
+                b_n_fixation: 0,
             })
 
             await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
