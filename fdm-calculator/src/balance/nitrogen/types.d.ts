@@ -351,3 +351,15 @@ export type NitrogenBalanceInput = {
     }
     fdmPublicDataUrl: string
 }
+
+declare module "geoblaze" {
+    export interface Geoblaze {
+        identify(
+            url: string,
+            coords: [number, number],
+        ): Promise<number[] | null>
+    }
+
+    const geoblaze: Geoblaze
+    export default geoblaze
+}
