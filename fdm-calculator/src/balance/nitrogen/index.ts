@@ -11,13 +11,18 @@ import { calculateNitrogenSupply } from "./supply"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenVolatilization } from "./volatilization"
 
-export function calculateNitrogenBalance(
+export async function calculateNitrogenBalance(
     nitrogenBalanceInput: NitrogenBalanceInput,
-): NitrogenBalance {
+): Promise<NitrogenBalance> {
     try {
         // Destructure input directly
-        const { fields, fertilizerDetails, cultivationDetails } =
-            nitrogenBalanceInput
+        const {
+            fields,
+            fertilizerDetails,
+            cultivationDetails,
+            fdmPublicDataUrl,
+            timeFrame,
+        } = nitrogenBalanceInput
 
         // Pre-process details into Maps for efficient lookups
         const fertilizerDetailsMap = new Map(
@@ -28,8 +33,8 @@ export function calculateNitrogenBalance(
         )
 
         // Calculate for each field the nitrogen balance
-        const fieldsWithBalance = fields.map((field: FieldInput) => {
-            return calculateNitrogenBalanceField(
+        const fieldsWithBalance = await Promise.all(fields.map(async (field: FieldInput) => {
+            return await calculateNitrogenBalanceField(
                 field.field,
                 field.cultivations,
                 field.harvests,
@@ -37,8 +42,10 @@ export function calculateNitrogenBalance(
                 field.fertilizerApplications,
                 fertilizerDetailsMap,
                 cultivationDetailsMap,
+                timeFrame,
+                fdmPublicDataUrl,
             )
-        })
+        }))
 
         // Aggregate the field balances to farm level
         const farmWithBalance = calculateNitrogenBalancesFieldToFarm(
@@ -52,23 +59,28 @@ export function calculateNitrogenBalance(
     }
 }
 
-export function calculateNitrogenBalanceField(
+export async function calculateNitrogenBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     cultivationDetailsMap: Map<string, CultivationDetail>,
-): NitrogenBalanceField {
+    timeFrame: NitrogenBalanceInput["timeFrame"],
+    fdmPublicDataUrl: NitrogenBalanceInput["fdmPublicDataUrl"],
+): Promise<NitrogenBalanceField> {
     // Get the details of the field
     const fieldDetails = field
 
     // Calculate the amount of Nitrogen supplied
-    const supply = calculateNitrogenSupply(
+    const supply = await calculateNitrogenSupply(
+        field,
         cultivations,
         fertilizerApplications,
         cultivationDetailsMap,
         fertilizerDetailsMap,
+        timeFrame,
+        fdmPublicDataUrl,
     )
 
     // Calculate the amount of Nitrogen removed

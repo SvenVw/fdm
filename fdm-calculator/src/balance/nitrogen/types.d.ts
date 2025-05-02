@@ -341,8 +341,13 @@ export type FertilizerDetail = Pick<
 /**
  * Represents the overall input structure required for nitrogen balance calculation.
  */
-export interface NitrogenBalanceInput {
+export type NitrogenBalanceInput = {
     fields: FieldInput[]
     fertilizerDetails: FertilizerDetail[]
     cultivationDetails: CultivationDetail[]
+    timeFrame: {
+        start: Date
+        end: Date
+    }
+    fdmPublicDataUrl: string
 }
