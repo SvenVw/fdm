@@ -80,6 +80,22 @@ export type NitrogenSupplyFixation = {
 }
 
 /**
+ * Represents the amount of nitrogen supply derived from soil mineralization by cultivations.
+ * All values are in kilograms of nitrogen per hectare (kg N / ha).
+ */
+export type NitrogenSupplyMineralization = {
+    /**
+     * The total amount of nitrogen supply derived from soil mineralization by all cultivations on the field.
+     */
+    total: Decimal
+    /**
+     * A detailed list of nitrogen mineralization by cultivations.
+     * Each entry includes the cultivation's unique identifier (`id`) and the amount of nitrogen mineralized (`value`).
+     */
+    cultivations: { id: string; value: Decimal }[]
+}
+
+/**
  * Represents the total nitrogen supply for a field, considering all sources.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
@@ -101,9 +117,9 @@ export type NitrogenSupply = {
      */
     deposition: { total: Decimal }
     /**
-     * The amount of nitrogen supplied through mineralization of organic matter in the soil.
+     * The amount of nitrogen supplied through mineralization of organic matter in the soil during a cultivation
      */
-    mineralisation: Decimal
+    mineralisation: NitrogenSupplyMineralization
 }
 
 /**
@@ -309,7 +325,15 @@ export type FieldInput = {
         "b_lu" | "b_lu_catalogue" | "m_cropresidue"
     >[]
     harvests: Harvest[]
-    soilAnalyses: SoilAnalysis[]
+    soilAnalyses: Pick<
+        SoilAnalysis,
+        | "a_id"
+        | "a_c_of"
+        | "a_cn_fr"
+        | "a_density_sa"
+        | "a_n_rt"
+        | "b_soiltype_agr"
+    >[]
     fertilizerApplications: FertilizerApplication[]
 }
 
@@ -319,6 +343,7 @@ export type FieldInput = {
 export type CultivationDetail = Pick<
     CultivationCatalogue,
     | "b_lu_catalogue"
+    | "b_lu_croprotation"
     | "b_lu_yield"
     | "b_lu_hi"
     | "b_lu_n_harvestable"
