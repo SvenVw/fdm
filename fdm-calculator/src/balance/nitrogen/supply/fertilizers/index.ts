@@ -9,25 +9,25 @@ import { calculateNitrogenSupplyByCompost } from "./compost"
 
 export function calculateNitrogenSupplyByFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetail[],
+    fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupplyFertilizers {
     // Calculate the amount of Nitrogen supplied by mineral fertilizers
     const fertilizersSupplyMineral =
         calculateNitrogenSupplyByMineralFertilizers(
             fertilizerApplications,
-            fertilizerDetails,
+            fertilizerDetailsMap,
         )
 
     // Calculate the amount of Nitrogen supplied by manure
     const fertilizersSupplyManure = calculateNitrogenSupplyByManure(
         fertilizerApplications,
-        fertilizerDetails,
+        fertilizerDetailsMap,
     )
 
     // Calculate the amount of Nitrogen supplied by compost
     const fertilizersSupplyCompost = calculateNitrogenSupplyByCompost(
         fertilizerApplications,
-        fertilizerDetails,
+        fertilizerDetailsMap,
     )
 
     // Calculate the total amount of Nitrogen supplied by fertilizers

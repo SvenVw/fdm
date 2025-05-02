@@ -7,22 +7,24 @@ import type {
 
 export function calculateNitrogenSupplyByManure(
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetail[],
+    fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupplyFertilizers["manure"] {
     const applications = fertilizerApplications.map((application) => {
-        // Get fertilizerDetails of application
-        const fertilizerDetail = fertilizerDetails.find((detail) => {
-            return detail.p_id_catalogue === application.p_id_catalogue
-        })
+        // Get fertilizerDetails of application using the Map
+        const fertilizerDetail = fertilizerDetailsMap.get(
+            application.p_id_catalogue,
+        )
 
         if (!fertilizerDetail) {
             throw new Error(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
             )
         }
+        const p_type_manure = fertilizerDetail.p_type_manure
+        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).times(1000) // Convert from g N / kg to kg N / kg
 
         // If the fertilizer used is not of the type manure
-        if (fertilizerDetail.p_type_manure === false) {
+        if (p_type_manure === false) {
             return {
                 id: application.p_id_catalogue,
                 value: new Decimal(0),
@@ -31,7 +33,6 @@ export function calculateNitrogenSupplyByManure(
 
         // Calculate for this application the amount of Nitrogen supplied by manure
         const p_app_amount = new Decimal(application.p_app_amount)
-        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).times(1000) // Convert from g N / kg to kg N / kg
         const applicationValue = p_app_amount.times(p_n_rt)
 
         return {

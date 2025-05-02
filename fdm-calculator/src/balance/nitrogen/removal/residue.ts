@@ -9,13 +9,13 @@ import Decimal from "decimal.js"
 export function calculateNitrogenRemovalByResidue(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
-    cultivationDetails: CultivationDetail[],
+    cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenRemovalResidues {
     const removalsResidue = cultivations.map((cultivation) => {
-        // Get details of cultivation
-        const cultivationDetail = cultivationDetails.find((detail) => {
-            return detail.b_lu_catalogue === cultivation.b_lu_catalogue
-        })
+        // Get details of cultivation using the Map
+        const cultivationDetail = cultivationDetailsMap.get(
+            cultivation.b_lu_catalogue,
+        )
 
         if (!cultivationDetail) {
             throw new Error(

@@ -15,9 +15,17 @@ export function calculateNitrogenBalance(
     nitrogenBalanceInput: NitrogenBalanceInput,
 ): NitrogenBalance {
     try {
-        const fields = nitrogenBalanceInput.fields
-        const fertilizerDetails = nitrogenBalanceInput.fertilizerDetails
-        const cultivationDetails = nitrogenBalanceInput.cultivationDetails
+        // Destructure input directly
+        const { fields, fertilizerDetails, cultivationDetails } =
+            nitrogenBalanceInput
+
+        // Pre-process details into Maps for efficient lookups
+        const fertilizerDetailsMap = new Map(
+            fertilizerDetails.map((detail) => [detail.p_id_catalogue, detail]),
+        )
+        const cultivationDetailsMap = new Map(
+            cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
+        )
 
         // Calculate for each field the nitrogen balance
         const fieldsWithBalance = fields.map((field: FieldInput) => {
@@ -27,8 +35,8 @@ export function calculateNitrogenBalance(
                 field.harvests,
                 // soilAnalyses: field.soilAnalyses,
                 field.fertilizerApplications,
-                fertilizerDetails,
-                cultivationDetails,
+                fertilizerDetailsMap,
+                cultivationDetailsMap,
             )
         })
 
@@ -49,8 +57,8 @@ export function calculateNitrogenBalanceField(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetail[],
-    cultivationDetails: CultivationDetail[],
+    fertilizerDetailsMap: Map<string, FertilizerDetail>,
+    cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenBalanceField {
     // Get the details of the field
     const fieldDetails = field
@@ -59,15 +67,15 @@ export function calculateNitrogenBalanceField(
     const supply = calculateNitrogenSupply(
         cultivations,
         fertilizerApplications,
-        cultivationDetails,
-        fertilizerDetails,
+        cultivationDetailsMap,
+        fertilizerDetailsMap,
     )
 
     // Calculate the amount of Nitrogen removed
     const removal = calculateNitrogenRemoval(
         cultivations,
         harvests,
-        cultivationDetails,
+        cultivationDetailsMap,
     )
 
     // Calculate the amount of Nitrogen that is volatilized
@@ -93,16 +101,20 @@ export function calculateNitrogenBalancesFieldToFarm(
     )
 
     // Calculate total weighted supply, removal, and volatilization across the farm
-    let totalFarmSupply = Decimal(0);
-    let totalFarmRemoval = Decimal(0);
-    let totalFarmVolatilization = Decimal(0);
+    let totalFarmSupply = Decimal(0)
+    let totalFarmRemoval = Decimal(0)
+    let totalFarmVolatilization = Decimal(0)
 
     for (const fieldBalance of fieldsWithBalance) {
-        const fieldInput = fields.find((f) => f.field.b_id === fieldBalance.b_id);
+        const fieldInput = fields.find(
+            (f) => f.field.b_id === fieldBalance.b_id,
+        )
 
         if (!fieldInput) {
             // Should not happen if inputs are consistent, but good to handle
-            console.warn(`Could not find field input for field balance ${fieldBalance.b_id}`)
+            console.warn(
+                `Could not find field input for field balance ${fieldBalance.b_id}`,
+            )
             continue // Skip this iteration if fieldInput is not found
         }
         const fieldArea = new Decimal(fieldInput.field.b_area)

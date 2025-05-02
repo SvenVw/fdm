@@ -9,7 +9,7 @@ import Decimal from "decimal.js"
 export function calculateNitrogenRemovalByHarvests(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
-    cultivationDetails: CultivationDetail[],
+    cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenRemovalHarvests {
     const removalHarvests = harvests.map((harvest) => {
         const b_lu = harvest.b_lu
@@ -23,9 +23,9 @@ export function calculateNitrogenRemovalByHarvests(
             )
         }
 
-        const cultivationDetail = cultivationDetails.find((detail) => {
-            return detail.b_lu_catalogue === b_lu_catalogue
-        })
+        // Get details of cultivation using the Map
+        const cultivationDetail = cultivationDetailsMap.get(b_lu_catalogue)
+
         if (!cultivationDetail) {
             throw new Error(
                 `Cultivation ${b_lu_catalogue} has no corresponding cultivation in cultivationDetails`,

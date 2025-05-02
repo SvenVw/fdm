@@ -7,22 +7,23 @@ import { Decimal } from "decimal.js"
 
 export function calculateNitrogenFixation(
     cultivations: FieldInput["cultivations"],
-    cultivationDetails: CultivationDetail[],
+    cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenSupplyFixation {
     const fixations = cultivations.map((cultivation) => {
-        // Get details of cultivation
-        const cultivationDetail = cultivationDetails.find((detail) => {
-            return detail.b_lu_catalogue === cultivation.b_lu_catalogue
-        })
+        // Get details of cultivation using the Map
+        const cultivationDetail = cultivationDetailsMap.get(
+            cultivation.b_lu_catalogue,
+        )
 
         if (!cultivationDetail) {
             throw new Error(
                 `Cultivation ${cultivation.b_lu} has no corresponding cultivation in cultivationDetails`,
             )
         }
+        const b_n_fixation = cultivationDetail.b_n_fixation
 
         // If this cultivation does not fixate Nitrogen set it to 0
-        if (!cultivationDetail.b_n_fixation) {
+        if (b_n_fixation) {
             return {
                 id: cultivation.b_lu,
                 value: new Decimal(0),
@@ -32,7 +33,7 @@ export function calculateNitrogenFixation(
         // Return the amount of Nitrogen fixated by the cultivation
         return {
             id: cultivation.b_lu,
-            value: new Decimal(cultivationDetail.b_n_fixation),
+            value: new Decimal(b_n_fixation),
         }
     })
 

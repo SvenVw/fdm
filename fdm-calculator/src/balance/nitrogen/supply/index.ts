@@ -11,19 +11,19 @@ import { calculateNitrogenFixation } from "./fixation"
 export function calculateNitrogenSupply(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    cultivationDetails: CultivationDetail[],
-    fertilizerDetails: FertilizerDetail[],
+    cultivationDetailsMap: Map<string, CultivationDetail>,
+    fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupply {
     // Calculate the amount of Nitrogen supplied by fertilizers
     const fertilizersSupply = calculateNitrogenSupplyByFertilizers(
         fertilizerApplications,
-        fertilizerDetails,
+        fertilizerDetailsMap,
     )
 
     // Calculate the amount of Nitrogen fixated by the cultivations
     const fixationSupply = calculateNitrogenFixation(
         cultivations,
-        cultivationDetails,
+        cultivationDetailsMap,
     )
 
     // Calculate the total amount of Nitrogen supplied

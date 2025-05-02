@@ -7,13 +7,13 @@ import type {
 
 export function calculateNitrogenSupplyByCompost(
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    fertilizerDetails: FertilizerDetail[],
+    fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupplyFertilizers["compost"] {
     const applications = fertilizerApplications.map((application) => {
-        // Get fertilizerDetails of application
-        const fertilizerDetail = fertilizerDetails.find((detail) => {
-            return detail.p_id_catalogue === application.p_id_catalogue
-        })
+        // Get fertilizerDetails of application using the Map
+        const fertilizerDetail = fertilizerDetailsMap.get(
+            application.p_id_catalogue,
+        )
 
         if (!fertilizerDetail) {
             throw new Error(
@@ -21,8 +21,11 @@ export function calculateNitrogenSupplyByCompost(
             )
         }
 
+        const p_type_compost = fertilizerDetail.p_type_compost
+        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).times(1000) // Convert from g N / kg to kg N / kg
+
         // If the fertilizer used is not of the type compost
-        if (fertilizerDetail.p_type_compost === false) {
+        if (p_type_compost === false) {
             return {
                 id: application.p_id_catalogue,
                 value: new Decimal(0),
@@ -31,7 +34,6 @@ export function calculateNitrogenSupplyByCompost(
 
         // Calculate for this application the amount of Nitrogen supplied by compost
         const p_app_amount = new Decimal(application.p_app_amount)
-        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).times(1000) // Convert from g N / kg to kg N / kg
         const applicationValue = p_app_amount.times(p_n_rt)
 
         return {

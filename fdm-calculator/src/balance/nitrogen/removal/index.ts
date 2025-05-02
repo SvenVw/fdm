@@ -5,20 +5,20 @@ import { calculateNitrogenRemovalByResidue } from "./residue"
 export function calculateNitrogenRemoval(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
-    cultivationDetails: CultivationDetail[],
+    cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenRemoval {
     // Calculate the amount of Nitrogen removed by harvests
     const harvestsRemoval = calculateNitrogenRemovalByHarvests(
         cultivations,
         harvests,
-        cultivationDetails,
+        cultivationDetailsMap,
     )
 
     // Calculate the amount of Nitrogen removed by crop residues
     const residuesRemoval = calculateNitrogenRemovalByResidue(
         cultivations,
         harvests,
-        cultivationDetails,
+        cultivationDetailsMap,
     )
 
     // Calculate the total amount of Nitrogen removed
