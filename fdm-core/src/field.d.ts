@@ -6,6 +6,7 @@ export interface Field {
     b_id_farm: schema.fieldAcquiringTypeSelect["b_id_farm"]
     b_id_source: schema.fieldsTypeSelect["b_id_source"]
     b_geometry: schema.fieldsTypeSelect["b_geometry"]
+    b_centroid: [number, number]
     b_area: number | null
     b_start: schema.fieldAcquiringTypeSelect["b_start"]
     b_end: schema.fieldDiscardingTypeSelect["b_end"]

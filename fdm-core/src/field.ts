@@ -150,6 +150,9 @@ export async function getField(
                 b_id_farm: schema.fieldAcquiring.b_id_farm,
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
+                b_centroid: sql<
+                    [number, number]
+                >`ST_Centroid(b_geometry)::geometry::point`,
                 b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
                 b_start: schema.fieldAcquiring.b_start,
                 b_end: schema.fieldDiscarding.b_end,
@@ -250,6 +253,9 @@ export async function getFields(
                 b_id_farm: schema.fieldAcquiring.b_id_farm,
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
+                b_centroid: sql<
+                    [number, number]
+                >`ST_Centroid(b_geometry)::geometry::point`,
                 b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
                 b_start: schema.fieldAcquiring.b_start,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
