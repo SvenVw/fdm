@@ -328,10 +328,10 @@ export type FieldInput = {
     soilAnalyses: Pick<
         SoilAnalysis,
         | "a_id"
-        | "a_c_of"
-        | "a_cn_fr"
-        | "a_density_sa"
-        | "a_n_rt"
+        | "a_c_of" // g C / kg
+        | "a_cn_fr" // -
+        | "a_density_sa" // g / cm^3
+        | "a_n_rt" // mg N / kg
         | "b_soiltype_agr"
     >[]
     fertilizerApplications: FertilizerApplication[]
@@ -344,11 +344,11 @@ export type CultivationDetail = Pick<
     CultivationCatalogue,
     | "b_lu_catalogue"
     | "b_lu_croprotation"
-    | "b_lu_yield"
+    | "b_lu_yield" // kg / ha
     | "b_lu_hi"
-    | "b_lu_n_harvestable"
-    | "b_lu_n_residue"
-    | "b_n_fixation"
+    | "b_lu_n_harvestable" // g N /kg
+    | "b_lu_n_residue" // g N /kg
+    | "b_n_fixation" // kg N / ha
 >
 
 /**
@@ -357,7 +357,7 @@ export type CultivationDetail = Pick<
 export type FertilizerDetail = Pick<
     Fertilizer,
     | "p_id_catalogue"
-    | "p_n_rt"
+    | "p_n_rt" // Total nitrogen content (g N / kg fertilizer)
     | "p_type_manure"
     | "p_type_mineral"
     | "p_type_compost"

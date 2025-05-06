@@ -5,10 +5,20 @@ import type {
     NitrogenSupplyFertilizers,
 } from "../../types"
 
+/**
+ * Calculates the amount of nitrogen supplied by compost applications.
+ *
+ * This function iterates through the provided fertilizer applications, identifies those that are of the 'compost' type,
+ * and calculates the total nitrogen supplied based on the application amount and the nitrogen content of the compost.
+ * @param fertilizerApplications - An array of fertilizer applications, each containing the application amount and a reference to the fertilizer details.
+ * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
+ * @returns An object containing the total nitrogen supplied by compost and a list of individual compost applications with their nitrogen contributions.
+ */
 export function calculateNitrogenSupplyByCompost(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupplyFertilizers["compost"] {
+    // Map through each fertilizer application to calculate nitrogen supply by compost
     const applications = fertilizerApplications.map((application) => {
         // Get fertilizerDetails of application using the Map
         const fertilizerDetail = fertilizerDetailsMap.get(

@@ -7,6 +7,15 @@ import { calculateNitrogenSupplyByMineralFertilizers } from "./mineral"
 import { calculateNitrogenSupplyByManure } from "./manure"
 import { calculateNitrogenSupplyByCompost } from "./compost"
 
+/**
+ * Calculates the total nitrogen supply from all fertilizer sources (mineral, manure, and compost).
+ *
+ * This function aggregates the nitrogen contributions from mineral fertilizers, manure, and compost
+ * by calling individual calculation functions for each fertilizer type and summing their results.
+ * @param fertilizerApplications - An array of fertilizer applications, each containing the application amount and a reference to the fertilizer details.
+ * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
+ * @returns An object containing the total nitrogen supplied by all fertilizers, as well as a breakdown by fertilizer type (mineral, manure, compost).
+ */
 export function calculateNitrogenSupplyByFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,

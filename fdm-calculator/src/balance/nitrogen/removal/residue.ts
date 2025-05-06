@@ -6,6 +6,17 @@ import type {
 } from "../types"
 import Decimal from "decimal.js"
 
+/**
+ * Calculates the amount of Nitrogen removed from the field through crop residue removal.
+ *
+ * This function determines the nitrogen removed based on the cultivations performed, harvest yields,
+ * and crop residue management practices. It uses cultivation details and harvest information to estimate
+ * the amount of nitrogen present in the crop residues and accounts for its removal.
+ * @param cultivations - A list of cultivations on the field.
+ * @param harvests - A list of harvests from the field.
+ * @param cultivationDetailsMap - The map of cultivation details.
+ * @returns The NitrogenRemovalResidues object containing the total amount of Nitrogen removed and the individual cultivation values.
+ */
 export function calculateNitrogenRemovalByResidue(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],

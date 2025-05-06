@@ -6,6 +6,13 @@ import type {
 } from "../types"
 import Decimal from "decimal.js"
 
+/**
+ * Calculates the amount of Nitrogen removed from the field through harvests.
+ * @param cultivations - The cultivations on the field.
+ * @param harvests - The harvests from the field.
+ * @param cultivationDetailsMap - The map of cultivation details.
+ * @returns The NitrogenRemovalHarvests object containing the total amount of Nitrogen removed and the individual harvest values.
+ */
 export function calculateNitrogenRemovalByHarvests(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],

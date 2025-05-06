@@ -11,6 +11,22 @@ import { calculateNitrogenFixation } from "./fixation"
 import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
 
+/**
+ * Calculates the total nitrogen supply for a field, considering various sources such as fertilizers,
+ * biological fixation, atmospheric deposition, and soil mineralization.
+ *
+ * @param field - The field for which to calculate the nitrogen supply.
+ * @param cultivations - A list of cultivations on the field.
+ * @param fertilizerApplications - A list of fertilizer applications on the field.
+ * @param soilAnalyses - Soil analysis data for the field.
+ * @param cultivationDetailsMap - A map containing details for each cultivation, including its nitrogen fixation value.
+ * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
+ * @param timeFrame - The time frame for which to calculate the nitrogen supply.
+ * @param fdmPublicDataUrl - The base URL for accessing FDM public data, including the deposition raster dataset.
+ *
+ * @returns A promise that resolves with an object containing the total nitrogen supply for the field,
+ *  as well as a breakdown by source (fertilizers, fixation, deposition, and mineralization).
+ */
 export async function calculateNitrogenSupply(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],

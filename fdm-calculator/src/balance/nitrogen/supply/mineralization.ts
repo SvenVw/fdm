@@ -6,6 +6,16 @@ import type {
 } from "../types"
 import Decimal from "decimal.js"
 
+/**
+ * Calculates the amount of nitrogen supplied through soil mineralization, considering both grassland and arable land.
+ *
+ * This function determines the mineralization based on the cultivations performed and soil analyses conducted.
+ * It uses cultivation details to differentiate between grassland and arable land, then applies specific calculations for each.
+ * @param cultivations - A list of cultivations on the field.
+ * @param soilAnalyses - Soil analysis data for the field.
+ * @param cultivationDetailsMap - A map containing details for each cultivation.
+ * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized and the individual cultivation values.
+ */
 export function calculateNitrogenSupplyBySoilMineralization(
     cultivations: FieldInput["cultivations"],
     soilAnalyses: FieldInput["soilAnalyses"],
@@ -90,6 +100,15 @@ export function calculateNitrogenSupplyBySoilMineralization(
     }
 }
 
+/**
+ * Calculates the amount of nitrogen supplied through soil mineralization for grassland.
+ *
+ * This function applies a specific formula to calculate nitrogen mineralization based on soil type and total nitrogen content.
+ * @param b_soiltype_agr - The agricultural soil type.
+ * @param a_n_rt - The total nitrogen content of the soil (g N / kg soil).
+ * @returns The amount of nitrogen mineralized in kg N / ha.
+ * @throws Throws an error if the soil type is unknown or required data is missing.
+ */
 function calculateNitrogenSupplyBySoilMineralizationForGrassland(
     b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"],
     a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"],
@@ -99,7 +118,7 @@ function calculateNitrogenSupplyBySoilMineralizationForGrassland(
         return Decimal(250)
     }
 
-    if (!a_n_rt) {
+    if (a_n_rt === null || a_n_rt === undefined) {
         throw new Error("No a_n_rt value found in soil analysis for grassland")
     }
 
@@ -128,6 +147,17 @@ function calculateNitrogenSupplyBySoilMineralizationForGrassland(
     throw new Error(`Unknown soil type: ${b_soiltype_agr}`)
 }
 
+/**
+ * Calculates the amount of nitrogen supplied through soil mineralization for arable land.
+ *
+ * This function applies a specific formula to calculate nitrogen mineralization based on organic carbon content,
+ * C/N ratio, and soil bulk density.
+ * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
+ * @param a_cn_fr - The C/N ratio of the soil organic matter.
+ * @param a_density_sa - The soil bulk density (kg / m³).
+ * @returns The amount of nitrogen mineralized in kg N / ha.
+ * @throws Throws an error if required soil analysis data is missing or average yearly temperature is too high.
+ */
 function calculateNitrogenSupplyBySoilMineralizationForArable(
     a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"],
     a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"],
@@ -150,13 +180,13 @@ function calculateNitrogenSupplyBySoilMineralizationForArable(
         throw new Error("Average yearly temperature is too high")
     }
 
-    if (!a_c_of) {
+    if (a_c_of === null || a_c_of === undefined) {
         throw new Error("No a_c_of value found in soil analysis for arable")
     }
-    if (!a_cn_fr) {
+    if (a_cn_fr === null || a_cn_fr === undefined) {
         throw new Error("No a_cn_fr value found in soil analysis for arable")
     }
-    if (!a_density_sa) {
+    if (a_density_sa === null || a_density_sa === undefined) {
         throw new Error(
             "No a_density_sa value found in soil analysis for arable",
         )

@@ -11,6 +11,17 @@ import { calculateNitrogenSupply } from "./supply"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenVolatilization } from "./volatization"
 
+/**
+ * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and volatilization.
+ *
+ * This function takes comprehensive input data, including field details, fertilizer information,
+ * and cultivation practices, to provide a detailed nitrogen balance analysis. It processes each field
+ * individually and then aggregates the results to provide an overall farm-level balance.
+ *
+ * @param nitrogenBalanceInput - The input data for the nitrogen balance calculation, including fields, fertilizer details, and cultivation details.
+ * @returns A promise that resolves with the calculated nitrogen balance.
+ * @throws Throws an error if any of the calculations fail.
+ */
 export async function calculateNitrogenBalance(
     nitrogenBalanceInput: NitrogenBalanceInput,
 ): Promise<NitrogenBalance> {
@@ -61,6 +72,32 @@ export async function calculateNitrogenBalance(
     }
 }
 
+/**
+ * Calculates the nitrogen balance for a single field, considering nitrogen supply, removal, and volatilization.
+ *
+ * This function performs a detailed calculation of the nitrogen balance for a single field,
+ * taking into account various sources of nitrogen supply (e.g., fertilizers, mineralization),
+ * nitrogen removal (e.g., harvest, crop residues), and nitrogen losses through volatilization.
+ *
+ * The calculation relies on detailed input parameters, including:
+ *   - field characteristics
+ *   - cultivation details
+ *   - harvest yields and nitrogen content
+ *   - fertilizer applications and their nitrogen contributions
+ *   - soil analysis data
+ *
+ * @param field - The field to calculate the nitrogen balance for.
+ * @param cultivations - The cultivations on the field.
+ * @param harvests - The harvests from the field.
+ * @param fertilizerApplications - The fertilizer applications on the field.
+ * @param soilAnalyses - The soil analyses for the field.
+ * @param fertilizerDetailsMap - A map containing details for each fertilizer.
+ * @param cultivationDetailsMap - A map containing details for each cultivation.
+ * @param timeFrame - The time frame for the calculation.
+ * @param fdmPublicDataUrl - The URL for accessing public FDM data.
+ * @returns A promise that resolves with the calculated nitrogen balance for the field.
+ * @throws Throws an error if any of the calculations fail.
+ */
 export async function calculateNitrogenBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
@@ -110,6 +147,18 @@ export async function calculateNitrogenBalanceField(
     }
 }
 
+/**
+ * Aggregates nitrogen balances from individual fields to the farm level.
+ *
+ * This function takes an array of nitrogen balance results for individual fields and aggregates
+ * them to provide an overall nitrogen balance for the entire farm. It calculates weighted
+ * averages of nitrogen supply, removal, and volatilization based on the area of each field.
+ *
+ * The function returns a comprehensive nitrogen balance for the farm, including total supply,
+ * removal, volatilization, and the overall balance.
+ * @param fieldsWithBalance - An array of nitrogen balance results for individual fields.
+ * @returns The aggregated nitrogen balance for the farm.
+ */
 export function calculateNitrogenBalancesFieldToFarm(
     fieldsWithBalance: NitrogenBalanceField[],
     fields: FieldInput[],

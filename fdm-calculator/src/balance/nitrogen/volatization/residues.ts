@@ -6,6 +6,16 @@ import type {
 } from "../types"
 import Decimal from "decimal.js"
 
+/**
+ * Calculates the amount of Nitrogen volatilized via ammonia emissions from crop residues.
+ *
+ * This function determines the nitrogen volatilization from crop residues based on the cultivations performed, harvest yields,
+ * and cultivation details, including the nitrogen content of the crop residues. It calculates an emission factor
+ * based on the nitrogen content and then estimates the total nitrogen volatilization.
+ * @param cultivations - A list of cultivations on the field.
+ * @param harvests - A list of harvests from the field.
+ * @param cultivationDetailsMap - The map of cultivation details.
+ */
 export function calculateNitrogenVolatizationViaAmmoniaByResidue(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],

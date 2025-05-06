@@ -5,6 +5,21 @@ import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
 
 type DepositonFromDataset = number[] | null
 
+/**
+ * Calculates the amount of nitrogen supplied through atmospheric deposition for a given field and time frame.
+ *
+ * This function uses the geoblaze library to identify the nitrogen deposition value at the field's centroid
+ * from a raster dataset (TIFF file) provided by RIVM (Netherlands National Institute for Public Health and the Environment).
+ * It adjusts the total deposition based on the number of days in the specified time frame.
+ *
+ * @param field - The field for which to calculate nitrogen deposition.
+ *                  The field object must include the `b_centroid` property, which represents the field's centroid coordinates.
+ * @param timeFrame - The time frame for which to calculate nitrogen deposition.
+ *                      The timeFrame object must include `start` and `end` properties, which are Date objects representing the start and end dates of the period.
+ * @param fdmPublicDataUrl - The base URL for accessing FDM public data, including the deposition raster dataset.
+ * @returns A promise that resolves with an object containing the total nitrogen deposition for the field in kg N / ha.
+ *          If the location is outside the RIVM dataset, it returns 0.
+ */
 export async function calculateNitrogenSupplyByDeposition(
     field: FieldInput["field"],
     timeFrame: NitrogenBalanceInput["timeFrame"],
@@ -35,11 +50,12 @@ export async function calculateNitrogenSupplyByDeposition(
     const timeFrameDays = new Decimal(
         differenceInCalendarDays(timeFrame.end, timeFrame.start),
     )
+    const timeFrameFraction = new Decimal(timeFrameDays).dividedBy(365)
 
     // Return the total amount of Nitrogen deposited in kg N / ha adjusted from the number of days
-    const deposition = new Decimal(depositionFromDataset[0])
-        .dividedBy(timeFrameDays)
-        .times(365)
+    const deposition = new Decimal(depositionFromDataset[0]).times(
+        timeFrameFraction,
+    )
 
     return {
         total: deposition,
