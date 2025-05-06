@@ -223,7 +223,7 @@ export type NitrogenEmissionAmmoniaResidues = {
      * A detailed list of crop residues.
      * Each entry includes the residue's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
      */
-    harvestables: { id: string; value: Decimal }[]
+    cultivations: { id: string; value: Decimal }[]
 }
 
 /**

@@ -9,7 +9,7 @@ import type {
 } from "./types"
 import { calculateNitrogenSupply } from "./supply"
 import { calculateNitrogenRemoval } from "./removal"
-import { calculateNitrogenVolatilization } from "./volatilization"
+import { calculateNitrogenVolatilization } from "./volatization"
 
 export async function calculateNitrogenBalance(
     nitrogenBalanceInput: NitrogenBalanceInput,
@@ -33,19 +33,21 @@ export async function calculateNitrogenBalance(
         )
 
         // Calculate for each field the nitrogen balance
-        const fieldsWithBalance = await Promise.all(fields.map(async (field: FieldInput) => {
-            return await calculateNitrogenBalanceField(
-                field.field,
-                field.cultivations,
-                field.harvests,
-                field.soilAnalyses,
-                field.fertilizerApplications,
-                fertilizerDetailsMap,
-                cultivationDetailsMap,
-                timeFrame,
-                fdmPublicDataUrl,
-            )
-        }))
+        const fieldsWithBalance = await Promise.all(
+            fields.map(async (field: FieldInput) => {
+                return await calculateNitrogenBalanceField(
+                    field.field,
+                    field.cultivations,
+                    field.harvests,
+                    field.soilAnalyses,
+                    field.fertilizerApplications,
+                    fertilizerDetailsMap,
+                    cultivationDetailsMap,
+                    timeFrame,
+                    fdmPublicDataUrl,
+                )
+            }),
+        )
 
         // Aggregate the field balances to farm level
         const farmWithBalance = calculateNitrogenBalancesFieldToFarm(
@@ -93,7 +95,11 @@ export async function calculateNitrogenBalanceField(
     )
 
     // Calculate the amount of Nitrogen that is volatilized
-    const volatilization = calculateNitrogenVolatilization()
+    const volatilization = calculateNitrogenVolatilization(
+        cultivations,
+        harvests,
+        cultivationDetailsMap,
+    )
 
     return {
         b_id: fieldDetails.b_id,
