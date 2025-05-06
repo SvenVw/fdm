@@ -132,6 +132,8 @@ export async function addFertilizerToCatalogue(
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
+        p_ef_nh3: schema.fertilizersCatalogueTypeInsert["p_ef_nh3"]
+        p_ef_n2o: schema.fertilizersCatalogueTypeInsert["p_ef_n2o"]
         p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
         p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
         p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
@@ -311,6 +313,8 @@ export async function getFertilizer(
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
                 p_cl_rt: schema.fertilizersCatalogue.p_cl_rt,
+                p_ef_nh3: schema.fertilizersCatalogue.p_ef_nh3,
+                p_ef_n2o: schema.fertilizersCatalogue.p_ef_n2o,
                 p_type_manure: schema.fertilizersCatalogue.p_type_manure,
                 p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
                 p_type_compost: schema.fertilizersCatalogue.p_type_compost,
@@ -403,6 +407,8 @@ export async function updateFertilizerFromCatalogue(
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
+        p_ef_nh3: schema.fertilizersCatalogueTypeInsert["p_ef_nh3"]
+        p_ef_n2o: schema.fertilizersCatalogueTypeInsert["p_ef_n2o"]
         p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
         p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
         p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
@@ -541,6 +547,8 @@ export async function getFertilizers(
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
                 p_cl_rt: schema.fertilizersCatalogue.p_cl_rt,
+                p_ef_nh3: schema.fertilizersCatalogue.p_ef_nh3,
+                p_ef_n2o: schema.fertilizersCatalogue.p_ef_n2o,
                 p_type_manure: schema.fertilizersCatalogue.p_type_manure,
                 p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
                 p_type_compost: schema.fertilizersCatalogue.p_type_compost,
