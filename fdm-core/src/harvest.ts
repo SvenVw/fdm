@@ -580,7 +580,7 @@ async function getHarvestSimplified(
         .where(
             eq(
                 schema.harvestableSampling.b_id_harvestable,
-                harvest.harvestables[0].b_id_harvestable,
+                harvest.harvestable.b_id_harvestable,
             ),
         )
         .limit(1)
