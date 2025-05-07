@@ -26,7 +26,7 @@ export function calculateNitrogenRemovalByHarvests(
         })?.b_lu_catalogue
         if (!b_lu_catalogue) {
             throw new Error(
-                `Harvest ${harvest.b_id} has no corresponding cultivation in cultivations`,
+                `Harvest ${harvest.b_id_harvesting} has no corresponding cultivation in cultivations`,
             )
         }
 
@@ -40,7 +40,7 @@ export function calculateNitrogenRemovalByHarvests(
         }
 
         // Go through the analyses for a harvest to determine the amount of Nitrogen removed with this harvest (currently fdm-core only supports 1 harvestable per harvest)
-        const removalsHarvest = harvest.harvestable.harvestableAnalyses.map(
+        const removalsHarvest = harvest.harvestable.harvestable_analyses.map(
             (harvestAnalysis: HarvestableAnalysis): Decimal => {
                 // Collect yield from input or use default value or use default value of the cultivation
                 let b_lu_yield = harvestAnalysis.b_lu_yield

@@ -46,7 +46,7 @@ export function calculateNitrogenRemovalByResidue(
         const yields = harvests
             .filter((x) => x.b_lu === cultivation.b_lu)
             .map((harvest: Harvest) => {
-                const yields = harvest.harstable.harvestableAnalyses.map(
+                const yields = harvest.harvestable.harvestable_analyses.map(
                     (harvestAnalyse: HarvestableAnalysis) => {
                         if (!harvestAnalyse.b_lu_yield) {
                             return undefined
@@ -54,6 +54,10 @@ export function calculateNitrogenRemovalByResidue(
                         return new Decimal(harvestAnalyse.b_lu_yield)
                     },
                 )
+
+                if (yields.length === 0) {
+                    return undefined
+                }
 
                 const yieldsWithoutUndefined = yields.filter(
                     (x: Decimal | undefined) => x !== undefined,
@@ -76,6 +80,7 @@ export function calculateNitrogenRemovalByResidue(
         } else {
             b_lu_yield = yields
                 .reduce((prev: Decimal, curr: Decimal) => {
+                    if (!prev || !curr) return new Decimal(0)
                     return prev.add(curr)
                 }, new Decimal(0))
                 .dividedBy(yields.length)
