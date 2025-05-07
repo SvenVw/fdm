@@ -30,7 +30,7 @@ export function calculateNitrogenSupplyByMineralFertilizers(
             )
         }
         const p_type_mineral = fertilizerDetail.p_type_mineral
-        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).times(1000) // Convert from g N / kg to kg N / kg
+        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).dividedBy(1000) // Convert from g N / kg to kg N / kg
 
         // If the fertilizer used is not of the type mineral
         if (p_type_mineral === false) {
