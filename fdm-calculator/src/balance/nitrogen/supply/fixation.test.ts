@@ -1,0 +1,159 @@
+// c:\Users\sven.verweij\Applications\fdm\fdm-calculator\src\balance\nitrogen\supply\fixation.test.ts
+import { describe, expect, it } from "vitest"
+import { Decimal } from "decimal.js"
+import { calculateNitrogenFixation } from "./fixation"
+import type { CultivationDetail, FieldInput } from "../types"
+
+describe("calculateNitrogenFixation", () => {
+    it("should return 0 if no cultivations are provided", () => {
+        const cultivations: FieldInput["cultivations"] = []
+        const cultivationDetailsMap = new Map<string, CultivationDetail>()
+
+        const result = calculateNitrogenFixation(
+            cultivations,
+            cultivationDetailsMap,
+        )
+
+        expect(result.total.equals(new Decimal(0))).toBe(true)
+        expect(result.cultivations).toEqual([])
+    })
+
+    it("should calculate nitrogen fixation for a single cultivation", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "cultivation1",
+                b_lu_catalogue: "catalogue1",
+                m_cropresidue: false,
+            },
+        ]
+
+        const cultivationDetailsMap = new Map<string, CultivationDetail>([
+            [
+                "catalogue1",
+                {
+                    b_lu_catalogue: "catalogue1",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 1000,
+                    b_lu_n_harvestable: 20,
+                    b_lu_hi: 0.4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 50, // kg N/ha
+                },
+            ],
+        ])
+
+        const result = calculateNitrogenFixation(
+            cultivations,
+            cultivationDetailsMap,
+        )
+
+        expect(result.total.equals(new Decimal(50))).toBe(true)
+        expect(result.cultivations).toEqual([
+            { id: "cultivation1", value: new Decimal(50) },
+        ])
+    })
+
+    it("should calculate nitrogen fixation for multiple cultivations", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            { b_lu: "cultivation1", b_lu_catalogue: "catalogue1", m_cropresidue: true },
+            { b_lu: "cultivation2", b_lu_catalogue: "catalogue2", m_cropresidue: false },
+        ]
+
+        const cultivationDetailsMap = new Map<string, CultivationDetail>([
+            [
+                "catalogue1",
+                {
+                    b_lu_catalogue: "catalogue1",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 1000,
+                    b_lu_n_harvestable: 20,
+                    b_lu_hi: 0.4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 50, // kg N/ha
+                },
+            ],
+            [
+                "catalogue2",
+                {
+                    b_lu_catalogue: "catalogue2",
+                    b_lu_croprotation: "legume",
+                    b_lu_yield: 1200,
+                    b_lu_n_harvestable: 22,
+                    b_lu_hi: 0.5,
+                    b_lu_n_residue: 3,
+                    b_n_fixation: 75, // kg N/ha
+                },
+            ],
+        ])
+
+        const result = calculateNitrogenFixation(
+            cultivations,
+            cultivationDetailsMap,
+        )
+
+        expect(result.total.equals(new Decimal(125))).toBe(true)
+        expect(result.cultivations).toEqual([
+            { id: "cultivation1", value: new Decimal(50) },
+            { id: "cultivation2", value: new Decimal(75) },
+        ])
+    })
+
+    it("should handle cultivations with no or undefined fixation values", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            { b_lu: "cultivation1", b_lu_catalogue: "catalogue1", m_cropresidue: true },
+            { b_lu: "cultivation2", b_lu_catalogue: "catalogue2", m_cropresidue: false },
+        ]
+
+        const cultivationDetailsMap = new Map<string, CultivationDetail>([
+            [
+                "catalogue1",
+                {
+                    b_lu_catalogue: "catalogue1",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 1000,
+                    b_lu_n_harvestable: 20,
+                    b_lu_hi: 0.4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 50, // kg N/ha
+                },
+            ],
+            [
+                "catalogue2",
+                {
+                    b_lu_catalogue: "catalogue2",
+                    b_lu_croprotation: "grass",
+                    b_lu_yield: 1200,
+                    b_lu_n_harvestable: 22,
+                    b_lu_hi: 0.5,
+                    b_lu_n_residue: 3,
+                    b_n_fixation: undefined, //undefined fixation value
+                },
+            ],
+        ])
+
+        const result = calculateNitrogenFixation(
+            cultivations,
+            cultivationDetailsMap,
+        )
+
+        expect(result.total.equals(new Decimal(50))).toBe(true)
+        expect(result.cultivations).toEqual([
+            { id: "cultivation1", value: new Decimal(50) },
+            { id: "cultivation2", value: new Decimal(0) },
+        ])
+    })
+
+    it("should throw an error if a cultivation has no details", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            { b_lu: "cultivation1", b_lu_catalogue: "catalogue1", m_cropresidue: true },
+        ]
+
+        const cultivationDetailsMap = new Map<string, CultivationDetail>()
+
+        expect(() =>
+            calculateNitrogenFixation(cultivations, cultivationDetailsMap),
+        ).toThrowError(
+            "Cultivation cultivation1 has no corresponding cultivation in cultivationDetails",
+        )
+    })
+})

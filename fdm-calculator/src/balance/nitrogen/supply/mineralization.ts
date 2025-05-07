@@ -33,30 +33,42 @@ export function calculateNitrogenSupplyBySoilMineralization(
             )
         }
 
+        // if (soilAnalyses.length === 0) {
+        //     return {
+        //         id: cultivation.b_lu,
+        //         value: new Decimal(0),
+        //     }
+        // }
+
         const b_lu_croprotation = cultivationDetail.b_lu_croprotation
         const isGrassland = b_lu_croprotation === "grassland"
-        const b_soiltype_agr = soilAnalyses.filter(
-            (x: {
-                b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
-            }) => x.b_soiltype_agr,
-        )[0].b_soiltype_agr
-        const a_n_rt = soilAnalyses.filter(
-            (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>
-                x.a_n_rt,
-        )[0].a_n_rt
-        const a_c_of = soilAnalyses.filter(
-            (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
-                x.a_c_of,
-        )[0].a_c_of
-        const a_cn_fr = soilAnalyses.filter(
-            (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
-                x.a_cn_fr,
-        )[0].a_cn_fr
-        const a_density_sa = soilAnalyses.filter(
-            (x: {
-                a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"]
-            }) => x.a_density_sa,
-        )[0].a_density_sa
+        const b_soiltype_agr =
+            soilAnalyses.find(
+                (x: {
+                    b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
+                }) => x.b_soiltype_agr,
+            )?.b_soiltype_agr || undefined
+        const a_n_rt =
+            soilAnalyses.find(
+                (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>
+                    x.a_n_rt,
+            )?.a_n_rt || undefined
+        const a_c_of =
+            soilAnalyses.find(
+                (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
+                    x.a_c_of,
+            )?.a_c_of || undefined
+        const a_cn_fr =
+            soilAnalyses.find(
+                (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
+                    x.a_cn_fr,
+            )?.a_cn_fr || undefined
+        const a_density_sa =
+            soilAnalyses.find(
+                (x: {
+                    a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"]
+                }) => x.a_density_sa,
+            )?.a_density_sa || undefined
 
         // Calculate the amount of Nitrogen mineralized by the soil
         let mineralization = Decimal(0)
@@ -91,6 +103,7 @@ export function calculateNitrogenSupplyBySoilMineralization(
 
     // Calculate the total amount of Nitrogen mineralized
     const totalValue = mineralizations.reduce((acc, mineralization) => {
+        if (!mineralization.value) return acc
         return acc.add(mineralization.value)
     }, Decimal(0))
 
@@ -113,7 +126,7 @@ function calculateNitrogenSupplyBySoilMineralizationForGrassland(
     b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"],
     a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"],
 ): Decimal {
-    // Return amount of Nitrogen mineralizd by soil at Grasslan for veen
+    // Return amount of Nitrogen mineralizd by soil at Grassland for veen
     if (b_soiltype_agr === "veen") {
         return Decimal(250)
     }
