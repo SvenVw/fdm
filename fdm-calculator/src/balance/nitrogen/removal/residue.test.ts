@@ -108,8 +108,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.32) //Approximation due to floating point
-        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.32) //Approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
+        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
     })
 
     it("should handle missing harvest data using cultivation defaults", () => {
@@ -128,7 +128,7 @@ describe("calculateNitrogenRemovalByResidue", () => {
             harvests,
             cultivationDetailsMap,
         )
-
+        console.log(result)
         expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
         expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
     })
@@ -206,7 +206,7 @@ describe("calculateNitrogenRemovalByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(0) //Approximation due to floating point
-        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(0) //Approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
+        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
     })
 })

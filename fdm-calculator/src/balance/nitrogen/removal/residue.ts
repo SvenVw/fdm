@@ -42,48 +42,46 @@ export function calculateNitrogenRemovalByResidue(
             }
         }
 
-        // Get the (average) yield for this crop
-        const yields = harvests
-            .filter((x) => x.b_lu === cultivation.b_lu)
-            .map((harvest: Harvest) => {
-                const yields = harvest.harvestable.harvestable_analyses.map(
-                    (harvestAnalyse: HarvestableAnalysis) => {
-                        if (!harvestAnalyse.b_lu_yield) {
-                            return undefined
-                        }
-                        return new Decimal(harvestAnalyse.b_lu_yield)
-                    },
-                )
-
-                if (yields.length === 0) {
-                    return undefined
+        // Get the (total) yield for this crop and number of harvests
+        let totalYield = new Decimal(0)
+        let harvestCount = 0
+        let b_lu_yield = new Decimal(0)
+        for (const harvest of harvests) {
+            let yieldForThisHarvest: Decimal | null = null
+            if (
+                harvest.harvestable?.harvestable_analyses &&
+                harvest.harvestable.harvestable_analyses.length > 0
+            ) {
+                // Prioritize the specific yield if available
+                const analysisWithYield =
+                    harvest.harvestable.harvestable_analyses.find(
+                        (analysis: { b_lu_yield: number | undefined }) =>
+                            analysis.b_lu_yield !== undefined,
+                    )
+                if (analysisWithYield) {
+                    yieldForThisHarvest = new Decimal(
+                        analysisWithYield.b_lu_yield,
+                    )
                 }
+            }
 
-                const yieldsWithoutUndefined = yields.filter(
-                    (x: Decimal | undefined) => x !== undefined,
-                )
+            // Fallback to default yield from cultivation_catalogue
+            if (yieldForThisHarvest === null) {
+                yieldForThisHarvest = cultivationDetail.b_lu_yield
+            }
 
-                if (yieldsWithoutUndefined === 0) {
-                    return undefined
-                }
+            if (yieldForThisHarvest !== null) {
+                totalYield = totalYield.add(yieldForThisHarvest)
+                harvestCount++
+            }
+        }
 
-                return yieldsWithoutUndefined
-                    .reduce((prev: Decimal, curr: Decimal) => {
-                        return prev.add(curr)
-                    }, new Decimal(0))
-                    .dividedBy(yieldsWithoutUndefined.length)
-            })
-
-        let b_lu_yield = yields[0]
-        if (!yields || yields.length === 0) {
+        // Get the average yield for the cultivation
+        if (harvestCount === 0) {
+            // Return default yield from cultivation catalogue
             b_lu_yield = new Decimal(cultivationDetail.b_lu_yield)
         } else {
-            b_lu_yield = yields
-                .reduce((prev: Decimal, curr: Decimal) => {
-                    if (!prev || !curr) return new Decimal(0)
-                    return prev.add(curr)
-                }, new Decimal(0))
-                .dividedBy(yields.length)
+            b_lu_yield = totalYield.dividedBy(harvestCount)
         }
 
         // Get the harvest for crop residues
