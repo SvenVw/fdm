@@ -74,7 +74,6 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             timeFrame,
             fdmPublicDataUrl,
         )
-        console.log(result)
 
         expect(result.total.toNumber()).toBeCloseTo(0)
     })
