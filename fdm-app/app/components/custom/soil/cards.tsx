@@ -145,19 +145,34 @@ export function SoilDataCards({
     )
     return (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl2:grid-cols-3 xl3:grid-cols-5">
-            {cards.map((card) => (
-                <SoilDataCard
-                    key={card.title}
-                    title={card.title}
-                    shortname={card.shortname}
-                    value={card.value}
-                    unit={card.unit}
-                    type={card.type}
-                    link={card.link}
-                    date={card.date}
-                    source={card.source}
-                />
-            ))}
+            {cards.map(
+                (card: {
+                    value: string | number | undefined
+                    title: string
+                    shortname: string
+                    unit: string
+                    type: "numeric" | "enum"
+                    link: string
+                    date: Date
+                    source: string
+                }) => {
+                    if (card.value) {
+                        return (
+                            <SoilDataCard
+                                key={card.title}
+                                title={card.title}
+                                shortname={card.shortname}
+                                value={card.value}
+                                unit={card.unit}
+                                type={card.type}
+                                link={card.link}
+                                date={card.date}
+                                source={card.source}
+                            />
+                        )
+                    }
+                },
+            )}
         </div>
     )
 }
@@ -167,30 +182,40 @@ function constructSoilDataCards(
     soilParameterDescription: SoilParameterDescription,
 ) {
     // Construct the soil data cards
-    const cardValues = currentSoilData.map((item) => {
-        const description = soilParameterDescription.find((x) => {
-            return x.parameter === item.parameter
-        })
-
-        if (!description) {
-            console.warn(
-                `No description found for parameter: ${item.parameter}`,
+    const cardValues = currentSoilData.map(
+        (item: {
+            parameter: string
+            value: string | number | undefined
+            a_id: string
+            b_sampling_date: Date
+            a_source: string
+        }) => {
+            const description = soilParameterDescription.find(
+                (x: { parameter: string }) => {
+                    return x.parameter === item.parameter
+                },
             )
-            return null
-        }
 
-        const cardValue = {
-            title: description.name,
-            shortname: description.description,
-            value: item.value,
-            unit: description.unit,
-            type: description.type,
-            link: `./analysis/${item.a_id}`,
-            date: item.b_sampling_date,
-            source: item.a_source,
-        }
+            if (!description) {
+                console.warn(
+                    `No description found for parameter: ${item.parameter}`,
+                )
+                return null
+            }
 
-        return cardValue
-    })
+            const cardValue = {
+                title: description.name,
+                shortname: description.description,
+                value: item.value,
+                unit: description.unit,
+                type: description.type,
+                link: `./analysis/${item.a_id}`,
+                date: item.b_sampling_date,
+                source: item.a_source,
+            }
+
+            return cardValue
+        },
+    )
     return cardValues.filter(Boolean)
 }

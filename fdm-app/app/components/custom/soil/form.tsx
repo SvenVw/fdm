@@ -46,6 +46,12 @@ export function SoilAnalysisForm(props: {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             a_source: soilAnalysis?.a_source ? soilAnalysis.a_source : "",
+            a_n_rt: soilAnalysis?.a_n_rt ? soilAnalysis.a_n_rt : undefined,
+            a_c_of: soilAnalysis?.a_c_of ? soilAnalysis.a_c_of : undefined,
+            a_cn_fr: soilAnalysis?.a_cn_fr ? soilAnalysis.a_cn_fr : undefined,
+            a_density_sa: soilAnalysis?.a_density_sa
+                ? soilAnalysis.a_density_sa
+                : undefined,
             a_p_al: soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : undefined,
             a_p_cc: soilAnalysis?.a_p_cc ? soilAnalysis.a_p_cc : undefined,
             a_som_loi: soilAnalysis?.a_som_loi
@@ -176,6 +182,38 @@ export function SoilAnalysisForm(props: {
                             />
                             <FormField
                                 control={form.control}
+                                name="a_n_rt"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {getParameterName(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={field.value}
+                                                placeholder="Bv. 4500 mg N / kg"
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${getParameterDescription(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )} [${getParameterUnit(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
                                 name="a_p_al"
                                 render={({ field }) => (
                                     <FormItem>
@@ -266,6 +304,102 @@ export function SoilAnalysisForm(props: {
                                                  soilParameterDescription,
                                                  field.name,
                                              )}]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="a_c_of"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {getParameterName(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={field.value}
+                                                placeholder="Bv. 37 g C / kg"
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${getParameterDescription(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )} [${getParameterUnit(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="a_cn_fr"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {getParameterName(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={field.value}
+                                                placeholder="Bv. 14"
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${getParameterDescription(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )} [${getParameterUnit(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}]`}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="a_density_sa"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>
+                                            {getParameterName(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                type="number"
+                                                value={field.value}
+                                                placeholder="Bv. 1.2 g / cm³"
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            {`${getParameterDescription(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )} [${getParameterUnit(
+                                                soilParameterDescription,
+                                                field.name,
+                                            )}]`}
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

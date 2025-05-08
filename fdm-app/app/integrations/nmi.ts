@@ -16,6 +16,7 @@ export async function getSoilParameterEstimates(
     field: Feature | Polygon,
     nmiApiKey: string | undefined,
 ): Promise<{
+    a_n_rt: number
     a_p_al: number
     a_p_cc: number
     a_som_loi: number
@@ -76,6 +77,7 @@ export async function getSoilParameterEstimates(
 }
 
 const soilParameterEstimatesSchema = z.object({
+    a_n_rt: z.number(),
     a_p_al: z.number(),
     a_p_cc: z.number(),
     a_som_loi: z.number(),
