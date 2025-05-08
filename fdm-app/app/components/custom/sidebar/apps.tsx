@@ -80,9 +80,6 @@ export function SidebarApps() {
                                 </span>
                             )}
                         </SidebarMenuButton>
-                        <SidebarMenuBadge>
-                            <Badge>Binnenkort</Badge>
-                        </SidebarMenuBadge>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
