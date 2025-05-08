@@ -37,7 +37,6 @@
         "@sentry/node": "^9.13.0",
         "@sentry/profiling-node": "^9.13.0",
         "@sentry/react": "^9.13.0",
-        "@sentry/vite-plugin": "^3.3.1",
         "@svenvw/fdm-calculator": "workspace:^",
         "@svenvw/fdm-core": "workspace:^",
         "@tanstack/react-table": "^8.21.3",
