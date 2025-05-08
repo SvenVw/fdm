@@ -326,7 +326,6 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             soilAnalyses2,
             cultivationDetailsMap2,
         )
-        console.log(result2)
 
         expect(result2.total.equals(new Decimal(5))).toBe(true)
     })

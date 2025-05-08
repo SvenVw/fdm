@@ -128,7 +128,7 @@ describe("calculateNitrogenRemovalByResidue", () => {
             harvests,
             cultivationDetailsMap,
         )
-        console.log(result)
+        
         expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
         expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
     })
