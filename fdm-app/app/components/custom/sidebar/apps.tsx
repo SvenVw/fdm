@@ -35,7 +35,15 @@ export function SidebarApps() {
         atlasLink = undefined
     }
 
-    const nutrienBalanceLink = undefined
+    let nutrientBalanceLink: string | undefined
+    if (isCreateFarmWizard) {
+        nutrientBalanceLink = undefined
+    } else if (farmId) {
+        nutrientBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance`
+    } else {
+        nutrientBalanceLink = undefined
+    }
+
     const omBalanceLink = undefined
     const baatLink = undefined
     return (
@@ -60,8 +68,8 @@ export function SidebarApps() {
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton asChild>
-                            {nutrienBalanceLink ? (
-                                <NavLink to={nutrienBalanceLink}>
+                            {nutrientBalanceLink ? (
+                                <NavLink to={nutrientBalanceLink}>
                                     <ArrowRightLeft />
                                     <span>Nutriëntenbalans</span>
                                 </NavLink>
