@@ -1,36 +1,9 @@
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import { calculateNitrogenSupplyByDeposition } from "./deposition"
-import { Decimal } from "decimal.js"
 import type { FieldInput, NitrogenBalanceInput } from "../types"
-import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
-import geoblaze from "geoblaze"
 
 describe("calculateNitrogenSupplyByDeposition", () => {
-    it("should return 0 if depositionFromDataset is null", async () => {
-        const field: FieldInput["field"] = {
-            b_centroid: [5.0, 52.0],
-            b_area: 100000,
-            b_id: "test_field",
-        }
-        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date("2023-01-01"),
-            end: new Date("2023-12-31"),
-        }
-        const fdmPublicDataUrl = "mock-url"
-
-        const geoblazeIdentifySpy = vi
-            .spyOn(geoblaze, "identify")
-            .mockResolvedValue(null)
-
-        const result = await calculateNitrogenSupplyByDeposition(
-            field,
-            timeFrame,
-            fdmPublicDataUrl,
-        )
-
-        expect(result.total.equals(new Decimal(0))).toBe(true)
-        expect(geoblazeIdentifySpy).toHaveBeenCalled()
-    })
+    const fdmPublicDataUrl = String(process.env.FDM_PUBLIC_DATA_URL)
 
     it("should calculate nitrogen deposition correctly", async () => {
         const field: FieldInput["field"] = {
@@ -42,12 +15,6 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             start: new Date("2025-01-01"),
             end: new Date("2025-12-31"),
         }
-        const fdmPublicDataUrl = "mock-url"
-        const depositionValue = 10 // kg N/ha/year
-
-        const geoblazeIdentifySpy = vi
-            .spyOn(geoblaze, "identify")
-            .mockResolvedValue([depositionValue])
 
         const result = await calculateNitrogenSupplyByDeposition(
             field,
@@ -55,8 +22,7 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             fdmPublicDataUrl,
         )
 
-        expect(result.total).toBeDefined()
-        expect(geoblazeIdentifySpy).toHaveBeenCalled()
+        expect(result.total.toNumber()).toBeCloseTo(19.5183)
     })
 
     it("should handle different timeframes correctly", async () => {
@@ -65,9 +31,6 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             b_area: 100000,
             b_id: "test_field",
         }
-        const depositionValue = 10 // kg N/ha/year
-
-        vi.spyOn(geoblaze, "identify").mockResolvedValue([depositionValue])
 
         // Test with a full year
         let timeFrame: NitrogenBalanceInput["timeFrame"] = {
@@ -77,9 +40,9 @@ describe("calculateNitrogenSupplyByDeposition", () => {
         let result = await calculateNitrogenSupplyByDeposition(
             field,
             timeFrame,
-            "mock-url",
+            fdmPublicDataUrl,
         )
-        expect(result.total.equals(new Decimal(depositionValue))).toBe(true)
+        expect(result.total.toNumber()).toBeCloseTo(19.57194)
 
         // Test with half a year
         timeFrame = {
@@ -89,50 +52,15 @@ describe("calculateNitrogenSupplyByDeposition", () => {
         result = await calculateNitrogenSupplyByDeposition(
             field,
             timeFrame,
-            "mock-url",
+            fdmPublicDataUrl,
         )
 
-        expect(
-            result.total.equals(
-                new Decimal(depositionValue).times(
-                    new Decimal(
-                        differenceInCalendarDays(
-                            timeFrame.end,
-                            timeFrame.start,
-                        ),
-                    ).dividedBy(365),
-                ),
-            ),
-        ).toBe(true)
-
-        // Test with a shorter period
-        timeFrame = {
-            start: new Date("2023-03-01"),
-            end: new Date("2023-04-01"),
-        }
-        result = await calculateNitrogenSupplyByDeposition(
-            field,
-            timeFrame,
-            "mock-url",
-        )
-
-        expect(
-            result.total.equals(
-                new Decimal(depositionValue).times(
-                    new Decimal(
-                        differenceInCalendarDays(
-                            timeFrame.end,
-                            timeFrame.start,
-                        ),
-                    ).dividedBy(365),
-                ),
-            ),
-        ).toBe(true)
+        expect(result.total.toNumber()).toBeCloseTo(9.70554)
     })
 
-    it("should handle errors from geoblaze.identify", async () => {
+    it("should provide zero if outside bounding box", async () => {
         const field: FieldInput["field"] = {
-            b_centroid: [5.0, 52.0],
+            b_centroid: [50.0, 12.0],
             b_area: 100000,
             b_id: "test_field",
         }
@@ -140,20 +68,14 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             start: new Date("2023-01-01"),
             end: new Date("2023-12-31"),
         }
-        const fdmPublicDataUrl = "mock-url"
 
-        const error = new Error("Geoblaze error")
-        const geoblazeIdentifySpy = vi
-            .spyOn(geoblaze, "identify")
-            .mockRejectedValue(error)
+        const result = await calculateNitrogenSupplyByDeposition(
+            field,
+            timeFrame,
+            fdmPublicDataUrl,
+        )
+        console.log(result)
 
-        await expect(
-            calculateNitrogenSupplyByDeposition(
-                field,
-                timeFrame,
-                fdmPublicDataUrl,
-            ),
-        ).rejects.toThrow(error)
-        expect(geoblazeIdentifySpy).toHaveBeenCalled()
+        expect(result.total.toNumber()).toBeCloseTo(0)
     })
 })
