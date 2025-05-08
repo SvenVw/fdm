@@ -376,3 +376,111 @@ export type NitrogenBalanceInput = {
     }
     fdmPublicDataUrl: string
 }
+
+// Numeric version of NitrogenSupplyFertilizers
+export type NitrogenSupplyFertilizersNumeric = {
+    total: number
+    mineral: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    manure: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    compost: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+}
+
+// Numeric version of NitrogenSupplyFixation
+export type NitrogenSupplyFixationNumeric = {
+    total: number
+    cultivations: { id: string; value: number }[]
+}
+
+// Numeric version of NitrogenSupplyMineralization
+export type NitrogenSupplyMineralizationNumeric = {
+    total: number
+    cultivations: { id: string; value: number }[]
+}
+
+// Numeric version of NitrogenSupply
+export type NitrogenSupplyNumeric = {
+    total: number
+    fertilizers: NitrogenSupplyFertilizersNumeric
+    fixation: NitrogenSupplyFixationNumeric
+    deposition: { total: number }
+    mineralisation: NitrogenSupplyMineralizationNumeric
+}
+
+// Numeric version of NitrogenRemovalHarvests
+export type NitrogenRemovalHarvestsNumeric = {
+    total: number
+    harvests: { id: string; value: number }[]
+}
+
+// Numeric version of NitrogenRemovalResidues
+export type NitrogenRemovalResiduesNumeric = {
+    total: number
+    cultivations: { id: string; value: number }[]
+}
+
+// Numeric version of NitrogenRemoval
+export type NitrogenRemovalNumeric = {
+    total: number
+    harvests: NitrogenRemovalHarvestsNumeric
+    residues: NitrogenRemovalResiduesNumeric
+}
+
+// Numeric version of NitrogenEmissionAmmoniaFertilizers
+export type NitrogenEmissionAmmoniaFertilizersNumeric = {
+    total: number
+    mineral: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    manure: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+}
+
+// Numeric version of NitrogenEmissionAmmoniaResidues
+export type NitrogenEmissionAmmoniaResiduesNumeric = {
+    total: number
+    cultivations: { id: string; value: number }[]
+}
+
+// Numeric version of NitrogenEmissionAmmonia
+export type NitrogenEmissionAmmoniaNumeric = {
+    total: number
+    fertilizers: NitrogenEmissionAmmoniaFertilizersNumeric
+    residues: NitrogenEmissionAmmoniaResiduesNumeric
+    grazing: undefined
+}
+
+// Numeric version of NitrogenVolatilization
+export type NitrogenVolatilizationNumeric = {
+    total: number
+    ammonia: NitrogenEmissionAmmoniaNumeric
+}
+
+// Numeric version of NitrogenBalanceField
+export type NitrogenBalanceFieldNumeric = {
+    b_id: string
+    balance: number
+    supply: NitrogenSupplyNumeric
+    removal: NitrogenRemovalNumeric
+    volatilization: NitrogenVolatilizationNumeric
+}
+
+// Numeric version of NitrogenBalance
+export type NitrogenBalanceNumeric = {
+    balance: number
+    supply: number
+    removal: number
+    volatilization: number
+    fields: NitrogenBalanceFieldNumeric[]
+}

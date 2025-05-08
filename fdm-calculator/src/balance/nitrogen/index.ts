@@ -6,6 +6,7 @@ import type {
     NitrogenBalance,
     NitrogenBalanceField,
     NitrogenBalanceInput,
+    NitrogenBalanceNumeric,
 } from "./types"
 import { calculateNitrogenSupply } from "./supply"
 import { calculateNitrogenRemoval } from "./removal"
@@ -19,12 +20,12 @@ import { calculateNitrogenVolatilization } from "./volatization"
  * individually and then aggregates the results to provide an overall farm-level balance.
  *
  * @param nitrogenBalanceInput - The input data for the nitrogen balance calculation, including fields, fertilizer details, and cultivation details.
- * @returns A promise that resolves with the calculated nitrogen balance.
+ * @returns A promise that resolves with the calculated nitrogen balance, with numeric values as numbers.
  * @throws Throws an error if any of the calculations fail.
  */
 export async function calculateNitrogenBalance(
     nitrogenBalanceInput: NitrogenBalanceInput,
-): Promise<NitrogenBalance> {
+): Promise<NitrogenBalanceNumeric> { // Changed return type
     try {
         // Destructure input directly
         const {
@@ -61,12 +62,14 @@ export async function calculateNitrogenBalance(
         )
 
         // Aggregate the field balances to farm level
-        const farmWithBalance = calculateNitrogenBalancesFieldToFarm(
+        // calculateNitrogenBalancesFieldToFarm returns NitrogenBalance (with Decimals)
+        const farmWithBalanceDecimal = calculateNitrogenBalancesFieldToFarm(
             fieldsWithBalance,
             fields,
         )
 
-        return farmWithBalance
+        // Convert the final result to use numbers instead of Decimals
+        return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
     } catch (error) {
         throw new Error(String(error))
     }
@@ -162,7 +165,7 @@ export async function calculateNitrogenBalanceField(
 export function calculateNitrogenBalancesFieldToFarm(
     fieldsWithBalance: NitrogenBalanceField[],
     fields: FieldInput[],
-) {
+): NitrogenBalance { // Explicitly state it returns the Decimal version
     // Calculate the total farm area
     const totalFarmArea = fields.reduce(
         (sum, field) => sum.add(new Decimal(field.field.b_area)),
@@ -216,7 +219,7 @@ export function calculateNitrogenBalancesFieldToFarm(
         .add(avgFarmVolatilization)
 
     // Return the farm with average balances per hectare
-    const farmWithBalance = {
+    const farmWithBalance: NitrogenBalance = { 
         balance: avgFarmBalance,
         supply: avgFarmSupply,
         removal: avgFarmRemoval,
@@ -225,4 +228,31 @@ export function calculateNitrogenBalancesFieldToFarm(
     }
 
     return farmWithBalance
+}
+
+// Helper function to convert Decimal to number recursively
+function convertDecimalToNumberRecursive(data: unknown): unknown {
+    if (data instanceof Decimal) {
+        return data.toNumber()
+    }
+    if (Array.isArray(data)) {
+        return data.map(convertDecimalToNumberRecursive)
+    }
+    if (typeof data === "object" && data !== null && !(data instanceof Date)) {
+        const newData: { [key: string]: unknown } = {}
+        for (const key in data) {
+            if (Object.prototype.hasOwnProperty.call(data, key)) {
+                newData[key] = convertDecimalToNumberRecursive((data as Record<string, unknown>)[key])
+            }
+        }
+        return newData
+    }
+    return data
+}
+
+// Main conversion function with type safety
+export function convertNitrogenBalanceToNumeric(
+    balance: NitrogenBalance, // Input is the original Decimal-based type
+): NitrogenBalanceNumeric { // Output is the new number-based type
+    return convertDecimalToNumberRecursive(balance) as NitrogenBalanceNumeric
 }

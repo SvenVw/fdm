@@ -5,5 +5,5 @@ export { calculateNitrogenBalance } from "./balance/nitrogen/index"
 export type { Dose } from "./doses/d"
 export type {
     NitrogenBalanceInput,
-    NitrogenBalance,
+    NitrogenBalanceNumeric,
 } from "./balance/nitrogen/types"
