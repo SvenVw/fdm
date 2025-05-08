@@ -26,8 +26,8 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@changesets/cli": "^2.29.2",
-        "turbo": "^2.5.0"
+        "@changesets/cli": "^2.29.3",
+        "turbo": "^2.5.3"
     },
     "packageManager": "pnpm@10.9.0",
     "pnpm": {
