@@ -1,6 +1,6 @@
 import Decimal from "decimal.js"
 import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
-import geoblaze from "geoblaze"
+import { identify } from "geoblaze"
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
 
 type DepositonFromDataset = number[] | null
@@ -34,7 +34,7 @@ export async function calculateNitrogenSupplyByDeposition(
     const b_centroid = field.b_centroid
 
     // Obtain total Nitrogen deposition values from RIVM map at FDM Public Data Storage
-    const depositionFromDataset: DepositonFromDataset = await geoblaze.identify(
+    const depositionFromDataset: DepositonFromDataset = await identify(
         url,
         b_centroid,
     )

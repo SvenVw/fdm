@@ -25,5 +25,5 @@ export default defineConfig({
                     : false,
         }), // Minifies the output
     ],
-    external: ["@svenvw/fdm-core"],
+    external: ["@svenvw/fdm-core", "geoblaze"],
 })
