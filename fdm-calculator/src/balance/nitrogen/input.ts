@@ -91,17 +91,17 @@ export async function collectInputForNitrogenBalance(
                         )
 
                     return {
-                        field,
-                        cultivations,
-                        harvests,
-                        soilAnalyses,
-                        fertilizerApplications,
+                        field: field,
+                        cultivations: cultivations,
+                        harvests: harvests,
+                        soilAnalyses: soilAnalyses,
+                        fertilizerApplications: fertilizerApplications,
                     }
                 }),
             )
 
             // Collect the details of the fertilizers
-            const fertilizerDetails = getFertilizers(
+            const fertilizerDetails = await getFertilizers(
                 tx,
                 principal_id,
                 b_id_farm,
@@ -116,7 +116,7 @@ export async function collectInputForNitrogenBalance(
 
             return {
                 fields,
-                fertilizerDetails: await fertilizerDetails,
+                fertilizerDetails: fertilizerDetails,
                 cultivationDetails,
                 timeFrame: timeframe,
                 fdmPublicDataUrl: fdmPublicDataUrl,
