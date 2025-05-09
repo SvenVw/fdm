@@ -6,11 +6,9 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { FarmContent } from "~/components/custom/farm/farm-content"
 import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { SidebarInset } from "~/components/ui/sidebar"
-import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
@@ -117,8 +115,11 @@ export default function FarmBalanceNitrogenBlock() {
                     title={"Stikstof"}
                     description={"Bekijk stikstof voor je nutriëntenbalans."}
                 />
-                <Outlet />
-                <Toaster />
+                <div className="space-y-6 p-10 pb-0">
+                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <div className="flex-1">{<Outlet />}</div>
+                    </div>
+                </div>
             </main>
         </SidebarInset>
     )
