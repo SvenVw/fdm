@@ -45,6 +45,7 @@ export function FertilizerApplicationForm({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
+            p_id: undefined,
             p_app_amount: undefined,
             p_app_date: new Date(),
         },
