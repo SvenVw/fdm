@@ -5,9 +5,15 @@ import {
     type MetaFunction,
 } from "react-router"
 import { clientConfig } from "~/lib/config"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
-import { getFarm } from "@svenvw/fdm-core"
+import { getFarm, getFields } from "@svenvw/fdm-core"
 import { fdm } from "~/lib/fdm.server"
 import {
     calculateNitrogenBalance,
@@ -15,7 +21,12 @@ import {
     type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import { getTimeframe } from "../lib/calendar"
-import { ArrowDownToLine, ArrowRight, ArrowUpFromLine, House } from "lucide-react"
+import {
+    ArrowDownToLine,
+    ArrowRight,
+    ArrowUpFromLine,
+    House,
+} from "lucide-react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -55,6 +66,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         })
     }
 
+    // Get details of fields
+    const fields = await getFields(fdm, session.principal_id, b_id_farm)
+
     // Collect input data for nutrient balance calculation
     // const nitrogenBalanceInput = await collectInputForNitrogenBalance(
     //     fdm,
@@ -73,18 +87,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     return {
         nitrogenBalanceResult: nitrogenBalanceResult,
+        fields: fields,
     }
 }
 
 export default function FarmBalanceNitrogenOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const { nitrogenBalanceResult } = loaderData
-
-    console.log(nitrogenBalanceResult.balance)
-    const hoi = String(nitrogenBalanceResult.balance)
+    const { nitrogenBalanceResult, fields } = loaderData
 
     return (
-        <>
+        <div className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -152,7 +164,56 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                     </CardContent>
                 </Card>
             </div>
-        </>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="col-span-4">
+                    <CardHeader>
+                        <CardTitle>Balans</CardTitle>
+                    </CardHeader>
+                    <CardContent className="pl-2">
+                        {/* <Overview /> */}
+                    </CardContent>
+                </Card>
+                <Card className="col-span-3">
+                    <CardHeader>
+                        <CardTitle>Percelen</CardTitle>
+                        <CardDescription />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-8">
+                            {nitrogenBalanceResult.fields.map((field) => (
+                                <div
+                                    className="flex items-center"
+                                    key={field.b_id}
+                                >
+                                    {/* <Avatar className="h-9 w-9">
+                                    <AvatarImage
+                                        src="/avatars/01.png"
+                                        alt="Avatar"
+                                    />
+                                    <AvatarFallback>OM</AvatarFallback>
+                                </Avatar> */}
+                                    <div className="ml-4 space-y-1">
+                                        <p className="text-sm font-medium leading-none">
+                                            {fields.find(
+                                                (f) => f.b_id === field.b_id,
+                                            )?.b_name || "Test perceel"}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {fields.find(
+                                                (f) => f.b_id === field.b_id,
+                                            )?.b_area || "4 ha"}
+                                        </p>
+                                    </div>
+                                    <div className="ml-auto font-medium">
+                                        +{field.balance}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
     )
 }
 
