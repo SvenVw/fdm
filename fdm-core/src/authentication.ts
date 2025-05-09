@@ -4,6 +4,7 @@ import { organization, username } from "better-auth/plugins"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
 import { generateFromEmail } from "unique-username-generator"
+import { eq } from "drizzle-orm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
@@ -197,18 +198,26 @@ async function createUsername(fdm: FdmType, email: string): Promise<string> {
     let username = generateFromEmail(email, digits)
 
     // Check if username already exists
-    const existingUser = await fdm.query.authN.user.findFirst({
-        where: { username: { equals: username } },
-    })
+    const existingUser = await fdm
+        .select({
+            username: authNSchema.user.username,
+        })
+        .from(authNSchema.user)
+        .where(eq(authNSchema.user.username, username))
+        .limit(1)
 
     // If username exists, append random digits until we find a unique one
-    if (existingUser) {
+    if (existingUser && existingUser.length > 0) {
         while (existingUser) {
             username = generateFromEmail(email, digits)
-            const checkUser = await fdm.query.authN.user.findFirst({
-                where: { username: { equals: username } },
-            })
-            if (!checkUser) break
+            const checkUser = await fdm
+                .select({
+                    username: authNSchema.user.username,
+                })
+                .from(authNSchema.user)
+                .where(eq(authNSchema.user.username, username))
+                .limit(1)
+            if (checkUser && checkUser.length === 0) break
         }
     }
 
