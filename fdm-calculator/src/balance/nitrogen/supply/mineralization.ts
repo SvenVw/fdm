@@ -22,6 +22,12 @@ export function calculateNitrogenSupplyBySoilMineralization(
     soilAnalysis: SoilAnalysisPicked,
     cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenSupplyMineralization {
+    if (cultivations.length === 0) {
+        return {
+            total: new Decimal(0),
+            cultivations: [],
+        }
+    }
     const mineralizations = cultivations.map((cultivation) => {
         // Get details of cultivation using the Map
         const cultivationDetail = cultivationDetailsMap.get(

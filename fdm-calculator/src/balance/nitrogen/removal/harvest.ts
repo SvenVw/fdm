@@ -18,6 +18,12 @@ export function calculateNitrogenRemovalByHarvests(
     harvests: FieldInput["harvests"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenRemovalHarvests {
+    if (harvests.length === 0) {
+        return {
+            total: new Decimal(0),
+            harvests: [],
+        }
+    }
     const removalHarvests = harvests.map((harvest) => {
         const b_lu = harvest.b_lu
 

@@ -21,6 +21,12 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
     harvests: FieldInput["harvests"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenEmissionAmmoniaResidues {
+    if (cultivations.length === 0) {
+        return {
+            total: new Decimal(0),
+            cultivations: [],
+        }
+    }
     const volatilizationResidue = cultivations.map((cultivation) => {
         // Get details of cultivation using the Map
         const cultivationDetail = cultivationDetailsMap.get(

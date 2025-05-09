@@ -19,6 +19,12 @@ export function calculateNitrogenSupplyByManure(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupplyFertilizers["manure"] {
+    if (fertilizerApplications.length === 0) {
+        return {
+            total: new Decimal(0),
+            applications: [],
+        }
+    }
     const applications = fertilizerApplications.map((application) => {
         // Get fertilizerDetails of application using the Map
         const fertilizerDetail = fertilizerDetailsMap.get(
