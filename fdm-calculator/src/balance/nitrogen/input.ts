@@ -43,7 +43,12 @@ export async function collectInputForNitrogenBalance(
     try {
         return await fdm.transaction(async (tx: FdmType) => {
             // Collect the fields for the farm
-            const farmFields = await getFields(tx, principal_id, b_id_farm, timeframe)
+            const farmFields = await getFields(
+                tx,
+                principal_id,
+                b_id_farm,
+                timeframe,
+            )
 
             // Collect the details per field
             const fields = await Promise.all(
@@ -56,12 +61,16 @@ export async function collectInputForNitrogenBalance(
                         timeframe,
                     )
 
-                    // Collect the harvests of the field
-                    const harvests = await getHarvests(
-                        tx,
-                        principal_id,
-                        field.b_id,
-                        timeframe,
+                    // Collect the harvests of the cultivations
+                    const harvests = await Promise.all(
+                        cultivations.map(async (cultivation) => {
+                            return await getHarvests(
+                                tx,
+                                principal_id,
+                                cultivation.b_lu,
+                                timeframe,
+                            )
+                        }),
                     )
 
                     // Get the soil analyses of the field
