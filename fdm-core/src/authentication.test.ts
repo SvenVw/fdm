@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, inject, it } from "vitest"
-import { type BetterAuth, createFdmAuth, splitFullName } from "./authentication"
+import {
+    type BetterAuth,
+    createDisplayUsername,
+    createFdmAuth,
+    splitFullName,
+} from "./authentication"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 
@@ -91,5 +96,35 @@ describe("splitFullName", () => {
         splittedFullName = splitFullName("  Doe  ,   John  ")
         expect(splittedFullName.firstname).toBe("John")
         expect(splittedFullName.surname).toBe("Doe")
+    })
+})
+
+describe("createDisplayUsername", () => {
+    it("should return full name when both first and last names are provided", () => {
+        const firstname = "John"
+        const surname = "Doe"
+        const displayName = createDisplayUsername(firstname, surname)
+        expect(displayName).toBe("John Doe")
+    })
+
+    it("should return only first name when only first name is provided", () => {
+        const firstname = "John"
+        const surname = null
+        const displayName = createDisplayUsername(firstname, surname)
+        expect(displayName).toBe("John")
+    })
+
+    it("should return only last name when only last name is provided", () => {
+        const firstname = null
+        const surname = "Doe"
+        const displayName = createDisplayUsername(firstname, surname)
+        expect(displayName).toBe("Doe")
+    })
+
+    it("should return null when neither first nor last name is provided", () => {
+        const firstname = null
+        const surname = null
+        const displayName = createDisplayUsername(firstname, surname)
+        expect(displayName).toBeNull()
     })
 })

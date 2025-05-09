@@ -224,7 +224,7 @@ async function createUsername(fdm: FdmType, email: string): Promise<string> {
     return username
 }
 
-function createDisplayUsername(
+export function createDisplayUsername(
     firstname: string | null,
     surname: string | null,
 ): string | null {
