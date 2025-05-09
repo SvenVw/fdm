@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Verify user is authenticated
-        if (!session.userId) {
+        if (!session.principal_id) {
             throw new Response("Unauthorized", { status: 401 })
         }
 
