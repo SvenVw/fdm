@@ -10,16 +10,20 @@ export default defineConfig({
         {
             file: "dist/fdm-calculator.esm.js", // Output for ES modules
             format: "esm",
+            sourcemap: process.env.NODE_ENV === "development",
         },
     ],
     plugins: [
         resolve(),
-        typescript(),
+        typescript({
+            sourceMap: process.env.NODE_ENV === "development",
+            inlineSources: process.env.NODE_ENV === "development",
+        }),
         terser({
             sourceMap:
-                process.env.NODE_ENV === "production"
+                process.env.NODE_ENV === "development"
                     ? {
-                          fileName: "dist/fdm-calculator.esm.js.map",
+                          filename: "dist/fdm-calculator.esm.js.map",
                           url: "fdm-calculator.esm.js.map",
                       }
                     : false,
