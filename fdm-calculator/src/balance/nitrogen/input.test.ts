@@ -10,8 +10,6 @@ import type {
     Harvest,
     SoilAnalysis,
     FertilizerApplication,
-    Fertilizer,
-    CultivationCatalogue,
 } from "@svenvw/fdm-core"
 import type { NitrogenBalanceInput, FieldInput, FertilizerDetail, CultivationDetail } from "./types"
 

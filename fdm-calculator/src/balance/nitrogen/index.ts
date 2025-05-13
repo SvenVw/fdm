@@ -60,8 +60,8 @@ export async function calculateNitrogenBalance(
                     field.field,
                     field.cultivations,
                     field.harvests,
-                    field.soilAnalyses,
                     field.fertilizerApplications,
+                    field.soilAnalyses,
                     fertilizerDetailsMap,
                     cultivationDetailsMap,
                     timeFrame,
@@ -305,12 +305,12 @@ export function combineSoilAnalyses(
         a_som_loi: null as fdmSchema.soilAnalysisTypeSelect["a_som_loi"],
     }
 
-    soilAnalysis.b_soiltype_agr
-    soilAnalyses.find(
-        (x: {
-            b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
-        }) => x.b_soiltype_agr,
-    )?.b_soiltype_agr || null
+    soilAnalysis.b_soiltype_agr =
+        soilAnalyses.find(
+            (x: {
+                b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
+            }) => x.b_soiltype_agr,
+        )?.b_soiltype_agr || null
     soilAnalysis.a_n_rt =
         soilAnalyses.find(
             (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>

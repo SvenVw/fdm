@@ -94,8 +94,8 @@ export async function collectInputForNitrogenBalance(
                         field: field,
                         cultivations: cultivations,
                         harvests: harvests,
-                        soilAnalyses: soilAnalyses,
                         fertilizerApplications: fertilizerApplications,
+                        soilAnalyses: soilAnalyses,
                     }
                 }),
             )
