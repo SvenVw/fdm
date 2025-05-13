@@ -12,13 +12,11 @@ import type {
 import { calculateNitrogenSupply } from "./supply"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenVolatilization } from "./volatization"
-import { fdmSchema } from "@svenvw/fdm-core"
+import type { fdmSchema } from "@svenvw/fdm-core"
 import {
     calculateBulkDensity,
     calculateCarbonNitrogenRatio,
     calculateOrganicCarbon,
-    convertOrganicCarbonFromOrganicMatter,
-    convertRatioFromCarbonAndNitrogen,
 } from "../../conversions/soil"
 
 /**
