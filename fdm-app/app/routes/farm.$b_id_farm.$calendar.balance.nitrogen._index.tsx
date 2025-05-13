@@ -1,5 +1,6 @@
 import {
     data,
+    NavLink,
     useLoaderData,
     useLocation,
     type LoaderFunctionArgs,
@@ -90,6 +91,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     return {
+        nitrogenBalanceInput: nitrogenBalanceInput,
         nitrogenBalanceResult: nitrogenBalanceResult,
         fields: fields,
         errorMessage: errorMessage,
@@ -101,7 +103,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
     const location = useLocation()
     const page = location.pathname
     const { nitrogenBalanceResult, fields, errorMessage } = loaderData
-    console.log(errorMessage)
+
     return (
         <div className="space-y-4">
             {nitrogenBalanceResult ? (
@@ -203,20 +205,27 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                     <AvatarFallback>OM</AvatarFallback>
                                 </Avatar> */}
                                                 <div className="ml-4 space-y-1">
-                                                    <p className="text-sm font-medium leading-none">
-                                                        {fields.find(
-                                                            (f) =>
-                                                                f.b_id ===
-                                                                field.b_id,
-                                                        )?.b_name ||
-                                                            "Test perceel"}
-                                                    </p>
+                                                    <NavLink
+                                                        to={`./${field.b_id}`}
+                                                    >
+                                                        <p className="text-sm font-medium leading-none">
+                                                            {
+                                                                fields.find(
+                                                                    (f) =>
+                                                                        f.b_id ===
+                                                                        field.b_id,
+                                                                )?.b_name
+                                                            }
+                                                        </p>
+                                                    </NavLink>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {fields.find(
-                                                            (f) =>
-                                                                f.b_id ===
-                                                                field.b_id,
-                                                        )?.b_area || "4 ha"}
+                                                        {
+                                                            fields.find(
+                                                                (f) =>
+                                                                    f.b_id ===
+                                                                    field.b_id,
+                                                            )?.b_area
+                                                        }
                                                     </p>
                                                 </div>
                                                 <div className="ml-auto font-medium">
