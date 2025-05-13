@@ -246,7 +246,7 @@ export function calculateNitrogenBalancesFieldToFarm(
 // Helper function to convert Decimal to number recursively
 function convertDecimalToNumberRecursive(data: unknown): unknown {
     if (data instanceof Decimal) {
-        return data.toNumber()
+        return data.round().toNumber()
     }
     if (Array.isArray(data)) {
         return data.map(convertDecimalToNumberRecursive)
