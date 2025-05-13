@@ -3,6 +3,7 @@ import type {
     NitrogenSupplyMineralization,
     CultivationDetail,
     FieldInput,
+    SoilAnalysisPicked,
 } from "../types"
 import Decimal from "decimal.js"
 
@@ -12,13 +13,13 @@ import Decimal from "decimal.js"
  * This function determines the mineralization based on the cultivations performed and soil analyses conducted.
  * It uses cultivation details to differentiate between grassland and arable land, then applies specific calculations for each.
  * @param cultivations - A list of cultivations on the field.
- * @param soilAnalyses - Soil analysis data for the field.
+ * @param soilAnalysis - Combined soil analysis data for the field.
  * @param cultivationDetailsMap - A map containing details for each cultivation.
  * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized and the individual cultivation values.
  */
 export function calculateNitrogenSupplyBySoilMineralization(
     cultivations: FieldInput["cultivations"],
-    soilAnalyses: FieldInput["soilAnalyses"],
+    soilAnalysis: SoilAnalysisPicked,
     cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenSupplyMineralization {
     const mineralizations = cultivations.map((cultivation) => {
@@ -42,48 +43,21 @@ export function calculateNitrogenSupplyBySoilMineralization(
 
         const b_lu_croprotation = cultivationDetail.b_lu_croprotation
         const isGrassland = b_lu_croprotation === "grassland"
-        const b_soiltype_agr =
-            soilAnalyses.find(
-                (x: {
-                    b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
-                }) => x.b_soiltype_agr,
-            )?.b_soiltype_agr || undefined
-        const a_n_rt =
-            soilAnalyses.find(
-                (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>
-                    x.a_n_rt,
-            )?.a_n_rt || undefined
-        const a_c_of =
-            soilAnalyses.find(
-                (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
-                    x.a_c_of,
-            )?.a_c_of || undefined
-        const a_cn_fr =
-            soilAnalyses.find(
-                (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
-                    x.a_cn_fr,
-            )?.a_cn_fr || undefined
-        const a_density_sa =
-            soilAnalyses.find(
-                (x: {
-                    a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"]
-                }) => x.a_density_sa,
-            )?.a_density_sa || undefined
 
         // Calculate the amount of Nitrogen mineralized by the soil
         let mineralization = Decimal(0)
         if (isGrassland) {
             mineralization =
                 calculateNitrogenSupplyBySoilMineralizationForGrassland(
-                    b_soiltype_agr,
-                    a_n_rt,
+                    soilAnalysis.b_soiltype_agr,
+                    soilAnalysis.a_n_rt,
                 )
         } else {
             mineralization =
                 calculateNitrogenSupplyBySoilMineralizationForArable(
-                    a_c_of,
-                    a_cn_fr,
-                    a_density_sa,
+                    soilAnalysis.a_c_of,
+                    soilAnalysis.a_cn_fr,
+                    soilAnalysis.a_density_sa,
                 )
         }
 
@@ -134,8 +108,13 @@ function calculateNitrogenSupplyBySoilMineralizationForGrassland(
     if (a_n_rt === null || a_n_rt === undefined) {
         throw new Error("No a_n_rt value found in soil analysis for grassland")
     }
+    if (b_soiltype_agr === null || b_soiltype_agr === undefined) {
+        throw new Error(
+            "No b_soiltype_agr value found in soil analysis for grassland",
+        )
+    }
 
-    // Return amount of Nitrogen mineralizd by soil at Grasslan for zand
+    // Return amount of Nitrogen mineralizd by soil at Grasslans for zand
     if (["dekzand", "dalgrond", "duinzand"].includes(b_soiltype_agr)) {
         return new Decimal(a_n_rt)
             .dividedBy(1000)

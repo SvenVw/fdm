@@ -315,6 +315,16 @@ export type NitrogenBalance = {
     fields: NitrogenBalanceField[]
 }
 
+export type SoilAnalysisPicked = Pick<
+    SoilAnalysis,
+    | "a_c_of" // g C / kg
+    | "a_cn_fr" // -
+    | "a_density_sa" // g / cm^3
+    | "a_n_rt" // mg N / kg
+    | "a_som_loi" // %
+    | "b_soiltype_agr"
+>
+
 /**
  * Represents the structure of fields with related entities for nitrogen balance calculation
  */
@@ -328,10 +338,12 @@ export type FieldInput = {
     soilAnalyses: Pick<
         SoilAnalysis,
         | "a_id"
+        | "b_sampling_date"
         | "a_c_of" // g C / kg
         | "a_cn_fr" // -
         | "a_density_sa" // g / cm^3
         | "a_n_rt" // mg N / kg
+        | "a_som_loi" // %
         | "b_soiltype_agr"
     >[]
     fertilizerApplications: FertilizerApplication[]

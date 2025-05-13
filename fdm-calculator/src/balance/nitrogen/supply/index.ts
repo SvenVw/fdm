@@ -1,10 +1,10 @@
-import { Decimal } from "decimal.js"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
     NitrogenBalanceInput,
     NitrogenSupply,
+    SoilAnalysisPicked,
 } from "../types"
 import { calculateNitrogenSupplyByFertilizers } from "./fertilizers"
 import { calculateNitrogenFixation } from "./fixation"
@@ -18,7 +18,7 @@ import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
  * @param field - The field for which to calculate the nitrogen supply.
  * @param cultivations - A list of cultivations on the field.
  * @param fertilizerApplications - A list of fertilizer applications on the field.
- * @param soilAnalyses - Soil analysis data for the field.
+ * @param soilAnalysis - Combined soil analysis data for the field.
  * @param cultivationDetailsMap - A map containing details for each cultivation, including its nitrogen fixation value.
  * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
  * @param timeFrame - The time frame for which to calculate the nitrogen supply.
@@ -31,7 +31,7 @@ export async function calculateNitrogenSupply(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
-    soilAnalyses: FieldInput["soilAnalyses"],
+    soilAnalysis: SoilAnalysisPicked,
     cultivationDetailsMap: Map<string, CultivationDetail>,
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
@@ -59,7 +59,7 @@ export async function calculateNitrogenSupply(
     // Calculate the amount of Nitrogen supplied by minerlization from the soil
     const mineralisationSupply = calculateNitrogenSupplyBySoilMineralization(
         cultivations,
-        soilAnalyses,
+        soilAnalysis,
         cultivationDetailsMap,
     )
 

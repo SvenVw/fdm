@@ -1,17 +1,28 @@
 import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
 import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
-import type { CultivationDetail, FieldInput } from "../types"
+import type {
+    CultivationDetail,
+    FieldInput,
+    SoilAnalysisPicked,
+} from "../types"
 
 describe("calculateNitrogenSupplyBySoilMineralization", () => {
     it("should return 0 if no cultivations are provided", () => {
         const cultivations: FieldInput["cultivations"] = []
-        const soilAnalyses: FieldInput["soilAnalyses"] = []
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: null,
+            a_n_rt: null,
+            a_c_of: null,
+            a_cn_fr: null,
+            a_density_sa: null,
+            a_som_loi: null,
+        }
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
 
         const result = calculateNitrogenSupplyBySoilMineralization(
             cultivations,
-            soilAnalyses,
+            soilAnalysis,
             cultivationDetailsMap,
         )
 
@@ -27,16 +38,15 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: true,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_soiltype_agr: "veen",
-                a_n_rt: 20000,
-                a_c_of: 10,
-                a_cn_fr: 14,
-                a_density_sa: 1.2,
-            },
-        ]
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: "veen",
+            a_n_rt: 20000,
+            a_c_of: 10,
+            a_cn_fr: 14,
+            a_density_sa: 1.2,
+            a_som_loi: null,
+        }
+
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
             [
                 "grasslandCatalogue",
@@ -54,7 +64,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
 
         const result = calculateNitrogenSupplyBySoilMineralization(
             cultivations,
-            soilAnalyses,
+            soilAnalysis,
             cultivationDetailsMap,
         )
 
@@ -72,16 +82,15 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: true,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_soiltype_agr: "arable",
-                a_n_rt: 20000,
-                a_c_of: 10,
-                a_cn_fr: 14,
-                a_density_sa: 1.2,
-            },
-        ]
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: "arable",
+            a_n_rt: 20000,
+            a_c_of: 10,
+            a_cn_fr: 14,
+            a_density_sa: 1.2,
+            a_som_loi: null,
+        }
+
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
             [
                 "arableCatalogue",
@@ -99,7 +108,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
 
         const result = calculateNitrogenSupplyBySoilMineralization(
             cultivations,
-            soilAnalyses,
+            soilAnalysis,
             cultivationDetailsMap,
         )
 
@@ -117,7 +126,14 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: false,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = []
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: null,
+            a_n_rt: null,
+            a_c_of: null,
+            a_cn_fr: null,
+            a_density_sa: null,
+            a_som_loi: null,
+        }
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
             [
                 "grasslandCatalogue",
@@ -136,7 +152,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         expect(() =>
             calculateNitrogenSupplyBySoilMineralization(
                 cultivations,
-                soilAnalyses,
+                soilAnalysis,
                 cultivationDetailsMap,
             ),
         ).toThrowError("No a_n_rt value found in soil analysis for grassland")
@@ -150,7 +166,14 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: true,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = []
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: null,
+            a_n_rt: null,
+            a_c_of: null,
+            a_cn_fr: null,
+            a_density_sa: null,
+            a_som_loi: null,
+        }
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
             [
                 "arableCatalogue",
@@ -169,7 +192,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         expect(() =>
             calculateNitrogenSupplyBySoilMineralization(
                 cultivations,
-                soilAnalyses,
+                soilAnalysis,
                 cultivationDetailsMap,
             ),
         ).toThrowError("No a_c_of value found in soil analysis for arable")
@@ -183,16 +206,15 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: false,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_soiltype_agr: "unknownType",
-                a_n_rt: 20000,
-                a_c_of: 10,
-                a_cn_fr: 14,
-                a_density_sa: 1.2,
-            },
-        ]
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: "unknownType",
+            a_n_rt: 20000,
+            a_c_of: 10,
+            a_cn_fr: 14,
+            a_density_sa: 1.2,
+            a_som_loi: null,
+        }
+
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
             [
                 "grasslandCatalogue",
@@ -211,7 +233,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         expect(() =>
             calculateNitrogenSupplyBySoilMineralization(
                 cultivations,
-                soilAnalyses,
+                soilAnalysis,
                 cultivationDetailsMap,
             ),
         ).toThrowError("Unknown soil type: unknownType")
@@ -225,22 +247,21 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: false,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_soiltype_agr: "veen",
-                a_n_rt: 20000,
-                a_c_of: 10,
-                a_cn_fr: 14,
-                a_density_sa: 1.2,
-            },
-        ]
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: "veen",
+            a_n_rt: 20000,
+            a_c_of: 10,
+            a_cn_fr: 14,
+            a_density_sa: 1.2,
+            a_som_loi: null,
+        }
+
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
 
         expect(() =>
             calculateNitrogenSupplyBySoilMineralization(
                 cultivations,
-                soilAnalyses,
+                soilAnalysis,
                 cultivationDetailsMap,
             ),
         ).toThrowError(
@@ -256,16 +277,15 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: true,
             },
         ]
-        const soilAnalyses: FieldInput["soilAnalyses"] = [
-            {
-                a_id: "soil1",
-                b_soiltype_agr: "rivierklei",
-                a_n_rt: 200000,
-                a_c_of: 10,
-                a_cn_fr: 14,
-                a_density_sa: 1.2,
-            }, //High value to exceed max
-        ]
+        const soilAnalysis: SoilAnalysisPicked = {
+            b_soiltype_agr: "rivierklei",
+            a_n_rt: 200000,
+            a_c_of: 10,
+            a_cn_fr: 14,
+            a_density_sa: 1.2,
+            a_som_loi: null,
+        } //High value to exceed max
+
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
             [
                 "grasslandCatalogue",
@@ -283,7 +303,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
 
         const result = calculateNitrogenSupplyBySoilMineralization(
             cultivations,
-            soilAnalyses,
+            soilAnalysis,
             cultivationDetailsMap,
         )
 
@@ -296,16 +316,15 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
                 m_cropresidue: true,
             },
         ]
-        const soilAnalyses2: FieldInput["soilAnalyses"] = [
-            {
-                b_soiltype_agr: "rivierklei",
-                a_c_of: 0.1,
-                a_cn_fr: 30,
-                a_density_sa: 1.2,
-                a_id: "soil2",
-                a_n_rt: 1,
-            }, //Low value to check min
-        ]
+        const soilAnalysis2: SoilAnalysisPicked = {
+            b_soiltype_agr: "rivierklei",
+            a_c_of: 0.1,
+            a_cn_fr: 30,
+            a_density_sa: 1.2,
+            a_n_rt: 1,
+            a_som_loi: null,
+        } //Low value to check min
+
         const cultivationDetailsMap2 = new Map<string, CultivationDetail>([
             [
                 "arableCatalogue",
@@ -323,7 +342,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
 
         const result2 = calculateNitrogenSupplyBySoilMineralization(
             cultivations2,
-            soilAnalyses2,
+            soilAnalysis2,
             cultivationDetailsMap2,
         )
 
