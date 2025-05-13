@@ -321,6 +321,11 @@ export function combineSoilAnalyses(
             (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
                 x.a_c_of,
         )?.a_c_of || null
+    soilAnalysis.a_som_loi =
+        soilAnalyses.find(
+            (x: { a_som_loi: fdmSchema.soilAnalysisTypeSelect["a_som_loi"] }) =>
+                x.a_som_loi,
+        )?.a_som_loi || null
     soilAnalysis.a_cn_fr =
         soilAnalyses.find(
             (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
@@ -356,7 +361,7 @@ export function combineSoilAnalyses(
         )
     }
 
-    // Validate if all required soil paramters for nitrogen balance are present
+    // Validate if all required soil parameters for nitrogen balance are present
     const requiredSoilParameters = [
         "b_soiltype_agr",
         "a_n_rt",
