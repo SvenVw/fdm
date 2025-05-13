@@ -72,6 +72,9 @@ export async function collectInputForNitrogenBalance(
                             )
                         }),
                     )
+                    const harvestsFiltered = harvests.flat().filter(
+                        (harvest) => harvest.length > 0,
+                    )
 
                     // Get the soil analyses of the field
                     const soilAnalyses = await getSoilAnalyses(
@@ -93,7 +96,7 @@ export async function collectInputForNitrogenBalance(
                     return {
                         field: field,
                         cultivations: cultivations,
-                        harvests: harvests,
+                        harvests: harvestsFiltered,
                         fertilizerApplications: fertilizerApplications,
                         soilAnalyses: soilAnalyses,
                     }
