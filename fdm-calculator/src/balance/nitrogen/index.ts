@@ -17,6 +17,7 @@ import {
     calculateBulkDensity,
     calculateCarbonNitrogenRatio,
     calculateOrganicCarbon,
+    calculateOrganicMatter,
 } from "../../conversions/soil"
 
 /**
@@ -338,9 +339,7 @@ export function combineSoilAnalyses(
     }
 
     if (!soilAnalysis.a_som_loi) {
-        soilAnalysis.a_som_loi = convertOrganicCarbonFromOrganicMatter(
-            soilAnalysis.a_c_of,
-        )
+        soilAnalysis.a_som_loi = calculateOrganicMatter(soilAnalysis.a_c_of)
     }
 
     if (!soilAnalysis.a_cn_fr) {
