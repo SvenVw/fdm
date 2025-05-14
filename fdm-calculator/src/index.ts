@@ -6,4 +6,15 @@ export type { Dose } from "./doses/d"
 export type {
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
+    NitrogenSupplyNumeric,
+    NitrogenRemovalNumeric,
+    NitrogenVolatilizationNumeric,
+    NitrogenSupplyFertilizersNumeric,
+    NitrogenSupplyFixationNumeric,
+    NitrogenSupplyMineralizationNumeric,
+    NitrogenRemovalHarvestsNumeric,
+    NitrogenRemovalResiduesNumeric,
+    NitrogenEmissionAmmoniaNumeric,
+    NitrogenEmissionAmmoniaFertilizersNumeric,
+    NitrogenEmissionAmmoniaResiduesNumeric,
 } from "./balance/nitrogen/types"

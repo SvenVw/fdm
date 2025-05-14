@@ -1,0 +1,330 @@
+import React from "react"
+import type {
+    NitrogenBalanceNumeric,
+    NitrogenSupplyNumeric,
+    NitrogenRemovalNumeric,
+    NitrogenVolatilizationNumeric,
+    NitrogenSupplyFertilizersNumeric,
+    NitrogenSupplyFixationNumeric,
+    NitrogenSupplyMineralizationNumeric,
+    NitrogenRemovalHarvestsNumeric,
+    NitrogenRemovalResiduesNumeric,
+} from "@svenvw/fdm-calculator"
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from "~/components/ui/accordion"
+
+interface NitrogenBalanceDetailsProps {
+    balanceData: NitrogenBalanceNumeric
+}
+
+const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
+    balanceData,
+}) => {
+    const renderSupply = (supply: NitrogenSupplyNumeric) => {
+        const sectionKey = "supply"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Aanvoer (Totaal): {supply.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <Accordion type="multiple" className="ml-4">
+                        {/* Render Fertilizers */}
+                        {renderFertilizersSupply(supply.fertilizers)}
+
+                        {/* Render Fixation */}
+                        {renderFixationSupply(supply.fixation)}
+
+                        {/* Render Deposition */}
+                        <div className="ml-4 py-2">
+                            Depositie (Totaal): {supply.deposition.total} kg N /
+                            ha
+                        </div>
+
+                        {/* Render Mineralization */}
+                        {renderMineralizationSupply(supply.mineralisation)}
+                    </Accordion>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderFertilizersSupply = (
+        fertilizers: NitrogenSupplyFertilizersNumeric,
+    ) => {
+        const sectionKey = "supply.fertilizers"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Bemesting (Totaal): {fertilizers.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <Accordion
+                        type="multiple"                        
+                        className="ml-4"
+                    >
+                        {/* Render Mineral Fertilizers */}
+                        {renderMineralFertilizersSupply(fertilizers.mineral)}
+
+                        {/* Render Manure */}
+                        {renderManureSupply(fertilizers.manure)}
+
+                        {/* Render Compost */}
+                        {renderCompostSupply(fertilizers.compost)}
+                    </Accordion>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderMineralFertilizersSupply = (
+        mineral: NitrogenSupplyFertilizersNumeric["mineral"],
+    ) => {
+        const sectionKey = "supply.fertilizers.mineral"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Minerale meststoffen (Totaal): {mineral.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {mineral.applications.map(
+                            (app: { id: string; value: number }) => (
+                                <li
+                                    key={app.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Bemesting {app.id}: {app.value} kg N / ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderManureSupply = (
+        manure: NitrogenSupplyFertilizersNumeric["manure"],
+    ) => {
+        const sectionKey = "supply.fertilizers.manure"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Mest (Totaal): {manure.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {manure.applications.map(
+                            (app: { id: string; value: number }) => (
+                                <li
+                                    key={app.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Bemesting {app.id}: {app.value} kg N / ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderCompostSupply = (
+        compost: NitrogenSupplyFertilizersNumeric["compost"],
+    ) => {
+        const sectionKey = "supply.fertilizers.compost"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Compost (Totaal): {compost.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {compost.applications.map(
+                            (app: { id: string; value: number }) => (
+                                <li
+                                    key={app.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Bemesting {app.id}: {app.value} kg N / ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderFixationSupply = (fixation: NitrogenSupplyFixationNumeric) => {
+        const sectionKey = "supply.fixation"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Fixatie (Totaal): {fixation.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {fixation.cultivations.map(
+                            (cult: { id: string; value: number }) => (
+                                <li
+                                    key={cult.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Gewas {cult.id}: {cult.value} kg N / ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderMineralizationSupply = (
+        mineralization: NitrogenSupplyMineralizationNumeric,
+    ) => {
+        const sectionKey = "supply.mineralization"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Mineralisatie (Totaal): {mineralization.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {mineralization.cultivations.map(
+                            (cult: { id: string; value: number }) => (
+                                <li
+                                    key={cult.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Gewas {cult.id}: {cult.value} kg N / ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderRemoval = (removal: NitrogenRemovalNumeric) => {
+        const sectionKey = "removal"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Afvoer (Totaal): {removal.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <Accordion type="multiple" className="ml-4">
+                        {/* Render Harvests */}
+                        {renderHarvestsRemoval(removal.harvests)}
+
+                        {/* Render Residues */}
+                        {renderResiduesRemoval(removal.residues)}
+                    </Accordion>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderHarvestsRemoval = (
+        harvests: NitrogenRemovalHarvestsNumeric,
+    ) => {
+        const sectionKey = "removal.harvests"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Oogsten (Totaal): {harvests.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {harvests.harvests.map(
+                            (harvest: { id: string; value: number }) => (
+                                <li
+                                    key={harvest.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Oogst {harvest.id}: {harvest.value} kg N /
+                                    ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderResiduesRemoval = (
+        residues: NitrogenRemovalResiduesNumeric,
+    ) => {
+        const sectionKey = "removal.residues"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Gewasresten (Totaal): {residues.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {residues.cultivations.map(
+                            (cult: { id: string; value: number }) => (
+                                <li
+                                    key={cult.id}
+                                    className="text-sm text-muted-foreground"
+                                >
+                                    Gewas {cult.id}: {cult.value} kg N / ha
+                                </li>
+                            ),
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderVolatilization = (
+        volatilization: NitrogenVolatilizationNumeric,
+    ) => {
+        const sectionKey = "volatilization"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Emissie (Totaal): {volatilization.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    {/* Ammonia calculation is not finished, skipping rendering */}
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    return (
+        <div>
+            <Accordion type="multiple" className="w-full">
+                {renderSupply(balanceData.supply)}
+                {renderRemoval(balanceData.removal)}
+                {renderVolatilization(balanceData.volatilization)}
+            </Accordion>
+        </div>
+    )
+}
+
+export default NitrogenBalanceDetails
