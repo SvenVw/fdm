@@ -17,7 +17,7 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
-import { getFarm, getField, getFields } from "@svenvw/fdm-core"
+import { getFarm, getField } from "@svenvw/fdm-core"
 import { fdm } from "~/lib/fdm.server"
 import {
     calculateNitrogenBalance,
@@ -85,7 +85,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const field = await getField(fdm, session.principal_id, b_id)
 
     // Collect input data for nutrient balance calculation
-    const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+    let nitrogenBalanceInput = await collectInputForNitrogenBalance(
         fdm,
         session.principal_id,
         b_id_farm,
@@ -101,6 +101,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         nitrogenBalanceResult = nitrogenBalanceResult.fields.find(
             (field) => field.b_id === b_id,
+        )
+
+        nitrogenBalanceInput = nitrogenBalanceInput.fields.find(
+            (field) => field.field.b_id === b_id,
         )
     } catch (error) {
         errorMessage = String(error).replace("Error: ", "")
@@ -121,8 +125,9 @@ export default function FarmBalanceNitrogenFieldBlock() {
     const page = location.pathname
     const isLoading = navigation.state === "loading"
 
-    const { nitrogenBalanceResult, field, errorMessage } = loaderData
-    console.log(nitrogenBalanceResult)
+    const { nitrogenBalanceInput, nitrogenBalanceResult, errorMessage } =
+        loaderData
+    // console.log(nitrogenBalanceInput)
 
     return (
         <div className="space-y-4">
@@ -221,9 +226,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                     <div className="flex items-center justify-center">
                                         <LoadingSpinner />
                                     </div>
-                                ) : (
-                                  null
-                                )}
+                                ) : null}
                             </CardContent>
                         </Card>
                         <Card className="col-span-3">
@@ -252,6 +255,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                     ) : (
                                         <NitrogenBalanceDetails
                                             balanceData={nitrogenBalanceResult}
+                                            fieldInput={nitrogenBalanceInput}
                                         />
                                     )}
                                 </div>

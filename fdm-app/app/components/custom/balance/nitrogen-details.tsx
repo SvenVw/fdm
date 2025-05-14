@@ -1,5 +1,6 @@
-import React from "react"
+import type React from "react"
 import type {
+    FieldInput,
     NitrogenBalanceNumeric,
     NitrogenSupplyNumeric,
     NitrogenRemovalNumeric,
@@ -16,17 +17,27 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from "~/components/ui/accordion"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import { NavLink } from "react-router"
+import { useCalendarStore } from "@/app/store/calendar"
 
 interface NitrogenBalanceDetailsProps {
     balanceData: NitrogenBalanceNumeric
+    fieldInput: FieldInput
 }
 
 const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     balanceData,
+    fieldInput,
 }) => {
-    const renderSupply = (supply: NitrogenSupplyNumeric) => {
-        const sectionKey = "supply"
+    const calendar = useCalendarStore((state) => state.calendar)
 
+    const renderSupply = (
+        supply: NitrogenSupplyNumeric,
+        fieldInput: FieldInput,
+    ) => {
+        const sectionKey = "supply"
         return (
             <AccordionItem value={sectionKey}>
                 <AccordionTrigger>
@@ -35,7 +46,10 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
                         {/* Render Fertilizers */}
-                        {renderFertilizersSupply(supply.fertilizers)}
+                        {renderFertilizersSupply(
+                            supply.fertilizers,
+                            fieldInput,
+                        )}
 
                         {/* Render Fixation */}
                         {renderFixationSupply(supply.fixation)}
@@ -56,6 +70,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
     const renderFertilizersSupply = (
         fertilizers: NitrogenSupplyFertilizersNumeric,
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "supply.fertilizers"
 
@@ -65,18 +80,18 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                     Bemesting (Totaal): {fertilizers.total} kg N / ha
                 </AccordionTrigger>
                 <AccordionContent>
-                    <Accordion
-                        type="multiple"                        
-                        className="ml-4"
-                    >
+                    <Accordion type="multiple" className="ml-4">
                         {/* Render Mineral Fertilizers */}
-                        {renderMineralFertilizersSupply(fertilizers.mineral)}
+                        {renderMineralFertilizersSupply(
+                            fertilizers.mineral,
+                            fieldInput,
+                        )}
 
                         {/* Render Manure */}
-                        {renderManureSupply(fertilizers.manure)}
+                        {renderManureSupply(fertilizers.manure, fieldInput)}
 
                         {/* Render Compost */}
-                        {renderCompostSupply(fertilizers.compost)}
+                        {renderCompostSupply(fertilizers.compost, fieldInput)}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
@@ -85,6 +100,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
     const renderMineralFertilizersSupply = (
         mineral: NitrogenSupplyFertilizersNumeric["mineral"],
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "supply.fertilizers.mineral"
 
@@ -96,14 +112,35 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {mineral.applications.map(
-                            (app: { id: string; value: number }) => (
-                                <li
-                                    key={app.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Bemesting {app.id}: {app.value} kg N / ha
-                                </li>
-                            ),
+                            (app: { id: string; value: number }) => {
+                                if (app.value === 0) {
+                                    return null
+                                }
+
+                                const application =
+                                    fieldInput.fertilizerApplications.find(
+                                        (fa: { p_app_id: string }) =>
+                                            fa.p_app_id === app.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                        key={app.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {application.p_name_nl} op{" "}
+                                            {format(
+                                                application.p_app_date,
+                                                "PP",
+                                                {
+                                                    locale: nl,
+                                                },
+                                            )}
+                                            : {app.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
@@ -113,6 +150,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
     const renderManureSupply = (
         manure: NitrogenSupplyFertilizersNumeric["manure"],
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "supply.fertilizers.manure"
 
@@ -124,14 +162,35 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {manure.applications.map(
-                            (app: { id: string; value: number }) => (
-                                <li
-                                    key={app.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Bemesting {app.id}: {app.value} kg N / ha
-                                </li>
-                            ),
+                            (app: { id: string; value: number }) => {
+                                if (app.value === 0) {
+                                    return null
+                                }
+
+                                const application =
+                                    fieldInput.fertilizerApplications.find(
+                                        (fa: { p_app_id: string }) =>
+                                            fa.p_app_id === app.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                        key={app.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {application.p_name_nl} op{" "}
+                                            {format(
+                                                application.p_app_date,
+                                                "PP",
+                                                {
+                                                    locale: nl,
+                                                },
+                                            )}
+                                            : {app.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
@@ -152,14 +211,35 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {compost.applications.map(
-                            (app: { id: string; value: number }) => (
-                                <li
-                                    key={app.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Bemesting {app.id}: {app.value} kg N / ha
-                                </li>
-                            ),
+                            (app: { id: string; value: number }) => {
+                                if (app.value === 0) {
+                                    return null
+                                }
+
+                                const application =
+                                    fieldInput.fertilizerApplications.find(
+                                        (fa: { p_app_id: string }) =>
+                                            fa.p_app_id === app.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                        key={app.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {application.p_name_nl} op{" "}
+                                            {format(
+                                                application.p_app_date,
+                                                "PP",
+                                                {
+                                                    locale: nl,
+                                                },
+                                            )}
+                                            : {app.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
@@ -319,7 +399,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     return (
         <div>
             <Accordion type="multiple" className="w-full">
-                {renderSupply(balanceData.supply)}
+                {renderSupply(balanceData.supply, fieldInput)}
                 {renderRemoval(balanceData.removal)}
                 {renderVolatilization(balanceData.volatilization)}
             </Accordion>
