@@ -52,13 +52,10 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                         )}
 
                         {/* Render Fixation */}
-                        {renderFixationSupply(supply.fixation)}
+                        {renderFixationSupply(supply.fixation, fieldInput)}
 
                         {/* Render Deposition */}
-                        <div className="ml-4 py-2">
-                            Depositie (Totaal): {supply.deposition.total} kg N /
-                            ha
-                        </div>
+                        {renderDepositionSupply(supply.deposition)}
 
                         {/* Render Mineralization */}
                         {renderMineralizationSupply(supply.mineralisation)}
@@ -200,6 +197,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
     const renderCompostSupply = (
         compost: NitrogenSupplyFertilizersNumeric["compost"],
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "supply.fertilizers.compost"
 
@@ -247,7 +245,10 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
-    const renderFixationSupply = (fixation: NitrogenSupplyFixationNumeric) => {
+    const renderFixationSupply = (
+        fixation: NitrogenSupplyFixationNumeric,
+        fieldInput: FieldInput,
+    ) => {
         const sectionKey = "supply.fixation"
 
         return (
@@ -258,17 +259,43 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {fixation.cultivations.map(
-                            (cult: { id: string; value: number }) => (
-                                <li
-                                    key={cult.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Gewas {cult.id}: {cult.value} kg N / ha
-                                </li>
-                            ),
+                            (cult: { id: string; value: number }) => {
+                                if (cult.value === 0) {
+                                    return null
+                                }
+
+                                const cultivation =
+                                    fieldInput.cultivations.find(
+                                        (cultivation: { b_lu: string }) =>
+                                            cultivation.b_lu === cult.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
+                                        key={cult.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {cultivation.b_lu_name}:{" "}
+                                            {cult.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
+            </AccordionItem>
+        )
+    }
+    const renderDepositionSupply = (deposition: { total: number }) => {
+        const sectionKey = "supply.deposition"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Depositie (Totaal): {deposition.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent />
             </AccordionItem>
         )
     }
@@ -286,14 +313,28 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {mineralization.cultivations.map(
-                            (cult: { id: string; value: number }) => (
-                                <li
-                                    key={cult.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Gewas {cult.id}: {cult.value} kg N / ha
-                                </li>
-                            ),
+                            (cult: { id: string; value: number }) => {
+                                if (cult.value === 0) {
+                                    return null
+                                }
+
+                                const cultivation =
+                                    fieldInput.cultivations.find(
+                                        (cultivation: { b_lu: string }) =>
+                                            cultivation.b_lu === cult.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
+                                        key={cult.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {cultivation.b_lu_name}:{" "}
+                                            {cult.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
