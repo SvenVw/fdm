@@ -3,6 +3,7 @@ import {
     NavLink,
     useLoaderData,
     useLocation,
+    useNavigation,
     type LoaderFunctionArgs,
     type MetaFunction,
 } from "react-router"
@@ -30,6 +31,8 @@ import {
     House,
 } from "lucide-react"
 import { timestamp } from "drizzle-orm/gel-core"
+import { LoadingSpinner } from "../components/custom/loadingspinner"
+import { Skeleton } from "../components/ui/skeleton"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -101,7 +104,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmBalanceNitrogenOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
+    const navigation = useNavigation()
     const page = location.pathname
+    const isLoading = navigation.state === "loading"
+
     const { nitrogenBalanceResult, fields, errorMessage } = loaderData
 
     return (
@@ -118,7 +124,11 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    +{nitrogenBalanceResult.balance}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.balance
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     kg N / ha
@@ -134,8 +144,11 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {" "}
-                                    +{nitrogenBalanceResult.supply}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.supply
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     kg N / ha
@@ -151,7 +164,11 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {nitrogenBalanceResult.removal}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.removal
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     kg N / ha
@@ -167,7 +184,11 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {nitrogenBalanceResult.volatilization}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.volatilization
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     kg N / ha
@@ -181,6 +202,11 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                 <CardTitle>Balans</CardTitle>
                             </CardHeader>
                             <CardContent className="pl-2">
+                                {isLoading ? (
+                                    <div className="flex items-center justify-center">
+                                        <LoadingSpinner />
+                                    </div>
+                                ) : null}
                                 {/* <Overview /> */}
                             </CardContent>
                         </Card>
@@ -191,49 +217,65 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-8">
-                                    {nitrogenBalanceResult.fields.map(
-                                        (field) => (
-                                            <div
-                                                className="flex items-center"
-                                                key={field.b_id}
-                                            >
-                                                {/* <Avatar className="h-9 w-9">
+                                    {isLoading
+                                        ? fields.map((field) => {
+                                              return (
+                                                  <div
+                                                      className="flex items-center"
+                                                      key={field.b_id}
+                                                  >
+                                                      <div className="ml-4 space-y-1">
+                                                          <Skeleton className="h-4 w-[250px]" />
+                                                      </div>
+                                                      <div className="ml-auto">
+                                                          <Skeleton className="h-4 w-[50px]" />
+                                                      </div>
+                                                  </div>
+                                              )
+                                          })
+                                        : nitrogenBalanceResult.fields.map(
+                                              (field) => (
+                                                  <div
+                                                      className="flex items-center"
+                                                      key={field.b_id}
+                                                  >
+                                                      {/* <Avatar className="h-9 w-9">
                                     <AvatarImage
                                         src="/avatars/01.png"
                                         alt="Avatar"
                                     />
                                     <AvatarFallback>OM</AvatarFallback>
                                 </Avatar> */}
-                                                <div className="ml-4 space-y-1">
-                                                    <NavLink
-                                                        to={`./${field.b_id}`}
-                                                    >
-                                                        <p className="text-sm font-medium leading-none">
-                                                            {
-                                                                fields.find(
-                                                                    (f) =>
-                                                                        f.b_id ===
-                                                                        field.b_id,
-                                                                )?.b_name
-                                                            }
-                                                        </p>
-                                                    </NavLink>
-                                                    <p className="text-sm text-muted-foreground">
-                                                        {
-                                                            fields.find(
-                                                                (f) =>
-                                                                    f.b_id ===
-                                                                    field.b_id,
-                                                            )?.b_area
-                                                        }
-                                                    </p>
-                                                </div>
-                                                <div className="ml-auto font-medium">
-                                                    +{field.balance}
-                                                </div>
-                                            </div>
-                                        ),
-                                    )}
+                                                      <div className="ml-4 space-y-1">
+                                                          <NavLink
+                                                              to={`./${field.b_id}`}
+                                                          >
+                                                              <p className="text-sm font-medium leading-none">
+                                                                  {
+                                                                      fields.find(
+                                                                          (f) =>
+                                                                              f.b_id ===
+                                                                              field.b_id,
+                                                                      )?.b_name
+                                                                  }
+                                                              </p>
+                                                          </NavLink>
+                                                          <p className="text-sm text-muted-foreground">
+                                                              {
+                                                                  fields.find(
+                                                                      (f) =>
+                                                                          f.b_id ===
+                                                                          field.b_id,
+                                                                  )?.b_area
+                                                              }
+                                                          </p>
+                                                      </div>
+                                                      <div className="ml-auto font-medium">
+                                                          +{field.balance}
+                                                      </div>
+                                                  </div>
+                                              ),
+                                          )}
                                 </div>
                             </CardContent>
                         </Card>
