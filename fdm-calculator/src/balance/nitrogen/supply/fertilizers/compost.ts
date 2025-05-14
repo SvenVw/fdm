@@ -37,7 +37,7 @@ export function calculateNitrogenSupplyByCompost(
         // If the fertilizer used is not of the type compost
         if (p_type_compost === false) {
             return {
-                id: application.p_id_catalogue,
+                id: application.p_app_id,
                 value: new Decimal(0),
             }
         }
@@ -47,7 +47,7 @@ export function calculateNitrogenSupplyByCompost(
         const applicationValue = p_app_amount.times(p_n_rt)
 
         return {
-            id: application.p_id_catalogue,
+            id: application.p_app_id,
             value: applicationValue,
         }
     })

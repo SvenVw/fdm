@@ -36,7 +36,7 @@ export function calculateNitrogenSupplyByManure(
         // If the fertilizer used is not of the type manure
         if (p_type_manure === false) {
             return {
-                id: application.p_id_catalogue,
+                id: application.p_app_id,
                 value: new Decimal(0),
             }
         }
@@ -46,7 +46,7 @@ export function calculateNitrogenSupplyByManure(
         const applicationValue = p_app_amount.times(p_n_rt).dividedBy(1000) // convert from g N to kg N
 
         return {
-            id: application.p_id_catalogue,
+            id: application.p_app_id,
             value: applicationValue,
         }
     })
