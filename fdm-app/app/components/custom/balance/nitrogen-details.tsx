@@ -342,7 +342,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
-    const renderRemoval = (removal: NitrogenRemovalNumeric) => {
+    const renderRemoval = (removal: NitrogenRemovalNumeric, fieldInput: FieldInput) => {
         const sectionKey = "removal"
 
         return (
@@ -356,7 +356,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                         {renderHarvestsRemoval(removal.harvests)}
 
                         {/* Render Residues */}
-                        {renderResiduesRemoval(removal.residues)}
+                        {renderResiduesRemoval(removal.residues, fieldInput)}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
@@ -394,6 +394,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
     const renderResiduesRemoval = (
         residues: NitrogenRemovalResiduesNumeric,
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "removal.residues"
 
@@ -405,14 +406,28 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {residues.cultivations.map(
-                            (cult: { id: string; value: number }) => (
-                                <li
-                                    key={cult.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Gewas {cult.id}: {cult.value} kg N / ha
-                                </li>
-                            ),
+                            (cult: { id: string; value: number }) => {
+                                if (cult.value === 0) {
+                                    return null
+                                }
+
+                                const cultivation =
+                                    fieldInput.cultivations.find(
+                                        (cultivation: { b_lu: string }) =>
+                                            cultivation.b_lu === cult.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
+                                        key={cult.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {cultivation.b_lu_name}:{" "}
+                                            {cult.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
@@ -441,7 +456,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         <div>
             <Accordion type="multiple" className="w-full">
                 {renderSupply(balanceData.supply, fieldInput)}
-                {renderRemoval(balanceData.removal)}
+                {renderRemoval(balanceData.removal, fieldInput)}
                 {renderVolatilization(balanceData.volatilization)}
             </Accordion>
         </div>
