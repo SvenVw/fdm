@@ -20,12 +20,12 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
   it("should calculate nitrogen supply from mineral fertilizer applications", () => {
     const fertilizerApplications: FieldInput["fertilizerApplications"] = [
       {
-        p_id_catalogue: "mineral1",
+        p_id_catalogue: "app1",
         p_app_amount: 1000,
         p_app_id: "app1",
       },
       {
-        p_id_catalogue: "mineral2",
+        p_id_catalogue: "app2",
         p_app_amount: 500,
         p_app_id: "app2",
       },
@@ -33,9 +33,9 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
 
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
       [
-        "mineral1",
+        "app1",
         {
-          p_id_catalogue: "mineral1",
+          p_id_catalogue: "app1",
           p_type_compost: false,
           p_n_rt: 20,
           p_type_manure: false,
@@ -43,9 +43,9 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
         },
       ],
       [
-        "mineral2",
+        "app2",
         {
-          p_id_catalogue: "mineral2",
+          p_id_catalogue: "app2",
           p_type_compost: false,
           p_n_rt: 15,
           p_type_manure: false,
@@ -61,8 +61,8 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
 
     expect(result.total.equals(new Decimal(27.5))).toBe(true);
     expect(result.applications).toEqual([
-      { id: "mineral1", value: new Decimal(20) },
-      { id: "mineral2", value: new Decimal(7.5) },
+      { id: "app1", value: new Decimal(20) },
+      { id: "app2", value: new Decimal(7.5) },
     ]);
   });
 

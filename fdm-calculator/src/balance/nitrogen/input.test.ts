@@ -103,7 +103,7 @@ describe("collectInputForNitrogenBalance", () => {
         const expectedFieldInputs: FieldInput[] = mockFieldsData.map(field => ({
             field: field,
             cultivations: mockCultivationsData,
-            harvests: [mockHarvestsData], // Since getHarvests is called per cultivation
+            harvests: mockHarvestsData,
             soilAnalyses: mockSoilAnalysesData,
             fertilizerApplications: mockFertilizerApplicationsData,
         }))

@@ -240,7 +240,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             harvests,
             cultivationDetailsMap,
         )
-        console.log(result)
+
         expect(result.total.toNumber()).toBeCloseTo(-1.2, -1)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
