@@ -159,14 +159,14 @@ function calculateNitrogenSupplyBySoilMineralizationForArable(
     const w_temp_mean = new Decimal(10.6)
 
     // Depth of bouwvoor (cm)
-    const bouwvoor = 20
+    const bouwvoor = new Decimal(20)
 
     // Calculate temperature correction
     let temperatureCorrection = new Decimal(0)
     if (w_temp_mean.gt(-1) && w_temp_mean.lte(9)) {
         temperatureCorrection = w_temp_mean.times(0.1)
     } else if (w_temp_mean.gt(9) && w_temp_mean.lte(27)) {
-        const a = w_temp_mean.minus(-9).dividedBy(9)
+        const a = w_temp_mean.minus(9).dividedBy(9)
         temperatureCorrection = new Decimal(2).pow(a)
     } else if (w_temp_mean.gt(27)) {
         throw new Error("Average yearly temperature is too high")
@@ -185,7 +185,7 @@ function calculateNitrogenSupplyBySoilMineralizationForArable(
     }
 
     // Calculate Cdec
-    const b = temperatureCorrection.times(10).pow(-0.6)
+    const b = temperatureCorrection.times(10).add(17).pow(-0.6)
     const c = new Decimal(17).pow(-0.6)
     const d = b.minus(c).times(4.7).exp()
     const e = new Decimal(1).minus(d)
@@ -197,8 +197,8 @@ function calculateNitrogenSupplyBySoilMineralizationForArable(
     const mineralization = f
         .minus(g)
         .times(10000)
+        .times(bouwvoor.dividedBy(100))
         .times(a_density_sa)
-        .times(bouwvoor)
 
     return mineralization
 }
