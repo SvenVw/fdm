@@ -17,7 +17,7 @@ export function calculateOrganicCarbon(
         return null
     }
 
-    let a_c_of = new Decimal(a_som_loi).times(0.5)
+    let a_c_of = new Decimal(a_som_loi).times(0.5).times(10)
 
     if (a_c_of.gt(new Decimal(600))) {
         a_c_of = new Decimal(600)
@@ -44,7 +44,7 @@ export function calculateOrganicMatter(
         return null
     }
 
-    let a_som_loi = new Decimal(a_c_of).dividedBy(0.5)
+    let a_som_loi = new Decimal(a_c_of).dividedBy(10).dividedBy(0.5)
 
     if (a_som_loi.gt(new Decimal(75))) {
         a_som_loi = new Decimal(75)
@@ -74,7 +74,7 @@ export function calculateCarbonNitrogenRatio(
         return null
     }
 
-    let a_cn_fr = new Decimal(a_c_of).div(new Decimal(a_n_rt))
+    let a_cn_fr = new Decimal(a_c_of).dividedBy(new Decimal(a_n_rt).dividedBy(1000))
 
     if (a_cn_fr.gt(new Decimal(40))) {
         a_cn_fr = new Decimal(40)
