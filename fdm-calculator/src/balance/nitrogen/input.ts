@@ -63,7 +63,7 @@ export async function collectInputForNitrogenBalance(
 
                     // Collect the harvests of the cultivations
                     const harvests = await Promise.all(
-                        cultivations.map(async (cultivation) => {
+                        cultivations.flatMap(async (cultivation) => {
                             return await getHarvests(
                                 tx,
                                 principal_id,
@@ -73,7 +73,7 @@ export async function collectInputForNitrogenBalance(
                         }),
                     )
                     const harvestsFiltered = harvests.flat().filter(
-                        (harvest) => harvest.length > 0,
+                        (harvest) => harvest.b_lu !== undefined,
                     )
 
                     // Get the soil analyses of the field
