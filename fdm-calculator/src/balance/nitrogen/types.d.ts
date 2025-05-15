@@ -329,7 +329,7 @@ export type SoilAnalysisPicked = Pick<
  * Represents the structure of fields with related entities for nitrogen balance calculation
  */
 export type FieldInput = {
-    field: Pick<Field, "b_id" | "b_centroid" | "b_area">
+    field: Pick<Field, "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end">
     cultivations: Pick<
         Cultivation,
         "b_lu" | "b_lu_catalogue" | "m_cropresidue"
