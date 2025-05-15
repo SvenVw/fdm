@@ -250,7 +250,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                                           <NavLink
                                                               to={`./${field.b_id}`}
                                                           >
-                                                              <p className="text-sm font-medium leading-none">
+                                                              <p className="text-sm font-medium leading-none hover:underline">
                                                                   {
                                                                       fields.find(
                                                                           (f) =>
@@ -267,7 +267,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                                                           f.b_id ===
                                                                           field.b_id,
                                                                   )?.b_area
-                                                              }
+                                                              } ha
                                                           </p>
                                                       </div>
                                                       <div className="ml-auto font-medium">
