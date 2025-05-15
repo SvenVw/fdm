@@ -1,6 +1,9 @@
 import type { Timeframe } from "@svenvw/fdm-core"
 import type { Params } from "react-router"
 
+const yearStart = 2020
+const yearEnd = new Date().getFullYear()
+
 export function getCalendar(params: Params): string {
     const calendar = params.calendar as string | "all"
 
@@ -11,8 +14,8 @@ export function getTimeframe(params: Params): Timeframe {
     const calendar = getCalendar(params)
 
     const timeframe = {
-        start: new Date("1970-01-01T00:00:00.000Z"),
-        end: new Date("2099-12-31T00:00:00.000Z"),
+        start: new Date(`${yearStart}-01-01T00:00:00.000Z`),
+        end: new Date(`${yearEnd}-12-31T23:59:59.999Z`),
     }
 
     // Check if calendar is year and create a timeframe
@@ -21,7 +24,7 @@ export function getTimeframe(params: Params): Timeframe {
         const year = Number(calendar)
         if (!Number.isNaN(year)) {
             // Check if year is supported
-            if (year < 1970 || year > 2099) {
+            if (year < yearStart || year > yearEnd) {
                 throw new Error(`Unsupported year: ${calendar}`)
             }
             // Set start and end date
@@ -34,12 +37,9 @@ export function getTimeframe(params: Params): Timeframe {
 }
 
 export function getCalendarSelection(): string[] {
-    // Get current year
-    const currentYear = new Date().getFullYear()
-
     // Create array of years from 2020 to current year
     const years = []
-    for (let i = 2020; i <= currentYear; i++) {
+    for (let i = yearStart; i <= yearEnd; i++) {
         years.push(i.toString())
     }
     years.push("all")
