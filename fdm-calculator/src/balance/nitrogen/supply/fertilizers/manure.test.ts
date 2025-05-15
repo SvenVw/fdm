@@ -20,12 +20,12 @@ describe("calculateNitrogenSupplyByManure", () => {
   it("should calculate nitrogen supply from manure fertilizer applications", () => {
     const fertilizerApplications: FieldInput["fertilizerApplications"] = [
       {
-        p_id_catalogue: "manure1",
+        p_id_catalogue: "app1",
         p_app_amount: 1000,
         p_app_id: "app1",
       },
       {
-        p_id_catalogue: "manure2",
+        p_id_catalogue: "app2",
         p_app_amount: 500,
         p_app_id: "app2",
       },
@@ -33,9 +33,9 @@ describe("calculateNitrogenSupplyByManure", () => {
 
     const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
       [
-        "manure1",
+        "app1",
         {
-          p_id_catalogue: "manure1",
+          p_id_catalogue: "app1",
           p_type_compost: false,
           p_n_rt: 20,
           p_type_manure: true,
@@ -43,9 +43,9 @@ describe("calculateNitrogenSupplyByManure", () => {
         },
       ],
       [
-        "manure2",
+        "app2",
         {
-          p_id_catalogue: "manure2",
+          p_id_catalogue: "app2",
           p_type_compost: false,
           p_n_rt: 15,
           p_type_manure: true,
@@ -61,8 +61,8 @@ describe("calculateNitrogenSupplyByManure", () => {
 
     expect(result.total.equals(new Decimal(27.5))).toBe(true);
     expect(result.applications).toEqual([
-      { id: "manure1", value: new Decimal(20) },
-      { id: "manure2", value: new Decimal(7.5) },
+      { id: "app1", value: new Decimal(20) },
+      { id: "app2", value: new Decimal(7.5) },
     ]);
   });
 

@@ -20,18 +20,18 @@ describe("calculateNitrogenSupplyByCompost", () => {
     it("should calculate nitrogen supply from compost applications", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
             {
-                p_id_catalogue: "compost1",
+                p_id_catalogue: "app1",
                 p_app_amount: 1000,
                 p_app_id: "app1",
             },
-            { p_id_catalogue: "compost2", p_app_amount: 500, p_app_id: "app2" },
+            { p_id_catalogue: "app2", p_app_amount: 500, p_app_id: "app2" },
         ]
 
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
             [
-                "compost1",
+                "app1",
                 {
-                    p_id_catalogue: "compost1",
+                    p_id_catalogue: "app1",
                     p_type_compost: true,
                     p_n_rt: 20,
                     p_type_manure: false,
@@ -39,9 +39,9 @@ describe("calculateNitrogenSupplyByCompost", () => {
                 },
             ],
             [
-                "compost2",
+                "app2",
                 {
-                    p_id_catalogue: "compost2",
+                    p_id_catalogue: "app2",
                     p_type_compost: true,
                     p_n_rt: 15,
                     p_type_manure: false,
@@ -57,15 +57,15 @@ describe("calculateNitrogenSupplyByCompost", () => {
 
         expect(result.total.equals(new Decimal(27.5))).toBe(true) 
         expect(result.applications).toEqual([
-            { id: "compost1", value: new Decimal(20) },
-            { id: "compost2", value: new Decimal(7.5) },
+            { id: "app1", value: new Decimal(20) },
+            { id: "app2", value: new Decimal(7.5) },
         ])
     })
     
     it("should throw an error if a fertilizer application has no details", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
             {
-                p_id_catalogue: "compost1",
+                p_id_catalogue: "app1",
                 p_app_amount: 1000,
                 p_app_id: "app1",
             },

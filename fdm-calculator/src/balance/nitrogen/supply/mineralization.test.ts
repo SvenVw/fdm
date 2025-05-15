@@ -112,7 +112,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(250, -1)
+        expect(result.total.toNumber()).toBeCloseTo(27.78, 2)
         expect(result.cultivations).toEqual([
             { id: "arable1", value: expect.any(Decimal) },
         ])

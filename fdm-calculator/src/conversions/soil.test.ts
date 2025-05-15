@@ -9,8 +9,8 @@ import {
 describe("Soil Conversions", () => {
     describe("calculateOrganicCarbon", () => {
         it("should calculate organic carbon correctly", () => {
-            expect(calculateOrganicCarbon(10)).toBe(5)
-            expect(calculateOrganicCarbon(20)).toBe(10)
+            expect(calculateOrganicCarbon(10)).toBe(50)
+            expect(calculateOrganicCarbon(20)).toBe(100)
         })
 
         it("should handle null input", () => {
@@ -19,14 +19,14 @@ describe("Soil Conversions", () => {
 
         it("should clamp values within the valid range", () => {
             expect(calculateOrganicCarbon(1201)).toBe(600) // Test upper limit
-            expect(calculateOrganicCarbon(0.1)).toBeCloseTo(0.1, 2) // Test lower limit
+            expect(calculateOrganicCarbon(0.01)).toBeCloseTo(0.1, 2) // Test lower limit
         })
     })
 
     describe("calculateOrganicMatter", () => {
         it("should calculate organic matter correctly", () => {
-            expect(calculateOrganicMatter(5)).toBe(10)
-            expect(calculateOrganicMatter(10)).toBe(20)
+            expect(calculateOrganicMatter(5)).toBe(1)
+            expect(calculateOrganicMatter(10)).toBe(2)
         })
 
         it("should handle null input", () => {
@@ -34,25 +34,25 @@ describe("Soil Conversions", () => {
         })
 
         it("should clamp values within the valid range", () => {
-            expect(calculateOrganicMatter(76)).toBe(75) // Test upper limit
+            expect(calculateOrganicMatter(760)).toBe(75) // Test upper limit
             expect(calculateOrganicMatter(0.2)).toBeCloseTo(0.5) // Test lower limit
         })
     })
 
     describe("calculateCarbonNitrogenRatio", () => {
         it("should calculate the C/N ratio correctly", () => {
-            expect(calculateCarbonNitrogenRatio(10, 2)).toBe(5)
-            expect(calculateCarbonNitrogenRatio(30, 5)).toBe(6)
+            expect(calculateCarbonNitrogenRatio(15, 2000)).toBe(7.5)
+            expect(calculateCarbonNitrogenRatio(30, 5000)).toBe(6)
         })
 
         it("should handle null input for either parameter", () => {
-            expect(calculateCarbonNitrogenRatio(null, 2)).toBeNull()
+            expect(calculateCarbonNitrogenRatio(null, 2000)).toBeNull()
             expect(calculateCarbonNitrogenRatio(10, null)).toBeNull()
         })
 
         it("should clamp values within the valid range", () => {
-            expect(calculateCarbonNitrogenRatio(100, 1)).toBe(40) // Test upper limit
-            expect(calculateCarbonNitrogenRatio(1, 1)).toBe(5) // Test lower limit
+            expect(calculateCarbonNitrogenRatio(100, 1000)).toBe(40) // Test upper limit
+            expect(calculateCarbonNitrogenRatio(1, 1000)).toBe(5) // Test lower limit
         })
     })
 
