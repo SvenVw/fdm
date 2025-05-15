@@ -127,6 +127,14 @@ export async function calculateNitrogenBalanceField(
     // Combine soil analyses
     const soilAnalysis = combineSoilAnalyses(soilAnalyses)
 
+    // If timeframe is broader than field existence, shorten it
+    if (field.b_start?.getTime() > timeFrame.start.getTime()) {
+        timeFrame.start = field.b_start
+    }
+    if (field.b_end?.getTime() < timeFrame.end.getTime()) {
+        timeFrame.end = field.b_end
+    }
+
     // Calculate the amount of Nitrogen supplied
     const supply = await calculateNitrogenSupply(
         field,
