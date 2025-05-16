@@ -13,6 +13,7 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -24,15 +25,17 @@ import {
     collectInputForNitrogenBalance,
     type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
-import { getTimeframe } from "../lib/calendar"
+import { getTimeframe } from "~/lib/calendar"
 import {
     ArrowDownToLine,
     ArrowRight,
     ArrowUpFromLine,
     House,
 } from "lucide-react"
-import { LoadingSpinner } from "../components/custom/loadingspinner"
-import { Skeleton } from "../components/ui/skeleton"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Skeleton } from "~/components/ui/skeleton"
+import { Button } from "~/components/ui/button"
+import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -125,9 +128,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
     const page = location.pathname
     const isLoading = navigation.state === "loading"
 
-    const { nitrogenBalanceInput, nitrogenBalanceResult, errorMessage } =
+    const calendar = useCalendarStore((state) => state.calendar)
+
+    const { nitrogenBalanceInput, nitrogenBalanceResult, field, errorMessage } =
         loaderData
-    // console.log(nitrogenBalanceInput)
 
     return (
         <div className="space-y-4">
@@ -263,6 +267,30 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         </Card>
                     </div>
                 </>
+            ) : !nitrogenBalanceInput ? (
+                <div className="flex items-center justify-center">
+                    <Card className="w-[350px]">
+                        <CardHeader>
+                            <CardTitle>Ongeldig jaar</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-muted-foreground">
+                                <p>
+                                    Dit perceel was in gebruik voor dit jaar.
+                                    Als dit perceel wel in gebruik was, werk dan
+                                    de startdatum bij in de perceelsinstelling.
+                                </p>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <NavLink
+                                to={`../../${calendar}/field/${field.b_id}/`}
+                            >
+                                <Button>Naar perceelsinstelling</Button>
+                            </NavLink>
+                        </CardFooter>
+                    </Card>
+                </div>
             ) : (
                 <div className="flex items-center justify-center">
                     <Card className="w-[350px]">
