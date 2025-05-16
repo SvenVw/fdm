@@ -200,6 +200,7 @@ export default function AddOrganizationPage() {
                                                                 type="text"
                                                                 readOnly
                                                                 required
+                                                                className="text-muted-foreground"
                                                             />
                                                         </FormControl>
                                                         <FormDescription />
