@@ -87,24 +87,7 @@ export default function OrganizationIndex() {
     const permissions = organization.permissions
 
     return (
-        <main className="container">
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="/organization">
-                                Organisaties
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem className="hidden md:block">
-                            {organization.name}
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+        <main className="container">           
             <div className="max-w-3xl mx-auto px-4">
                 {/* Changed this div to a flex container with justify-between */}
                 <div className="mb-8 flex items-center justify-between">

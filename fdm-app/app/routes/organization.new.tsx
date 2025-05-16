@@ -15,13 +15,6 @@ import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -45,8 +38,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Separator } from "../components/ui/separator"
-import { SidebarTrigger } from "../components/ui/sidebar"
 
 export const meta: MetaFunction = () => {
     return [
@@ -122,26 +113,7 @@ export default function AddOrganizationPage() {
     }, [form.watch, form.setValue])
 
     return (
-        <main className="container">
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="/organization">
-                                Organisaties
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="/organization">
-                                Nieuw
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+        <main className="container">           
             <div className="max-w-3xl mx-auto px-4">
                 <div className="mb-8">
                     <FarmTitle
