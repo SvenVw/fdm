@@ -1,4 +1,4 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -8,12 +8,24 @@ import {
 } from "react-router"
 import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { SidebarInset } from "~/components/ui/sidebar"
+import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { getCalendar, getTimeframe } from "../lib/calendar"
+import { BalanceHeader } from "../components/custom/balance/header"
+import { Separator } from "../components/ui/separator"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+} from "../components/ui/breadcrumb"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { HeaderBalance } from "../components/custom/header/balance"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -51,8 +63,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        // Get the field id
+        const b_id = params.b_id
+
         // Get the session
         const session = await getSession(request)
+
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
 
         // Get details of farm
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
@@ -79,11 +97,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        // Get the fields to be selected
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+        const fieldOptions = fields.map((field) => {
+            if (!field?.b_id || !field?.b_name) {
+                throw new Error("Invalid field data structure")
+            }
+            return {
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
+            }
+        })
+
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
+            b_id: b_id,
             farmOptions: farmOptions,
+            fieldOptions: fieldOptions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -102,14 +140,17 @@ export default function FarmBalanceNitrogenBlock() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-                // action={{
-                //     to: `/farm/${loaderData.b_id_farm}/${calendar}/field`,
-                //     label: "Naar percelen",
-                // }}
-            />
+            <Header>
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderBalance
+                    b_id_farm={loaderData.b_id_farm}
+                    b_id={loaderData.b_id}
+                    fieldOptions={loaderData.fieldOptions}
+                />
+            </Header>
             <main>
                 <FarmTitle
                     title={"Stikstof"}
