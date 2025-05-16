@@ -114,7 +114,7 @@ export default function App() {
                 />
             </Sidebar>
             <SidebarInset>
-                <Header>
+                <Header action={undefined}>
                     <HeaderOrganization
                         selectedOrganizationSlug={
                             loaderData.selectedOrganizationSlug

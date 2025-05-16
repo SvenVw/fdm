@@ -67,7 +67,7 @@ export default function User() {
 
     return (
         <main className="container">
-            <Header>
+            <Header action={undefined}>
                 <HeaderUser name={user.name} />
             </Header>
             <div className="max-w-3xl mx-auto px-4">

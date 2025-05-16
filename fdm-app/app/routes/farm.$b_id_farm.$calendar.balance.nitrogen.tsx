@@ -136,11 +136,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmBalanceNitrogenBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const calendar = useCalendarStore((state) => state.calendar)
 
     return (
         <SidebarInset>
-            <Header>
+            <Header action={undefined}>
                 <HeaderFarm
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}

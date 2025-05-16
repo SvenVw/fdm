@@ -124,7 +124,7 @@ export default function WhatsNew() {
 
     return (
         <>
-            <Header>
+            <Header action={undefined}>
                 <HeaderAbout />
             </Header>
             <main className="container">
