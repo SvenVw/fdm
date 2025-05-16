@@ -16,6 +16,9 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { HeaderField } from "../components/custom/header/field"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -117,18 +120,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
+
     const calendar = useCalendarStore((state) => state.calendar)
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
+            <Header
                 action={{
                     to: `/farm/${loaderData.b_id_farm}/${calendar}/field`,
                     label: "Naar percelen",
+                    disabled: false,
                 }}
-            />
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+            </Header>
             <main>
                 <FarmTitle
                     title={"Instellingen"}
