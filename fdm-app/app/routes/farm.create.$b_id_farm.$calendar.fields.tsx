@@ -1,8 +1,6 @@
 import {
-    getCultivationsFromCatalogue,
     getFarm,
     getFields,
-    updateField,
 } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
@@ -13,22 +11,17 @@ import {
 } from "react-router"
 import { useLoaderData } from "react-router"
 import { SidebarPage } from "~/components/custom/sidebar-page"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import {  handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
+import { Header } from "~/components/custom/header/base"
+import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -117,29 +110,9 @@ export default function Index() {
 
     return (
         <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>Maak een bedrijf</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                {loaderData.b_name_farm}
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                Vul perceelsinformatie in
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
+            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-16">
                     <div className="flex items-center">

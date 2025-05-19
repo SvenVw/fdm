@@ -29,6 +29,8 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { HeaderFarmCreate } from "../components/custom/header/create-farm"
+import { Header } from "../components/custom/header/base"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -67,21 +69,9 @@ export default function AddFarmPage() {
     const loaderData = useLoaderData<typeof loader>()
     return (
         <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>Maak een bedrijf</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>Bedrijfsgegevens</BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={undefined} />
+            </Header>
             <main>
                 <Farm
                     b_name_farm={loaderData.b_name_farm}
