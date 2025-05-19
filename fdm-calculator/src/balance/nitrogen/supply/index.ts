@@ -35,7 +35,7 @@ export async function calculateNitrogenSupply(
     cultivationDetailsMap: Map<string, CultivationDetail>,
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
-    fdmPublicDataUrl: NitrogenBalanceInput["fdmPublicDataUrl"],
+    fdmPublicDataUrl: string,
 ): Promise<NitrogenSupply> {
     // Calculate the amount of Nitrogen supplied by fertilizers
     const fertilizersSupply = calculateNitrogenSupplyByFertilizers(

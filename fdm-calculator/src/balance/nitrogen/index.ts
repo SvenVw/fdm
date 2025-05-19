@@ -37,13 +37,11 @@ export async function calculateNitrogenBalance(
     // Changed return type
     try {
         // Destructure input directly
-        const {
-            fields,
-            fertilizerDetails,
-            cultivationDetails,
-            fdmPublicDataUrl,
-            timeFrame,
-        } = nitrogenBalanceInput
+        const { fields, fertilizerDetails, cultivationDetails, timeFrame } =
+            nitrogenBalanceInput
+
+        // Set the link to location of FDM public data
+        const fdmPublicDataUrl = getFdmPublicDataUrl()
 
         // Pre-process details into Maps for efficient lookups
         const fertilizerDetailsMap = new Map(
@@ -119,7 +117,7 @@ export async function calculateNitrogenBalanceField(
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     cultivationDetailsMap: Map<string, CultivationDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
-    fdmPublicDataUrl: NitrogenBalanceInput["fdmPublicDataUrl"],
+    fdmPublicDataUrl: string,
 ): Promise<NitrogenBalanceField> {
     // Get the details of the field
     const fieldDetails = field
@@ -388,4 +386,8 @@ export function combineSoilAnalyses(
     }
 
     return soilAnalysis
+}
+
+export function getFdmPublicDataUrl(): string {
+    return "https://storage.googleapis.com/fdm-public-data/"
 }

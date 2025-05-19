@@ -386,7 +386,6 @@ export type NitrogenBalanceInput = {
         start: Date
         end: Date
     }
-    fdmPublicDataUrl: string
 }
 
 // Numeric version of NitrogenSupplyFertilizers
