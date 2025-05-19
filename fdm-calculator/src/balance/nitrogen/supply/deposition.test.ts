@@ -1,15 +1,18 @@
 import { describe, expect, it } from "vitest"
 import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import type { FieldInput, NitrogenBalanceInput } from "../types"
+import { getFdmPublicDataUrl } from "../index"
 
 describe("calculateNitrogenSupplyByDeposition", () => {
-    const fdmPublicDataUrl = String(process.env.FDM_PUBLIC_DATA_URL)
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
 
     it("should calculate nitrogen deposition correctly", async () => {
         const field: FieldInput["field"] = {
             b_centroid: [5.0, 52.0],
             b_area: 100000,
             b_id: "test_field",
+            b_start: new Date("2025-01-01"),
+            b_end: new Date("2025-12-31"),
         }
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
             start: new Date("2025-01-01"),
@@ -30,6 +33,8 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             b_centroid: [5.0, 52.0],
             b_area: 100000,
             b_id: "test_field",
+            b_start: new Date("2025-01-01"),
+            b_end: new Date("2025-12-31"),
         }
 
         // Test with a full year
@@ -63,6 +68,8 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             b_centroid: [50.0, 12.0],
             b_area: 100000,
             b_id: "test_field",
+            b_start: new Date("2025-01-01"),
+            b_end: new Date("2025-12-31"),
         }
         const timeFrame: NitrogenBalanceInput["timeFrame"] = {
             start: new Date("2023-01-01"),
