@@ -23,7 +23,7 @@ export async function getSoilParameterEstimates(
     b_soiltype_agr: string
     b_gwl_class: string
     a_source: string
-    a_depth: number
+    a_depth_lower: number
 }> {
     if (!nmiApiKey) {
         throw new Error("Please provide a NMI API key")
@@ -59,7 +59,7 @@ export async function getSoilParameterEstimates(
     const result = await responseApi.json()
     const response = result.data
     response.a_source = "NMI"
-    response.a_depth = 0.3
+    response.a_depth_lower = undefined
 
     // Validate the response using the Zod schema
     const parsedResponse = soilParameterEstimatesSchema.safeParse(result.data)
@@ -84,5 +84,5 @@ const soilParameterEstimatesSchema = z.object({
     b_soiltype_agr: z.string(),
     b_gwl_class: z.string(),
     a_source: z.string(),
-    a_depth: z.number(),
+    a_depth_lower: z.number(),
 })

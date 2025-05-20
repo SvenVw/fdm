@@ -25,8 +25,9 @@ import type { Timeframe } from "./timeframe"
  * @param a_date - The date when the soil analysis was performed.
  * @param a_source - The source of the soil analysis data.
  * @param b_id - The identifier of the field where the soil sample was collected.
- * @param b_depth - The depth at which the soil sample was taken.
+ * @param a_depth_lower - The lower depth up to whidch the soil sample was taken.
  * @param b_sampling_date - The date when the soil sample was collected.
+ * @param _a_depth_upper - The upper depth from which the soil sample was taken. Defaults to 0
  * @param soilAnalysisData - Optional additional data for the soil analysis (e.g., pH, nutrient levels).
  * @returns The ID of the newly added soil analysis record.
  * @throws {Error} If the database transaction fails.
@@ -37,10 +38,11 @@ export async function addSoilAnalysis(
     a_date: schema.soilAnalysisTypeInsert["a_date"],
     a_source: schema.soilAnalysisTypeInsert["a_source"],
     b_id: schema.soilSamplingTypeInsert["b_id"],
-    b_depth: schema.soilSamplingTypeInsert["b_depth"],
+    a_depth_lower: schema.soilSamplingTypeInsert["a_depth_lower"],
     b_sampling_date: schema.soilSamplingTypeInsert["b_sampling_date"],
     // b_sampling_geometry: schema.soilSamplingTypeInsert['b_sampling_geometry'],
     soilAnalysisData?: Partial<schema.soilAnalysisTypeInsert>,
+    a_depth_upper: schema.soilSamplingTypeInsert["a_depth_upper"] = 0,
 ): Promise<schema.soilAnalysisTypeSelect["a_id"]> {
     try {
         await checkPermission(
@@ -51,6 +53,11 @@ export async function addSoilAnalysis(
             principal_id,
             "addSoilAnalysis",
         )
+
+        // Validate if a_depth_lower is beneath a_depth_upper
+        if (a_depth_lower && a_depth_lower <= a_depth_upper) {
+            throw new Error("a_depth_lower must be greater than a_depth_upper")
+        }
 
         return await fdm.transaction(async (tx: FdmType) => {
             const a_id = createId()
@@ -69,7 +76,8 @@ export async function addSoilAnalysis(
                 b_id_sampling: b_id_sampling,
                 b_id: b_id,
                 a_id: a_id,
-                b_depth: b_depth,
+                a_depth_upper: a_depth_upper,
+                a_depth_lower: a_depth_lower,
                 b_sampling_date: b_sampling_date,
                 // b_sampling_geometry: b_sampling_geometry,
             })
@@ -81,7 +89,8 @@ export async function addSoilAnalysis(
             a_date,
             a_source,
             b_id,
-            b_depth,
+            a_depth_upper,
+            a_depth_lower,
             b_sampling_date,
             // b_sampling_geometry
         })
@@ -214,11 +223,12 @@ export async function getSoilAnalysis(
                 a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
-                a_som_loi: schema.soilAnalysis.a_som_loi,     
+                a_som_loi: schema.soilAnalysis.a_som_loi,
                 b_gwl_class: schema.soilAnalysis.b_gwl_class,
                 b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
                 b_id_sampling: schema.soilSampling.b_id_sampling,
-                b_depth: schema.soilSampling.b_depth,
+                a_depth_upper: schema.soilSampling.a_depth_upper,
+                a_depth_lower: schema.soilSampling.a_depth_lower,
                 b_sampling_date: schema.soilSampling.b_sampling_date,
                 // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
             })
@@ -310,7 +320,8 @@ export async function getSoilAnalyses(
                 b_gwl_class: schema.soilAnalysis.b_gwl_class,
                 b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
                 b_id_sampling: schema.soilSampling.b_id_sampling,
-                b_depth: schema.soilSampling.b_depth,
+                a_depth_upper: schema.soilSampling.a_depth_upper,
+                a_depth_lower: schema.soilSampling.a_depth_lower,
                 b_sampling_date: schema.soilSampling.b_sampling_date,
                 // b_sampling_geometry: schema.soilSampling.b_sampling_geometry,
             })
@@ -392,6 +403,8 @@ export async function getCurrentSoilData(
                 b_gwl_class: schema.soilAnalysis.b_gwl_class,
                 b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
                 b_sampling_date: schema.soilSampling.b_sampling_date,
+                a_depth_upper: schema.soilSampling.a_depth_upper,
+                a_depth_lower: schema.soilSampling.a_depth_lower,
             })
             .from(schema.soilAnalysis)
             .innerJoin(
@@ -428,6 +441,8 @@ export async function getCurrentSoilData(
                     value: analysis[parameter as keyof typeof analysis],
                     a_id: analysis.a_id,
                     b_sampling_date: analysis.b_sampling_date,
+                    a_depth_upper: analysis.a_depth_upper,
+                    a_depth_lower: analysis.a_depth_lower,
                     a_source: analysis.a_source,
                 }
             })

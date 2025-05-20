@@ -540,7 +540,8 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
     a_id: text()
         .notNull()
         .references(() => soilAnalysis.a_id),
-    b_depth: numericCasted(),
+    a_depth_upper: numericCasted().notNull(),
+    a_depth_lower: numericCasted(),
     b_sampling_date: timestamp({ withTimezone: true }),
     b_sampling_geometry: geometry("b_sampling_geometry", {
         type: "MultiPoint",
