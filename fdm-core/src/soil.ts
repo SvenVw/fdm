@@ -728,9 +728,9 @@ export function getSoilParametersDescription(
         {
             parameter: "a_n_rt",
             unit: "mg N/g",
-            name: "Ntot",
+            name: "N-totale bodemvoorraad",
             type: "numeric",
-            description: "Totaal stikstofgehalte",
+            description: "Stikstof, totale bodemvoorraad",
         },
         {
             parameter: "a_p_al",
