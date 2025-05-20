@@ -16,10 +16,38 @@ export async function getSoilParameterEstimates(
     field: Feature | Polygon,
     nmiApiKey: string | undefined,
 ): Promise<{
+    a_al_ox: number
+    a_c_of: number
+    a_ca_co: number
+    a_ca_co_po: number
+    a_caco3_if: number
+    a_cec_co: number
+    a_clay_mi: number
+    a_cn_cc: number
+    a_com_fr: number
+    a_cu_cc: number
+    a_density_sa: number
+    a_fe_ox: number
+    a_k_cc: number
+    a_k_co: number
+    a_k_co_po: number
+    a_mg_cc: number
+    a_mg_co: number
+    a_mg_co_po: number
+    a_n_pmn: number
     a_n_rt: number
     a_p_al: number
     a_p_cc: number
+    a_p_ox: number
+    a_p_rt: number
+    a_p_sg: number
+    a_p_wa: number
+    a_ph_cc: number
+    a_s_rt: number
+    a_sand_mi: number
+    a_silt_mi: number
     a_som_loi: number
+    a_zn_cc: number
     b_soiltype_agr: string
     b_gwl_class: string
     a_source: string
@@ -77,10 +105,38 @@ export async function getSoilParameterEstimates(
 }
 
 const soilParameterEstimatesSchema = z.object({
+    a_al_ox: z.number(),
+    a_c_of: z.number(),
+    a_ca_co: z.number(),
+    a_ca_co_po: z.number(),
+    a_caco3_if: z.number(),
+    a_cec_co: z.number(),
+    a_clay_mi: z.number(),
+    a_cn_cc: z.number(),
+    a_com_fr: z.number(),
+    a_cu_cc: z.number(),
+    a_density_sa: z.number(),
+    a_fe_ox: z.number(),
+    a_k_cc: z.number(),
+    a_k_co: z.number(),
+    a_k_co_po: z.number(),
+    a_mg_cc: z.number(),
+    a_mg_co: z.number(),
+    a_mg_co_po: z.number(),
+    a_n_pmn: z.number(),
     a_n_rt: z.number(),
     a_p_al: z.number(),
     a_p_cc: z.number(),
+    a_p_ox: z.number(),
+    a_p_rt: z.number(),
+    a_p_sg: z.number(),
+    a_p_wa: z.number(),
+    a_ph_cc: z.number(),
+    a_s_rt: z.number(),
+    a_sand_mi: z.number(),
+    a_silt_mi: z.number(),
     a_som_loi: z.number(),
+    a_zn_cc: z.number(),
     b_soiltype_agr: z.string(),
     b_gwl_class: z.string(),
     a_source: z.string(),
