@@ -899,7 +899,7 @@ describe("Soil Analysis Functions", () => {
 describe("getSoilParametersDescription", () => {
     it("should return the correct soil parameter descriptions for NL-nl locale", () => {
         const descriptions = getSoilParametersDescription("NL-nl")
-        expect(descriptions).toHaveLength(12)
+        expect(descriptions).toHaveLength(37)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
@@ -923,7 +923,7 @@ describe("getSoilParametersDescription", () => {
 
     it("should return the correct soil parameter descriptions for default locale", () => {
         const descriptions = getSoilParametersDescription()
-        expect(descriptions).toHaveLength(12)
+        expect(descriptions).toHaveLength(37)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
