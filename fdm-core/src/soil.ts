@@ -575,8 +575,9 @@ export function getSoilParametersDescription(
             parameter: "a_source",
             unit: "",
             name: "Bron",
-            type: "text",
+            type: "enum",
             description: "Laboratorium of bron van analyse",
+            options: schema.soilAnalysisSourceOptions,
         },
         {
             parameter: "a_id",

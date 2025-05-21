@@ -479,6 +479,11 @@ export const soilTypesOptions = [
     { value: "duinzand", label: "Duinzand" },
     { value: "maasklei", label: "Maasklei" },
 ]
+export const soiltypeEnum = fdmSchema.enum(
+    "b_soiltype_agr",
+    soilTypesOptions.map((x) => x.value) as [string, ...string[]],
+)
+
 export const gwlClassesOptions = [
     { value: "II", label: "II" },
     { value: "IV", label: "IV" },
@@ -502,19 +507,62 @@ export const gwlClassesOptions = [
     { value: "bVI", label: "bVI" },
     { value: "IIIa", label: "IIIa" },
 ]
-export const soiltypeEnum = fdmSchema.enum(
-    "b_soiltype_agr",
-    soilTypesOptions.map((x) => x.value) as [string, ...string[]],
-)
 export const gwlClassEnum = fdmSchema.enum(
     "b_gwl_class",
     gwlClassesOptions.map((x) => x.value) as [string, ...string[]],
 )
 
+export const soilAnalysisSourceOptions = [
+    {
+        value: "nl-rva-l122",
+        label: "Eurofins Agro Testing Wageningen B.V.",
+    },
+    {
+        value: "nl-rva-l136",
+        label: "Nutrilab B.V.",
+    },
+    {
+        value: "nl-rva-l264",
+        label: "Normec Robalab B.V.",
+    },
+    {
+        value: "nl-rva-l320",
+        label: "Agrarisch Laboratorium Noord-Nederland/Alnn B.V.",
+    },
+    {
+        value: "nl-rva-l335",
+        label: "Normec Groen Agro Control",
+    },
+    {
+        value: "nl-rva-l610",
+        label: "Normec Dumea B.V.",
+    },
+    {
+        value: "nl-rva-l648",
+        label: "Fertilab B.V.",
+    },
+    {
+        value: "nl-rva-l697",
+        label: "Care4Agro B.V.",
+    },
+    {
+        value: "nl-other-nmi",
+        label: "NMI BodemSchat",
+    },
+    {
+        value: "other",
+        label: "Ander laboratorium",
+    },
+]
+export const soilAnalysisSourceEnum = fdmSchema.enum(
+    "a_source",
+    soilAnalysisSourceOptions.map((x) => x.value) as [string, ...string[]],
+)
+
 export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_id: text().primaryKey(),
     a_date: timestamp({ withTimezone: true }),
-    a_source: text(),
+    a_source: soilAnalysisSourceEnum().default("other"),
     a_al_ox: numericCasted(),
     a_c_of: numericCasted(),
     a_ca_co: numericCasted(),
