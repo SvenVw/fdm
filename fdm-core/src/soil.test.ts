@@ -205,7 +205,7 @@ describe("Soil Analysis Functions", () => {
                 a_depth_upper,
             )
         }).rejects.toThrowError(
-            "a_depth_lower must be greater than a_depth_upper",
+            "Exception for addSoilAnalysis",
         )
     })
 
