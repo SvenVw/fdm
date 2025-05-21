@@ -42,12 +42,6 @@ export function SoilAnalysisForm(props: {
 }) {
     const { soilAnalysis, soilParameterDescription, action } = props
 
-    // Do not let the user choose NMI as source
-    SoilParameterDescription.a_source =
-        soilParameterDescription.a_source.filter((x) => {
-            x.value !== "nl-other-nmi"
-        })
-
     const defaultValues = soilParameterDescription.map((x) => {
         let defaultValue = soilAnalysis
             ? soilAnalysis[x.parameter as keyof SoilAnalysis]
@@ -145,20 +139,28 @@ export function SoilAnalysisForm(props: {
                                                                 (option: {
                                                                     value: string
                                                                     label: string
-                                                                }) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            option.value
-                                                                        }
-                                                                        value={
-                                                                            option.value
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            option.label
-                                                                        }
-                                                                    </SelectItem>
-                                                                ),
+                                                                }) => {
+                                                                    if (
+                                                                        option.value ===
+                                                                        "nl-other-nmi"
+                                                                    ) {
+                                                                        return null
+                                                                    }
+                                                                    return (
+                                                                        <SelectItem
+                                                                            key={
+                                                                                option.value
+                                                                            }
+                                                                            value={
+                                                                                option.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                option.label
+                                                                            }
+                                                                        </SelectItem>
+                                                                    )
+                                                                },
                                                             ) || null}
                                                         </SelectContent>
                                                     </Select>
