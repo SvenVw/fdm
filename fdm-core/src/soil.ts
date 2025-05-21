@@ -602,6 +602,20 @@ export function getSoilParametersDescription(
             description: "Datum van monstername",
         },
         {
+            parameter: "a_depth_upper",
+            unit: "cm",
+            name: "Bemonsterde laag (bovenkant)",
+            type: "numeric",
+            description: "Diepte vanaf waar is bemonsterd",
+        },
+        {
+            parameter: "a_depth_lower",
+            unit: "cm",
+            name: "Bemonsterde laag (onderkant)",
+            type: "numeric",
+            description: "Diepte tot waar is bemonsterd",
+        },
+        {
             parameter: "a_al_ox",
             unit: "mmol Al/kg",
             name: "Al-ox",
