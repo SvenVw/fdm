@@ -5,7 +5,7 @@ export const FormSchema = z.object({
         .string({
             invalid_type_error: "Bron is ongeldig",
         })
-        .refine((value) => value.toUpperCase() !== "NMI", {
+        .refine((value) => value.toUpperCase() !== "nl-other-nmi", {
             message: "Bron mag niet 'NMI' zijn.",
         })
         .optional(),
