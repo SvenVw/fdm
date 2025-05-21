@@ -24,6 +24,7 @@ function SoilDataCard({
     link,
     date,
     source,
+    sourceLabel,
 }: {
     title: string
     shortname: string
@@ -33,6 +34,7 @@ function SoilDataCard({
     link: string
     date: Date
     source: string
+    sourceLabel: string
 }) {
     return (
         <Card>
@@ -40,7 +42,7 @@ function SoilDataCard({
                 <CardTitle className="text-sm font-medium">
                     {shortname}
                 </CardTitle>
-                {source !== "NMI" ? (
+                {source !== "nl-other-nmi" ? (
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -77,28 +79,27 @@ function SoilDataCard({
                                         !source ? "invisible" : "",
                                     )}
                                 >
-                                    {source === "NMI" ? (
+                                    {source === "nl-other-nmi" ? (
                                         <Sparkles className="h-4 w-4" />
-                                    ) : source === "" || !source ? (
+                                    ) : source === "other" || !source ? (
                                         <User className="h-4 w-4" />
                                     ) : (
                                         <Microscope className="h-4 w-4" />
                                     )}
                                     <span>
                                         {(() => {
-                                            if (source === "NMI") return "NMI"
                                             if (!source) return "Onbekend"
-                                            return source
+                                            return sourceLabel
                                         })()}
                                     </span>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {source === "NMI"
-                                    ? "Geschat door NMI"
-                                    : source === "" || !source
+                                {source === "nl-other-nmi"
+                                    ? `Geschat met ${sourceLabel}`
+                                    : source === "other" || !source
                                       ? "Onbekende bron"
-                                      : `Gemeten door ${source}`}
+                                      : `Gemeten door ${sourceLabel}`}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -108,7 +109,7 @@ function SoilDataCard({
                                 <div
                                     className={cn(
                                         "flex items-center space-x-1",
-                                        !date || source === "NMI"
+                                        !date || source === "nl-other-nmi"
                                             ? "invisible"
                                             : "",
                                     )}
@@ -155,8 +156,12 @@ export function SoilDataCards({
                     link: string
                     date: Date
                     source: string
+                    sourceLabel: string
                 }) => {
                     if (card.value) {
+                        const sourceLabel = soilParameterDescription
+                            .find((x) => x.parameter === "a_source")
+                            .options.find((x) => x.value === card.source).label
                         return (
                             <SoilDataCard
                                 key={card.title}
@@ -168,6 +173,7 @@ export function SoilDataCards({
                                 link={card.link}
                                 date={card.date}
                                 source={card.source}
+                                sourceLabel={sourceLabel}
                             />
                         )
                     }

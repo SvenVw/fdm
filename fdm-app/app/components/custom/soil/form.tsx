@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { SoilParameterDescription } from "@svenvw/fdm-core"
+import { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { CalendarIcon } from "lucide-react"
@@ -41,6 +41,12 @@ export function SoilAnalysisForm(props: {
     action: string
 }) {
     const { soilAnalysis, soilParameterDescription, action } = props
+
+    // Do not let the user choose NMI as source
+    SoilParameterDescription.a_source =
+        soilParameterDescription.a_source.filter((x) => {
+            x.value !== "nl-other-nmi"
+        })
 
     const defaultValues = soilParameterDescription.map((x) => {
         let defaultValue = soilAnalysis
@@ -136,16 +142,21 @@ export function SoilAnalysisForm(props: {
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {x.options?.map(
-                                                                (option) => (
+                                                                (option: {
+                                                                    value: string
+                                                                    label: string
+                                                                }) => (
                                                                     <SelectItem
                                                                         key={
-                                                                            option
+                                                                            option.value
                                                                         }
                                                                         value={
-                                                                            option
+                                                                            option.value
                                                                         }
                                                                     >
-                                                                        {option}
+                                                                        {
+                                                                            option.label
+                                                                        }
                                                                     </SelectItem>
                                                                 ),
                                                             ) || null}

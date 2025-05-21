@@ -86,7 +86,7 @@ export async function getSoilParameterEstimates(
 
     const result = await responseApi.json()
     const response = result.data
-    response.a_source = "NMI"
+    response.a_source = "nl-other-nmi"
     response.a_depth_lower = undefined
 
     // Validate the response using the Zod schema
