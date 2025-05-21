@@ -68,6 +68,8 @@ export type SoilParameters =
     | "a_mg_co_po"
     | "a_n_pmn"
     | "a_n_rt"
+    | "a_nh4_cc"
+    | "a_no3_cc"
     | "a_p_al"
     | "a_p_cc"
     | "a_p_ox"
