@@ -20,6 +20,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { SoilAnalysisFormSelection } from "../components/custom/soil/form-selection"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -98,7 +99,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 <div>
                     <h3 className="text-lg font-medium">Bodem</h3>
                     <p className="text-sm text-muted-foreground">
-                        Voeg een nieuwe bodemanalyse toe
+                        Kies het type bodemanalyse voor uw formulier
                     </p>
                 </div>
                 <Button asChild>
@@ -109,11 +110,12 @@ export default function FarmFieldSoilOverviewBlock() {
                 </Button>
             </div>
             <Separator />
-            <SoilAnalysisForm
+            <SoilAnalysisFormSelection />
+            {/* <SoilAnalysisForm
                 soilAnalysis={undefined}
                 soilParameterDescription={loaderData.soilParameterDescription}
                 action="."
-            />
+            /> */}
         </div>
     )
 }
