@@ -19,6 +19,7 @@ function SoilDataCard({
     title,
     shortname,
     value,
+    label,
     unit,
     type,
     link,
@@ -29,6 +30,7 @@ function SoilDataCard({
     title: string
     shortname: string
     value: number | string
+    label: string | undefined
     unit: string
     type: "numeric" | "enum"
     link: string
@@ -58,7 +60,9 @@ function SoilDataCard({
             <CardContent className="space-y-2">
                 <div className="flex items-baseline space-x-2">
                     {type === "enum" ? (
-                        <div className="text-2xl font-bold">{value}</div>
+                        <div className="text-2xl font-bold">
+                            {label && type === "enum" ? label : value}
+                        </div>
                     ) : (
                         <>
                             <div className="text-2xl font-bold">{`${Math.round(value as number)}`}</div>
@@ -148,9 +152,10 @@ export function SoilDataCards({
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl2:grid-cols-3 xl3:grid-cols-5">
             {cards.map(
                 (card: {
-                    value: string | number | undefined
                     title: string
                     shortname: string
+                    value: string | number | undefined
+                    label: string | undefined
                     unit: string
                     type: "numeric" | "enum"
                     link: string
@@ -162,12 +167,14 @@ export function SoilDataCards({
                         const sourceLabel = soilParameterDescription
                             .find((x) => x.parameter === "a_source")
                             .options.find((x) => x.value === card.source).label
+
                         return (
                             <SoilDataCard
                                 key={card.title}
                                 title={card.title}
                                 shortname={card.shortname}
                                 value={card.value}
+                                label={card.label}
                                 unit={card.unit}
                                 type={card.type}
                                 link={card.link}
@@ -209,10 +216,18 @@ function constructSoilDataCards(
                 return null
             }
 
+            let label = undefined
+            if (description.type === "enum") {
+                label = description.options?.find(
+                    (option: { value: string }) => option.value === item.value,
+                )?.label
+            }
+
             const cardValue = {
                 title: description.name,
                 shortname: description.description,
                 value: item.value,
+                label: label,
                 unit: description.unit,
                 type: description.type,
                 link: `./analysis/${item.a_id}`,
