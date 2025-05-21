@@ -822,7 +822,7 @@ export function getSoilParametersDescription(
             name: "GWT",
             type: "enum",
             description: "Grondwatertrap",
-            options: schema.gwlClasses,
+            options: schema.gwlClassesOptions,
         },
         {
             parameter: "b_soiltype_agr",
@@ -830,7 +830,7 @@ export function getSoilParametersDescription(
             name: "Bodemtype",
             type: "enum",
             description: "Agrarisch bodemtype",
-            options: schema.soilTypes,
+            options: schema.soilTypesOptions,
         },
     ]
 

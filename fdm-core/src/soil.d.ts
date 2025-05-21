@@ -101,7 +101,10 @@ export interface SoilParameterDescriptionItem {
     description: string
     min?: number
     max?: number
-    options?: string[]
+    options?: {
+        value: schema.gwlClasses | schema.soilTypes
+        label: string
+    }[]
 }
 
 export type SoilParameterDescription = SoilParameterDescriptionItem[]
