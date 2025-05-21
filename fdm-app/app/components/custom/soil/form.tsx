@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { SoilParameterDescription } from "@svenvw/fdm-core"
+import type { SoilParameterDescription } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { CalendarIcon } from "lucide-react"
@@ -78,8 +78,11 @@ export function SoilAnalysisForm(props: {
                 method="post"
             >
                 <fieldset disabled={form.formState.isSubmitting}>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 items-end gap-x-3 space-y-4 justify-between">
+                    <div className="space-y-6">
+                        <p className="text-sm text-muted-foreground">
+                            Vul de gegevens van de bodemanalyse in.
+                        </p>
+                        <div className="grid grid-cols-1 gap-4 space-x-4">
                             {soilParameterDescription.map((x) => {
                                 if (x.parameter === "a_id") {
                                     return null
@@ -96,15 +99,24 @@ export function SoilAnalysisForm(props: {
                                                         {x.name}
                                                     </FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="number"
-                                                            value={field.value}
-                                                            placeholder=""
-                                                        />
+                                                        <div className="relative">
+                                                            <Input
+                                                                {...field}
+                                                                type="number"
+                                                                value={
+                                                                    field.value
+                                                                }
+                                                                placeholder=""
+                                                            />
+                                                            {x.unit && (
+                                                                <span className="absolute inset-y-0 right-8 pr-3 flex items-center pointer-events-none text-muted-foreground text-sm">
+                                                                    {x.unit}
+                                                                </span>
+                                                            )}
+                                                        </div>
                                                     </FormControl>
                                                     <FormDescription>
-                                                        {`${x.description} [${x.unit}]`}
+                                                        {x.description}
                                                     </FormDescription>
                                                     <FormMessage />
                                                 </FormItem>
