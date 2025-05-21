@@ -1,4 +1,6 @@
 CREATE TYPE "fdm"."a_source" AS ENUM('nl-rva-l122', 'nl-rva-l136', 'nl-rva-l264', 'nl-rva-l320', 'nl-rva-l335', 'nl-rva-l610', 'nl-rva-l648', 'nl-rva-l697', 'nl-other-nmi', 'other');--> statement-breakpoint
+UPDATE "fdm"."soil_analysis" SET "a_source" = 'nl-other-nmi' WHERE "a_source" = 'NMI'; --> statement-breakpoint
+UPDATE "fdm"."soil_analysis" SET "a_source" = 'other' WHERE "a_source" != 'nl-other-nmi'; --> statement-breakpoint
 ALTER TABLE "fdm"."soil_sampling" RENAME COLUMN "b_depth" TO "a_depth_lower";--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ALTER COLUMN "a_source" SET DEFAULT 'other'::"fdm"."a_source";--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ALTER COLUMN "a_source" SET DATA TYPE "fdm"."a_source" USING "a_source"::"fdm"."a_source";--> statement-breakpoint
