@@ -522,7 +522,7 @@ export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_caco3_if: numericCasted(),
     a_cec_co: numericCasted(),
     a_clay_mi: numericCasted(),
-    a_cn_cc: numericCasted(),
+    a_cn_fr: numericCasted(),
     a_com_fr: numericCasted(),
     a_cu_cc: numericCasted(),
     a_density_sa: numericCasted(),
@@ -565,7 +565,7 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
     a_id: text()
         .notNull()
         .references(() => soilAnalysis.a_id),
-    a_depth_upper: numericCasted().notNull(),
+    a_depth_upper: numericCasted().notNull().default(0),
     a_depth_lower: numericCasted(),
     b_sampling_date: timestamp({ withTimezone: true }),
     b_sampling_geometry: geometry("b_sampling_geometry", {
