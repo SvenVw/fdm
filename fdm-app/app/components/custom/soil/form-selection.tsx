@@ -71,7 +71,9 @@ export function SoilAnalysisFormSelection() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between">
-                    <Button disabled={true}>Binnenkort beschikbaar</Button>
+                    <Button>
+                        <NavLink to={"./upload"}>Kies</NavLink>
+                    </Button>
                 </CardFooter>
             </Card>
         </div>
