@@ -82,7 +82,7 @@ export function SoilAnalysisForm(props: {
                         <p className="text-sm text-muted-foreground">
                             Vul de gegevens van de bodemanalyse in.
                         </p>
-                        <div className="grid grid-cols-1 gap-4 space-x-4">
+                        <div className="grid md:grid-cols-2 gap-4">
                             {soilParameterDescription.map((x) => {
                                 if (x.parameter === "a_id") {
                                     return null
