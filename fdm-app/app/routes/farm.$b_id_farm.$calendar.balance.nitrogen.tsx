@@ -6,23 +6,12 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { SidebarInset} from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "~/store/calendar"
-import { getCalendar, getTimeframe } from "../lib/calendar"
-import { BalanceHeader } from "../components/custom/balance/header"
-import { Separator } from "../components/ui/separator"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from "../components/ui/breadcrumb"
 import { Header } from "../components/custom/header/base"
 import { HeaderFarm } from "../components/custom/header/farm"
 import { HeaderBalance } from "../components/custom/header/balance"

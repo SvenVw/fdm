@@ -5,7 +5,6 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import {
     type Fertilizer,
@@ -17,6 +16,9 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { Header } from "~/components/custom/header/base"
+import { HeaderFarm } from "~/components/custom/header/farm"
+import { HeaderFertilizer } from "~/components/custom/header/fertilizer"
 
 export const meta: MetaFunction = () => {
     return [
@@ -97,10 +99,17 @@ export default function FarmFertilizersBlock() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-            />
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderFertilizer
+                    b_id_farm={loaderData.b_id_farm}
+                    p_id={undefined}
+                    fertilizerOptions={loaderData.fertilizers}
+                />
+            </Header>
             <main>
                 <FarmTitle
                     title={"Meststoffen"}

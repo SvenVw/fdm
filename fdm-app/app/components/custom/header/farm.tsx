@@ -16,7 +16,7 @@ export function HeaderFarm({
     b_id_farm,
     farmOptions,
 }: {
-    b_id_farm: string
+    b_id_farm: string | undefined
     farmOptions: HeaderFarmOption[]
 }) {
     const location = useLocation()

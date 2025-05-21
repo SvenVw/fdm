@@ -5,7 +5,6 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { Button } from "~/components/ui/button"
 import {
@@ -22,6 +21,8 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -84,11 +85,12 @@ export default function AppIndex() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={undefined}
-                action={undefined}
-            />
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={undefined}
+                    farmOptions={loaderData.farmOptions}
+                />
+            </Header>
             <main>
                 {loaderData.farmOptions.length === 0 ? (
                     <>
