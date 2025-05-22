@@ -139,3 +139,55 @@ const soilParameterEstimatesSchema = z.object({
     b_gwl_class: z.string(),
     a_source: z.string(),
 })
+
+export async function extractSoilAnalysis(formData: FormData) {
+    const nmiApiKey = getNmiApiKey()
+
+
+    const responseApi = await fetch(
+        "https://api.nmi-agro.nl/soilreader",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${nmiApiKey}`,
+            },
+            body: formData,
+        },
+    )
+
+    if (!responseApi.ok) {
+        throw new Error("Request to NMI API failed")
+    }
+
+    const result = await responseApi.json()
+    const response = result.data
+    console.log(response)
+
+    // Process the response
+    const field = response.fields[0]
+
+    // Select the a_* parameters
+    const soilAnalysis: { [key: string]: any } = {} = Object.keys(field)
+        .filter(key => key.startsWith("a_"))
+        .reduce((obj, key) => {
+            return {
+                ...obj,
+                [key]: field[key]
+            }
+        }, {})
+
+    // Process the other parameters
+    if (field.b_date) {
+        soilAnalysis.b_sampling_date = new Date(field.b_date)
+    }
+    if (field.b_soiltype_agr) {
+        soilAnalysis.b_soil_type = field.b_soiltype_agr
+    }
+    if (field.b_depth) {
+        soilAnalysis.a_depth_upper = field.b_depth.split("-")[0]
+        soilAnalysis.a_depth_lower = field.b_depth.split("-")[1]
+    }
+
+    return soilAnalysis
+
+}
