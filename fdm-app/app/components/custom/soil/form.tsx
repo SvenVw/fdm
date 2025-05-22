@@ -40,21 +40,23 @@ export function SoilAnalysisForm(props: {
     soilParameterDescription: SoilParameterDescription
     action: string
 }) {
-    const { soilAnalysis, soilParameterDescription, action } = props
+    const { soilAnalysis, soilParameterDescription } = props
 
-    const defaultValues = soilParameterDescription.map((x) => {
+    const defaultValues: { [key: string]: any } = {}
+    for (const x of soilParameterDescription) {
         let defaultValue = soilAnalysis
             ? soilAnalysis[x.parameter as keyof SoilAnalysis]
             : undefined
 
-        if (defaultValue === undefined && x.type === "string") {
+        if (
+            defaultValue === undefined &&
+            (x.type === "text" || x.type === "numeric")
+        ) {
             defaultValue = ""
         }
 
-        return {
-            [x.parameter]: defaultValue,
-        }
-    })
+        defaultValues[x.parameter] = defaultValue
+    }
     defaultValues.a_id = undefined
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -73,7 +75,6 @@ export function SoilAnalysisForm(props: {
         <RemixFormProvider {...form}>
             <Form
                 id="soilAnalysisForm"
-                action={action}
                 onSubmit={form.handleSubmit}
                 method="post"
             >
