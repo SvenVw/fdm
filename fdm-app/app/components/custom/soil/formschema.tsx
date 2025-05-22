@@ -8,9 +8,8 @@ export const FormSchema = z
             })
             .refine((value) => value.toLowerCase() !== "nl-other-nmi", {
                 message: "Bron mag niet 'nl-other-nmi' zijn.",
-            })
-            .optional(),
-        b_sampling_date: z.coerce.date().optional(),
+            }),
+        b_sampling_date: z.coerce.date(),
         a_depth_upper: z.coerce
             .number()
             .gte(0, "Waarde moet groter of gelijk aan 0 zijn")
