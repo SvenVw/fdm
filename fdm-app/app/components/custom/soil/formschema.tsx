@@ -178,7 +178,7 @@ export const FormSchema = z
         a_silt_mi: z.coerce
             .number()
             .gte(0.1, "Waarde moet groter of gelijk aan 0.1 zijn")
-            .lte(100, "Waarde moet kleiner of gelijk aan 100 zijn")            
+            .lte(100, "Waarde moet kleiner of gelijk aan 100 zijn")
             .optional(),
         a_som_loi: z.coerce
             .number()
@@ -193,16 +193,24 @@ export const FormSchema = z
         b_gwl_class: z.string().optional(),
         b_soiltype_agr: z.string().optional(),
     })
+    .partial()
     .refine(
-        ({ a_depth_lower, a_depth_upper }) => {
-            if (a_depth_lower && a_depth_upper) {
-                return a_depth_lower <= a_depth_upper
+        (data) => {
+            // Check if both values are present and are numbers
+            if (
+                typeof data.a_depth_upper === "number" &&
+                typeof data.a_depth_lower === "number"
+            ) {
+                // You can make this log more informative if needed, e.g.:
+                // console.log(`Refining depths: upper=${data.a_depth_upper}, lower=${data.a_depth_lower}, valid=${data.a_depth_lower > data.a_depth_upper}`);
+                console.log("hoi - refine check running")
+                return data.a_depth_lower > data.a_depth_upper
             }
-            return true
+            return true // Pass if one or both are not (yet) numbers (e.g. still undefined due to optional)
         },
-        () => ({
-            path: ["a_depth_lower"],
+        {
             message:
-                "Bovenkant van bemonsterde laag moet minder diep zijn dan onderkant",
-        }),
+                "Bovenkant van bemonsterde laag moet minder diep zijn dan onderkant", // Corrected message
+            path: ["a_depth_upper"],
+        },
     )
