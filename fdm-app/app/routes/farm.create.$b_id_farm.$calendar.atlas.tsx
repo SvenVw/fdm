@@ -307,15 +307,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             undefined,
                             estimates.a_source,
                             b_id,
-                            estimates.a_depth,
+                            estimates.a_depth_lower,
                             undefined,
-                            {
-                                a_p_al: estimates.a_p_al,
-                                a_p_cc: estimates.a_p_cc,
-                                a_som_loi: estimates.a_som_loi,
-                                b_soiltype_agr: estimates.b_soiltype_agr,
-                                b_gwl_class: estimates.b_gwl_class,
-                            },
+                            estimates,
                         )
                     }
 
