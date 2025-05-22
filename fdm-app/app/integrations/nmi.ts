@@ -106,16 +106,14 @@ export async function getSoilParameterEstimates(
 
 const soilParameterEstimatesSchema = z.object({
     a_al_ox: z.number(),
-    a_c_of: z.number(),
     a_ca_co: z.number(),
     a_ca_co_po: z.number(),
     a_caco3_if: z.number(),
     a_cec_co: z.number(),
     a_clay_mi: z.number(),
-    a_cn_cc: z.number(),
+    a_cn_fr: z.number(),
     a_com_fr: z.number(),
     a_cu_cc: z.number(),
-    a_density_sa: z.number(),
     a_fe_ox: z.number(),
     a_k_cc: z.number(),
     a_k_co: z.number(),
@@ -140,5 +138,4 @@ const soilParameterEstimatesSchema = z.object({
     b_soiltype_agr: z.string(),
     b_gwl_class: z.string(),
     a_source: z.string(),
-    a_depth_lower: z.number(),
 })
