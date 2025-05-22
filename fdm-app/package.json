@@ -16,6 +16,7 @@
     "dependencies": {
         "@hookform/resolvers": "^5.0.1",
         "@mapbox/geojson-extent": "^1.0.1",
+        "@mjackson/file-storage": "^0.6.1",
         "@mjackson/form-data-parser": "^0.7.0",
         "@radix-ui/react-accordion": "^1.2.10",
         "@radix-ui/react-avatar": "^1.1.9",
