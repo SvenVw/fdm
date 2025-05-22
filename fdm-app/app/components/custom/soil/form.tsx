@@ -130,6 +130,7 @@ export function SoilAnalysisForm(props: {
                                         <FormField
                                             control={form.control}
                                             name={x.parameter}
+                                            key={x.parameter}
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>
@@ -191,6 +192,7 @@ export function SoilAnalysisForm(props: {
                                         <FormField
                                             control={form.control}
                                             name={x.parameter}
+                                            key={x.parameter}
                                             render={({ field }) => (
                                                 <FormItem className="">
                                                     <FormLabel>
@@ -265,6 +267,7 @@ export function SoilAnalysisForm(props: {
                                         <FormField
                                             control={form.control}
                                             name={x.parameter}
+                                            key={x.parameter}
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>
