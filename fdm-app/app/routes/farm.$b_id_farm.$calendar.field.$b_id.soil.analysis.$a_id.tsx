@@ -93,8 +93,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get soil parameter descriptions
-        const soilParameterDescription = getSoilParametersDescription()
+        // Get soil parameter descriptions and filter on the available soil parameters
+        let soilParameterDescription = getSoilParametersDescription()
+        const soilParametersAvailable = Object.keys(soilAnalysis).filter(
+            (key) => {
+                if (soilAnalysis[key]) {
+                    return key
+                }
+            },
+        )
+        soilParameterDescription = soilParameterDescription.filter(
+            (item: { parameter: string }) =>
+                soilParametersAvailable.includes(item.parameter),
+        )
 
         // Return user information from loader
         return {
