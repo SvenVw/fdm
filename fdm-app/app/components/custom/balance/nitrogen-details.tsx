@@ -292,9 +292,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
         return (
             <AccordionItem value={sectionKey}>
-                <AccordionTrigger>
-                    Depositie (Totaal): {deposition.total} kg N / ha
-                </AccordionTrigger>
+                <p className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all text-left">
+                    Depositie: {deposition.total} kg N / ha
+                </p>
                 <AccordionContent />
             </AccordionItem>
         )
@@ -307,14 +307,17 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
         return (
             <AccordionItem value={sectionKey}>
-                <AccordionTrigger>
+                <p className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all text-left">
                     Mineralisatie: {mineralization.total} kg N / ha
                 </p>
             </AccordionItem>
         )
     }
 
-    const renderRemoval = (removal: NitrogenRemovalNumeric, fieldInput: FieldInput) => {
+    const renderRemoval = (
+        removal: NitrogenRemovalNumeric,
+        fieldInput: FieldInput,
+    ) => {
         const sectionKey = "removal"
 
         return (
