@@ -308,36 +308,8 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         return (
             <AccordionItem value={sectionKey}>
                 <AccordionTrigger>
-                    Mineralisatie (Totaal): {mineralization.total} kg N / ha
-                </AccordionTrigger>
-                <AccordionContent>
-                    <ul className="ml-6 list-disc list-outside space-y-1">
-                        {mineralization.cultivations.map(
-                            (cult: { id: string; value: number }) => {
-                                if (cult.value === 0) {
-                                    return null
-                                }
-
-                                const cultivation =
-                                    fieldInput.cultivations.find(
-                                        (cultivation: { b_lu: string }) =>
-                                            cultivation.b_lu === cult.id,
-                                    )
-                                return (
-                                    <NavLink
-                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
-                                        key={cult.id}
-                                    >
-                                        <li className="text-sm text-muted-foreground hover:underline">
-                                            {cultivation.b_lu_name}:{" "}
-                                            {cult.value} kg N / ha
-                                        </li>
-                                    </NavLink>
-                                )
-                            },
-                        )}
-                    </ul>
-                </AccordionContent>
+                    Mineralisatie: {mineralization.total} kg N / ha
+                </p>
             </AccordionItem>
         )
     }
