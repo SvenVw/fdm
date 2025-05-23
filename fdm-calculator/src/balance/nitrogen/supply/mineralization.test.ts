@@ -2,14 +2,11 @@ import { describe, expect, it } from "vitest"
 import {
     calculateNitrogenSupplyBySoilMineralization,
     calculateNitrogenSupplyBySoilMineralizationUsingMinip,
-    calculateNitrogenSupplyBySoilMineralizationUsingMinipNumeric,
-    calculateNitrogenSupplyBySoilMineralizationNumeric,
 } from "./mineralization"
 import type {
     SoilAnalysisPicked,
     NitrogenBalanceInput,
     NitrogenSupplyMineralization,
-    NitrogenSupplyMineralizationNumeric,
 } from "../types"
 import Decimal from "decimal.js"
 
