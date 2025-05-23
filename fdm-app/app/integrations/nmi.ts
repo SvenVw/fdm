@@ -167,7 +167,7 @@ export async function extractSoilAnalysis(formData: FormData) {
     const field = response.fields[0]
 
     // Select the a_* parameters
-    const soilAnalysis: { [key: string]: any } = {} = Object.keys(field)
+    const soilAnalysis: { [key: string]: string | number | Date } = Object.keys(field)
         .filter(key => key.startsWith("a_"))
         .reduce((obj, key) => {
             return {
@@ -175,6 +175,11 @@ export async function extractSoilAnalysis(formData: FormData) {
                 [key]: field[key]
             }
         }, {})
+
+    // Check if soil parameters are returned
+    if (Object.keys(soilAnalysis).length === 0) {
+        throw new Error('Invalid soil analysis')
+    }
 
     // Process the other parameters
     if (field.b_date) {
@@ -184,8 +189,8 @@ export async function extractSoilAnalysis(formData: FormData) {
         soilAnalysis.b_soil_type = field.b_soiltype_agr
     }
     if (field.b_depth) {
-        soilAnalysis.a_depth_upper = field.b_depth.split("-")[0]
-        soilAnalysis.a_depth_lower = field.b_depth.split("-")[1]
+        soilAnalysis.a_depth_upper = Number(field.b_depth.split("-")[0]) as number
+        soilAnalysis.a_depth_lower = Number(field.b_depth.split("-")[1]) as number
     }
 
     return soilAnalysis
