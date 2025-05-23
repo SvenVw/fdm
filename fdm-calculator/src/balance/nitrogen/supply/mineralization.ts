@@ -1,146 +1,51 @@
 import type { fdmSchema } from "@svenvw/fdm-core"
 import type {
     NitrogenSupplyMineralization,
-    CultivationDetail,
-    FieldInput,
     SoilAnalysisPicked,
+    NitrogenBalanceInput,
 } from "../types"
 import Decimal from "decimal.js"
+import { differenceInCalendarDays } from "date-fns"
 
 /**
- * Calculates the amount of nitrogen supplied through soil mineralization, considering both grassland and arable land.
+ * Calculates the amount of nitrogen supplied through soil mineralization using Minip.
  *
- * This function determines the mineralization based on the cultivations performed and soil analyses conducted.
- * It uses cultivation details to differentiate between grassland and arable land, then applies specific calculations for each.
- * @param cultivations - A list of cultivations on the field.
+ * This function determines the mineralization based on the soil analyses conducted.
  * @param soilAnalysis - Combined soil analysis data for the field.
- * @param cultivationDetailsMap - A map containing details for each cultivation.
- * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized and the individual cultivation values.
+ * @param timeFrame - The timeframe for which to calculate the nitrogen mineralization.
+ * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized.
  */
 export function calculateNitrogenSupplyBySoilMineralization(
-    cultivations: FieldInput["cultivations"],
     soilAnalysis: SoilAnalysisPicked,
-    cultivationDetailsMap: Map<string, CultivationDetail>,
+    timeFrame: NitrogenBalanceInput["timeFrame"],
 ): NitrogenSupplyMineralization {
-    const mineralizations = cultivations.map((cultivation) => {
-        // Get details of cultivation using the Map
-        const cultivationDetail = cultivationDetailsMap.get(
-            cultivation.b_lu_catalogue,
+    const mineralizationValue =
+        calculateNitrogenSupplyBySoilMineralizationUsingMinip(
+            soilAnalysis.a_c_of,
+            soilAnalysis.a_cn_fr,
+            soilAnalysis.a_density_sa,
         )
 
-        if (!cultivationDetail) {
-            throw new Error(
-                `Cultivation ${cultivation.b_lu} has no corresponding cultivation in cultivationDetails`,
-            )
-        }
-
-        // if (soilAnalyses.length === 0) {
-        //     return {
-        //         id: cultivation.b_lu,
-        //         value: new Decimal(0),
-        //     }
-        // }
-
-        const b_lu_croprotation = cultivationDetail.b_lu_croprotation
-        const isGrassland = b_lu_croprotation === "grassland"
-
-        // Calculate the amount of Nitrogen mineralized by the soil
-        let mineralization = Decimal(0)
-        if (isGrassland) {
-            mineralization =
-                calculateNitrogenSupplyBySoilMineralizationForGrassland(
-                    soilAnalysis.b_soiltype_agr,
-                    soilAnalysis.a_n_rt,
-                )
-        } else {
-            mineralization =
-                calculateNitrogenSupplyBySoilMineralizationForArable(
-                    soilAnalysis.a_c_of,
-                    soilAnalysis.a_cn_fr,
-                    soilAnalysis.a_density_sa,
-                )
-        }
-
-        // Limit the min and max value of mineralization
-        if (mineralization.greaterThan(new Decimal(250))) {
-            mineralization = new Decimal(250)
-        }
-        if (mineralization.lessThan(new Decimal(5))) {
-            mineralization = new Decimal(5)
-        }
-
-        return {
-            id: cultivation.b_lu,
-            value: new Decimal(mineralization),
-        }
-    })
-
-    // Calculate the total amount of Nitrogen mineralized
-    const totalValue = mineralizations.reduce((acc, mineralization) => {
-        if (!mineralization.value) return acc
-        return acc.add(mineralization.value)
-    }, Decimal(0))
+    // Adjust for the number of days
+    const timeFrameDays = new Decimal(
+        differenceInCalendarDays(timeFrame.end, timeFrame.start),
+    )
+    // Ensure timeFrameDays is positive
+    if (timeFrameDays.lessThanOrEqualTo(0)) {
+        return { total: new Decimal(0) }
+    }
+    const timeFrameFraction = timeFrameDays.dividedBy(365)
+    const mineralization = new Decimal(mineralizationValue).times(
+        timeFrameFraction,
+    )
 
     return {
-        total: totalValue,
-        cultivations: mineralizations,
+        total: mineralization,
     }
 }
 
 /**
- * Calculates the amount of nitrogen supplied through soil mineralization for grassland.
- *
- * This function applies a specific formula to calculate nitrogen mineralization based on soil type and total nitrogen content.
- * @param b_soiltype_agr - The agricultural soil type.
- * @param a_n_rt - The total nitrogen content of the soil (g N / kg soil).
- * @returns The amount of nitrogen mineralized in kg N / ha.
- * @throws Throws an error if the soil type is unknown or required data is missing.
- */
-function calculateNitrogenSupplyBySoilMineralizationForGrassland(
-    b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"],
-    a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"],
-): Decimal {
-    // Return amount of Nitrogen mineralizd by soil at Grassland for veen
-    if (b_soiltype_agr === "veen") {
-        return Decimal(250)
-    }
-
-    if (a_n_rt === null || a_n_rt === undefined) {
-        throw new Error("No a_n_rt value found in soil analysis for grassland")
-    }
-    if (b_soiltype_agr === null || b_soiltype_agr === undefined) {
-        throw new Error(
-            "No b_soiltype_agr value found in soil analysis for grassland",
-        )
-    }
-
-    // Return amount of Nitrogen mineralizd by soil at Grasslans for zand
-    if (["dekzand", "dalgrond", "duinzand"].includes(b_soiltype_agr)) {
-        return new Decimal(a_n_rt)
-            .dividedBy(1000)
-            .pow(1.0046)
-            .times(28.4)
-            .add(78)
-    }
-
-    // Return amount of Nitrogen mineralizd by soil at Grasslan for klei
-    if (
-        ["moerige_klei", "rivierklei", "zeeklei", "loess", "maasklei"].includes(
-            b_soiltype_agr,
-        )
-    ) {
-        return new Decimal(a_n_rt)
-            .dividedBy(1000)
-            .pow(1.0046)
-            .times(31.6)
-            .add(31.7)
-    }
-
-    throw new Error(`Unknown soil type: ${b_soiltype_agr}`)
-}
-
-/**
- * Calculates the amount of nitrogen supplied through soil mineralization for arable land.
+ * Calculates the amount of nitrogen supplied through soil mineralization by using the MINIP model
  *
  * This function applies a specific formula to calculate nitrogen mineralization based on organic carbon content,
  * C/N ratio, and soil bulk density.
@@ -150,7 +55,7 @@ function calculateNitrogenSupplyBySoilMineralizationForGrassland(
  * @returns The amount of nitrogen mineralized in kg N / ha.
  * @throws Throws an error if required soil analysis data is missing or average yearly temperature is too high.
  */
-function calculateNitrogenSupplyBySoilMineralizationForArable(
+export function calculateNitrogenSupplyBySoilMineralizationUsingMinip(
     a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"],
     a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"],
     a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"],
@@ -182,6 +87,11 @@ function calculateNitrogenSupplyBySoilMineralizationForArable(
         throw new Error(
             "No a_density_sa value found in soil analysis for arable",
         )
+    }
+
+    // Set organic soils to 250 kg N / ha
+    if (new Decimal(a_c_of).gt(250)) {
+        return new Decimal(250)
     }
 
     // Calculate Cdec
