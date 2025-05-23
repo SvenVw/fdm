@@ -155,6 +155,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        const fileStorage = new LocalFileStorage("./uploads/soil_analyses")
+
         const uploadHandler = async (fileUpload: FileUpload) => {
             if (
                 fileUpload.fieldName === "soilAnalysisFile" &&
@@ -213,7 +215,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {
-        console.error(error)
         if (
             error instanceof Error &&
             (error.message === "Invalid file type (magic bytes check)" ||
@@ -238,5 +239,3 @@ export async function action({ request, params }: ActionFunctionArgs) {
         throw handleActionError(error)
     }
 }
-
-export const fileStorage = new LocalFileStorage("./uploads/soil_analyses")

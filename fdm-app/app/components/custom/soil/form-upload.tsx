@@ -20,7 +20,6 @@ import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { FileUpload } from "@mjackson/form-data-parser"
 import { useEffect } from "react"
 
 export function SoilAnalysisUploadForm() {
@@ -63,7 +62,7 @@ export function SoilAnalysisUploadForm() {
                                         <FormField
                                             control={form.control}
                                             name="soilAnalysisFile"
-                                            render={({ field }) => (
+                                            render={({ field: { name, onBlur, onChange, disabled, ref } }) => (
                                                 <FormItem>
                                                     <FormLabel>
                                                         Bodemanalyse (pdf)
@@ -71,27 +70,23 @@ export function SoilAnalysisUploadForm() {
                                                     <FormControl>
                                                         <div className="relative">
                                                             <Input
-                                                                {...field}
-                                                                type="file"
-                                                                placeholder=""
-                                                                className="block w-full rounded-md"
-                                                                accept=".pdf"
-                                                                multiple={false}
-                                                                // required={true}
-                                                                disabled={
-                                                                    form
-                                                                        .formState
-                                                                        .isSubmitting
-                                                                }
-                                                                onChange={(
-                                                                    event,
-                                                                ) => {
-                                                                    field.onChange(
+                                                                name={name}
+                                                                onBlur={onBlur}
+                                                                onChange={(event) => {
+                                                                    onChange(
                                                                         event
                                                                             .target
                                                                             .files?.[0],
                                                                     )
                                                                 }}
+                                                                ref={ref}
+                                                                type="file"
+                                                                placeholder=""
+                                                                className="block w-full rounded-md"
+                                                                accept=".pdf"
+                                                                multiple={false}
+                                                                required={true}
+                                                                disabled={disabled}                                                            
                                                             />
                                                         </div>
                                                     </FormControl>
