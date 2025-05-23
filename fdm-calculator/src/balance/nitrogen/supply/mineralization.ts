@@ -19,12 +19,20 @@ export function calculateNitrogenSupplyBySoilMineralization(
     soilAnalysis: SoilAnalysisPicked,
     timeFrame: NitrogenBalanceInput["timeFrame"],
 ): NitrogenSupplyMineralization {
-    const mineralizationValue =
+    let mineralizationValue =
         calculateNitrogenSupplyBySoilMineralizationUsingMinip(
             soilAnalysis.a_c_of,
             soilAnalysis.a_cn_fr,
             soilAnalysis.a_density_sa,
         )
+
+    // Limit the min and max values for the mineralization
+    if (mineralizationValue.greaterThan(250)) {
+        mineralizationValue = new Decimal(250)
+    }
+    if (mineralizationValue.lessThan(5)) {
+        mineralizationValue = new Decimal(5)
+    }
 
     // Adjust for the number of days
     const timeFrameDays = new Decimal(
@@ -87,11 +95,6 @@ export function calculateNitrogenSupplyBySoilMineralizationUsingMinip(
         throw new Error(
             "No a_density_sa value found in soil analysis for arable",
         )
-    }
-
-    // Set organic soils to 250 kg N / ha
-    if (new Decimal(a_c_of).gt(250)) {
-        return new Decimal(250)
     }
 
     // Calculate Cdec
