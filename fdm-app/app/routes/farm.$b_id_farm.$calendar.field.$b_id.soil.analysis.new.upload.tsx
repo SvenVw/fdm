@@ -11,29 +11,20 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
+import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { Form } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "../components/ui/form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
-import { z } from "zod"
-import { Input } from "../components/ui/input"
-import { FileUpload, parseFormData } from "@mjackson/form-data-parser"
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
 import { LocalFileStorage } from "@mjackson/file-storage/local"
-import { extractSoilAnalysis} from "~/integrations/nmi"
+import { extractSoilAnalysis } from "~/integrations/nmi"
+import { fileTypeFromBuffer } from "file-type"
+import {
+    FormSchema,
+    SoilAnalysisUploadForm,
+} from "../components/custom/soil/form-upload"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -106,25 +97,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldSoilOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
-        mode: "onTouched",
-        resolver: zodResolver(FormSchema),
-        defaultValues: {},
-    })
-
-    useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
-            form.reset()
-        }
-    }, [form.formState, form.reset])
-
     return (
         <div className="space-y-6">
             <div className="space-y-4">
                 <div>
-                    <h3 className="text-lg font-medium">Upload bodemanalyse</h3>
+                    <h3 className="text-lg font-medium">Bodem</h3>
                     <p className="text-sm text-muted-foreground">
-                        Upload een bodemanalyse en check de gegevens
+                        Kies het type bodemanalyse voor uw formulier
                     </p>
                 </div>
                 <Button asChild>
@@ -135,67 +114,10 @@ export default function FarmFieldSoilOverviewBlock() {
                 </Button>
             </div>
             <Separator />
-            <RemixFormProvider {...form}>
-                <Form
-                    id="soilAnalysisUploadForm"
-                    onSubmit={form.handleSubmit}
-                    method="post"
-                    encType="multipart/form-data"
-                >
-                    <fieldset disabled={form.formState.isSubmitting}>
-                        <div className="space-y-6">
-                            <p className="text-sm text-muted-foreground">
-                                Vul de gegevens van de bodemanalyse in.
-                            </p>
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <FormField
-                                    control={form.control}
-                                    name="soilAnalysisFile"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>file</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Input
-                                                        {...field}
-                                                        type="file"
-                                                        placeholder=""
-                                                    />
-                                                </div>
-                                            </FormControl>
-                                            <FormDescription>
-                                                hoi
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                        </div>
-                        <div className="space-y-6">
-                            <div className="flex justify-end mt-4">
-                                <Button type="submit">
-                                    {form.formState.isSubmitting ? (
-                                        <div className="flex items-center space-x-2">
-                                            {/* <LoadingSpinner /> */}
-                                            <span>Opslaan...</span>
-                                        </div>
-                                    ) : (
-                                        "Opslaan"
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
-                    </fieldset>
-                </Form>
-            </RemixFormProvider>
+            <SoilAnalysisUploadForm />
         </div>
     )
 }
-
-const FormSchema = z.object({
-    soilAnalysisFile: z.instanceof(FileUpload),
-})
 
 /**
  * Action function to update the soil analysis.
@@ -238,23 +160,38 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fileUpload.fieldName === "soilAnalysisFile" &&
                 fileUpload.type === "application/pdf"
             ) {
-                // process the upload and return a File
-                console.log("processing the file...")
+                // Check file type based on magic bytes
+                const fileBuffer = await fileUpload.arrayBuffer()
+                const fileType = await fileTypeFromBuffer(fileBuffer)
 
+                if (fileType?.mime !== "application/pdf") {
+                    throw new Error("Invalid file type (magic bytes check)")
+                }
+
+                // We need to create a new File object from the buffer
+                const file = new File([fileBuffer], fileUpload.name, {
+                    type: fileUpload.type,
+                })
                 const storageKey = crypto.randomUUID()
-                await fileStorage.set(storageKey, fileUpload)
-
-                // // Check the magic bytes of file
-                // const file = await fileStorage.get(storageKey)
-                // const fileType = filetype(file)
-                // console.log(fileType)
+                await fileStorage.set(storageKey, file)
 
                 return fileStorage.get(storageKey)
             }
+            throw new Error("Invalid file type (mime check)")
         }
 
         const formData = await parseFormData(request, uploadHandler)
-        const file = formData.get("soilAnalysisFile")
+        const file = formData.get("soilAnalysisFile") as File | undefined
+
+        // Server-side validation using Zod schema
+        const parsedFile = FormSchema.safeParse({ soilAnalysisFile: file })
+        if (!parsedFile.success) {
+            throw data(parsedFile.error.flatten(), { status: 400 })
+        }
+
+        if (!file) {
+            throw data("No file uploaded", { status: 400 })
+        }
 
         // Submit to NMI API
         const soilAnalysis = await extractSoilAnalysis(formData)
@@ -264,18 +201,40 @@ export async function action({ request, params }: ActionFunctionArgs) {
             fdm,
             session.principal_id,
             null,
-            'other',
+            "other",
             b_id,
-            soilAnalysis.a_depth_lower,
-            soilAnalysis.b_sampling_date,
+            Number(soilAnalysis.a_depth_lower),
+            new Date(soilAnalysis.b_sampling_date),
             soilAnalysis,
-            soilAnalysis.a_depth_upper
+            Number(soilAnalysis.a_depth_upper),
         )
 
         return redirectWithSuccess(`../soil/analysis/${soilAnalysisId}`, {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {
+        console.error(error)
+        if (
+            error instanceof Error &&
+            (error.message === "Invalid file type (magic bytes check)" ||
+                error.message === "Invalid file type (mime check)")
+        ) {
+            return dataWithError(
+                null,
+                "Het bestand is ongeldig. Controleer het bestand en probeer het opnieuw",
+            )
+        }
+
+        if (
+            error instanceof Error &&
+            error.message === "Invalid soil analysis"
+        ) {
+            return dataWithError(
+                null,
+                "Helaas is het niet gelukt om de pdf te analyseren. Controleer het bestand of neem contact op met Ondersteuning",
+            )
+        }
+
         throw handleActionError(error)
     }
 }
