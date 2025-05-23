@@ -20,7 +20,6 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { SoilAnalysisFormSelection } from "../components/custom/soil/form-selection"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -113,6 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 "a_n_pmn",
                 "a_n_rt",
                 "a_nh4_cc",
+                "a_nmin_cc",
                 "a_no3_cc",
                 "a_p_al",
                 "a_p_cc",
@@ -135,8 +135,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 "b_sampling_date",
                 "a_depth_upper",
                 "a_depth_lower",
-                "a_nh4_cc",
                 "a_no3_cc",
+                "a_nh4_cc",
+                "a_nmin_cc",
             ]
         } else if (soilAnalysisType === "derogation") {
             soilParameters = [
