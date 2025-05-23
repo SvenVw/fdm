@@ -27,6 +27,7 @@ export interface SoilAnalysis {
     a_n_pmn: schema.soilAnalysisTypeSelect["a_n_pmn"]
     a_n_rt: schema.soilAnalysisTypeSelect["a_n_rt"]
     a_nh4_cc: schema.soilAnalysisTypeSelect["a_nh4_cc"]
+    a_nmin_cc: schema.soilAnalysisTypeSelect["a_nmin_cc"]
     a_no3_cc: schema.soilAnalysisTypeSelect["a_no3_cc"]
     a_p_al: schema.soilAnalysisTypeSelect["a_p_al"]
     a_p_cc: schema.soilAnalysisTypeSelect["a_p_cc"]
@@ -75,6 +76,7 @@ export type SoilParameters =
     | "a_n_pmn"
     | "a_n_rt"
     | "a_nh4_cc"
+    | "a_nmin_cc"
     | "a_no3_cc"
     | "a_p_al"
     | "a_p_cc"
