@@ -58,9 +58,8 @@ export async function calculateNitrogenSupply(
 
     // Calculate the amount of Nitrogen supplied by minerlization from the soil
     const mineralisationSupply = calculateNitrogenSupplyBySoilMineralization(
-        cultivations,
         soilAnalysis,
-        cultivationDetailsMap,
+        timeFrame,
     )
 
     // Calculate the total amount of Nitrogen supplied

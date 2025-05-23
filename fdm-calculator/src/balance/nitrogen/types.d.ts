@@ -80,19 +80,14 @@ export type NitrogenSupplyFixation = {
 }
 
 /**
- * Represents the amount of nitrogen supply derived from soil mineralization by cultivations.
+ * Represents the amount of nitrogen supply derived from soil mineralization.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
 export type NitrogenSupplyMineralization = {
     /**
-     * The total amount of nitrogen supply derived from soil mineralization by all cultivations on the field.
+     * The total amount of nitrogen supply derived from soil mineralization on the field.
      */
     total: Decimal
-    /**
-     * A detailed list of nitrogen mineralization by cultivations.
-     * Each entry includes the cultivation's unique identifier (`id`) and the amount of nitrogen mineralized (`value`).
-     */
-    cultivations: { id: string; value: Decimal }[]
 }
 
 /**
