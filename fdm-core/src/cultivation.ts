@@ -754,23 +754,20 @@ export async function getCultivationPlan(
                     existingField.harvests.push({
                         b_id_harvesting: curr.b_id_harvesting,
                         b_lu_harvest_date: curr.b_lu_harvest_date,
-// fdm-core/src/cultivation.ts
-
-// … earlier in getCultivationPlan, before .from(schema.farms)
-.select({
-    b_id_harvesting:    schema.cultivationHarvesting.b_id_harvesting,
-    b_lu_harvest_date:  schema.cultivationHarvesting.b_lu_harvest_date,
-    b_id_harvestable:   schema.harvestables.b_id_harvestable,    // newly added
-    b_lu_yield:         schema.harvestableAnalyses.b_lu_yield,
-    b_lu_n_harvestable: schema.harvestableAnalyses.b_lu_n_harvestable,
-    b_lu_n_residue:     schema.harvestableAnalyses.b_lu_n_residue,
-    b_lu_p_harvestable: schema.harvestableAnalyses.b_lu_p_harvestable,
-    b_lu_p_residue:     schema.harvestableAnalyses.b_lu_p_residue,
-    b_lu_k_harvestable: schema.harvestableAnalyses.b_lu_k_harvestable,
-    b_lu_k_residue:     schema.harvestableAnalyses.b_lu_k_residue,
-    // … any other selected fields
-})
-// … rest of the query chain
+                        harvestable: {
+                            b_id_harvestable: curr.b_id_harvestable,
+                            harvestable_analyses: [
+                                {
+                                    b_lu_yield: curr.b_lu_yield,
+                                    b_lu_n_harvestable: curr.b_lu_n_harvestable,
+                                    b_lu_n_residue: curr.b_lu_n_residue,
+                                    b_lu_p_harvestable: curr.b_lu_p_harvestable,
+                                    b_lu_p_residue: curr.b_lu_p_residue,
+                                    b_lu_k_harvestable: curr.b_lu_k_harvestable,
+                                    b_lu_k_residue: curr.b_lu_k_residue,
+                                },
+                            ],
+                        },
                     })
                 }
                 return acc
