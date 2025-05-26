@@ -407,9 +407,9 @@ export type NitrogenSupplyFixationNumeric = {
 }
 
 // Numeric version of NitrogenSupplyMineralization
+// Numeric version of NitrogenSupplyMineralization
 export type NitrogenSupplyMineralizationNumeric = {
     total: number
-    cultivations: { id: string; value: number }[]
 }
 
 // Numeric version of NitrogenSupply
