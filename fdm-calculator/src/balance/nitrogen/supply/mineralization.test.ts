@@ -33,10 +33,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             )
 
         expect(result.total).toBeInstanceOf(Decimal)
-        expect(result.total.toNumber()).toBeCloseTo(
-            96.97,
-            2,
-        ) // Expected value based on the mock data
+        expect(result.total.toNumber()).toBeCloseTo(96.97, 2) // Expected value based on the mock data
     })
     it("should return 0 if the time frame is negative or zero", () => {
         const zeroTimeFrame: NitrogenBalanceInput["timeFrame"] = {
@@ -61,6 +58,26 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             ).total.toNumber(),
         ).toBe(0)
     })
+
+    it("should return 250 if organic carbon is above 250", () => {
+        const mockSoilAnalysis2: SoilAnalysisPicked = {
+            a_c_of: 350, // Example value
+            a_cn_fr: 10, // Example value
+            a_density_sa: 1.2, // Example value
+            b_soiltype_agr: "zand",
+            a_n_rt: 1,
+            a_som_loi: 1,
+        }
+
+        const result: NitrogenSupplyMineralization =
+            calculateNitrogenSupplyBySoilMineralization(
+                mockSoilAnalysis2,
+                mockTimeFrame,
+            )
+
+        expect(result.total).toBeInstanceOf(Decimal)
+        expect(result.total.toNumber()).toBe(250)
+    })
 })
 
 describe("calculateNitrogenSupplyBySoilMineralizationUsingMinip", () => {
@@ -77,19 +94,5 @@ describe("calculateNitrogenSupplyBySoilMineralizationUsingMinip", () => {
 
         expect(result).toBeInstanceOf(Decimal)
         expect(result.toNumber()).toBeCloseTo(97.24, 2)
-    })
-    it("should return 250 if organic carbon is above 250", () => {
-        const a_c_of = 300
-        const a_cn_fr = 10
-        const a_density_sa = 1.2
-
-        const result = calculateNitrogenSupplyBySoilMineralizationUsingMinip(
-            a_c_of,
-            a_cn_fr,
-            a_density_sa,
-        )
-
-        expect(result).toBeInstanceOf(Decimal)
-        expect(result.toNumber()).toBe(250)
     })
 })
