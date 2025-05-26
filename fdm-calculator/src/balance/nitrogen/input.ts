@@ -62,16 +62,19 @@ export async function collectInputForNitrogenBalance(
                     )
 
                     // Collect the harvests of the cultivations
-                    const harvests = await Promise.all(
-                        cultivations.flatMap(async (cultivation) => {
-                            return await getHarvests(
-                                tx,
-                                principal_id,
-                                cultivation.b_lu,
-                                timeframe,
-                            )
-                        }),
-                    )
+                    // Collect a promise per cultivation
+                    const harvestPromises = cultivations.map(async (cultivation) => {
+                        return await getHarvests(
+                            tx,
+                            principal_id,
+                            cultivation.b_lu,
+                            timeframe,
+                        )
+                    })
+
+                    // Wait for all, then flatten the resulting arrays into one list
+                    const harvestArrays = await Promise.all(harvestPromises)
+                    const harvests = harvestArrays.flat()
                     const harvestsFiltered = harvests.flat().filter(
                         (harvest) => harvest.b_lu !== undefined,
                     )
