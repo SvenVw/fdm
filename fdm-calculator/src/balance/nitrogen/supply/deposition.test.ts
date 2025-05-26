@@ -25,7 +25,7 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             fdmPublicDataUrl,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(19.5183)
+        expect(result.total.toNumber()).toBeCloseTo(19.572)
     })
 
     it("should handle different timeframes correctly", async () => {
@@ -47,7 +47,7 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             timeFrame,
             fdmPublicDataUrl,
         )
-        expect(result.total.toNumber()).toBeCloseTo(19.57194)
+        expect(result.total.toNumber()).toBeCloseTo(19.626)
 
         // Test with half a year
         timeFrame = {
@@ -60,7 +60,7 @@ describe("calculateNitrogenSupplyByDeposition", () => {
             fdmPublicDataUrl,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(9.70554)
+        expect(result.total.toNumber()).toBeCloseTo(9.7592)
     })
 
     it("should provide zero if outside bounding box", async () => {

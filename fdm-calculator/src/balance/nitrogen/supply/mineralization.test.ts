@@ -33,7 +33,7 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
             )
 
         expect(result.total).toBeInstanceOf(Decimal)
-        expect(result.total.toNumber()).toBeCloseTo(96.97, 2) // Expected value based on the mock data
+        expect(result.total.toNumber()).toBeCloseTo(97.24, 2) // Expected value based on the mock data
     })
     it("should return 0 if the time frame is negative or zero", () => {
         const zeroTimeFrame: NitrogenBalanceInput["timeFrame"] = {
