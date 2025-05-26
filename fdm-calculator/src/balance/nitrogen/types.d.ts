@@ -281,6 +281,10 @@ export type NitrogenBalanceField = {
      * The total nitrogen volatilization from the field.
      */
     volatilization: NitrogenVolatilization
+    /**
+     * The target value for the nitrogen balance for the field
+     */
+    target: Decimal
 }
 
 /**
@@ -305,6 +309,10 @@ export type NitrogenBalance = {
      */
     volatilization: Decimal
     /**
+     * The average target value for the nitrogen balance for all the fields
+     */
+    target: Decimal
+    /**
      * A detailed breakdown of the nitrogen balance for each individual field.
      */
     fields: NitrogenBalanceField[]
@@ -318,6 +326,7 @@ export type SoilAnalysisPicked = Pick<
     | "a_n_rt" // mg N / kg
     | "a_som_loi" // %
     | "b_soiltype_agr"
+    | "b_gwl_class"
 >
 
 /**
@@ -340,6 +349,7 @@ export type FieldInput = {
         | "a_n_rt" // mg N / kg
         | "a_som_loi" // %
         | "b_soiltype_agr"
+        | "b_gwl_class"
     >[]
     fertilizerApplications: FertilizerApplication[]
 }
@@ -479,6 +489,7 @@ export type NitrogenBalanceFieldNumeric = {
     balance: number
     supply: NitrogenSupplyNumeric
     removal: NitrogenRemovalNumeric
+    target: number
     volatilization: NitrogenVolatilizationNumeric
 }
 
@@ -488,5 +499,6 @@ export type NitrogenBalanceNumeric = {
     supply: number
     removal: number
     volatilization: number
+    target: number
     fields: NitrogenBalanceFieldNumeric[]
 }
