@@ -175,7 +175,7 @@ describe("Soil Analysis Functions", () => {
         expect(addedSampling[0].a_depth_upper).toEqual(a_depth_upper)
     })
 
-     it("should throw an error if lower depth is greater than upper depth", async () => {
+    it("should throw an error if lower depth is greater than upper depth", async () => {
         const a_date = new Date()
         const a_source = "other"
         const a_depth_lower = 30
@@ -204,9 +204,7 @@ describe("Soil Analysis Functions", () => {
                 },
                 a_depth_upper,
             )
-        }).rejects.toThrowError(
-            "Exception for addSoilAnalysis",
-        )
+        }).rejects.toThrowError("Exception for addSoilAnalysis")
     })
 
     it("should add a new soil analysis with upper depth", async () => {
@@ -237,7 +235,6 @@ describe("Soil Analysis Functions", () => {
             },
             a_depth_upper,
         )
-        
 
         expect(test_a_id).toBeDefined()
 
@@ -260,7 +257,7 @@ describe("Soil Analysis Functions", () => {
         const a_date = new Date()
         const a_source = "other"
         const a_depth_lower = 30
-        const b_sampling_date = new Date()
+        const b_sampling_date = new Date("2025-02-01")
         // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
         test_a_id = await addSoilAnalysis(
@@ -274,9 +271,8 @@ describe("Soil Analysis Functions", () => {
         )
 
         // Test updating existing soil data
-        const updated_a_source = "updated other"
         await updateSoilAnalysis(fdm, principal_id, test_a_id, {
-            a_source: updated_a_source,
+            a_n_rt: 1000,
         })
 
         const updatedAnalysis = await fdm
@@ -284,7 +280,7 @@ describe("Soil Analysis Functions", () => {
             .from(schema.soilAnalysis)
             .where(eq(schema.soilAnalysis.a_id, test_a_id))
             .limit(1)
-        expect(updatedAnalysis[0].a_source).toEqual(updated_a_source)
+        expect(updatedAnalysis[0].a_n_rt).toEqual(1000)
     })
 
     // Test removing existing soil data
