@@ -311,38 +311,21 @@ export function combineSoilAnalyses(
         a_som_loi: null as fdmSchema.soilAnalysisTypeSelect["a_som_loi"],
     }
 
-    soilAnalysis.b_soiltype_agr =
-        soilAnalyses.find(
-            (x: {
-                b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
-            }) => x.b_soiltype_agr,
-        )?.b_soiltype_agr || null
-    soilAnalysis.a_n_rt =
-        soilAnalyses.find(
-            (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>
-                x.a_n_rt,
-        )?.a_n_rt || null
-    soilAnalysis.a_c_of =
-        soilAnalyses.find(
-            (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
-                x.a_c_of,
-        )?.a_c_of || null
-    soilAnalysis.a_som_loi =
-        soilAnalyses.find(
-            (x: { a_som_loi: fdmSchema.soilAnalysisTypeSelect["a_som_loi"] }) =>
-                x.a_som_loi,
-        )?.a_som_loi || null
-    soilAnalysis.a_cn_fr =
-        soilAnalyses.find(
-            (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
-                x.a_cn_fr,
-        )?.a_cn_fr || null
-    soilAnalysis.a_density_sa =
-        soilAnalyses.find(
-            (x: {
-                a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"]
-            }) => x.a_density_sa,
-        )?.a_density_sa || null
+// Define properties to extract
+const propertiesToExtract = [
+    'b_soiltype_agr',
+    'a_n_rt',
+    'a_c_of',
+    'a_cn_fr',
+    'a_density_sa',
+    'a_som_loi'
+] as const
+
+// Extract each property
+for (const prop of propertiesToExtract) {
+    soilAnalysis[prop] =
+        soilAnalyses.find(x => x[prop] !== null && x[prop] !== undefined)?.[prop] || null
+}
 
     // When values for soil parameters are not available try to estimate them with convertsion functions
     if (!soilAnalysis.a_c_of) {
