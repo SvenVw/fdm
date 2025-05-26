@@ -75,7 +75,7 @@ export async function collectInputForNitrogenBalance(
                     // Wait for all, then flatten the resulting arrays into one list
                     const harvestArrays = await Promise.all(harvestPromises)
                     const harvests = harvestArrays.flat()
-                    const harvestsFiltered = harvests.flat().filter(
+                    const harvestsFiltered = harvests.filter(
                         (harvest) => harvest.b_lu !== undefined,
                     )
 

@@ -203,16 +203,11 @@ export function calculateNitrogenBalancesFieldToFarm(
 
         if (!fieldInput) {
             // Should not happen if inputs are consistent, but good to handle
-            if (!fieldInput) {
--               // Should not happen if inputs are consistent, but good to handle
--               console.warn(
--                   `Could not find field input for field balance ${fieldBalance.b_id}`,
--               )
--               continue // Skip this iteration if fieldInput is not found
-+               throw new Error(
-+                   `Data inconsistency: Could not find field input for field balance ${fieldBalance.b_id}`,
-+               )
-            }
+            console.warn(
+                `Could not find field input for field balance ${fieldBalance.b_id}`,
+            )
+            continue // Skip this iteration if fieldInput is not found
+        }
         const fieldArea = new Decimal(fieldInput.field.b_area)
 
         totalFarmSupply = totalFarmSupply.add(
