@@ -594,6 +594,7 @@ export async function getCultivationPlan(
                 b_id_harvesting: schema.cultivationHarvesting.b_id_harvesting,
                 b_lu_harvest_date:
                     schema.cultivationHarvesting.b_lu_harvest_date,
+                b_id_harvestable: schema.harvestables.b_id_harvestable,
                 b_lu_yield: schema.harvestableAnalyses.b_lu_yield,
                 b_lu_n_harvestable:
                     schema.harvestableAnalyses.b_lu_n_harvestable,
