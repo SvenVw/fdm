@@ -63,10 +63,11 @@ export function calculateNitrogenRemovalByHarvests(
             },
         ) as Decimal[]
 
-        let removalHarvest = removalsHarvest[0]
-
-        // If multiple harvestable analyses exist take the average
-        if (removalsHarvest.length > 1) {
+        let removalHarvest = new Decimal(0)
+        if (removalsHarvest.length === 1) {
+            removalHarvest = removalsHarvest[0]
+        } else if (removalsHarvest.length > 1) {
+            // If multiple harvestable analyses exist take the average
             removalHarvest = removalsHarvest
                 .reduce((a, b) => a.add(b), new Decimal(0))
                 .dividedBy(new Decimal(removalsHarvest.length))
