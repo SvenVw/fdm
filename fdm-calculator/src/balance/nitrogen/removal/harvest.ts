@@ -26,7 +26,7 @@ export function calculateNitrogenRemovalByHarvests(
         })?.b_lu_catalogue
         if (!b_lu_catalogue) {
             throw new Error(
-                `Harvest ${harvest.b_id_harvesting} has no corresponding cultivation in cultivations`,
+                `Harvest ${harvest.b_id_harvesting}: cultivation with b_lu '${b_lu}' is missing b_lu_catalogue`,
             )
         }
 
