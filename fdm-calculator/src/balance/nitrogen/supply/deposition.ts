@@ -24,6 +24,8 @@ export async function calculateNitrogenSupplyByDeposition(
     fdmPublicDataUrl: string,
 ): Promise<NitrogenSupply["deposition"]> {
     // Settings
+    // Using the year 2022 as this is currrently only available.
+    // TO DO: Expand the options of other years
     const year = "2022"
     const region = "nl"
     const url = `${fdmPublicDataUrl}deposition/${region}/ntot_${year}.tiff`
