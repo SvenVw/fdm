@@ -126,6 +126,11 @@ export async function collectInputForNitrogenBalance(
             }
         })
     } catch (error) {
-        throw new Error(String(error))
+        throw new Error(
+            `Failed to collect nitrogen balance input for farm ${b_id_farm}: ${
+                error instanceof Error ? error.message : String(error)
+            }`,
+            { cause: error }
+        )
     }
 }
