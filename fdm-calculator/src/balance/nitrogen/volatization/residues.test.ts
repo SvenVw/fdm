@@ -50,7 +50,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(-0.276, -2)
+        expect(result.total.toNumber()).toBeCloseTo(-0.276, 2)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
@@ -102,7 +102,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(-0.276, -2)
+        expect(result.total.toNumber()).toBeCloseTo(-0.276, 2)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
@@ -241,7 +241,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.2, -1)
+        expect(result.total.toNumber()).toBeCloseTo(-1.2, 1)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
