@@ -1,4 +1,4 @@
-import type { Harvest, HarvestableAnalysis } from "@svenvw/fdm-core"
+import type { HarvestableAnalysis } from "@svenvw/fdm-core"
 import type {
     CultivationDetail,
     FieldInput,
@@ -54,7 +54,7 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
                 // Prioritize the specific yield if available
                 const analysisWithYield =
                     harvest.harvestable.harvestable_analyses.find(
-                        (analysis: { b_lu_yield: number | undefined }) =>
+                        (analysis: HarvestableAnalysis) =>
                             analysis.b_lu_yield !== undefined,
                     )
                 if (analysisWithYield) {
