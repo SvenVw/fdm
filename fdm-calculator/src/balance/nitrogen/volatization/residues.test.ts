@@ -37,7 +37,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
                     b_lu_yield: 1000,
                     b_lu_n_harvestable: 20,
                     b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
+                    b_lu_n_residue: 14,
                     b_n_fixation: 0,
                 },
             ],
@@ -50,7 +50,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(-0.276, -2)
+        expect(result.total.toNumber()).toBeCloseTo(-2.688, 2)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
@@ -89,7 +89,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
                     b_lu_yield: 1000,
                     b_lu_n_harvestable: 20,
                     b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
+                    b_lu_n_residue: 14,
                     b_n_fixation: 0,
                 },
             ],
@@ -102,7 +102,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(-0.276, -2)
+        expect(result.total.toNumber()).toBeCloseTo(-2.688, 2)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
@@ -148,7 +148,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
                     b_lu_yield: 1000,
                     b_lu_n_harvestable: 20,
                     b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
+                    b_lu_n_residue: 14,
                     b_n_fixation: 0,
                 },
             ],
@@ -183,7 +183,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
                     b_lu_yield: 1000,
                     b_lu_n_harvestable: 20,
                     b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
+                    b_lu_n_residue: 14,
                     b_n_fixation: 0,
                 },
             ],
@@ -229,7 +229,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
                     b_lu_yield: 1000,
                     b_lu_n_harvestable: 20,
                     b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
+                    b_lu_n_residue: 14,
                     b_n_fixation: 0,
                 },
             ],
@@ -241,7 +241,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.2, -1)
+        expect(result.total.toNumber()).toBeCloseTo(-2.688, 1)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])

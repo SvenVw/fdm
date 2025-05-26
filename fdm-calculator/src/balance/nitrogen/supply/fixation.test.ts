@@ -1,4 +1,3 @@
-// c:\Users\sven.verweij\Applications\fdm\fdm-calculator\src\balance\nitrogen\supply\fixation.test.ts
 import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
 import { calculateNitrogenFixation } from "./fixation"

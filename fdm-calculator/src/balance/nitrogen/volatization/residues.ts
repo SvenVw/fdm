@@ -1,4 +1,4 @@
-import type { Harvest, HarvestableAnalysis } from "@svenvw/fdm-core"
+import type { HarvestableAnalysis } from "@svenvw/fdm-core"
 import type {
     CultivationDetail,
     FieldInput,
@@ -51,7 +51,9 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
         let totalYield = new Decimal(0)
         let harvestCount = 0
         let b_lu_yield = new Decimal(0)
-        for (const harvest of harvests) {
+        for (const harvest of harvests.filter(
+            (h) => h.b_lu === cultivation.b_lu,
+        )) {
             let yieldForThisHarvest: Decimal | null = null
             if (
                 harvest.harvestable?.harvestable_analyses &&
@@ -60,7 +62,7 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
                 // Prioritize the specific yield if available
                 const analysisWithYield =
                     harvest.harvestable.harvestable_analyses.find(
-                        (analysis: { b_lu_yield: number | undefined }) =>
+                        (analysis: HarvestableAnalysis) =>
                             analysis.b_lu_yield !== undefined,
                     )
                 if (analysisWithYield) {
@@ -71,8 +73,9 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
             }
 
             // Fallback to default yield from cultivation_catalogue
+            // Fallback to default yield from cultivation catalogue
             if (yieldForThisHarvest === null) {
-                yieldForThisHarvest = cultivationDetail.b_lu_yield
+                yieldForThisHarvest = new Decimal(cultivationDetail.b_lu_yield)
             }
 
             if (yieldForThisHarvest !== null) {
