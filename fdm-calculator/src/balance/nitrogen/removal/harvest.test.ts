@@ -190,7 +190,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 cultivationDetailsMap,
             ),
         ).toThrowError(
-            "Harvest harvest1 has no corresponding cultivation in cultivations",
+            "Harvest harvest1: cultivation with b_lu 'cultivation1' is missing b_lu_catalogue",
         )
     })
 
