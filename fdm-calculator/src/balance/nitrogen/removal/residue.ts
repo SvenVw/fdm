@@ -34,7 +34,7 @@ export function calculateNitrogenRemovalByResidue(
             )
         }
 
-        // If no crop residues are left or if this is not know return 0 for the amount of Nitrogen removed by crop residues
+        // If no crop residues are left or if this is not known return 0 for the amount of Nitrogen removed by crop residues
         if (!cultivation.m_cropresidue || cultivation.m_cropresidue === false) {
             return {
                 id: cultivation.b_lu,
