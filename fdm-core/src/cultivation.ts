@@ -689,7 +689,7 @@ export async function getCultivationPlan(
             )
 
         const cultivationPlan = cultivations.reduce(
-            (acc: CultivationPlan[], curr: any) => {
+            (acc: CultivationPlan[], curr: (typeof cultivations)[0]) => {
                 let existingCultivation = acc.find(
                     (item) =>
                         item.b_lu_catalogue === curr.b_lu_catalogue &&
