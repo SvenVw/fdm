@@ -42,7 +42,7 @@ export function calculateNitrogenSupplyBySoilMineralization(
     if (timeFrameDays.lessThanOrEqualTo(0)) {
         return { total: new Decimal(0) }
     }
-    const timeFrameFraction = timeFrameDays.dividedBy(365)
+    const timeFrameFraction = timeFrameDays.add(1).dividedBy(365)
     const mineralization = new Decimal(mineralizationValue).times(
         timeFrameFraction,
     )
