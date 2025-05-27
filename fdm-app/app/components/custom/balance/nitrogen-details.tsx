@@ -141,7 +141,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                         (fa: { p_app_id: string }) =>
                                             fa.p_app_id === app.id,
                                     )
-                                if (!application) {
+                                if (!application || !application.p_name_nl || !application.p_app_date) {
                                     console.error(
                                         `Application not found for id: ${app.id}`,
                                     )
@@ -196,7 +196,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             cultivation.b_lu === cult.id,
                                     )
                                 return (
-                                    <NavLink
+                                    cultivation ? <NavLink
                                         to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
                                         key={cult.id}
                                     >
@@ -204,7 +204,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {cultivation.b_lu_name}:{" "}
                                             {cult.value} kg N / ha
                                         </li>
-                                    </NavLink>
+                                    </NavLink> : null
                                 )
                             },
                         )}
@@ -318,7 +318,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             cultivation.b_lu === cult.id,
                                     )
                                 return (
-                                    <NavLink
+                                    cultivation ? <NavLink
                                         to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
                                         key={cult.id}
                                     >
@@ -326,7 +326,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {cultivation.b_lu_name}:{" "}
                                             {cult.value} kg N / ha
                                         </li>
-                                    </NavLink>
+                                    </NavLink> : null
                                 )
                             },
                         )}
