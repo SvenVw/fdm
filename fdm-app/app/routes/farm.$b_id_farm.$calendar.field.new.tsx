@@ -49,6 +49,9 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { useCalendarStore } from "~/store/calendar"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { Header } from "../components/custom/header/base"
+import { HeaderField } from "../components/custom/header/field"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -207,7 +210,24 @@ export default function Index() {
 
     return (
         <SidebarInset>
-            <FarmHeader
+            <Header
+                action={{
+                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
+                    label: "Terug naar percelen",
+                    disabled: false,
+                }}
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderField
+                    b_id_farm={loaderData.b_id_farm}
+                    fieldOptions={[]}
+                    b_id={undefined}
+                />
+            </Header>
+            {/* <FarmHeader
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}
                 fieldOptions={undefined}
@@ -220,7 +240,7 @@ export default function Index() {
                     to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
                     label: "Terug naar percelen",
                 }}
-            />
+            /> */}
             <main>
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex items-center">

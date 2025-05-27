@@ -18,6 +18,12 @@ export function calculateNitrogenSupplyByCompost(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenSupplyFertilizers["compost"] {
+    if (fertilizerApplications.length === 0) {
+        return {
+            total: new Decimal(0),
+            applications: [],
+        }
+    }
     // Map through each fertilizer application to calculate nitrogen supply by compost
     const applications = fertilizerApplications.map((application) => {
         // Get fertilizerDetails of application using the Map

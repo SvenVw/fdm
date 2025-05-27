@@ -5,7 +5,6 @@ import {
     NavLink,
     useLoaderData,
 } from "react-router"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { Button } from "~/components/ui/button"
 import {
@@ -25,6 +24,9 @@ import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
 import { Badge } from "~/components/ui/badge"
 import { House } from "lucide-react"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+
 // Meta
 export const meta: MetaFunction = () => {
     return [
@@ -79,14 +81,12 @@ export default function AppIndex() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farms.map((farm) => ({
-                    b_id_farm: farm.b_id_farm,
-                    b_name_farm: farm.b_name_farm,
-                }))}
-                b_id_farm={undefined}
-                action={undefined}
-            />
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={undefined}
+                    farmOptions={loaderData.farmOptions}
+                />
+            </Header>
             <main>
                 {loaderData.farms.length === 0 ? (
                     <>

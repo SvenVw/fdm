@@ -43,6 +43,13 @@
       "when": 1748353081475,
       "tag": "0005_glorious_sugar_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1748353926519,
+      "tag": "0006_organic_vengeance",
+      "breakpoints": true
     }
   ]
 }
