@@ -21,6 +21,7 @@ ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_mg_co" numeric;--> statement-bre
 ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_mg_co_po" numeric;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_n_pmn" numeric;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_nh4_cc" numeric;--> statement-breakpoint
+ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_nmin_cc" numeric;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_no3_cc" numeric;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_p_ox" numeric;--> statement-breakpoint
 ALTER TABLE "fdm"."soil_analysis" ADD COLUMN "a_p_rt" numeric;--> statement-breakpoint

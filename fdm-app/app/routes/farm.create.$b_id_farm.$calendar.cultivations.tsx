@@ -132,7 +132,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field`}
+                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/access`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         loaderData.cultivationPlan.length === 0,

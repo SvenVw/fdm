@@ -1,6 +1,6 @@
 {
-  "id": "1f191187-8e50-45d2-b8b0-e753e53f7187",
-  "prevId": "f907648d-dae5-45cf-bba5-86b13aaeb0d7",
+  "id": "c58fdae0-902d-4a8e-b24b-c96cda17c470",
+  "prevId": "c265d3db-a2bf-43b6-a7e9-2c9223a916a2",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2532,6 +2532,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_username": {
+          "name": "display_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "firstname": {
           "name": "firstname",
           "type": "text",
@@ -2566,6 +2578,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        },
+        "user_username_unique": {
+          "name": "user_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
           ]
         }
       },

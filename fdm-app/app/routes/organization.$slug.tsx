@@ -48,6 +48,7 @@ import {
 } from "../components/ui/select"
 import { serverConfig } from "../lib/config.server"
 import { renderInvitationEmail, sendEmail } from "../lib/email.server"
+import { username } from "better-auth/plugins/username"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!params.slug) {
@@ -114,7 +115,7 @@ export default function OrganizationIndex() {
                                 <div className="grid gap-6">
                                     {members.map((member) => (
                                         <MemberRow
-                                            key={member.id}
+                                            key={member.username}
                                             member={member}
                                             permissions={permissions}
                                             slug={organization.slug}
@@ -180,7 +181,7 @@ const MemberRow = ({
         id: string
         firstname: string
         surname: string
-        email: string
+        username: string
         role: string
         image: string
     }
@@ -195,7 +196,7 @@ const MemberRow = ({
     const initials = member.firstname.charAt(0) + member.surname.charAt(0)
     return (
         <div
-            key={member.email}
+            key={member.username}
             className="flex items-center justify-between space-x-4"
         >
             <div className="flex items-center space-x-4">
@@ -228,7 +229,7 @@ const MemberAction = ({
     member: {
         firstname: string
         surname: string
-        email: string
+        username: string
         role: string
         image: string
     }
@@ -242,7 +243,7 @@ const MemberAction = ({
 }) => {
     return (
         <form method="post" className="flex items-center space-x-4">
-            <input type="hidden" name="email" value={member.email} />
+            <input type="hidden" name="username" value={member.username} />
             <Select defaultValue={member.role} name="role">
                 <SelectTrigger className="ml-auto w-[110px]">
                     <SelectValue placeholder="Select" />
@@ -375,6 +376,7 @@ const InvitationForm = ({ organizationId }: { organizationId: string }) => {
 
 const FormSchema = z.object({
     email: z.string().email().optional(),
+    username: z.string().optional(),
     role: z.enum(["owner", "admin", "member"]).optional(),
     user_id: z.string().optional(),
     invitation_id: z.string().optional(),
@@ -438,8 +440,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
         if (formValues.intent === "update_role") {
-            if (!formValues.email) {
-                return handleActionError("missing: email")
+            if (!formValues.username) {
+                return handleActionError("missing: username")
             }
             if (!formValues.role) {
                 return handleActionError("missing: role")
@@ -448,7 +450,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 fdm,
                 session.user.id,
                 organization.id,
-                formValues.email,
+                formValues.username,
                 formValues.role,
             )
             return dataWithSuccess(null, {
@@ -456,17 +458,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
             })
         }
         if (formValues.intent === "remove_user") {
-            if (!formValues.email) {
-                return handleActionError("missing: email")
+            if (!formValues.username) {
+                return handleActionError("missing: username")
             }
             await removeUserFromOrganization(
                 fdm,
                 session.user.id,
                 organization.id,
-                formValues.email,
+                formValues.username,
             )
             return dataWithSuccess(null, {
-                message: `Gebruiker ${formValues.email} is verwijderd`,
+                message: `Gebruiker ${formValues.username} is verwijderd`,
             })
         }
         if (formValues.intent === "cancel_invite") {

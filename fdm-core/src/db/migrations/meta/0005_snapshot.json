@@ -1,6 +1,6 @@
 {
-  "id": "f907648d-dae5-45cf-bba5-86b13aaeb0d7",
-  "prevId": "0d0ec778-d020-4c00-8866-cb2e61635552",
+  "id": "c265d3db-a2bf-43b6-a7e9-2c9223a916a2",
+  "prevId": "d4ef4f75-1b77-4ba2-b754-51e6ed3f050a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1690,50 +1690,12 @@
         },
         "a_source": {
           "name": "a_source",
-          "type": "a_source",
-          "typeSchema": "fdm",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "'other'"
-        },
-        "a_al_ox": {
-          "name": "a_al_ox",
-          "type": "numeric",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
         "a_c_of": {
           "name": "a_c_of",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_ca_co": {
-          "name": "a_ca_co",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_ca_co_po": {
-          "name": "a_ca_co_po",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_caco3_if": {
-          "name": "a_caco3_if",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_cec_co": {
-          "name": "a_cec_co",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_clay_mi": {
-          "name": "a_clay_mi",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -1744,86 +1706,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "a_com_fr": {
-          "name": "a_com_fr",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_cu_cc": {
-          "name": "a_cu_cc",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
         "a_density_sa": {
           "name": "a_density_sa",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
-        "a_fe_ox": {
-          "name": "a_fe_ox",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_k_cc": {
-          "name": "a_k_cc",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_k_co": {
-          "name": "a_k_co",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_k_co_po": {
-          "name": "a_k_co_po",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_mg_cc": {
-          "name": "a_mg_cc",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_mg_co": {
-          "name": "a_mg_co",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_mg_co_po": {
-          "name": "a_mg_co_po",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_n_pmn": {
-          "name": "a_n_pmn",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
         "a_n_rt": {
           "name": "a_n_rt",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_nh4_cc": {
-          "name": "a_nh4_cc",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_no3_cc": {
-          "name": "a_no3_cc",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -1840,62 +1730,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "a_p_ox": {
-          "name": "a_p_ox",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_p_rt": {
-          "name": "a_p_rt",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_p_sg": {
-          "name": "a_p_sg",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_p_wa": {
-          "name": "a_p_wa",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_ph_cc": {
-          "name": "a_ph_cc",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_s_rt": {
-          "name": "a_s_rt",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_sand_mi": {
-          "name": "a_sand_mi",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_silt_mi": {
-          "name": "a_silt_mi",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
         "a_som_loi": {
           "name": "a_som_loi",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "a_zn_cc": {
-          "name": "a_zn_cc",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -1958,15 +1794,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "a_depth_upper": {
-          "name": "a_depth_upper",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        },
-        "a_depth_lower": {
-          "name": "a_depth_lower",
+        "b_depth": {
+          "name": "b_depth",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -2526,6 +2355,18 @@
           "primaryKey": false,
           "notNull": true
         },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_username": {
+          "name": "display_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "firstname": {
           "name": "firstname",
           "type": "text",
@@ -2560,6 +2401,13 @@
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        },
+        "user_username_unique": {
+          "name": "user_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
           ]
         }
       },
@@ -2868,22 +2716,6 @@
         "sugarbeet",
         "alfalfa",
         "catchcrop"
-      ]
-    },
-    "fdm.a_source": {
-      "name": "a_source",
-      "schema": "fdm",
-      "values": [
-        "nl-rva-l122",
-        "nl-rva-l136",
-        "nl-rva-l264",
-        "nl-rva-l320",
-        "nl-rva-l335",
-        "nl-rva-l610",
-        "nl-rva-l648",
-        "nl-rva-l697",
-        "nl-other-nmi",
-        "other"
       ]
     },
     "fdm.b_soiltype_agr": {
