@@ -276,9 +276,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <CardContent>
                             <div className="text-muted-foreground">
                                 <p>
-                                    Dit perceel was in gebruik voor dit jaar.
-                                    Als dit perceel wel in gebruik was, werk dan
-                                    de startdatum bij in de perceelsinstelling.
+                                    Dit perceel was niet in gebruik voor dit
+                                    jaar. Als dit perceel wel in gebruik was,
+                                    werk dan de startdatum bij in de
+                                    perceelsinstelling.
                                 </p>
                             </div>
                         </CardContent>
