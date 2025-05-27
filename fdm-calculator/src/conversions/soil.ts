@@ -64,7 +64,7 @@ export function calculateOrganicMatter(
  * calculated by dividing the organic carbon content by the total nitrogen content. The result
  * is clamped within a typical range for agricultural soils (5 to 40) to ensure realistic values.
  * @param a_c_of - The organic carbon content of the soil (g C / kg soil).
- * @param a_n_rt - The total nitrogen content of the soil (g N / kg soil).
+ * @param a_n_rt - The total nitrogen content of the soil (mg N / kg soil).
  */
 export function calculateCarbonNitrogenRatio(
     a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"],
