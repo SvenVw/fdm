@@ -40,27 +40,29 @@ export function HeaderFarm({
                             : "Kies een bedrijf"}
                         <ChevronDown />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                        {farmOptions.map((option) => (
-                            <DropdownMenuCheckboxItem
-                                checked={b_id_farm === option.b_id_farm}
-                                key={option.b_id_farm}
-                            >
-                                <NavLink
-                                    to={
-                                        b_id_farm
-                                            ? currentPath.replace(
-                                                  b_id_farm,
-                                                  option.b_id_farm,
-                                              )
-                                            : `/farm/${option.b_id_farm}`
-                                    }
+                    {farmOptions ? (
+                        <DropdownMenuContent align="start">
+                            {farmOptions.map((option) => (
+                                <DropdownMenuCheckboxItem
+                                    checked={b_id_farm === option.b_id_farm}
+                                    key={option.b_id_farm}
                                 >
-                                    {option.b_name_farm}
-                                </NavLink>
-                            </DropdownMenuCheckboxItem>
-                        ))}
-                    </DropdownMenuContent>
+                                    <NavLink
+                                        to={
+                                            b_id_farm
+                                                ? currentPath.replace(
+                                                      b_id_farm,
+                                                      option.b_id_farm,
+                                                  )
+                                                : `/farm/${option.b_id_farm}`
+                                        }
+                                    >
+                                        {option.b_name_farm}
+                                    </NavLink>
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    ) : null}
                 </DropdownMenu>
             </BreadcrumbItem>
         </>
