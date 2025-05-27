@@ -7,6 +7,19 @@ import type {
 } from "./types"
 import { differenceInCalendarDays } from "date-fns"
 
+/**
+ * Calculates the target nitrogen balance based on cultivation type, soil analysis, and cultivation details.
+ *
+ * This function determines the target nitrogen balance for a field based on several factors:
+ * - **Cultivation Type**: Distinguishes between grassland and arable land.
+ * - **Soil Analysis**: Considers soil type (sand/loess or clay/peat) and groundwater class.
+ * - **Cultivation Details**: Uses a map of cultivation details to identify crop rotation types.
+ * - **Time Frame**: Adjusts the target value based on the length of the specified time period.
+ *
+ * The function uses a predefined set of target values based on combinations of these factors,
+ * derived from Ros et al. 2023.
+ * @returns A Decimal representing the calculated target nitrogen balance in kg N / ha, adjusted for the given time frame.
+ */
 export function calculateTargetForNitrogenBalance(
     cultivations: FieldInput["cultivations"],
     soilAnalysis: SoilAnalysisPicked,
@@ -110,7 +123,7 @@ export function calculateTargetForNitrogenBalance(
     )
     // Ensure timeFrameDays is positive
     if (timeFrameDays.lessThanOrEqualTo(0)) {
-        return new Decimal(0) 
+        return new Decimal(0)
     }
     const timeFrameFraction = timeFrameDays.add(1).dividedBy(365)
     const target = new Decimal(targetValue).times(timeFrameFraction)
