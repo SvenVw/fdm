@@ -6,8 +6,8 @@ export const FormSchema = z
             .string({
                 invalid_type_error: "Bron is ongeldig",
             })
-            .refine((value) => value.toLowerCase() !== "nl-other-nmi", {
-                message: "Bron mag niet 'nl-other-nmi' zijn.",
+            .refine((value) => value.toLowerCase() !== "nmi", {
+                message: "Bron mag niet 'NMI' zijn.",
             }),
         b_sampling_date: z.coerce.date(),
         a_depth_upper: z.coerce
