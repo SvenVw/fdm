@@ -25,9 +25,9 @@ import type { Timeframe } from "./timeframe"
  * @param a_date - The date when the soil analysis was performed.
  * @param a_source - The source of the soil analysis data.
  * @param b_id - The identifier of the field where the soil sample was collected.
- * @param a_depth_lower - The lower depth up to whidch the soil sample was taken.
+ * @param a_depth_lower - The lower depth up to which the soil sample was taken.
  * @param b_sampling_date - The date when the soil sample was collected.
- * @param _a_depth_upper - The upper depth from which the soil sample was taken. Defaults to 0
+ * @param a_depth_upper - The upper depth from which the soil sample was taken. Defaults to 0
  * @param soilAnalysisData - Optional additional data for the soil analysis (e.g., pH, nutrient levels).
  * @returns The ID of the newly added soil analysis record.
  * @throws {Error} If the database transaction fails.
