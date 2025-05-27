@@ -5,6 +5,7 @@ import type {
     NitrogenBalanceInput,
     SoilAnalysisPicked,
 } from "./types"
+import { differenceInCalendarDays } from "date-fns"
 
 export function calculateTargetForNitrogenBalance(
     cultivations: FieldInput["cultivations"],
@@ -62,46 +63,57 @@ export function calculateTargetForNitrogenBalance(
         throw new Error("Unknown groundwater class")
     }
 
-    // Determine target based on Ros et al. 2023
-    let target = undefined
+    // Determine targetValue based on Ros et al. 2023
+    let targetValue = undefined
     if (
         cultivationType === "grassland" &&
         soilType === "sand" &&
         groundwaterClass === "dry"
     ) {
-        target = new Decimal(80)
+        targetValue = new Decimal(80)
     } else if (cultivationType === "grassland") {
-        target = new Decimal(125)
+        targetValue = new Decimal(125)
     } else if (
         cultivationType === "arable" &&
         soilType === "sand" &&
         groundwaterClass === "dry"
     ) {
-        target = new Decimal(50)
+        targetValue = new Decimal(50)
     } else if (
         cultivationType === "arable" &&
         soilType === "sand" &&
         groundwaterClass === "average"
     ) {
-        target = new Decimal(70)
+        targetValue = new Decimal(70)
     } else if (
         cultivationType === "arable" &&
         soilType === "sand" &&
         groundwaterClass === "wet"
     ) {
-        target = new Decimal(125)
+        targetValue = new Decimal(125)
     } else if (
         cultivationType === "arable" &&
         soilType === "clay" &&
         groundwaterClass === "dry"
     ) {
-        target = new Decimal(115)
-        target = new Decimal(125)
+        targetValue = new Decimal(115)
+        targetValue = new Decimal(125)
     } else if (cultivationType === "arable" && soilType === "clay") {
-        target = new Decimal(125)
+        targetValue = new Decimal(125)
     } else {
         throw new Error("Unknown combination of classes")
     }
+
+    // Adjust for the number of days
+    const timeFrameDays = new Decimal(
+        differenceInCalendarDays(timeFrame.end, timeFrame.start),
+    )
+    // Ensure timeFrameDays is positive
+    if (timeFrameDays.lessThanOrEqualTo(0)) {
+        return new Decimal(0) 
+    }
+    const timeFrameFraction = timeFrameDays.add(1).dividedBy(365)
+    const target = new Decimal(targetValue).times(timeFrameFraction)
 
     return target
 }
