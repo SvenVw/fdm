@@ -19,6 +19,7 @@ import {
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
+import { calculateTargetForNitrogenBalance } from "./target"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and volatilization.
@@ -159,12 +160,21 @@ export async function calculateNitrogenBalanceField(
         cultivationDetailsMap,
     )
 
+    // Calculate the target for the Nitrogen balance
+    const target = calculateTargetForNitrogenBalance(
+        cultivations,
+        soilAnalysis,
+        cultivationDetailsMap,
+        timeFrame,
+    )
+
     return {
         b_id: fieldDetails.b_id,
         balance: supply.total.add(removal.total).add(volatilization.total),
         supply: supply,
         removal: removal,
         volatilization: volatilization,
+        target: target,
     }
 }
 
@@ -195,6 +205,7 @@ export function calculateNitrogenBalancesFieldToFarm(
     let totalFarmSupply = Decimal(0)
     let totalFarmRemoval = Decimal(0)
     let totalFarmVolatilization = Decimal(0)
+    let totalFarmTarget = Decimal(0)
 
     for (const fieldBalance of fieldsWithBalance) {
         const fieldInput = fields.find(
@@ -219,6 +230,9 @@ export function calculateNitrogenBalancesFieldToFarm(
         totalFarmVolatilization = totalFarmVolatilization.add(
             fieldBalance.volatilization.total.times(fieldArea),
         )
+        totalFarmTarget = totalFarmTarget.add(
+            fieldBalance.target.times(fieldArea),
+        )
     }
 
     // Calculate average values per hectare for the farm
@@ -231,6 +245,9 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmVolatilization = totalFarmArea.isZero()
         ? Decimal(0)
         : totalFarmVolatilization.dividedBy(totalFarmArea)
+    const avgFarmTarget = totalFarmArea.isZero()
+        ? Decimal(0)
+        : totalFarmTarget.dividedBy(totalFarmArea)
 
     // Calculate the average balance at farm level (Supply + Removal + Volatilization)
     const avgFarmBalance = avgFarmSupply
@@ -243,6 +260,7 @@ export function calculateNitrogenBalancesFieldToFarm(
         supply: avgFarmSupply,
         removal: avgFarmRemoval,
         volatilization: avgFarmVolatilization,
+        target: avgFarmTarget,
         fields: fieldsWithBalance,
     }
 
@@ -361,6 +379,7 @@ export function combineSoilAnalyses(
         "a_c_of",
         "a_cn_fr",
         "a_density_sa",
+        "b_gwl_class",
     ]
     const missingParameters = requiredSoilParameters.filter(
         (param) => soilAnalysis[param as keyof typeof soilAnalysis] === null,

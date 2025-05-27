@@ -107,6 +107,7 @@ describe("calculateNitrogenBalance", () => {
         expect(typeof result.supply).toBe("number")
         expect(typeof result.removal).toBe("number")
         expect(typeof result.volatilization).toBe("number")
+        expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)
     })
 
@@ -176,7 +177,7 @@ describe("combineSoilAnalyses", () => {
         expect(result.a_density_sa).toBe(1.3)
         expect(result.a_n_rt).toBe(2000)
         expect(result.a_som_loi).toBe(3)
-        expect(result.b_soiltype_agr).toBe("klei")
+        expect(result.b_soiltype_agr).toBe("zeeklei")
     })
 
     it("should throw an error if required soil parameters are missing", () => {
