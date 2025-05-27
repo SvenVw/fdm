@@ -61,6 +61,20 @@ export type NitrogenSupplyFertilizers = {
          */
         applications: { id: string; value: Decimal }[]
     }
+    /**
+     * The nitrogen supply specifically from other fertilizers than mineral, manure or compost.
+     */
+    other: {
+        /**
+         * The total amount of nitrogen supplied by all other fertilizer applications.
+         */
+        total: Decimal
+        /**
+         * A detailed list of individual other fertilzer applications.
+         * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
+         */
+        applications: { id: string; value: Decimal }[]
+    }
 }
 
 /**
@@ -395,6 +409,10 @@ export type NitrogenSupplyFertilizersNumeric = {
         applications: { id: string; value: number }[]
     }
     compost: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    other: {
         total: number
         applications: { id: string; value: number }[]
     }

@@ -18,9 +18,11 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
         expect(result.mineral.total.equals(new Decimal(0))).toBe(true)
         expect(result.manure.total.equals(new Decimal(0))).toBe(true)
         expect(result.compost.total.equals(new Decimal(0))).toBe(true)
+        expect(result.other.total.equals(new Decimal(0))).toBe(true)
         expect(result.mineral.applications).toEqual([])
         expect(result.manure.applications).toEqual([])
         expect(result.compost.applications).toEqual([])
+        expect(result.other.applications).toEqual([])
     })
 
     it("should calculate nitrogen supply from all fertilizer types", () => {
@@ -32,6 +34,7 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             },
             { p_id_catalogue: "manure1", p_app_amount: 500, p_app_id: "app2" },
             { p_id_catalogue: "compost1", p_app_amount: 250, p_app_id: "app3" },
+            { p_id_catalogue: "other1", p_app_amount: 100, p_app_id: "app4" },
         ]
 
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>([
@@ -65,6 +68,16 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                     p_type_mineral: false,
                 },
             ],
+            [
+                "other1",
+                {
+                    p_id_catalogue: "other1",
+                    p_type_compost: false,
+                    p_n_rt: 10,
+                    p_type_manure: false,
+                    p_type_mineral: false,
+                },
+            ],
         ])
 
         const result = calculateNitrogenSupplyByFertilizers(
@@ -72,10 +85,11 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
             fertilizerDetailsMap,
         )
 
-        expect(result.total.equals(new Decimal(30))).toBe(true)
+        expect(result.total.equals(new Decimal(31))).toBe(true)
         expect(result.mineral.total.equals(new Decimal(20))).toBe(true)
         expect(result.manure.total.equals(new Decimal(7.5))).toBe(true)
-        expect(result.compost.total.equals(new Decimal(2.5))).toBe(true)       
+        expect(result.compost.total.equals(new Decimal(2.5))).toBe(true)
+        expect(result.other.total.equals(new Decimal(1))).toBe(true)
     })
 
     it("should handle missing fertilizer details gracefully", () => {
