@@ -412,6 +412,10 @@ export type NitrogenSupplyFertilizersNumeric = {
         total: number
         applications: { id: string; value: number }[]
     }
+    other: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
 }
 
 // Numeric version of NitrogenSupplyFixation
