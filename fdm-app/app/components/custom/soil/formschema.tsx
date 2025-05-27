@@ -147,7 +147,7 @@ export const FormSchema = z
             .optional(),
         a_p_rt: z.coerce
             .number()
-            .gte(0.01, "Waarde moet groter of gelijk aan 0.1 zijn")
+            .gte(0.01, "Waarde moet groter of gelijk aan 0.01 zijn")
             .lte(10, "Waarde moet kleiner of gelijk aan 10 zijn")
             .optional(),
         a_p_sg: z.coerce
