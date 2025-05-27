@@ -79,49 +79,74 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
                         {/* Render Mineral Fertilizers */}
-                        {renderMineralFertilizersSupply(
+                        {renderFertilizerApplications(
                             fertilizers.mineral,
                             fieldInput,
+                            "Minerale meststoffen",
+                            "supply.fertilizers.mineral",
                         )}
 
                         {/* Render Manure */}
-                        {renderManureSupply(fertilizers.manure, fieldInput)}
+                        {renderFertilizerApplications(
+                            fertilizers.manure,
+                            fieldInput,
+                            "Mest",
+                            "supply.fertilizers.manure",
+                        )}
 
                         {/* Render Compost */}
-                        {renderCompostSupply(fertilizers.compost, fieldInput)}
+                        {renderFertilizerApplications(
+                            fertilizers.compost,
+                            fieldInput,
+                            "Compost",
+                            "supply.fertilizers.compost",
+                        )}
 
                         {/* Render Compost */}
-                        {renderOtherFertilizersSupply(fertilizers.other, fieldInput)}
+                        {renderFertilizerApplications(
+                            fertilizers.other,
+                            fieldInput,
+                            "Overig",
+                            "supply.fertilizers.other",
+                        )}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
         )
     }
 
-    const renderMineralFertilizersSupply = (
-        mineral: NitrogenSupplyFertilizersNumeric["mineral"],
+    const renderFertilizerApplications = (
+        applications: {
+            total: number
+            applications: Array<{ id: string; value: number }>
+        },
         fieldInput: FieldInput,
+        title: string,
+        sectionKey: string,
     ) => {
-        const sectionKey = "supply.fertilizers.mineral"
-
         return (
             <AccordionItem value={sectionKey}>
                 <AccordionTrigger>
-                    Minerale meststoffen (Totaal): {mineral.total} kg N / ha
+                    {title} (Totaal): {applications.total} kg N / ha
                 </AccordionTrigger>
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
-                        {mineral.applications.map(
+                        {applications.applications.map(
                             (app: { id: string; value: number }) => {
                                 if (app.value === 0) {
                                     return null
                                 }
-
                                 const application =
                                     fieldInput.fertilizerApplications.find(
                                         (fa: { p_app_id: string }) =>
                                             fa.p_app_id === app.id,
                                     )
+                                if (!application) {
+                                    console.error(
+                                        `Application not found for id: ${app.id}`,
+                                    )
+                                    return null
+                                }
                                 return (
                                     <NavLink
                                         to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
@@ -132,159 +157,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {format(
                                                 application.p_app_date,
                                                 "PP",
-                                                {
-                                                    locale: nl,
-                                                },
-                                            )}
-                                            : {app.value} kg N / ha
-                                        </li>
-                                    </NavLink>
-                                )
-                            },
-                        )}
-                    </ul>
-                </AccordionContent>
-            </AccordionItem>
-        )
-    }
-
-    const renderManureSupply = (
-        manure: NitrogenSupplyFertilizersNumeric["manure"],
-        fieldInput: FieldInput,
-    ) => {
-        const sectionKey = "supply.fertilizers.manure"
-
-        return (
-            <AccordionItem value={sectionKey}>
-                <AccordionTrigger>
-                    Mest (Totaal): {manure.total} kg N / ha
-                </AccordionTrigger>
-                <AccordionContent>
-                    <ul className="ml-6 list-disc list-outside space-y-1">
-                        {manure.applications.map(
-                            (app: { id: string; value: number }) => {
-                                if (app.value === 0) {
-                                    return null
-                                }
-
-                                const application =
-                                    fieldInput.fertilizerApplications.find(
-                                        (fa: { p_app_id: string }) =>
-                                            fa.p_app_id === app.id,
-                                    )
-                                return (
-                                    <NavLink
-                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
-                                        key={app.id}
-                                    >
-                                        <li className="text-sm text-muted-foreground hover:underline">
-                                            {application.p_name_nl} op{" "}
-                                            {format(
-                                                application.p_app_date,
-                                                "PP",
-                                                {
-                                                    locale: nl,
-                                                },
-                                            )}
-                                            : {app.value} kg N / ha
-                                        </li>
-                                    </NavLink>
-                                )
-                            },
-                        )}
-                    </ul>
-                </AccordionContent>
-            </AccordionItem>
-        )
-    }
-
-    const renderCompostSupply = (
-        compost: NitrogenSupplyFertilizersNumeric["compost"],
-        fieldInput: FieldInput,
-    ) => {
-        const sectionKey = "supply.fertilizers.compost"
-
-        return (
-            <AccordionItem value={sectionKey}>
-                <AccordionTrigger>
-                    Compost (Totaal): {compost.total} kg N / ha
-                </AccordionTrigger>
-                <AccordionContent>
-                    <ul className="ml-6 list-disc list-outside space-y-1">
-                        {compost.applications.map(
-                            (app: { id: string; value: number }) => {
-                                if (app.value === 0) {
-                                    return null
-                                }
-
-                                const application =
-                                    fieldInput.fertilizerApplications.find(
-                                        (fa: { p_app_id: string }) =>
-                                            fa.p_app_id === app.id,
-                                    )
-                                return (
-                                    <NavLink
-                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
-                                        key={app.id}
-                                    >
-                                        <li className="text-sm text-muted-foreground hover:underline">
-                                            {application.p_name_nl} op{" "}
-                                            {format(
-                                                application.p_app_date,
-                                                "PP",
-                                                {
-                                                    locale: nl,
-                                                },
-                                            )}
-                                            : {app.value} kg N / ha
-                                        </li>
-                                    </NavLink>
-                                )
-                            },
-                        )}
-                    </ul>
-                </AccordionContent>
-            </AccordionItem>
-        )
-    }
-
-    const renderOtherFertilizersSupply = (
-        other: NitrogenSupplyFertilizersNumeric["other"],
-        fieldInput: FieldInput,
-    ) => {
-        const sectionKey = "supply.fertilizers.other"
-
-        return (
-            <AccordionItem value={sectionKey}>
-                <AccordionTrigger>
-                    Overig (Totaal): {other.total} kg N / ha
-                </AccordionTrigger>
-                <AccordionContent>
-                    <ul className="ml-6 list-disc list-outside space-y-1">
-                        {other.applications.map(
-                            (app: { id: string; value: number }) => {
-                                if (app.value === 0) {
-                                    return null
-                                }
-
-                                const application =
-                                    fieldInput.fertilizerApplications.find(
-                                        (fa: { p_app_id: string }) =>
-                                            fa.p_app_id === app.id,
-                                    )
-                                return (
-                                    <NavLink
-                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
-                                        key={app.id}
-                                    >
-                                        <li className="text-sm text-muted-foreground hover:underline">
-                                            {application.p_name_nl} op{" "}
-                                            {format(
-                                                application.p_app_date,
-                                                "PP",
-                                                {
-                                                    locale: nl,
-                                                },
+                                                { locale: nl },
                                             )}
                                             : {app.value} kg N / ha
                                         </li>
