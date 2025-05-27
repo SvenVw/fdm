@@ -6,12 +6,6 @@ import {
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from "~/components/ui/breadcrumb"
-import {
     Card,
     CardContent,
     CardDescription,
@@ -19,10 +13,11 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
-import { SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
+import { Header } from "~/components/custom/header/base"
+import { HeaderUser } from "~/components/custom/header/user"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -72,19 +67,9 @@ export default function User() {
 
     return (
         <main className="container">
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="/user">
-                                Account
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+            <Header action={undefined}>
+                <HeaderUser name={user.name} />
+            </Header>
             <div className="max-w-3xl mx-auto px-4">
                 <div className="mb-8">
                     <FarmTitle

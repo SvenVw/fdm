@@ -1,8 +1,10 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { organization } from "better-auth/plugins"
+import { organization, username } from "better-auth/plugins"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
+import { generateFromEmail } from "unique-username-generator"
+import { eq } from "drizzle-orm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
@@ -34,7 +36,7 @@ export function createFdmAuth(
         googleAuth = {
             clientId: google?.clientId,
             clientSecret: google?.clientSecret,
-            mapProfileToUser: (profile: {
+            mapProfileToUser: async (profile: {
                 name: string
                 email: string
                 picture: string
@@ -47,6 +49,11 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: profile.given_name,
                     surname: profile.family_name,
+                    username: await createUsername(fdm, profile.email),
+                    displayUsername: createDisplayUsername(
+                        profile.given_name,
+                        profile.family_name,
+                    ),
                 }
             },
         }
@@ -59,7 +66,7 @@ export function createFdmAuth(
             clientSecret: microsoft.clientSecret,
             tenantId: "common",
             requireSelectAccount: true,
-            mapProfileToUser: (profile: {
+            mapProfileToUser: async (profile: {
                 name: string | undefined
                 email: string
                 picture: string
@@ -71,6 +78,8 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: firstname,
                     surname: surname,
+                    username: await createUsername(fdm, profile.email),
+                    displayUsername: createDisplayUsername(firstname, surname),
                 }
             },
         }
@@ -123,6 +132,7 @@ export function createFdmAuth(
             enabled: emailAndPassword || false,
         },
         plugins: [
+            username(),
             organization({
                 organizationCreation: {
                     disabled: false, // Set to true to disable organization creation
@@ -179,4 +189,53 @@ export function splitFullName(fullName: string | undefined): {
     const firstname = names[0]
     const surname = names.slice(-1)[0] // Get the last name
     return { firstname, surname }
+}
+
+async function createUsername(fdm: FdmType, email: string): Promise<string> {
+    const digits = 3
+
+    // Create username from email
+    let username = generateFromEmail(email, digits)
+
+    // Check if username already exists
+    const existingUser = await fdm
+        .select({
+            username: authNSchema.user.username,
+        })
+        .from(authNSchema.user)
+        .where(eq(authNSchema.user.username, username))
+        .limit(1)
+
+    // If username exists, append random digits until we find a unique one
+    if (existingUser && existingUser.length > 0) {
+        while (existingUser) {
+            username = generateFromEmail(email, digits)
+            const checkUser = await fdm
+                .select({
+                    username: authNSchema.user.username,
+                })
+                .from(authNSchema.user)
+                .where(eq(authNSchema.user.username, username))
+                .limit(1)
+            if (checkUser && checkUser.length === 0) break
+        }
+    }
+
+    return username
+}
+
+export function createDisplayUsername(
+    firstname: string | null,
+    surname: string | null,
+): string | null {
+    // Filter out null or empty name parts and join with a space
+    const nameParts = [firstname, surname].filter((part) => part?.trim())
+    const name = nameParts.join(" ")
+
+    // If no name is given return null
+    if (!name || name.trim() === "") {
+        return null
+    }
+
+    return name
 }

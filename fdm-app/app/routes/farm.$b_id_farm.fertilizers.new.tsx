@@ -16,7 +16,6 @@ import {
 import { useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import type { z } from "zod"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { FertilizerForm } from "~/components/custom/fertilizer/form"
 import { FormSchema } from "~/components/custom/fertilizer/formschema"
@@ -26,6 +25,9 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { HeaderFertilizer } from "../components/custom/header/fertilizer"
+import { Header } from "../components/custom/header/base"
 
 export const meta: MetaFunction = () => {
     return [
@@ -165,15 +167,23 @@ export default function FarmFertilizerBlock() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
+            <Header
                 action={{
                     to: "../fertilizers",
                     label: "Terug naar overzicht",
+                    disabled: false,
                 }}
-                fertilizerOptions={loaderData.fertilizerOptions}
-            />
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderFertilizer
+                    b_id_farm={loaderData.b_id_farm}
+                    p_id={undefined}
+                    fertilizerOptions={[]}
+                />
+            </Header>
             <main>
                 <FarmTitle
                     title={"Meststof toevoegen"}

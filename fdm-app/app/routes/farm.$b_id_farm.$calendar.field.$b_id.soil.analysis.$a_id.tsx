@@ -93,8 +93,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get soil parameter descriptions
-        const soilParameterDescription = getSoilParametersDescription()
+        // Get soil parameter descriptions and filter on the available soil parameters
+        const soilParameterDescription = getSoilParametersDescription().filter(
+            (item: { parameter: string }) => 
+                soilAnalysis[item.parameter]
+        )
 
         // Return user information from loader
         return {

@@ -33,15 +33,8 @@ import {
 } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
 import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
 import { Separator } from "~/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
@@ -49,7 +42,10 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
+import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
+import { Header } from "~/components/custom/header/base"
+import type { Polygon, Feature, GeoJsonProperties } from "geojson"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -100,6 +96,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const mapboxStyle = getMapboxStyle()
 
         return {
+            b_id_farm: farm.b_id_farm,
             b_name_farm: farm.b_name_farm,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
@@ -129,27 +126,9 @@ export default function Index() {
 
     return (
         <SidebarInset>
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>Maak een bedrijf</BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>
-                                {loaderData.b_name_farm}
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator className="hidden md:block" />
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink>Selecteer percelen</BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
+            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex items-center">
@@ -274,67 +253,69 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Add fields to farm
         await Promise.all(
-            selectedFields.features.map(async (field, index: number) => {
-                const b_name = `Perceel ${index + 1}`
-                const b_id_source = field.properties.b_id_source
-                const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
-                const b_geometry = field.geometry
-                const currentYear = new Date().getFullYear()
-                const defaultDate = timeframe.start
-                    ? timeframe.start
-                    : `${currentYear}-01-01`
-                const b_start = defaultDate
-                const b_lu_start = defaultDate
-                const b_lu_end = undefined
-                const b_end = undefined
-                const b_acquiring_method = "unknown"
+            selectedFields.features.map(
+                async (
+                    field: Feature<Polygon, GeoJsonProperties>,
+                    index: number,
+                ) => {
+                    if (!field.properties) {
+                        throw new Error("missing: field.properties")
+                    }
+                    const b_name = `Perceel ${index + 1}`
+                    const b_id_source = field.properties.b_id_source
+                    const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
+                    const b_geometry = field.geometry
+                    const currentYear = new Date().getFullYear()
+                    const defaultDate = timeframe.start
+                        ? timeframe.start
+                        : `${currentYear}-01-01`
+                    const b_start = defaultDate
+                    const b_lu_start = defaultDate
+                    const b_lu_end = undefined
+                    const b_end = undefined
+                    const b_acquiring_method = "unknown"
 
-                const b_id = await addField(
-                    fdm,
-                    session.principal_id,
-                    b_id_farm,
-                    b_name,
-                    b_id_source,
-                    b_geometry,
-                    b_start,
-                    b_acquiring_method,
-                    b_end,
-                )
-                await addCultivation(
-                    fdm,
-                    session.principal_id,
-                    b_lu_catalogue,
-                    b_id,
-                    b_lu_start,
-                    b_lu_end,
-                )
-
-                if (nmiApiKey) {
-                    const estimates = await getSoilParameterEstimates(
-                        field,
-                        nmiApiKey,
-                    )
-
-                    await addSoilAnalysis(
+                    const b_id = await addField(
                         fdm,
                         session.principal_id,
-                        undefined,
-                        estimates.a_source,
-                        b_id,
-                        estimates.a_depth,
-                        undefined,
-                        {
-                            a_p_al: estimates.a_p_al,
-                            a_p_cc: estimates.a_p_cc,
-                            a_som_loi: estimates.a_som_loi,
-                            b_soiltype_agr: estimates.b_soiltype_agr,
-                            b_gwl_class: estimates.b_gwl_class,
-                        },
+                        b_id_farm,
+                        b_name,
+                        b_id_source,
+                        b_geometry,
+                        b_start,
+                        b_acquiring_method,
+                        b_end,
                     )
-                }
+                    await addCultivation(
+                        fdm,
+                        session.principal_id,
+                        b_lu_catalogue,
+                        b_id,
+                        b_lu_start,
+                        b_lu_end,
+                    )
 
-                return b_id
-            }),
+                    if (nmiApiKey) {
+                        const estimates = await getSoilParameterEstimates(
+                            field,
+                            nmiApiKey,
+                        )
+
+                        await addSoilAnalysis(
+                            fdm,
+                            session.principal_id,
+                            undefined,
+                            estimates.a_source,
+                            b_id,
+                            estimates.a_depth_lower,
+                            undefined,
+                            estimates,
+                        )
+                    }
+
+                    return b_id
+                },
+            ),
         )
 
         return redirectWithSuccess(

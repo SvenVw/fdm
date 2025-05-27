@@ -1,13 +1,16 @@
 import { and, desc, eq, isNotNull, isNull } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     actions,
     checkPermission,
+    getRolesOfPrincipalForResource,
     grantRole,
+    listPrincipalsForResource,
     listResources,
     resources,
-    revokeRole,
+    revokePrincipal,
     roles,
+    updateRole,
 } from "./authorization"
 import * as authZSchema from "./db/schema-authz"
 import { addFarm } from "./farm"
@@ -19,16 +22,23 @@ describe("Authorization Functions", () => {
     let fdm: FdmServerType
     let principal_id: string
     let farm_id: string
+    let host: string
+    let port: number
+    let user: string
+    let password: string
+    let database: string
+
+    beforeAll(async () => {
+        host = inject("host")
+        port = inject("port")
+        user = inject("user")
+        password = inject("password")
+        database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database, 10) // allow some connections
+        principal_id = createId()
+    })
 
     beforeEach(async () => {
-        const host = inject("host")
-        const port = inject("port")
-        const user = inject("user")
-        const password = inject("password")
-        const database = inject("database")
-        fdm = createFdmServer(host, port, user, password, database)
-
-        principal_id = createId()
         farm_id = createId()
         // Create a test farm
         const farmName = "Test Farm"
@@ -159,26 +169,6 @@ describe("Authorization Functions", () => {
             expect(roles.length).toBe(1)
         })
 
-        it("should handle non-unique role grants", async () => {
-            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-
-            const roles = await fdm
-                .select()
-                .from(authZSchema.role)
-                .where(
-                    and(
-                        eq(authZSchema.role.resource, "farm"),
-                        eq(authZSchema.role.resource_id, farm_id),
-                        eq(authZSchema.role.principal_id, principal_id),
-                        eq(authZSchema.role.role, "owner"),
-                        isNull(authZSchema.role.deleted),
-                    ),
-                )
-
-            expect(roles.length).toBe(2)
-        })
-
         it("should throw an error for invalid resource", async () => {
             await expect(
                 grantRole(
@@ -211,12 +201,20 @@ describe("Authorization Functions", () => {
                 grantRole(fdm, "farm", "owner", farm_id, null as any),
             ).rejects.toThrowError()
         })
+
+        it("should throw an error if the principal already has a non-deleted role", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            await expect(
+                grantRole(fdm, "farm", "advisor", farm_id, principal_id),
+            ).rejects.toThrowError("Exception for grantRole")
+        })
     })
 
-    describe("revokeRole", () => {
+    describe("revokePrincipal", () => {
         it("should revoke a role from a principal for a resource", async () => {
             await grantRole(fdm, "farm", "owner", farm_id, principal_id)
-            await revokeRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
 
             const roles = await fdm
                 .select()
@@ -234,7 +232,7 @@ describe("Authorization Functions", () => {
         })
 
         it("should not throw an error when revoking a non-existing role", async () => {
-            await revokeRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
             const roles = await fdm
                 .select()
                 .from(authZSchema.role)
@@ -252,20 +250,72 @@ describe("Authorization Functions", () => {
 
         it("should throw an error for invalid resource", async () => {
             await expect(
-                revokeRole(
+                revokePrincipal(
                     fdm,
                     // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
                     "unknown_resource" as any,
-                    "owner",
                     farm_id,
                     principal_id,
                 ),
             ).rejects.toThrowError()
         })
+    })
+
+    describe("updateRole", () => {
+        it("should update the role of a principal for a resource", async () => {
+            // Grant initial role
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            // Update the role
+            await updateRole(fdm, "farm", "advisor", farm_id, principal_id)
+
+            // Verify the new role
+            const newRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "advisor"),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+            expect(newRole.length).toBe(1)
+
+            // Verify the old role is revoked
+            const oldRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "owner"),
+                    ),
+                )
+            expect(oldRole.length).toBe(1)
+            expect(oldRole[0].deleted).not.toBeNull()
+        })
+
+        it("should throw an error for invalid resource", async () => {
+            await expect(
+                updateRole(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    "advisor",
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError("Exception for updateRole")
+        })
 
         it("should throw an error for invalid role", async () => {
             await expect(
-                revokeRole(
+                updateRole(
                     fdm,
                     "farm",
                     // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
@@ -273,7 +323,93 @@ describe("Authorization Functions", () => {
                     farm_id,
                     principal_id,
                 ),
-            ).rejects.toThrowError()
+            ).rejects.toThrowError("Exception for updateRole")
+        })
+
+        it("should throw an error if the database transaction fails", async () => {
+            // Mock the transaction function to throw an error
+            const mockTx = async () => {
+                throw new Error("Database transaction failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                transaction: mockTx,
+            }
+            // Act & Assert
+            await expect(
+                updateRole(fdmMock, "farm", "advisor", farm_id, principal_id),
+            ).rejects.toThrowError("Exception for updateRole")
+        })
+
+        it("should handle case when no old role to revoke", async () => {
+            // Update the role
+            await updateRole(fdm, "farm", "advisor", farm_id, principal_id)
+
+            // Verify the new role
+            const newRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "advisor"),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+            expect(newRole.length).toBe(1)
+
+            // Verify no old role is revoked
+            const oldRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "owner"),
+                    ),
+                )
+            expect(oldRole.length).toBe(0)
+        })
+        it("should handle updating the role to a non existing role", async () => {
+            // Grant initial role
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            // Update the role
+            await updateRole(fdm, "farm", "researcher", farm_id, principal_id)
+
+            // Verify the new role
+            const newRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "researcher"),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+            expect(newRole.length).toBe(1)
+
+            // Verify the old role is revoked
+            const oldRole = await fdm
+                .select()
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, "farm"),
+                        eq(authZSchema.role.resource_id, farm_id),
+                        eq(authZSchema.role.principal_id, principal_id),
+                        eq(authZSchema.role.role, "owner"),
+                    ),
+                )
+            expect(oldRole.length).toBe(1)
+            expect(oldRole[0].deleted).not.toBeNull()
         })
     })
 
@@ -341,6 +477,261 @@ describe("Authorization Functions", () => {
         })
     })
 
+    describe("getRolesOfPrincipalForResource", () => {
+        it("should get direct roles", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+
+            const roles = await getRolesOfPrincipalForResource(
+                fdm,
+                "farm",
+                farm_id,
+                principal_id,
+            )
+            expect(roles).toEqual(["owner"])
+        })
+
+        // it("should get inherited roles", async () => {
+        //     const field_id = await addField(
+        //         fdm,
+        //         principal_id,
+        //         farm_id,
+        //         "Test Field",
+        //         "test source",
+        //         {
+        //             type: "Polygon",
+        //             coordinates: [
+        //                 [
+        //                     [30, 10],
+        //                     [40, 40],
+        //                     [20, 40],
+        //                     [10, 20],
+        //                     [30, 10],
+        //                 ],
+        //             ],
+        //         },
+        //         new Date("2023-01-01"),
+        //         "owner",
+        //         new Date("2024-01-01"),
+        //     )
+        //     await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+        //     await grantRole(fdm, "field", "advisor", field_id, principal_id)
+
+        //     const roles = await getRolesOfPrincipalForResource(
+        //         fdm,
+        //         "field",
+        //         field_id,
+        //         principal_id,
+        //     )
+        //     expect(roles).toEqual(["advisor", "owner"])
+        // })
+
+        // it("should get direct roles without inherited roles", async () => {
+        //     const field_id = await addField(
+        //         fdm,
+        //         principal_id,
+        //         farm_id,
+        //         "Test Field",
+        //         "test source",
+        //         {
+        //             type: "Polygon",
+        //             coordinates: [
+        //                 [
+        //                     [30, 10],
+        //                     [40, 40],
+        //                     [20, 40],
+        //                     [10, 20],
+        //                     [30, 10],
+        //                 ],
+        //             ],
+        //         },
+        //         new Date("2023-01-01"),
+        //         "owner",
+        //         new Date("2024-01-01"),
+        //     )
+
+        //     await grantRole(fdm, "farm", "advisor", farm_id, principal_id)
+        //     await grantRole(fdm, "field", "advisor", field_id, principal_id)
+
+        //     const roles = await getRolesOfPrincipalForResource(
+        //         fdm,
+        //         "field",
+        //         field_id,
+        //         principal_id,
+        //     )
+        //     expect(roles).toEqual(["advisor"])
+        // })
+
+        it("should return an empty array if the principal has no roles for the resource", async () => {
+            const other_principal_id = createId()
+
+            const roles = await getRolesOfPrincipalForResource(
+                fdm,
+                "farm",
+                farm_id,
+                other_principal_id,
+            )
+            expect(roles).toEqual([])
+        })
+
+        it("should throw error with invalid resource", async () => {
+            await expect(
+                getRolesOfPrincipalForResource(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "unknown_resource" as any,
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError(
+                "Exception for getRolesOfPrincipalForResource",
+            )
+        })
+
+        it("should throw an error if the database transaction fails", async () => {
+            // Mock the transaction function to throw an error
+            const mockTx = async () => {
+                throw new Error("Database transaction failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                transaction: mockTx,
+            }
+            // Act & Assert
+            await expect(
+                getRolesOfPrincipalForResource(
+                    fdmMock,
+                    "farm",
+                    farm_id,
+                    principal_id,
+                ),
+            ).rejects.toThrowError(
+                "Exception for getRolesOfPrincipalForResource",
+            )
+        })
+    })
+
+    describe("listPrincipalsForResource", () => {
+        let principal_id2: string
+
+        beforeEach(async () => {
+            principal_id2 = createId()
+        })
+
+        it("should list principals associated with a resource", async () => {
+            // Grant roles to two principals
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await grantRole(fdm, "farm", "advisor", farm_id, principal_id2)
+
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+
+            expect(principals.length).toBe(2)
+            expect(principals).toContainEqual({
+                principal_id: principal_id,
+                role: "owner",
+            })
+            expect(principals).toContainEqual({
+                principal_id: principal_id2,
+                role: "advisor",
+            })
+        })
+
+        it("should return an empty array if no principals are associated with the resource", async () => {
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+            expect(principals).toEqual([])
+        })
+
+        it("should throw an error for an invalid resource type", async () => {
+            await expect(
+                listPrincipalsForResource(
+                    fdm,
+                    // biome-ignore lint/suspicious/noExplicitAny: Used for testing validation
+                    "invalid_resource" as any,
+                    farm_id,
+                ),
+            ).rejects.toThrowError("Exception for listPrincipalsForResource")
+        })
+
+        it("should handle revoked principals correctly", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
+
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                farm_id,
+            )
+            expect(principals).toEqual([])
+        })
+
+        it("should not list revoked roles", async () => {
+            // Grant and then revoke the role
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            await revokePrincipal(fdm, "farm", farm_id, principal_id)
+
+            // Now check if the role is present in the list
+            const result = await listPrincipalsForResource(fdm, "farm", farm_id)
+            expect(result.length).toBe(0)
+        })
+
+        it("should throw an error if the database transaction fails", async () => {
+            // Mock the transaction function to throw an error
+            const mockTx = async () => {
+                throw new Error("Database transaction failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                transaction: mockTx,
+            }
+            // Act & Assert
+            await expect(
+                listPrincipalsForResource(fdmMock, "farm", farm_id),
+            ).rejects.toThrowError("Exception for listPrincipalsForResource")
+        })
+
+        it("should handle different resources", async () => {
+            for (const resource of resources) {
+                if (resource === "user" || resource === "organization") continue // these resources are not added by the code
+                const testResourceId = createId()
+                await grantRole(
+                    fdm,
+                    resource,
+                    "owner",
+                    testResourceId,
+                    principal_id,
+                )
+                const principals = await listPrincipalsForResource(
+                    fdm,
+                    resource,
+                    testResourceId,
+                )
+
+                expect(principals.length).toBe(1)
+                expect(principals).toContainEqual({
+                    principal_id: principal_id,
+                    role: "owner",
+                })
+            }
+        })
+
+        it("should have the correct properties on the result object", async () => {
+            await grantRole(fdm, "farm", "owner", farm_id, principal_id)
+            const result = await listPrincipalsForResource(fdm, "farm", farm_id)
+
+            expect(result.length).toBe(1)
+            expect(result[0]).toHaveProperty("principal_id")
+            expect(result[0]).toHaveProperty("role")
+            expect(typeof result[0].principal_id).toBe("string")
+            expect(typeof result[0].role).toBe("string")
+        })
+    })
     describe("Authorization Constants", () => {
         it("should have the correct resources", () => {
             expect(resources).toEqual([

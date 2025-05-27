@@ -17,6 +17,10 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
+import { Header } from "~/components/custom/header/base"
+import { HeaderOrganization } from "~/components/custom/header/organization"
+import { getOrganizationsForUser } from "@svenvw/fdm-core"
+import { fdm } from "~/lib/fdm.server"
 
 /**
  * Retrieves the session from the HTTP request and returns user information if available.
@@ -29,7 +33,7 @@ import { handleLoaderError } from "~/lib/error"
  *
  * @throws {Error} If an error occurs during session retrieval, processed by handleLoaderError.
  */
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
@@ -43,11 +47,20 @@ export async function loader({ request }: LoaderFunctionArgs) {
             return redirect(signInUrl)
         }
 
+        const selectedOrganizationSlug = params.slug
+
+        const organizations = await getOrganizationsForUser(
+            fdm,
+            session.user.id,
+        )
+
         // Return user information from loader
         return {
             user: session.user,
             userName: session.userName,
             initials: session.initials,
+            selectedOrganizationSlug: selectedOrganizationSlug,
+            organizations: organizations,
         }
     } catch (error) {
         // If getSession throws (e.g., invalid token), it might result in a 401
@@ -101,6 +114,14 @@ export default function App() {
                 />
             </Sidebar>
             <SidebarInset>
+                <Header action={undefined}>
+                    <HeaderOrganization
+                        selectedOrganizationSlug={
+                            loaderData.selectedOrganizationSlug
+                        }
+                        organizationOptions={loaderData.organizations}
+                    />
+                </Header>
                 <Outlet />
             </SidebarInset>
         </SidebarProvider>

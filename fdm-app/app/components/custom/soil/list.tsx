@@ -31,14 +31,14 @@ export function SoilAnalysesList({
                     >
                         <div className="col-span-1">
                             <p className="text-sm font-medium leading-none">
-                                {analysis.a_source === "NMI"
-                                    ? "Schatting van NMI"
+                                {analysis.a_source === "nl-other-nmi"
+                                    ? "Geschat met NMI BodemSchat"
                                     : format(analysis.b_sampling_date, "PP", {
                                           locale: nl,
                                       })}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                {analysis.a_source === "NMI"
+                                {analysis.a_source === "nl-other-nmi"
                                     ? null
                                     : analysis.a_source === "" ||
                                         !analysis.a_source
@@ -54,7 +54,7 @@ export function SoilAnalysesList({
                                     asChild
                                     className={cn(
                                         "pointer-events-auto",
-                                        analysis.a_source === "NMI"
+                                        analysis.a_source === "nl-other-nmi"
                                             ? "pointer-events-none"
                                             : "",
                                     )}
@@ -63,7 +63,7 @@ export function SoilAnalysesList({
                                         variant="default"
                                         disabled={
                                             fetcher.state === "submitting" ||
-                                            analysis.a_source === "NMI"
+                                            analysis.a_source === "nl-other-nmi"
                                         }
                                     >
                                         Bewerk
@@ -73,7 +73,7 @@ export function SoilAnalysesList({
                                     variant="destructive"
                                     disabled={
                                         fetcher.state === "submitting" ||
-                                        analysis.a_source === "NMI"
+                                        analysis.a_source === "nl-other-nmi"
                                     }
                                     onClick={() => {
                                         handleDelete(analysis.a_id)
