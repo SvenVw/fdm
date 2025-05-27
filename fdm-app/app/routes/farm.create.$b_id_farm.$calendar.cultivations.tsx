@@ -143,7 +143,7 @@ export default function Index() {
                                         loaderData.cultivationPlan.length === 0
                                     }
                                 >
-                                    Voltooien
+                                    Volgende
                                 </Button>
                             </NavLink>
                         </div>
