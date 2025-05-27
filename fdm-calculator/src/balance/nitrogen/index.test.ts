@@ -61,7 +61,8 @@ describe("calculateNitrogenBalance", () => {
                             a_density_sa: 1.2,
                             a_n_rt: 3000,
                             a_som_loi: 2,
-                            b_soiltype_agr: "zand",
+                            b_soiltype_agr: "dekzand",
+                            b_gwl_class: "II",
                         },
                     ],
                     fertilizerApplications: [
@@ -151,7 +152,8 @@ describe("combineSoilAnalyses", () => {
                 a_density_sa: 1.2,
                 a_n_rt: 3000,
                 a_som_loi: 2,
-                b_soiltype_agr: "zand",
+                b_soiltype_agr: "dekzand",
+                b_gwl_class: "II",
             },
             {
                 a_id: "soil2",
@@ -161,7 +163,8 @@ describe("combineSoilAnalyses", () => {
                 a_density_sa: 1.3,
                 a_n_rt: 2000,
                 a_som_loi: 3,
-                b_soiltype_agr: "klei",
+                b_soiltype_agr: "zeeklei",
+                b_gwl_class: "II",
             },
         ]
 
@@ -186,7 +189,8 @@ describe("combineSoilAnalyses", () => {
                 a_density_sa: 1.2,
                 a_n_rt: 3000,
                 a_som_loi: 2,
-                b_soiltype_agr: "zand",
+                b_soiltype_agr: "dekzand",
+                b_gwl_class: "II",
             },
         ]
         soilAnalyses[0].a_n_rt = null
