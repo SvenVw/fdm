@@ -6,7 +6,7 @@ import {
     type ChartConfig,
     ChartLegend,
 } from "~/components/ui/chart"
-import { Bar, BarChart, XAxis, YAxis, ReferenceLine } from "recharts"
+import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 export function NitrogenBalanceChart({
     balanceData,
@@ -16,17 +16,14 @@ export function NitrogenBalanceChart({
         supply: number
         removal: number
         emission: number
-        target: number
     }
-}): any {
-    console.log(balanceData)
+}): JSX.Element {
     const chartData = [
         {
-            primary: "Aanvoer",
-            supply: 150,
-            removal: 20,
-            emission: 10,
-        },       
+            supply: balanceData.supply,
+            removal: balanceData.removal,
+            emission: balanceData.emission,
+        },
     ]
 
     const chartConfig = {
@@ -43,7 +40,6 @@ export function NitrogenBalanceChart({
             color: "hsl(var(--chart-3))",
         },
     } satisfies ChartConfig
-    const referenceLineColor = balanceData.balance <= balanceData.target ? "green" : "red"
 
     return (
         <ChartContainer config={chartConfig}>
@@ -87,7 +83,6 @@ export function NitrogenBalanceChart({
                     radius={5}
                     stackId={"b"}
                 />
-                <ReferenceLine x={balanceData.target} stroke={referenceLineColor} strokeWidth={2}/>
             </BarChart>
         </ChartContainer>
     )
