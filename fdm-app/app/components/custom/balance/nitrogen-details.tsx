@@ -102,7 +102,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                             "supply.fertilizers.compost",
                         )}
 
-                        {/* Render Compost */}
+                        {/* Render other fertilizers */}
                         {renderFertilizerApplications(
                             fertilizers.other,
                             fieldInput,
