@@ -1,6 +1,6 @@
 {
-  "id": "d4ef4f75-1b77-4ba2-b754-51e6ed3f050a",
-  "prevId": "4045f176-3de9-4671-b96a-81879977f3ea",
+  "id": "c265d3db-a2bf-43b6-a7e9-2c9223a916a2",
+  "prevId": "d4ef4f75-1b77-4ba2-b754-51e6ed3f050a",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -70,6 +70,12 @@
         "b_lu_end": {
           "name": "b_lu_end",
           "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "m_cropresidue": {
+          "name": "m_cropresidue",
+          "type": "boolean",
           "primaryKey": false,
           "notNull": false
         },
@@ -387,6 +393,43 @@
         "b_lu_hcat3_name": {
           "name": "b_lu_hcat3_name",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_croprotation": {
+          "name": "b_lu_croprotation",
+          "type": "b_lu_croprotation",
+          "typeSchema": "fdm",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_yield": {
+          "name": "b_lu_yield",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_hi": {
+          "name": "b_lu_hi",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_n_harvestable": {
+          "name": "b_lu_n_harvestable",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_lu_n_residue": {
+          "name": "b_lu_n_residue",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "b_n_fixation": {
+          "name": "b_n_fixation",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -1651,6 +1694,30 @@
           "primaryKey": false,
           "notNull": false
         },
+        "a_c_of": {
+          "name": "a_c_of",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_cn_fr": {
+          "name": "a_cn_fr",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_density_sa": {
+          "name": "a_density_sa",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "a_n_rt": {
+          "name": "a_n_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
         "a_p_al": {
           "name": "a_p_al",
           "type": "numeric",
@@ -2631,6 +2698,24 @@
         "none",
         "once",
         "multiple"
+      ]
+    },
+    "fdm.b_lu_croprotation": {
+      "name": "b_lu_croprotation",
+      "schema": "fdm",
+      "values": [
+        "other",
+        "clover",
+        "nature",
+        "potato",
+        "grass",
+        "rapeseed",
+        "starch",
+        "maize",
+        "cereal",
+        "sugarbeet",
+        "alfalfa",
+        "catchcrop"
       ]
     },
     "fdm.b_soiltype_agr": {

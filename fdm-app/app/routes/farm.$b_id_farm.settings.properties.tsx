@@ -278,13 +278,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
+        // Remove new lines in address
+        const b_address_farm = formValues.b_address_farm?.replace(/\\n/g, " ")
+
         await updateFarm(
             fdm,
             session.principal_id,
             b_id_farm,
             formValues.b_name_farm,
             formValues.b_businessid_farm,
-            formValues.b_address_farm,
+            b_address_farm,
             formValues.b_postalcode_farm,
         )
 
