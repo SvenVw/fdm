@@ -309,23 +309,27 @@ export function combineSoilAnalyses(
         a_cn_fr: null as fdmSchema.soilAnalysisTypeSelect["a_cn_fr"],
         a_density_sa: null as fdmSchema.soilAnalysisTypeSelect["a_density_sa"],
         a_som_loi: null as fdmSchema.soilAnalysisTypeSelect["a_som_loi"],
+        b_gwl_class: null as fdmSchema.soilAnalysisTypeSelect["b_gwl_class"],
     }
 
-// Define properties to extract
-const propertiesToExtract = [
-    'b_soiltype_agr',
-    'a_n_rt',
-    'a_c_of',
-    'a_cn_fr',
-    'a_density_sa',
-    'a_som_loi'
-] as const
+    // Define properties to extract
+    const propertiesToExtract = [
+        "b_soiltype_agr",
+        "a_n_rt",
+        "a_c_of",
+        "a_cn_fr",
+        "a_density_sa",
+        "a_som_loi",
+        "b_gwl_class",
+    ] as const
 
-// Extract each property
-for (const prop of propertiesToExtract) {
-    soilAnalysis[prop] =
-        soilAnalyses.find(x => x[prop] !== null && x[prop] !== undefined)?.[prop] || null
-}
+    // Extract each property
+    for (const prop of propertiesToExtract) {
+        soilAnalysis[prop] =
+            soilAnalyses.find(
+                (x) => x[prop] !== null && x[prop] !== undefined,
+            )?.[prop] || null
+    }
 
     // When values for soil parameters are not available try to estimate them with convertsion functions
     if (!soilAnalysis.a_c_of) {
