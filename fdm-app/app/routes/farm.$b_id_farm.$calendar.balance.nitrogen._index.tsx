@@ -36,6 +36,7 @@ import {
 } from "lucide-react"
 import { LoadingSpinner } from "../components/custom/loadingspinner"
 import { Skeleton } from "../components/ui/skeleton"
+import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -99,6 +100,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
         nitrogenBalanceInput: nitrogenBalanceInput,
         nitrogenBalanceResult: nitrogenBalanceResult,
+        farm: farm,
         fields: fields,
         errorMessage: errorMessage,
     }
@@ -111,7 +113,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
     const page = location.pathname
     const isLoading = navigation.state === "loading"
 
-    const { nitrogenBalanceResult, fields, errorMessage } = loaderData
+    const { nitrogenBalanceResult, farm, fields, errorMessage } = loaderData
 
     return (
         <div className="space-y-4">
@@ -210,13 +212,24 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                         <Card className="col-span-4">
                             <CardHeader>
                                 <CardTitle>Balans</CardTitle>
+                                <CardDescription>
+                                    De stikstofbalans voor alle percelen van{" "}
+                                    {farm.b_name_farm} . De balans is het
+                                    verschil tussen de totale aanvoer, afvoer en
+                                    emissie van stikstof. Een positieve balans
+                                    betekent een overschot aan stikstof, een
+                                    negatieve balans een tekort.
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="pl-2">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
                                         <LoadingSpinner />
                                     </div>
-                                ) : null}
+                                ) : (
+                                    <NitrogenBalanceChart
+                                    balanceData={nitrogenBalanceResult} />
+                                )}
                                 {/* <Overview /> */}
                             </CardContent>
                         </Card>
@@ -282,7 +295,8 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                                           </p>
                                                       </div>
                                                       <div className="ml-auto font-medium">
-                                                          {field.balance} / {field.target}
+                                                          {field.balance} /{" "}
+                                                          {field.target}
                                                       </div>
                                                   </div>
                                               ),
