@@ -5,7 +5,11 @@ interface CalendarState {
     setCalendar: (calendar: string | undefined) => void
 }
 
+// Get current year
+const currentYear = new Date().getFullYear().toString()
+
 export const useCalendarStore = create<CalendarState>((set) => ({
-    calendar: "all", // Initial calendar is 'all'
-    setCalendar: (calendar) => set({ calendar: calendar ? calendar : "all" }),
+    calendar: currentYear, // Initial calendar is current year
+    setCalendar: (calendar) =>
+        set({ calendar: calendar ? calendar : currentYear }),
 }))
