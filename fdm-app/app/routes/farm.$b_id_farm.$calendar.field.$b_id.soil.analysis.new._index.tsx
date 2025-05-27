@@ -20,6 +20,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { SoilAnalysisFormSelection } from "../components/custom/soil/form-selection"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -98,7 +99,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 <div>
                     <h3 className="text-lg font-medium">Bodem</h3>
                     <p className="text-sm text-muted-foreground">
-                        Voeg een nieuwe bodemanalyse toe
+                        Kies het type bodemanalyse voor uw formulier
                     </p>
                 </div>
                 <Button asChild>
@@ -109,73 +110,7 @@ export default function FarmFieldSoilOverviewBlock() {
                 </Button>
             </div>
             <Separator />
-            <SoilAnalysisForm
-                soilAnalysis={undefined}
-                soilParameterDescription={loaderData.soilParameterDescription}
-                action="."
-            />
+            <SoilAnalysisFormSelection />
         </div>
     )
-}
-
-/**
- * Action function to update the soil analysis.
- *
- * This function updates a soil analysis based on the provided form data.
- * It validates the data, retrieves the necessary IDs from the route parameters,
- * and uses the `updateSoilAnalysis` function from `@svenvw/fdm-core` to perform the update.
- *
- * @param request - The HTTP request object.
- * @param params - The route parameters, including `a_id`, `b_id`, and `b_id_farm`.
- * @returns A redirect response after successful update.
- * @throws {Response} If any ID is missing (HTTP 400).
- * @throws {Response} If there is an error during the update (HTTP 500).
- */
-export async function action({ request, params }: ActionFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("Farm ID is required", {
-            status: 400,
-            statusText: "Farm ID is required",
-        })
-    }
-
-    // Get the field id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("Field ID is required", {
-            status: 400,
-            statusText: "Field ID is required",
-        })
-    }
-
-    try {
-        // Get the session
-        const session = await getSession(request)
-
-        // Get from values
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-
-        // add soil analysis
-        await addSoilAnalysis(
-            fdm,
-            session.principal_id,
-            undefined,
-            formValues.a_source,
-            b_id,
-            undefined,
-            formValues.b_sampling_date,
-            formValues,
-        )
-
-        return redirectWithSuccess("../soil", {
-            message: "Bodemanalyse is toegevoegd! 🎉",
-        })
-    } catch (error) {
-        throw handleActionError(error)
-    }
 }

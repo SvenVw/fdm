@@ -19,20 +19,24 @@ function SoilDataCard({
     title,
     shortname,
     value,
+    label,
     unit,
     type,
     link,
     date,
     source,
+    sourceLabel,
 }: {
     title: string
     shortname: string
     value: number | string
+    label: string | undefined
     unit: string
     type: "numeric" | "enum"
     link: string
     date: Date
     source: string
+    sourceLabel: string
 }) {
     return (
         <Card>
@@ -40,7 +44,7 @@ function SoilDataCard({
                 <CardTitle className="text-sm font-medium">
                     {shortname}
                 </CardTitle>
-                {source !== "NMI" ? (
+                {source !== "nl-other-nmi" ? (
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -56,7 +60,9 @@ function SoilDataCard({
             <CardContent className="space-y-2">
                 <div className="flex items-baseline space-x-2">
                     {type === "enum" ? (
-                        <div className="text-2xl font-bold">{value}</div>
+                        <div className="text-2xl font-bold">
+                            {label && type === "enum" ? label : value}
+                        </div>
                     ) : (
                         <>
                             <div className="text-2xl font-bold">{`${Math.round(value as number)}`}</div>
@@ -77,28 +83,27 @@ function SoilDataCard({
                                         !source ? "invisible" : "",
                                     )}
                                 >
-                                    {source === "NMI" ? (
+                                    {source === "nl-other-nmi" ? (
                                         <Sparkles className="h-4 w-4" />
-                                    ) : source === "" || !source ? (
+                                    ) : source === "other" || !source ? (
                                         <User className="h-4 w-4" />
                                     ) : (
                                         <Microscope className="h-4 w-4" />
                                     )}
                                     <span>
                                         {(() => {
-                                            if (source === "NMI") return "NMI"
                                             if (!source) return "Onbekend"
-                                            return source
+                                            return sourceLabel
                                         })()}
                                     </span>
                                 </div>
                             </TooltipTrigger>
                             <TooltipContent>
-                                {source === "NMI"
-                                    ? "Geschat door NMI"
-                                    : source === "" || !source
+                                {source === "nl-other-nmi"
+                                    ? `Geschat met ${sourceLabel}`
+                                    : source === "other" || !source
                                       ? "Onbekende bron"
-                                      : `Gemeten door ${source}`}
+                                      : `Gemeten door ${sourceLabel}`}
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
@@ -108,7 +113,7 @@ function SoilDataCard({
                                 <div
                                     className={cn(
                                         "flex items-center space-x-1",
-                                        !date || source === "NMI"
+                                        !date || source === "nl-other-nmi"
                                             ? "invisible"
                                             : "",
                                     )}
@@ -145,19 +150,48 @@ export function SoilDataCards({
     )
     return (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl2:grid-cols-3 xl3:grid-cols-5">
-            {cards.map((card) => (
-                <SoilDataCard
-                    key={card.title}
-                    title={card.title}
-                    shortname={card.shortname}
-                    value={card.value}
-                    unit={card.unit}
-                    type={card.type}
-                    link={card.link}
-                    date={card.date}
-                    source={card.source}
-                />
-            ))}
+            {cards.map(
+                (card: {
+                    title: string
+                    shortname: string
+                    value: string | number | undefined
+                    label: string | undefined
+                    unit: string
+                    type: "numeric" | "enum"
+                    link: string
+                    date: Date
+                    source: string
+                    sourceLabel: string
+                }) => {
+                    if (card.value) {
+                        const sourceParam = soilParameterDescription.find(
+                            (x: { parameter: string }) =>
+                                x.parameter === "a_source",
+                        )
+                        const sourceOption = sourceParam?.options?.find(
+                            (x: { value: string }) => x.value === card.source,
+                        )
+                        const sourceLabel =
+                            sourceOption?.label || card.source || "Onbekend"
+
+                        return (
+                            <SoilDataCard
+                                key={card.title}
+                                title={card.title}
+                                shortname={card.shortname}
+                                value={card.value}
+                                label={card.label}
+                                unit={card.unit}
+                                type={card.type}
+                                link={card.link}
+                                date={card.date}
+                                source={card.source}
+                                sourceLabel={sourceLabel}
+                            />
+                        )
+                    }
+                },
+            )}
         </div>
     )
 }
@@ -167,30 +201,48 @@ function constructSoilDataCards(
     soilParameterDescription: SoilParameterDescription,
 ) {
     // Construct the soil data cards
-    const cardValues = currentSoilData.map((item) => {
-        const description = soilParameterDescription.find((x) => {
-            return x.parameter === item.parameter
-        })
-
-        if (!description) {
-            console.warn(
-                `No description found for parameter: ${item.parameter}`,
+    const cardValues = currentSoilData.map(
+        (item: {
+            parameter: string
+            value: string | number | undefined
+            a_id: string
+            b_sampling_date: Date
+            a_source: string
+        }) => {
+            const description = soilParameterDescription.find(
+                (x: { parameter: string }) => {
+                    return x.parameter === item.parameter
+                },
             )
-            return null
-        }
 
-        const cardValue = {
-            title: description.name,
-            shortname: description.description,
-            value: item.value,
-            unit: description.unit,
-            type: description.type,
-            link: `./analysis/${item.a_id}`,
-            date: item.b_sampling_date,
-            source: item.a_source,
-        }
+            if (!description) {
+                console.warn(
+                    `No description found for parameter: ${item.parameter}`,
+                )
+                return null
+            }
 
-        return cardValue
-    })
+            let label = undefined
+            if (description.type === "enum") {
+                label = description.options?.find(
+                    (option: { value: string }) => option.value === item.value,
+                )?.label
+            }
+
+            const cardValue = {
+                title: description.name,
+                shortname: description.description,
+                value: item.value,
+                label: label,
+                unit: description.unit,
+                type: description.type,
+                link: `./analysis/${item.a_id}`,
+                date: item.b_sampling_date,
+                source: item.a_source,
+            }
+
+            return cardValue
+        },
+    )
     return cardValues.filter(Boolean)
 }

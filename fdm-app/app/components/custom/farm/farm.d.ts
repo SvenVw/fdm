@@ -1,6 +1,6 @@
 export interface FarmOption {
     b_id_farm: string
-    b_name_farm: string | undefined
+    b_name_farm: string | undefined | null
 }
 
 export type FarmOptions = FarmOption[] | undefined

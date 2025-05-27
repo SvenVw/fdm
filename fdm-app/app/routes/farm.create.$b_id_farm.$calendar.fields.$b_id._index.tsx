@@ -11,7 +11,7 @@ import {
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { Layer, Map as MapGL } from "react-map-gl"
+import { Layer, Map as MapGL } from "react-map-gl/mapbox"
 import { Form } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -52,11 +52,11 @@ import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getTimeframe } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

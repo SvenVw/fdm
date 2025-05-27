@@ -1,18 +1,18 @@
 import type * as schema from "./db/schema"
 
-export interface HarvestType {
+export interface Harvest {
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"]
     b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"]
-    harvestables: HarvestableType[]
+    harvestable: Harvestable
 }
 
-export interface HarvestableType {
+export interface Harvestable {
     b_id_harvestable: schema.harvestablesTypeSelect["b_id_harvestable"]
-    harvestable_analyses: HarvestableAnalysisType[]
+    harvestable_analyses: HarvestableAnalysis[]
 }
 
-export interface HarvestableAnalysisType {
+export interface HarvestableAnalysis {
     b_id_harvestable_analysis: schema.harvestableAnalysesTypeSelect["b_id_harvestable_analysis"]
     b_lu_yield: schema.harvestableAnalysesTypeSelect["b_lu_yield"]
     b_lu_n_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_n_harvestable"]

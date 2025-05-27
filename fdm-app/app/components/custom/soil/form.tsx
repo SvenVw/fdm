@@ -40,27 +40,31 @@ export function SoilAnalysisForm(props: {
     soilParameterDescription: SoilParameterDescription
     action: string
 }) {
-    const { soilAnalysis, soilParameterDescription, action } = props
+    const { soilAnalysis, soilParameterDescription } = props
+
+    const defaultValues: {
+        [key: string]: string | number | Date | undefined | null
+    } = {}
+    for (const x of soilParameterDescription) {
+        let defaultValue = soilAnalysis
+            ? soilAnalysis[x.parameter as keyof SoilAnalysis]
+            : undefined
+
+        if (
+            defaultValue === undefined &&
+            (x.type === "text" || x.type === "numeric")
+        ) {
+            defaultValue = ""
+        }
+
+        defaultValues[x.parameter] = defaultValue
+    }
+    defaultValues.a_id = undefined
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
-        defaultValues: {
-            a_source: soilAnalysis?.a_source ? soilAnalysis.a_source : "",
-            a_p_al: soilAnalysis?.a_p_al ? soilAnalysis.a_p_al : undefined,
-            a_p_cc: soilAnalysis?.a_p_cc ? soilAnalysis.a_p_cc : undefined,
-            a_som_loi: soilAnalysis?.a_som_loi
-                ? soilAnalysis.a_som_loi
-                : undefined,
-            b_gwl_class: soilAnalysis?.b_gwl_class
-                ? soilAnalysis.b_gwl_class
-                : undefined,
-            b_soiltype_agr: soilAnalysis?.b_soiltype_agr
-                ? soilAnalysis.b_soiltype_agr
-                : undefined,
-            b_sampling_date: soilAnalysis?.b_sampling_date
-                ? new Date(soilAnalysis.b_sampling_date)
-                : undefined,
-        },
+        defaultValues: defaultValues,
     })
 
     useEffect(() => {
@@ -73,294 +77,225 @@ export function SoilAnalysisForm(props: {
         <RemixFormProvider {...form}>
             <Form
                 id="soilAnalysisForm"
-                action={action}
                 onSubmit={form.handleSubmit}
                 method="post"
             >
                 <fieldset disabled={form.formState.isSubmitting}>
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-2 items-end gap-x-3 space-y-4 justify-between">
-                            <FormField
-                                control={form.control}
-                                name="a_source"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
+                    <div className="space-y-6">
+                        <p className="text-sm text-muted-foreground">
+                            Vul de gegevens van de bodemanalyse in.
+                        </p>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {soilParameterDescription.map((x) => {
+                                if (x.parameter === "a_id") {
+                                    return null
+                                }
+                                if (x.type === "numeric") {
+                                    return (
+                                        <FormField
+                                            control={form.control}
+                                            name={x.parameter}
+                                            key={x.parameter}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {x.name}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Input
+                                                                {...field}
+                                                                type="number"
+                                                                value={
+                                                                    field.value
+                                                                }
+                                                                placeholder=""
+                                                            />
+                                                            {x.unit && (
+                                                                <span className="absolute inset-y-0 right-8 pr-3 flex items-center pointer-events-none text-muted-foreground text-sm">
+                                                                    {x.unit}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        {x.description}
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
                                             )}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="text"
-                                                value={field.value}
-                                                placeholder="Bv. Jansen lab B.V."
-                                                aria-required="true"
-                                                required
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="b_sampling_date"
-                                render={({ field }) => (
-                                    <FormItem className="">
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-full text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
+                                        />
+                                    )
+                                }
+
+                                if (x.type === "enum") {
+                                    return (
+                                        <FormField
+                                            control={form.control}
+                                            name={x.parameter}
+                                            key={x.parameter}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {x.name}
+                                                    </FormLabel>
+                                                    <Select
+                                                        onValueChange={
+                                                            field.onChange
+                                                        }
+                                                        value={field.value}
                                                     >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "yyyy-MM-dd",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Kies een datum
-                                                            </span>
-                                                        )}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    locale={nl}
-                                                    disabled={(date) =>
-                                                        date <
-                                                        new Date("1970-01-01")
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormDescription>
-                                            {getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="a_p_al"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="number"
-                                                value={field.value}
-                                                placeholder="Bv. 14.5 mg P2O5 / 100 g"
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {`${getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )} [${getParameterUnit(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}]`}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="a_p_cc"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="number"
-                                                value={field.value}
-                                                placeholder="Bv. 1.2 mg P/kg"
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {`${getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )} [${getParameterUnit(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}]`}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="a_som_loi"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                {...field}
-                                                type="number"
-                                                value={field.value}
-                                                placeholder="Bv. 3.7%"
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            {`${getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                             [${getParameterUnit(
-                                                 soilParameterDescription,
-                                                 field.name,
-                                             )}]`}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="b_soiltype_agr"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                        >
-                                            <SelectTrigger {...field}>
-                                                <SelectValue placeholder="Selecteer bodemtype" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {soilParameterDescription
-                                                    .find(
-                                                        (x) =>
-                                                            x.parameter ===
-                                                            field.name,
-                                                    )
-                                                    ?.options?.map((option) => (
-                                                        <SelectItem
-                                                            key={option}
-                                                            value={option}
+                                                        <SelectTrigger
+                                                            {...field}
                                                         >
-                                                            {option}
-                                                        </SelectItem>
-                                                    )) || null}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormDescription>
-                                            {getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
+                                                            <SelectValue placeholder="" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {x.options?.map(
+                                                                (option: {
+                                                                    value: string
+                                                                    label: string
+                                                                }) => {
+                                                                    if (
+                                                                        option.value ===
+                                                                        "nl-other-nmi"
+                                                                    ) {
+                                                                        return null
+                                                                    }
+                                                                    return (
+                                                                        <SelectItem
+                                                                            key={
+                                                                                option.value
+                                                                            }
+                                                                            value={
+                                                                                option.value
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                option.label
+                                                                            }
+                                                                        </SelectItem>
+                                                                    )
+                                                                },
+                                                            ) || null}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormDescription>
+                                                        {x.description}
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
                                             )}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="b_gwl_class"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>
-                                            {getParameterName(
-                                                soilParameterDescription,
-                                                field.name,
-                                            )}
-                                        </FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                        >
-                                            <SelectTrigger {...field}>
-                                                <SelectValue placeholder="Selecteer bodemtype" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {soilParameterDescription
-                                                    .find(
-                                                        (x) =>
-                                                            x.parameter ===
-                                                            field.name,
-                                                    )
-                                                    ?.options?.map((option) => (
-                                                        <SelectItem
-                                                            key={option}
-                                                            value={option}
+                                        />
+                                    )
+                                }
+
+                                if (x.type === "date") {
+                                    return (
+                                        <FormField
+                                            control={form.control}
+                                            name={x.parameter}
+                                            key={x.parameter}
+                                            render={({ field }) => (
+                                                <FormItem className="">
+                                                    <FormLabel>
+                                                        {x.name}
+                                                    </FormLabel>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant={
+                                                                        "outline"
+                                                                    }
+                                                                    className={cn(
+                                                                        "w-full text-left font-normal",
+                                                                        !field.value &&
+                                                                            "text-muted-foreground",
+                                                                    )}
+                                                                >
+                                                                    {field.value ? (
+                                                                        format(
+                                                                            field.value,
+                                                                            "yyyy-MM-dd",
+                                                                        )
+                                                                    ) : (
+                                                                        <span>
+                                                                            Kies
+                                                                            een
+                                                                            datum
+                                                                        </span>
+                                                                    )}
+                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent
+                                                            className="w-auto p-0"
+                                                            align="start"
                                                         >
-                                                            {option}
-                                                        </SelectItem>
-                                                    )) || null}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormDescription>
-                                            {getParameterDescription(
-                                                soilParameterDescription,
-                                                field.name,
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={
+                                                                    field.value
+                                                                }
+                                                                onSelect={
+                                                                    field.onChange
+                                                                }
+                                                                locale={nl}
+                                                                disabled={(
+                                                                    date,
+                                                                ) =>
+                                                                    date <
+                                                                    new Date(
+                                                                        "1970-01-01",
+                                                                    )
+                                                                }
+                                                                initialFocus
+                                                            />
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormDescription>
+                                                        {x.description}
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
                                             )}
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                        />
+                                    )
+                                }
+
+                                if (x.type === "text") {
+                                    return (
+                                        <FormField
+                                            control={form.control}
+                                            name={x.parameter}
+                                            key={x.parameter}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        {x.name}
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <Input
+                                                            {...field}
+                                                            type="text"
+                                                            value={field.value}
+                                                            placeholder=""
+                                                            aria-required="true"
+                                                            required
+                                                        />
+                                                    </FormControl>
+                                                    <FormDescription>
+                                                        {x.description}
+                                                    </FormDescription>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    )
+                                }
+                            })}
                         </div>
                         <div className="flex justify-end mt-4">
                             <Button type="submit">
@@ -378,34 +313,5 @@ export function SoilAnalysisForm(props: {
                 </fieldset>
             </Form>
         </RemixFormProvider>
-    )
-}
-function getParameterName(
-    soilParameterDescription: SoilParameterDescription[],
-    parameter: string,
-) {
-    return (
-        soilParameterDescription.find((x) => x.parameter === parameter)?.name ||
-        parameter
-    )
-}
-
-function getParameterDescription(
-    soilParameterDescription: SoilParameterDescription[],
-    parameter: string,
-) {
-    return (
-        soilParameterDescription.find((x) => x.parameter === parameter)
-            ?.description || ""
-    )
-}
-
-function getParameterUnit(
-    soilParameterDescription: SoilParameterDescription[],
-    parameter: string,
-) {
-    return (
-        soilParameterDescription.find((x) => x.parameter === parameter)?.unit ||
-        ""
     )
 }

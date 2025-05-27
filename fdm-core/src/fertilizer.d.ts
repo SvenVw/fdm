@@ -1,4 +1,4 @@
-export interface getFertilizerType {
+export interface Fertilizer {
     p_id: string
     p_name_nl: string | null
     p_name_en: string | null
@@ -36,7 +36,7 @@ export interface getFertilizerType {
     p_cl_cr: number | null
 }
 
-export interface getFertilizerApplicationType {
+export interface FertilizerApplication {
     p_id: string
     p_id_catalogue: string
     p_name_nl: string | null

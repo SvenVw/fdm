@@ -2,6 +2,7 @@ import { Check, Cookie, Info, MoveDown } from "lucide-react"
 import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import type { MetaFunction } from "react-router"
+import { useSearchParams } from "react-router-dom" // Import useSearchParams
 import { toast } from "sonner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
@@ -72,6 +73,9 @@ export async function loader({ request }: LoaderFunctionArgs) {
  * @returns A React element representing the sign-in page.
  */
 export default function SignIn() {
+    const [searchParams] = useSearchParams() // Get search params
+    const redirectTo = searchParams.get("redirectTo") || "/farm" // Get redirectTo or default to /farm
+
     const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
@@ -202,7 +206,7 @@ export default function SignIn() {
                                                 try {
                                                     await signIn.social({
                                                         provider: "microsoft",
-                                                        callbackURL: "/farm",
+                                                        callbackURL: redirectTo,
                                                     })
                                                 } catch (error) {
                                                     handleSignInError(
@@ -249,7 +253,7 @@ export default function SignIn() {
                                                 try {
                                                     await signIn.social({
                                                         provider: "google",
-                                                        callbackURL: "/farm",
+                                                        callbackURL: redirectTo,
                                                     })
                                                 } catch (error) {
                                                     handleSignInError(
@@ -296,7 +300,7 @@ export default function SignIn() {
                                 <p className="text-sm font-medium text-muted-foreground text-center">
                                     Door verder te gaan, gaat u akkoord met het{" "}
                                     <a
-                                        href="/privacy"
+                                        href={clientConfig.privacy_url}
                                         aria-label="Lees ons privacybeleid"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -307,12 +311,12 @@ export default function SignIn() {
                                 </p>
                             </CardFooter>
                         </Card>
-                        <div className="mb-4 text-center text-sm">
+                        {/* <div className="mb-4 text-center text-sm">
                             <Button variant={"outline"}>
                                 {`Lees meer over ${clientConfig.name}`}{" "}
                                 <MoveDown />
                             </Button>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <div className="hidden bg-muted lg:block">

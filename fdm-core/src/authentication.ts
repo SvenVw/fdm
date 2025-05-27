@@ -1,28 +1,34 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { organization, username } from "better-auth/plugins"
+import { eq } from "drizzle-orm"
+import { generateFromEmail } from "unique-username-generator"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 
 /**
- * Initializes and configures the authentication system for the farm management application.
+ * Initializes and configures the authentication system for the FDM application using Better Auth.
  *
- * This function sets up the better-auth system with a PostgreSQL database adapter and a custom schema.
- * It validates that required environment variables for Google and Microsoft authentication are set,
- * configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
+ * This function sets up the Better Auth system with a PostgreSQL database adapter and a custom schema,
+ * allowing users to authenticate via social providers like Google and Microsoft, or optionally with email and password.
+ * It configures additional user fields (firstname, surname, lang, farm_active), and manages session parameters
  * with a 30-day expiration and daily update. It also defines mappings from social provider profiles to user
- * formats.
+ * formats, extracting relevant user information.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param google Optional configuration for Google authentication. If provided, users can sign up and sign in with their Google accounts.
+ * @param microsoft Optional configuration for Microsoft authentication. If provided, users can sign up and sign in with their Microsoft accounts.
+ * @param emailAndPassword Optional boolean indicating whether to enable email and password authentication. Defaults to false.
  * @returns The configured authentication instance.
- *
  * @throws {Error} If required environment variables are missing or if role assignment fails.
  */
 export function createFdmAuth(
     fdm: FdmType,
     google?: { clientSecret: string; clientId: string },
     microsoft?: { clientSecret: string; clientId: string },
+    emailAndPassword?: boolean,
 ): BetterAuth {
     // Setup social auth providers
     let googleAuth = undefined
@@ -30,7 +36,7 @@ export function createFdmAuth(
         googleAuth = {
             clientId: google?.clientId,
             clientSecret: google?.clientSecret,
-            mapProfileToUser: (profile: {
+            mapProfileToUser: async (profile: {
                 name: string
                 email: string
                 picture: string
@@ -43,6 +49,11 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: profile.given_name,
                     surname: profile.family_name,
+                    username: await createUsername(fdm, profile.email),
+                    displayUsername: createDisplayUsername(
+                        profile.given_name,
+                        profile.family_name,
+                    ),
                 }
             },
         }
@@ -55,7 +66,7 @@ export function createFdmAuth(
             clientSecret: microsoft.clientSecret,
             tenantId: "common",
             requireSelectAccount: true,
-            mapProfileToUser: (profile: {
+            mapProfileToUser: async (profile: {
                 name: string | undefined
                 email: string
                 picture: string
@@ -67,6 +78,8 @@ export function createFdmAuth(
                     image: profile.picture,
                     firstname: firstname,
                     surname: surname,
+                    username: await createUsername(fdm, profile.email),
+                    displayUsername: createDisplayUsername(firstname, surname),
                 }
             },
         }
@@ -110,8 +123,33 @@ export function createFdmAuth(
             microsoft: microsoftAuth,
         },
         rateLimit: {
+            enabled: process.env.NODE_ENV === "production",
+            window: 10,
+            max: 100,
             storage: "database",
         },
+        emailAndPassword: {
+            enabled: emailAndPassword || false,
+        },
+        plugins: [
+            username(),
+            organization({
+                organizationCreation: {
+                    disabled: false, // Set to true to disable organization creation
+                    beforeCreate: async ({ organization }) => {
+                        return {
+                            data: {
+                                ...organization,
+                                metadata: {
+                                    isVerified: false,
+                                    description: "",
+                                },
+                            },
+                        }
+                    },
+                },
+            }),
+        ],
     })
 
     return auth
@@ -151,4 +189,53 @@ export function splitFullName(fullName: string | undefined): {
     const firstname = names[0]
     const surname = names.slice(-1)[0] // Get the last name
     return { firstname, surname }
+}
+
+async function createUsername(fdm: FdmType, email: string): Promise<string> {
+    const digits = 3
+
+    // Create username from email
+    let username = generateFromEmail(email, digits)
+
+    // Check if username already exists
+    const existingUser = await fdm
+        .select({
+            username: authNSchema.user.username,
+        })
+        .from(authNSchema.user)
+        .where(eq(authNSchema.user.username, username))
+        .limit(1)
+
+    // If username exists, append random digits until we find a unique one
+    if (existingUser && existingUser.length > 0) {
+        while (existingUser) {
+            username = generateFromEmail(email, digits)
+            const checkUser = await fdm
+                .select({
+                    username: authNSchema.user.username,
+                })
+                .from(authNSchema.user)
+                .where(eq(authNSchema.user.username, username))
+                .limit(1)
+            if (checkUser && checkUser.length === 0) break
+        }
+    }
+
+    return username
+}
+
+export function createDisplayUsername(
+    firstname: string | null,
+    surname: string | null,
+): string | null {
+    // Filter out null or empty name parts and join with a space
+    const nameParts = [firstname, surname].filter((part) => part?.trim())
+    const name = nameParts.join(" ")
+
+    // If no name is given return null
+    if (!name || name.trim() === "") {
+        return null
+    }
+
+    return name
 }

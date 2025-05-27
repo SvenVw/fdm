@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.4.0
+
+### Minor Changes
+
+- 6305c52: Add documentation for nitrogen balance calculation
+
 ## 0.3.0
 
 ### Minor Changes

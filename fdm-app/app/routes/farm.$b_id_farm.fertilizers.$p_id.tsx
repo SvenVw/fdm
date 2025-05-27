@@ -17,7 +17,6 @@ import {
 import { useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import type { z } from "zod"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
 import { FertilizerForm } from "~/components/custom/fertilizer/form"
 import { FormSchema } from "~/components/custom/fertilizer/formschema"
@@ -27,6 +26,9 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { HeaderFertilizer } from "../components/custom/header/fertilizer"
 
 export const meta: MetaFunction = () => {
     return [
@@ -111,6 +113,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             farm: farm,
+            p_id: p_id,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fertilizerOptions: fertilizerOptions,
@@ -177,16 +180,23 @@ export default function FarmFertilizerBlock() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
+            <Header
                 action={{
                     to: "../fertilizers",
                     label: "Terug naar overzicht",
+                    disabled: false,
                 }}
-                fertilizerOptions={loaderData.fertilizerOptions}
-                p_id={loaderData.fertilizer.p_id}
-            />
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderFertilizer
+                    b_id_farm={loaderData.b_id_farm}
+                    p_id={loaderData.p_id}
+                    fertilizerOptions={loaderData.fertilizerOptions}
+                />
+            </Header>
             <main>
                 <FarmTitle
                     title={loaderData.fertilizer.p_name_nl}

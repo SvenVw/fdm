@@ -4,13 +4,9 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Header } from "~/components/custom/header/base"
+import { HeaderUser } from "~/components/custom/header/user"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from "~/components/ui/breadcrumb"
 import {
     Card,
     CardContent,
@@ -19,7 +15,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
-import { SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
@@ -36,7 +31,7 @@ export const meta: MetaFunction = () => {
 }
 
 /**
- * Retrieves the user session data.
+ * Retrieves the user data.
  *
  * @param request - The HTTP request object used to retrieve session information.
  * @returns An object containing:
@@ -60,11 +55,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the user interface for the Account page.
+ * Renders the user interface for the user page.
  *
- * This component uses data from the loader to display the user's account details.
+ * This component uses data from the loader to display the user's user details.
  */
-export default function Account() {
+export default function User() {
     const loaderData = useLoaderData<typeof loader>()
     const user = loaderData.user
 
@@ -72,19 +67,9 @@ export default function Account() {
 
     return (
         <main className="container">
-            <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                <SidebarTrigger className="-ml-1" />
-                <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem className="hidden md:block">
-                            <BreadcrumbLink href="/farm/account">
-                                Account
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-            </header>
+            <Header action={undefined}>
+                <HeaderUser name={user.name} />
+            </Header>
             <div className="max-w-3xl mx-auto px-4">
                 <div className="mb-8">
                     <FarmTitle

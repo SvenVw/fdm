@@ -1,4 +1,4 @@
-import { Layer, Map as MapGL } from "react-map-gl"
+import { Layer, Map as MapGL } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"

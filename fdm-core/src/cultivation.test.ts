@@ -110,6 +110,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "test-hcat3",
                 b_lu_hcat3_name: "test-hcat3-name",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             b_lu_start = new Date("2024-01-01")
@@ -148,6 +154,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable,
                 b_lu_hcat3,
                 b_lu_hcat3_name,
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             const cultivations = await getCultivationsFromCatalogue(
@@ -195,6 +207,12 @@ describe("Cultivation Data Model", () => {
                     b_lu_harvestable: "invalid-value",
                     b_lu_hcat3: "test-hcat3",
                     b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
                 }),
             ).rejects.toThrow()
         })
@@ -341,6 +359,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "multiple",
                 b_lu_hcat3: "new-hcat3",
                 b_lu_hcat3_name: "new-hcat3-name",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             await updateCultivation(
@@ -405,6 +429,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "multiple",
                 b_lu_hcat3: "new-hcat3",
                 b_lu_hcat3_name: "new-hcat3-name",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             const newSowingDate = new Date("2024-02-01")
@@ -417,6 +447,7 @@ describe("Cultivation Data Model", () => {
                 newCatalogueId,
                 newSowingDate,
                 newTerminateDate,
+                true,
             )
 
             const updatedCultivation = await getCultivation(
@@ -427,18 +458,25 @@ describe("Cultivation Data Model", () => {
             expect(updatedCultivation.b_lu_start).toEqual(newSowingDate)
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
             expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
+            expect(updatedCultivation.m_cropresidue).toEqual(true)
         })
 
         it("should update a cultivation with only the catalogue ID", async () => {
             const newCatalogueId = createId()
             await addCultivationToCatalogue(fdm, {
                 b_lu_catalogue: newCatalogueId,
-                b_lu_source: b_lu_source,
-                b_lu_name: "new-name",
-                b_lu_name_en: "new-name-en",
-                b_lu_harvestable: "none",
-                b_lu_hcat3: "new-hcat3",
-                b_lu_hcat3_name: "new-hcat3-name",
+                b_lu_source,
+                b_lu_name: "test",
+                b_lu_name_en: "test",
+                b_lu_harvestable: "once",
+                b_lu_hcat3: "00000",
+                b_lu_hcat3_name: "test",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 10000,
+                b_lu_hi: 0.35,
+                b_lu_n_harvestable: 8,
+                b_lu_n_residue: 5,
+                b_n_fixation: 0,
             })
 
             await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
@@ -449,6 +487,8 @@ describe("Cultivation Data Model", () => {
                 b_lu,
             )
             expect(updatedCultivation.b_lu_catalogue).toEqual(newCatalogueId)
+            expect(updatedCultivation.b_lu_end).toBeNull()
+            expect(updatedCultivation.m_cropresidue).toBeNull()
         })
 
         it("should update a cultivation with only the sowing date", async () => {
@@ -480,6 +520,7 @@ describe("Cultivation Data Model", () => {
                 undefined,
                 undefined,
                 newTerminateDate,
+                false,
             )
 
             const updatedCultivation = await getCultivation(
@@ -488,6 +529,7 @@ describe("Cultivation Data Model", () => {
                 b_lu,
             )
             expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
+            expect(updatedCultivation.m_cropresidue).toEqual(false)
         })
 
         it("should throw an error when updating with invalid sowing date - before termination date", async () => {
@@ -601,6 +643,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "1",
                 b_lu_hcat3_name: "test",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             await addCultivation(
@@ -760,6 +808,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "2",
                 b_lu_hcat3_name: "test2",
+                b_lu_croprotation: "maize",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             // Add a second field
@@ -897,6 +951,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "2",
                 b_lu_hcat3_name: "test2",
+                b_lu_croprotation: "maize",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             // Add a cultivation 'Wheat' within the timeframe
@@ -953,6 +1013,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "2",
                 b_lu_hcat3_name: "test2",
+                b_lu_croprotation: "maize",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             // Add a cultivation 'Wheat'
@@ -1009,6 +1075,12 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "2",
                 b_lu_hcat3_name: "test2",
+                b_lu_croprotation: "maize",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             // Add a cultivation 'Wheat' - outside timeframe

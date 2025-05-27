@@ -3,7 +3,7 @@ import {
     Layer,
     Map as MapGL,
     NavigationControl,
-} from "react-map-gl"
+} from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"

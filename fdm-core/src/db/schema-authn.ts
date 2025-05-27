@@ -1,4 +1,3 @@
-// Authentication
 import {
     bigint,
     boolean,
@@ -8,9 +7,10 @@ import {
     timestamp,
 } from "drizzle-orm/pg-core"
 
-export const fdmAuthSchema = pgSchema("fdm-authn")
+export const fdmAuthNSchema = pgSchema("fdm-authn")
+export type fdmSchemaAuthNTypeSelect = typeof fdmAuthNSchema.table
 
-export const user = fdmAuthSchema.table("user", {
+export const user = fdmAuthNSchema.table("user", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
@@ -18,13 +18,15 @@ export const user = fdmAuthSchema.table("user", {
     image: text("image"),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
+    username: text("username").unique(),
+    displayUsername: text("display_username"),
     firstname: text("firstname"),
     surname: text("surname"),
     lang: text("lang").notNull(),
     farm_active: text("farm_active"),
 })
 
-export const session = fdmAuthSchema.table("session", {
+export const session = fdmAuthNSchema.table("session", {
     id: text("id").primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
@@ -35,9 +37,10 @@ export const session = fdmAuthSchema.table("session", {
     userId: text("user_id")
         .notNull()
         .references(() => user.id, { onDelete: "cascade" }),
+    activeOrganizationId: text("active_organization_id"),
 })
 
-export const account = fdmAuthSchema.table("account", {
+export const account = fdmAuthNSchema.table("account", {
     id: text("id").primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
@@ -55,7 +58,7 @@ export const account = fdmAuthSchema.table("account", {
     updatedAt: timestamp("updated_at").notNull(),
 })
 
-export const verification = fdmAuthSchema.table("verification", {
+export const verification = fdmAuthNSchema.table("verification", {
     id: text("id").primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
@@ -64,7 +67,42 @@ export const verification = fdmAuthSchema.table("verification", {
     updatedAt: timestamp("updated_at"),
 })
 
-export const rateLimit = fdmAuthSchema.table("rate_limit", {
+export const organization = fdmAuthNSchema.table("organization", {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").unique(),
+    logo: text("logo"),
+    createdAt: timestamp("created_at").notNull(),
+    metadata: text("metadata"),
+})
+
+export const member = fdmAuthNSchema.table("member", {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+        .notNull()
+        .references(() => organization.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
+    role: text("role").notNull(),
+    createdAt: timestamp("created_at").notNull(),
+})
+
+export const invitation = fdmAuthNSchema.table("invitation", {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+        .notNull()
+        .references(() => organization.id, { onDelete: "cascade" }),
+    email: text("email").notNull(),
+    role: text("role"),
+    status: text("status").notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    inviterId: text("inviter_id")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
+})
+
+export const rateLimit = fdmAuthNSchema.table("rate_limit", {
     id: text("id").primaryKey(),
     key: text("key"),
     count: integer("count"),

@@ -7,10 +7,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type {
-    getFertilizerApplicationType,
-    getFertilizerType,
-} from "./fertilizer.d"
+import type { Fertilizer, FertilizerApplication } from "./fertilizer.d"
 import type { Timeframe } from "./timeframe"
 
 /**
@@ -256,7 +253,7 @@ export async function addFertilizer(
 export async function getFertilizer(
     fdm: FdmType,
     p_id: schema.fertilizersTypeSelect["p_id"],
-): Promise<getFertilizerType> {
+): Promise<Fertilizer> {
     try {
         // Get properties of the requested fertilizer
         const fertilizer = await fdm
@@ -478,7 +475,7 @@ export async function getFertilizers(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.fertilizerAcquiringTypeSelect["b_id_farm"],
-): Promise<getFertilizerType[]> {
+): Promise<Fertilizer[]> {
     try {
         await checkPermission(
             fdm,
@@ -783,7 +780,7 @@ export async function getFertilizerApplication(
     fdm: FdmType,
     principal_id: PrincipalId,
     p_app_id: schema.fertilizerApplicationTypeSelect["p_app_id"],
-): Promise<getFertilizerApplicationType | null> {
+): Promise<FertilizerApplication | null> {
     try {
         await checkPermission(
             fdm,
@@ -848,7 +845,7 @@ export async function getFertilizerApplications(
     principal_id: PrincipalId,
     b_id: schema.fertilizerApplicationTypeSelect["b_id"],
     timeframe?: Timeframe,
-): Promise<getFertilizerApplicationType[]> {
+): Promise<FertilizerApplication[]> {
     try {
         await checkPermission(
             fdm,

@@ -20,7 +20,7 @@ import { toast as notify } from "sonner"
 import { Banner } from "~/components/custom/banner"
 import { ErrorBlock } from "~/components/custom/error"
 import { Toaster } from "~/components/ui/sonner"
-import { clientConfig } from "~/lib/config" // Import clientConfig
+import { clientConfig } from "~/lib/config"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 
@@ -74,7 +74,9 @@ export function Layout() {
     // Hook to show the toasts
     useEffect(() => {
         if (toast && toast.type === "error") {
-            notify.error(toast.message)
+            notify.error(toast.message, {
+                duration: 30000,
+            })
         }
         if (toast && toast.type === "warning") {
             notify.warning(toast.message)
@@ -141,7 +143,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (isRouteErrorResponse(error)) {
         // Redirect to signin page if authentication is not provided
         if (error.status === 401) {
-            redirect("./signin")
+            // Get the current path the user tried to access
+            const currentPath =
+                location.pathname + location.search + location.hash
+            // Construct the sign-in URL with the redirectTo parameter
+            const signInUrl = `./signin?redirectTo=${encodeURIComponent(currentPath)}`
+            // Throw the redirect response to be caught by React Router
+            throw redirect(signInUrl)
         }
 
         const clientErrors = [400, 403, 404]

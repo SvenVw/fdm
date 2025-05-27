@@ -3,7 +3,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import { CalendarIcon } from "lucide-react"
 import { useEffect } from "react"
-import { Form } from "react-hook-form"
+import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { Button } from "~/components/ui/button"
@@ -31,20 +31,15 @@ import type { FertilizerOption } from "./types.d"
 export function FertilizerApplicationForm({
     options,
     action,
-    fetcher,
 }: {
     options: FertilizerOption[]
     action: string
-    fetcher: {
-        state: string
-        Form: typeof Form
-        submit: (data: FormData, options?: { method: string }) => void
-    }
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
+            p_id: undefined,
             p_app_amount: undefined,
             p_app_date: new Date(),
         },
@@ -64,12 +59,7 @@ export function FertilizerApplicationForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset
-                    disabled={
-                        form.formState.isSubmitting ||
-                        fetcher.state === "submitting"
-                    }
-                >
+                <fieldset disabled={form.formState.isSubmitting}>
                     <div className="grid grid-cols-1 xl2:grid-cols-5 items-end gap-x-3 justify-between">
                         <div className="col-span-2">
                             {/* <Label htmlFor="b_name_farm">Meststof</Label> */}

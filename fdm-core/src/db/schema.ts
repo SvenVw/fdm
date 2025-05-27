@@ -308,6 +308,20 @@ export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [
     "once",
     "multiple",
 ])
+export const rotationEnum = fdmSchema.enum("b_lu_croprotation", [
+    "other",
+    "clover",
+    "nature",
+    "potato",
+    "grass",
+    "rapeseed",
+    "starch",
+    "maize",
+    "cereal",
+    "sugarbeet",
+    "alfalfa",
+    "catchcrop",
+])
 export const cultivationsCatalogue = fdmSchema.table(
     "cultivations_catalogue",
     {
@@ -318,6 +332,12 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_harvestable: harvestableEnum().notNull(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
+        b_lu_croprotation: rotationEnum(),
+        b_lu_yield: numericCasted(),
+        b_lu_hi: numericCasted(),
+        b_lu_n_harvestable: numericCasted(),
+        b_lu_n_residue: numericCasted(),
+        b_n_fixation: numericCasted(),
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -431,6 +451,7 @@ export const cultivationEnding = fdmSchema.table(
             .notNull()
             .references(() => cultivations.b_lu),
         b_lu_end: timestamp({ withTimezone: true }),
+        m_cropresidue: boolean(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -447,56 +468,136 @@ export type cultivationEndingTypeSelect = typeof cultivationEnding.$inferSelect
 export type cultivationEndingTypeInsert = typeof cultivationEnding.$inferInsert
 
 // Define soil_analyis table
-export const soilTypes = [
-    "moerige_klei",
-    "rivierklei",
-    "dekzand",
-    "zeeklei",
-    "dalgrond",
-    "veen",
-    "loess",
-    "duinzand",
-    "maasklei",
-]
-export const gwlClasses: [string, ...string[]] = [
-    "II",
-    "IV",
-    "IIIb",
-    "V",
-    "VI",
-    "VII",
-    "Vb",
-    "-",
-    "Va",
-    "III",
-    "VIII",
-    "sVI",
-    "I",
-    "IIb",
-    "sVII",
-    "IVu",
-    "bVII",
-    "sV",
-    "sVb",
-    "bVI",
-    "IIIa",
+export const soilTypesOptions = [
+    { value: "moerige_klei", label: "Moerige klei" },
+    { value: "rivierklei", label: "Rivierklei" },
+    { value: "dekzand", label: "Dekzand" },
+    { value: "zeeklei", label: "Zeeklei" },
+    { value: "dalgrond", label: "Dalgrond" },
+    { value: "veen", label: "Veen" },
+    { value: "loess", label: "Löss" },
+    { value: "duinzand", label: "Duinzand" },
+    { value: "maasklei", label: "Maasklei" },
 ]
 export const soiltypeEnum = fdmSchema.enum(
     "b_soiltype_agr",
-    soilTypes as [string, ...string[]],
+    soilTypesOptions.map((x) => x.value) as [string, ...string[]],
 )
+
+export const gwlClassesOptions = [
+    { value: "II", label: "II" },
+    { value: "IV", label: "IV" },
+    { value: "IIIb", label: "IIIb" },
+    { value: "V", label: "V" },
+    { value: "VI", label: "VI" },
+    { value: "VII", label: "VII" },
+    { value: "Vb", label: "Vb" },
+    { value: "-", label: "-" },
+    { value: "Va", label: "Va" },
+    { value: "III", label: "III" },
+    { value: "VIII", label: "VIII" },
+    { value: "sVI", label: "sVI" },
+    { value: "I", label: "I" },
+    { value: "IIb", label: "IIb" },
+    { value: "sVII", label: "sVII" },
+    { value: "IVu", label: "IVu" },
+    { value: "bVII", label: "bVII" },
+    { value: "sV", label: "sV" },
+    { value: "sVb", label: "sVb" },
+    { value: "bVI", label: "bVI" },
+    { value: "IIIa", label: "IIIa" },
+]
 export const gwlClassEnum = fdmSchema.enum(
     "b_gwl_class",
-    gwlClasses as [string, ...string[]],
+    gwlClassesOptions.map((x) => x.value) as [string, ...string[]],
+)
+
+export const soilAnalysisSourceOptions = [
+    {
+        value: "nl-rva-l122",
+        label: "Eurofins Agro Testing Wageningen B.V.",
+    },
+    {
+        value: "nl-rva-l136",
+        label: "Nutrilab B.V.",
+    },
+    {
+        value: "nl-rva-l264",
+        label: "Normec Robalab B.V.",
+    },
+    {
+        value: "nl-rva-l320",
+        label: "Agrarisch Laboratorium Noord-Nederland/Alnn B.V.",
+    },
+    {
+        value: "nl-rva-l335",
+        label: "Normec Groen Agro Control",
+    },
+    {
+        value: "nl-rva-l610",
+        label: "Normec Dumea B.V.",
+    },
+    {
+        value: "nl-rva-l648",
+        label: "Fertilab B.V.",
+    },
+    {
+        value: "nl-rva-l697",
+        label: "Care4Agro B.V.",
+    },
+    {
+        value: "nl-other-nmi",
+        label: "NMI BodemSchat",
+    },
+    {
+        value: "other",
+        label: "Ander laboratorium",
+    },
+]
+export const soilAnalysisSourceEnum = fdmSchema.enum(
+    "a_source",
+    soilAnalysisSourceOptions.map((x) => x.value) as [string, ...string[]],
 )
 
 export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_id: text().primaryKey(),
     a_date: timestamp({ withTimezone: true }),
-    a_source: text(),
+    a_source: soilAnalysisSourceEnum().default("other"),
+    a_al_ox: numericCasted(),
+    a_c_of: numericCasted(),
+    a_ca_co: numericCasted(),
+    a_ca_co_po: numericCasted(),
+    a_caco3_if: numericCasted(),
+    a_cec_co: numericCasted(),
+    a_clay_mi: numericCasted(),
+    a_cn_fr: numericCasted(),
+    a_com_fr: numericCasted(),
+    a_cu_cc: numericCasted(),
+    a_density_sa: numericCasted(),
+    a_fe_ox: numericCasted(),
+    a_k_cc: numericCasted(),
+    a_k_co: numericCasted(),
+    a_k_co_po: numericCasted(),
+    a_mg_cc: numericCasted(),
+    a_mg_co: numericCasted(),
+    a_mg_co_po: numericCasted(),
+    a_n_pmn: numericCasted(),
+    a_n_rt: numericCasted(),
+    a_nh4_cc: numericCasted(),
+    a_nmin_cc: numericCasted(),
+    a_no3_cc: numericCasted(),
     a_p_al: numericCasted(),
     a_p_cc: numericCasted(),
+    a_p_ox: numericCasted(),
+    a_p_rt: numericCasted(),
+    a_p_sg: numericCasted(),
+    a_p_wa: numericCasted(),
+    a_ph_cc: numericCasted(),
+    a_s_rt: numericCasted(),
+    a_sand_mi: numericCasted(),
+    a_silt_mi: numericCasted(),
     a_som_loi: numericCasted(),
+    a_zn_cc: numericCasted(),
     b_gwl_class: gwlClassEnum(),
     b_soiltype_agr: soiltypeEnum(),
     created: timestamp({ withTimezone: true }).notNull().defaultNow(),
@@ -515,7 +616,8 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
     a_id: text()
         .notNull()
         .references(() => soilAnalysis.a_id),
-    b_depth: numericCasted(),
+    a_depth_upper: numericCasted().notNull().default(0),
+    a_depth_lower: numericCasted(),
     b_sampling_date: timestamp({ withTimezone: true }),
     b_sampling_geometry: geometry("b_sampling_geometry", {
         type: "MultiPoint",

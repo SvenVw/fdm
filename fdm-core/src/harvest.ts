@@ -9,7 +9,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { HarvestType } from "./harvest.d"
+import type { Harvest } from "./harvest.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
@@ -156,7 +156,7 @@ export async function getHarvest(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
-): Promise<HarvestType> {
+): Promise<Harvest> {
     try {
         await checkPermission(
             fdm,
@@ -194,7 +194,7 @@ export async function getHarvests(
     principal_id: PrincipalId,
     b_lu: schema.cultivationHarvestingTypeSelect["b_lu"],
     timeframe?: Timeframe,
-): Promise<HarvestType[]> {
+): Promise<Harvest[]> {
     try {
         await checkPermission(
             fdm,
@@ -251,7 +251,7 @@ export async function getHarvests(
 
         // Get details of each harvest
         const result = await Promise.all(
-            harvests.map(async (harvest: HarvestType) => {
+            harvests.map(async (harvest: Harvest) => {
                 const harvestDetails = getHarvestSimplified(
                     fdm,
                     harvest.b_id_harvesting,
@@ -296,9 +296,9 @@ export async function removeHarvest(
         return await fdm.transaction(async (tx: FdmType) => {
             const harvest = await getHarvest(tx, principal_id, b_id_harvesting)
 
-            const b_id_harvestable = harvest.harvestables[0].b_id_harvestable
+            const b_id_harvestable = harvest.harvestable.b_id_harvestable
             const b_id_harvestable_analysis =
-                harvest.harvestables[0].harvestable_analyses[0]
+                harvest.harvestable.harvestable_analyses[0]
                     .b_id_harvestable_analysis
             const b_lu = harvest.b_lu
 
@@ -504,7 +504,7 @@ export async function checkHarvestDateCompability(
 async function getHarvestSimplified(
     fdm: FdmType,
     b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
-) {
+): Promise<Harvest> {
     // Get properties of the requested harvest action
     const harvesting = await fdm
         .select({
@@ -547,7 +547,7 @@ async function getHarvestSimplified(
         )
         .limit(1)
 
-    harvest.harvestables = harvestables
+    harvest.harvestable = harvestables[0]
 
     // Get properties of harvestable analyses for this harvesting
     const harvestableAnalyses = await fdm
@@ -580,12 +580,12 @@ async function getHarvestSimplified(
         .where(
             eq(
                 schema.harvestableSampling.b_id_harvestable,
-                harvest.harvestables[0].b_id_harvestable,
+                harvest.harvestable.b_id_harvestable,
             ),
         )
         .limit(1)
 
-    harvest.harvestables[0].harvestable_analyses = harvestableAnalyses
+    harvest.harvestable.harvestable_analyses = harvestableAnalyses
 
     return harvest
 }

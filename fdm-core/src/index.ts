@@ -21,8 +21,19 @@ export { createFdmServer } from "./fdm-server"
 // export { createFdmLocal } from './fdm-local'
 export { createFdmAuth } from "./authentication"
 export type { PrincipalId } from "./authorization.d"
-export { addFarm, getFarm, getFarms, updateFarm } from "./farm"
+export {
+    addFarm,
+    getFarm,
+    getFarms,
+    updateFarm,
+    grantRoleToFarm,
+    isAllowedToShareFarm,
+    listPrincipalsForFarm,
+    revokePrincipalFromFarm,
+    updateRoleOfPrincipalAtFarm,
+} from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
+export type { Field } from "./field.d"
 export {
     addFertilizerToCatalogue,
     updateFertilizerFromCatalogue,
@@ -38,8 +49,8 @@ export {
     getFertilizerApplications,
 } from "./fertilizer"
 export type {
-    getFertilizerType,
-    getFertilizerApplicationType,
+    Fertilizer,
+    FertilizerApplication,
 } from "./fertilizer.d"
 export {
     addCultivationToCatalogue,
@@ -51,6 +62,11 @@ export {
     getCultivations,
     getCultivationPlan,
 } from "./cultivation"
+export type {
+    Cultivation,
+    CultivationPlan,
+    CultivationCatalogue,
+} from "./cultivation.d"
 export {
     addSoilAnalysis,
     updateSoilAnalysis,
@@ -61,6 +77,7 @@ export {
     getSoilParametersDescription,
 } from "./soil"
 export type {
+    SoilAnalysis,
     CurrentSoilData,
     SoilParameters,
     SoilParameterDescription,
@@ -71,6 +88,11 @@ export {
     getHarvests,
     removeHarvest,
 } from "./harvest"
+export type {
+    Harvest,
+    Harvestable,
+    HarvestableAnalysis,
+} from "./harvest.d"
 export {
     getEnabledFertilizerCatalogues,
     getEnabledCultivationCatalogues,
@@ -84,3 +106,22 @@ export {
 } from "./catalogues"
 export type { Timeframe } from "./timeframe.d"
 export { runMigration } from "./migrate"
+export {
+    createOrganization,
+    getOrganizationsForUser,
+    getUsersInOrganization,
+    checkOrganizationSlugForAvailability,
+    inviteUserToOrganization,
+    rejectInvitation,
+    removeUserFromOrganization,
+    updateRoleOfUserAtOrganization,
+    deleteOrganization,
+    getPendingInvitationsForUser,
+    getPendingInvitationsForOrganization,
+    getPendingInvitation,
+    acceptInvitation,
+    cancelPendingInvitation,
+    updateOrganization,
+    getOrganization,
+} from "./organization"
+export { lookupPrincipal } from "./principal"

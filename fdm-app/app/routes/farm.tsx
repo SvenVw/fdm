@@ -1,23 +1,25 @@
 import posthog from "posthog-js"
 import { useEffect } from "react"
-import type {
-    ActionFunctionArgs,
-    LoaderFunctionArgs,
-    MetaFunction,
-} from "react-router"
-import { redirect, useRoutes } from "react-router"
+import type { LoaderFunctionArgs, MetaFunction } from "react-router"
+import { redirect } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
-import { SidebarApp } from "~/components/custom/sidebar-app"
-import { SidebarProvider } from "~/components/ui/sidebar"
+import { SidebarApps } from "~/components/custom/sidebar/apps"
+import { SidebarFarm } from "~/components/custom/sidebar/farm"
+import { SidebarSupport } from "~/components/custom/sidebar/support"
+import { SidebarTitle } from "~/components/custom/sidebar/title"
+import { SidebarUser } from "~/components/custom/sidebar/user"
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarProvider,
+} from "~/components/ui/sidebar"
 import { SidebarInset } from "~/components/ui/sidebar"
-import { auth, getSession } from "~/lib/auth.server"
+import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
-import Account from "./farm.account"
-import WhatsNew from "./farm.whats-new"
 
 export const meta: MetaFunction = () => {
     return [
@@ -47,7 +49,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         if (!session?.user) {
-            return redirect("/signin")
+            // Get the original URL the user tried to access
+            const currentPath = new URL(request.url).pathname
+            // Construct the sign-in URL with the redirectTo parameter
+            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+            // Perform the redirect
+            return redirect(signInUrl)
         }
 
         // Return user information from loader
@@ -57,6 +64,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
             initials: session.initials,
         }
     } catch (error) {
+        // If getSession throws (e.g., invalid token), it might result in a 401
+        // We need to handle that case here as well, similar to the ErrorBoundary
+        if (error instanceof Response && error.status === 401) {
+            const currentPath = new URL(request.url).pathname
+            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+            return redirect(signInUrl)
+        }
+        // Re-throw other errors to be handled by the ErrorBoundary or default handling
         throw handleLoaderError(error)
     }
 }
@@ -79,21 +94,6 @@ export default function App() {
     useEffect(() => {
         setFarmId(initialFarmId)
     }, [initialFarmId, setFarmId])
-
-    const routes = useRoutes([
-        {
-            path: "/farm/whats-new",
-            element: <WhatsNew />,
-        },
-        {
-            path: "/farm/account",
-            element: <Account />,
-        },
-        {
-            path: "*",
-            element: <Outlet />,
-        },
-    ])
 
     const calendarMatch = matches.find(
         (match) => match.pathname.startsWith("/farm/") && match.params.calendar,
@@ -118,45 +118,27 @@ export default function App() {
 
     return (
         <SidebarProvider>
-            <SidebarApp
-                user={loaderData.user}
-                userName={loaderData.userName}
-                initials={loaderData.initials}
-            />
+            <Sidebar>
+                <SidebarTitle />
+                <SidebarContent>
+                    <SidebarFarm />
+                    <SidebarApps />
+                </SidebarContent>
+                <SidebarSupport
+                    name={loaderData.userName}
+                    email={loaderData.user.email}
+                />
+                <SidebarUser
+                    name={loaderData.userName}
+                    email={loaderData.user.email}
+                    image={loaderData.user.image}
+                    avatarInitials={loaderData.initials}
+                    userName={loaderData.userName}
+                />
+            </Sidebar>
             <SidebarInset>
                 <Outlet />
-                {routes}
             </SidebarInset>
         </SidebarProvider>
     )
-}
-
-/**
- * Revokes the user session and redirects to the sign-in page.
- *
- * This function retrieves the current session from the provided HTTP request and attempts to revoke it through the
- * authentication API. On successful revocation, it returns a redirect response to the sign-in route. Any error during
- * session retrieval or revocation is caught, processed by the error handler, and re-thrown.
- *
- * @param request - The HTTP request containing session and header data.
- * @returns A redirect response to the sign-in page.
- *
- * @throws {Error} If an error occurs while retrieving or revoking the session.
- */
-export async function action({ request }: ActionFunctionArgs) {
-    try {
-        // Get the session
-        const session = await getSession(request)
-
-        // Revoke the session
-        await auth.api.revokeSession({
-            headers: request.headers,
-            body: {
-                token: session?.session.token,
-            },
-        })
-        return redirect("/signin")
-    } catch (error) {
-        throw handleActionError(error)
-    }
 }

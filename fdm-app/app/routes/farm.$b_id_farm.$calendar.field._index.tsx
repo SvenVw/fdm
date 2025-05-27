@@ -25,6 +25,9 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { HeaderField } from "../components/custom/header/field"
 
 export const meta: MetaFunction = () => {
     return [
@@ -140,16 +143,23 @@ export default function FarmFieldIndex() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-                fieldOptions={loaderData.fieldOptions}
-                b_id={undefined}
+            <Header
                 action={{
                     to: `/farm/${loaderData.b_id_farm}`,
                     label: "Terug naar bedrijf",
+                    disabled: false,
                 }}
-            />
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderField
+                    b_id_farm={loaderData.b_id_farm}
+                    fieldOptions={loaderData.fieldOptions}
+                    b_id={undefined}
+                />
+            </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
                     <>

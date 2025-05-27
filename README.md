@@ -1,5 +1,7 @@
 # FDM: Transforming Farm Data into Actionable Insights
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/SvenVw/fdm)
+
 The Farm Data Model (FDM) is an open-source project designed to empower data-driven decision-making in agriculture.  By providing a standardized, flexible, and extensible schema for organizing and analyzing farm data, FDM enables seamless data integration, analysis, and ultimately, improved farm management practices and lowering environmental impact.
 
 <img src="/fdm-docs/static/img/fdm-high-resolution-logo.png" alt="FDM Logo" height="250px">

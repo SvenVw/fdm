@@ -1,5 +1,72 @@
 # Changelog fdm-core
 
+## 0.20.0
+
+### Minor Changes
+
+- e260795: Add `a_c_of` to soil analysis. It represents the amount of organic carbon (g C / kg) that is reported on the soil analysis
+- 0dc93fd: Change `a_source` to a list of options
+- 5a3bf78: Add `b_n_fixation` as property of cultivation catalogue. It represents the amount of nitrogen that can be fixated by the cultivation as kg N / ha
+- 249138c: Add `a_nmin_cc` as parameter for soil analysis
+- f05e1cb: Add `b_lu_n_residue` as property of cultivation catalogue. It represents the nitrogen content (g N / kg) of the crop residues for the cultivation that can be used as a default.
+- 9a5be3b: Add parameter `m_cropresidue` to cultivationEnding to indicate whether crop residues are left behind or not when cultivation is ended
+- 6292cf3: Add function lookup for users and organizations
+- f05e1cb: Add `b_lu_hi` as property of cultivation catalogue. It represents the fraction of the crop biomass that is commercially valueable
+- 286abb9: The response of `getFarm` and `getFarms` include now the roles on the farm that the principal has
+- bdf0cb0: This change introduces a suite of helper functions within `fdm-core` to facilitate comprehensive organization management and user interaction as `better-auth` does not provide server functions to interact with organizations. These functions enable users and administrators to manage organizations, invite members, and control access.
+
+  - `createOrganization`: Creates a new organization.
+  - `updateOrganization`: Updates an existing organization.
+  - `getOrganization`: Retrieves information about a specific organization.
+  - `checkOrganizationSlugForAvailability`: Checks if a given organization slug is available for use.
+  - `getOrganizationsForUser`: Retrieves a list of organizations a user belongs to.
+  - `deleteOrganization`: Deletes an organization.
+  - `getUsersInOrganization`: Retrieves a list of users within a specific organization.
+  - `removeUserFromOrganization`: Removes a user from an organization.
+  - `updateRoleOfUserAtOrganization`: Updates the role of a user within an organization.
+  - `inviteUserToOrganization`: Sends an invitation to a user to join an organization.
+  - `getPendingInvitationsForUser`: Retrieves a list of pending invitations for a user.
+  - `getPendingInvitation`: Retrieves a specific pending invitation.
+  - `acceptInvitation`: Accepts a pending invitation to join an organization.
+  - `rejectInvitation`: Rejects a pending invitation to join an organization.
+  - `getPendingInvitationsForOrganization`: Retrieves a list of pending invitations for an organization.
+  - `cancelPendingInvitation`: Cancels a pending invitation to join an organization.
+
+- 343c580: At soil sampling rename `a_depth` to `a_depth_lower` and add `a_depth_upper`
+- e260795: Add `a_density_sa` to soil analysis. It represents the soil bulk density (g/cm^3) that is reported on a soil analysis
+- 18f195b: Add `b_centroid` to output of `getField` and `getFields`. It repesents the [longitude, latitude] of the center of the field
+- 7e881c1: Add new soil parameters: `a_al_ox`, `a_ca_co`, `a_ca_co_po`, `a_caco3_if`, `a_cec_co`, `a_cn_fr`, `a_com_fr`, `a_cu_cc`, `a_fe_ox`, `a_k_cc`, `a_k_co`, `a_k_co_po`, `a_mg_cc`, `a_mg_co`, `a_mg_co_po`, `a_n_pmn`,`a_p_ox`, `a_p_rt`, `a_p_sg`, `a_p_wa`, `a_ph_cc`, `a_s_rt`, `a_sand_mi`, `a_silt_mi`, `a_zn_cc`
+- c44812f: Adds `a_cn_fr` as property of soil analysis. It represents the carbon to nitrogen (-) ratio reported on a soil analysis
+- ec0494c: Add `b_lu_n_harvestable` as property of cultivation catalogue. It represents the nitrogen content (g N / kg) of the harvestable parts of the crop for a cultivation and can be used as default
+- ec0494c: Add `b_lu_yield` as property of cultivation catalogue. It represents an average dry matter yield (kg / ha) for the cultivation that can be used as default
+- 6676992: Adds functions to manage user and organization access to farms.
+
+  **New Functions:**
+
+  - `grantRoleToFarm`: Grants a role to a principal (user/org) on a farm.
+  - `isAllowedToShareFarm`: Checks if a principal can share a farm.
+  - `listPrincipalsForFarm`: Lists principals with access to a farm.
+  - `revokePrincipalFromFarm`: Removes access for a principal.
+  - `updateRoleOfPrincipalAtFarm`: Updates a principal's role.
+
+  **Purpose:** Enables granular control over farm data access between users and organizations.
+
+- 4027c9a: Add `a_nh4_cc` and `a_no3_cc` to soil analysis
+
+### Patch Changes
+
+- c44812f: Add `a_n_rt` as property of soil analysis. It represents the total nitrogen content (mg N / kg) as reported on a soil analysis
+- cf399ca: Make types `Harvestable`, `Harvest` and `HarvestableAnalysis` available
+- ef8a2c6: Add `b_lu_croprotation` as property to cultivation catalogue. It represents the type in the crop rotation
+- 13210e6: Limit that each harvest can have only 1 harvestable and not multiple
+- a550805: Rename types `getFertilizerType` and `GetFertilizerApplicationsType` to `Fertilizer` and `FertilizerApplication`
+- d4a7e02: Make types `Cultivation`, `CultivationPlan`, `CultivationCatalogue` available
+- e0a779c: Round `b_area`at `getField` and `getFields` to 2 decimals
+- dd7bb7b: Make type `SoilAnalysis` available
+- 0a546d4: Make type `Field` available
+- Updated dependencies [af2c6a2]
+  - @svenvw/fdm-data@0.13.0
+
 ## 0.19.0
 
 ### Minor Changes

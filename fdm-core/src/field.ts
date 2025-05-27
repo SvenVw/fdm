@@ -17,7 +17,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { getFieldType } from "./field.d"
+import type { Field } from "./field.d"
 import type { Timeframe } from "./timeframe"
 
 /**
@@ -131,7 +131,7 @@ export async function getField(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id: schema.fieldsTypeSelect["b_id"],
-): Promise<getFieldType> {
+): Promise<Field> {
     try {
         await checkPermission(
             fdm,
@@ -150,12 +150,12 @@ export async function getField(
                 b_id_farm: schema.fieldAcquiring.b_id_farm,
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
-                b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
+                b_centroid_x: sql<number>`ST_X(ST_Centroid(b_geometry))`,
+                b_centroid_y: sql<number>`ST_Y(ST_Centroid(b_geometry))`,
+                b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
                 b_start: schema.fieldAcquiring.b_start,
                 b_end: schema.fieldDiscarding.b_end,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
-                created: schema.fields.created,
-                updated: schema.fields.updated,
             })
             .from(schema.fields)
             .innerJoin(
@@ -168,6 +168,11 @@ export async function getField(
             )
             .where(eq(schema.fields.b_id, b_id))
             .limit(1)
+
+        // Process the centroid string into a tuple
+        field[0].b_centroid = [field[0].b_centroid_x, field[0].b_centroid_y]
+        field[0].b_centroid_x = undefined
+        field[0].b_centroid_y = undefined
 
         return field[0]
     } catch (err) {
@@ -195,7 +200,7 @@ export async function getFields(
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
     timeframe?: Timeframe,
-): Promise<getFieldType[]> {
+): Promise<Field[]> {
     try {
         await checkPermission(
             fdm,
@@ -252,12 +257,12 @@ export async function getFields(
                 b_id_farm: schema.fieldAcquiring.b_id_farm,
                 b_id_source: schema.fields.b_id_source,
                 b_geometry: schema.fields.b_geometry,
-                b_area: sql<number>`ST_Area(b_geometry::geography)/10000`,
+                b_centroid_x: sql<number>`ST_X(ST_Centroid(b_geometry))`,
+                b_centroid_y: sql<number>`ST_Y(ST_Centroid(b_geometry))`,
+                b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
                 b_start: schema.fieldAcquiring.b_start,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
                 b_end: schema.fieldDiscarding.b_end,
-                created: schema.fields.created,
-                updated: schema.fields.updated,
             })
             .from(schema.fields)
             .innerJoin(
@@ -270,6 +275,13 @@ export async function getFields(
             )
             .where(whereClause)
             .orderBy(asc(schema.fields.b_name))
+
+        // Process the centroids into  a tuple
+        for (const field of fields) {
+            field.b_centroid = [field.b_centroid_x, field.b_centroid_y]
+            field.b_centroid_x = undefined
+            field.b_centroid_y = undefined
+        }
 
         return fields
     } catch (err) {
@@ -307,7 +319,7 @@ export async function updateField(
     b_start?: schema.fieldAcquiringTypeInsert["b_start"],
     b_acquiring_method?: schema.fieldAcquiringTypeInsert["b_acquiring_method"],
     b_end?: schema.fieldDiscardingTypeInsert["b_end"],
-): Promise<getFieldType> {
+): Promise<Field> {
     return await fdm.transaction(async (tx: FdmType) => {
         try {
             await checkPermission(

@@ -22,6 +22,34 @@
             "when": 1743420907290,
             "tag": "0002_v0-18-0",
             "breakpoints": true
+        },
+        {
+            "idx": 3,
+            "version": "7",
+            "when": 1744205441260,
+            "tag": "0003_v0-20-0-1",
+            "breakpoints": true
+        },
+        {
+            "idx": 4,
+            "version": "7",
+            "when": 1745410821339,
+            "tag": "0004_v0-20-0-2",
+            "breakpoints": true
+        },
+        {
+            "idx": 5,
+            "version": "7",
+            "when": 1748353081475,
+            "tag": "0005_v0-20-0-3",
+            "breakpoints": true
+        },
+        {
+            "idx": 6,
+            "version": "7",
+            "when": 1748353926519,
+            "tag": "0006_v0-20-0-4",
+            "breakpoints": true
         }
     ]
 }

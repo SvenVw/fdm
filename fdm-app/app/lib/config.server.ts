@@ -4,6 +4,7 @@ import type { ServerConfig } from "~/types/config.d"
 export const serverConfig: ServerConfig = {
     name: String(process.env.VITE_FDM_NAME),
     url: String(process.env.VITE_FDM_URL),
+    privacy_url: String(process.env.VITE_FDM_PRIVACY_URL),
 
     // Authentication
     auth: {

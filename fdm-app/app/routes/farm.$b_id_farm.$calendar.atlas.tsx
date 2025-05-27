@@ -17,6 +17,10 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { HeaderAtlas } from "../components/custom/header/atlas"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { useCalendarStore } from "../store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -86,10 +90,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        const layerOptions = [
-            { layerKey: "fields", layerName: "Percelen" },
-            { layerKey: "soil", layerName: "Bodem" },
-            { layerKey: "elevation", layerName: "Hoogtekaart" },
+        const atlasLayerOptions = [
+            { atlasLayerId: "fields", atlasLayerName: "Percelen" },
+            { atlasLayerId: "soil", atlasLayerName: "Bodem" },
+            { atlasLayerId: "elevation", atlasLayerName: "Hoogtekaart" },
         ]
 
         // Return user information from loader
@@ -97,8 +101,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
-            layerOptions: layerOptions,
-            layerSelected: "fields",
+            atlasLayerOptions: atlasLayerOptions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -126,16 +129,17 @@ export default function FarmContentBlock() {
 
     return (
         <SidebarInset>
-            <FarmHeader
-                farmOptions={loaderData.farmOptions}
-                b_id_farm={loaderData.b_id_farm}
-                layerOptions={loaderData.layerOptions}
-                layerSelected={layerSelected}
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}/field`,
-                    label: "Naar percelen",
-                }}
-            />
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderAtlas
+                    b_id_farm={loaderData.b_id_farm}
+                    selectedAtlasLayerId={layerSelected}
+                    atlasLayerOptions={loaderData.atlasLayerOptions}
+                />
+            </Header>
             <main>
                 <FarmTitle
                     title={"Kaarten"}
