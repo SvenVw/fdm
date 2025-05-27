@@ -781,13 +781,6 @@ export function getSoilParametersDescription(
             description: "Nitraat (NO3-N)",
         },
         {
-            parameter: "a_n_rt",
-            unit: "mg N/g",
-            name: "N-totale bodemvoorraad",
-            type: "numeric",
-            description: "Stikstof, totale bodemvoorraad",
-        },
-        {
             parameter: "a_p_al",
             unit: "mg P2O5/100 g",
             name: "P-Al",
