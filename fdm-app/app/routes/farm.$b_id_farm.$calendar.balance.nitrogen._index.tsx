@@ -228,7 +228,11 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                     </div>
                                 ) : (
                                     <NitrogenBalanceChart
-                                    balanceData={nitrogenBalanceResult} />
+                                    balance={nitrogenBalanceResult.balance}
+                                    supply={nitrogenBalanceResult.supply}
+                                    removal={nitrogenBalanceResult.removal}
+                                    emission={nitrogenBalanceResult.emission} 
+                                    />
                                 )}
                                 {/* <Overview /> */}
                             </CardContent>

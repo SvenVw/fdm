@@ -9,20 +9,21 @@ import {
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 export function NitrogenBalanceChart({
-    balanceData,
+    balance,
+    supply,
+    removal,
+    emission,
 }: {
-    balanceData: {
-        balance: number
-        supply: number
-        removal: number
-        emission: number
-    }
+    balance: number
+    supply: number
+    removal: number
+    emission: number
 }): JSX.Element {
     const chartData = [
         {
-            supply: balanceData.supply,
-            removal: balanceData.removal,
-            emission: balanceData.emission,
+            supply: supply,
+            removal: removal,
+            emission: emission,
         },
     ]
 

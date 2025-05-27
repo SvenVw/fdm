@@ -39,6 +39,7 @@ import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Button } from "~/components/ui/button"
 import { useCalendarStore } from "~/store/calendar"
+import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -120,6 +121,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         nitrogenBalanceInput: nitrogenBalanceInput,
         nitrogenBalanceResult: nitrogenBalanceResult,
         field: field,
+        farm: farm,
         errorMessage: errorMessage,
     }
 }
@@ -133,8 +135,13 @@ export default function FarmBalanceNitrogenFieldBlock() {
 
     const calendar = useCalendarStore((state) => state.calendar)
 
-    const { nitrogenBalanceInput, nitrogenBalanceResult, field, errorMessage } =
-        loaderData
+    const {
+        nitrogenBalanceInput,
+        nitrogenBalanceResult,
+        field,
+        farm,
+        errorMessage,
+    } = loaderData
 
     return (
         <div className="space-y-4">
@@ -233,13 +240,35 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <Card className="col-span-4">
                             <CardHeader>
                                 <CardTitle>Balans</CardTitle>
+                                <CardDescription>
+                                    De stikstofbalans voor {field.b_name} van{" "}
+                                    {farm.b_name_farm} . De balans is het
+                                    verschil tussen de totale aanvoer, afvoer en
+                                    emissie van stikstof. Een positieve balans
+                                    betekent een overschot aan stikstof, een
+                                    negatieve balans een tekort.
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="pl-2">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
                                         <LoadingSpinner />
                                     </div>
-                                ) : null}
+                                ) : (
+                                    <NitrogenBalanceChart
+                                        balance={nitrogenBalanceResult.balance}
+                                        supply={
+                                            nitrogenBalanceResult.supply.total
+                                        }
+                                        removal={
+                                            nitrogenBalanceResult.removal.total
+                                        }
+                                        emission={
+                                            nitrogenBalanceResult.volatilization
+                                                .total
+                                        }
+                                    />
+                                )}
                             </CardContent>
                         </Card>
                         <Card className="col-span-3">
