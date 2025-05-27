@@ -52,7 +52,7 @@ export function NitrogenBalanceChart({
                     left: -20,
                 }}
             >
-                <XAxis type="number" dataKey="supply" />
+                <XAxis type="number" />
                 <YAxis
                     dataKey="primary"
                     type="category"
