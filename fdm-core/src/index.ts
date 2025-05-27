@@ -33,6 +33,7 @@ export {
     updateRoleOfPrincipalAtFarm,
 } from "./farm"
 export { addField, getField, getFields, updateField } from "./field"
+export type { Field } from "./field.d"
 export {
     addFertilizerToCatalogue,
     updateFertilizerFromCatalogue,
@@ -48,8 +49,8 @@ export {
     getFertilizerApplications,
 } from "./fertilizer"
 export type {
-    getFertilizerType,
-    getFertilizerApplicationType,
+    Fertilizer,
+    FertilizerApplication,
 } from "./fertilizer.d"
 export {
     addCultivationToCatalogue,
@@ -61,6 +62,7 @@ export {
     getCultivations,
     getCultivationPlan,
 } from "./cultivation"
+export type { Cultivation, CultivationPlan, CultivationCatalogue } from "./cultivation.d"
 export {
     addSoilAnalysis,
     updateSoilAnalysis,
@@ -71,6 +73,7 @@ export {
     getSoilParametersDescription,
 } from "./soil"
 export type {
+    SoilAnalysis,
     CurrentSoilData,
     SoilParameters,
     SoilParameterDescription,
@@ -81,6 +84,11 @@ export {
     getHarvests,
     removeHarvest,
 } from "./harvest"
+export type {
+    Harvest,
+    Harvestable,
+    HarvestableAnalysis,
+} from "./harvest.d"
 export {
     getEnabledFertilizerCatalogues,
     getEnabledCultivationCatalogues,

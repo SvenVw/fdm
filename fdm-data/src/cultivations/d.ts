@@ -8,6 +8,24 @@ export interface CatalogueCultivationItem {
     b_lu_harvestable: "once" | "none" | "multiple"
     b_lu_hcat3: string | null
     b_lu_hcat3_name: string | null
+    b_lu_croprotation:
+        | "other"
+        | "clover"
+        | "nature"
+        | "potato"
+        | "grass"
+        | "rapeseed"
+        | "starch"
+        | "maize"
+        | "cereal"
+        | "sugarbeet"
+        | "alfalfa"
+        | "catchcrop"
+    b_lu_yield: number
+    b_lu_hi: number
+    b_lu_n_harvestable: number
+    b_lu_n_residue: number
+    b_n_fixation: number
     hash: string | null
 }
 

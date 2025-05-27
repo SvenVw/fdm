@@ -1,12 +1,14 @@
 import type * as schema from "./db/schema"
 
-export interface getSoilAnalysisType {
+export interface SoilAnalysis {
     a_id: schema.soilAnalysisTypeSelect["a_id"]
     a_date: schema.soilAnalysisTypeSelect["a_date"]
     a_source: schema.soilAnalysisTypeSelect["a_source"]
+    a_n_rt: schema.soilAnalysisTypeSelect["a_n_rt"]
     a_p_al: schema.soilAnalysisTypeSelect["a_p_al"]
     a_p_cc: schema.soilAnalysisTypeSelect["a_p_cc"]
     a_som_loi: schema.soilAnalysisTypeSelect["a_som_loi"]
+    a_cn_fr: schema.soilAnalysisTypeSelect["a_cn_fr"]
     b_gwl_class: schema.soilAnalysisTypeSelect["b_gwl_class"]
     b_soiltype_agr: schema.soilAnalysisTypeSelect["b_soiltype_agr"]
     b_id_sampling: schema.soilSamplingTypeSelect["b_id_sampling"]
@@ -19,6 +21,10 @@ export type SoilParameters =
     | "a_source"
     | "a_id"
     | "b_sampling_date"
+    | "a_c_of"
+    | "a_cn_fr"
+    | "a_density_sa"
+    | "a_n_rt"
     | "a_p_al"
     | "a_p_cc"
     | "a_som_loi"
@@ -47,3 +53,4 @@ export interface SoilParameterDescriptionItem {
 }
 
 export type SoilParameterDescription = SoilParameterDescriptionItem[]
+

@@ -106,6 +106,12 @@ describe("harvest", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat",
             b_lu_hcat3_name: "hcat name",
+            b_lu_croprotation: "cereal",
+            b_lu_yield: 6000,
+            b_lu_hi: 0.4,
+            b_lu_n_harvestable: 4,
+            b_lu_n_residue: 2,
+            b_n_fixation: 0,
         })
 
         b_lu_once_nonexistent = await addCultivation(
@@ -128,6 +134,12 @@ describe("harvest", () => {
             b_lu_harvestable: "multiple",
             b_lu_hcat3: "hcat_multiple",
             b_lu_hcat3_name: "hcat name multiple",
+            b_lu_croprotation: "grass",
+            b_lu_yield: 6000,
+            b_lu_hi: 0.4,
+            b_lu_n_harvestable: 4,
+            b_lu_n_residue: 2,
+            b_n_fixation: 0,
         })
         b_lu_multiple = await addCultivation(
             fdm,
@@ -188,7 +200,7 @@ describe("harvest", () => {
         expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
         expect(harvest.b_lu_harvest_date).toEqual(harvesting_date)
         expect(
-            harvest.harvestables[0].harvestable_analyses[0].b_lu_yield,
+            harvest.harvestable.harvestable_analyses[0].b_lu_yield,
         ).toEqual(1000)
     })
 
@@ -204,7 +216,7 @@ describe("harvest", () => {
         )
         expect(harvests[0].b_lu_harvest_date).toEqual(harvesting_date)
         expect(
-            harvests[0].harvestables[0].harvestable_analyses[0].b_lu_yield,
+            harvests[0].harvestable.harvestable_analyses[0].b_lu_yield,
         ).toEqual(null)
     })
 
@@ -248,7 +260,7 @@ describe("harvest", () => {
         expect(
             harvests.map(
                 (f) =>
-                    f.harvestables[0].harvestable_analyses[0]
+                    f.harvestable.harvestable_analyses[0]
                         .b_lu_n_harvestable,
             ),
         ).toEqual(
@@ -436,6 +448,12 @@ describe("harvest", () => {
                 b_lu_harvestable: "multiple", // Different harvestable type
                 b_lu_hcat3: "hcat2",
                 b_lu_hcat3_name: "hcat name2",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
 
             const newCultivation = await addCultivation(
@@ -477,6 +495,12 @@ describe("harvest", () => {
                 b_lu_hcat3: "hcat3",
                 b_lu_hcat3_name: "hcat name3",
                 b_lu_harvestable: "none",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
             })
             const b_lu_none = await addCultivation(
                 fdm,

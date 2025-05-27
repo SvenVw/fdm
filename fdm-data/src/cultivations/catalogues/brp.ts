@@ -26,6 +26,27 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
                   })()
                 : cultivation.b_lu_harvestable
 
+        // Validate b_lu_croprotation
+        cultivation.b_lu_croprotation !== "other" &&
+        cultivation.b_lu_croprotation !== "clover" &&
+        cultivation.b_lu_croprotation !== "nature" &&
+        cultivation.b_lu_croprotation !== "potato" &&
+        cultivation.b_lu_croprotation !== "grass" &&
+        cultivation.b_lu_croprotation !== "rapeseed" &&
+        cultivation.b_lu_croprotation !== "starch" &&
+        cultivation.b_lu_croprotation !== "maize" &&
+        cultivation.b_lu_croprotation !== "cereal" &&
+        cultivation.b_lu_croprotation !== "sugarbeet" &&
+        cultivation.b_lu_croprotation !== "alfalfa" &&
+        cultivation.b_lu_croprotation !== "catchcrop"
+            ? (() => {
+                  throw new Error(
+                      `Invalid value for b_lu_croprotation: ${cultivation.b_lu_croprotation}.`,
+                  )
+              })()
+            : cultivation.b_lu_croprotation
+
+        // Transform to CatalogueCultivationItem
         const item: CatalogueCultivationItem = {
             b_lu_source: "brp",
             b_lu_catalogue: cultivation.b_lu_catalogue,
@@ -34,6 +55,12 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             b_lu_harvestable: harvestable,
             b_lu_hcat3: cultivation.b_lu_hcat3,
             b_lu_hcat3_name: cultivation.b_lu_hcat3_name,
+            b_lu_croprotation: cultivation.b_lu_croprotation,
+            b_lu_yield: cultivation.b_lu_yield,
+            b_lu_hi: cultivation.b_lu_hi,
+            b_lu_n_harvestable: cultivation.b_lu_n_harvestable,
+            b_lu_n_residue: cultivation.b_lu_n_residue,
+            b_n_fixation: cultivation.b_n_fixation,
             hash: null,
         }
 

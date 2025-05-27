@@ -1,6 +1,6 @@
 import type * as schema from "./db/schema"
 
-export interface getCultivationType {
+export interface Cultivation {
     b_lu: schema.cultivationsTypeSelect["b_lu"]
     b_lu_catalogue: schema.cultivationsTypeSelect["b_lu_catalogue"]
     b_lu_source: schema.cultivationsCatalogueTypeSelect["b_lu_source"]
@@ -10,14 +10,16 @@ export interface getCultivationType {
     b_lu_hcat3_name: schema.cultivationsCatalogueTypeSelect["b_lu_hcat3_name"]
     b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
     b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
+    m_cropresidue: schema.cultivationEndingTypeSelect["m_cropresidue"]
     b_id: schema.cultivationStartingTypeSelect["b_id"]
 }
 
-export interface cultivationPlanType {
+export interface CultivationPlan {
     b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"]
     b_lu_name: schema.cultivationsCatalogueTypeSelect["b_lu_name"]
     b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
     b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
+    m_cropresidue: schema.cultivationEndingTypeSelect["m_cropresidue"]
     fields: Array<{
         b_lu: schema.cultivationsTypeSelect["b_lu"]
         b_id: schema.fieldsTypeSelect["b_id"]
@@ -33,7 +35,7 @@ export interface cultivationPlanType {
         harvests: Array<{
             b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_"]
             b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
-            harvestables: Array<{
+            harvestable: {
                 b_id_harvestable: schema.harvestableAnalysesTypeSelect["b_id_harvestable"]
                 harvestable_analyses: Array<{
                     b_lu_yield: schema.harvestableAnalysesTypeSelect["b_lu_yield"]
@@ -44,7 +46,9 @@ export interface cultivationPlanType {
                     b_lu_k_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_k_harvestable"]
                     b_lu_k_residue: schema.harvestableAnalysesTypeSelect["b_lu_k_residue"]
                 }>
-            }>
+            }
         }>
     }>
 }
+
+export type CultivationCatalogue = schema.cultivationsCatalogueTypeSelect

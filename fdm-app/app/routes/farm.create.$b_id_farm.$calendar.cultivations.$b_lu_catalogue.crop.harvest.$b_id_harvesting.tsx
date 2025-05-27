@@ -112,9 +112,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
             b_lu_yield:
-                harvest?.harvestables?.[0].harvestable_analyses?.[0].b_lu_yield,
+                harvest?.harvestable.harvestable_analyses?.[0].b_lu_yield,
             b_lu_n_harvestable:
-                harvest?.harvestables?.[0].harvestable_analyses?.[0]
+                harvest?.harvestable.harvestable_analyses?.[0]
                     .b_lu_n_harvestable,
             b_lu_harvest_date: harvest?.b_lu_harvest_date,
         }

@@ -26,7 +26,7 @@ catalogs:
       version: 5.8.3
     vite:
       specifier: ^6.3.4
-      version: 6.3.4
+      version: 6.3.5
     vite-tsconfig-paths:
       specifier: ^5.1.4
       version: 5.1.4
@@ -247,10 +247,10 @@ importers:
         version: 1.41.0
       '@react-router/dev':
         specifier: ^7.5.3
-        version: 7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
+        version: 7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
       '@react-router/fs-routes':
         specifier: ^7.5.3
-        version: 7.5.3(@react-router/dev@7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1))(typescript@5.8.3)
+        version: 7.5.3(@react-router/dev@7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1))(typescript@5.8.3)
       '@types/geojson':
         specifier: ^7946.0.16
         version: 7946.0.16
@@ -286,16 +286,25 @@ importers:
         version: 5.8.3
       vite:
         specifier: 'catalog:'
-        version: 6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
+        version: 6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
       vite-tsconfig-paths:
         specifier: 'catalog:'
-        version: 5.1.4(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))
+        version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))
 
   fdm-calculator:
     dependencies:
       '@svenvw/fdm-core':
         specifier: workspace:^
         version: link:../fdm-core
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
+      decimal.js:
+        specifier: ^10.5.0
+        version: 10.5.0
+      geotiff:
+        specifier: ^2.1.3
+        version: 2.1.3
     devDependencies:
       '@dotenvx/dotenvx':
         specifier: 'catalog:'
@@ -1162,10 +1171,6 @@ packages:
 
   '@babel/runtime-corejs3@7.27.0':
     resolution: {integrity: sha512-UWjX6t+v+0ckwZ50Y5ShZLnlk95pP5MyW/pon9tiYzl3+18pkTHTFNTKr7rQbfRXPkowt2QAn30o1b6oswszew==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/runtime@7.27.0':
-    resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.27.1':
@@ -4782,6 +4787,9 @@ packages:
       supports-color:
         optional: true
 
+  decimal.js@10.5.0:
+    resolution: {integrity: sha512-8vDa8Qxvr/+d94hSh5P3IJwI5t8/c0KsMp+g8bNw9cY2icONa5aPfvKeieW1WlG0WQYwwhJ7mjui2xtiePQSXw==}
+
   decode-named-character-reference@1.1.0:
     resolution: {integrity: sha512-Wy+JTSbFThEOXQIR2L6mxJvEs+veIzpmqD7ynWxMXGpnk3smkHQOp6forLdHsKpAMW9iJpaBBIxz285t1n1C3w==}
 
@@ -4858,10 +4866,6 @@ packages:
 
   detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
-    engines: {node: '>=8'}
-
-  detect-libc@2.0.3:
-    resolution: {integrity: sha512-bwy0MGW55bG41VqxxypOsdSdGqLwXPI/focwgTYCFMbdUiBAxLg9CFzG08sz2aqzknwiX7Hkl0bQENjg8iLByw==}
     engines: {node: '>=8'}
 
   detect-libc@2.0.4:
@@ -8965,46 +8969,6 @@ packages:
       vite:
         optional: true
 
-  vite@6.3.4:
-    resolution: {integrity: sha512-BiReIiMS2fyFqbqNT/Qqt4CVITDU9M9vE+DKcVAsB+ZV0wvTKd+3hMbkpxz1b+NmEDMegpVbisKiAZOnvO92Sw==}
-    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
-      jiti: '>=1.21.0'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.16.0
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      jiti:
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
-        optional: true
-
   vite@6.3.5:
     resolution: {integrity: sha512-cZn6NDFE7wdTpINgs++ZJ4N49W2vRp8LCKrn3Ob1kYNtOo21vfDoaV5GzBfLU4MovSAB8uNRm4jgzVQZ+mBzPQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -10178,10 +10142,6 @@ snapshots:
       core-js-pure: 3.41.0
       regenerator-runtime: 0.14.1
 
-  '@babel/runtime@7.27.0':
-    dependencies:
-      regenerator-runtime: 0.14.1
-
   '@babel/runtime@7.27.1': {}
 
   '@babel/template@7.27.2':
@@ -10675,7 +10635,7 @@ snapshots:
       '@babel/preset-env': 7.26.9(@babel/core@7.27.1)
       '@babel/preset-react': 7.26.3(@babel/core@7.27.1)
       '@babel/preset-typescript': 7.27.1(@babel/core@7.27.1)
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
       '@babel/runtime-corejs3': 7.27.0
       '@babel/traverse': 7.27.1
       '@docusaurus/logger': 3.7.0
@@ -11240,7 +11200,7 @@ snapshots:
 
   '@docusaurus/react-loadable@6.0.0(react@18.3.1)':
     dependencies:
-      '@types/react': 19.1.2
+      '@types/react': 18.3.21
       react: 18.3.1
 
   '@docusaurus/theme-classic@3.7.0(@docusaurus/faster@3.7.0(@docusaurus/types@3.7.0(@swc/core@1.11.21)(acorn@8.14.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)))(@swc/core@1.11.21)(@types/react@19.1.3)(acorn@8.14.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)':
@@ -11302,7 +11262,7 @@ snapshots:
       '@docusaurus/utils': 3.7.0(@swc/core@1.11.21)(acorn@8.14.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@docusaurus/utils-common': 3.7.0(@swc/core@1.11.21)(acorn@8.14.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/history': 4.7.11
-      '@types/react': 19.1.3
+      '@types/react': 18.3.21
       '@types/react-router-config': 5.0.11
       clsx: 2.1.1
       parse-numeric-range: 1.3.0
@@ -12167,8 +12127,7 @@ snapshots:
       pvtsutils: 1.3.6
       tslib: 2.8.1
 
-  '@petamoriken/float16@3.9.2':
-    optional: true
+  '@petamoriken/float16@3.9.2': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -12767,7 +12726,7 @@ snapshots:
     dependencies:
       react: 18.3.1
 
-  '@react-router/dev@7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)':
+  '@react-router/dev@7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)':
     dependencies:
       '@babel/core': 7.27.1
       '@babel/generator': 7.27.1
@@ -12796,7 +12755,7 @@ snapshots:
       semver: 7.7.1
       set-cookie-parser: 2.7.1
       valibot: 0.41.0(typescript@5.8.3)
-      vite: 6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
+      vite: 6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
       vite-node: 3.0.0-beta.2(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
     optionalDependencies:
       '@react-router/serve': 7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3)
@@ -12825,9 +12784,9 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  '@react-router/fs-routes@7.5.3(@react-router/dev@7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1))(typescript@5.8.3)':
+  '@react-router/fs-routes@7.5.3(@react-router/dev@7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1))(typescript@5.8.3)':
     dependencies:
-      '@react-router/dev': 7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
+      '@react-router/dev': 7.5.3(@react-router/serve@7.5.3(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3))(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(react-router@7.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.0)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1))(yaml@2.7.1)
       minimatch: 9.0.5
     optionalDependencies:
       typescript: 5.8.3
@@ -13601,7 +13560,7 @@ snapshots:
   '@types/react-router@5.1.20':
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 19.1.2
+      '@types/react': 18.3.21
 
   '@types/react@18.3.21':
     dependencies:
@@ -14645,6 +14604,8 @@ snapshots:
     dependencies:
       ms: 2.1.3
 
+  decimal.js@10.5.0: {}
+
   decode-named-character-reference@1.1.0:
     dependencies:
       character-entities: 2.0.2
@@ -14705,8 +14666,6 @@ snapshots:
   destroy@1.2.0: {}
 
   detect-indent@6.1.0: {}
-
-  detect-libc@2.0.3: {}
 
   detect-libc@2.0.4: {}
 
@@ -15410,7 +15369,6 @@ snapshots:
       web-worker: 1.5.0
       xml-utils: 1.10.2
       zstddec: 0.1.0
-    optional: true
 
   get-intrinsic@1.3.0:
     dependencies:
@@ -15681,7 +15639,7 @@ snapshots:
 
   history@4.10.1:
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
       loose-envify: 1.4.0
       resolve-pathname: 3.0.0
       tiny-invariant: 1.3.3
@@ -16206,8 +16164,7 @@ snapshots:
 
   leac@0.6.0: {}
 
-  lerc@3.0.0:
-    optional: true
+  lerc@3.0.0: {}
 
   leven@3.1.0: {}
 
@@ -16243,7 +16200,7 @@ snapshots:
 
   lightningcss@1.29.3:
     dependencies:
-      detect-libc: 2.0.3
+      detect-libc: 2.0.4
     optionalDependencies:
       lightningcss-darwin-arm64: 1.29.3
       lightningcss-darwin-x64: 1.29.3
@@ -17201,8 +17158,7 @@ snapshots:
     dependencies:
       quansync: 0.2.10
 
-  pako@2.1.0:
-    optional: true
+  pako@2.1.0: {}
 
   param-case@3.0.4:
     dependencies:
@@ -17223,8 +17179,7 @@ snapshots:
       is-decimal: 2.0.1
       is-hexadecimal: 2.0.1
 
-  parse-headers@2.0.6:
-    optional: true
+  parse-headers@2.0.6: {}
 
   parse-json@5.2.0:
     dependencies:
@@ -17913,8 +17868,7 @@ snapshots:
 
   quick-lru@5.1.1: {}
 
-  quick-lru@6.1.2:
-    optional: true
+  quick-lru@6.1.2: {}
 
   quickselect@3.0.0: {}
 
@@ -18006,7 +17960,7 @@ snapshots:
 
   react-loadable-ssr-addon-v5-slorber@1.0.1(@docusaurus/react-loadable@6.0.0(react@18.3.1))(webpack@5.99.6(@swc/core@1.11.21)):
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
       react-loadable: '@docusaurus/react-loadable@6.0.0(react@18.3.1)'
       webpack: 5.99.6(@swc/core@1.11.21)
 
@@ -18064,13 +18018,13 @@ snapshots:
 
   react-router-config@5.1.1(react-router@5.3.4(react@18.3.1))(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
       react: 18.3.1
       react-router: 5.3.4(react@18.3.1)
 
   react-router-dom@5.3.4(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
       history: 4.10.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
@@ -18087,7 +18041,7 @@ snapshots:
 
   react-router@5.3.4(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
       history: 4.10.1
       hoist-non-react-statics: 3.3.2
       loose-envify: 1.4.0
@@ -18213,7 +18167,7 @@ snapshots:
 
   regenerator-transform@0.15.2:
     dependencies:
-      '@babel/runtime': 7.27.0
+      '@babel/runtime': 7.27.1
 
   regexp.prototype.flags@1.5.4:
     dependencies:
@@ -19373,7 +19327,7 @@ snapshots:
       debug: 4.4.0
       es-module-lexer: 1.7.0
       pathe: 1.1.2
-      vite: 6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
+      vite: 6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -19394,7 +19348,7 @@ snapshots:
       debug: 4.4.0
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
+      vite: 6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -19409,32 +19363,16 @@ snapshots:
       - tsx
       - yaml
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)):
+  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
       tsconfck: 3.1.5(typescript@5.8.3)
     optionalDependencies:
-      vite: 6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
+      vite: 6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1)
     transitivePeerDependencies:
       - supports-color
       - typescript
-
-  vite@6.3.4(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1):
-    dependencies:
-      esbuild: 0.25.4
-      fdir: 6.4.4(picomatch@4.0.2)
-      picomatch: 4.0.2
-      postcss: 8.5.3
-      rollup: 4.40.2
-      tinyglobby: 0.2.13
-    optionalDependencies:
-      '@types/node': 22.15.16
-      fsevents: 2.3.3
-      jiti: 1.21.7
-      lightningcss: 1.29.3
-      terser: 5.39.0
-      yaml: 2.7.1
 
   vite@6.3.5(@types/node@22.15.16)(jiti@1.21.7)(lightningcss@1.29.3)(terser@5.39.0)(yaml@2.7.1):
     dependencies:
@@ -19511,8 +19449,7 @@ snapshots:
 
   web-vitals@4.2.4: {}
 
-  web-worker@1.5.0:
-    optional: true
+  web-worker@1.5.0: {}
 
   webpack-bundle-analyzer@4.10.2:
     dependencies:
@@ -19744,8 +19681,7 @@ snapshots:
     dependencies:
       sax: 1.4.1
 
-  xml-utils@1.10.2:
-    optional: true
+  xml-utils@1.10.2: {}
 
   xtend@4.0.2: {}
 
@@ -19763,8 +19699,7 @@ snapshots:
 
   zod@3.24.4: {}
 
-  zstddec@0.1.0:
-    optional: true
+  zstddec@0.1.0: {}
 
   zustand@5.0.4(@types/react@18.3.21)(immer@9.0.21)(react@18.3.1)(use-sync-external-store@1.5.0(react@18.3.1)):
     optionalDependencies:

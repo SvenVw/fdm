@@ -308,6 +308,20 @@ export const harvestableEnum = fdmSchema.enum("b_lu_harvestable", [
     "once",
     "multiple",
 ])
+export const rotationEnum = fdmSchema.enum("b_lu_croprotation", [
+    "other",
+    "clover",
+    "nature",
+    "potato",
+    "grass",
+    "rapeseed",
+    "starch",
+    "maize",
+    "cereal",
+    "sugarbeet",
+    "alfalfa",
+    "catchcrop",
+])
 export const cultivationsCatalogue = fdmSchema.table(
     "cultivations_catalogue",
     {
@@ -318,6 +332,12 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_harvestable: harvestableEnum().notNull(),
         b_lu_hcat3: text(),
         b_lu_hcat3_name: text(),
+        b_lu_croprotation: rotationEnum(),
+        b_lu_yield: numericCasted(),
+        b_lu_hi: numericCasted(),
+        b_lu_n_harvestable: numericCasted(),
+        b_lu_n_residue: numericCasted(),
+        b_n_fixation: numericCasted(),
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -431,6 +451,7 @@ export const cultivationEnding = fdmSchema.table(
             .notNull()
             .references(() => cultivations.b_lu),
         b_lu_end: timestamp({ withTimezone: true }),
+        m_cropresidue: boolean(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -494,6 +515,10 @@ export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_id: text().primaryKey(),
     a_date: timestamp({ withTimezone: true }),
     a_source: text(),
+    a_c_of: numericCasted(),
+    a_cn_fr: numericCasted(),
+    a_density_sa: numericCasted(),
+    a_n_rt: numericCasted(),
     a_p_al: numericCasted(),
     a_p_cc: numericCasted(),
     a_som_loi: numericCasted(),

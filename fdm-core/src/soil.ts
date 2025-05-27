@@ -9,7 +9,7 @@ import type {
     CurrentSoilData,
     SoilParameterDescription,
     SoilParameters,
-    getSoilAnalysisType,
+    SoilAnalysis,
 } from "./soil.d"
 import type { Timeframe } from "./timeframe"
 
@@ -193,7 +193,7 @@ export async function getSoilAnalysis(
     fdm: FdmType,
     principal_id: PrincipalId,
     a_id: schema.soilAnalysisTypeSelect["a_id"],
-): Promise<getSoilAnalysisType> {
+): Promise<SoilAnalysis> {
     try {
         await checkPermission(
             fdm,
@@ -208,9 +208,13 @@ export async function getSoilAnalysis(
                 a_id: schema.soilAnalysis.a_id,
                 a_date: schema.soilAnalysis.a_date,
                 a_source: schema.soilAnalysis.a_source,
+                a_c_of: schema.soilAnalysis.a_c_of,
+                a_cn_fr: schema.soilAnalysis.a_cn_fr,
+                a_density_sa: schema.soilAnalysis.a_density_sa,
+                a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
-                a_som_loi: schema.soilAnalysis.a_som_loi,
+                a_som_loi: schema.soilAnalysis.a_som_loi,     
                 b_gwl_class: schema.soilAnalysis.b_gwl_class,
                 b_soiltype_agr: schema.soilAnalysis.b_soiltype_agr,
                 b_id_sampling: schema.soilSampling.b_id_sampling,
@@ -247,7 +251,7 @@ export async function getSoilAnalyses(
     principal_id: PrincipalId,
     b_id: schema.soilSamplingTypeSelect["b_id"],
     timeframe?: Timeframe,
-): Promise<getSoilAnalysisType[]> {
+): Promise<SoilAnalysis[]> {
     try {
         await checkPermission(
             fdm,
@@ -296,6 +300,10 @@ export async function getSoilAnalyses(
                 a_id: schema.soilAnalysis.a_id,
                 a_date: schema.soilAnalysis.a_date,
                 a_source: schema.soilAnalysis.a_source,
+                a_c_of: schema.soilAnalysis.a_c_of,
+                a_cn_fr: schema.soilAnalysis.a_cn_fr,
+                a_density_sa: schema.soilAnalysis.a_density_sa,
+                a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
                 a_som_loi: schema.soilAnalysis.a_som_loi,
@@ -374,6 +382,10 @@ export async function getCurrentSoilData(
             .select({
                 a_id: schema.soilAnalysis.a_id,
                 a_source: schema.soilAnalysis.a_source,
+                a_c_of: schema.soilAnalysis.a_c_of,
+                a_cn_fr: schema.soilAnalysis.a_cn_fr,
+                a_density_sa: schema.soilAnalysis.a_density_sa,
+                a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
                 a_som_loi: schema.soilAnalysis.a_som_loi,
@@ -393,6 +405,10 @@ export async function getCurrentSoilData(
             )
 
         const parameters: SoilParameters[] = [
+            "a_c_of",
+            "a_cn_fr",
+            "a_density_sa",
+            "a_n_rt",
             "a_p_al",
             "a_p_cc",
             "a_som_loi",
@@ -460,6 +476,34 @@ export function getSoilParametersDescription(
             name: "Datum",
             type: "date",
             description: "Datum van monstername",
+        },
+        {
+            parameter: "a_c_of",
+            unit: "g C/g",
+            name: "Corg",
+            type: "numeric",
+            description: "Organisch koolstogehalte",
+        },
+        {
+            parameter: "a_cn_fr",
+            unit: "-",
+            name: "CN ratio",
+            type: "numeric",
+            description: "Koolstof / Stikstof ratio",
+        },
+        {
+            parameter: "a_density_sa",
+            unit: "g/cm³",
+            name: "Dichtheid",
+            type: "numeric",
+            description: "Bulkdichtheid",
+        },
+        {
+            parameter: "a_n_rt",
+            unit: "mg N/g",
+            name: "Ntot",
+            type: "numeric",
+            description: "Totaal stikstofgehalte",
         },
         {
             parameter: "a_p_al",
