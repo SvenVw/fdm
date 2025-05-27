@@ -29,7 +29,10 @@ import { getTimeframe } from "~/lib/calendar"
 import {
     ArrowDownToLine,
     ArrowRight,
+    ArrowRightLeft,
     ArrowUpFromLine,
+    CircleAlert,
+    CircleCheck,
     House,
 } from "lucide-react"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
@@ -141,16 +144,27 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    Perceelssoverschot
+                                    Overschot / Doel (Perceel)
                                 </CardTitle>
-                                <House className="text-xs text-muted-foreground" />
+                                <ArrowRightLeft className="text-xs text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
                                     {isLoading ? (
                                         <LoadingSpinner />
                                     ) : (
-                                        nitrogenBalanceResult.balance
+                                        <div className="flex items-center gap-4">
+                                            <p>
+                                                {`${nitrogenBalanceResult.balance} /
+                                                ${nitrogenBalanceResult.target}`}
+                                            </p>
+                                            {nitrogenBalanceResult.balance <=
+                                            nitrogenBalanceResult.target ? (
+                                                <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
+                                            ) : (
+                                                <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full " />
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">

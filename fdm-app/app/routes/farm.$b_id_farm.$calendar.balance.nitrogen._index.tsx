@@ -12,7 +12,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -28,7 +27,11 @@ import { getTimeframe } from "../lib/calendar"
 import {
     ArrowDownToLine,
     ArrowRight,
+    ArrowRightLeft,
     ArrowUpFromLine,
+    Check,
+    CircleAlert,
+    CircleCheck,
     House,
 } from "lucide-react"
 import { LoadingSpinner } from "../components/custom/loadingspinner"
@@ -118,16 +121,27 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    Bedrijfsoverschot
+                                    Overschot / Doel (Bedrijf)
                                 </CardTitle>
-                                <House className="text-xs text-muted-foreground" />
+                                <ArrowRightLeft className="text-xs text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
                                     {isLoading ? (
                                         <LoadingSpinner />
                                     ) : (
-                                        nitrogenBalanceResult.balance
+                                        <div className="flex items-center gap-4">
+                                            <p>
+                                                {`${nitrogenBalanceResult.balance} /
+                                                ${nitrogenBalanceResult.target}`}
+                                            </p>
+                                            {nitrogenBalanceResult.balance <=
+                                            nitrogenBalanceResult.target ? (
+                                                <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
+                                            ) : (
+                                                <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full " />
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
@@ -184,14 +198,12 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? (
-                                        <LoadingSpinner />
-                                    ) : "-"}
+                                    {isLoading ? <LoadingSpinner /> : "-"}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     Berekening van emissie volgt later
                                 </p>
-                            </CardContent>                          
+                            </CardContent>
                         </Card>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -237,13 +249,13 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                                       className="flex items-center"
                                                       key={field.b_id}
                                                   >
-                                                      {/* <Avatar className="h-9 w-9">
-                                    <AvatarImage
-                                        src="/avatars/01.png"
-                                        alt="Avatar"
-                                    />
-                                    <AvatarFallback>OM</AvatarFallback>
-                                </Avatar> */}
+                                                      {field.balance <=
+                                                      field.target ? (
+                                                          <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full w-6 h-6" />
+                                                      ) : (
+                                                          <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full w-6 h-6" />
+                                                      )}
+
                                                       <div className="ml-4 space-y-1">
                                                           <NavLink
                                                               to={`./${field.b_id}`}
@@ -265,11 +277,12 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                                                           f.b_id ===
                                                                           field.b_id,
                                                                   )?.b_area
-                                                              } ha
+                                                              }{" "}
+                                                              ha
                                                           </p>
                                                       </div>
                                                       <div className="ml-auto font-medium">
-                                                          +{field.balance}
+                                                          {field.balance} / {field.target}
                                                       </div>
                                                   </div>
                                               ),
