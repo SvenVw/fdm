@@ -141,7 +141,11 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                         (fa: { p_app_id: string }) =>
                                             fa.p_app_id === app.id,
                                     )
-                                if (!application || !application.p_name_nl || !application.p_app_date) {
+                                if (
+                                    !application ||
+                                    !application.p_name_nl ||
+                                    !application.p_app_date
+                                ) {
                                     console.error(
                                         `Application not found for id: ${app.id}`,
                                     )
@@ -195,8 +199,8 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                         (cultivation: { b_lu: string }) =>
                                             cultivation.b_lu === cult.id,
                                     )
-                                return (
-                                    cultivation ? <NavLink
+                                return cultivation ? (
+                                    <NavLink
                                         to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
                                         key={cult.id}
                                     >
@@ -204,8 +208,8 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {cultivation.b_lu_name}:{" "}
                                             {cult.value} kg N / ha
                                         </li>
-                                    </NavLink> : null
-                                )
+                                    </NavLink>
+                                ) : null
                             },
                         )}
                     </ul>
@@ -317,8 +321,8 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                         (cultivation: { b_lu: string }) =>
                                             cultivation.b_lu === cult.id,
                                     )
-                                return (
-                                    cultivation ? <NavLink
+                                return cultivation ? (
+                                    <NavLink
                                         to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
                                         key={cult.id}
                                     >
@@ -326,8 +330,8 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             {cultivation.b_lu_name}:{" "}
                                             {cult.value} kg N / ha
                                         </li>
-                                    </NavLink> : null
-                                )
+                                    </NavLink>
+                                ) : null
                             },
                         )}
                     </ul>
@@ -343,12 +347,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
         return (
             <AccordionItem value={sectionKey}>
-                <AccordionTrigger>
-                    Emissie (Totaal): {volatilization.total} kg N / ha
-                </AccordionTrigger>
-                <AccordionContent>
-                    {/* Ammonia calculation is not finished, skipping rendering */}
-                </AccordionContent>
+                <p className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all text-left">
+                    Emissie (Totaal): - 
+                </p>
             </AccordionItem>
         )
     }

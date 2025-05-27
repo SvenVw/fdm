@@ -12,6 +12,7 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -185,14 +186,12 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                 <div className="text-2xl font-bold">
                                     {isLoading ? (
                                         <LoadingSpinner />
-                                    ) : (
-                                        nitrogenBalanceResult.volatilization
-                                    )}
+                                    ) : "-"}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    kg N / ha
+                                    Berekening van emissie volgt later
                                 </p>
-                            </CardContent>
+                            </CardContent>                          
                         </Card>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
