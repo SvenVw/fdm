@@ -38,7 +38,7 @@ export function calculateNitrogenSupplyByOtherFertilizers(
         // If the fertilizer used is not of the type other fertilizers
         if (
             p_type_manure === true ||
-            p_type_mimeral === true ||
+            p_type_mineral === true ||
             p_type_compost === true
         ) {
             return {
