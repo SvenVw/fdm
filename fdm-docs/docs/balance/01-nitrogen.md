@@ -13,7 +13,9 @@ Nitrogen is a macronutrient essential for plant growth, playing a vital role in 
 
 The nitrogen balance for each field is determined by the formula:
 
-**N Balance (kg N / ha) = N Supply - N Removal - N Volatilization**
+```text
+N Balance (kg N / ha) = N Supply - N Removal - N Volatilization
+```
 
 *   **N Supply:** Nitrogen added to the field.
 *   **N Removal:** Nitrogen taken off the field.
