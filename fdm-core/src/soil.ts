@@ -712,7 +712,7 @@ export function getSoilParametersDescription(
         },
         {
             parameter: "a_k_co",
-            unit: "mmmol+/kg",
+            unit: "mmol+/kg",
             name: "K-bodemvoorraad",
             type: "numeric",
             description: "Kalium, totale bodemvoorraad",
