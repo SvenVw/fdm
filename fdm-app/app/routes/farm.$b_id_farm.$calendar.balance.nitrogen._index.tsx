@@ -114,7 +114,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
     const isLoading = navigation.state === "loading"
 
     const { nitrogenBalanceResult, farm, fields, errorMessage } = loaderData
-
+    const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     return (
         <div className="space-y-4">
             {nitrogenBalanceResult ? (
@@ -262,49 +262,45 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                               )
                                           })
                                         : nitrogenBalanceResult.fields.map(
-                                              (field) => (
-                                                  <div
-                                                      className="flex items-center"
-                                                      key={field.b_id}
-                                                  >
-                                                      {field.balance <=
-                                                      field.target ? (
-                                                          <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full w-6 h-6" />
-                                                      ) : (
-                                                          <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full w-6 h-6" />
-                                                      )}
+                                              (field) => {
+                                                  const fieldData =
+                                                      fieldsMap.get(field.b_id)
+                                                  return (
+                                                      <div
+                                                          className="flex items-center"
+                                                          key={field.b_id}
+                                                      >
+                                                          {field.balance <=
+                                                          field.target ? (
+                                                              <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full w-6 h-6" />
+                                                          ) : (
+                                                              <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full w-6 h-6" />
+                                                          )}
 
-                                                      <div className="ml-4 space-y-1">
-                                                          <NavLink
-                                                              to={`./${field.b_id}`}
-                                                          >
-                                                              <p className="text-sm font-medium leading-none hover:underline">
+                                                          <div className="ml-4 space-y-1">
+                                                              <NavLink
+                                                                  to={`./${field.b_id}`}
+                                                              >
+                                                                  <p className="text-sm font-medium leading-none hover:underline">
+                                                                      {
+                                                                          fieldData?.b_name
+                                                                      }
+                                                                  </p>
+                                                              </NavLink>
+                                                              <p className="text-sm text-muted-foreground">
                                                                   {
-                                                                      fields.find(
-                                                                          (f) =>
-                                                                              f.b_id ===
-                                                                              field.b_id,
-                                                                      )?.b_name
-                                                                  }
+                                                                      fieldData?.b_area
+                                                                  }{" "}
+                                                                  ha
                                                               </p>
-                                                          </NavLink>
-                                                          <p className="text-sm text-muted-foreground">
-                                                              {
-                                                                  fields.find(
-                                                                      (f) =>
-                                                                          f.b_id ===
-                                                                          field.b_id,
-                                                                  )?.b_area
-                                                              }{" "}
-                                                              ha
-                                                          </p>
+                                                          </div>
+                                                          <div className="ml-auto font-medium">
+                                                              {field.balance} /{" "}
+                                                              {field.target}
+                                                          </div>
                                                       </div>
-                                                      <div className="ml-auto font-medium">
-                                                          {field.balance} /{" "}
-                                                          {field.target}
-                                                      </div>
-                                                  </div>
-                                              ),
+                                                  )
+                                              },
                                           )}
                                 </div>
                             </CardContent>
