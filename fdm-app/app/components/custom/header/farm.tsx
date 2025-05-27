@@ -47,10 +47,14 @@ export function HeaderFarm({
                                 key={option.b_id_farm}
                             >
                                 <NavLink
-                                    to={currentPath.replace(
-                                        b_id_farm,
-                                        option.b_id_farm,
-                                    )}
+                                    to={
+                                        b_id_farm
+                                            ? currentPath.replace(
+                                                  b_id_farm,
+                                                  option.b_id_farm,
+                                              )
+                                            : `/farm/${option.b_id_farm}`
+                                    }
                                 >
                                     {option.b_name_farm}
                                 </NavLink>

@@ -14,7 +14,7 @@ export interface SoilAnalysis {
     a_cn_fr: number | undefined | null
     /** Bulk density (g/cm³) */
     a_density_sa: number | undefined | null
-    /** Total nitrogen conteny (mg N / kg) */
+    /** Total nitrogen content (mg N / kg) */
     a_n_rt: number | undefined | null
     /** Phosphorus content measured with ammonium lactate method (mg P2O5/100g) */
     a_p_al: number | undefined | null

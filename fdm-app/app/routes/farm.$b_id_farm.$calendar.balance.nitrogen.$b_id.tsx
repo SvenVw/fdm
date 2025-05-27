@@ -207,15 +207,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? (
-                                        <LoadingSpinner />
-                                    ) : (
-                                        nitrogenBalanceResult.volatilization
-                                            .total
-                                    )}
+                                    {isLoading ? <LoadingSpinner /> : "-"}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    kg N / ha
+                                    Berekening van emissie volgt later
                                 </p>
                             </CardContent>
                         </Card>
@@ -241,11 +236,11 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             <CardContent>
                                 <div className="space-y-8">
                                     {isLoading ? (
-                                        [...Array(5)].map((item) => {
+                                        [...Array(5)].map((_, index) => {
                                             return (
                                                 <div
                                                     className="flex items-center"
-                                                    key={item}
+                                                    key={index}
                                                 >
                                                     <div className="ml-4 space-y-1">
                                                         <Skeleton className="h-4 w-[250px]" />
@@ -276,9 +271,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <CardContent>
                             <div className="text-muted-foreground">
                                 <p>
-                                    Dit perceel was in gebruik voor dit jaar.
-                                    Als dit perceel wel in gebruik was, werk dan
-                                    de startdatum bij in de perceelsinstelling.
+                                    Dit perceel was niet in gebruik voor dit
+                                    jaar. Als dit perceel wel in gebruik was,
+                                    werk dan de startdatum bij in de
+                                    perceelsinstelling.
                                 </p>
                             </div>
                         </CardContent>

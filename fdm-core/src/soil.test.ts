@@ -131,50 +131,6 @@ describe("Soil Analysis Functions", () => {
         expect(addedSampling[0].a_depth_upper).toEqual(0)
     })
 
-    it("should add a new soil analysis with upper depth", async () => {
-        const a_date = new Date()
-        const a_source = "other"
-        const a_depth_lower = 60
-        const a_depth_upper = 30
-        const b_sampling_date = new Date()
-        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
-        const a_p_al = 5
-        const a_p_cc = 5
-        const b_soiltype_agr = "rivierklei"
-        const b_gwl_class = "II"
-
-        test_a_id = await addSoilAnalysis(
-            fdm,
-            principal_id,
-            a_date,
-            a_source,
-            b_id,
-            a_depth_lower,
-            b_sampling_date,
-            {
-                a_p_al: a_p_al,
-                a_p_cc: a_p_cc,
-                b_soiltype_agr: b_soiltype_agr,
-                b_gwl_class: b_gwl_class,
-            },
-            a_depth_upper,
-        )
-
-        expect(test_a_id).toBeDefined()
-
-        const addedSampling = await fdm
-            .select()
-            .from(schema.soilSampling)
-            .where(eq(schema.soilSampling.a_id, test_a_id))
-            .limit(1)
-
-        expect(addedSampling).toHaveLength(1)
-        expect(addedSampling[0].b_id).toEqual(b_id)
-        expect(addedSampling[0].b_sampling_date).toEqual(b_sampling_date)
-        expect(addedSampling[0].a_depth_lower).toEqual(a_depth_lower)
-        expect(addedSampling[0].a_depth_upper).toEqual(a_depth_upper)
-    })
-
     it("should throw an error if lower depth is greater than upper depth", async () => {
         const a_date = new Date()
         const a_source = "other"
@@ -207,7 +163,7 @@ describe("Soil Analysis Functions", () => {
         }).rejects.toThrowError("Exception for addSoilAnalysis")
     })
 
-    it("should add a new soil analysis with upper depth", async () => {
+    it("should add a new soil analysis with upper and lower depth", async () => {
         const a_date = new Date()
         const a_source = "other"
         const a_depth_lower = 60
@@ -895,7 +851,7 @@ describe("Soil Analysis Functions", () => {
 describe("getSoilParametersDescription", () => {
     it("should return the correct soil parameter descriptions for NL-nl locale", () => {
         const descriptions = getSoilParametersDescription("NL-nl")
-        expect(descriptions).toHaveLength(43)
+        expect(descriptions).toHaveLength(42)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
@@ -919,7 +875,7 @@ describe("getSoilParametersDescription", () => {
 
     it("should return the correct soil parameter descriptions for default locale", () => {
         const descriptions = getSoilParametersDescription()
-        expect(descriptions).toHaveLength(43)
+        expect(descriptions).toHaveLength(42)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")

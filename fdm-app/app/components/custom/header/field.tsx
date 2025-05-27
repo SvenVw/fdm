@@ -75,7 +75,7 @@ export function HeaderField({
                 <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
-                        <BreadcrumbLink href={`farm/${b_id_farm}/${calendar}/field/new`}>
+                        <BreadcrumbLink href={`/farm/${b_id_farm}/${calendar}/field/new`}>
                             Nieuwe perceel
                         </BreadcrumbLink>
                     </BreadcrumbItem>

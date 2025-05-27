@@ -2,7 +2,7 @@ import { cn } from "@/app/lib/utils"
 import { NavLink } from "react-router"
 import { Button } from "../../ui/button"
 
-interface HeaderActionProps {
+export interface HeaderActionProps {
   label: string
   to: string
   disabled: boolean
