@@ -12,7 +12,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -28,11 +27,16 @@ import { getTimeframe } from "../lib/calendar"
 import {
     ArrowDownToLine,
     ArrowRight,
+    ArrowRightLeft,
     ArrowUpFromLine,
+    Check,
+    CircleAlert,
+    CircleCheck,
     House,
 } from "lucide-react"
 import { LoadingSpinner } from "../components/custom/loadingspinner"
 import { Skeleton } from "../components/ui/skeleton"
+import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -96,6 +100,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
         nitrogenBalanceInput: nitrogenBalanceInput,
         nitrogenBalanceResult: nitrogenBalanceResult,
+        farm: farm,
         fields: fields,
         errorMessage: errorMessage,
     }
@@ -108,8 +113,8 @@ export default function FarmBalanceNitrogenOverviewBlock() {
     const page = location.pathname
     const isLoading = navigation.state === "loading"
 
-    const { nitrogenBalanceResult, fields, errorMessage } = loaderData
-
+    const { nitrogenBalanceResult, farm, fields, errorMessage } = loaderData
+    const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     return (
         <div className="space-y-4">
             {nitrogenBalanceResult ? (
@@ -118,16 +123,26 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    Bedrijfsoverschot
+                                    Overschot / Doel (Bedrijf)
                                 </CardTitle>
-                                <House className="text-xs text-muted-foreground" />
+                                <ArrowRightLeft className="text-xs text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
                                     {isLoading ? (
                                         <LoadingSpinner />
                                     ) : (
-                                        nitrogenBalanceResult.balance
+                                        <div className="flex items-center gap-4">
+                                            <p>
+                                                {`${nitrogenBalanceResult.balance} / ${nitrogenBalanceResult.target}`}
+                                            </p>
+                                            {nitrogenBalanceResult.balance <=
+                                            nitrogenBalanceResult.target ? (
+                                                <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
+                                            ) : (
+                                                <CircleAlert className="text-red-500 bg-red-100 rounded-full " />
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
@@ -184,27 +199,42 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? (
-                                        <LoadingSpinner />
-                                    ) : "-"}
+                                    {isLoading ? <LoadingSpinner /> : "-"}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     Berekening van emissie volgt later
                                 </p>
-                            </CardContent>                          
+                            </CardContent>
                         </Card>
                     </div>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
                         <Card className="col-span-4">
                             <CardHeader>
                                 <CardTitle>Balans</CardTitle>
+                                <CardDescription>
+                                    De stikstofbalans voor alle percelen van{" "}
+                                    {farm.b_name_farm}. De balans is het
+                                    verschil tussen de totale aanvoer, afvoer en
+                                    emissie van stikstof. Een positieve balans
+                                    betekent een overschot aan stikstof, een
+                                    negatieve balans een tekort.
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="pl-2">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
                                         <LoadingSpinner />
                                     </div>
-                                ) : null}
+                                ) : (
+                                    <NitrogenBalanceChart
+                                        balance={nitrogenBalanceResult.balance}
+                                        supply={nitrogenBalanceResult.supply}
+                                        removal={nitrogenBalanceResult.removal}
+                                        emission={
+                                            nitrogenBalanceResult.emission
+                                        }
+                                    />
+                                )}
                                 {/* <Overview /> */}
                             </CardContent>
                         </Card>
@@ -232,47 +262,45 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                               )
                                           })
                                         : nitrogenBalanceResult.fields.map(
-                                              (field) => (
-                                                  <div
-                                                      className="flex items-center"
-                                                      key={field.b_id}
-                                                  >
-                                                      {/* <Avatar className="h-9 w-9">
-                                    <AvatarImage
-                                        src="/avatars/01.png"
-                                        alt="Avatar"
-                                    />
-                                    <AvatarFallback>OM</AvatarFallback>
-                                </Avatar> */}
-                                                      <div className="ml-4 space-y-1">
-                                                          <NavLink
-                                                              to={`./${field.b_id}`}
-                                                          >
-                                                              <p className="text-sm font-medium leading-none hover:underline">
+                                              (field) => {
+                                                  const fieldData =
+                                                      fieldsMap.get(field.b_id)
+                                                  return (
+                                                      <div
+                                                          className="flex items-center"
+                                                          key={field.b_id}
+                                                      >
+                                                          {field.balance <=
+                                                          field.target ? (
+                                                              <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full w-6 h-6" />
+                                                          ) : (
+                                                              <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full w-6 h-6" />
+                                                          )}
+
+                                                          <div className="ml-4 space-y-1">
+                                                              <NavLink
+                                                                  to={`./${field.b_id}`}
+                                                              >
+                                                                  <p className="text-sm font-medium leading-none hover:underline">
+                                                                      {
+                                                                          fieldData?.b_name
+                                                                      }
+                                                                  </p>
+                                                              </NavLink>
+                                                              <p className="text-sm text-muted-foreground">
                                                                   {
-                                                                      fields.find(
-                                                                          (f) =>
-                                                                              f.b_id ===
-                                                                              field.b_id,
-                                                                      )?.b_name
-                                                                  }
+                                                                      fieldData?.b_area
+                                                                  }{" "}
+                                                                  ha
                                                               </p>
-                                                          </NavLink>
-                                                          <p className="text-sm text-muted-foreground">
-                                                              {
-                                                                  fields.find(
-                                                                      (f) =>
-                                                                          f.b_id ===
-                                                                          field.b_id,
-                                                                  )?.b_area
-                                                              } ha
-                                                          </p>
+                                                          </div>
+                                                          <div className="ml-auto font-medium">
+                                                              {field.balance} /{" "}
+                                                              {field.target}
+                                                          </div>
                                                       </div>
-                                                      <div className="ml-auto font-medium">
-                                                          +{field.balance}
-                                                      </div>
-                                                  </div>
-                                              ),
+                                                  )
+                                              },
                                           )}
                                 </div>
                             </CardContent>

@@ -61,7 +61,8 @@ describe("calculateNitrogenBalance", () => {
                             a_density_sa: 1.2,
                             a_n_rt: 3000,
                             a_som_loi: 2,
-                            b_soiltype_agr: "zand",
+                            b_soiltype_agr: "dekzand",
+                            b_gwl_class: "II",
                         },
                     ],
                     fertilizerApplications: [
@@ -106,6 +107,7 @@ describe("calculateNitrogenBalance", () => {
         expect(typeof result.supply).toBe("number")
         expect(typeof result.removal).toBe("number")
         expect(typeof result.volatilization).toBe("number")
+        expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)
     })
 
@@ -151,7 +153,8 @@ describe("combineSoilAnalyses", () => {
                 a_density_sa: 1.2,
                 a_n_rt: 3000,
                 a_som_loi: 2,
-                b_soiltype_agr: "zand",
+                b_soiltype_agr: "dekzand",
+                b_gwl_class: "II",
             },
             {
                 a_id: "soil2",
@@ -161,7 +164,8 @@ describe("combineSoilAnalyses", () => {
                 a_density_sa: 1.3,
                 a_n_rt: 2000,
                 a_som_loi: 3,
-                b_soiltype_agr: "klei",
+                b_soiltype_agr: "zeeklei",
+                b_gwl_class: "II",
             },
         ]
 
@@ -173,7 +177,7 @@ describe("combineSoilAnalyses", () => {
         expect(result.a_density_sa).toBe(1.3)
         expect(result.a_n_rt).toBe(2000)
         expect(result.a_som_loi).toBe(3)
-        expect(result.b_soiltype_agr).toBe("klei")
+        expect(result.b_soiltype_agr).toBe("zeeklei")
     })
 
     it("should throw an error if required soil parameters are missing", () => {
@@ -186,7 +190,8 @@ describe("combineSoilAnalyses", () => {
                 a_density_sa: 1.2,
                 a_n_rt: 3000,
                 a_som_loi: 2,
-                b_soiltype_agr: "zand",
+                b_soiltype_agr: "dekzand",
+                b_gwl_class: "II",
             },
         ]
         soilAnalyses[0].a_n_rt = null
