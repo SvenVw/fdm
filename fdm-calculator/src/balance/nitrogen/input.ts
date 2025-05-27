@@ -63,14 +63,16 @@ export async function collectInputForNitrogenBalance(
 
                     // Collect the harvests of the cultivations
                     // Collect a promise per cultivation
-                    const harvestPromises = cultivations.map(async (cultivation) => {
-                        return await getHarvests(
-                            tx,
-                            principal_id,
-                            cultivation.b_lu,
-                            timeframe,
-                        )
-                    })
+                    const harvestPromises = cultivations.map(
+                        async (cultivation) => {
+                            return await getHarvests(
+                                tx,
+                                principal_id,
+                                cultivation.b_lu,
+                                timeframe,
+                            )
+                        },
+                    )
 
                     // Wait for all, then flatten the resulting arrays into one list
                     const harvestArrays = await Promise.all(harvestPromises)
@@ -123,7 +125,7 @@ export async function collectInputForNitrogenBalance(
             return {
                 fields,
                 fertilizerDetails: fertilizerDetails,
-                cultivationDetails,
+                cultivationDetails: cultivationDetails,
                 timeFrame: timeframe,
                 fdmPublicDataUrl: fdmPublicDataUrl,
             }
@@ -133,7 +135,7 @@ export async function collectInputForNitrogenBalance(
             `Failed to collect nitrogen balance input for farm ${b_id_farm}: ${
                 error instanceof Error ? error.message : String(error)
             }`,
-            { cause: error }
+            { cause: error },
         )
     }
 }
