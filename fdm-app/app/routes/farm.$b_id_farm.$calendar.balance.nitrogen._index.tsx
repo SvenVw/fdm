@@ -30,7 +30,6 @@ import {
     ArrowUpFromLine,
     House,
 } from "lucide-react"
-import { timestamp } from "drizzle-orm/gel-core"
 import { LoadingSpinner } from "../components/custom/loadingspinner"
 import { Skeleton } from "../components/ui/skeleton"
 
