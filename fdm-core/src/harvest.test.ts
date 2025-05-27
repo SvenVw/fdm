@@ -199,9 +199,9 @@ describe("harvest", () => {
 
         expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
         expect(harvest.b_lu_harvest_date).toEqual(harvesting_date)
-        expect(
-            harvest.harvestable.harvestable_analyses[0].b_lu_yield,
-        ).toEqual(1000)
+        expect(harvest.harvestable.harvestable_analyses[0].b_lu_yield).toEqual(
+            1000,
+        )
     })
 
     it("should have same date for cultivation harvest as for terminate date when harvestable type is 'once'", async () => {
@@ -259,9 +259,7 @@ describe("harvest", () => {
         )
         expect(
             harvests.map(
-                (f) =>
-                    f.harvestable.harvestable_analyses[0]
-                        .b_lu_n_harvestable,
+                (f) => f.harvestable.harvestable_analyses[0].b_lu_n_harvestable,
             ),
         ).toEqual(
             expect.arrayContaining([b_lu_n_harvestable1, b_lu_n_harvestable2]),

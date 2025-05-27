@@ -4,6 +4,7 @@ import {
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
+import type { Feature, GeoJsonProperties, Polygon } from "geojson"
 import { useState } from "react"
 import {
     GeolocateControl,
@@ -33,19 +34,18 @@ import {
 } from "~/components/custom/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
 import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { Header } from "~/components/custom/header/base"
+import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
-import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
-import { Header } from "~/components/custom/header/base"
-import type { Polygon, Feature, GeoJsonProperties } from "geojson"
 
 // Meta
 export const meta: MetaFunction = () => {

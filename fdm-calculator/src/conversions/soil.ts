@@ -74,7 +74,9 @@ export function calculateCarbonNitrogenRatio(
         return null
     }
 
-    let a_cn_fr = new Decimal(a_c_of).dividedBy(new Decimal(a_n_rt).dividedBy(1000))
+    let a_cn_fr = new Decimal(a_c_of).dividedBy(
+        new Decimal(a_n_rt).dividedBy(1000),
+    )
 
     if (a_cn_fr.gt(new Decimal(40))) {
         a_cn_fr = new Decimal(40)

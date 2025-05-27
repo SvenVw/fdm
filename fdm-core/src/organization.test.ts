@@ -1,3 +1,4 @@
+import { username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
 import { type BetterAuth, createFdmAuth } from "./authentication"
@@ -23,7 +24,6 @@ import {
     updateOrganization,
     updateRoleOfUserAtOrganization,
 } from "./organization"
-import { username } from "better-auth/plugins"
 
 describe("Organization Data Model", () => {
     let fdm: FdmServerType

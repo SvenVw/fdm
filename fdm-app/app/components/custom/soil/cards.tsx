@@ -165,7 +165,8 @@ export function SoilDataCards({
                 }) => {
                     if (card.value) {
                         const sourceParam = soilParameterDescription.find(
-                            (x: { parameter: string }) => x.parameter === "a_source",
+                            (x: { parameter: string }) =>
+                                x.parameter === "a_source",
                         )
                         const sourceOption = sourceParam?.options?.find(
                             (x: { value: string }) => x.value === card.source,

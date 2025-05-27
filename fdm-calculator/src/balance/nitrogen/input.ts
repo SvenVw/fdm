@@ -1,19 +1,19 @@
 import type {
-    PrincipalId,
     FdmType,
+    PrincipalId,
     Timeframe,
     fdmSchema,
 } from "@svenvw/fdm-core"
-import type { NitrogenBalanceInput } from "./types"
 import {
-    getFields,
     getCultivations,
-    getSoilAnalyses,
+    getCultivationsFromCatalogue,
     getFertilizerApplications,
     getFertilizers,
-    getCultivationsFromCatalogue,
+    getFields,
     getHarvests,
+    getSoilAnalyses,
 } from "@svenvw/fdm-core"
+import type { NitrogenBalanceInput } from "./types"
 
 /**
  * Collects necessary input data from a FDM instance for calculating the nitrogen balance.

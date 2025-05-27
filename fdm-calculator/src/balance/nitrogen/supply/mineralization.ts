@@ -1,11 +1,11 @@
 import type { fdmSchema } from "@svenvw/fdm-core"
+import { differenceInCalendarDays } from "date-fns"
+import Decimal from "decimal.js"
 import type {
+    NitrogenBalanceInput,
     NitrogenSupplyMineralization,
     SoilAnalysisPicked,
-    NitrogenBalanceInput,
 } from "../types"
-import Decimal from "decimal.js"
-import { differenceInCalendarDays } from "date-fns"
 
 /**
  * Calculates the amount of nitrogen supplied through soil mineralization using Minip.

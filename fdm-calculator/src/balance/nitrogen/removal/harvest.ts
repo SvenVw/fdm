@@ -1,10 +1,10 @@
 import type { HarvestableAnalysis } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import type {
     CultivationDetail,
     FieldInput,
     NitrogenRemovalHarvests,
 } from "../types"
-import Decimal from "decimal.js"
 
 /**
  * Calculates the amount of Nitrogen removed from the field through harvests.

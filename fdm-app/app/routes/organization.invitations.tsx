@@ -63,7 +63,7 @@ export default function OrganizationsIndex() {
     }>()
 
     return (
-        <main className="container">        
+        <main className="container">
             <div className="max-w-3xl mx-auto px-4">
                 <div className="mb-8 flex items-center justify-between">
                     <FarmTitle

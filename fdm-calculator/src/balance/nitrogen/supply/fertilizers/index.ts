@@ -3,9 +3,9 @@ import type {
     FieldInput,
     NitrogenSupplyFertilizers,
 } from "../../types"
-import { calculateNitrogenSupplyByMineralFertilizers } from "./mineral"
-import { calculateNitrogenSupplyByManure } from "./manure"
 import { calculateNitrogenSupplyByCompost } from "./compost"
+import { calculateNitrogenSupplyByManure } from "./manure"
+import { calculateNitrogenSupplyByMineralFertilizers } from "./mineral"
 import { calculateNitrogenSupplyByOtherFertilizers } from "./other"
 
 /**
@@ -57,7 +57,7 @@ export function calculateNitrogenSupplyByFertilizers(
         mineral: fertilizersSupplyMineral,
         manure: fertilizersSupplyManure,
         compost: fertilizersSupplyCompost,
-        other: fertilizersSupplyOther
+        other: fertilizersSupplyOther,
     }
     return fertilizers
 }

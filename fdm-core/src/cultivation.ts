@@ -13,9 +13,9 @@ import {
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import type {
-    CultivationPlan,
     Cultivation,
     CultivationCatalogue,
+    CultivationPlan,
 } from "./cultivation.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"

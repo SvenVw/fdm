@@ -1,4 +1,5 @@
 import { getFarms } from "@svenvw/fdm-core"
+import { House } from "lucide-react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -6,6 +7,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -22,8 +24,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { Badge } from "~/components/ui/badge"
-import { House } from "lucide-react"
 import { Header } from "../components/custom/header/base"
 import { HeaderFarm } from "../components/custom/header/farm"
 

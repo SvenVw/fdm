@@ -1,12 +1,12 @@
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { getPrincipal, identifyPrincipal, lookupPrincipal } from "./principal"
+import { type BetterAuth, createFdmAuth } from "./authentication"
+import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
-import * as authNSchema from "./db/schema-authn"
 import { createId } from "./id"
 import { createOrganization } from "./organization"
-import { createFdmAuth, type BetterAuth } from "./authentication"
+import { getPrincipal, identifyPrincipal, lookupPrincipal } from "./principal"
 
 describe("Principals", () => {
     let fdm: FdmType

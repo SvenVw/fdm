@@ -1,14 +1,14 @@
+import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
+import type {
+    NitrogenBalanceInput,
+    NitrogenSupplyMineralization,
+    SoilAnalysisPicked,
+} from "../types"
 import {
     calculateNitrogenSupplyBySoilMineralization,
     calculateNitrogenSupplyBySoilMineralizationUsingMinip,
 } from "./mineralization"
-import type {
-    SoilAnalysisPicked,
-    NitrogenBalanceInput,
-    NitrogenSupplyMineralization,
-} from "../types"
-import Decimal from "decimal.js"
 
 describe("calculateNitrogenSupplyBySoilMineralization", () => {
     const mockSoilAnalysis: SoilAnalysisPicked = {

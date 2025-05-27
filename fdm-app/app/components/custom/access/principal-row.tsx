@@ -1,8 +1,9 @@
+import { zodResolver } from "@hookform/resolvers/zod"
 import type React from "react"
 import { useFetcher } from "react-router-dom"
 import { useRemixForm } from "remix-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
 import type { z } from "zod"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -13,7 +14,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"
 
 // Define the props type based on usage in the original file
@@ -73,9 +73,7 @@ export const PrincipalRow = ({
     }
 
     return (
-        <div
-            className="flex items-center justify-between space-x-4"
-        >
+        <div className="flex items-center justify-between space-x-4">
             <div className="flex items-center space-x-4">
                 <Avatar>
                     <AvatarImage src={image} />

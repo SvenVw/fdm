@@ -17,10 +17,10 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "../store/calendar"
-import { HeaderFarm } from "../components/custom/header/farm"
-import { Header } from "../components/custom/header/base"
 import { HeaderAtlas } from "../components/custom/header/atlas"
+import { Header } from "../components/custom/header/base"
+import { HeaderFarm } from "../components/custom/header/farm"
+import { useCalendarStore } from "../store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

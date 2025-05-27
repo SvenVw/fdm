@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
+import { describe, expect, it } from "vitest"
 import type { FieldInput } from "../types"
 import { calculateNitrogenRemovalByResidue } from "./residue"
 
@@ -128,7 +128,7 @@ describe("calculateNitrogenRemovalByResidue", () => {
             harvests,
             cultivationDetailsMap,
         )
-        
+
         expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
         expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
     })

@@ -7,9 +7,9 @@ import type { FdmType } from "./fdm"
 import { createId } from "./id"
 import type {
     CurrentSoilData,
+    SoilAnalysis,
     SoilParameterDescription,
     SoilParameters,
-    SoilAnalysis,
 } from "./soil.d"
 import type { Timeframe } from "./timeframe"
 

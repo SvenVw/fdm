@@ -1,4 +1,14 @@
+import type { fdmSchema } from "@svenvw/fdm-core"
 import { Decimal } from "decimal.js"
+import {
+    calculateBulkDensity,
+    calculateCarbonNitrogenRatio,
+    calculateOrganicCarbon,
+    calculateOrganicMatter,
+} from "../../conversions/soil"
+import { calculateNitrogenRemoval } from "./removal"
+import { calculateNitrogenSupply } from "./supply"
+import { calculateTargetForNitrogenBalance } from "./target"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -9,17 +19,7 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
-import { calculateNitrogenSupply } from "./supply"
-import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenVolatilization } from "./volatization"
-import type { fdmSchema } from "@svenvw/fdm-core"
-import {
-    calculateBulkDensity,
-    calculateCarbonNitrogenRatio,
-    calculateOrganicCarbon,
-    calculateOrganicMatter,
-} from "../../conversions/soil"
-import { calculateTargetForNitrogenBalance } from "./target"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and volatilization.

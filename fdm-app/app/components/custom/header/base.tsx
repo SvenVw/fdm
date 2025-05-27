@@ -1,7 +1,7 @@
+import { Breadcrumb, BreadcrumbList } from "@/app/components/ui/breadcrumb"
 import { Separator } from "@/app/components/ui/separator"
 import { SidebarTrigger } from "@/app/components/ui/sidebar"
-import { Breadcrumb, BreadcrumbList } from "@/app/components/ui/breadcrumb"
-import { HeaderAction, type HeaderActionProps } from "./action";
+import { HeaderAction, type HeaderActionProps } from "./action"
 
 export function Header({
     action = undefined,
@@ -24,4 +24,3 @@ export function Header({
         </header>
     )
 }
-

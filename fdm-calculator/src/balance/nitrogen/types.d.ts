@@ -1,12 +1,12 @@
 import type {
-    fdmSchema,
     Cultivation,
+    CultivationCatalogue,
+    Fertilizer,
+    FertilizerApplication,
+    Field,
     Harvest,
     SoilAnalysis,
-    FertilizerApplication,
-    Fertilizer,
-    CultivationCatalogue,
-    Field,
+    fdmSchema,
 } from "@svenvw/fdm-core"
 import type { Decimal } from "decimal.js"
 

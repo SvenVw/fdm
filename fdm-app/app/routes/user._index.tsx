@@ -4,6 +4,8 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { Header } from "~/components/custom/header/base"
+import { HeaderUser } from "~/components/custom/header/user"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import {
     Card,
@@ -16,8 +18,6 @@ import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { Header } from "~/components/custom/header/base"
-import { HeaderUser } from "~/components/custom/header/user"
 
 // Meta
 export const meta: MetaFunction = () => {

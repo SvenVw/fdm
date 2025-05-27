@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
+    calculateBulkDensity,
+    calculateCarbonNitrogenRatio,
     calculateOrganicCarbon,
     calculateOrganicMatter,
-    calculateCarbonNitrogenRatio,
-    calculateBulkDensity,
 } from "./soil"
 
 describe("Soil Conversions", () => {
@@ -67,7 +67,10 @@ describe("Soil Conversions", () => {
         })
 
         it("should calculate bulk density correctly for non-sandy soils", () => {
-            expect(calculateBulkDensity(10, "rivierklei")).toBeCloseTo(0.9788, 3)
+            expect(calculateBulkDensity(10, "rivierklei")).toBeCloseTo(
+                0.9788,
+                3,
+            )
             expect(calculateBulkDensity(20, "zeeklei")).toBeCloseTo(0.874, 3)
         })
 

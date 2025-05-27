@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
-import { calculateNitrogenFixation } from "./fixation"
+import { describe, expect, it } from "vitest"
 import type { CultivationDetail, FieldInput } from "../types"
+import { calculateNitrogenFixation } from "./fixation"
 
 describe("calculateNitrogenFixation", () => {
     it("should return 0 if no cultivations are provided", () => {
@@ -54,8 +54,16 @@ describe("calculateNitrogenFixation", () => {
 
     it("should calculate nitrogen fixation for multiple cultivations", () => {
         const cultivations: FieldInput["cultivations"] = [
-            { b_lu: "cultivation1", b_lu_catalogue: "catalogue1", m_cropresidue: true },
-            { b_lu: "cultivation2", b_lu_catalogue: "catalogue2", m_cropresidue: false },
+            {
+                b_lu: "cultivation1",
+                b_lu_catalogue: "catalogue1",
+                m_cropresidue: true,
+            },
+            {
+                b_lu: "cultivation2",
+                b_lu_catalogue: "catalogue2",
+                m_cropresidue: false,
+            },
         ]
 
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
@@ -99,8 +107,16 @@ describe("calculateNitrogenFixation", () => {
 
     it("should handle cultivations with no or undefined fixation values", () => {
         const cultivations: FieldInput["cultivations"] = [
-            { b_lu: "cultivation1", b_lu_catalogue: "catalogue1", m_cropresidue: true },
-            { b_lu: "cultivation2", b_lu_catalogue: "catalogue2", m_cropresidue: false },
+            {
+                b_lu: "cultivation1",
+                b_lu_catalogue: "catalogue1",
+                m_cropresidue: true,
+            },
+            {
+                b_lu: "cultivation2",
+                b_lu_catalogue: "catalogue2",
+                m_cropresidue: false,
+            },
         ]
 
         const cultivationDetailsMap = new Map<string, CultivationDetail>([
@@ -144,7 +160,11 @@ describe("calculateNitrogenFixation", () => {
 
     it("should throw an error if a cultivation has no details", () => {
         const cultivations: FieldInput["cultivations"] = [
-            { b_lu: "cultivation1", b_lu_catalogue: "catalogue1", m_cropresidue: true },
+            {
+                b_lu: "cultivation1",
+                b_lu_catalogue: "catalogue1",
+                m_cropresidue: true,
+            },
         ]
 
         const cultivationDetailsMap = new Map<string, CultivationDetail>()

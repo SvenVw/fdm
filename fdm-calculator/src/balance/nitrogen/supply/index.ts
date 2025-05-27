@@ -6,9 +6,9 @@ import type {
     NitrogenSupply,
     SoilAnalysisPicked,
 } from "../types"
+import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import { calculateNitrogenSupplyByFertilizers } from "./fertilizers"
 import { calculateNitrogenFixation } from "./fixation"
-import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
 
 /**

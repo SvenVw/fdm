@@ -1,12 +1,12 @@
-import {
-    ChartContainer,
-    ChartLegendContent,
-    ChartTooltipContent,
-    ChartTooltip,
-    type ChartConfig,
-    ChartLegend,
-} from "~/components/ui/chart"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
+import {
+    type ChartConfig,
+    ChartContainer,
+    ChartLegend,
+    ChartLegendContent,
+    ChartTooltip,
+    ChartTooltipContent,
+} from "~/components/ui/chart"
 
 export function NitrogenBalanceChart({
     balance,

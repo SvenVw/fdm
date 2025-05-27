@@ -1,7 +1,7 @@
-import Decimal from "decimal.js"
-import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
-import { fromUrl } from "geotiff"
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
+import Decimal from "decimal.js"
+import { fromUrl } from "geotiff"
+import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 
 /**
  * Calculates the amount of nitrogen supplied through atmospheric deposition for a given field and time frame.
