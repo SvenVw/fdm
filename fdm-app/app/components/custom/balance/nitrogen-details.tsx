@@ -89,6 +89,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
                         {/* Render Compost */}
                         {renderCompostSupply(fertilizers.compost, fieldInput)}
+
+                        {/* Render Compost */}
+                        {renderOtherFertilizersSupply(fertilizers.other, fieldInput)}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
@@ -209,6 +212,56 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {compost.applications.map(
+                            (app: { id: string; value: number }) => {
+                                if (app.value === 0) {
+                                    return null
+                                }
+
+                                const application =
+                                    fieldInput.fertilizerApplications.find(
+                                        (fa: { p_app_id: string }) =>
+                                            fa.p_app_id === app.id,
+                                    )
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                        key={app.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {application.p_name_nl} op{" "}
+                                            {format(
+                                                application.p_app_date,
+                                                "PP",
+                                                {
+                                                    locale: nl,
+                                                },
+                                            )}
+                                            : {app.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderOtherFertilizersSupply = (
+        other: NitrogenSupplyFertilizersNumeric["other"],
+        fieldInput: FieldInput,
+    ) => {
+        const sectionKey = "supply.fertilizers.other"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Overig (Totaal): {other.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {other.applications.map(
                             (app: { id: string; value: number }) => {
                                 if (app.value === 0) {
                                     return null
