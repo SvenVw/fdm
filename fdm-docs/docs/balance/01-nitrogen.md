@@ -95,7 +95,7 @@ Atmospheric deposition refers to the input of nitrogen compounds from the atmosp
     1.  The system uses the field's centroid coordinates to pinpoint its geographical location.
     2.  It queries a GeoTIFF raster file for annual total N deposition. This raster dataset provides spatially explicit annual nitrogen deposition rates.
         *   Currently uses data for the Netherlands, year 2022 (`nl/ntot_2022.tiff` from RIVM, via FDM public data URL).
-    3.  The annual deposition rate (kg N/ha/year) for the field's specific location is extracted from the raster.
+    3.  The annual deposition rate (kg N/ha/year) for the field's specific location is extracted.
     4.  This annual rate is pro-rated for the balance `Time Frame` to reflect the actual period of calculation:
         `Deposition_period (kg N/ha) = Annual_Deposition (kg N/ha/year) * (Days_in_TimeFrame + 1) / 365`
 
@@ -117,21 +117,25 @@ Soil mineralization is a crucial biological process where organic nitrogen (N) c
             `temp_corr = 2 ^ ((w_temp_mean - 9) / 9)`
         *   If `w_temp_mean > 27` °C, an error is thrown, as the model's applicability range is exceeded.
     4.  **Decomposable Carbon Fraction (`cDec`, g C/kg soil):** This represents the portion of soil organic carbon that is readily available for microbial decomposition and subsequent nitrogen release.
-        Let $T_c$ be `temp_corr`.
-        Let $C_org$ be `a_c_of`.
-        $b = (T_c \times 10 + 17)^{-0.6}$
-        $c = 17^{-0.6}$
-        $d = \exp(4.7 \times (b - c))$
-        $e = 1 - d$
-        $cDec = (C_org \times e) / 10$
+        Let `Tc` be `temp_corr`.
+        Let `C_org` be `a_c_of`.
+        ```
+        b = (Tc * 10 + 17)^(-0.6)
+        c = 17^(-0.6)
+        d = exp(4.7 * (b - c))
+        e = 1 - d
+        cDec = (C_org * e) / 10
+        ```
     5.  **Annual N Mineralization Rate (`N_min_annual`, kg N/ha/year):** This is the estimated amount of nitrogen released annually from the soil organic matter.
-        Let $CN$ be `a_cn_fr`.
-        Let $D_bv$ be `bouwvoor` (cm).
-        Let $\rho_b$ be `a_density_sa` (g/cm³).
-        $f = (1.5 \times cDec) / CN$
-        $g = cDec / D_bv$
-        $N_min_annual = (f - g) \times 10000 \times (D_bv / 100) \times \rho_b$
-        *(This formula combines terms to convert g N/kg soil (implicitly from f-g) to kg N/ha using soil depth, bulk density, and area conversion.)*
+        Let `CN` be `a_cn_fr`.
+        Let `D_bv` be `bouwvoor` (cm).
+        Let `rho_b` be `a_density_sa` (g/cm³).
+        ```
+        f = (1.5 * cDec) / CN
+        g = cDec / D_bv
+        N_min_annual = (f - g) * 10000 * (D_bv / 100) * rho_b
+        ```
+        *(Note: The formulas are presented in a simplified text format due to rendering issues with complex mathematical notation in this documentation environment.)*
     6.  This annual rate is then capped (min: 5 kg N/ha/year, max: 250 kg N/ha/year) to ensure realistic agronomic values, preventing extreme estimations.
     7.  The capped annual rate is pro-rated for the balance `Time Frame`:
         `Mineralization_period (kg N/ha) = Capped_Annual_N_Min (kg N/ha/year) * (Days_in_TimeFrame + 1) / 365`
@@ -152,8 +156,10 @@ Soil analysis data can sometimes be incomplete. To ensure the Minip model has al
     *   For sandy/loess soils (e.g., "dekzand", "dalgrond", "duinzand", "loess"):
         `a_density_sa = 1 / (a_som_loi (%) * 0.02525 + 0.6541)`
     *   For other soil types:
-        Let $L = a_som_loi (\%)$.
-        $a\_density\_sa = (0.00000067 \times L^4) - (0.00007792 \times L^3) + (0.00314712 \times L^2) - (0.06039523 \times L) + 1.33932206$
+        Let `L` be `a_som_loi (%)`.
+        ```
+        a_density_sa = (0.00000067 * L^4) - (0.00007792 * L^3) + (0.00314712 * L^2) - (0.06039523 * L) + 1.33932206
+        ```
     (Clamped: 0.5-3.0 g/cm³).
 
 ### 3.2. Nitrogen Removal (kg N/ha)
