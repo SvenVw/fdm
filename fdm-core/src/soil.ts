@@ -859,7 +859,7 @@ export function getSoilParametersDescription(
         },
         {
             parameter: "a_zn_cc",
-            unit: "%",
+            unit: "µg Zn/kg",
             name: "Zn-plantbeschikbaar",
             type: "numeric",
             description: "Zink, plantbeschikbaar",
