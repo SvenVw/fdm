@@ -134,14 +134,13 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                     ) : (
                                         <div className="flex items-center gap-4">
                                             <p>
-                                                {`${nitrogenBalanceResult.balance} /
-                                                ${nitrogenBalanceResult.target}`}
+                                                {`${nitrogenBalanceResult.balance} / ${nitrogenBalanceResult.target}`}
                                             </p>
                                             {nitrogenBalanceResult.balance <=
                                             nitrogenBalanceResult.target ? (
                                                 <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
                                             ) : (
-                                                <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full " />
+                                                <CircleAlert className="text-red-500 bg-red-100 rounded-full " />
                                             )}
                                         </div>
                                     )}
@@ -214,7 +213,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                 <CardTitle>Balans</CardTitle>
                                 <CardDescription>
                                     De stikstofbalans voor alle percelen van{" "}
-                                    {farm.b_name_farm} . De balans is het
+                                    {farm.b_name_farm}. De balans is het
                                     verschil tussen de totale aanvoer, afvoer en
                                     emissie van stikstof. Een positieve balans
                                     betekent een overschot aan stikstof, een
@@ -228,10 +227,12 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                     </div>
                                 ) : (
                                     <NitrogenBalanceChart
-                                    balance={nitrogenBalanceResult.balance}
-                                    supply={nitrogenBalanceResult.supply}
-                                    removal={nitrogenBalanceResult.removal}
-                                    emission={nitrogenBalanceResult.emission} 
+                                        balance={nitrogenBalanceResult.balance}
+                                        supply={nitrogenBalanceResult.supply}
+                                        removal={nitrogenBalanceResult.removal}
+                                        emission={
+                                            nitrogenBalanceResult.emission
+                                        }
                                     />
                                 )}
                                 {/* <Overview /> */}

@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-At the nitrogen balance page for farm and field show a bar chart to compare supply, removal and emission
+Show a bar chart on the nitrogen balance pages for farms and fields to compare supply, removal, and emission

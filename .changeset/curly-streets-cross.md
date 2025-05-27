@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Show at nitrogen balance a comparison of the balance with the target level at farm and field level
+Show a comparison of the nitrogen balance with the target level on both farm and field pages

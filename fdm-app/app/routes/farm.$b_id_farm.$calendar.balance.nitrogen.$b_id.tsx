@@ -162,14 +162,13 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                     ) : (
                                         <div className="flex items-center gap-4">
                                             <p>
-                                                {`${nitrogenBalanceResult.balance} /
-                                                ${nitrogenBalanceResult.target}`}
+                                                {`${nitrogenBalanceResult.balance} / ${nitrogenBalanceResult.target}`}
                                             </p>
                                             {nitrogenBalanceResult.balance <=
                                             nitrogenBalanceResult.target ? (
                                                 <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
                                             ) : (
-                                                <CircleAlert className="text-red-500 bg-red-100 p-0 rounded-full " />
+                                                <CircleAlert className="text-red-500 bg-red-100 rounded-full " />
                                             )}
                                         </div>
                                     )}
@@ -242,7 +241,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                 <CardTitle>Balans</CardTitle>
                                 <CardDescription>
                                     De stikstofbalans voor {field.b_name} van{" "}
-                                    {farm.b_name_farm} . De balans is het
+                                    {farm.b_name_farm}. De balans is het
                                     verschil tussen de totale aanvoer, afvoer en
                                     emissie van stikstof. Een positieve balans
                                     betekent een overschot aan stikstof, een
