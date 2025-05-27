@@ -74,7 +74,7 @@ export function HeaderFertilizer({
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                         <BreadcrumbLink
-                            href={`farm/${b_id_farm}/fertilizers/new`}
+                            href={`/farm/${b_id_farm}/fertilizers/new`}
                         >
                             Nieuwe meststof
                         </BreadcrumbLink>
