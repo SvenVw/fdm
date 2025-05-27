@@ -30,9 +30,7 @@ export function HeaderBalance({
         <>
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink
-                    href={`/farm/${b_id_farm}/${calendar}/balance`}
-                >
+                <BreadcrumbLink href={`/farm/${b_id_farm}/${calendar}/balance`}>
                     Nutriëntenbalans
                 </BreadcrumbLink>
             </BreadcrumbItem>
@@ -74,8 +72,8 @@ export function HeaderBalance({
                                     >
                                         <NavLink
                                             to={currentPath.replace(
-                                                b_id,
-                                                option.b_id,
+                                                `/balance/nitrogen/${b_id}`,
+                                                `/balance/nitrogen/${option.b_id}`,
                                             )}
                                         >
                                             {option.b_name}
