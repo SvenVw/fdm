@@ -1,5 +1,46 @@
 # fdm-calculator
 
+## 0.3.0
+
+### Minor Changes
+
+- 119c328: Add the function `calculateNitrogenBalance` to calculate on farm level the nitrogen balance
+- 119c328: Add the function `collectInputForNitrogenBalance` to collect input data from a fdm instance for the `calculateNitrogenBalance` function
+- ba3801c: Add function `collectInputForNitrogenBalance` to collect the input data from a fdm instance to calculate the nitrogen balance
+- c122c66: Add function to calculate target for nitrogen balance
+
+### Patch Changes
+
+- Updated dependencies [e260795]
+- Updated dependencies [0dc93fd]
+- Updated dependencies [5a3bf78]
+- Updated dependencies [c44812f]
+- Updated dependencies [cf399ca]
+- Updated dependencies [249138c]
+- Updated dependencies [f05e1cb]
+- Updated dependencies [9a5be3b]
+- Updated dependencies [6292cf3]
+- Updated dependencies [f05e1cb]
+- Updated dependencies [286abb9]
+- Updated dependencies [bdf0cb0]
+- Updated dependencies [343c580]
+- Updated dependencies [ef8a2c6]
+- Updated dependencies [e260795]
+- Updated dependencies [13210e6]
+- Updated dependencies [18f195b]
+- Updated dependencies [a550805]
+- Updated dependencies [7e881c1]
+- Updated dependencies [d4a7e02]
+- Updated dependencies [e0a779c]
+- Updated dependencies [c44812f]
+- Updated dependencies [dd7bb7b]
+- Updated dependencies [ec0494c]
+- Updated dependencies [0a546d4]
+- Updated dependencies [ec0494c]
+- Updated dependencies [6676992]
+- Updated dependencies [4027c9a]
+  - @svenvw/fdm-core@0.20.0
+
 ## 0.2.6
 
 ### Patch Changes

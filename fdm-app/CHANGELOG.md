@@ -1,5 +1,64 @@
 # Changelog fdm-app
 
+## 0.18.0
+
+### Minor Changes
+
+- a07adde: Show a comparison of the nitrogen balance with the target level on both farm and field pages
+- ceb72eb: Implement core organization management features, including creation, listing, user invitations, and invitation management.
+- e870059: Add block to enable sharing of farm to other users and organizations
+- 58c2a56: Add `a_nmin_cc` to nmin soil analysis
+- 8303ad7: For the source of the soil analysis, users can now choose from a list of sources instead of a text field
+- f1cb0bc: Rename Kaart to Atlas and move to apps
+- ca0d61b: Add a platform sidebar that helps the user to navigate all the platform related things, like account management, settings, organizations etc.
+- 2771859: Add new soil parameters to soil analysis: `a_n_rt`, `a_c_of`, `a_cn_fr` and `a_density_sa`
+- b9ecbe6: Expand integration with NMI to include more soil parameters: `a_al_ox`, `a_ca_co`, `a_ca_co_po`, `a_caco3_if`, `a_cec_co`, `a_cn_fr`, `a_com_fr`, `a_cu_cc`, `a_fe_ox`, `a_k_cc`, `a_k_co`, `a_k_co_po`, `a_mg_cc`, `a_mg_co`, `a_mg_co_po`, `a_n_pmn`,`a_p_ox`, `a_p_rt`, `a_p_sg`, `a_p_wa`, `a_ph_cc`, `a_s_rt`, `a_sand_mi`, `a_silt_mi`, `a_zn_cc`
+- ff08686: Add the ability to select a type of soil analyses so that a subset of parameters can be shown at the form
+- ed226af: Redesign the page on which the farm can be selected by providing a card with some details for every farm
+- 6b21513: Show a bar chart on the nitrogen balance pages for farms and fields to compare supply, removal, and emission
+
+### Patch Changes
+
+- 971e813: Use configurable link to open a new page with the privacy policy
+- 92a1098: When another field of farm is selected in the page header, it does not redirect you anymore to the start page of farm or field, but reloads tthe current page with the new selected field or farm
+- 63a4cea: Move what's new page to about section
+- 13210e6: Limit that each harvest can have only 1 harvestable and not multiple
+- 6dfba80: Redirect unauthenticated users to their originally requested page after sign-in.
+- Updated dependencies [e260795]
+- Updated dependencies [0dc93fd]
+- Updated dependencies [5a3bf78]
+- Updated dependencies [c44812f]
+- Updated dependencies [cf399ca]
+- Updated dependencies [249138c]
+- Updated dependencies [119c328]
+- Updated dependencies [f05e1cb]
+- Updated dependencies [9a5be3b]
+- Updated dependencies [6292cf3]
+- Updated dependencies [f05e1cb]
+- Updated dependencies [286abb9]
+- Updated dependencies [bdf0cb0]
+- Updated dependencies [343c580]
+- Updated dependencies [ef8a2c6]
+- Updated dependencies [119c328]
+- Updated dependencies [e260795]
+- Updated dependencies [ba3801c]
+- Updated dependencies [13210e6]
+- Updated dependencies [c122c66]
+- Updated dependencies [18f195b]
+- Updated dependencies [a550805]
+- Updated dependencies [7e881c1]
+- Updated dependencies [d4a7e02]
+- Updated dependencies [e0a779c]
+- Updated dependencies [c44812f]
+- Updated dependencies [dd7bb7b]
+- Updated dependencies [ec0494c]
+- Updated dependencies [0a546d4]
+- Updated dependencies [ec0494c]
+- Updated dependencies [6676992]
+- Updated dependencies [4027c9a]
+  - @svenvw/fdm-core@0.20.0
+  - @svenvw/fdm-calculator@0.3.0
+
 ## 0.17.2
 
 ### Patch Changes
