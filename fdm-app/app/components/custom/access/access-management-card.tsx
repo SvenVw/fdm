@@ -1,4 +1,3 @@
-import { Separator } from "~/components/ui/separator"
 import {
     Card,
     CardContent,
@@ -6,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
 import { InvitationForm } from "./invitation-form"
 import { PrincipalRow } from "./principal-row"
 
@@ -54,14 +54,14 @@ export const AccessManagementCard = ({
                         {/* Map over principals to render PrincipalRow for each */}
                         {principals.map((principal) => (
                             <PrincipalRow
-                                key={principal.username} 
+                                key={principal.username}
                                 username={principal.username}
                                 displayUserName={principal.displayUserName}
                                 image={principal.image}
                                 initials={principal.initials}
                                 role={principal.role}
                                 type={principal.type}
-                                hasSharePermission={hasSharePermission}                         
+                                hasSharePermission={hasSharePermission}
                             />
                         ))}
                     </div>

@@ -7,10 +7,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type {
-    FertilizerApplication,
-    Fertilizer,
-} from "./fertilizer.d"
+import type { Fertilizer, FertilizerApplication } from "./fertilizer.d"
 import type { Timeframe } from "./timeframe"
 
 /**

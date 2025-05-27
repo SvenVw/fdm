@@ -1,30 +1,23 @@
 import {
-    data,
-    type LoaderFunctionArgs,
-    useLoaderData,
-    type MetaFunction,
-    type ActionFunctionArgs,
-    NavLink,
-} from "react-router"
-import { clientConfig } from "~/lib/config"
-import { Button } from "~/components/ui/button"
-import { handleLoaderError, handleActionError } from "~/lib/error"
-import { getSession } from "~/lib/auth.server"
-import {
     getFarm,
+    grantRoleToFarm,
     isAllowedToShareFarm,
     listPrincipalsForFarm,
-    grantRoleToFarm,
-    updateRoleOfPrincipalAtFarm,
     revokePrincipalFromFarm,
+    updateRoleOfPrincipalAtFarm,
 } from "@svenvw/fdm-core"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { dataWithSuccess, dataWithError } from "remix-toast"
-import { AccessFormSchema } from "~/lib/schemas/access.schema"
-import { AccessManagementCard } from "~/components/custom/access/access-management-card"
+import { is } from "drizzle-orm"
+import {
+    type ActionFunctionArgs,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+    useLoaderData,
+} from "react-router"
+import { dataWithError, dataWithSuccess } from "remix-toast"
 import { AccessInfoCard } from "~/components/custom/access/access-info-card"
-import { getCalendar } from "~/lib/calendar"
+import { AccessManagementCard } from "~/components/custom/access/access-management-card"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -32,8 +25,15 @@ import {
     BreadcrumbList,
     BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb"
+import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
-import { is } from "drizzle-orm"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
+import { AccessFormSchema } from "~/lib/schemas/access.schema"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -81,10 +81,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return {
             b_id_farm: b_id_farm,
-            b_name_farm: farm.b_name_farm, 
+            b_name_farm: farm.b_name_farm,
             principals: principals,
             hasSharePermission: hasSharePermission,
-            calendar: calendar, 
+            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -105,7 +105,9 @@ export default function CreateFarmAccessStep() {
                     <Breadcrumb>
                         <BreadcrumbList>
                             <BreadcrumbItem>
-                                <BreadcrumbLink>Maak een bedrijf</BreadcrumbLink>
+                                <BreadcrumbLink>
+                                    Maak een bedrijf
+                                </BreadcrumbLink>
                             </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem>
@@ -113,7 +115,9 @@ export default function CreateFarmAccessStep() {
                             </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem>
-                                <BreadcrumbLink>Toegang instellen</BreadcrumbLink>
+                                <BreadcrumbLink>
+                                    Toegang instellen
+                                </BreadcrumbLink>
                             </BreadcrumbItem>
                         </BreadcrumbList>
                     </Breadcrumb>
@@ -121,10 +125,13 @@ export default function CreateFarmAccessStep() {
                         Toegang instellen (Optioneel)
                     </h2>
                     <p className="text-muted-foreground">
-                        Nodig nu alvast gebruikers of organisaties uit, of voltooi de wizard.
+                        Nodig nu alvast gebruikers of organisaties uit, of
+                        voltooi de wizard.
                     </p>
                 </div>
-                <NavLink to={`/farm/${b_id_farm}`}> {/* Navigate to the main farm page */}
+                <NavLink to={`/farm/${b_id_farm}`}>
+                    {" "}
+                    {/* Navigate to the main farm page */}
                     <Button>Voltooien</Button>
                 </NavLink>
             </header>
@@ -159,33 +166,40 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const principalId = session.principal_id
 
         if (!principalId) {
-             throw data("User not authenticated", { status: 401 });
+            throw data("User not authenticated", { status: 401 })
         }
-
 
         if (formValues.intent === "invite_user") {
             if (!formValues.username) {
-                return dataWithError(null, "Gebruikersnaam/Organisatie is verplicht.");
+                return dataWithError(
+                    null,
+                    "Gebruikersnaam/Organisatie is verplicht.",
+                )
             }
             if (!formValues.role) {
-                 return dataWithError(null, "Rol is verplicht.");
+                return dataWithError(null, "Rol is verplicht.")
             }
             await grantRoleToFarm(
                 fdm,
-                principalId, 
+                principalId,
                 formValues.username,
                 b_id_farm,
                 formValues.role,
             )
-            return dataWithSuccess(null, { message: `${formValues.username} is uitgenodigd!` });
+            return dataWithSuccess(null, {
+                message: `${formValues.username} is uitgenodigd!`,
+            })
         }
 
         if (formValues.intent === "update_role") {
             if (!formValues.username) {
-                 return dataWithError(null, "Gebruikersnaam/Organisatie is verplicht.");
+                return dataWithError(
+                    null,
+                    "Gebruikersnaam/Organisatie is verplicht.",
+                )
             }
             if (!formValues.role) {
-                 return dataWithError(null, "Rol is verplicht.");
+                return dataWithError(null, "Rol is verplicht.")
             }
             await updateRoleOfPrincipalAtFarm(
                 fdm,
@@ -194,12 +208,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id_farm,
                 formValues.role,
             )
-            return dataWithSuccess(null, { message: "Rol is bijgewerkt!" });
+            return dataWithSuccess(null, { message: "Rol is bijgewerkt!" })
         }
 
         if (formValues.intent === "remove_user") {
             if (!formValues.username) {
-                 return dataWithError(null, "Gebruikersnaam/Organisatie is verplicht.");
+                return dataWithError(
+                    null,
+                    "Gebruikersnaam/Organisatie is verplicht.",
+                )
             }
             await revokePrincipalFromFarm(
                 fdm,
@@ -207,7 +224,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 formValues.username,
                 b_id_farm,
             )
-            return dataWithSuccess(null, { message: `Toegang voor ${formValues.username} ingetrokken.` });
+            return dataWithSuccess(null, {
+                message: `Toegang voor ${formValues.username} ingetrokken.`,
+            })
         }
 
         throw new Error("Invalid intent")

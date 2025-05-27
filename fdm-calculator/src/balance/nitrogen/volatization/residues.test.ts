@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
-import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
+import { describe, expect, it } from "vitest"
 import type { CultivationDetail, FieldInput } from "../types"
+import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
 
 describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
     it("should return 0 if no cultivations are provided", () => {

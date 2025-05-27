@@ -1,8 +1,8 @@
+import { eq, ilike, or } from "drizzle-orm"
+import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { Principal } from "./principal.d"
-import * as authNSchema from "./db/schema-authn"
-import { eq, ilike, or } from "drizzle-orm"
 
 /**
  * Retrieves details of a principal (either a user or an organization) by ID.

@@ -21,8 +21,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { Header } from "../components/custom/header/base"
 import { HeaderAbout } from "../components/custom/header/about"
+import { Header } from "../components/custom/header/base"
 
 export const meta: MetaFunction = () => {
     return [

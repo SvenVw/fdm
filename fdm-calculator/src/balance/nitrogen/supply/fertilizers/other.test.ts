@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
-import { calculateNitrogenSupplyByOtherFertilizers } from "./other"
+import { describe, expect, it } from "vitest"
 import type { FertilizerDetail, FieldInput } from "../../types"
+import { calculateNitrogenSupplyByOtherFertilizers } from "./other"
 
 describe("calculateNitrogenSupplyByOtherFertilizers", () => {
     it("should return 0 if no other fertilizer applications are found", () => {

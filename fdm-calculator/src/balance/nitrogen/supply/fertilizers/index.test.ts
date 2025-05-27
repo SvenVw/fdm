@@ -1,6 +1,6 @@
+import { Decimal } from "decimal.js"
 // c:\Users\sven.verweij\Applications\fdm\fdm-calculator\src\balance\nitrogen\supply\fertilizers\index.test.ts
 import { describe, expect, it, vi } from "vitest"
-import { Decimal } from "decimal.js"
 import { calculateNitrogenSupplyByFertilizers } from "."
 import type { FertilizerDetail, FieldInput } from "../../types"
 

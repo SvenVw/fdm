@@ -1,9 +1,12 @@
-import { Form } from "react-router-dom"
-import { useState } from "react" 
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { z } from "zod"
 import { User, Users } from "lucide-react"
+import { useState } from "react"
+import { Form } from "react-router-dom"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import type { z } from "zod"
+import { AutoComplete } from "~/components/custom/autocomplete"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
 import {
     Select,
     SelectContent,
@@ -11,9 +14,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { Button } from "~/components/ui/button"
-import { AutoComplete } from "~/components/custom/autocomplete"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"
 
 // Define the type for the principal object based on usage
@@ -27,7 +27,7 @@ type Principal = {
 }
 
 type InvitationFormProps = {
-    principals: Principal[] 
+    principals: Principal[]
 }
 
 export const InvitationForm = ({ principals }: InvitationFormProps) => {
@@ -48,14 +48,14 @@ export const InvitationForm = ({ principals }: InvitationFormProps) => {
         <RemixFormProvider {...form}>
             <Form method="post">
                 <fieldset
-                    disabled={form.formState.isSubmitting} 
+                    disabled={form.formState.isSubmitting}
                     className="flex items-center justify-between space-x-4"
                 >
                     <AutoComplete
                         className="flex-1"
                         lookupUrl="/api/lookup/principal"
                         excludeValues={principals.map((p) => p.username)}
-                        iconMap={iconMap} 
+                        iconMap={iconMap}
                         selectedValue={selectedValue}
                         onSelectedValueChange={(value) => {
                             setSelectedValue(value)

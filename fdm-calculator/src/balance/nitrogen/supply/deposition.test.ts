@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
-import { calculateNitrogenSupplyByDeposition } from "./deposition"
-import type { FieldInput, NitrogenBalanceInput } from "../types"
 import { getFdmPublicDataUrl } from "../index"
+import type { FieldInput, NitrogenBalanceInput } from "../types"
+import { calculateNitrogenSupplyByDeposition } from "./deposition"
 
 describe("calculateNitrogenSupplyByDeposition", () => {
     const fdmPublicDataUrl = getFdmPublicDataUrl()

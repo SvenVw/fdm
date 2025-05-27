@@ -1,7 +1,7 @@
 import { lookupPrincipal } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router-dom"
-import { handleLoaderError } from "~/lib/error"
 import { getSession } from "~/lib/auth.server"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "../lib/fdm.server"
 
 // Define the expected return type from lookupPrincipal based on previous usage
@@ -40,7 +40,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         // Only allow alphanumeric characters, underscores, and hyphens
         if (!/^[a-zA-Z0-9_-]+$/.test(identifier)) {
             return []
-        }        
+        }
         if (identifier.length < 2 || identifier.length > 100) {
             return [] // Return empty for too short or too long inputs
         }

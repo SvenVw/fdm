@@ -1,3 +1,4 @@
+import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
 import type {
     CultivationDetail,
@@ -5,7 +6,6 @@ import type {
     NitrogenBalanceInput,
     SoilAnalysisPicked,
 } from "./types"
-import { differenceInCalendarDays } from "date-fns"
 
 /**
  * Calculates the target nitrogen balance based on cultivation type, soil analysis, and cultivation details.

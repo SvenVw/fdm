@@ -1,8 +1,7 @@
-import { cn } from "~/lib/utils"
 import { Command as CommandPrimitive } from "cmdk"
 import { Check, User, Users } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useFetcher } from "react-router-dom"
-import { useEffect, useMemo, useState, useRef } from "react"
 import {
     Command,
     CommandEmpty,
@@ -12,6 +11,7 @@ import {
 } from "~/components/ui/command"
 import { Input } from "~/components/ui/input"
 import { Popover, PopoverAnchor, PopoverContent } from "~/components/ui/popover"
+import { cn } from "~/lib/utils"
 import { LoadingSpinner } from "./loadingspinner"
 
 // Expected shape of items returned by the lookup API

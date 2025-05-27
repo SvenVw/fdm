@@ -8,6 +8,7 @@ import {
     removeUserFromOrganization,
     updateRoleOfUserAtOrganization,
 } from "@svenvw/fdm-core"
+import { username } from "better-auth/plugins/username"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
@@ -48,7 +49,6 @@ import {
 } from "../components/ui/select"
 import { serverConfig } from "../lib/config.server"
 import { renderInvitationEmail, sendEmail } from "../lib/email.server"
-import { username } from "better-auth/plugins/username"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!params.slug) {
@@ -88,7 +88,7 @@ export default function OrganizationIndex() {
     const permissions = organization.permissions
 
     return (
-        <main className="container">           
+        <main className="container">
             <div className="max-w-3xl mx-auto px-4">
                 {/* Changed this div to a flex container with justify-between */}
                 <div className="mb-8 flex items-center justify-between">

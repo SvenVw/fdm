@@ -3,12 +3,16 @@ import { NavLink } from "react-router"
 import { Button } from "../../ui/button"
 
 export interface HeaderActionProps {
-  label: string
-  to: string
-  disabled: boolean
+    label: string
+    to: string
+    disabled: boolean
 }
 
-export function HeaderAction({ label, to, disabled }: HeaderActionProps): JSX.Element {
+export function HeaderAction({
+    label,
+    to,
+    disabled,
+}: HeaderActionProps): JSX.Element {
     return (
         <div className="ml-auto">
             <NavLink

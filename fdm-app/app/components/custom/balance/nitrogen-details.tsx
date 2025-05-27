@@ -1,26 +1,26 @@
-import type React from "react"
+import { useCalendarStore } from "@/app/store/calendar"
 import type {
     FieldInput,
     NitrogenBalanceNumeric,
-    NitrogenSupplyNumeric,
+    NitrogenRemovalHarvestsNumeric,
     NitrogenRemovalNumeric,
-    NitrogenVolatilizationNumeric,
+    NitrogenRemovalResiduesNumeric,
     NitrogenSupplyFertilizersNumeric,
     NitrogenSupplyFixationNumeric,
     NitrogenSupplyMineralizationNumeric,
-    NitrogenRemovalHarvestsNumeric,
-    NitrogenRemovalResiduesNumeric,
+    NitrogenSupplyNumeric,
+    NitrogenVolatilizationNumeric,
 } from "@svenvw/fdm-calculator"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale/nl"
+import type React from "react"
+import { NavLink } from "react-router"
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "~/components/ui/accordion"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { NavLink } from "react-router"
-import { useCalendarStore } from "@/app/store/calendar"
 
 interface NitrogenBalanceDetailsProps {
     balanceData: NitrogenBalanceNumeric
@@ -348,7 +348,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         return (
             <AccordionItem value={sectionKey}>
                 <p className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all text-left">
-                    Emissie (Totaal): - 
+                    Emissie (Totaal): -
                 </p>
             </AccordionItem>
         )

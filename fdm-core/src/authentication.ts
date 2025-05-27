@@ -1,10 +1,10 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { organization, username } from "better-auth/plugins"
+import { eq } from "drizzle-orm"
+import { generateFromEmail } from "unique-username-generator"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
-import { generateFromEmail } from "unique-username-generator"
-import { eq } from "drizzle-orm"
 
 export type BetterAuth = ReturnType<typeof betterAuth>
 

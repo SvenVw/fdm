@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
-import { calculateNitrogenSupplyByCompost } from "./compost"
+import { describe, expect, it } from "vitest"
 import type { FertilizerDetail, FieldInput } from "../../types"
+import { calculateNitrogenSupplyByCompost } from "./compost"
 
 describe("calculateNitrogenSupplyByCompost", () => {
     it("should return 0 if no compost applications are found", () => {
@@ -35,7 +35,7 @@ describe("calculateNitrogenSupplyByCompost", () => {
                     p_type_compost: true,
                     p_n_rt: 20,
                     p_type_manure: false,
-                    p_type_mineral:false,
+                    p_type_mineral: false,
                 },
             ],
             [
@@ -45,7 +45,7 @@ describe("calculateNitrogenSupplyByCompost", () => {
                     p_type_compost: true,
                     p_n_rt: 15,
                     p_type_manure: false,
-                    p_type_mineral:false,
+                    p_type_mineral: false,
                 },
             ],
         ])
@@ -55,13 +55,13 @@ describe("calculateNitrogenSupplyByCompost", () => {
             fertilizerDetailsMap,
         )
 
-        expect(result.total.equals(new Decimal(27.5))).toBe(true) 
+        expect(result.total.equals(new Decimal(27.5))).toBe(true)
         expect(result.applications).toEqual([
             { id: "app1", value: new Decimal(20) },
             { id: "app2", value: new Decimal(7.5) },
         ])
     })
-    
+
     it("should throw an error if a fertilizer application has no details", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
             {

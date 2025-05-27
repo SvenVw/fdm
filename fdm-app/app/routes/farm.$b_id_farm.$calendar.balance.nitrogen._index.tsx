@@ -1,29 +1,9 @@
 import {
-    data,
-    NavLink,
-    useLoaderData,
-    useLocation,
-    useNavigation,
-    type LoaderFunctionArgs,
-    type MetaFunction,
-} from "react-router"
-import { clientConfig } from "~/lib/config"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import { getSession } from "~/lib/auth.server"
-import { getFarm, getFields } from "@svenvw/fdm-core"
-import { fdm } from "~/lib/fdm.server"
-import {
+    type NitrogenBalanceNumeric,
     calculateNitrogenBalance,
     collectInputForNitrogenBalance,
-    type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
-import { getTimeframe } from "../lib/calendar"
+import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     ArrowDownToLine,
     ArrowRight,
@@ -34,9 +14,29 @@ import {
     CircleCheck,
     House,
 } from "lucide-react"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    NavLink,
+    data,
+    useLoaderData,
+    useLocation,
+    useNavigation,
+} from "react-router"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { fdm } from "~/lib/fdm.server"
+import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
 import { LoadingSpinner } from "../components/custom/loadingspinner"
 import { Skeleton } from "../components/ui/skeleton"
-import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
+import { getTimeframe } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
