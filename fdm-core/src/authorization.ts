@@ -4,6 +4,7 @@ import type {
     Permission,
     PrincipalId,
     Resource,
+    ResourceBead,
     ResourceChain,
     ResourceId,
     Role,
@@ -239,6 +240,67 @@ export async function checkPermission(
 }
 
 /**
+ * Retrieves a list of roles a principal has for a specific resource.
+ *
+ * This function queries the database to find all roles that a principal has been granted for the given resource.
+ * It returns an array of role strings.
+ * CAUTION: This function does not return inherited roles yet.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param resource - The type of the resource to query for the principal's roles.
+ * @param resource_id - The identifier of the specific resource instance.
+ * @param principal_id - The identifier of the principal.
+ * @returns A promise that resolves to an array of roles (strings) that the principal has for the given resource.
+ *   Returns an empty array if the principal has no roles for the resource.
+ * @throws {Error} If the resource type is invalid or if the database operation fails.
+ */
+export async function getRolesOfPrincipalForResource(
+    fdm: FdmType,
+    resource: Resource,
+    resource_id: ResourceId,
+    principal_id: PrincipalId,
+): Promise<Role[]> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+
+            // Convert principal_id to array
+            const principal_ids = Array.isArray(principal_id)
+                ? principal_id
+                : [principal_id]
+
+            const result = await tx
+                .select({
+                    role: authZSchema.role.role,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        inArray(authZSchema.role.principal_id, principal_ids),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+
+            const roles = result.map((item: { role: string }) => item.role)
+
+            // Make sure no duplicate roles are present
+            return [...new Set(roles)]
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for getRolesOfPrincipalForResource", {
+            resource: resource,
+            resource_id: resource_id,
+            principal_id: principal_id,
+        })
+    }
+}
+
+/**
  * Grants a specified role to a principal for a given resource.
  *
  * This function validates that the provided resource and role are allowed. It then generates a unique role identifier and
@@ -249,7 +311,7 @@ export async function checkPermission(
  * @param resource - The target resource type for which the role is being assigned.
  * @param role - The role to be granted.
  * @param resource_id - The identifier of the resource.
- * @param principal_id - The identifier of the principal receiving the role.
+ * @param target_id - The identifier of the principal receiving the role.
  *
  * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
  */
@@ -258,7 +320,7 @@ export async function grantRole(
     resource: Resource,
     role: Role,
     resource_id: ResourceId,
-    principal_id: string,
+    target_id: string,
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -268,6 +330,26 @@ export async function grantRole(
             }
             if (!roles.includes(role)) {
                 throw new Error("Invalid role")
+            }
+
+            // Check if principal has already a role on this resource
+            const existingRole = await tx
+                .select({
+                    role_id: authZSchema.role.role_id,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        eq(authZSchema.role.principal_id, target_id),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+                .limit(1)
+
+            if (existingRole.length > 0) {
+                throw new Error("Principal already has a role on this resource")
             }
 
             const role_id = createId()
@@ -275,45 +357,98 @@ export async function grantRole(
                 role_id: role_id,
                 resource: resource,
                 resource_id: resource_id,
-                principal_id: principal_id,
+                principal_id: target_id,
                 role: role,
             }
             await tx.insert(authZSchema.role).values(roleData)
-
-            return role_id
         })
     } catch (err) {
-        throw handleError(err, "Exception for granting role", {
+        throw handleError(err, "Exception for grantRole", {
             resource: resource,
             role: role,
             resource_id: resource_id,
-            principal_id: principal_id,
+            target_id: target_id,
         })
     }
 }
 
 /**
- * Revokes a role from a principal for a specified resource.
+ * Revokes the principal from a specified resource.
  *
- * This function revokes a role by marking the corresponding record as deleted in the database. It validates
- * that the provided resource and role are valid, and executes the update within a transaction. If the input
+ * This function revokes the role of a principal by marking the corresponding record as deleted in the database. It validates
+ * that the provided resource is valid, and executes the update within a transaction. If the input
  * values are invalid or if the operation fails, an error is thrown.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param resource - The type of the resource from which the role should be revoked.
- * @param role - The role to revoke.
  * @param resource_id - The identifier of the resource instance.
- * @param principal_id - The identifier of the principal whose role is being revoked.
+ * @param target_id - The identifier of the principal whose role is being revoked.
  *
- * @throws {Error} If the resource or role is invalid, or if the revocation operation fails.
+ * @throws {Error} If the resource is invalid, or if the revocation operation fails.
  */
-export async function revokeRole(
+export async function revokePrincipal(
+    fdm: FdmType,
+    resource: Resource,
+    resource_id: ResourceId,
+    target_id: string,
+): Promise<void> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+
+            // Revoke the role
+            await tx
+                .update(authZSchema.role)
+                .set({ deleted: new Date() })
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        eq(authZSchema.role.principal_id, target_id),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for revokePrincipal", {
+            resource: resource,
+            resource_id: resource_id,
+            principal_id: target_id,
+        })
+    }
+}
+
+/**
+ * Updates the role of a principal for a specific resource.
+ *
+ * This function revokes the existing role of the principal on the resource and then grants a new role. It first validates
+ * that the provided resource and role are valid. Both the revocation and granting operations are performed within a single
+ * transaction to maintain database consistency.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param resource - The type of the resource for which the role should be updated.
+ * @param role - The new role to assign.
+ * @param resource_id - The identifier of the specific resource.
+ * @param target_id - The identifier of the principal whose role is being updated.
+ * @returns A promise that resolves when the role has been updated
+ * @throws {Error} If the specified resource or role is invalid or if the database transaction fails.
+ *
+ * @example
+ * ```typescript
+ * // Example usage of updateRole
+ * await updateRole(fdm, "farm", "advisor", "farm123", "user456");
+ * ```
+ */
+export async function updateRole(
     fdm: FdmType,
     resource: Resource,
     role: Role,
     resource_id: ResourceId,
-    principal_id: string,
-): Promise<void> {
+    target_id: string,
+): Promise<string> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
             // Validate input
@@ -324,6 +459,7 @@ export async function revokeRole(
                 throw new Error("Invalid role")
             }
 
+            // Revoke the current role
             await tx
                 .update(authZSchema.role)
                 .set({ deleted: new Date() })
@@ -331,18 +467,28 @@ export async function revokeRole(
                     and(
                         eq(authZSchema.role.resource, resource),
                         eq(authZSchema.role.resource_id, resource_id),
-                        eq(authZSchema.role.principal_id, principal_id),
-                        eq(authZSchema.role.role, role),
+                        eq(authZSchema.role.principal_id, target_id),
                         isNull(authZSchema.role.deleted),
                     ),
                 )
+
+            // Grant the new role
+            const role_id = createId()
+            const roleData = {
+                role_id: role_id,
+                resource: resource,
+                resource_id: resource_id,
+                principal_id: target_id,
+                role: role,
+            }
+            await tx.insert(authZSchema.role).values(roleData)
         })
     } catch (err) {
-        throw handleError(err, "Exception for revoking role", {
+        throw handleError(err, "Exception for updateRole", {
             resource: resource,
             role: role,
             resource_id: resource_id,
-            principal_id: principal_id,
+            target_id: target_id,
         })
     }
 }
@@ -414,6 +560,74 @@ export async function listResources(
 }
 
 /**
+ * Retrieves a list of principals associated with a specific resource along with their roles.
+ *
+ * This function queries the database to find all principals that have been granted
+ * any role on the given resource. It returns an array of objects, each containing the
+ * principal's identifier and the role they possess for that resource.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param resource - The type of the resource to query for associated principals.
+ * @param resource_id - The identifier of the specific resource instance.
+ * @returns A promise that resolves to an array of objects, each with `principal_id` and `role` properties.
+ *   Returns an empty array if no principals are associated with the resource.
+ *
+ * @throws {Error} If the resource type is invalid or if the database operation fails.
+ *
+ * @example
+ * ```typescript
+ * // Example usage to list principals for a specific farm
+ * const principals = await listPrincipalsForResource(fdm, "farm", "farm123");
+ * if (principals.length > 0) {
+ *   console.log("Principals associated with farm123:", principals);
+ *   principals.forEach((principal) => {
+ *     console.log(`- Principal ID: ${principal.principal_id}, Role: ${principal.role}`);
+ *   });
+ * } else {
+ *   console.log("No principals associated with farm123.");
+ * }
+ * ```
+ */
+export async function listPrincipalsForResource(
+    fdm: FdmType,
+    resource: Resource,
+    resource_id: ResourceId,
+): Promise<
+    {
+        principal_id: string
+        role: string
+    }[]
+> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            // Validate input
+            if (!resources.includes(resource)) {
+                throw new Error("Invalid resource")
+            }
+
+            return await tx
+                .select({
+                    principal_id: authZSchema.role.principal_id,
+                    role: authZSchema.role.role,
+                })
+                .from(authZSchema.role)
+                .where(
+                    and(
+                        eq(authZSchema.role.resource, resource),
+                        eq(authZSchema.role.resource_id, resource_id),
+                        isNull(authZSchema.role.deleted),
+                    ),
+                )
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for listPrincipalsForResource", {
+            resource: resource,
+            resource_id: resource_id,
+        })
+    }
+}
+
+/**
  * Retrieves the roles authorized to perform a specific action on a given resource.
  *
  * This function filters the global permissions array for entries that match the specified
@@ -469,9 +683,9 @@ async function getResourceChain(
             "fertilizer_application",
             "soil_analysis",
         ]
-        const chain = []
+        const chain: ResourceBead[] = []
         if (resource === "farm") {
-            const bead = {
+            const bead: ResourceBead = {
                 resource: "farm",
                 resource_id: resource_id,
             }
@@ -491,7 +705,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -527,7 +741,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -576,7 +790,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -606,7 +820,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })
@@ -639,7 +853,7 @@ async function getResourceChain(
             }
             const beads = Object.keys(result[0]).map((x) => {
                 return {
-                    resource: x,
+                    resource: x as Resource,
                     resource_id: result[0][x],
                 }
             })

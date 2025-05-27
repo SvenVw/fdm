@@ -304,8 +304,7 @@ export async function getUsersInOrganization(
     organization_slug: string,
 ): Promise<
     {
-        id: string
-        email: string
+        username: string
         firstname: string
         surname: string
         image: string
@@ -315,8 +314,7 @@ export async function getUsersInOrganization(
     try {
         const users = await fdm
             .select({
-                id: authNSchema.member.id,
-                email: authNSchema.user.email,
+                username: authNSchema.user.username,
                 firstname: authNSchema.user.firstname,
                 surname: authNSchema.user.surname,
                 image: authNSchema.user.image,
@@ -739,14 +737,14 @@ export async function rejectInvitation(
  * @param fdm - The FDM instance providing the connection to the database.
  * @param admin_id - The ID of the user initiating the removal (must be owner or admin).
  * @param organization_id - The ID of the organization from which the user is being removed.
- * @param email - The email address of the user being removed.
+ * @param username - The username of the user being removed.
  * @throws {Error} Throws an error if any database operation fails, if the user initiating the removal does not have permissions, or if the user to be removed is not found.
  */
 export async function removeUserFromOrganization(
     fdm: FdmType,
     admin_id: string,
     organization_id: string,
-    email: string,
+    username: string,
 ): Promise<void> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -760,11 +758,11 @@ export async function removeUserFromOrganization(
                 throw new Error("User has no permission to remove user")
             }
 
-            // Remove user from organization based on email
+            // Remove user from organization based on username
             const userToRemove = await tx
                 .select({ id: authNSchema.user.id })
                 .from(authNSchema.user)
-                .where(eq(authNSchema.user.email, email))
+                .where(eq(authNSchema.user.username, username))
                 .limit(1)
             if (userToRemove.length === 0) {
                 throw new Error("User to remove not found")
@@ -796,7 +794,7 @@ export async function removeUserFromOrganization(
         throw handleError(err, "Exception for removeUserFromOrganization", {
             admin_id,
             organization_id,
-            email,
+            username,
         })
     }
 }
@@ -807,7 +805,7 @@ export async function removeUserFromOrganization(
  * @param fdm - The FDM instance providing the connection to the database.
  * @param admin_id - The ID of the user initiating the update (must be owner or admin).
  * @param organization_id - The ID of the organization in which the user's role is being updated.
- * @param email - The email address of the user whose role is being updated.
+ * @param username - The username of the user whose role is being updated.
  * @param role - The new role to assign to the user.
  * @throws {Error} Throws an error if any database operation fails, if the user initiating the update does not have permissions, or if the user to be updated is not found.
  */
@@ -815,7 +813,7 @@ export async function updateRoleOfUserAtOrganization(
     fdm: FdmType,
     admin_id: string,
     organization_id: string,
-    email: string,
+    username: string,
     role: "owner" | "admin" | "member",
 ): Promise<void> {
     try {
@@ -832,11 +830,11 @@ export async function updateRoleOfUserAtOrganization(
                 )
             }
 
-            // Update user at organization based on email
+            // Update user at organization based on username
             const userToUpdate = await tx
                 .select({ id: authNSchema.user.id })
                 .from(authNSchema.user)
-                .where(eq(authNSchema.user.email, email))
+                .where(eq(authNSchema.user.username, username))
                 .limit(1)
             if (userToUpdate.length === 0) {
                 throw new Error("User to update not found")
@@ -869,7 +867,7 @@ export async function updateRoleOfUserAtOrganization(
         throw handleError(err, "Exception for updateRoleOfUserAtOrganization", {
             admin_id,
             organization_id,
-            email,
+            username,
             role,
         })
     }
@@ -938,7 +936,16 @@ export async function checkOrganizationSlugForAvailability(
             .where(eq(authNSchema.organization.slug, organization_slug))
             .limit(1)
 
-        return existingOrganization.length === 0
+        // Check if slug is not already an username
+        const existingUsername = await fdm
+            .select({ id: authNSchema.user.id })
+            .from(authNSchema.user)
+            .where(eq(authNSchema.user.username, organization_slug))
+            .limit(1)
+
+        return (
+            existingOrganization.length === 0 && existingUsername.length === 0
+        )
     } catch (err) {
         throw handleError(
             err,
