@@ -12,8 +12,8 @@ import type {
  * and calculates the total nitrogen supplied based on the application amount and the nitrogen content of the fertilizer.
  * @param fertilizerApplications - An array of fertilizer applications, each containing the application amount and a reference to the fertilizer details.
  * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
- * @returns An object containing the total nitrogen supplied by manure and a list of individual manure applications with their nitrogen contributions.
- * The values are of type: NitrogenSupplyFertilizers["manure"]
+ * @returns An object containing the total nitrogen supplied by other fertilizers and a list of individual other fertilizer applications with their nitrogen contributions.
+ * The values are of type: NitrogenSupplyFertilizers["other"]
  */
 export function calculateNitrogenSupplyByOtherFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
