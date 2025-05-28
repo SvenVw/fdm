@@ -1,6 +1,6 @@
 ---
 slug: release-may-2025
-title: May 2025 Release Notes
+title: May 2025 Release
 authors: [svenverweij]
 tags: [release, fdm-core, fdm-calculator, fdm-data]
 date: 2025-05-27
@@ -15,8 +15,8 @@ This post outlines the recent updates to the FDM libraries: `@svenvw/fdm-core`, 
 This release significantly expands the capabilities for managing and interpreting soil analysis data, allowing for a more nuanced understanding of soil characteristics:
 
 *   **Expanded Soil Parameter Set:** To support more detailed soil characterization and agronomic modeling, a wide array of new soil parameters have been added. These include:
-    *   Key indicators such as `a_c_of` (organic carbon, g C / kg), `a_nmin_cc` (mineral nitrogen available to crops), and `a_density_sa` (soil bulk density, g/cm³), which is crucial for converting nutrient concentrations to area-based amounts (e.g., kg/ha).
-    *   A comprehensive suite for in-depth analysis: `a_al_ox` (Aluminium oxide), `a_ca_co` (Calcium carbonate), `a_ca_co_po` (Calcium carbonate potential), `a_caco3_if` (Calcium carbonate if present), `a_cec_co` (Cation exchange capacity via cobalt hexamine method), `a_cn_fr` (Carbon to Nitrogen fraction/ratio), `a_com_fr` (Clay organic matter fraction), `a_cu_cc` (Copper via cobalt hexamine), `a_fe_ox` (Iron oxide), `a_k_cc` (Potassium via cobalt hexamine), `a_k_co` (Potassium content), `a_k_co_po` (Potassium content potential), `a_mg_cc` (Magnesium via cobalt hexamine), `a_mg_co` (Magnesium content), `a_mg_co_po` (Magnesium content potential), `a_n_pmn` (Potentially mineralizable nitrogen),`a_p_ox` (Phosphorus oxide), `a_p_rt` (Phosphorus total), `a_p_sg` (Phosphorus classification for N-sensitivity), `a_p_wa` (Water extractable phosphorus), `a_ph_cc` (pH via cobalt hexamine), `a_s_rt` (Sulphur total), `a_sand_mi` (Sand mineral fraction), `a_silt_mi` (Silt mineral fraction), and `a_zn_cc` (Zinc via cobalt hexamine).
+    *   Key indicators such as `a_c_of` (organic carbon, g C / kg), `a_nmin_cc` (Plant available mineral nitrogen), and `a_density_sa` (soil bulk density, g/cm³), which is crucial for converting nutrient concentrations to area-based amounts (e.g., kg/ha).
+    *   A comprehensive suite for in-depth analysis: `a_al_ox` (Aluminium with oxalate extraction), `a_ca_co` (Calcium exchangeable, extracted with cohex), `a_ca_co_po` (Calcium occupation), `a_caco3_if` (Carbonated Lime), `a_cec_co` (	Cation Exchange Capacity), `a_cn_fr` (Carbon to Nitrogen fraction/ratio), `a_com_fr` (Carbon fraction Organic Matter), `a_cu_cc` (Copper plant available), `a_fe_ox` (Iron extractable with oxalate), `a_k_cc` (Potassium plant available), `a_k_co` (Potassium exchangeable, extracted with cohex), `a_k_co_po` (Potassium occupation), `a_mg_cc` (Magnesium plant available), `a_mg_co` (Magnesium exchangeable, extracted with cohex), `a_mg_co_po` (Magnesium occupation), `a_n_pmn` (Microbial Activity),`a_p_ox` (Phosphor extractable with oxalate), `a_p_rt` (	Phosphor total content), `a_p_sg` (	Phosphor saturation grade), `a_p_wa` (Phosphate in water extraction), `a_ph_cc` (	Acidity in CaCl2), `a_s_rt` (Sulphur total), `a_sand_mi` (Sand content), `a_silt_mi` (Silt content), and `a_zn_cc` (Zinc plant available).
     *   Specific nitrogen forms: `a_nh4_cc` (Ammonium nitrogen) and `a_no3_cc` (Nitrate nitrogen), providing insight into readily available nitrogen.
     *   The `a_cn_fr` (Carbon to Nitrogen ratio) and `a_n_rt` (total nitrogen content, mg N / kg) parameters further refine soil nitrogen characterization.
 *   **Precise Soil Sampling Depth:** To allow for more accurate representation of soil profile data, `a_depth` for soil sampling has been replaced by `a_depth_lower` and `a_depth_upper`, enabling the definition of specific soil layers.
@@ -32,7 +32,7 @@ Updates to cultivation and harvest functionalities in `@svenvw/fdm-core` and rel
     *   `b_lu_hi` (Harvest Index): The fraction of total crop biomass that is commercially valuable, crucial for yield and residue estimations.
     *   `b_lu_n_harvestable`: Default nitrogen content (g N / kg) of the harvestable parts of the crop, used for calculating nutrient removal.
     *   `b_lu_yield`: Default average dry matter yield (kg / ha), useful for planning and benchmarking.
-    *   `b_lu_croprotation`: Specifies the crop's type within a rotation sequence (e.g., main crop, cover crop).
+    *   `b_lu_croprotation`: Specifies the crop's category within a rotation sequence (e.g., cereals, grassland, maize, etc.).
     *   These new parameters have also been integrated into the BRP (Basisregistratie Percelen) dataset within `@svenvw/fdm-data` to ensure data consistency.
 *   **Crop Residue Tracking (`@svenvw/fdm-core`):** The `cultivationEnding` process now includes an `m_cropresidue` parameter, allowing users to explicitly state whether crop residues are left on the field or removed. This is vital for accurate soil organic matter modeling and nutrient management.
 *   **Refined Harvest Data Structure (`@svenvw/fdm-core`):**
