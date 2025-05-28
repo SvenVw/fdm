@@ -1,7 +1,7 @@
-import Decimal from "decimal.js"
-import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
-import { fromUrl } from "geotiff"
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
+import Decimal from "decimal.js"
+import { fromUrl } from "geotiff"
+import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 
 /**
  * Calculates the amount of nitrogen supplied through atmospheric deposition for a given field and time frame.
@@ -24,6 +24,8 @@ export async function calculateNitrogenSupplyByDeposition(
     fdmPublicDataUrl: string,
 ): Promise<NitrogenSupply["deposition"]> {
     // Settings
+    // Using the year 2022 as this is currrently only available.
+    // TO DO: Expand the options of other years
     const year = "2022"
     const region = "nl"
     const url = `${fdmPublicDataUrl}deposition/${region}/ntot_${year}.tiff`
@@ -92,7 +94,7 @@ export async function calculateNitrogenSupplyByDeposition(
         if (timeFrameDays.lessThanOrEqualTo(0)) {
             return { total: new Decimal(0) }
         }
-        const timeFrameFraction = timeFrameDays.dividedBy(365)
+        const timeFrameFraction = timeFrameDays.add(1).dividedBy(365)
         const deposition = new Decimal(depositionValue).times(timeFrameFraction)
 
         return { total: deposition }

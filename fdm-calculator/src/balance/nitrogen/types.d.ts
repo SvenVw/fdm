@@ -1,12 +1,12 @@
 import type {
-    fdmSchema,
     Cultivation,
+    CultivationCatalogue,
+    Fertilizer,
+    FertilizerApplication,
+    Field,
     Harvest,
     SoilAnalysis,
-    FertilizerApplication,
-    Fertilizer,
-    CultivationCatalogue,
-    Field,
+    fdmSchema,
 } from "@svenvw/fdm-core"
 import type { Decimal } from "decimal.js"
 
@@ -61,6 +61,20 @@ export type NitrogenSupplyFertilizers = {
          */
         applications: { id: string; value: Decimal }[]
     }
+    /**
+     * The nitrogen supply specifically from other fertilizers than mineral, manure or compost.
+     */
+    other: {
+        /**
+         * The total amount of nitrogen supplied by all other fertilizer applications.
+         */
+        total: Decimal
+        /**
+         * A detailed list of individual other fertilzer applications.
+         * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
+         */
+        applications: { id: string; value: Decimal }[]
+    }
 }
 
 /**
@@ -80,19 +94,14 @@ export type NitrogenSupplyFixation = {
 }
 
 /**
- * Represents the amount of nitrogen supply derived from soil mineralization by cultivations.
+ * Represents the amount of nitrogen supply derived from soil mineralization.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
 export type NitrogenSupplyMineralization = {
     /**
-     * The total amount of nitrogen supply derived from soil mineralization by all cultivations on the field.
+     * The total amount of nitrogen supply derived from soil mineralization on the field.
      */
     total: Decimal
-    /**
-     * A detailed list of nitrogen mineralization by cultivations.
-     * Each entry includes the cultivation's unique identifier (`id`) and the amount of nitrogen mineralized (`value`).
-     */
-    cultivations: { id: string; value: Decimal }[]
 }
 
 /**
@@ -286,6 +295,10 @@ export type NitrogenBalanceField = {
      * The total nitrogen volatilization from the field.
      */
     volatilization: NitrogenVolatilization
+    /**
+     * The target value for the nitrogen balance for the field
+     */
+    target: Decimal
 }
 
 /**
@@ -310,6 +323,10 @@ export type NitrogenBalance = {
      */
     volatilization: Decimal
     /**
+     * The average target value for the nitrogen balance for all the fields
+     */
+    target: Decimal
+    /**
      * A detailed breakdown of the nitrogen balance for each individual field.
      */
     fields: NitrogenBalanceField[]
@@ -323,6 +340,7 @@ export type SoilAnalysisPicked = Pick<
     | "a_n_rt" // mg N / kg
     | "a_som_loi" // %
     | "b_soiltype_agr"
+    | "b_gwl_class"
 >
 
 /**
@@ -345,6 +363,7 @@ export type FieldInput = {
         | "a_n_rt" // mg N / kg
         | "a_som_loi" // %
         | "b_soiltype_agr"
+        | "b_gwl_class"
     >[]
     fertilizerApplications: FertilizerApplication[]
 }
@@ -403,6 +422,10 @@ export type NitrogenSupplyFertilizersNumeric = {
         total: number
         applications: { id: string; value: number }[]
     }
+    other: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
 }
 
 // Numeric version of NitrogenSupplyFixation
@@ -412,9 +435,9 @@ export type NitrogenSupplyFixationNumeric = {
 }
 
 // Numeric version of NitrogenSupplyMineralization
+// Numeric version of NitrogenSupplyMineralization
 export type NitrogenSupplyMineralizationNumeric = {
     total: number
-    cultivations: { id: string; value: number }[]
 }
 
 // Numeric version of NitrogenSupply
@@ -484,6 +507,7 @@ export type NitrogenBalanceFieldNumeric = {
     balance: number
     supply: NitrogenSupplyNumeric
     removal: NitrogenRemovalNumeric
+    target: number
     volatilization: NitrogenVolatilizationNumeric
 }
 
@@ -493,5 +517,6 @@ export type NitrogenBalanceNumeric = {
     supply: number
     removal: number
     volatilization: number
+    target: number
     fields: NitrogenBalanceFieldNumeric[]
 }

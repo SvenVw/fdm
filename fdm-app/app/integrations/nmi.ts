@@ -23,7 +23,7 @@ export async function getSoilParameterEstimates(
     a_caco3_if: number
     a_cec_co: number
     a_clay_mi: number
-    a_cn_cc: number
+    a_cn_fr: number
     a_com_fr: number
     a_cu_cc: number
     a_density_sa: number
@@ -51,7 +51,8 @@ export async function getSoilParameterEstimates(
     b_soiltype_agr: string
     b_gwl_class: string
     a_source: string
-    a_depth_lower: number
+    a_depth_upper: number
+    a_depth_lower: number | undefined
 }> {
     if (!nmiApiKey) {
         throw new Error("Please provide a NMI API key")
@@ -87,6 +88,7 @@ export async function getSoilParameterEstimates(
     const result = await responseApi.json()
     const response = result.data
     response.a_source = "nl-other-nmi"
+    response.a_depth_upper = 0
     response.a_depth_lower = undefined
 
     // Validate the response using the Zod schema

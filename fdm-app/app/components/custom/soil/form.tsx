@@ -42,7 +42,9 @@ export function SoilAnalysisForm(props: {
 }) {
     const { soilAnalysis, soilParameterDescription } = props
 
-    const defaultValues: { [key: string]: any } = {}
+    const defaultValues: {
+        [key: string]: string | number | Date | undefined | null
+    } = {}
     for (const x of soilParameterDescription) {
         let defaultValue = soilAnalysis
             ? soilAnalysis[x.parameter as keyof SoilAnalysis]

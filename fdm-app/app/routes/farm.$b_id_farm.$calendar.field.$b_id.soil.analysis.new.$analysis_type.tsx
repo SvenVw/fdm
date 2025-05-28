@@ -20,7 +20,6 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { SoilAnalysisFormSelection } from "../components/custom/soil/form-selection"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -113,6 +112,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 "a_n_pmn",
                 "a_n_rt",
                 "a_nh4_cc",
+                "a_nmin_cc",
                 "a_no3_cc",
                 "a_p_al",
                 "a_p_cc",
@@ -135,8 +135,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 "b_sampling_date",
                 "a_depth_upper",
                 "a_depth_lower",
-                "a_nh4_cc",
                 "a_no3_cc",
+                "a_nh4_cc",
+                "a_nmin_cc",
             ]
         } else if (soilAnalysisType === "derogation") {
             soilParameters = [
@@ -245,17 +246,17 @@ export default function FarmFieldSoilOverviewBlock() {
 }
 
 /**
- * Action function to update the soil analysis.
+ *  Action function to add a new soil analysis.
  *
- * This function updates a soil analysis based on the provided form data.
+ * his function creates a new soil analysis based on the provided form data.
  * It validates the data, retrieves the necessary IDs from the route parameters,
- * and uses the `updateSoilAnalysis` function from `@svenvw/fdm-core` to perform the update.
+ * and uses the `addSoilAnalysis` function from `@svenvw/fdm-core` to perform the creation.
  *
- * @param request - The HTTP request object.
- * @param params - The route parameters, including `a_id`, `b_id`, and `b_id_farm`.
+ * @param params - The route parameters, including `b_id` and `b_id_farm`.
+ * @returns A redirect response after successful creation.
  * @returns A redirect response after successful update.
  * @throws {Response} If any ID is missing (HTTP 400).
- * @throws {Response} If there is an error during the update (HTTP 500).
+ * @throws {Response} If there is an error during the creation (HTTP 500).
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     // Get the farm id

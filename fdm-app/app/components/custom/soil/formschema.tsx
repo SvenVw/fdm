@@ -6,8 +6,8 @@ export const FormSchema = z
             .string({
                 invalid_type_error: "Bron is ongeldig",
             })
-            .refine((value) => value.toLowerCase() !== "nl-other-nmi", {
-                message: "Bron mag niet 'nl-other-nmi' zijn.",
+            .refine((value) => value.toLowerCase() !== "nmi", {
+                message: "Bron mag niet 'NMI' zijn.",
             }),
         b_sampling_date: z.coerce.date(),
         a_depth_upper: z.coerce
@@ -58,7 +58,7 @@ export const FormSchema = z
         a_cn_fr: z.coerce
             .number()
             .gte(5, "Waarde moet groter of gelijk aan 5 zijn")
-            .lte(40, "Waarde moet kleiner of gelijk aan 100 zijn")
+            .lte(40, "Waarde moet kleiner of gelijk aan 40 zijn")
             .optional(),
         a_com_fr: z.coerce
             .number()
@@ -147,7 +147,7 @@ export const FormSchema = z
             .optional(),
         a_p_rt: z.coerce
             .number()
-            .gte(0.01, "Waarde moet groter of gelijk aan 0.1 zijn")
+            .gte(0.01, "Waarde moet groter of gelijk aan 0.01 zijn")
             .lte(10, "Waarde moet kleiner of gelijk aan 10 zijn")
             .optional(),
         a_p_sg: z.coerce
@@ -196,21 +196,17 @@ export const FormSchema = z
     .partial()
     .refine(
         (data) => {
-            // Check if both values are present and are numbers
             if (
                 typeof data.a_depth_upper === "number" &&
                 typeof data.a_depth_lower === "number"
             ) {
-                // You can make this log more informative if needed, e.g.:
-                // console.log(`Refining depths: upper=${data.a_depth_upper}, lower=${data.a_depth_lower}, valid=${data.a_depth_lower > data.a_depth_upper}`);
-                console.log("hoi - refine check running")
                 return data.a_depth_lower > data.a_depth_upper
             }
-            return true // Pass if one or both are not (yet) numbers (e.g. still undefined due to optional)
+            return true
         },
         {
             message:
-                "Bovenkant van bemonsterde laag moet minder diep zijn dan onderkant", // Corrected message
+                "Bovenkant van bemonsterde laag moet minder diep zijn dan onderkant",
             path: ["a_depth_upper"],
         },
     )

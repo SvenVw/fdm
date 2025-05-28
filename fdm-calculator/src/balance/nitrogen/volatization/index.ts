@@ -1,5 +1,9 @@
 import { Decimal } from "decimal.js"
-import type { CultivationDetail, FieldInput, NitrogenVolatilization } from "../types"
+import type {
+    CultivationDetail,
+    FieldInput,
+    NitrogenVolatilization,
+} from "../types"
 import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
 
 /**
@@ -17,9 +21,12 @@ export function calculateNitrogenVolatilization(
     harvests: FieldInput["harvests"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
 ): NitrogenVolatilization {
-
     /** Calculate the total amount of Nitrogen volatilized as Ammonia */
-    const residues = calculateNitrogenVolatizationViaAmmoniaByResidue(cultivations, harvests, cultivationDetailsMap)
+    const residues = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        cultivations,
+        harvests,
+        cultivationDetailsMap,
+    )
 
     const ammonia = {
         total: residues.total, // Ammonia total should include residues total

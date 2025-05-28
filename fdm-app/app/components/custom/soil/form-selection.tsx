@@ -19,7 +19,7 @@ export function SoilAnalysisFormSelection() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between">
-                    <Button>
+                    <Button asChild>
                         <NavLink to={"./standard"}>Kies</NavLink>
                     </Button>
                 </CardFooter>
@@ -32,7 +32,7 @@ export function SoilAnalysisFormSelection() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between">
-                    <Button>
+                    <Button asChild>
                         <NavLink to={"./nmin"}>Kies</NavLink>
                     </Button>
                 </CardFooter>
@@ -45,7 +45,7 @@ export function SoilAnalysisFormSelection() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between">
-                    <Button>
+                    <Button asChild>
                         <NavLink to={"./derogation"}>Kies</NavLink>
                     </Button>
                 </CardFooter>
@@ -58,7 +58,7 @@ export function SoilAnalysisFormSelection() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between">
-                    <Button>
+                    <Button asChild>
                         <NavLink to={"./all"}>Kies</NavLink>
                     </Button>
                 </CardFooter>
@@ -71,7 +71,7 @@ export function SoilAnalysisFormSelection() {
                     </CardDescription>
                 </CardHeader>
                 <CardFooter className="flex justify-between">
-                    <Button>
+                    <Button asChild>
                         <NavLink to={"./upload"}>Kies</NavLink>
                     </Button>
                 </CardFooter>

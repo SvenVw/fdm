@@ -3,7 +3,7 @@ import {
     BreadcrumbLink,
     BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb"
-import { clientConfig } from "@/app/lib/config"
+import { clientConfig } from "~/lib/config"
 
 export function HeaderAbout() {
     return (

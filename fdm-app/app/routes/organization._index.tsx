@@ -45,7 +45,7 @@ export default function OrganizationsIndex() {
     }>()
 
     return (
-        <main className="container">           
+        <main className="container">
             <div className="max-w-3xl mx-auto px-4">
                 {/* Changed this div to a flex container with justify-between */}
                 <div className="mb-8 flex items-center justify-between">

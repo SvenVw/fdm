@@ -1,351 +1,98 @@
+import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
-import { Decimal } from "decimal.js"
-import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
 import type {
-    CultivationDetail,
-    FieldInput,
+    NitrogenBalanceInput,
+    NitrogenSupplyMineralization,
     SoilAnalysisPicked,
 } from "../types"
+import {
+    calculateNitrogenSupplyBySoilMineralization,
+    calculateNitrogenSupplyBySoilMineralizationUsingMinip,
+} from "./mineralization"
 
 describe("calculateNitrogenSupplyBySoilMineralization", () => {
-    it("should return 0 if no cultivations are provided", () => {
-        const cultivations: FieldInput["cultivations"] = []
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: null,
-            a_n_rt: null,
-            a_c_of: null,
-            a_cn_fr: null,
-            a_density_sa: null,
-            a_som_loi: null,
-        }
-        const cultivationDetailsMap = new Map<string, CultivationDetail>()
+    const mockSoilAnalysis: SoilAnalysisPicked = {
+        a_c_of: 20, // Example value
+        a_cn_fr: 10, // Example value
+        a_density_sa: 1.2, // Example value
+        b_soiltype_agr: "zand",
+        a_n_rt: 1,
+        a_som_loi: 1,
+    }
 
-        const result = calculateNitrogenSupplyBySoilMineralization(
-            cultivations,
-            soilAnalysis,
-            cultivationDetailsMap,
-        )
+    const mockTimeFrame: NitrogenBalanceInput["timeFrame"] = {
+        start: new Date("2023-01-01"),
+        end: new Date("2023-12-31"),
+    }
 
-        expect(result.total.equals(new Decimal(0))).toBe(true)
-        expect(result.cultivations).toEqual([])
-    })
-
-    it("should calculate mineralization for grassland", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "grassland1",
-                b_lu_catalogue: "grasslandCatalogue",
-                m_cropresidue: true,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: "veen",
-            a_n_rt: 20000,
-            a_c_of: 10,
-            a_cn_fr: 14,
-            a_density_sa: 1.2,
-            a_som_loi: null,
-        }
-
-        const cultivationDetailsMap = new Map<string, CultivationDetail>([
-            [
-                "grasslandCatalogue",
-                {
-                    b_lu_catalogue: "grasslandCatalogue",
-                    b_lu_croprotation: "grassland",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
-
-        const result = calculateNitrogenSupplyBySoilMineralization(
-            cultivations,
-            soilAnalysis,
-            cultivationDetailsMap,
-        )
-
-        expect(result.total.equals(new Decimal(250))).toBe(true)
-        expect(result.cultivations).toEqual([
-            { id: "grassland1", value: new Decimal(250) },
-        ])
-    })
-
-    it("should calculate mineralization for arable land", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "arable1",
-                b_lu_catalogue: "arableCatalogue",
-                m_cropresidue: true,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: "arable",
-            a_n_rt: 20000,
-            a_c_of: 10,
-            a_cn_fr: 14,
-            a_density_sa: 1.2,
-            a_som_loi: null,
-        }
-
-        const cultivationDetailsMap = new Map<string, CultivationDetail>([
-            [
-                "arableCatalogue",
-                {
-                    b_lu_catalogue: "arableCatalogue",
-                    b_lu_croprotation: "cereal",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
-
-        const result = calculateNitrogenSupplyBySoilMineralization(
-            cultivations,
-            soilAnalysis,
-            cultivationDetailsMap,
-        )
-
-        expect(result.total.toNumber()).toBeCloseTo(27.78, 2)
-        expect(result.cultivations).toEqual([
-            { id: "arable1", value: expect.any(Decimal) },
-        ])
-    })
-
-    it("should handle missing soil analysis data and throw an error for grassland", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "grassland1",
-                b_lu_catalogue: "grasslandCatalogue",
-                m_cropresidue: false,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: null,
-            a_n_rt: null,
-            a_c_of: null,
-            a_cn_fr: null,
-            a_density_sa: null,
-            a_som_loi: null,
-        }
-        const cultivationDetailsMap = new Map<string, CultivationDetail>([
-            [
-                "grasslandCatalogue",
-                {
-                    b_lu_catalogue: "grasslandCatalogue",
-                    b_lu_croprotation: "grassland",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
-
-        expect(() =>
+    it("should calculate nitrogen supply by soil mineralization correctly", () => {
+        const result: NitrogenSupplyMineralization =
             calculateNitrogenSupplyBySoilMineralization(
-                cultivations,
-                soilAnalysis,
-                cultivationDetailsMap,
-            ),
-        ).toThrowError("No a_n_rt value found in soil analysis for grassland")
-    })
+                mockSoilAnalysis,
+                mockTimeFrame,
+            )
 
-    it("should handle missing soil analysis data and throw an error for arable land", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "arable1",
-                b_lu_catalogue: "arableCatalogue",
-                m_cropresidue: true,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: null,
-            a_n_rt: null,
-            a_c_of: null,
-            a_cn_fr: null,
-            a_density_sa: null,
-            a_som_loi: null,
+        expect(result.total).toBeInstanceOf(Decimal)
+        expect(result.total.toNumber()).toBeCloseTo(97.24, 2) // Expected value based on the mock data
+    })
+    it("should return 0 if the time frame is negative or zero", () => {
+        const zeroTimeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-01-01"), // Same start and end date
         }
-        const cultivationDetailsMap = new Map<string, CultivationDetail>([
-            [
-                "arableCatalogue",
-                {
-                    b_lu_catalogue: "arableCatalogue",
-                    b_lu_croprotation: "cereal",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
-
-        expect(() =>
-            calculateNitrogenSupplyBySoilMineralization(
-                cultivations,
-                soilAnalysis,
-                cultivationDetailsMap,
-            ),
-        ).toThrowError("No a_c_of value found in soil analysis for arable")
-    })
-
-    it("should handle unknown soil type and throw an error for grassland", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "grassland1",
-                b_lu_catalogue: "grasslandCatalogue",
-                m_cropresidue: false,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: "unknownType",
-            a_n_rt: 20000,
-            a_c_of: 10,
-            a_cn_fr: 14,
-            a_density_sa: 1.2,
-            a_som_loi: null,
+        const negativeTimeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-02"),
+            end: new Date("2023-01-01"), // End date before start date
         }
 
-        const cultivationDetailsMap = new Map<string, CultivationDetail>([
-            [
-                "grasslandCatalogue",
-                {
-                    b_lu_catalogue: "grasslandCatalogue",
-                    b_lu_croprotation: "grassland",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
-
-        expect(() =>
+        expect(
             calculateNitrogenSupplyBySoilMineralization(
-                cultivations,
-                soilAnalysis,
-                cultivationDetailsMap,
-            ),
-        ).toThrowError("Unknown soil type: unknownType")
+                mockSoilAnalysis,
+                zeroTimeFrame,
+            ).total.toNumber(),
+        ).toBe(0)
+        expect(
+            calculateNitrogenSupplyBySoilMineralization(
+                mockSoilAnalysis,
+                negativeTimeFrame,
+            ).total.toNumber(),
+        ).toBe(0)
     })
 
-    it("should handle missing cultivation details and throw an error", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "cultivation1",
-                b_lu_catalogue: "missingCatalogue",
-                m_cropresidue: false,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: "veen",
-            a_n_rt: 20000,
-            a_c_of: 10,
-            a_cn_fr: 14,
-            a_density_sa: 1.2,
-            a_som_loi: null,
-        }
-
-        const cultivationDetailsMap = new Map<string, CultivationDetail>()
-
-        expect(() =>
-            calculateNitrogenSupplyBySoilMineralization(
-                cultivations,
-                soilAnalysis,
-                cultivationDetailsMap,
-            ),
-        ).toThrowError(
-            "Cultivation cultivation1 has no corresponding cultivation in cultivationDetails",
-        )
-    })
-
-    it("should limit mineralization to min/max values", () => {
-        const cultivations: FieldInput["cultivations"] = [
-            {
-                b_lu: "grassland1",
-                b_lu_catalogue: "grasslandCatalogue",
-                m_cropresidue: true,
-            },
-        ]
-        const soilAnalysis: SoilAnalysisPicked = {
-            b_soiltype_agr: "rivierklei",
-            a_n_rt: 200000,
-            a_c_of: 10,
-            a_cn_fr: 14,
-            a_density_sa: 1.2,
-            a_som_loi: null,
-        } //High value to exceed max
-
-        const cultivationDetailsMap = new Map<string, CultivationDetail>([
-            [
-                "grasslandCatalogue",
-                {
-                    b_lu_catalogue: "grasslandCatalogue",
-                    b_lu_croprotation: "grassland",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
-
-        const result = calculateNitrogenSupplyBySoilMineralization(
-            cultivations,
-            soilAnalysis,
-            cultivationDetailsMap,
-        )
-
-        expect(result.total.equals(new Decimal(250))).toBe(true)
-
-        const cultivations2: FieldInput["cultivations"] = [
-            {
-                b_lu: "arable1",
-                b_lu_catalogue: "arableCatalogue",
-                m_cropresidue: true,
-            },
-        ]
-        const soilAnalysis2: SoilAnalysisPicked = {
-            b_soiltype_agr: "rivierklei",
-            a_c_of: 0.1,
-            a_cn_fr: 30,
-            a_density_sa: 1.2,
+    it("should return 250 if organic carbon is above 250", () => {
+        const mockSoilAnalysis2: SoilAnalysisPicked = {
+            a_c_of: 350, // Example value
+            a_cn_fr: 10, // Example value
+            a_density_sa: 1.2, // Example value
+            b_soiltype_agr: "zand",
             a_n_rt: 1,
-            a_som_loi: null,
-        } //Low value to check min
+            a_som_loi: 1,
+        }
 
-        const cultivationDetailsMap2 = new Map<string, CultivationDetail>([
-            [
-                "arableCatalogue",
-                {
-                    b_lu_catalogue: "arableCatalogue",
-                    b_lu_croprotation: "cereal",
-                    b_lu_yield: 1000,
-                    b_lu_n_harvestable: 20,
-                    b_lu_hi: 0.4,
-                    b_lu_n_residue: 2,
-                    b_n_fixation: 0,
-                },
-            ],
-        ])
+        const result: NitrogenSupplyMineralization =
+            calculateNitrogenSupplyBySoilMineralization(
+                mockSoilAnalysis2,
+                mockTimeFrame,
+            )
 
-        const result2 = calculateNitrogenSupplyBySoilMineralization(
-            cultivations2,
-            soilAnalysis2,
-            cultivationDetailsMap2,
+        expect(result.total).toBeInstanceOf(Decimal)
+        expect(result.total.toNumber()).toBe(250)
+    })
+})
+
+describe("calculateNitrogenSupplyBySoilMineralizationUsingMinip", () => {
+    it("should calculate nitrogen mineralization correctly using Minip", () => {
+        const a_c_of = 20
+        const a_cn_fr = 10
+        const a_density_sa = 1.2
+
+        const result = calculateNitrogenSupplyBySoilMineralizationUsingMinip(
+            a_c_of,
+            a_cn_fr,
+            a_density_sa,
         )
 
-        expect(result2.total.equals(new Decimal(5))).toBe(true)
+        expect(result).toBeInstanceOf(Decimal)
+        expect(result.toNumber()).toBeCloseTo(97.24, 2)
     })
 })

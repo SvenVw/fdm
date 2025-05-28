@@ -1,10 +1,10 @@
+import type { Harvest } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { Eye, Trash2 } from "lucide-react"
 import { NavLink, useFetcher } from "react-router"
 import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../loadingspinner"
 import type { HarvestableType } from "./types"
-import type { Harvest } from "@svenvw/fdm-core"
 
 export function HarvestsList({
     harvests,
@@ -49,7 +49,7 @@ export function HarvestsList({
                                     </div>
                                     <div className="col-span-2">
                                         <p className="text-sm font-light leading-none">
-                                            {`${harvest.harvestable.harvestable_analyses[0].b_lu_yield} kg DS/ha`}
+                                            {`${harvest.harvestable?.harvestable_analyses?.[0]?.b_lu_yield ?? "–"} kg DS/ha`}
                                         </p>
                                         {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
                                     </div>

@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react"
+import { NavLink, useLocation } from "react-router"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -10,7 +11,6 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { NavLink, useLocation } from "react-router"
 
 export function HeaderFarm({
     b_id_farm,
@@ -40,23 +40,29 @@ export function HeaderFarm({
                             : "Kies een bedrijf"}
                         <ChevronDown />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                        {farmOptions.map((option) => (
-                            <DropdownMenuCheckboxItem
-                                checked={b_id_farm === option.b_id_farm}
-                                key={option.b_id_farm}
-                            >
-                                <NavLink
-                                    to={currentPath.replace(
-                                        b_id_farm,
-                                        option.b_id_farm,
-                                    )}
+                    {farmOptions ? (
+                        <DropdownMenuContent align="start">
+                            {farmOptions.map((option) => (
+                                <DropdownMenuCheckboxItem
+                                    checked={b_id_farm === option.b_id_farm}
+                                    key={option.b_id_farm}
                                 >
-                                    {option.b_name_farm}
-                                </NavLink>
-                            </DropdownMenuCheckboxItem>
-                        ))}
-                    </DropdownMenuContent>
+                                    <NavLink
+                                        to={
+                                            b_id_farm
+                                                ? currentPath.replace(
+                                                      b_id_farm,
+                                                      option.b_id_farm,
+                                                  )
+                                                : `/farm/${option.b_id_farm}`
+                                        }
+                                    >
+                                        {option.b_name_farm}
+                                    </NavLink>
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    ) : null}
                 </DropdownMenu>
             </BreadcrumbItem>
         </>

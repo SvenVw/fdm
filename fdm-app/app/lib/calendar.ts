@@ -5,7 +5,7 @@ const yearStart = 2020
 const yearEnd = new Date().getFullYear()
 
 export function getCalendar(params: Params): string {
-    const calendar = params.calendar as string | "all"
+    const calendar = params.calendar as string
 
     return calendar
 }
@@ -42,7 +42,6 @@ export function getCalendarSelection(): string[] {
     for (let i = yearStart; i <= yearEnd; i++) {
         years.push(i.toString())
     }
-    years.push("all")
 
     // Reverse the array
     years.reverse()

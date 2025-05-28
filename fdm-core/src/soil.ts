@@ -7,9 +7,9 @@ import type { FdmType } from "./fdm"
 import { createId } from "./id"
 import type {
     CurrentSoilData,
+    SoilAnalysis,
     SoilParameterDescription,
     SoilParameters,
-    SoilAnalysis,
 } from "./soil.d"
 import type { Timeframe } from "./timeframe"
 
@@ -25,9 +25,9 @@ import type { Timeframe } from "./timeframe"
  * @param a_date - The date when the soil analysis was performed.
  * @param a_source - The source of the soil analysis data.
  * @param b_id - The identifier of the field where the soil sample was collected.
- * @param a_depth_lower - The lower depth up to whidch the soil sample was taken.
+ * @param a_depth_lower - The lower depth up to which the soil sample was taken.
  * @param b_sampling_date - The date when the soil sample was collected.
- * @param _a_depth_upper - The upper depth from which the soil sample was taken. Defaults to 0
+ * @param a_depth_upper - The upper depth from which the soil sample was taken. Defaults to 0
  * @param soilAnalysisData - Optional additional data for the soil analysis (e.g., pH, nutrient levels).
  * @returns The ID of the newly added soil analysis record.
  * @throws {Error} If the database transaction fails.
@@ -238,6 +238,7 @@ export async function getSoilAnalysis(
                 a_n_pmn: schema.soilAnalysis.a_n_pmn,
                 a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_nh4_cc: schema.soilAnalysis.a_nh4_cc,
+                a_nmin_cc: schema.soilAnalysis.a_nmin_cc,
                 a_no3_cc: schema.soilAnalysis.a_no3_cc,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
@@ -358,6 +359,7 @@ export async function getSoilAnalyses(
                 a_n_pmn: schema.soilAnalysis.a_n_pmn,
                 a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_nh4_cc: schema.soilAnalysis.a_nh4_cc,
+                a_nmin_cc: schema.soilAnalysis.a_nmin_cc,
                 a_no3_cc: schema.soilAnalysis.a_no3_cc,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
@@ -468,6 +470,7 @@ export async function getCurrentSoilData(
                 a_n_pmn: schema.soilAnalysis.a_n_pmn,
                 a_n_rt: schema.soilAnalysis.a_n_rt,
                 a_nh4_cc: schema.soilAnalysis.a_nh4_cc,
+                a_nmin_cc: schema.soilAnalysis.a_nmin_cc,
                 a_no3_cc: schema.soilAnalysis.a_no3_cc,
                 a_p_al: schema.soilAnalysis.a_p_al,
                 a_p_cc: schema.soilAnalysis.a_p_cc,
@@ -520,6 +523,7 @@ export async function getCurrentSoilData(
             "a_n_pmn",
             "a_n_rt",
             "a_nh4_cc",
+            "a_nmin_cc",
             "a_no3_cc",
             "a_p_al",
             "a_p_cc",
@@ -708,7 +712,7 @@ export function getSoilParametersDescription(
         },
         {
             parameter: "a_k_co",
-            unit: "mmmol+/kg",
+            unit: "mmol+/kg",
             name: "K-bodemvoorraad",
             type: "numeric",
             description: "Kalium, totale bodemvoorraad",
@@ -763,18 +767,18 @@ export function getSoilParametersDescription(
             description: "Ammonium (NH4-N)",
         },
         {
+            parameter: "a_nmin_cc",
+            unit: "kg N/ha",
+            name: "N-voorraad",
+            type: "numeric",
+            description: "Beschikbare stikstofvoorraad",
+        },
+        {
             parameter: "a_no3_cc",
             unit: "mg N/l",
             name: "Nitraat-N",
             type: "numeric",
             description: "Nitraat (NO3-N)",
-        },
-        {
-            parameter: "a_n_rt",
-            unit: "mg N/g",
-            name: "N-totale bodemvoorraad",
-            type: "numeric",
-            description: "Stikstof, totale bodemvoorraad",
         },
         {
             parameter: "a_p_al",
@@ -855,7 +859,7 @@ export function getSoilParametersDescription(
         },
         {
             parameter: "a_zn_cc",
-            unit: "%",
+            unit: "µg Zn/kg",
             name: "Zn-plantbeschikbaar",
             type: "numeric",
             description: "Zink, plantbeschikbaar",

@@ -1,19 +1,19 @@
 import type {
-    PrincipalId,
     FdmType,
+    PrincipalId,
     Timeframe,
     fdmSchema,
 } from "@svenvw/fdm-core"
-import type { NitrogenBalanceInput } from "./types"
 import {
-    getFields,
     getCultivations,
-    getSoilAnalyses,
+    getCultivationsFromCatalogue,
     getFertilizerApplications,
     getFertilizers,
-    getCultivationsFromCatalogue,
+    getFields,
     getHarvests,
+    getSoilAnalyses,
 } from "@svenvw/fdm-core"
+import type { NitrogenBalanceInput } from "./types"
 
 /**
  * Collects necessary input data from a FDM instance for calculating the nitrogen balance.
@@ -62,17 +62,22 @@ export async function collectInputForNitrogenBalance(
                     )
 
                     // Collect the harvests of the cultivations
-                    const harvests = await Promise.all(
-                        cultivations.flatMap(async (cultivation) => {
+                    // Collect a promise per cultivation
+                    const harvestPromises = cultivations.map(
+                        async (cultivation) => {
                             return await getHarvests(
                                 tx,
                                 principal_id,
                                 cultivation.b_lu,
                                 timeframe,
                             )
-                        }),
+                        },
                     )
-                    const harvestsFiltered = harvests.flat().filter(
+
+                    // Wait for all, then flatten the resulting arrays into one list
+                    const harvestArrays = await Promise.all(harvestPromises)
+                    const harvests = harvestArrays.flat()
+                    const harvestsFiltered = harvests.filter(
                         (harvest) => harvest.b_lu !== undefined,
                     )
 
@@ -120,12 +125,17 @@ export async function collectInputForNitrogenBalance(
             return {
                 fields,
                 fertilizerDetails: fertilizerDetails,
-                cultivationDetails,
+                cultivationDetails: cultivationDetails,
                 timeFrame: timeframe,
                 fdmPublicDataUrl: fdmPublicDataUrl,
             }
         })
     } catch (error) {
-        throw new Error(String(error))
+        throw new Error(
+            `Failed to collect nitrogen balance input for farm ${b_id_farm}: ${
+                error instanceof Error ? error.message : String(error)
+            }`,
+            { cause: error },
+        )
     }
 }

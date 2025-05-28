@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest"
 import { Decimal } from "decimal.js"
+import { describe, expect, it } from "vitest"
 import type { FieldInput } from "../types"
 import { calculateNitrogenRemovalByHarvests } from "./harvest"
 
@@ -9,7 +9,6 @@ describe("calculateNitrogenRemovalByHarvests", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
                 m_cropresidue: true,
             },
         ]
@@ -191,7 +190,7 @@ describe("calculateNitrogenRemovalByHarvests", () => {
                 cultivationDetailsMap,
             ),
         ).toThrowError(
-            "Harvest harvest1 has no corresponding cultivation in cultivations",
+            "Harvest harvest1: cultivation with b_lu 'cultivation1' is missing b_lu_catalogue",
         )
     })
 

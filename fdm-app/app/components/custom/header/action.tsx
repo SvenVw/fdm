@@ -2,12 +2,22 @@ import { cn } from "@/app/lib/utils"
 import { NavLink } from "react-router"
 import { Button } from "../../ui/button"
 
-export function HeaderAction(label: string, to: string, disabled: boolean) {
+export interface HeaderActionProps {
+    label: string
+    to: string
+    disabled: boolean
+}
+
+export function HeaderAction({
+    label,
+    to,
+    disabled,
+}: HeaderActionProps): JSX.Element {
     return (
         <div className="ml-auto">
             <NavLink
                 to={to}
-                className={cn("ml-auto", {
+                className={cn({
                     "pointer-events-none": disabled,
                 })}
             >

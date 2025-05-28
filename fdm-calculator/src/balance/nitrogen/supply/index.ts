@@ -6,9 +6,9 @@ import type {
     NitrogenSupply,
     SoilAnalysisPicked,
 } from "../types"
+import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import { calculateNitrogenSupplyByFertilizers } from "./fertilizers"
 import { calculateNitrogenFixation } from "./fixation"
-import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
 
 /**
@@ -37,45 +37,49 @@ export async function calculateNitrogenSupply(
     timeFrame: NitrogenBalanceInput["timeFrame"],
     fdmPublicDataUrl: string,
 ): Promise<NitrogenSupply> {
-    // Calculate the amount of Nitrogen supplied by fertilizers
-    const fertilizersSupply = calculateNitrogenSupplyByFertilizers(
-        fertilizerApplications,
-        fertilizerDetailsMap,
-    )
+    try {
+        // Calculate the amount of Nitrogen supplied by fertilizers
+        const fertilizersSupply = calculateNitrogenSupplyByFertilizers(
+            fertilizerApplications,
+            fertilizerDetailsMap,
+        )
 
-    // Calculate the amount of Nitrogen fixated by the cultivations
-    const fixationSupply = calculateNitrogenFixation(
-        cultivations,
-        cultivationDetailsMap,
-    )
+        // Calculate the amount of Nitrogen fixated by the cultivations
+        const fixationSupply = calculateNitrogenFixation(
+            cultivations,
+            cultivationDetailsMap,
+        )
 
-    // Calculate the amount of Nitrogen supplied by deposition
-    const depositionSupply = await calculateNitrogenSupplyByDeposition(
-        field,
-        timeFrame,
-        fdmPublicDataUrl,
-    )
+        // Calculate the amount of Nitrogen supplied by deposition
+        const depositionSupply = await calculateNitrogenSupplyByDeposition(
+            field,
+            timeFrame,
+            fdmPublicDataUrl,
+        )
 
-    // Calculate the amount of Nitrogen supplied by minerlization from the soil
-    const mineralisationSupply = calculateNitrogenSupplyBySoilMineralization(
-        cultivations,
-        soilAnalysis,
-        cultivationDetailsMap,
-    )
+        // Calculate the amount of Nitrogen supplied by mineralization from the soil
+        const mineralisationSupply =
+            calculateNitrogenSupplyBySoilMineralization(soilAnalysis, timeFrame)
 
-    // Calculate the total amount of Nitrogen supplied
-    const totalSupply = fertilizersSupply.total
-        .add(fixationSupply.total)
-        .add(depositionSupply.total)
-        .add(mineralisationSupply.total)
+        // Calculate the total amount of Nitrogen supplied
+        const totalSupply = fertilizersSupply.total
+            .add(fixationSupply.total)
+            .add(depositionSupply.total)
+            .add(mineralisationSupply.total)
 
-    const supply = {
-        total: totalSupply,
-        fertilizers: fertilizersSupply,
-        fixation: fixationSupply,
-        deposition: depositionSupply,
-        mineralisation: mineralisationSupply,
+        const supply = {
+            total: totalSupply,
+            fertilizers: fertilizersSupply,
+            fixation: fixationSupply,
+            deposition: depositionSupply,
+            mineralisation: mineralisationSupply,
+        }
+
+        return supply
+    } catch (error) {
+        console.error("Error calculating nitrogen supply:", error)
+        throw new Error(
+            `Failed to calculate nitrogen supply: ${error instanceof Error ? error.message : "Unknown error"}`,
+        )
     }
-
-    return supply
 }

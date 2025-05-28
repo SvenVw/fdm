@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react"
+import { NavLink, useLocation } from "react-router"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -10,7 +11,6 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { NavLink, useLocation } from "react-router"
 
 export function HeaderOrganization({
     selectedOrganizationSlug,

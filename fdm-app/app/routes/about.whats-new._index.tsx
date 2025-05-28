@@ -21,8 +21,8 @@ import { SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { Header } from "../components/custom/header/base"
 import { HeaderAbout } from "../components/custom/header/about"
+import { Header } from "../components/custom/header/base"
 
 export const meta: MetaFunction = () => {
     return [
@@ -46,6 +46,53 @@ export interface UpdatePost {
 // Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
+        id: "update-2025-05-27",
+        title: "Nieuwe Functies & Uitgebreide Verbeteringen (Mei 2025)",
+        description: `Welkom bij de nieuwste update van ${clientConfig.name}! Lees snel verder wat er nieuw is!
+
+## Uitgebreidere Bodemanalyse en Invoer
+
+Het correct invoeren en interpreteren van bodemanalyses is cruciaal. Daarom hebben we de volgende verbeteringen doorgevoerd:
+
+*   **Meer Bodemparameters Beschikbaar:** U kunt nu een nog breder scala aan bodemparameters vastleggen bij uw analyses. Dit omvat belangrijke waarden zoals:
+    *   \`a_nmin_cc\` (N-mineraal), \`a_n_rt\` (totale stikstof), \`a_c_of\` (organische koolstof), \`a_cn_fr\` (C/N-verhouding), en \`a_density_sa\` (bodemdichtheid).
+    *   Daarnaast is er ondersteuning voor een uitgebreide lijst van specifieke elementen en eigenschappen (zoals \`a_al_ox\`, \`a_ca_co\`, \`a_cec_co\`, etc.), wat een dieper inzicht geeft in de bodemvruchtbaarheid en -samenstelling. Deze gegevens kunnen nu ook direct vanuit NMI-integraties worden overgenomen.
+*   **Keuzelijst voor Analysebron:** Bij het invoeren van een bodemanalyse kunt u nu de bron van de analyse selecteren uit een vaste keuzelijst, in plaats van vrije tekstinvoer. Dit zorgt voor meer consistentie in uw data.
+*   **Selectie Type Bodemanalyse:** Om het invoerformulier overzichtelijker te maken, kunt u nu een type bodemanalyse selecteren. Afhankelijk van het gekozen type wordt een relevante selectie van parameters getoond.
+
+### Stikstofbalans: Vergelijking en Visualisatie
+
+De stikstofbalans is een belangrijk hulpmiddel. We hebben nieuwe functies toegevoegd om hier meer inzicht in te krijgen:
+
+*   **Vergelijking met Streefwaarde:** Zowel op bedrijfsniveau als op perceelsniveau wordt nu een vergelijking getoond tussen de berekende stikstofbalans en de geldende streefwaarde. Zo ziet u direct hoe u presteert.
+*   **Grafische Weergave:** Op de stikstofbalanspagina's (voor bedrijf en percelen) vindt u nu een staafdiagram. Deze grafiek visualiseert de aanvoer, afvoer en emissie van stikstof, wat helpt om de balans beter te begrijpen.
+
+### Organisaties en Toegang tot Bedrijven delen
+
+Samenwerken wordt makkelijker met de nieuwe functies voor organisatiebeheer:
+
+*   **Organisaties Aanmaken en Beheren:** U kunt nu organisaties aanmaken binnen ${clientConfig.name}. Dit is handig als u bijvoorbeeld als adviesbureau met meerdere adviseurs voor verschillende klanten werkt.
+*   **Gebruikers Uitnodigen:** Nodig eenvoudig andere gebruikers uit om lid te worden van uw organisatie.
+*   **Toegang tot bedrijven delen:** Het is nu mogelijk om toegang to een bedrijf te delen met andere gebruikers of zelfs met hele organisaties. U kunt hierbij aangeven welke rol (en dus welke rechten) de ander krijgt op uw bedrijf. Dit maakt het makkelijker om bijvoorbeeld uw adviseur toegang te geven tot uw bedrijfsgegevens.
+
+### Verbeterd Gebruiksgemak
+
+Ook aan de algemene werking van de app is gesleuteld:
+
+*   **Nieuwe Navigatie via Platform Zijbalk:** Er is een nieuwe zijbalk toegevoegd voor platform-brede zaken. Hier vindt u nu bijvoorbeeld uw accountinstellingen, organisatiebeheer en de "Wat is nieuw"-pagina.
+*   **Kaart hernoemd naar Atlas:** De functionaliteit die voorheen "Kaart" heette, is nu hernoemd naar "Atlas" en verplaatst naar het "Apps" gedeelte voor een logischere structuur.
+*   **Behouden van Context bij Navigeren:** Wanneer u in de paginakop een ander perceel of bedrijf selecteert, blijft u op de huidige pagina (bijvoorbeeld de instellingenpagina van dat perceel/bedrijf) in plaats van teruggestuurd te worden naar de startpagina.
+*   **Betere Afhandeling na Inloggen:** Als u werd doorgestuurd naar de inlogpagina, wordt u na succesvol inloggen nu automatisch teruggebracht naar de pagina die u oorspronkelijk wilde bezoeken.
+*   **Vernieuwde Bedrijfsselectiepagina:** De pagina waar u een bedrijf selecteert, heeft een nieuw ontwerp gekregen met overzichtelijke kaarten per bedrijf, waarop direct enkele kerngegevens zichtbaar zijn.
+*   **"Wat is Nieuw" verplaatst:** Deze pagina is nu te vinden onder de "Over ${clientConfig.name}" sectie in de nieuwe platform zijbalk.
+
+### Overige Wijzigingen
+
+*   **Beperking Oogst:** Per oogstmoment kan nu slechts één oogstbaar product worden geregistreerd, wat de datastructuur vereenvoudigt.`,
+        date: new Date("2025-05-27"),
+        isNew: true,
+    },
+    {
         id: "update-2025-04-14",
         title: "Nieuwe Functies & Uitgebreide Verbeteringen (April 2025)",
         description: `Deze update introduceert een reeks nieuwe functies en significante verbeteringen, ontworpen om uw workflow binnen ${clientConfig.name} efficiënter en duidelijker te maken:
@@ -59,7 +106,7 @@ export const updatePosts: UpdatePost[] = [
 **Verbeteringen in de 'Bedrijf Aanmaken' Wizard:**
 *   **Direct bodemanalyse Toevoegen:** U hoeft de wizard niet meer te verlaten om een nieuwe bodemanalyse toe te voegen. Dit kan nu direct tijdens het configureren van een perceel binnen de wizard, wat tijd bespaart.
 *   **Duidelijkere Bodem Component:** De manier waarop bodemgegevens worden gepresenteerd en hoe u ermee interacteert op de perceelpagina binnen de wizard, is volledig herzien. Dit zorgt voor een beter overzicht en minder kans op fouten bij het invoeren van bodemdata.
-*   **Overzichtelijkere Percelen Pagina:** De layout van de pagina voor het beheren van percelen binnen de wizard is verbeterd voor een betere workflow en duidelijkheid.
+*   **Overzichtelijker Percelen Pagina:** De layout van de pagina voor het beheren van percelen binnen de wizard is verbeterd voor een betere workflow en duidelijkheid.
 *   **Opgeloste Weergaveproblemen Oogst:** Eerdere problemen met het correct weergeven van de oogstlijst en de bijbehorende detailpagina's binnen de wizard zijn verholpen.
 *   **Voorkomen van Navigatiefouten:** Om te voorkomen dat u per ongeluk de wizard verlaat, worden de links in de zijbalk nu tijdelijk uitgeschakeld (niet klikbaar) terwijl u bezig bent met het aanmaken van een bedrijf.
 

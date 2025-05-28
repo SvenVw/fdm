@@ -78,7 +78,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should add a new soil analysis", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 30
         const b_sampling_date = new Date()
         // const b_sampling_geometry = 'MULTIPOINT((0 0))'
@@ -131,53 +131,9 @@ describe("Soil Analysis Functions", () => {
         expect(addedSampling[0].a_depth_upper).toEqual(0)
     })
 
-    it("should add a new soil analysis with upper depth", async () => {
+    it("should throw an error if lower depth is greater than upper depth", async () => {
         const a_date = new Date()
-        const a_source = "test source"
-        const a_depth_lower = 60
-        const a_depth_upper = 30
-        const b_sampling_date = new Date()
-        // const b_sampling_geometry = 'MULTIPOINT((0 0))'
-        const a_p_al = 5
-        const a_p_cc = 5
-        const b_soiltype_agr = "rivierklei"
-        const b_gwl_class = "II"
-
-        test_a_id = await addSoilAnalysis(
-            fdm,
-            principal_id,
-            a_date,
-            a_source,
-            b_id,
-            a_depth_lower,
-            b_sampling_date,
-            {
-                a_p_al: a_p_al,
-                a_p_cc: a_p_cc,
-                b_soiltype_agr: b_soiltype_agr,
-                b_gwl_class: b_gwl_class,
-            },
-            a_depth_upper,
-        )
-
-        expect(test_a_id).toBeDefined()
-
-        const addedSampling = await fdm
-            .select()
-            .from(schema.soilSampling)
-            .where(eq(schema.soilSampling.a_id, test_a_id))
-            .limit(1)
-
-        expect(addedSampling).toHaveLength(1)
-        expect(addedSampling[0].b_id).toEqual(b_id)
-        expect(addedSampling[0].b_sampling_date).toEqual(b_sampling_date)
-        expect(addedSampling[0].a_depth_lower).toEqual(a_depth_lower)
-        expect(addedSampling[0].a_depth_upper).toEqual(a_depth_upper)
-    })
-
-     it("should throw an error if lower depth is greater than upper depth", async () => {
-        const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 30
         const a_depth_upper = 60
         const b_sampling_date = new Date()
@@ -204,14 +160,12 @@ describe("Soil Analysis Functions", () => {
                 },
                 a_depth_upper,
             )
-        }).rejects.toThrowError(
-            "Exception for addSoilAnalysis",
-        )
+        }).rejects.toThrowError("Exception for addSoilAnalysis")
     })
 
-    it("should add a new soil analysis with upper depth", async () => {
+    it("should add a new soil analysis with upper and lower depth", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 60
         const a_depth_upper = 30
         const b_sampling_date = new Date()
@@ -237,7 +191,6 @@ describe("Soil Analysis Functions", () => {
             },
             a_depth_upper,
         )
-        
 
         expect(test_a_id).toBeDefined()
 
@@ -258,9 +211,9 @@ describe("Soil Analysis Functions", () => {
 
     it("should update an existing soil analysis", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 30
-        const b_sampling_date = new Date()
+        const b_sampling_date = new Date("2025-02-01")
         // const b_sampling_geometry = 'MULTIPOINT((0 0))'
 
         test_a_id = await addSoilAnalysis(
@@ -274,9 +227,8 @@ describe("Soil Analysis Functions", () => {
         )
 
         // Test updating existing soil data
-        const updated_a_source = "updated test source"
         await updateSoilAnalysis(fdm, principal_id, test_a_id, {
-            a_source: updated_a_source,
+            a_n_rt: 1000,
         })
 
         const updatedAnalysis = await fdm
@@ -284,13 +236,13 @@ describe("Soil Analysis Functions", () => {
             .from(schema.soilAnalysis)
             .where(eq(schema.soilAnalysis.a_id, test_a_id))
             .limit(1)
-        expect(updatedAnalysis[0].a_source).toEqual(updated_a_source)
+        expect(updatedAnalysis[0].a_n_rt).toEqual(1000)
     })
 
     // Test removing existing soil data
     it("should remove an existing soil analysis", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 30
         const b_sampling_date = new Date()
         // const b_sampling_geometry = 'MULTIPOINT((0 0))'
@@ -323,7 +275,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should get latest soil analysis", async () => {
         const a_date_old = new Date("2024-01-02T00:00:00Z")
-        const a_source = "test source"
+        const a_source = "other"
         const a_som_loi = 5
         const a_depth_lower = 30
         const b_sampling_date_old = new Date("2024-01-01T00:00:00Z")
@@ -370,7 +322,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should get all soil analysis", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_som_loi = 7
         const a_depth_lower = 30
         const b_sampling_date = new Date()
@@ -410,7 +362,7 @@ describe("Soil Analysis Functions", () => {
             fdm,
             principal_id,
             new Date("2023-03-15"),
-            "source1",
+            "other",
             b_id,
             10,
             new Date("2023-03-15"),
@@ -419,7 +371,7 @@ describe("Soil Analysis Functions", () => {
             fdm,
             principal_id,
             new Date("2023-04-20"),
-            "source2",
+            "other",
             b_id,
             15,
             new Date("2023-04-20"),
@@ -428,7 +380,7 @@ describe("Soil Analysis Functions", () => {
             fdm,
             principal_id,
             new Date("2023-05-25"),
-            "source3",
+            "other",
             b_id,
             20,
             new Date("2023-05-25"),
@@ -437,7 +389,7 @@ describe("Soil Analysis Functions", () => {
             fdm,
             principal_id,
             new Date("2023-06-30"),
-            "source4",
+            "other",
             b_id,
             25,
             new Date("2023-06-30"),
@@ -548,7 +500,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should get current soil data", async () => {
         const a_date_old = new Date("2024-01-02T00:00:00Z")
-        const a_source = "test source"
+        const a_source = "other"
         const a_som_loi_old = 5
         const a_p_al_old = 10
         const a_depth_lower = 30
@@ -613,7 +565,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should get current soil data within a timeframe", async () => {
         const a_date_old = new Date("2024-01-02T00:00:00Z")
-        const a_source = "test source"
+        const a_source = "other"
         const a_som_loi_old = 5
         const a_p_al_old = 10
         const a_depth_lower = 30
@@ -714,7 +666,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should return empty array if no soil data is present within timeframe", async () => {
         const a_date_old = new Date("2024-01-02T00:00:00Z")
-        const a_source = "test source"
+        const a_source = "other"
         const a_som_loi_old = 5
         const a_p_al_old = 10
         const a_depth_lower = 30
@@ -742,7 +694,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should return all data if timeframe has no end", async () => {
         const a_date_old = new Date("2024-01-02T00:00:00Z")
-        const a_source = "test source"
+        const a_source = "other"
         const a_som_loi_old = 5
         const a_p_al_old = 10
         const a_depth_lower = 30
@@ -775,7 +727,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should retrieve soil analyses including those with null b_sampling_date and order correctly", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 30
 
         // Add analyses with valid b_sampling_date
@@ -825,7 +777,7 @@ describe("Soil Analysis Functions", () => {
 
     it("should retrieve soil analyses including those with null b_sampling_date and order correctly with timeframe", async () => {
         const a_date = new Date()
-        const a_source = "test source"
+        const a_source = "other"
         const a_depth_lower = 30
 
         // Add analyses with valid b_sampling_date
@@ -899,7 +851,7 @@ describe("Soil Analysis Functions", () => {
 describe("getSoilParametersDescription", () => {
     it("should return the correct soil parameter descriptions for NL-nl locale", () => {
         const descriptions = getSoilParametersDescription("NL-nl")
-        expect(descriptions).toHaveLength(41)
+        expect(descriptions).toHaveLength(42)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
@@ -923,7 +875,7 @@ describe("getSoilParametersDescription", () => {
 
     it("should return the correct soil parameter descriptions for default locale", () => {
         const descriptions = getSoilParametersDescription()
-        expect(descriptions).toHaveLength(41)
+        expect(descriptions).toHaveLength(42)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")

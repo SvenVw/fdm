@@ -6,6 +6,8 @@ import {
     data,
 } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
+import { Header } from "~/components/custom/header/base"
+import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 import { SidebarPage } from "~/components/custom/sidebar-page"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
@@ -16,8 +18,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -132,7 +132,7 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field`}
+                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/access`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
                                         loaderData.cultivationPlan.length === 0,
@@ -143,7 +143,7 @@ export default function Index() {
                                         loaderData.cultivationPlan.length === 0
                                     }
                                 >
-                                    Voltooien
+                                    Volgende
                                 </Button>
                             </NavLink>
                         </div>

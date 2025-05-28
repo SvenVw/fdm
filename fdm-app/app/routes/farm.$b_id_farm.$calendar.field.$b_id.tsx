@@ -187,11 +187,13 @@ export default function FarmFieldIndex() {
     return (
         <>
             <SidebarInset>
-                <Header action={{
-                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
-                    label: "Terug naar percelen",
-                    disabled: false,
-                }}>
+                <Header
+                    action={{
+                        to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
+                        label: "Terug naar percelen",
+                        disabled: false,
+                    }}
+                >
                     <HeaderFarm
                         b_id_farm={loaderData.b_id_farm}
                         farmOptions={loaderData.farmOptions}
@@ -201,7 +203,7 @@ export default function FarmFieldIndex() {
                         fieldOptions={loaderData.fieldOptions}
                         b_id={loaderData.b_id}
                     />
-                </Header>         
+                </Header>
                 <main>
                     <>
                         <FarmTitle

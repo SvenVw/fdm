@@ -164,9 +164,15 @@ export function SoilDataCards({
                     sourceLabel: string
                 }) => {
                     if (card.value) {
-                        const sourceLabel = soilParameterDescription
-                            .find((x) => x.parameter === "a_source")
-                            .options.find((x) => x.value === card.source).label
+                        const sourceParam = soilParameterDescription.find(
+                            (x: { parameter: string }) =>
+                                x.parameter === "a_source",
+                        )
+                        const sourceOption = sourceParam?.options?.find(
+                            (x: { value: string }) => x.value === card.source,
+                        )
+                        const sourceLabel =
+                            sourceOption?.label || card.source || "Onbekend"
 
                         return (
                             <SoilDataCard

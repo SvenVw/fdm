@@ -1,4 +1,14 @@
+import type { fdmSchema } from "@svenvw/fdm-core"
 import { Decimal } from "decimal.js"
+import {
+    calculateBulkDensity,
+    calculateCarbonNitrogenRatio,
+    calculateOrganicCarbon,
+    calculateOrganicMatter,
+} from "../../conversions/soil"
+import { calculateNitrogenRemoval } from "./removal"
+import { calculateNitrogenSupply } from "./supply"
+import { calculateTargetForNitrogenBalance } from "./target"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -9,16 +19,7 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
-import { calculateNitrogenSupply } from "./supply"
-import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenVolatilization } from "./volatization"
-import type { fdmSchema } from "@svenvw/fdm-core"
-import {
-    calculateBulkDensity,
-    calculateCarbonNitrogenRatio,
-    calculateOrganicCarbon,
-    calculateOrganicMatter,
-} from "../../conversions/soil"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and volatilization.
@@ -159,12 +160,21 @@ export async function calculateNitrogenBalanceField(
         cultivationDetailsMap,
     )
 
+    // Calculate the target for the Nitrogen balance
+    const target = calculateTargetForNitrogenBalance(
+        cultivations,
+        soilAnalysis,
+        cultivationDetailsMap,
+        timeFrame,
+    )
+
     return {
         b_id: fieldDetails.b_id,
         balance: supply.total.add(removal.total).add(volatilization.total),
         supply: supply,
         removal: removal,
         volatilization: volatilization,
+        target: target,
     }
 }
 
@@ -195,6 +205,7 @@ export function calculateNitrogenBalancesFieldToFarm(
     let totalFarmSupply = Decimal(0)
     let totalFarmRemoval = Decimal(0)
     let totalFarmVolatilization = Decimal(0)
+    let totalFarmTarget = Decimal(0)
 
     for (const fieldBalance of fieldsWithBalance) {
         const fieldInput = fields.find(
@@ -219,6 +230,9 @@ export function calculateNitrogenBalancesFieldToFarm(
         totalFarmVolatilization = totalFarmVolatilization.add(
             fieldBalance.volatilization.total.times(fieldArea),
         )
+        totalFarmTarget = totalFarmTarget.add(
+            fieldBalance.target.times(fieldArea),
+        )
     }
 
     // Calculate average values per hectare for the farm
@@ -231,6 +245,9 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmVolatilization = totalFarmArea.isZero()
         ? Decimal(0)
         : totalFarmVolatilization.dividedBy(totalFarmArea)
+    const avgFarmTarget = totalFarmArea.isZero()
+        ? Decimal(0)
+        : totalFarmTarget.dividedBy(totalFarmArea)
 
     // Calculate the average balance at farm level (Supply + Removal + Volatilization)
     const avgFarmBalance = avgFarmSupply
@@ -243,6 +260,7 @@ export function calculateNitrogenBalancesFieldToFarm(
         supply: avgFarmSupply,
         removal: avgFarmRemoval,
         volatilization: avgFarmVolatilization,
+        target: avgFarmTarget,
         fields: fieldsWithBalance,
     }
 
@@ -309,40 +327,27 @@ export function combineSoilAnalyses(
         a_cn_fr: null as fdmSchema.soilAnalysisTypeSelect["a_cn_fr"],
         a_density_sa: null as fdmSchema.soilAnalysisTypeSelect["a_density_sa"],
         a_som_loi: null as fdmSchema.soilAnalysisTypeSelect["a_som_loi"],
+        b_gwl_class: null as fdmSchema.soilAnalysisTypeSelect["b_gwl_class"],
     }
 
-    soilAnalysis.b_soiltype_agr =
-        soilAnalyses.find(
-            (x: {
-                b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"]
-            }) => x.b_soiltype_agr,
-        )?.b_soiltype_agr || null
-    soilAnalysis.a_n_rt =
-        soilAnalyses.find(
-            (x: { a_n_rt: fdmSchema.soilAnalysisTypeSelect["a_n_rt"] }) =>
-                x.a_n_rt,
-        )?.a_n_rt || null
-    soilAnalysis.a_c_of =
-        soilAnalyses.find(
-            (x: { a_c_of: fdmSchema.soilAnalysisTypeSelect["a_c_of"] }) =>
-                x.a_c_of,
-        )?.a_c_of || null
-    soilAnalysis.a_som_loi =
-        soilAnalyses.find(
-            (x: { a_som_loi: fdmSchema.soilAnalysisTypeSelect["a_som_loi"] }) =>
-                x.a_som_loi,
-        )?.a_som_loi || null
-    soilAnalysis.a_cn_fr =
-        soilAnalyses.find(
-            (x: { a_cn_fr: fdmSchema.soilAnalysisTypeSelect["a_cn_fr"] }) =>
-                x.a_cn_fr,
-        )?.a_cn_fr || null
-    soilAnalysis.a_density_sa =
-        soilAnalyses.find(
-            (x: {
-                a_density_sa: fdmSchema.soilAnalysisTypeSelect["a_density_sa"]
-            }) => x.a_density_sa,
-        )?.a_density_sa || null
+    // Define properties to extract
+    const propertiesToExtract = [
+        "b_soiltype_agr",
+        "a_n_rt",
+        "a_c_of",
+        "a_cn_fr",
+        "a_density_sa",
+        "a_som_loi",
+        "b_gwl_class",
+    ] as const
+
+    // Extract each property
+    for (const prop of propertiesToExtract) {
+        soilAnalysis[prop] =
+            soilAnalyses.find(
+                (x) => x[prop] !== null && x[prop] !== undefined,
+            )?.[prop] || null
+    }
 
     // When values for soil parameters are not available try to estimate them with convertsion functions
     if (!soilAnalysis.a_c_of) {
@@ -374,6 +379,7 @@ export function combineSoilAnalyses(
         "a_c_of",
         "a_cn_fr",
         "a_density_sa",
+        "b_gwl_class",
     ]
     const missingParameters = requiredSoilParameters.filter(
         (param) => soilAnalysis[param as keyof typeof soilAnalysis] === null,

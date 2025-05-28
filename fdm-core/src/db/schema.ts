@@ -584,6 +584,7 @@ export const soilAnalysis = fdmSchema.table("soil_analysis", {
     a_n_pmn: numericCasted(),
     a_n_rt: numericCasted(),
     a_nh4_cc: numericCasted(),
+    a_nmin_cc: numericCasted(),
     a_no3_cc: numericCasted(),
     a_p_al: numericCasted(),
     a_p_cc: numericCasted(),

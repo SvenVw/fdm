@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react"
+import { NavLink, useLocation } from "react-router"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -10,7 +11,6 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { NavLink, useLocation } from "react-router"
 
 export function HeaderFertilizer({
     b_id_farm,
@@ -74,7 +74,7 @@ export function HeaderFertilizer({
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
                         <BreadcrumbLink
-                            href={`farm/${b_id_farm}/fertilizers/new`}
+                            href={`/farm/${b_id_farm}/fertilizers/new`}
                         >
                             Nieuwe meststof
                         </BreadcrumbLink>

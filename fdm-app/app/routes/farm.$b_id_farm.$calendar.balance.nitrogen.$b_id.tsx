@@ -1,14 +1,30 @@
+import NitrogenBalanceDetails from "@/app/components/custom/balance/nitrogen-details"
 import {
-    data,
+    type NitrogenBalanceNumeric,
+    calculateNitrogenBalance,
+    collectInputForNitrogenBalance,
+} from "@svenvw/fdm-calculator"
+import { getFarm, getField } from "@svenvw/fdm-core"
+import {
+    ArrowDownToLine,
+    ArrowRight,
+    ArrowRightLeft,
+    ArrowUpFromLine,
+    CircleAlert,
+    CircleCheck,
+    House,
+} from "lucide-react"
+import {
+    type LoaderFunctionArgs,
+    type MetaFunction,
     NavLink,
+    data,
     useLoaderData,
     useLocation,
     useNavigation,
-    type LoaderFunctionArgs,
-    type MetaFunction,
 } from "react-router"
-import NitrogenBalanceDetails from "@/app/components/custom/balance/nitrogen-details"
-import { clientConfig } from "~/lib/config"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -17,25 +33,13 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { getSession } from "~/lib/auth.server"
-import { getFarm, getField } from "@svenvw/fdm-core"
-import { fdm } from "~/lib/fdm.server"
-import {
-    calculateNitrogenBalance,
-    collectInputForNitrogenBalance,
-    type NitrogenBalanceNumeric,
-} from "@svenvw/fdm-calculator"
-import { getTimeframe } from "~/lib/calendar"
-import {
-    ArrowDownToLine,
-    ArrowRight,
-    ArrowUpFromLine,
-    House,
-} from "lucide-react"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Skeleton } from "~/components/ui/skeleton"
-import { Button } from "~/components/ui/button"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -117,6 +121,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         nitrogenBalanceInput: nitrogenBalanceInput,
         nitrogenBalanceResult: nitrogenBalanceResult,
         field: field,
+        farm: farm,
         errorMessage: errorMessage,
     }
 }
@@ -130,8 +135,13 @@ export default function FarmBalanceNitrogenFieldBlock() {
 
     const calendar = useCalendarStore((state) => state.calendar)
 
-    const { nitrogenBalanceInput, nitrogenBalanceResult, field, errorMessage } =
-        loaderData
+    const {
+        nitrogenBalanceInput,
+        nitrogenBalanceResult,
+        field,
+        farm,
+        errorMessage,
+    } = loaderData
 
     return (
         <div className="space-y-4">
@@ -141,16 +151,26 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <Card>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                    Perceelssoverschot
+                                    Overschot / Doel (Perceel)
                                 </CardTitle>
-                                <House className="text-xs text-muted-foreground" />
+                                <ArrowRightLeft className="text-xs text-muted-foreground" />
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
                                     {isLoading ? (
                                         <LoadingSpinner />
                                     ) : (
-                                        nitrogenBalanceResult.balance
+                                        <div className="flex items-center gap-4">
+                                            <p>
+                                                {`${nitrogenBalanceResult.balance} / ${nitrogenBalanceResult.target}`}
+                                            </p>
+                                            {nitrogenBalanceResult.balance <=
+                                            nitrogenBalanceResult.target ? (
+                                                <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
+                                            ) : (
+                                                <CircleAlert className="text-red-500 bg-red-100 rounded-full " />
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
@@ -207,15 +227,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? (
-                                        <LoadingSpinner />
-                                    ) : (
-                                        nitrogenBalanceResult.volatilization
-                                            .total
-                                    )}
+                                    {isLoading ? <LoadingSpinner /> : "-"}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    kg N / ha
+                                    Berekening van emissie volgt later
                                 </p>
                             </CardContent>
                         </Card>
@@ -224,13 +239,35 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <Card className="col-span-4">
                             <CardHeader>
                                 <CardTitle>Balans</CardTitle>
+                                <CardDescription>
+                                    De stikstofbalans voor {field.b_name} van{" "}
+                                    {farm.b_name_farm}. De balans is het
+                                    verschil tussen de totale aanvoer, afvoer en
+                                    emissie van stikstof. Een positieve balans
+                                    betekent een overschot aan stikstof, een
+                                    negatieve balans een tekort.
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="pl-2">
                                 {isLoading ? (
                                     <div className="flex items-center justify-center">
                                         <LoadingSpinner />
                                     </div>
-                                ) : null}
+                                ) : (
+                                    <NitrogenBalanceChart
+                                        balance={nitrogenBalanceResult.balance}
+                                        supply={
+                                            nitrogenBalanceResult.supply.total
+                                        }
+                                        removal={
+                                            nitrogenBalanceResult.removal.total
+                                        }
+                                        emission={
+                                            nitrogenBalanceResult.volatilization
+                                                .total
+                                        }
+                                    />
+                                )}
                             </CardContent>
                         </Card>
                         <Card className="col-span-3">
@@ -241,11 +278,11 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             <CardContent>
                                 <div className="space-y-8">
                                     {isLoading ? (
-                                        [...Array(5)].map((item) => {
+                                        [...Array(5)].map((_, index) => {
                                             return (
                                                 <div
                                                     className="flex items-center"
-                                                    key={item}
+                                                    key={index}
                                                 >
                                                     <div className="ml-4 space-y-1">
                                                         <Skeleton className="h-4 w-[250px]" />
@@ -276,9 +313,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
                         <CardContent>
                             <div className="text-muted-foreground">
                                 <p>
-                                    Dit perceel was in gebruik voor dit jaar.
-                                    Als dit perceel wel in gebruik was, werk dan
-                                    de startdatum bij in de perceelsinstelling.
+                                    Dit perceel was niet in gebruik voor dit
+                                    jaar. Als dit perceel wel in gebruik was,
+                                    werk dan de startdatum bij in de
+                                    perceelsinstelling.
                                 </p>
                             </div>
                         </CardContent>

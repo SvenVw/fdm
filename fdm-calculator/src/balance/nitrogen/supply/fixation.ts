@@ -1,9 +1,9 @@
+import { Decimal } from "decimal.js"
 import type {
     CultivationDetail,
     FieldInput,
     NitrogenSupplyFixation,
 } from "../types"
-import { Decimal } from "decimal.js"
 
 /**
  * Calculates the amount of nitrogen supplied through biological fixation by cultivations.

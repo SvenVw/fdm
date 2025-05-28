@@ -1,7 +1,4 @@
-import {
-    getFarm,
-    getFields,
-} from "@svenvw/fdm-core"
+import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -10,6 +7,8 @@ import {
     data,
 } from "react-router"
 import { useLoaderData } from "react-router"
+import { Header } from "~/components/custom/header/base"
+import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 import { SidebarPage } from "~/components/custom/sidebar-page"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
@@ -17,11 +16,9 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import {  handleLoaderError } from "~/lib/error"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 
 // Meta
 export const meta: MetaFunction = () => {
