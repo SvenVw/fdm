@@ -29,7 +29,7 @@
         "@changesets/cli": "^2.29.3",
         "turbo": "^2.5.3"
     },
-    "packageManager": "pnpm@10.9.0",
+    "packageManager": "pnpm@10.11.0",
     "pnpm": {
         "packageExtensions": {
             "vite-plugin-dts": {
