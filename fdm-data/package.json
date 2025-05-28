@@ -27,7 +27,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "vite",
         "db:generate": "npx drizzle-kit generate",
@@ -48,12 +50,12 @@
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
         "@vitest/coverage-v8": "catalog:",
-        "rollup": "^4.40.2",
+        "rollup": "^4.41.1",
         "rollup-plugin-polyfill-node": "^0.13.0",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.9.0",
+    "packageManager": "pnpm@10.11.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },
