@@ -1,5 +1,13 @@
 # Changelog fdm-app
 
+## 0.18.1
+
+### Patch Changes
+
+- 8d36091: Fix button to update cultivation will not redirect to 404 page but update the values
+- 497343c: Fix that max for `b_lu_yield` is 100000 instead of 100
+- 03de714: Fix that values in cultivation form update when selecting a different cultivation at cultivation plan
+
 ## 0.18.0
 
 ### Minor Changes
