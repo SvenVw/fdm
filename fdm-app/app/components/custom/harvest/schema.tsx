@@ -11,8 +11,8 @@ export const FormSchema = z.object({
         .finite({
             message: "Hoeveelheid moet een geheel getal zijn",
         })
-        .max(100, {
-            message: "Hoeveelheid mag niet groter zijn dan 100",
+        .max(100000, {
+            message: "Hoeveelheid mag niet groter zijn dan 100000",
         })
         .safe({
             message: "Hoeveelheid moet een safe getal zijn",
