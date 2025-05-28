@@ -19,7 +19,7 @@ import { HarvestsList } from "~/components/custom/harvest/list"
 import type { HarvestableType } from "~/components/custom/harvest/types"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -68,6 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
         // Get the available cultivations
         let cultivationOptions = []
@@ -178,6 +179,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_harvestable: b_lu_harvestable,
             harvests: harvests,
             cultivationOptions: cultivationOptions,
+            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -211,7 +213,7 @@ export default function FarmAFieldCultivationBlock() {
                     b_lu_start={loaderData.b_lu_start}
                     b_lu_end={loaderData.b_lu_end}
                     options={loaderData.cultivationOptions}
-                    action={`/farm/create/${loaderData.b_id_farm}/cultivations/${loaderData.b_lu_catalogue}/crop`}
+                    action={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`}
                 />
                 <div>{null}</div>
                 <HarvestsList
