@@ -1,9 +1,12 @@
+import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, Cookie, Info, MoveDown } from "lucide-react"
-import type { LoaderFunctionArgs } from "react-router"
-import { redirect } from "react-router"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
+import { Form, redirect } from "react-router"
 import type { MetaFunction } from "react-router"
-import { useSearchParams } from "react-router-dom" // Import useSearchParams
+import { useSearchParams } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { toast } from "sonner"
+import { z } from "zod"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import {
@@ -17,8 +20,18 @@ import {
 import { signIn } from "~/lib/auth-client"
 import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
+import { handleLoaderError, handleActionError } from "~/lib/error"
 import { cn } from "~/lib/utils"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormMessage,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { extractFormValuesFromRequest } from "../lib/form"
 
 export const meta: MetaFunction = () => {
     return [
@@ -29,6 +42,16 @@ export const meta: MetaFunction = () => {
         },
     ]
 }
+
+const FormSchema = z.object({
+    email: z.coerce
+        .string({
+            required_error: "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
+        }).email({
+            message: "Dit is geen geldig e-mailadres",
+        })
+})
+
 
 /**
  * Checks for an existing user session and redirects authenticated users.
@@ -89,6 +112,15 @@ export default function SignIn() {
     const onOpenCookieSettings = () => {
         openCookieSettings()
     }
+
+    const form = useRemixForm<z.infer<typeof FormSchema>>({
+        mode: "onTouched",
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            email: "",
+        },
+    })
+
     return (
         <div>
             <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
@@ -195,7 +227,7 @@ export default function SignIn() {
                                     te melden.
                                 </CardDescription>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="space-y-4">
                                 <div className="grid w-full items-center gap-4">
                                     <div className="flex flex-col space-y-1.5">
                                         <Button
@@ -294,6 +326,57 @@ export default function SignIn() {
                                         </Button>
                                     </div>
                                 </div>
+                                <div className="relative">
+                                    <div className="absolute inset-0 flex items-center">
+                                        <span className="w-full border-t" />
+                                    </div>
+                                    <div className="relative flex justify-center text-xs uppercase">
+                                        <span className="bg-background px-2 text-muted-foreground">
+                                            Of
+                                        </span>
+                                    </div>
+                                </div>
+                                <RemixFormProvider {...form}>
+                                    <Form
+                                        id="formSigninMagicLink"
+                                        onSubmit={form.handleSubmit}
+                                        method="POST"
+                                    >
+                                        <fieldset disabled={form.formState.isSubmitting}>
+                                            <div className="grid w-full items-center gap-4">
+                                                <div className="flex flex-col space-y-1.5">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="email"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        placeholder="E-mailadres"
+                                                                        aria-required="true"
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                                <FormDescription />
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                </div>
+                                                <Button type="submit" className="w-full">
+                                                    {form.formState.isSubmitting ? (
+                                                        <div className="flex items-center space-x-2">
+                                                            <LoadingSpinner />
+                                                            <span>Aamelden...</span>
+                                                        </div>
+                                                    ) : (
+                                                        "Aanmelden met e-mail"
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </fieldset>
+                                    </Form>
+                                </RemixFormProvider>
                             </CardContent>
                             <CardFooter className="flex justify-center">
                                 <p className="text-sm font-medium text-muted-foreground text-center">
@@ -342,4 +425,34 @@ export default function SignIn() {
             </div>
         </div>
     )
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+
+    const redirectTo = "/farm"
+
+    // Get form values
+    const formValues = await extractFormValuesFromRequest(
+        request,
+        FormSchema,
+    )
+    console.log(formValues)
+    const { email } = formValues
+
+    // console.log("Auth API:", Object.keys(auth.api));
+
+    try {
+        // This will trigger the sendMagicLink hook in fdm-core, which now sends the email
+        await auth.api.signInMagicLink({
+            body: {
+                email: email,
+                callbackURL: redirectTo
+            },
+            headers: request.headers,
+        })
+        return "Magic link sent successfully!"
+    } catch (error) {
+        console.error("Error sending magic link:", error)
+        handleActionError(error)
+    }
 }

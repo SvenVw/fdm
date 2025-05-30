@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { organization, username } from "better-auth/plugins"
+import { organization, username, magicLink } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { generateFromEmail } from "unique-username-generator"
 import * as authNSchema from "./db/schema-authn"
@@ -20,6 +20,7 @@ export type BetterAuth = ReturnType<typeof betterAuth>
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param google Optional configuration for Google authentication. If provided, users can sign up and sign in with their Google accounts.
  * @param microsoft Optional configuration for Microsoft authentication. If provided, users can sign up and sign in with their Microsoft accounts.
+ * @param sendMagicLinkEmail Optional function to send magic link emails. If provided, the magic link plugin will use this function to send emails.
  * @param emailAndPassword Optional boolean indicating whether to enable email and password authentication. Defaults to false.
  * @returns The configured authentication instance.
  * @throws {Error} If required environment variables are missing or if role assignment fails.
@@ -28,6 +29,7 @@ export function createFdmAuth(
     fdm: FdmType,
     google?: { clientSecret: string; clientId: string },
     microsoft?: { clientSecret: string; clientId: string },
+    sendMagicLinkEmail?: (email: string, url: string) => Promise<void>,
     emailAndPassword?: boolean,
 ): BetterAuth {
     // Setup social auth providers
@@ -147,6 +149,18 @@ export function createFdmAuth(
                             },
                         }
                     },
+                },
+            }),
+            magicLink({
+                sendMagicLink: async (
+                    { email, url },
+                    request,
+                ): Promise<void> => {
+                    if (sendMagicLinkEmail) {
+                        await sendMagicLinkEmail(email, url)
+                    } else {
+                        console.warn("sendMagicLinkEmail function not provided to createFdmAuth. Magic link emails will not be sent.")
+                    }
                 },
             }),
         ],
