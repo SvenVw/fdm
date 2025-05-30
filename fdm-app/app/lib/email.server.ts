@@ -71,12 +71,14 @@ export async function renderMagicLinkEmail(
     emailAddress: string,
     magicLinkUrl: string,
 ): Promise<Email> {
+    const emailTimestamp = format(new Date(), 'Pp', { locale: nl })
     const emailHtml = await render(
         MagicLinkEmail({
             url: magicLinkUrl,
             appName: serverConfig.name,
             appBaseUrl: serverConfig.url,
             senderName: serverConfig.mail?.postmark.sender_name,
+            emailTimestamp: emailTimestamp,
         }),
         { pretty: true },
     )
@@ -84,7 +86,7 @@ export async function renderMagicLinkEmail(
     const email: Email = {
         From: `"${serverConfig.mail?.postmark.sender_name}" <${serverConfig.mail?.postmark.sender_address}>`,
         To: emailAddress,
-        Subject: `Aanmeldlink voor ${serverConfig.name} | ${format(new Date(), 'Pp', { locale: nl })}`,
+        Subject: `Aanmeldlink voor ${serverConfig.name} | ${emailTimestamp}}`,
         HtmlBody: emailHtml,
         Tag: 'magic-link',
     }

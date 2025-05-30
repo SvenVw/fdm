@@ -18,6 +18,7 @@ interface MagicLinkEmailProps {
     appName: string
     appBaseUrl: string
     senderName: string | undefined
+    emailTimestamp: string
 }
 
 export const MagicLinkEmail = ({
@@ -25,6 +26,7 @@ export const MagicLinkEmail = ({
     appName,
     appBaseUrl,
     senderName,
+    emailTimestamp,
 }: MagicLinkEmailProps) => (
     <Html lang="nl">
         <Head>
@@ -68,6 +70,9 @@ export const MagicLinkEmail = ({
                         >
                             Aanmelden bij {appName}
                         </Button>
+                        <Text className="text-[#666666] text-[12px] leading-[24px] mt-[5px] block text-center">
+                            Deze link is éénmalig en voor 5 minuten geldig.
+                        </Text
                     </Section>
                     <Text className="text-black text-[14px] leading-[24px]">
                         Indien u dit niet heeft aangevraagd, kunt u deze e-mail
@@ -84,6 +89,9 @@ export const MagicLinkEmail = ({
                     >
                         {appName}
                     </Link>
+                    <Text className="text-[#666666] text-[12px] leading-[24px] mt-[5px] block text-center">
+                        {`Deze link is aangemaakt op ${emailTimestamp}`}
+                    </Text>
                 </Container>
             </Body>
         </Tailwind>
