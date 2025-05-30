@@ -52,11 +52,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             PUBLIC_SENTRY_DSN: process.env.PUBLIC_SENTRY_DSN,
             PUBLIC_SENTRY_ORG: process.env.PUBLIC_SENTRY_ORG,
             PUBLIC_SENTRY_PROJECT: process.env.PUBLIC_SENTRY_PROJECT,
-            PUBLIC_SENTRY_TRACE_SAMPLE_RATE: process.env.PUBLIC_SENTRY_TRACE_SAMPLE_RATE,
-            PUBLIC_SENTRY_REPLAY_SAMPLE_RATE: process.env.PUBLIC_SENTRY_REPLAY_SAMPLE_RATE,
-            PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR: process.env.PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR,
-            PUBLIC_SENTRY_PROFILE_SAMPLE_RATE: process.env.PUBLIC_SENTRY_PROFILE_SAMPLE_RATE,
-            PUBLIC_SENTRY_SECURITY_REPORT_URI: process.env.PUBLIC_SENTRY_SECURITY_REPORT_URI,
+            PUBLIC_SENTRY_TRACE_SAMPLE_RATE:
+                process.env.PUBLIC_SENTRY_TRACE_SAMPLE_RATE,
+            PUBLIC_SENTRY_REPLAY_SAMPLE_RATE:
+                process.env.PUBLIC_SENTRY_REPLAY_SAMPLE_RATE,
+            PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR:
+                process.env.PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR,
+            PUBLIC_SENTRY_PROFILE_SAMPLE_RATE:
+                process.env.PUBLIC_SENTRY_PROFILE_SAMPLE_RATE,
+            PUBLIC_SENTRY_SECURITY_REPORT_URI:
+                process.env.PUBLIC_SENTRY_SECURITY_REPORT_URI,
             PUBLIC_POSTHOG_KEY: process.env.PUBLIC_POSTHOG_KEY,
             PUBLIC_POSTHOG_HOST: process.env.PUBLIC_POSTHOG_HOST,
         }
@@ -128,11 +133,29 @@ export function Layout() {
                 {/* Inject runtime environment variables */}
                 {runtimeEnv && (
                     <script
+                        id="runtime-config"
+                        type="application/json"
                         dangerouslySetInnerHTML={{
-                            __html: `window.__RUNTIME_CONFIG__ = ${JSON.stringify(runtimeEnv)}`,
+                            __html: JSON.stringify(runtimeEnv).replace(
+                                /</g,
+                                "\\u003c",
+                            ),
                         }}
                     />
                 )}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            try {
+                                const configScript = document.getElementById('runtime-config');
+                                window.__RUNTIME_CONFIG__ = configScript ? JSON.parse(configScript.textContent) : {};
+                            } catch (e) {
+                                console.warn('Failed to parse runtime config:', e);
+                                window.__RUNTIME_CONFIG__ = {};
+                            }
+                        `,
+                    }}
+                />
                 <Scripts />
             </body>
         </html>
