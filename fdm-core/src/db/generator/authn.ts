@@ -2,13 +2,29 @@ import { createFdmAuth } from "../../authentication";
 import { createFdmServer } from "../../fdm-server";
 
 const host = String(process.env.POSTGRES_HOST)
+if (!process.env.POSTGRES_HOST) {
+    throw new Error("POSTGRES_HOST environment variable is required")
+}
+
 const port = Number(process.env.POSTGRES_PORT)
 if (Number.isNaN(port)) {
     throw new Error("POSTGRES_PORT must be a valid number")
 }
+
 const user = String(process.env.POSTGRES_USER)
+if (!process.env.POSTGRES_USER) {
+    throw new Error("POSTGRES_USER environment variable is required")
+}
+
 const password = String(process.env.POSTGRES_PASSWORD)
+if (!process.env.POSTGRES_PASSWORD) {
+    throw new Error("POSTGRES_PASSWORD environment variable is required")
+}
+
 const database = String(process.env.POSTGRES_DB)
+if (!process.env.POSTGRES_DB) {
+    throw new Error("POSTGRES_DB environment variable is required")
+}
 
 // Mock environment variables
 const googleAuth = {
