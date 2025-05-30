@@ -1,5 +1,12 @@
 # Changelog fdm-app
 
+## 0.18.2
+
+### Patch Changes
+
+- 2d163bf: Public environmentals that are used client-side are now set at runtime instead of buildtime
+- 7bde06a: Rename prefix of public environmentals from `VITE_` to `PUBLIC_`
+
 ## 0.18.1
 
 ### Patch Changes
