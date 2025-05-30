@@ -3,4 +3,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add option to signin with magic-link
+Add option to sign in with magic-link

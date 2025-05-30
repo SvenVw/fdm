@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Fixes loading public environmentals at server side by using correct prefix
+Fix loading public environment variables on the server side by using the correct prefix

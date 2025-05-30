@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Check, Cookie, Info, MoveDown } from "lucide-react"
+import { Check, Cookie, Info } from "lucide-react"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
 import { Form, redirect } from "react-router"
 import type { MetaFunction } from "react-router"

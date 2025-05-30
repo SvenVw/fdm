@@ -37,7 +37,7 @@ export const MagicLinkEmail = ({
             />
             <style>{`
                 * {
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif;
+                    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
                 }
             `}</style>
         </Head>
@@ -60,19 +60,21 @@ export const MagicLinkEmail = ({
                         Hallo,
                     </Text>
                     <Text className="text-black text-[14px] leading-[24px]">
-                        U heeft een link aangevraagd om in te loggen bij
+                        U heeft een link aangevraagd om in te loggen
                         bij {appName}. Klik op de knop hieronder om verder te gaan:
                     </Text>
                     <Section className="mt-[32px] mb-[32px] text-center">
                         <Button
                             href={url}
+                            role="button"
+                            aria-label={`Inloggen bij ${appName}`}
                             className="bg-[#0070f3] text-white rounded px-[12px] py-[12px] text-[14px] font-semibold no-underline"
                         >
                             Aanmelden bij {appName}
                         </Button>
                         <Text className="text-[#666666] text-[12px] leading-[24px] mt-[5px] block text-center">
                             Deze link is éénmalig en voor 5 minuten geldig.
-                        </Text
+                        </Text>
                     </Section>
                     <Text className="text-black text-[14px] leading-[24px]">
                         Indien u dit niet heeft aangevraagd, kunt u deze e-mail

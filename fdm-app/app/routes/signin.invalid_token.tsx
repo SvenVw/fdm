@@ -96,8 +96,6 @@ export default function SignIn() {
                                 </span>
                             </div>
                         </div>
-
-
                         <Card>
                             <CardHeader>
                                 <CardTitle>Aanmeldlink is niet meer geldig</CardTitle>
@@ -119,8 +117,7 @@ export default function SignIn() {
                                 </Button>
 
                             </CardFooter>
-                        </Card>
-    
+                        </Card>    
                     </div>
                 </div>
                 <div className="hidden bg-muted lg:block">
