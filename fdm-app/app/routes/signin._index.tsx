@@ -368,7 +368,7 @@ export default function SignIn() {
                                                     {form.formState.isSubmitting ? (
                                                         <div className="flex items-center space-x-2">
                                                             <LoadingSpinner />
-                                                            <span>Aamelden...</span>
+                                                            <span>Aanmelden...</span>
                                                         </div>
                                                     ) : (
                                                         "Aanmelden met e-mail"
