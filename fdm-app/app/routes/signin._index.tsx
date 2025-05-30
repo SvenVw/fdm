@@ -32,6 +32,7 @@ import {
 import { Input } from "~/components/ui/input"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { extractFormValuesFromRequest } from "../lib/form"
+import { redirectWithSuccess } from "remix-toast"
 
 export const meta: MetaFunction = () => {
     return [
@@ -436,13 +437,10 @@ export async function action({ request }: ActionFunctionArgs) {
         request,
         FormSchema,
     )
-    console.log(formValues)
     const { email } = formValues
 
-    // console.log("Auth API:", Object.keys(auth.api));
-
     try {
-        // This will trigger the sendMagicLink hook in fdm-core, which now sends the email
+        // This will trigger the sendMagicLink hook in fdm-core, which sends the email
         await auth.api.signInMagicLink({
             body: {
                 email: email,
@@ -450,7 +448,8 @@ export async function action({ request }: ActionFunctionArgs) {
             },
             headers: request.headers,
         })
-        return "Magic link sent successfully!"
+        return redirectWithSuccess("/signin/check-your-email", `Aanmeldlink is verstuurd naar ${email}.`
+        )
     } catch (error) {
         console.error("Error sending magic link:", error)
         handleActionError(error)
