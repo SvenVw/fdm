@@ -16,7 +16,7 @@ interface Email {
     To: string
     Subject: string
     HtmlBody: string
-    Tag?: string
+    Tag: string
 }
 
 export async function renderWelcomeEmail(user: User): Promise<Email> {
@@ -34,6 +34,7 @@ export async function renderWelcomeEmail(user: User): Promise<Email> {
         To: user.email,
         Subject: `Welkom bij ${serverConfig.name}! Krijg inzicht in je bedrijfsdata.`,
         HtmlBody: emailHtml,
+        Tag: 'welcome',
     }
 
     return email
@@ -60,6 +61,7 @@ export async function renderInvitationEmail(
         To: inviteeEmail,
         Subject: `${inviter.firstname} ${inviter.surname} heeft je uitgenodigd om lid te worden van ${organizationName}!`,
         HtmlBody: emailHtml,
+        Tag: 'invitation-organization',
     }
 
     return email
