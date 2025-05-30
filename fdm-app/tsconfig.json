@@ -10,7 +10,7 @@
         "app/routes/*.tsx",
         "app/components/**/*.tsx",
         "app/lib/fdm-migrate.server.js",
-        "app/types/vite-env.d.ts"
+        "app/types/public-env.d.ts"
     ],
     "compilerOptions": {
         "lib": ["DOM", "DOM.Iterable", "ES2022"],

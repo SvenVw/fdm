@@ -81,11 +81,10 @@ export function Layout() {
     // Capture pageviews if PostHog is configured
     // biome-ignore lint/correctness/useExhaustiveDependencies: This is a false positive: the useEffect should run whenever the location changes to capture new pageviews correctly
     useEffect(() => {
-        // clientConfig will now use the new logic (runtime or fallback)
         if (clientConfig.analytics.posthog && typeof window !== "undefined") {
             posthog.capture("$pageview")
         }
-    }, [location]) // Removed clientConfig from deps as it should be stable
+    }, [location])
 
     // Hook to show the toasts
     useEffect(() => {
