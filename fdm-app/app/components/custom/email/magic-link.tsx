@@ -47,7 +47,7 @@ export const MagicLinkEmail = ({
                         <Img
                             src={`${appBaseUrl}/fdm-high-resolution-logo-transparent.png`}
                             width="150"
-                            alt={appName}
+                            alt={`${appName} logo`}
                             className="my-0 mx-auto"
                         />
                     </Section>
