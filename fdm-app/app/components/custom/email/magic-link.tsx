@@ -39,7 +39,7 @@ export const MagicLinkEmail = ({
                 }
             `}</style>
         </Head>
-        <Preview>{`Aanmelden bij ${appName}`}</Preview>
+        <Preview>{`Link om aan te melden bij ${appName}`}</Preview>
         <Tailwind>
             <Body className="bg-white my-auto mx-auto font-sans">
                 <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] w-[465px]">
