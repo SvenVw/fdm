@@ -78,13 +78,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the sign-in page with social authentication options.
+ * Renders the invalid token page when a magic link has expired or is invalid.
  *
- * This component displays a structured interface for user sign-in. It provides social sign-in buttons for Microsoft and Google,
- * along with information about service benefits and a link to the privacy policy. If a social sign-in attempt fails, a toast notification
- * is displayed and the error is logged to the console.
+ * This component displays a message informing the user that their sign-in link is no longer valid,
+ * explaining the 5-minute validity and single-use nature of magic links. It provides a button to
+ * navigate back to the main sign-in page.
  *
- * @returns A React element representing the sign-in page.
+ * @returns A React element representing the invalid token page.
  */
 export default function SignIn() {
     const openCookieSettings = () => {
