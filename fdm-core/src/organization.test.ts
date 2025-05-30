@@ -50,7 +50,7 @@ describe("Organization Data Model", () => {
 
         fdm = createFdmServer(host, port, user, password, database)
 
-        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, true)
+        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
         try {
             const user1 = await fdmAuth.api.signUpEmail({
                 headers: undefined,

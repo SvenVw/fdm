@@ -2,9 +2,9 @@ import type { ServerConfig } from "~/types/config.d"
 
 // Export the full config for server-side use
 export const serverConfig: ServerConfig = {
-    name: String(process.env.VITE_FDM_NAME),
-    url: String(process.env.VITE_FDM_URL),
-    privacy_url: String(process.env.VITE_FDM_PRIVACY_URL),
+    name: String(process.env.PUBLIC_FDM_NAME),
+    url: String(process.env.PUBLIC_FDM_URL),
+    privacy_url: String(process.env.PUBLIC_FDM_PRIVACY_URL),
 
     // Authentication
     auth: {
@@ -32,7 +32,7 @@ export const serverConfig: ServerConfig = {
     // Integrations
     integrations: {
         mapbox: {
-            token: String(process.env.VITE_MAPBOX_TOKEN),
+            token: String(process.env.PUBLIC_MAPBOX_TOKEN),
         },
         nmi: {
             api_key: String(process.env.NMI_API_KEY),

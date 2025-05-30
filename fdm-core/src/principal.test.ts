@@ -34,7 +34,7 @@ describe("Principals", () => {
             clientSecret: "mock_ms_client_secret",
         }
 
-        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, true)
+        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
         userName = "testuser"
         userEmail = "user5@example.com"
 
