@@ -43,15 +43,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-const FormSchema = z.object({
-    email: z.coerce
-        .string({
-            required_error: "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
-        }).email({
-            message: "Dit is geen geldig e-mailadres",
-        })
-})
-
 
 /**
  * Checks for an existing user session and redirects authenticated users.
