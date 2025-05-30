@@ -405,7 +405,7 @@ export default function SignIn() {
                 <div className="hidden bg-muted lg:block">
                     <img
                         src="https://images.unsplash.com/photo-1717702576954-c07131c54169?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt=""
+                         alt='Photo by <a href="https://unsplash.com/@tombelgium?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Tom De Decker</a> on <a href="https://unsplash.com/photos/a-tractor-plowing-a-field-at-sunset-_dnc3j1oVlk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
                         width="1920"
                         height="1080"
                         loading="lazy"
