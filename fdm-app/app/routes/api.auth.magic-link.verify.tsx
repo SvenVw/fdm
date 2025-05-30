@@ -22,6 +22,6 @@ export async function loader({ request }: { request: Request }) {
 
         })
     } catch (error) {
-        handleLoaderError(error)
+        throw handleLoaderError(error)
     }
 }
