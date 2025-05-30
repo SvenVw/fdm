@@ -26,14 +26,13 @@ if (!process.env.POSTGRES_DB) {
     throw new Error("POSTGRES_DB environment variable is required")
 }
 
-// Mock environment variables
 const googleAuth = {
-    clientId: "mock_google_client_id",
-    clientSecret: "mock_google_client_secret",
+    clientId: process.env.GOOGLE_CLIENT_ID || "mock_google_client_id",
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock_google_client_secret",
 }
 const microsoftAuth = {
-    clientId: "mock_ms_client_id",
-    clientSecret: "mock_ms_client_secret",
+    clientId: process.env.MICROSOFT_CLIENT_ID || "mock_ms_client_id",
+    clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "mock_ms_client_secret",
 }
 
 const fdm = createFdmServer(host, port, user, password, database)
