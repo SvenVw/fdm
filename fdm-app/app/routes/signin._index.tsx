@@ -368,7 +368,7 @@ export default function SignIn() {
                                                     {form.formState.isSubmitting ? (
                                                         <div className="flex items-center space-x-2">
                                                             <LoadingSpinner />
-                                                            <span>Aamelden...</span>
+                                                            <span>Aanmelden...</span>
                                                         </div>
                                                     ) : (
                                                         "Aanmelden met e-mail"
@@ -429,8 +429,12 @@ export default function SignIn() {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-
-    const redirectTo = "/farm"
+    // Get the URL object to extract search params
+    const url = new URL(request.url)
+    const redirectTo = url.searchParams.get("redirectTo") || "/farm"
+    // Validate redirectTo to prevent open redirect
+    const isValidRedirect = redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+    const safeRedirectTo = isValidRedirect ? redirectTo : "/farm"
 
     // Get form values
     const formValues = await extractFormValuesFromRequest(
@@ -444,14 +448,16 @@ export async function action({ request }: ActionFunctionArgs) {
         await auth.api.signInMagicLink({
             body: {
                 email: email,
-                callbackURL: redirectTo
+                callbackURL: safeRedirectTo
             },
             headers: request.headers,
         })
-        return redirectWithSuccess("/signin/check-your-email", `Aanmeldlink is verstuurd naar ${email}.`
+        return redirectWithSuccess(
+            "/signin/check-your-email",
+            `Aanmeldlink is verstuurd naar ${email}.`
         )
     } catch (error) {
-        console.error("Error sending magic link:", error)
+        console.error("Error sending magic link") // Don't log full error details
         handleActionError(error)
     }
 }

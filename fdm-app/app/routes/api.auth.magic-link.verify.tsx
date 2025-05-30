@@ -4,7 +4,16 @@ import { handleLoaderError } from "~/lib/error";
 
 export async function loader({ request }: { request: Request }) {
     const url = new URL(request.url);
-    const callbackUrl = url.searchParams.get("callbackUrl") || "/farm";
+    const callbackUrlParam = url.searchParams.get("callbackUrl") || "/farm";
+    
+    // Validate callback URL to prevent open redirects
+    const callbackUrl = callbackUrlParam.startsWith("/") ||
+                       callbackUrlParam.startsWith(url.origin)
+                       ? callbackUrlParam
+                       : "/farm";
+
+    // …the rest of your loader logic…
+}
     try {
         // Delegate to better-auth's handler for verification and session creation
         const authResponse = await auth.handler(request)
@@ -22,6 +31,6 @@ export async function loader({ request }: { request: Request }) {
 
         })
     } catch (error) {
-        handleLoaderError(error)
+        throw handleLoaderError(error)
     }
 }

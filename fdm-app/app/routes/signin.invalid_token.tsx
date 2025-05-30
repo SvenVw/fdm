@@ -1,13 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Check, Cookie, Info, MoveDown } from "lucide-react"
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
-import { Form, NavLink, redirect } from "react-router"
+import { Cookie } from "lucide-react"
+import type { LoaderFunctionArgs } from "react-router"
+import { NavLink, redirect } from "react-router"
 import type { MetaFunction } from "react-router"
-import { useSearchParams } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -17,22 +11,9 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { signIn } from "~/lib/auth-client"
 import { auth } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
-import { handleLoaderError, handleActionError } from "~/lib/error"
-import { cn } from "~/lib/utils"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormMessage,
-} from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { extractFormValuesFromRequest } from "../lib/form"
-
+import { handleLoaderError } from "~/lib/error"
 export const meta: MetaFunction = () => {
     return [
         { title: `Aanmelden | ${clientConfig.name}` },
@@ -42,15 +23,6 @@ export const meta: MetaFunction = () => {
         },
     ]
 }
-
-const FormSchema = z.object({
-    email: z.coerce
-        .string({
-            required_error: "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
-        }).email({
-            message: "Dit is geen geldig e-mailadres",
-        })
-})
 
 
 /**
@@ -87,13 +59,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the sign-in page with social authentication options.
+ * Renders the invalid token page when a magic link has expired or is invalid.
  *
- * This component displays a structured interface for user sign-in. It provides social sign-in buttons for Microsoft and Google,
- * along with information about service benefits and a link to the privacy policy. If a social sign-in attempt fails, a toast notification
- * is displayed and the error is logged to the console.
+ * This component displays a message informing the user that their sign-in link is no longer valid,
+ * explaining the 5-minute validity and single-use nature of magic links. It provides a button to
+ * navigate back to the main sign-in page.
  *
- * @returns A React element representing the sign-in page.
+ * @returns A React element representing the invalid token page.
  */
 export default function SignIn() {
     const openCookieSettings = () => {
