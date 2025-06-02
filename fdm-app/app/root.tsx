@@ -135,6 +135,7 @@ export function Layout() {
                     <script
                         id="runtime-config"
                         type="application/json"
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe because we are stringifying a JSON object
                         dangerouslySetInnerHTML={{
                             __html: JSON.stringify(runtimeEnv).replace(
                                 /</g,
@@ -144,6 +145,7 @@ export function Layout() {
                     />
                 )}
                 <script
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe because we are stringifying a JSON object
                     dangerouslySetInnerHTML={{
                         __html: `
                             try {

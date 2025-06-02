@@ -66,8 +66,7 @@ export const MagicLinkEmail = ({
                     <Section className="mt-[32px] mb-[32px] text-center">
                         <Button
                             href={url}
-                            role="button"
-                            aria-label={`Inloggen bij ${appName}`}
+                            aria-label={`Aanmelden bij ${appName}`}
                             className="bg-[#0070f3] text-white rounded px-[12px] py-[12px] text-[14px] font-semibold no-underline"
                         >
                             Aanmelden bij {appName}

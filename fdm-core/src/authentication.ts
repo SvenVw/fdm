@@ -5,8 +5,8 @@ import { eq } from "drizzle-orm"
 import { generateFromEmail } from "unique-username-generator"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
-
-export type BetterAuth = ReturnType<typeof betterAuth>
+import type { FdmAuth } from "./authentication.d"
+import { handleError } from "./error"
 
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.
@@ -31,7 +31,7 @@ export function createFdmAuth(
     microsoft?: { clientSecret: string; clientId: string },
     sendMagicLinkEmail?: (email: string, url: string) => Promise<void>,
     emailAndPassword?: boolean,
-): BetterAuth {
+): FdmAuth {
     // Setup social auth providers
     let googleAuth = undefined
     if (google) {
@@ -67,7 +67,6 @@ export function createFdmAuth(
             clientId: microsoft.clientId,
             clientSecret: microsoft.clientSecret,
             tenantId: "common",
-            requireSelectAccount: true,
             mapProfileToUser: async (profile: {
                 name: string | undefined
                 email: string
@@ -87,7 +86,7 @@ export function createFdmAuth(
         }
     }
 
-    const auth: BetterAuth = betterAuth({
+    const auth: FdmAuth = betterAuth({
         database: drizzleAdapter(fdm, {
             provider: "pg",
             schema: authNSchema,
@@ -158,15 +157,152 @@ export function createFdmAuth(
                 ): Promise<void> => {
                     if (sendMagicLinkEmail) {
                         await sendMagicLinkEmail(email, url)
+
+                        // Set username if user is new
+                        const user = await fdm
+                            .select({
+                                id: authNSchema.user.id,
+                                username: authNSchema.user.username,
+                                email: authNSchema.user.email,
+                            })
+                            .from(authNSchema.user)
+                            .where(eq(authNSchema.user.email, email))
+                            .limit(1)
+
+                        if (user.length > 0 && !user[0].username) {
+                            await fdm
+                                .update(authNSchema.user)
+                                .set({
+                                    username: await createUsername(fdm, email),
+                                })
+                                .where(eq(authNSchema.user.id, user[0].id))
+                        }
                     } else {
-                        console.warn("sendMagicLinkEmail function not provided to createFdmAuth. Magic link emails will not be sent.")
+                        console.warn(
+                            "sendMagicLinkEmail function not provided to createFdmAuth. Magic link emails will not be sent.",
+                        )
                     }
                 },
             }),
         ],
+        databaseHooks: {
+            user: {
+                create: {
+                    after: async (user) => {
+                        // Check if username is created after signup, otherwise add an username (typically when signed up with magic link)
+                        const userName = await fdm
+                            .select({
+                                username: authNSchema.user.username,
+                            })
+                            .from(authNSchema.user)
+                            .where(eq(authNSchema.user.id, user.id))
+                            .limit(1)
+
+                        if (userName.length > 0 && !userName[0].username) {
+                            await fdm
+                                .update(authNSchema.user)
+                                .set({
+                                    username: await createUsername(
+                                        fdm,
+                                        user.email,
+                                    ),
+                                })
+                                .where(eq(authNSchema.user.id, user.id))
+                        }
+                    },
+                },
+            },
+        },
     })
 
     return auth
+}
+
+/**
+ * Updates the profile information of a user.
+ *
+ * This function allows updating the first name, surname, and language preference of a user. It constructs an object
+ * containing only the fields that need to be updated and then performs the update operation. Additionally, it updates
+ * the display username if either the first name or surname is being updated.
+ *
+ * @param fdm - The FDM instance providing the connection to the database.
+ * @param user_id - The ID of the user to update.
+ * @param firstname - (Optional) The new first name of the user.
+ * @param surname - (Optional) The new surname of the user.
+ * @param lang - (Optional) The new language preference of the user.
+ * @returns A promise that resolves when the user's profile has been updated.
+ * @throws {Error} Throws an error if any database operation fails.
+ *
+ */
+export async function updateUserProfile(
+    fdm: FdmType,
+    user_id: string,
+    firstname?: string,
+    surname?: string,
+    lang?: "nl-NL",
+): Promise<void> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            const updatedFields: Partial<typeof authNSchema.user.$inferInsert> =
+                {}
+            if (firstname !== undefined) {
+                updatedFields.firstname = firstname
+            }
+            if (surname !== undefined) {
+                updatedFields.surname = surname
+            }
+            if (lang !== undefined) {
+                updatedFields.lang = lang
+            }
+
+            // Update displayUsername if firstname or surname are updated
+            if (firstname !== undefined || surname !== undefined) {
+                const currentUser = await tx
+                    .select({
+                        firstname: authNSchema.user.firstname,
+                        surname: authNSchema.user.surname,
+                        username: authNSchema.user.username,
+                    })
+                    .from(authNSchema.user)
+                    .where(eq(authNSchema.user.id, user_id))
+                    .limit(1)
+
+                if (currentUser.length > 0) {
+                    const currentFirstname =
+                        firstname !== undefined
+                            ? firstname
+                            : currentUser[0].firstname
+                    const currentSurname =
+                        surname !== undefined ? surname : currentUser[0].surname
+                    updatedFields.displayUsername = createDisplayUsername(
+                        currentFirstname,
+                        currentSurname,
+                    )
+
+                    // Build `name` from non-null parts (or set to null if none)
+                    const nameParts = [currentFirstname, currentSurname].filter(
+                        (part) => part != null,
+                    )
+                    updatedFields.name =
+                        nameParts.length > 0 ? nameParts.join(" ") : undefined
+                }
+            }
+
+            if (Object.keys(updatedFields).length > 0) {
+                await tx
+                    .update(authNSchema.user)
+                    .set(updatedFields)
+                    .where(eq(authNSchema.user.id, user_id))
+            }
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for updateUserProfile", {
+            user_id,
+            firstname,
+            surname,
+            lang,
+        })
+    }
 }
 
 /**
@@ -239,8 +375,8 @@ async function createUsername(fdm: FdmType, email: string): Promise<string> {
 }
 
 export function createDisplayUsername(
-    firstname: string | null,
-    surname: string | null,
+    firstname: string | null | undefined,
+    surname: string | null | undefined,
 ): string | null {
     // Filter out null or empty name parts and join with a space
     const nameParts = [firstname, surname].filter((part) => part?.trim())
