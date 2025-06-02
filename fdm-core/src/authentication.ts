@@ -86,7 +86,7 @@ export function createFdmAuth(
         }
     }
 
-    const auth: BetterAuth = betterAuth({
+    const auth: FdmAuth = betterAuth({
         database: drizzleAdapter(fdm, {
             provider: "pg",
             schema: authNSchema,
@@ -157,6 +157,26 @@ export function createFdmAuth(
                 ): Promise<void> => {
                     if (sendMagicLinkEmail) {
                         await sendMagicLinkEmail(email, url)
+
+                        // Set username if user is new
+                        const user = await fdm
+                            .select({
+                                id: authNSchema.user.id,
+                                username: authNSchema.user.username,
+                                email: authNSchema.user.email,
+                            })
+                            .from(authNSchema.user)
+                            .where(eq(authNSchema.user.email, email))
+                            .limit(1)
+
+                        if (user.length > 0 && !user[0].username) {
+                            await fdm
+                                .update(authNSchema.user)
+                                .set({
+                                    username: await createUsername(fdm, email),
+                                })
+                                .where(eq(authNSchema.user.id, user[0].id))
+                        }
                     } else {
                         console.warn(
                             "sendMagicLinkEmail function not provided to createFdmAuth. Magic link emails will not be sent.",
