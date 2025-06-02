@@ -47,7 +47,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
-        await checkSession(session, request)
+        const sessionCheckResponse = await checkSession(session, request)
+        // If checkSession returns a Response, it means a redirect is needed
+        if (sessionCheckResponse instanceof Response) {
+            return sessionCheckResponse
+        }
 
         // Return user information from loader
         return {
