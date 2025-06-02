@@ -19,7 +19,8 @@ export type { FdmType } from "./fdm.d"
 export type { FdmServerType } from "./fdm-server.d"
 export { createFdmServer } from "./fdm-server"
 // export { createFdmLocal } from './fdm-local'
-export { createFdmAuth } from "./authentication"
+export { createFdmAuth, createDisplayUsername } from "./authentication"
+export type { FdmAuth } from "./authentication.d"
 export type { PrincipalId } from "./authorization.d"
 export {
     addFarm,

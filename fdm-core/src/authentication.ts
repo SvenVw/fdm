@@ -5,8 +5,7 @@ import { eq } from "drizzle-orm"
 import { generateFromEmail } from "unique-username-generator"
 import * as authNSchema from "./db/schema-authn"
 import type { FdmType } from "./fdm"
-
-export type BetterAuth = ReturnType<typeof betterAuth>
+import type { FdmAuth } from "./authentication.d"
 
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.
@@ -31,7 +30,7 @@ export function createFdmAuth(
     microsoft?: { clientSecret: string; clientId: string },
     sendMagicLinkEmail?: (email: string, url: string) => Promise<void>,
     emailAndPassword?: boolean,
-): BetterAuth {
+): FdmAuth {
     // Setup social auth providers
     let googleAuth = undefined
     if (google) {
@@ -159,7 +158,9 @@ export function createFdmAuth(
                     if (sendMagicLinkEmail) {
                         await sendMagicLinkEmail(email, url)
                     } else {
-                        console.warn("sendMagicLinkEmail function not provided to createFdmAuth. Magic link emails will not be sent.")
+                        console.warn(
+                            "sendMagicLinkEmail function not provided to createFdmAuth. Magic link emails will not be sent.",
+                        )
                     }
                 },
             }),
@@ -239,8 +240,8 @@ async function createUsername(fdm: FdmType, email: string): Promise<string> {
 }
 
 export function createDisplayUsername(
-    firstname: string | null,
-    surname: string | null,
+    firstname: string | null | undefined,
+    surname: string | null | undefined,
 ): string | null {
     // Filter out null or empty name parts and join with a space
     const nameParts = [firstname, surname].filter((part) => part?.trim())

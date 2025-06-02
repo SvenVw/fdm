@@ -1,4 +1,4 @@
-import { createFdmAuth, type BetterAuth } from "@svenvw/fdm-core" // Import BetterAuth
+import { createFdmAuth, createDisplayUsername, type FdmAuth } from "@svenvw/fdm-core"
 import type { Session, User as BetterAuthUser } from "better-auth"
 import type { GenericEndpointContext } from "better-auth"
 import { fdm } from "~/lib/fdm.server"
@@ -7,7 +7,7 @@ import { renderWelcomeEmail, sendEmail, sendMagicLinkEmailToUser } from "./email
 import type { ExtendedUser } from "~/types/extended-user"
 
 // Initialize better-auth instance for FDM
-export const auth: BetterAuth = createFdmAuth(
+export const auth: FdmAuth = createFdmAuth(
     fdm,
     serverConfig.auth.google,
     serverConfig.auth.microsoft,
