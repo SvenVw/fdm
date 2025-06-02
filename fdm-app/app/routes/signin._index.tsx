@@ -398,7 +398,7 @@ export default function SignIn() {
                                         aria-label="Lees ons privacybeleid"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="underline hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                                        className="underline hover:text-primary focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                     >
                                         Privacybeleid
                                     </a>
