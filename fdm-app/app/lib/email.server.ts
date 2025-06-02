@@ -34,7 +34,7 @@ export async function renderWelcomeEmail(user: User): Promise<Email> {
         To: user.email,
         Subject: `Welkom bij ${serverConfig.name}! Krijg inzicht in je bedrijfsdata.`,
         HtmlBody: emailHtml,
-        Tag: 'welcome',
+        Tag: "welcome",
     }
 
     return email
@@ -61,7 +61,7 @@ export async function renderInvitationEmail(
         To: inviteeEmail,
         Subject: `${inviter.firstname} ${inviter.surname} heeft je uitgenodigd om lid te worden van ${organizationName}!`,
         HtmlBody: emailHtml,
-        Tag: 'invitation-organization',
+        Tag: "invitation-organization",
     }
 
     return email
@@ -71,7 +71,7 @@ export async function renderMagicLinkEmail(
     emailAddress: string,
     magicLinkUrl: string,
 ): Promise<Email> {
-    const emailTimestamp = format(new Date(), 'Pp', { locale: nl })
+    const emailTimestamp = format(new Date(), "Pp", { locale: nl })
     const emailHtml = await render(
         MagicLinkEmail({
             url: magicLinkUrl,
@@ -88,7 +88,7 @@ export async function renderMagicLinkEmail(
         To: emailAddress,
         Subject: `Aanmeldlink voor ${serverConfig.name} | ${emailTimestamp}}`,
         HtmlBody: emailHtml,
-        Tag: 'magic-link',
+        Tag: "magic-link",
     }
 
     return email
@@ -104,6 +104,5 @@ export async function sendMagicLinkEmailToUser(
     magicLinkUrl: string,
 ): Promise<void> {
     const email = await renderMagicLinkEmail(emailAddress, magicLinkUrl)
-    console.log(`Sending magic link ${magicLinkUrl} email to ${emailAddress}`)
     await sendEmail(email)
 }
