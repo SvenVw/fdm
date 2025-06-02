@@ -442,11 +442,11 @@ export default function SignIn() {
 export async function action({ request }: ActionFunctionArgs) {
     // Get the URL object to extract search params
     const url = new URL(request.url)
-    const redirectTo = url.searchParams.get("redirectTo") || "/welcome"
+    const redirectTo = url.searchParams.get("redirectTo") || "/farm"
     // Validate redirectTo to prevent open redirect
     const isValidRedirect =
         redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-    const safeRedirectTo = isValidRedirect ? redirectTo : "/welcome"
+    const safeRedirectTo = isValidRedirect ? redirectTo : "/farm"
 
     // Get form values
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
