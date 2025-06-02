@@ -219,86 +219,28 @@ export function createFdmAuth(
     return auth
 }
 
-/**
- * Updates the profile information of a user.
- *
- * This function allows updating the first name, surname, and language preference of a user. It constructs an object
- * containing only the fields that need to be updated and then performs the update operation. Additionally, it updates
- * the display username if either the first name or surname is being updated.
- *
- * @param fdm - The FDM instance providing the connection to the database.
- * @param user_id - The ID of the user to update.
- * @param firstname - (Optional) The new first name of the user.
- * @param surname - (Optional) The new surname of the user.
- * @param lang - (Optional) The new language preference of the user.
- * @returns A promise that resolves when the user's profile has been updated.
- * @throws {Error} Throws an error if any database operation fails.
- *
- */
-export async function updateUserProfile(
-    fdm: FdmType,
-    user_id: string,
-    firstname?: string,
-    surname?: string,
-    lang?: "nl-NL",
-): Promise<void> {
-    try {
-        return await fdm.transaction(async (tx: FdmType) => {
-            const updatedFields: Partial<typeof authNSchema.user.$inferInsert> =
-                {}
-            if (firstname !== undefined) {
-                updatedFields.firstname = firstname
-            }
-            if (surname !== undefined) {
-                updatedFields.surname = surname
-            }
-            if (lang !== undefined) {
-                updatedFields.lang = lang
-            }
+            if (currentUser.length > 0) {
+                const currentFirstname =
+                    firstname !== undefined
+                        ? firstname
+                        : currentUser[0].firstname
+                const currentSurname =
+                    surname !== undefined
+                        ? surname
+                        : currentUser[0].surname
 
-            // Update displayUsername if firstname or surname are updated
-            if (firstname !== undefined || surname !== undefined) {
-                const currentUser = await tx
-                    .select({
-                        firstname: authNSchema.user.firstname,
-                        surname: authNSchema.user.surname,
-                        username: authNSchema.user.username,
-                    })
-                    .from(authNSchema.user)
-                    .where(eq(authNSchema.user.id, user_id))
-                    .limit(1)
+                updatedFields.displayUsername = createDisplayUsername(
+                    currentFirstname,
+                    currentSurname,
+                )
 
-                if (currentUser.length > 0) {
-                    const currentFirstname =
-                        firstname !== undefined
-                            ? firstname
-                            : currentUser[0].firstname
-                    const currentSurname =
-                        surname !== undefined ? surname : currentUser[0].surname
-                    updatedFields.displayUsername = createDisplayUsername(
-                        currentFirstname,
-                        currentSurname,
-                    )
-                    updatedFields.name = `${currentFirstname} ${currentSurname}`
-                }
+                // Build `name` from non-null parts (or set to null if none)
+                const nameParts = [currentFirstname, currentSurname]
+                    .filter(part => part != null)
+                updatedFields.name = nameParts.length > 0
+                    ? nameParts.join(' ')
+                    : null
             }
-
-            if (Object.keys(updatedFields).length > 0) {
-                await tx
-                    .update(authNSchema.user)
-                    .set(updatedFields)
-                    .where(eq(authNSchema.user.id, user_id))
-            }
-        })
-    } catch (err) {
-        throw handleError(err, "Exception for updateUserProfile", {
-            user_id,
-            firstname,
-            surname,
-            lang,
-        })
-    }
-}
 
 /**
  * Splits a full name into first name and surname, handling various formats including "LastName, FirstName".
