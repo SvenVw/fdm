@@ -251,6 +251,7 @@ export async function updateUserProfile(
                         currentFirstname,
                         currentSurname,
                     )
+                    updatedFields.name = `${currentFirstname} ${currentSurname}`
                 }
             }
 
