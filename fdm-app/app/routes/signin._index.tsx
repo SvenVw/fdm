@@ -47,12 +47,13 @@ export const meta: MetaFunction = () => {
 const FormSchema = z.object({
     email: z.coerce
         .string({
-            required_error: "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
-        }).email({
-            message: "Dit is geen geldig e-mailadres",
+            required_error:
+                "Voor aanmelden met e-mail hebben we je e-mailadres nodig",
         })
+        .email({
+            message: "Dit is geen geldig e-mailadres",
+        }),
 })
-
 
 /**
  * Checks for an existing user session and redirects authenticated users.
@@ -343,7 +344,11 @@ export default function SignIn() {
                                         onSubmit={form.handleSubmit}
                                         method="POST"
                                     >
-                                        <fieldset disabled={form.formState.isSubmitting}>
+                                        <fieldset
+                                            disabled={
+                                                form.formState.isSubmitting
+                                            }
+                                        >
                                             <div className="grid w-full items-center gap-4">
                                                 <div className="flex flex-col space-y-1.5">
                                                     <FormField
@@ -364,11 +369,17 @@ export default function SignIn() {
                                                         )}
                                                     />
                                                 </div>
-                                                <Button type="submit" className="w-full">
-                                                    {form.formState.isSubmitting ? (
+                                                <Button
+                                                    type="submit"
+                                                    className="w-full"
+                                                >
+                                                    {form.formState
+                                                        .isSubmitting ? (
                                                         <div className="flex items-center space-x-2">
                                                             <LoadingSpinner />
-                                                            <span>Aanmelden...</span>
+                                                            <span>
+                                                                Aanmelden...
+                                                            </span>
                                                         </div>
                                                     ) : (
                                                         "Aanmelden met e-mail"
@@ -431,16 +442,14 @@ export default function SignIn() {
 export async function action({ request }: ActionFunctionArgs) {
     // Get the URL object to extract search params
     const url = new URL(request.url)
-    const redirectTo = url.searchParams.get("redirectTo") || "/farm"
+    const redirectTo = url.searchParams.get("redirectTo") || "/welcome"
     // Validate redirectTo to prevent open redirect
-    const isValidRedirect = redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-    const safeRedirectTo = isValidRedirect ? redirectTo : "/farm"
+    const isValidRedirect =
+        redirectTo.startsWith("/") && !redirectTo.startsWith("//")
+    const safeRedirectTo = isValidRedirect ? redirectTo : "/welcome"
 
     // Get form values
-    const formValues = await extractFormValuesFromRequest(
-        request,
-        FormSchema,
-    )
+    const formValues = await extractFormValuesFromRequest(request, FormSchema)
     const { email } = formValues
 
     try {
@@ -448,13 +457,13 @@ export async function action({ request }: ActionFunctionArgs) {
         await auth.api.signInMagicLink({
             body: {
                 email: email,
-                callbackURL: safeRedirectTo
+                callbackURL: safeRedirectTo,
             },
             headers: request.headers,
         })
         return redirectWithSuccess(
             "/signin/check-your-email",
-            `Aanmeldlink is verstuurd naar ${email}.`
+            `Aanmeldlink is verstuurd naar ${email}.`,
         )
     } catch (error) {
         console.error("Error sending magic link") // Don't log full error details
