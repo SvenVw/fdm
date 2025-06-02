@@ -98,7 +98,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function SignIn() {
     const [searchParams] = useSearchParams() // Get search params
-    const redirectTo = searchParams.get("redirectTo") || "/farm" // Get redirectTo or default to /farm
+    const redirectTo = searchParams.get("redirectTo") || "/welcome" // Get redirectTo or default to /welcome
     const handleSignInError = (provider: string, error: unknown) => {
         toast(
             `Er is helaas iets misgegaan bij het aanmelden met ${provider}. Probeer het opnieuw.`,
