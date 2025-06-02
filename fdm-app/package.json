@@ -40,6 +40,7 @@
         "@sentry/react": "^9.22.0",
         "@svenvw/fdm-calculator": "workspace:^",
         "@svenvw/fdm-core": "workspace:^",
+        "@tailwindcss/vite": "^4.1.8",
         "@tanstack/react-table": "^8.21.3",
         "@turf/centroid": "^7.2.0",
         "better-auth": "catalog:",
