@@ -1,5 +1,17 @@
 # Changelog fdm-core
 
+## 0.21.0
+
+### Minor Changes
+
+- 004c58d: Add option to sign in with magic-link
+- 7b447f6: Make the function `createDisplayUserName` available
+- 842aac4: Add the function `updateUserProfile` to update the profile parameters of the user
+
+### Patch Changes
+
+- 7b447f6: Make the type `FdmAuth` available
+
 ## 0.20.0
 
 ### Minor Changes

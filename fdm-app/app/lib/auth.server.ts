@@ -1,15 +1,26 @@
-import { createFdmAuth } from "@svenvw/fdm-core"
-import type { Session, User } from "better-auth"
+import {
+    createFdmAuth,
+    createDisplayUsername,
+    type FdmAuth,
+} from "@svenvw/fdm-core"
+import type { Session } from "better-auth"
 import type { GenericEndpointContext } from "better-auth"
 import { fdm } from "~/lib/fdm.server"
 import { serverConfig } from "./config.server"
-import { renderWelcomeEmail, sendEmail } from "./email.server"
+import {
+    renderWelcomeEmail,
+    sendEmail,
+    sendMagicLinkEmailToUser,
+} from "./email.server"
+import type { ExtendedUser } from "~/types/extended-user"
+import { redirect } from "react-router"
 
 // Initialize better-auth instance for FDM
-export const auth = createFdmAuth(
+export const auth: FdmAuth = createFdmAuth(
     fdm,
     serverConfig.auth.google,
     serverConfig.auth.microsoft,
+    sendMagicLinkEmailToUser,
 )
 
 // Extend database hooks with sending a welcome email after sign up
@@ -22,7 +33,10 @@ if (serverConfig.mail) {
             ...auth.options.databaseHooks?.user,
             create: {
                 ...auth.options.databaseHooks?.user?.create,
-                after: async (user, context?: GenericEndpointContext) => {
+                after: async (
+                    user: ExtendedUser,
+                    context?: GenericEndpointContext,
+                ) => {
                     if (originalUserCreateAfter) {
                         await originalUserCreateAfter(user, context)
                     }
@@ -48,29 +62,30 @@ export async function getSession(request: Request): Promise<FdmSession> {
         throw new Response("Unauthorized", { status: 401 })
     }
 
+    // Cast session.user to ExtendedUser for type safety
+    const user = session.user as ExtendedUser
+
     // Determine avatar initials
-    let initials = session.user.email[0]
-    if (session.user.firstname && session.user.surname) {
-        initials = session.user.firstname[0] + session.user.surname[0]
-    } else if (session.user.firstname) {
-        initials = session.user.firstname[0]
-    } else if (session.user.name) {
-        initials = session.user.name[0]
+    let initials = user.email[0]
+    if (user.firstname && user.surname) {
+        initials = user.firstname[0] + user.surname[0]
+    } else if (user.firstname) {
+        initials = user.firstname[0]
+    } else if (user.name) {
+        initials = user.name[0]
     }
 
     // Determine userName
-    let userName = session.user.name
-    if (session.user.firstname && session.user.surname) {
-        userName = `${session.user.firstname} ${session.user.surname}`
-    } else if (session.user.firstname) {
-        userName = session.user.firstname
+    let displayUserName = user.displayUsername
+    if (!displayUserName) {
+        displayUserName = createDisplayUsername(user.firstname, user.surname)
     }
 
     // Expand session
     const sessionWithUserName = {
         ...session,
-        userName: userName,
-        principal_id: session.user.id,
+        userName: displayUserName,
+        principal_id: user.id,
         initials: initials,
     }
 
@@ -79,8 +94,32 @@ export async function getSession(request: Request): Promise<FdmSession> {
 
 interface FdmSession {
     session: Session
-    user: User
+    user: ExtendedUser
     userName: string
     principal_id: string
     initials: string
+}
+
+export async function checkSession(
+    session: FdmSession,
+    request: Request,
+): Promise<undefined | Response> {
+    if (!session?.user) {
+        // Get the original URL the user tried to access
+        const currentPath = new URL(request.url).pathname
+        // Construct the sign-in URL with the redirectTo parameter
+        const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+        // Perform the redirect
+        return redirect(signInUrl)
+    }
+    // Check if profile is complete, otherwise redirect to welcome page
+    if (!session.user.firstname || !session.user.surname) {
+        // Get the original URL the user tried to access
+        const currentPath = new URL(request.url).pathname
+        // Construct the welcome URL with the redirectTo parameter
+        const welcomeUrl = `/welcome?redirectTo=${encodeURIComponent(currentPath)}`
+        console.log(`Redirecting to ${welcomeUrl}`)
+        // Perform the redirect
+        return redirect(welcomeUrl)
+    }
 }

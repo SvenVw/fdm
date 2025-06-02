@@ -1,5 +1,25 @@
 # Changelog fdm-app
 
+## 0.19.0
+
+### Minor Changes
+
+- a963506: Redirect users with incomplete profiles to the welcome page
+- 004c58d: Add option to sign in with magic-link
+- 4db6f37: Redirect new users to welcome page (if no redirect is provided) to complete their profile
+
+### Patch Changes
+
+- aba0f81: Add tags to emails
+- 050f170: Fix showing avatar image at dropdown menu
+- c1ad4b7: Fix loading public environment variables on the server side by using the correct prefix
+- Updated dependencies [004c58d]
+- Updated dependencies [7b447f6]
+- Updated dependencies [7b447f6]
+- Updated dependencies [842aac4]
+  - @svenvw/fdm-core@0.21.0
+  - @svenvw/fdm-calculator@0.3.1
+
 ## 0.18.2
 
 ### Patch Changes
