@@ -104,5 +104,6 @@ export async function sendMagicLinkEmailToUser(
     magicLinkUrl: string,
 ): Promise<void> {
     const email = await renderMagicLinkEmail(emailAddress, magicLinkUrl)
+    console.log(`Sending magic link ${magicLinkUrl} email to ${emailAddress}`)
     await sendEmail(email)
 }
