@@ -30,6 +30,7 @@ import { extractFormValuesFromRequest } from "../lib/form"
 import { redirectWithSuccess } from "remix-toast"
 import { updateUserProfile } from "@svenvw/fdm-core"
 import { fdm } from "~/lib/fdm.server"
+import { Avatar, AvatarImage } from "~/components/ui/avatar"
 
 export const meta: MetaFunction = () => {
     return [
@@ -83,6 +84,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         return {
             firstname: session.user.firstname,
             surname: session.user.surname,
+            image: session.user.image,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -158,6 +160,17 @@ export default function Welcome() {
                                             }
                                         >
                                             <div className="grid w-full items-center gap-4">
+                                                {loaderData.image ? (
+                                                    <div className="flex flex-col justify-self-center">
+                                                        <Avatar className="h-12 w-12 rounded-lg">
+                                                            <AvatarImage
+                                                                src={
+                                                                    loaderData.image
+                                                                }                                                
+                                                            />
+                                                        </Avatar>
+                                                 </div>
+                                                ) : null}
                                                 <div className="flex flex-col space-y-1.5">
                                                     <FormField
                                                         control={form.control}
