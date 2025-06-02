@@ -303,6 +303,6 @@ export async function action({ request }: ActionFunctionArgs) {
         return redirectWithSuccess(safeRedirectTo, "Je profiel is voltooid!")
     } catch (error) {
         console.error("Error updating user profile")
-        handleActionError(error)
+        return handleActionError(error)
     }
 }
