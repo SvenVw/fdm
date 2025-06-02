@@ -89,14 +89,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
-/**
- * Renders the sign-in page with social authentication options.
+ /**
+ * Renders the welcome page for profile completion.
  *
- * This component displays a structured interface for user sign-in. It provides social sign-in buttons for Microsoft and Google,
- * along with information about service benefits and a link to the privacy policy. If a social sign-in attempt fails, a toast notification
- * is displayed and the error is logged to the console.
+ * This component displays a form for users to complete their profile by entering their firstname and surname.
+ * It shows the user's avatar if available and handles form submission with validation.
  *
- * @returns A React element representing the sign-in page.
+ * @returns A React element representing the profile completion page.
  */
 export default function Welcome() {
     const loaderData = useLoaderData<typeof loader>()
