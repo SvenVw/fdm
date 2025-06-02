@@ -74,6 +74,7 @@ describe("updateUserProfile", () => {
                 email,
                 name,
                 emailVerified: false,
+                lang: "nl-NL",
                 createdAt: new Date(),
                 updatedAt: new Date(),
             })
