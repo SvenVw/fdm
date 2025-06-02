@@ -250,9 +250,9 @@ export default function Welcome() {
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <img
-                        src="
-https://images.unsplash.com/photo-1625565570971-e6b404974366?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                        alt='Photo by <a href="https://unsplash.com/@sonysnaper?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Rickie-Tom Schünemann</a> on <a href="https://unsplash.com/photos/herd-of-cow-on-green-grass-field-during-daytime-MX_wmmlo2Fs?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+                     <img
+                         src="https://images.unsplash.com/photo-1625565570971-e6b404974366?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                         alt='Herd of cows on green grass field during daytime by Rickie-Tom Schünemann on Unsplash'
                         width="1920"
                         height="1080"
                         loading="lazy"
