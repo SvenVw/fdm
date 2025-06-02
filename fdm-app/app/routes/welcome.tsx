@@ -13,7 +13,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { auth } from "~/lib/auth.server"
+import { auth, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError, handleActionError } from "~/lib/error"
 import {
@@ -76,9 +76,7 @@ const FormSchema = z.object({
 export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
-        const session = await auth.api.getSession({
-            headers: request.headers,
-        })
+        const session = await getSession(request)
 
         // Return user information from loader
         return {
