@@ -1,16 +1,20 @@
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
-    type BetterAuth,
     createDisplayUsername,
     createFdmAuth,
     splitFullName,
+    updateUserProfile,
 } from "./authentication"
 import type { FdmType } from "./fdm"
+import * as authNSchema from "./db/schema-authn"
 import { createFdmServer } from "./fdm-server"
+import { eq } from "drizzle-orm"
+import type { FdmAuth } from "./authentication.d"
+import { createId } from "./id"
 
 describe("createFdmAuth", () => {
     let fdm: FdmType
-    let fdmAuth: BetterAuth
+    let fdmAuth: FdmAuth
     let googleAuth: { clientSecret: string; clientId: string }
     let microsoftAuth: { clientSecret: string; clientId: string }
 
@@ -47,6 +51,78 @@ describe("createFdmAuth", () => {
         expect(fdmAuth.options.database).toBeDefined()
     })
 })
+
+describe("updateUserProfile", () => {
+    let fdm: FdmType
+    let userId: string
+
+    beforeAll(async () => {
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
+
+        // Create a test user
+        const email = "testuser@example.com"
+        const name = "Test User"
+        const insertResult = await fdm
+            .insert(authNSchema.user)
+            .values({
+                id: createId(),
+                email,
+                name,
+            })
+            .returning({ id: authNSchema.user.id })
+
+        userId = insertResult[0].id
+    })
+
+    it("should update user profile information", async () => {
+        const newFirstName = "John"
+        const newSurname = "Doe"
+        const newLang = "nl-NL" as const
+
+        await updateUserProfile(fdm, userId, newFirstName, newSurname, newLang)
+
+        const updatedUser = await fdm
+            .select()
+            .from(authNSchema.user)
+            .where(eq(authNSchema.user.id, userId))
+            .limit(1)
+        expect(updatedUser[0].firstname).toBe(newFirstName)
+        expect(updatedUser[0].surname).toBe(newSurname)
+        expect(updatedUser[0].lang).toBe(newLang)
+        expect(updatedUser[0].displayUsername).toBe("John Doe")
+    })
+
+    it("should handle partial updates to user profile", async () => {
+        const newFirstName = "Jane"
+        await updateUserProfile(fdm, userId, newFirstName)
+
+        const updatedUser = await fdm
+            .select()
+            .from(authNSchema.user)
+            .where(eq(authNSchema.user.id, userId))
+            .limit(1)
+        expect(updatedUser[0].firstname).toBe(newFirstName)
+    })
+
+    it("should handle database errors during profile update", async () => {
+        // Mock the transaction function to throw an error
+        const mockFdm = {
+            ...fdm,
+            transaction: async () => {
+                throw new Error("Database update failed")
+            },
+        } as unknown as FdmType
+        await expect(
+            updateUserProfile(mockFdm, userId, "NewName"),
+        ).rejects.toThrowError("Exception for updateUserProfile")
+    })
+})
+
 describe("splitFullName", () => {
     let splittedFullName: { firstname: string | null; surname: string | null }
 
