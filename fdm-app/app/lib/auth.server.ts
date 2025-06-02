@@ -13,6 +13,7 @@ import {
     sendMagicLinkEmailToUser,
 } from "./email.server"
 import type { ExtendedUser } from "~/types/extended-user"
+import { redirect } from "react-router"
 
 // Initialize better-auth instance for FDM
 export const auth: FdmAuth = createFdmAuth(
@@ -97,4 +98,28 @@ interface FdmSession {
     userName: string
     principal_id: string
     initials: string
+}
+
+export async function checkSession(
+    session: FdmSession,
+    request: Request,
+): Promise<undefined | Response> {
+    if (!session?.user) {
+        // Get the original URL the user tried to access
+        const currentPath = new URL(request.url).pathname
+        // Construct the sign-in URL with the redirectTo parameter
+        const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
+        // Perform the redirect
+        return redirect(signInUrl)
+    }
+    // Check if profile is complete, otherwise redirect to welcome page
+    if (!session.user.firstname || !session.user.surname) {
+        // Get the original URL the user tried to access
+        const currentPath = new URL(request.url).pathname
+        // Construct the welcome URL with the redirectTo parameter
+        const welcomeUrl = `/welcome?redirectTo=${encodeURIComponent(currentPath)}`
+        console.log(`Redirecting to ${welcomeUrl}`)
+        // Perform the redirect
+        return redirect(welcomeUrl)
+    }
 }
