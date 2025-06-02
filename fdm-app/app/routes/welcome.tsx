@@ -166,10 +166,10 @@ export default function Welcome() {
                                                             <AvatarImage
                                                                 src={
                                                                     loaderData.image
-                                                                }                                                
+                                                                }
                                                             />
                                                         </Avatar>
-                                                 </div>
+                                                    </div>
                                                 ) : null}
                                                 <div className="flex flex-col space-y-1.5">
                                                     <FormField
@@ -250,9 +250,8 @@ export default function Welcome() {
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <img
-                     <img
-                         src="https://images.unsplash.com/photo-1625565570971-e6b404974366?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                         alt='Herd of cows on green grass field during daytime by Rickie-Tom Schünemann on Unsplash'
+                        src="https://images.unsplash.com/photo-1625565570971-e6b404974366?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt="Herd of cows on green grass field during daytime by Rickie-Tom Schünemann on Unsplash"
                         width="1920"
                         height="1080"
                         loading="lazy"
