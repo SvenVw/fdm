@@ -186,6 +186,34 @@ export function createFdmAuth(
                 },
             }),
         ],
+        databaseHooks: {
+            user: {
+                create: {
+                    after: async (user) => {
+                        // Check if username is created after signup, otherwise add an username (typically when signed up with magic link)
+                        const userName = await fdm
+                            .select({
+                                username: authNSchema.user.username,
+                            })
+                            .from(authNSchema.user)
+                            .where(eq(authNSchema.user.id, user.id))
+                            .limit(1)
+
+                        if (userName.length > 0 && !userName[0].username) {
+                            await fdm
+                                .update(authNSchema.user)
+                                .set({
+                                    username: await createUsername(
+                                        fdm,
+                                        user.email,
+                                    ),
+                                })
+                                .where(eq(authNSchema.user.id, user.id))
+                        }
+                    },
+                },
+            },
+        },
     })
 
     return auth
