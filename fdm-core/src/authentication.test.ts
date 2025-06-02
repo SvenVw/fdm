@@ -73,6 +73,7 @@ describe("updateUserProfile", () => {
                 id: createId(),
                 email,
                 name,
+                emailVerified: false,
             })
             .returning({ id: authNSchema.user.id })
 
