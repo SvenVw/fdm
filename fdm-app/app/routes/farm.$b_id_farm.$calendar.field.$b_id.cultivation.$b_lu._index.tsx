@@ -23,7 +23,7 @@ import type { HarvestableType } from "~/components/custom/harvest/types"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -93,6 +93,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
         // Get details of field
         const field = await getField(fdm, session.principal_id, b_id)
@@ -153,6 +154,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             harvests: harvests,
             b_lu_harvestable: b_lu_harvestable,
             b_id_farm: b_id_farm,
+            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -192,7 +194,7 @@ export default function FarmFieldsOverviewBlock() {
                     b_lu_start={loaderData.cultivation.b_lu_start}
                     b_lu_end={loaderData.cultivation.b_lu_end}
                     options={loaderData.cultivationsCatalogueOptions}
-                    action={`/farm/${loaderData.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
+                    action={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
                 />
                 <Separator />
                 <HarvestsList

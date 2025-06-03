@@ -1,5 +1,11 @@
 # fdm-data
 
+## 0.13.1
+
+### Patch Changes
+
+- 5eb6ef2: Fix typo in parameter name `p_cl_rt` in the type CatalogueFertilizerItem
+
 ## 0.13.0
 
 ### Minor Changes

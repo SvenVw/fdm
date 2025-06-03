@@ -45,10 +45,12 @@ export function CultivationForm({
     })
 
     useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
-            form.reset()
-        }
-    }, [form.formState, form.reset])
+        form.reset({
+            b_lu_catalogue: b_lu_catalogue,
+            b_lu_start: b_lu_start,
+            b_lu_end: b_lu_end,
+        })
+    }, [form.reset, b_lu_catalogue, b_lu_start, b_lu_end])
 
     return (
         <RemixFormProvider {...form}>

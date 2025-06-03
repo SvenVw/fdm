@@ -47,7 +47,7 @@ describe("Farm Functions", () => {
             clientSecret: "mock_ms_client_secret",
         }
 
-        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, true)
+        fdmAuth = createFdmAuth(fdm, googleAuth, microsoftAuth, undefined, true)
 
         // Create principal_id
         const user1 = await fdmAuth.api.signUpEmail({

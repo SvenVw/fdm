@@ -14,7 +14,7 @@ import {
     SidebarProvider,
 } from "~/components/ui/sidebar"
 import { SidebarInset } from "~/components/ui/sidebar"
-import { getSession } from "~/lib/auth.server"
+import { checkSession, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 
@@ -33,14 +33,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
-
-        if (!session?.user) {
-            // Get the original URL the user tried to access
-            const currentPath = new URL(request.url).pathname
-            // Construct the sign-in URL with the redirectTo parameter
-            const signInUrl = `/signin?redirectTo=${encodeURIComponent(currentPath)}`
-            // Perform the redirect
-            return redirect(signInUrl)
+        const sessionCheckResponse = await checkSession(session, request)
+        // If checkSession returns a Response, it means a redirect is needed
+        if (sessionCheckResponse instanceof Response) {
+            return sessionCheckResponse
         }
 
         // Return user information from loader

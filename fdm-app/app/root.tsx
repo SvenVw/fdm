@@ -42,25 +42,45 @@ export const links: LinksFunction = () => [
 export const loader = async ({ request }: LoaderFunctionArgs) => {
     try {
         const { toast, headers } = await getToast(request)
-        return data({ toast }, { headers })
+
+        // Prepare runtime environment variables for the client
+        const runtimeEnv = {
+            PUBLIC_FDM_URL: process.env.PUBLIC_FDM_URL,
+            PUBLIC_FDM_NAME: process.env.PUBLIC_FDM_NAME,
+            PUBLIC_FDM_PRIVACY_URL: process.env.PUBLIC_FDM_PRIVACY_URL,
+            PUBLIC_MAPBOX_TOKEN: process.env.PUBLIC_MAPBOX_TOKEN,
+            PUBLIC_SENTRY_DSN: process.env.PUBLIC_SENTRY_DSN,
+            PUBLIC_SENTRY_ORG: process.env.PUBLIC_SENTRY_ORG,
+            PUBLIC_SENTRY_PROJECT: process.env.PUBLIC_SENTRY_PROJECT,
+            PUBLIC_SENTRY_TRACE_SAMPLE_RATE:
+                process.env.PUBLIC_SENTRY_TRACE_SAMPLE_RATE,
+            PUBLIC_SENTRY_REPLAY_SAMPLE_RATE:
+                process.env.PUBLIC_SENTRY_REPLAY_SAMPLE_RATE,
+            PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR:
+                process.env.PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR,
+            PUBLIC_SENTRY_PROFILE_SAMPLE_RATE:
+                process.env.PUBLIC_SENTRY_PROFILE_SAMPLE_RATE,
+            PUBLIC_SENTRY_SECURITY_REPORT_URI:
+                process.env.PUBLIC_SENTRY_SECURITY_REPORT_URI,
+            PUBLIC_POSTHOG_KEY: process.env.PUBLIC_POSTHOG_KEY,
+            PUBLIC_POSTHOG_HOST: process.env.PUBLIC_POSTHOG_HOST,
+        }
+
+        return data({ toast, runtimeEnv }, { headers })
     } catch (error) {
-        console.error("Failed to get toast:", error)
-        return data({ toast: null }, {})
+        console.error("Failed to get toast or runtimeEnv:", error)
+        // Fallback for runtimeEnv if process.env access fails or is not desired here for some reason
+        const runtimeEnvFallback = {
+            // Provide fallbacks or leave undefined if config.ts handles undefined from window object
+        }
+        return data({ toast: null, runtimeEnv: runtimeEnvFallback }, {})
     }
 }
 
-/**
- * Renders the application layout with integrated toast notifications and error handling.
- *
- * This component retrieves loader data to display toast notifications for error, warning, success, and info types.
- * It sets up the HTML document structure, including meta tags, links for stylesheets and fonts, and renders
- * nested routes along with components for managing notifications, error boundaries, scroll restoration, and scripts.
- *
- * @returns The application's base layout as a React element.
- */
 export function Layout() {
     const loaderData = useLoaderData<typeof loader>()
     const toast = loaderData?.toast
+    const runtimeEnv = loaderData?.runtimeEnv // Get runtimeEnv from loader data
     const location = useLocation()
 
     // Capture pageviews if PostHog is configured
@@ -107,8 +127,35 @@ export function Layout() {
                 <ErrorBoundary error={null} params={{}} />
                 <ScrollRestoration
                     getKey={(location) => {
-                        // Use pathname for scroll restoration
                         return location.pathname
+                    }}
+                />
+                {/* Inject runtime environment variables */}
+                {runtimeEnv && (
+                    <script
+                        id="runtime-config"
+                        type="application/json"
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe because we are stringifying a JSON object
+                        dangerouslySetInnerHTML={{
+                            __html: JSON.stringify(runtimeEnv).replace(
+                                /</g,
+                                "\\u003c",
+                            ),
+                        }}
+                    />
+                )}
+                <script
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: This is safe because we are stringifying a JSON object
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            try {
+                                const configScript = document.getElementById('runtime-config');
+                                window.__RUNTIME_CONFIG__ = configScript ? JSON.parse(configScript.textContent) : {};
+                            } catch (e) {
+                                console.warn('Failed to parse runtime config:', e);
+                                window.__RUNTIME_CONFIG__ = {};
+                            }
+                        `,
                     }}
                 />
                 <Scripts />

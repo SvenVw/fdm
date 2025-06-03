@@ -1,5 +1,52 @@
 # Changelog fdm-app
 
+## 0.19.1
+
+### Patch Changes
+
+- a452ac8: Fix various validation issues at soil analysis form
+- bc2b796: Remove the incorrect nitrogen limit value from fertilizer application cards
+- 3f5fd9a: Clear value for p_app_amount on fertilizer application form after successful submission
+- ad75270: Fix exception when clicking on a field to add a new field
+- Updated dependencies [8cb4399]
+  - @svenvw/fdm-core@0.21.1
+  - @svenvw/fdm-calculator@0.3.2
+
+## 0.19.0
+
+### Minor Changes
+
+- a963506: Redirect users with incomplete profiles to the welcome page
+- 004c58d: Add option to sign in with magic-link
+- 4db6f37: Redirect new users to welcome page (if no redirect is provided) to complete their profile
+
+### Patch Changes
+
+- aba0f81: Add tags to emails
+- 050f170: Fix showing avatar image at dropdown menu
+- c1ad4b7: Fix loading public environment variables on the server side by using the correct prefix
+- Updated dependencies [004c58d]
+- Updated dependencies [7b447f6]
+- Updated dependencies [7b447f6]
+- Updated dependencies [842aac4]
+  - @svenvw/fdm-core@0.21.0
+  - @svenvw/fdm-calculator@0.3.1
+
+## 0.18.2
+
+### Patch Changes
+
+- 2d163bf: Public environmentals that are used client-side are now set at runtime instead of buildtime
+- 7bde06a: Rename prefix of public environmentals from `VITE_` to `PUBLIC_`
+
+## 0.18.1
+
+### Patch Changes
+
+- 8d36091: Fix button to update cultivation will not redirect to 404 page but update the values
+- 497343c: Fix that max for `b_lu_yield` is 100000 instead of 100
+- 03de714: Fix that values in cultivation form update when selecting a different cultivation at cultivation plan
+
 ## 0.18.0
 
 ### Minor Changes

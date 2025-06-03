@@ -1,5 +1,25 @@
 # Changelog fdm-core
 
+## 0.21.1
+
+### Patch Changes
+
+- 8cb4399: Fix typo in parameter name `p_cl_rt` in the type Fertilizer
+- Updated dependencies [5eb6ef2]
+  - @svenvw/fdm-data@0.13.1
+
+## 0.21.0
+
+### Minor Changes
+
+- 004c58d: Add option to sign in with magic-link
+- 7b447f6: Make the function `createDisplayUserName` available
+- 842aac4: Add the function `updateUserProfile` to update the profile parameters of the user
+
+### Patch Changes
+
+- 7b447f6: Make the type `FdmAuth` available
+
 ## 0.20.0
 
 ### Minor Changes
