@@ -23,9 +23,7 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
@@ -47,15 +45,17 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
-        "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^12.1.2",
+        "@rollup/plugin-commonjs": "catalog:",
+        "@rollup/plugin-node-resolve": "catalog:",
+        "@rollup/plugin-terser": "catalog:",
+        "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
         "postgres": "^3.4.7",
-        "rollup": "^4.41.1",
-        "rollup-plugin-polyfill-node": "^0.13.0",
+        "rollup": "catalog:",
+        "rollup-plugin-polyfill-node": "catalog:",
+        "typedoc": "catalog:",
+        "typedoc-plugin-missing-exports": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
