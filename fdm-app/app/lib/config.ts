@@ -1,17 +1,60 @@
 import type { ClientConfig } from "~/types/config.d"
-import type { RuntimeConfig } from "~/types/public-env.d" // Import the new RuntimeConfig
 
-// Define a map that holds the runtime environment variables,
-// falling back to import.meta.env for local development/build time.
-const runtimeEnvMap: RuntimeConfig = (() => {
+declare global {
+    interface Window {
+        __RUNTIME_CONFIG__?: RuntimeConfig
+    }
+}
+
+// Define a function to initialize the runtime environment map
+const initializeRuntimeEnvMap = (): RuntimeConfig => {
+    // On the client, __RUNTIME_CONFIG__ is populated by the root loader.
     if (typeof window !== "undefined" && window.__RUNTIME_CONFIG__) {
         return window.__RUNTIME_CONFIG__
     }
-    // Fallback to import.meta.env for local development or if not injected
-    // We cast to any here to avoid strict type issues with direct indexing,
-    // as ImportMetaEnv is augmented globally.
-    return import.meta.env as any as RuntimeConfig
-})()
+
+    // On the server (SSR context for routes like welcome.tsx, or other server-side uses):
+    // We need to construct a config map that mirrors what the root loader provides.
+    // Prioritize process.env for known public variables, then fallback to import.meta.env.
+    // This ensures consistency between SSR and client-side hydration.
+    const env: Partial<RuntimeConfig> = {}
+
+    // These are the keys that root.tsx loader includes in runtimeEnv
+    const keysToProcess: Array<keyof RuntimeConfig> = [
+        "PUBLIC_FDM_URL",
+        "PUBLIC_FDM_NAME",
+        "PUBLIC_FDM_PRIVACY_URL",
+        "PUBLIC_MAPBOX_TOKEN",
+        "PUBLIC_SENTRY_DSN",
+        "PUBLIC_SENTRY_ORG",
+        "PUBLIC_SENTRY_PROJECT",
+        "PUBLIC_SENTRY_TRACE_SAMPLE_RATE",
+        "PUBLIC_SENTRY_REPLAY_SAMPLE_RATE",
+        "PUBLIC_SENTRY_REPLAY_SAMPLE_RATE_ON_ERROR",
+        "PUBLIC_SENTRY_PROFILE_SAMPLE_RATE",
+        "PUBLIC_SENTRY_SECURITY_REPORT_URI",
+        "PUBLIC_POSTHOG_KEY",
+        "PUBLIC_POSTHOG_HOST",
+    ]
+
+    for (const key of keysToProcess) {
+        const stringKey = key as string // Explicit cast for indexing
+
+        if (
+            typeof process !== "undefined" &&
+            process.env &&
+            process.env[stringKey] !== undefined
+        ) {
+            env[key] = process.env[stringKey]
+        } else if (import.meta.env[stringKey] !== undefined) {
+            env[key] = import.meta.env[stringKey]
+        }
+    }
+
+    return env as RuntimeConfig
+}
+
+const runtimeEnvMap: RuntimeConfig = initializeRuntimeEnvMap()
 
 // Helper to get config value from the runtimeEnvMap
 const getConfigValue = (
