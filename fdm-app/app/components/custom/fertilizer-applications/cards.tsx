@@ -101,7 +101,7 @@ function constructCards(dose: Dose) {
             shortname: "Ntot",
             value: dose.p_dose_n,
             unit: "kg/ha",
-            limit: 10,
+            limit: undefined,
             advice: undefined,
         },
         {

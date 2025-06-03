@@ -42,15 +42,13 @@ export default function FieldDetailsDialog({
     fieldNameDefault,
 }: FieldDetailsDialogProps) {
     const b_lu_catalogue = `nl_${field.properties?.b_lu_catalogue ?? ""}`
-    const [selectedCultivation, setSelectedCultivation] =
-        useState<string>(b_lu_catalogue)
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name: fieldNameDefault,
-            b_lu_catalogue: selectedCultivation,
+            b_lu_catalogue: b_lu_catalogue,
         },
         submitData: {
             b_id_source: field.properties?.b_id_source,
@@ -59,14 +57,18 @@ export default function FieldDetailsDialog({
     })
 
     useEffect(() => {
-        form.setValue("b_lu_catalogue", selectedCultivation)
-    }, [selectedCultivation, form])
-
-    useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
+        if (form.formState.isSubmitSuccessful || !open) {
             form.reset()
         }
-    }, [form.formState, form.reset])
+    }, [form.formState, form.reset, open])
+
+    // Effect to update form values when the 'field' prop changes
+    useEffect(() => {
+        form.reset({
+            b_name: fieldNameDefault,
+            b_lu_catalogue: b_lu_catalogue,
+        });
+    }, [fieldNameDefault, b_lu_catalogue, form.reset]);
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -110,6 +112,7 @@ export default function FieldDetailsDialog({
                                 <Combobox
                                     options={cultivationOptions}
                                     name="b_lu_catalogue"
+                                    form={form}
                                     label={
                                         <span>
                                             Hoofdgewas
@@ -118,9 +121,7 @@ export default function FieldDetailsDialog({
                                             </span>
                                         </span>
                                     }
-                                    defaultValue={selectedCultivation}
                                     disabled={form.formState.isSubmitting}
-                                    onChange={setSelectedCultivation}
                                 />
                             </div>
                             <DialogFooter>
