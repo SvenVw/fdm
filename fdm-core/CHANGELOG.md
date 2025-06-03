@@ -1,5 +1,13 @@
 # Changelog fdm-core
 
+## 0.21.1
+
+### Patch Changes
+
+- 8cb4399: Fix typo in parameter name `p_cl_rt` in the type Fertilizer
+- Updated dependencies [5eb6ef2]
+  - @svenvw/fdm-data@0.13.1
+
 ## 0.21.0
 
 ### Minor Changes
