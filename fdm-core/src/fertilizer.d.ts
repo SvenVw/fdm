@@ -33,7 +33,7 @@ export interface Fertilizer {
     p_cr_vi: number | null
     p_pb_rt: number | null
     p_hg_rt: number | null
-    p_cl_cr: number | null
+    p_cl_rt: number | null
 }
 
 export interface FertilizerApplication {

@@ -45,7 +45,7 @@ export interface CatalogueFertilizerItem {
     p_cr_vi?: number | null
     p_pb_rt?: number | null
     p_hg_rt?: number | null
-    p_cl_cr?: number | null
+    p_cl_rt?: number | null
     p_type_manure?: boolean | null
     p_type_mineral?: boolean | null
     p_type_compost?: boolean | null
