@@ -1,5 +1,17 @@
 # Changelog fdm-app
 
+## 0.19.1
+
+### Patch Changes
+
+- a452ac8: Fix various validation issues at soil analysis form
+- bc2b796: Remove the incorrect nitrogen limit value from fertilizer application cards
+- 3f5fd9a: Clear value for p_app_amount on fertilizer application form after successful submission
+- ad75270: Fix exception when clicking on a field to add a new field
+- Updated dependencies [8cb4399]
+  - @svenvw/fdm-core@0.21.1
+  - @svenvw/fdm-calculator@0.3.2
+
 ## 0.19.0
 
 ### Minor Changes

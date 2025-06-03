@@ -47,9 +47,9 @@ export function FertilizerApplicationForm({
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
-            form.reset()
+            form.reset();
         }
-    }, [form.formState, form.reset])
+    }, [form.formState, form.reset]);
 
     return (
         <RemixFormProvider {...form}>
@@ -90,14 +90,17 @@ export function FertilizerApplicationForm({
                                         <FormControl>
                                             <Input
                                                 {...field}
+                                                value={field.value === undefined || field.value === null || Number.isNaN(Number.parseFloat(String(field.value))) ? "" : field.value}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    if (val === "") {
+                                                        field.onChange(undefined);
+                                                    } else {
+                                                        field.onChange(Number.parseFloat(val));
+                                                    }
+                                                }}
                                                 type="number"
-                                                value={
-                                                    field.value === 0
-                                                        ? ""
-                                                        : field.value
-                                                }
                                                 placeholder="12500 kg/ha"
-                                                aria-required="true"
                                                 required
                                             />
                                         </FormControl>
