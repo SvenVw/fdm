@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.19.2
+
+### Patch Changes
+
+- 284f17a: Fix hydration error
+
 ## 0.19.1
 
 ### Patch Changes
