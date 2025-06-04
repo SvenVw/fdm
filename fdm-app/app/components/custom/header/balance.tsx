@@ -39,7 +39,7 @@ export function HeaderBalance({
                 <DropdownMenu>
                     <DropdownMenuTrigger className="flex items-center gap-1">
                         Stikstof
-                        <ChevronDown />
+                        <ChevronDown className="text-muted-foreground h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
                         <DropdownMenuCheckboxItem
