@@ -25,9 +25,9 @@ export function HeaderFarm({
     return (
         <>
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={`/farm/${b_id_farm}`}>
-                    Bedrijf
-                </BreadcrumbLink>
+            {b_id_farm ? (
+                <BreadcrumbLink href={`/farm/${b_id_farm}`}>Bedrijf</BreadcrumbLink>
+            ) : "Bedrijf"}
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
