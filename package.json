@@ -51,6 +51,7 @@
             "@sentry-internal/node-cpu-profiler",
             "@sentry/cli",
             "@swc/core",
+            "@tailwindcss/oxide",
             "core-js",
             "core-js-pure",
             "esbuild"
