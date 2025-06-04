@@ -1,5 +1,17 @@
 # Changelog fdm-app
 
+## 0.19.3
+
+### Patch Changes
+
+- db2f2cb: Make the ChevronDown icon in header less prominent
+- e4f70cf: Make more clear that buttons in the sidebar with no action are not clickable
+- 885588e: Show absolute values at balance chart
+- efa12f6: Do not show dropdown menu if no options are provided
+- 046fdd2: Fix dead link for `Bedrijf` at '/farm' page
+- 40cf4b6: At nitrogen balance details for field show harvest date and link to harvest page instead of harvest id
+- 7711209: Fix redirect after successful harvest form submission
+
 ## 0.19.2
 
 ### Patch Changes

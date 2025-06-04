@@ -43,7 +43,7 @@ export function HeaderFertilizer({
                                           (option) => option.p_id === p_id,
                                       )?.p_name_nl ?? "Unknown field")
                                     : "Kies een meststof"}
-                                <ChevronDown />
+                                <ChevronDown className="text-muted-foreground h-4 w-4" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
                                 {fertilizerOptions.map((option) => (
