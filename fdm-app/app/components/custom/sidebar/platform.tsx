@@ -58,7 +58,7 @@ export function SidebarPlatform() {
                         <SidebarMenuItem>
                             <SidebarMenuButton
                                 asChild
-                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
                             >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <Languages />
