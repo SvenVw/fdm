@@ -22,6 +22,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getCalendar } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -196,6 +197,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        const calendar = await getCalendar(params)
 
         if (request.method === "POST") {
             // Collect form entry
@@ -216,7 +218,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
 
             return redirectWithSuccess(
-                `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
                 {
                     message: "Oogst is toegevoegd! 🎉",
                 },
