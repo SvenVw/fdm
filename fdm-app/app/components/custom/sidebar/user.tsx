@@ -113,11 +113,10 @@ export function SidebarUser({
                                     <Cookie className="mr-2 h-4 w-4" />
                                     Cookies
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    {/* <NavLink to="#">
-                                            <Languages className="mr-2 h-4 w-4" />
-                                            Taal
-                                        </NavLink> */}
+                                <DropdownMenuItem
+                                    asChild
+                                    className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                                >
                                     <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                         <Languages className="mr-2 h-4 w-4" />
                                         <span>Taal</span>
@@ -126,11 +125,10 @@ export function SidebarUser({
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
-                                <DropdownMenuItem asChild>
-                                    {/* <NavLink to="/farm/whats-new">
-                                            <Settings className="mr-2 h-4 w-4" />
-                                            Instellingen
-                                        </NavLink> */}
+                                <DropdownMenuItem
+                                    asChild
+                                    className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                                >
                                     <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                         <Settings className="mr-2 h-4 w-4" />
                                         <span>Instellingen</span>

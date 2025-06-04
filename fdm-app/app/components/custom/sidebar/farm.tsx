@@ -160,28 +160,35 @@ export function SidebarFarm() {
                     ) : (
                         <SidebarMenuItem>
                             <SidebarMenuButton
-                                tooltip={"Kalender"}
-                                className="cursor-default text-muted-foreground"
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
                             >
-                                <Calendar />
-                                <span>Kalender</span>
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <Calendar />
+                                    <span>Kalender</span>
+                                </span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     )}
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {fieldsLink ? (
+                        {fieldsLink ? (
+                            <SidebarMenuButton asChild>
                                 <NavLink to={fieldsLink}>
                                     <Square />
                                     <span>Percelen</span>
                                 </NavLink>
-                            ) : (
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                            >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <Square />
                                     <span>Percelen</span>
                                 </span>
-                            )}
-                        </SidebarMenuButton>
+                            </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                     {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
@@ -192,19 +199,24 @@ export function SidebarFarm() {
                                 </SidebarMenuButton>
                             </SidebarMenuItem> */}
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {fertilizersLink ? (
+                        {fertilizersLink ? (
+                            <SidebarMenuButton asChild>
                                 <NavLink to={fertilizersLink}>
                                     <Shapes />
                                     <span>Meststoffen</span>
                                 </NavLink>
-                            ) : (
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                            >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <Shapes />
                                     <span>Meststoffen</span>
                                 </span>
-                            )}
-                        </SidebarMenuButton>
+                            </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                     {/* <SidebarMenuItem>
                                 <SidebarMenuButton asChild>

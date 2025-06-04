@@ -52,67 +52,87 @@ export function SidebarApps() {
             <SidebarGroupContent>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {atlasLink ? (
+                        {atlasLink ? (
+                            <SidebarMenuButton asChild>
                                 <NavLink to={atlasLink}>
                                     <MapIcon />
                                     <span>Atlas</span>
                                 </NavLink>
-                            ) : (
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                            >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <MapIcon />
                                     <span>Atlas</span>
                                 </span>
-                            )}
-                        </SidebarMenuButton>
+                            </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {nutrientBalanceLink ? (
+                        {nutrientBalanceLink ? (
+                            <SidebarMenuButton asChild>
                                 <NavLink to={nutrientBalanceLink}>
                                     <ArrowRightLeft />
                                     <span>Nutriëntenbalans</span>
                                 </NavLink>
-                            ) : (
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                            >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <ArrowRightLeft />
                                     <span>Nutriëntenbalans</span>
                                 </span>
-                            )}
-                        </SidebarMenuButton>
+                            </SidebarMenuButton>
+                        )}
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {omBalanceLink ? (
+                        {omBalanceLink ? (
+                            <SidebarMenuButton asChild>
                                 <NavLink to={omBalanceLink}>
                                     <Scale />
                                     <span>OS Balans</span>
                                 </NavLink>
-                            ) : (
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                            >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <Scale />
                                     <span>OS Balans</span>
                                 </span>
-                            )}
-                        </SidebarMenuButton>
+                            </SidebarMenuButton>
+                        )}
                         <SidebarMenuBadge>
                             <Badge>Binnenkort</Badge>
                         </SidebarMenuBadge>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            {baatLink ? (
+                        {baatLink ? (
+                            <SidebarMenuButton asChild>
                                 <NavLink to={baatLink}>
                                     <GitPullRequestArrow />
                                     <span>BAAT</span>
                                 </NavLink>
-                            ) : (
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparant hover:text-muted-foreground active:bg-transparant active:text-muted-foreground"
+                            >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <GitPullRequestArrow />
                                     <span>BAAT</span>
                                 </span>
-                            )}
-                        </SidebarMenuButton>
+                            </SidebarMenuButton>
+                        )}
                         <SidebarMenuBadge>
                             <Badge>Binnenkort</Badge>
                         </SidebarMenuBadge>
