@@ -25,9 +25,13 @@ export function HeaderFarm({
     return (
         <>
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={`/farm/${b_id_farm}`}>
-                    Bedrijf
-                </BreadcrumbLink>
+                {b_id_farm ? (
+                    <BreadcrumbLink href={`/farm/${b_id_farm}`}>
+                        Bedrijf
+                    </BreadcrumbLink>
+                ) : (
+                    "Bedrijf"
+                )}
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -38,9 +42,11 @@ export function HeaderFarm({
                                   (option) => option.b_id_farm === b_id_farm,
                               )?.b_name_farm ?? "Unknown farm")
                             : "Kies een bedrijf"}
-                        <ChevronDown />
+                        {farmOptions && farmOptions.length > 0 ? (
+                            <ChevronDown className="text-muted-foreground h-4 w-4" />
+                        ) : null}
                     </DropdownMenuTrigger>
-                    {farmOptions ? (
+                    {farmOptions && farmOptions.length > 0 ? (
                         <DropdownMenuContent align="start">
                             {farmOptions.map((option) => (
                                 <DropdownMenuCheckboxItem

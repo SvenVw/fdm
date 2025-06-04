@@ -16,14 +16,14 @@ export function NitrogenBalanceChart({
 }: {
     balance: number
     supply: number
-    removal: number
-    emission: number
+    removal: number | undefined
+    emission: number | undefined
 }): JSX.Element {
     const chartData = [
         {
             supply: supply,
-            removal: removal,
-            emission: emission,
+            removal: removal ? Math.abs(removal) : undefined,
+            emission: emission ? Math.abs(emission) : undefined,
         },
     ]
 

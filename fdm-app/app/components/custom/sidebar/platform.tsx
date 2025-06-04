@@ -56,11 +56,14 @@ export function SidebarPlatform() {
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
-                            <SidebarMenuButton disabled asChild>
-                                <NavLink to={"#"}>
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <Languages />
                                     <span>Taal</span>
-                                </NavLink>
+                                </span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
