@@ -258,7 +258,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
                         {/* Render Harvests */}
-                        {renderHarvestsRemoval(removal.harvests)}
+                        {renderHarvestsRemoval(removal.harvests, fieldInput)}
 
                         {/* Render Residues */}
                         {renderResiduesRemoval(removal.residues, fieldInput)}
@@ -270,6 +270,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
 
     const renderHarvestsRemoval = (
         harvests: NitrogenRemovalHarvestsNumeric,
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "removal.harvests"
 
@@ -281,15 +282,35 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <ul className="ml-6 list-disc list-outside space-y-1">
                         {harvests.harvests.map(
-                            (harvest: { id: string; value: number }) => (
-                                <li
-                                    key={harvest.id}
-                                    className="text-sm text-muted-foreground"
-                                >
-                                    Oogst {harvest.id}: {harvest.value} kg N /
-                                    ha
-                                </li>
-                            ),
+                            (harvest: { id: string; value: number }) => {
+                                const harvestDetails = fieldInput.harvests.find(
+                                    (item: { b_id_harvesting: string }) =>
+                                        item.b_id_harvesting === harvest.id,
+                                )
+                                const cultivationDetails =
+                                    fieldInput.cultivations.find(
+                                        (cultivation: { b_lu: string }) =>
+                                            cultivation.b_lu ===
+                                            harvestDetails.b_lu,
+                                    )
+
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivationDetails.b_lu}/harvest/${harvest.id}`}
+                                        key={harvest.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            Oogst op{" "}
+                                            {format(
+                                                harvestDetails.b_lu_harvest_date,
+                                                "PP",
+                                                { locale: nl },
+                                            )}
+                                            : {harvest.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
                         )}
                     </ul>
                 </AccordionContent>
