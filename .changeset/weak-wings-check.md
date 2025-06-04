@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Fix redirect after successfull harvest form submission
+Fix redirect after successful harvest form submission

@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Do dot show dropdown menu if no options are provided
+Do not show dropdown menu if no options are provided
