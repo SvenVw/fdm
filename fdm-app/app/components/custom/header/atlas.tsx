@@ -47,7 +47,8 @@ export function HeaderAtlas({
                             : "Kies een kaartlaag"}
                         <ChevronDown />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
+                    {atlasLayerOptions && atlasLayerOptions.length > 0 ? (
+                        <DropdownMenuContent align="start">
                         {atlasLayerOptions.map((option) => (
                             <DropdownMenuCheckboxItem
                                 checked={
@@ -66,6 +67,7 @@ export function HeaderAtlas({
                             </DropdownMenuCheckboxItem>
                         ))}
                     </DropdownMenuContent>
+                    ): null}                  
                 </DropdownMenu>
             </BreadcrumbItem>
         </>

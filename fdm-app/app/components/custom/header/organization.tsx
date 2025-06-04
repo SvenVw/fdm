@@ -28,7 +28,7 @@ export function HeaderOrganization({
     } else if (currentPath.includes("invitation")) {
         page = "invitation"
     }
-    console.log(page)
+
     return (
         <>
             <BreadcrumbItem className="hidden md:block">
@@ -69,7 +69,8 @@ export function HeaderOrganization({
                                     : "Kies een organisatie"}
                                 <ChevronDown />
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
+                            {organizationOptions && organizationOptions.length > 0 ? (
+                                  <DropdownMenuContent align="start">
                                 {organizationOptions.map((option) => (
                                     <DropdownMenuCheckboxItem
                                         checked={
@@ -93,6 +94,7 @@ export function HeaderOrganization({
                                     </DropdownMenuCheckboxItem>
                                 ))}
                             </DropdownMenuContent>
+                            ) : null}                          
                         </DropdownMenu>
                     </BreadcrumbItem>
                 </>

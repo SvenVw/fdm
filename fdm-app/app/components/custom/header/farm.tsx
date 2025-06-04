@@ -21,7 +21,7 @@ export function HeaderFarm({
 }) {
     const location = useLocation()
     const currentPath = String(location.pathname)
-
+    console.log(farmOptions)
     return (
         <>
             <BreadcrumbItem className="hidden md:block">
@@ -40,7 +40,7 @@ export function HeaderFarm({
                             : "Kies een bedrijf"}
                         <ChevronDown />
                     </DropdownMenuTrigger>
-                    {farmOptions ? (
+                    {farmOptions && farmOptions.length > 0 ? (
                         <DropdownMenuContent align="start">
                             {farmOptions.map((option) => (
                                 <DropdownMenuCheckboxItem
