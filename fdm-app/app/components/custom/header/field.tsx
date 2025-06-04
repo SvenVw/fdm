@@ -45,7 +45,7 @@ export function HeaderField({
                                           (option) => option.b_id === b_id,
                                       )?.b_name ?? "Unknown field")
                                     : "Kies een perceel"}
-                                <ChevronDown />
+                                <ChevronDown className="text-muted-foreground h-4 w-4" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start">
                                 {fieldOptions.map((option) => (

@@ -21,13 +21,17 @@ export function HeaderFarm({
 }) {
     const location = useLocation()
     const currentPath = String(location.pathname)
-    console.log(farmOptions)
+
     return (
         <>
             <BreadcrumbItem className="hidden md:block">
-            {b_id_farm ? (
-                <BreadcrumbLink href={`/farm/${b_id_farm}`}>Bedrijf</BreadcrumbLink>
-            ) : "Bedrijf"}
+                {b_id_farm ? (
+                    <BreadcrumbLink href={`/farm/${b_id_farm}`}>
+                        Bedrijf
+                    </BreadcrumbLink>
+                ) : (
+                    "Bedrijf"
+                )}
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -38,7 +42,9 @@ export function HeaderFarm({
                                   (option) => option.b_id_farm === b_id_farm,
                               )?.b_name_farm ?? "Unknown farm")
                             : "Kies een bedrijf"}
-                        <ChevronDown />
+                        {farmOptions && farmOptions.length > 0 ? (
+                            <ChevronDown className="text-muted-foreground h-4 w-4" />
+                        ) : null}
                     </DropdownMenuTrigger>
                     {farmOptions && farmOptions.length > 0 ? (
                         <DropdownMenuContent align="start">

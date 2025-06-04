@@ -67,34 +67,35 @@ export function HeaderOrganization({
                                               selectedOrganizationSlug,
                                       )?.name ?? "Unknown organization")
                                     : "Kies een organisatie"}
-                                <ChevronDown />
+                                <ChevronDown className="text-muted-foreground h-4 w-4" />
                             </DropdownMenuTrigger>
-                            {organizationOptions && organizationOptions.length > 0 ? (
-                                  <DropdownMenuContent align="start">
-                                {organizationOptions.map((option) => (
-                                    <DropdownMenuCheckboxItem
-                                        checked={
-                                            selectedOrganizationSlug ===
-                                            option.slug
-                                        }
-                                        key={option.slug}
-                                    >
-                                        <NavLink
-                                            to={
-                                                selectedOrganizationSlug
-                                                    ? currentPath.replace(
-                                                          selectedOrganizationSlug,
-                                                          option.slug,
-                                                      )
-                                                    : `/organization/${option.slug}`
+                            {organizationOptions &&
+                            organizationOptions.length > 0 ? (
+                                <DropdownMenuContent align="start">
+                                    {organizationOptions.map((option) => (
+                                        <DropdownMenuCheckboxItem
+                                            checked={
+                                                selectedOrganizationSlug ===
+                                                option.slug
                                             }
+                                            key={option.slug}
                                         >
-                                            {option.name}
-                                        </NavLink>
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                            </DropdownMenuContent>
-                            ) : null}                          
+                                            <NavLink
+                                                to={
+                                                    selectedOrganizationSlug
+                                                        ? currentPath.replace(
+                                                              selectedOrganizationSlug,
+                                                              option.slug,
+                                                          )
+                                                        : `/organization/${option.slug}`
+                                                }
+                                            >
+                                                {option.name}
+                                            </NavLink>
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            ) : null}
                         </DropdownMenu>
                     </BreadcrumbItem>
                 </>

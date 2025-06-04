@@ -45,29 +45,30 @@ export function HeaderAtlas({
                                       selectedAtlasLayerId,
                               )?.atlasLayerName ?? "Unknown layer")
                             : "Kies een kaartlaag"}
-                        <ChevronDown />
+                        <ChevronDown className="text-muted-foreground h-4 w-4" />
                     </DropdownMenuTrigger>
                     {atlasLayerOptions && atlasLayerOptions.length > 0 ? (
                         <DropdownMenuContent align="start">
-                        {atlasLayerOptions.map((option) => (
-                            <DropdownMenuCheckboxItem
-                                checked={
-                                    selectedAtlasLayerId === option.atlasLayerId
-                                }
-                                key={option.atlasLayerId}
-                            >
-                                <NavLink
-                                    to={currentPath.replace(
-                                        selectedAtlasLayerId,
-                                        option.atlasLayerId,
-                                    )}
+                            {atlasLayerOptions.map((option) => (
+                                <DropdownMenuCheckboxItem
+                                    checked={
+                                        selectedAtlasLayerId ===
+                                        option.atlasLayerId
+                                    }
+                                    key={option.atlasLayerId}
                                 >
-                                    {option.atlasLayerName}
-                                </NavLink>
-                            </DropdownMenuCheckboxItem>
-                        ))}
-                    </DropdownMenuContent>
-                    ): null}                  
+                                    <NavLink
+                                        to={currentPath.replace(
+                                            selectedAtlasLayerId,
+                                            option.atlasLayerId,
+                                        )}
+                                    >
+                                        {option.atlasLayerName}
+                                    </NavLink>
+                                </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                    ) : null}
                 </DropdownMenu>
             </BreadcrumbItem>
         </>
