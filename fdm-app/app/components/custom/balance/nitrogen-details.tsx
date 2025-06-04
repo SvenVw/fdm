@@ -287,12 +287,21 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                     (item: { b_id_harvesting: string }) =>
                                         item.b_id_harvesting === harvest.id,
                                 )
+                                if (!harvestDetails) {
+                                    console.error(`Harvest not found for id: ${harvest.id}`)
+                                    return null
+                                }
+
                                 const cultivationDetails =
                                     fieldInput.cultivations.find(
                                         (cultivation: { b_lu: string }) =>
                                             cultivation.b_lu ===
                                             harvestDetails.b_lu,
                                     )
+                                if (!cultivationDetails) {
+                                    console.error(`Cultivation not found for harvest: ${harvest.id}`)
+                                    return null
+                                }
 
                                 return (
                                     <NavLink
