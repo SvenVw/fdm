@@ -3,26 +3,34 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Form } from "react-router"
+import { Form, useActionData, useNavigation } from "react-router"
 import {
-    FormControl,
     FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { Button } from "~/components/ui/button"
-import { LoadingSpinner } from "../loadingspinner"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { cn } from "@/app/lib/utils"
+import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
+import { Progress } from "~/components/ui/progress"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+
+type UploadStatus = "idle" | "uploading" | "success" | "error"
 
 export function SoilAnalysisUploadForm() {
+    const [fileName, setFileName] = useState<string | null>(null)
+    const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle")
+    const [uploadProgress, setUploadProgress] = useState(0)
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -31,91 +39,238 @@ export function SoilAnalysisUploadForm() {
         },
     })
 
+    const actionData = useActionData<{
+        message?: string
+        fieldErrors?: Record<string, string[]> 
+        formErrors?: string[]
+    } | null>() 
+    const navigation = useNavigation() 
+
+    // Determine if the form is currently submitting
+    const isSubmitting = navigation.state === "submitting"
+
     useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
-            form.reset()
+        if (isSubmitting) {
+            setUploadStatus("uploading")
+            setUploadProgress(100)
+        } else if (actionData) {
+            if (actionData.message) {
+                setUploadStatus("success")
+            } else if (actionData.fieldErrors || actionData.formErrors) {
+                setUploadStatus("error")
+            }
+            // Reset status after a short delay for visual feedback
+            const timer = setTimeout(() => {
+                setUploadStatus("idle")
+                setUploadProgress(0)
+                form.reset() 
+            }, 2000)
+            return () => clearTimeout(timer)
+        } else {
+            setUploadStatus("idle")
+            setUploadProgress(0)
         }
-    }, [form.formState, form.reset])
+    }, [isSubmitting, actionData, form.reset]) 
+
+    // Handle file change to display the file name
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFileName(e.target.files[0].name)
+            setUploadStatus("idle")
+        } else {
+            setFileName(null)
+        }
+    }
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault() // Prevent default to allow drop
+    }
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault() // Prevent default file opening in browser
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const file = e.dataTransfer.files[0]
+            form.setValue("soilAnalysisFile", file, { shouldValidate: true })
+            setFileName(file.name)
+            setUploadStatus("idle") // Reset status when a new file is dropped
+            e.dataTransfer.clearData()
+        }
+    }
+
     return (
         <div className="flex justify-center">
-            <Card className="w-[500px]">
+            <Card className="w-full max-w-lg mx-auto">
                 <CardHeader>
                     <CardTitle>Upload bodemanalyse</CardTitle>
                     <CardDescription>
-                        Upload een bodemanalyse en check de gegevens
+                        Upload het PDF-rapport van uw bodemanalyse van een van
+                        onze ondersteunde laboratoria.
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                     <RemixFormProvider {...form}>
                         <Form
                             id="soilAnalysisUploadForm"
-                            onSubmit={form.handleSubmit}
                             method="post"
                             encType="multipart/form-data"
                         >
-                            <fieldset disabled={form.formState.isSubmitting}>
+                            <fieldset disabled={isSubmitting}>                                   
                                 <div className="space-y-6">
-                                    <p className="text-sm text-muted-foreground">
-                                        Vul de gegevens van de bodemanalyse in.
-                                    </p>
-                                    <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 gap-4">
                                         <FormField
                                             control={form.control}
                                             name="soilAnalysisFile"
-                                            render={({ field: { name, onBlur, onChange, disabled, ref } }) => (
+                                            render={({
+                                                field: {
+                                                    name,
+                                                    onBlur,
+                                                    onChange,
+                                                    disabled,
+                                                    ref,
+                                                },
+                                            }) => (
                                                 <FormItem>
-                                                    <FormLabel>
-                                                        Bodemanalyse (pdf)
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <div className="relative">
+                                                    <div>                                                                                                  
+                                                        Bodemanalyse
+                                                    </div>
+                                                    <div>                                             
+                                                        <div
+                                                            className={cn(
+                                                                "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
+                                                                uploadStatus ===
+                                                                    "success" &&
+                                                                    "border-green-500 bg-green-50",
+                                                                uploadStatus ===
+                                                                    "error" &&
+                                                                    "border-red-500 bg-red-50",
+                                                            )}
+                                                            onDragOver={
+                                                                handleDragOver
+                                                            }
+                                                            onDrop={handleDrop}
+                                                        >
                                                             <Input
                                                                 name={name}
                                                                 onBlur={onBlur}
-                                                                onChange={(event) => {
+                                                                onChange={(
+                                                                    event,
+                                                                ) => {
                                                                     onChange(
                                                                         event
                                                                             .target
                                                                             .files?.[0],
                                                                     )
+                                                                    setFileName(
+                                                                        event
+                                                                            .target
+                                                                            .files?.[0]
+                                                                            ?.name ||
+                                                                            null,
+                                                                    )
+                                                                    handleFileChange(
+                                                                        event,
+                                                                    )
                                                                 }}
                                                                 ref={ref}
                                                                 type="file"
                                                                 placeholder=""
-                                                                className="block w-full rounded-md"
+                                                                className="hidden"
                                                                 accept=".pdf"
                                                                 multiple={false}
                                                                 required={true}
-                                                                disabled={disabled}                                                            
+                                                                disabled={
+                                                                    disabled
+                                                                }
+                                                                id="file-upload"
                                                             />
+                                                            <label
+                                                                htmlFor="file-upload"
+                                                                className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
+                                                            >
+                                                                {uploadStatus ===
+                                                                    "idle" && (
+                                                                    <>
+                                                                        <FileUp className="w-8 h-8 mb-2 text-muted-foreground" />
+                                                                        <div className="text-sm text-muted-foreground">
+                                                                            {fileName
+                                                                                ? fileName
+                                                                                : "Klik om te uploaden of sleep een PDF bestand naar hier"}
+                                                                        </div>
+                                                                        <div className="text-xs text-muted-foreground mt-1">
+                                                                            PDF
+                                                                            tot
+                                                                            5MB
+                                                                        </div>
+                                                                    </>
+                                                                )}
+
+                                                                {uploadStatus ===
+                                                                    "uploading" && (
+                                                                    <>
+                                                                        <Upload className="w-8 h-8 mb-2 text-primary animate-pulse" />
+                                                                        <div className="text-sm">
+                                                                            Uploading{" "}
+                                                                            {
+                                                                                fileName
+                                                                            }
+                                                                            ...
+                                                                        </div>
+                                                                        <Progress
+                                                                            value={
+                                                                                uploadProgress
+                                                                            }
+                                                                            className="w-full mt-2 h-2"
+                                                                        />
+                                                                    </>
+                                                                )}
+
+                                                                {uploadStatus ===
+                                                                    "success" && (
+                                                                    <>
+                                                                        <CheckCircle className="w-8 h-8 mb-2 text-green-500" />
+                                                                        <div className="text-sm text-green-600">
+                                                                            Uploaden
+                                                                            succesvol!
+                                                                        </div>
+                                                                    </>
+                                                                )}
+
+                                                                {uploadStatus ===
+                                                                    "error" && (
+                                                                    <>
+                                                                        <AlertCircle className="w-8 h-8 mb-2 text-red-500" />
+                                                                        <div className="text-sm text-red-600">
+                                                                            Uploaden
+                                                                            mislukt.
+                                                                            Probeer
+                                                                            het
+                                                                            opnieuw.
+                                                                        </div>
+                                                                    </>
+                                                                )}
+                                                            </label>
                                                         </div>
-                                                    </FormControl>
-                                                    <FormDescription>
-                                                        Kies een pdf met
-                                                        bodemanalyse van één van
-                                                        de volgende labs:
-                                                    </FormDescription>
+                                                    </div>                            
+                                                    <FormDescription />
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                    </div>
-                                </div>
-                                <div className="space-y-6">
-                                    <div className="flex justify-end mt-4">
                                         <Button
                                             type="submit"
+                                            className="w-full"
                                             disabled={
-                                                form.formState.isSubmitting
+                                                isSubmitting ||
+                                                uploadStatus === "success"
                                             }
                                         >
-                                            {form.formState.isSubmitting ? (
+                                            {isSubmitting ? (
                                                 <div className="flex items-center space-x-2">
                                                     <LoadingSpinner />
-                                                    <span>Uploaden...</span>
+                                                    <span>Opslaan...</span>
                                                 </div>
                                             ) : (
-                                                "Uploaden"
+                                                "Upload analyse"
                                             )}
                                         </Button>
                                     </div>
@@ -124,6 +279,11 @@ export function SoilAnalysisUploadForm() {
                         </Form>
                     </RemixFormProvider>
                 </CardContent>
+                <CardFooter className="flex flex-col items-start">
+                    <p className="text-sm text-muted-foreground">
+                        De volgende labs worden op dit moment ondersteunt: ?
+                    </p>
+                </CardFooter>
             </Card>
         </div>
     )
