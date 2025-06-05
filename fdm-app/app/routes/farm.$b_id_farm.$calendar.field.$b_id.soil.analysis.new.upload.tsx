@@ -9,11 +9,9 @@ import {
     type LoaderFunctionArgs,
     NavLink,
     data,
-    useLoaderData,
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -24,23 +22,16 @@ import { fileTypeFromBuffer } from "file-type"
 import {
     FormSchema,
     SoilAnalysisUploadForm,
-} from "../components/custom/soil/form-upload"
+} from "~/components/custom/soil/form-upload"
 
 /**
- * Loader function for the soil data page of a specific farm field.
+ * Loader function for the soil analysis upload page.
  *
- * This function fetches the necessary data for rendering the soil data page, including
- * field details, soil analyses, current soil data, and soil parameter descriptions.
- * It validates the presence of the farm ID (`b_id_farm`) and field ID (`b_id`) in the
- * route parameters and retrieves the user session.
+ * Fetches the field details and soil parameter descriptions.
  *
  * @param request - The HTTP request object.
- * @param params - The route parameters, including `b_id_farm` and `b_id`.
- * @returns An object containing the field details, current soil data, soil parameter descriptions, and soil analyses.
- *
- * @throws {Response} If the farm ID is missing (HTTP 400).
- * @throws {Error} If the field ID is missing (HTTP 400).
- * @throws {Error} If the field is not found (HTTP 404).
+ * @param params - The route parameters containing `b_id_farm` and `b_id`.
+ * @returns An object containing the field details and soil parameter descriptions.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -88,49 +79,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Component that renders the soil analysis creation form for a specific field.
+ * Renders the soil analysis upload form.
  *
- * This component displays a page header with description, a back button,
- * and the SoilAnalysisForm component for adding a new soil analysis.
- * It uses data loaded by the loader function to provide soil parameter descriptions.
+ * @returns The JSX element for the soil analysis upload form.
  */
-export default function FarmFieldSoilOverviewBlock() {
-    const loaderData = useLoaderData<typeof loader>()
+export default function FarmFieldSoilAnalysisUploadBlock() {
 
     return (
         <div className="space-y-6">
-            <div className="space-y-4">
-                <div>
-                    <h3 className="text-lg font-medium">Bodem</h3>
-                    <p className="text-sm text-muted-foreground">
-                        Kies het type bodemanalyse voor uw formulier
-                    </p>
-                </div>
-                <Button asChild>
-                    <NavLink to="../soil/analysis/new">
-                        <ArrowLeft />
-                        Terug
-                    </NavLink>
-                </Button>
-            </div>
-            <Separator />
             <SoilAnalysisUploadForm />
         </div>
     )
 }
 
 /**
- * Action function to update the soil analysis.
- *
- * This function updates a soil analysis based on the provided form data.
- * It validates the data, retrieves the necessary IDs from the route parameters,
- * and uses the `updateSoilAnalysis` function from `@svenvw/fdm-core` to perform the update.
+ * Action function for uploading a soil analysis file.
  *
  * @param request - The HTTP request object.
- * @param params - The route parameters, including `a_id`, `b_id`, and `b_id_farm`.
- * @returns A redirect response after successful update.
- * @throws {Response} If any ID is missing (HTTP 400).
- * @throws {Response} If there is an error during the update (HTTP 500).
+ * @param params - The route parameters containing `b_id_farm` and `b_id`.
+ * @returns A redirect response to the soil analysis page.
  */
 export async function action({ request, params }: ActionFunctionArgs) {
     // Get the farm id
