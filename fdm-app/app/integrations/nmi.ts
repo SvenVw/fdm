@@ -145,6 +145,16 @@ const soilParameterEstimatesSchema = z.object({
 export async function extractSoilAnalysis(formData: FormData) {
     const nmiApiKey = getNmiApiKey()
 
+    if (!nmiApiKey) {
+        throw new Error("NMI API key not configured")
+    }
+
+    // Validate that FormData contains a file
+    const file = formData.get("file") as File
+    if (!file || !(file instanceof File)) {
+        throw new Error("No file provided in FormData")
+    }
+
     const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
         method: "POST",
         headers: {
