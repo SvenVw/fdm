@@ -19,7 +19,7 @@ import { fileTypeFromBuffer } from "file-type"
 import {
     FormSchema,
     SoilAnalysisUploadForm,
-} from "../components/custom/soil/form-upload"
+} from "~/components/custom/soil/form-upload"
 
 /**
  * Loader function for the soil analysis upload page.
@@ -82,7 +82,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 
 export default function FarmFieldSoilAnalysisUploadBlock() {
-
     return (
         <div className="space-y-6">
             <SoilAnalysisUploadForm />
@@ -162,6 +161,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Submit to NMI API
         const soilAnalysis = await extractSoilAnalysis(formData)
+
+        // Validate required fields exist
+        if (!soilAnalysis.a_depth_lower) {
+            throw new Error("Missing required a_depth_lower value")
+        }
+        if (!soilAnalysis.b_sampling_date) {
+            throw new Error("Missing required b_sampling_date")
+        }
+        if (!soilAnalysis.a_depth_upper) {
+            throw new Error("Missing required a_depth_upper value")
+        }
 
         // Add soil analysis
         await addSoilAnalysis(

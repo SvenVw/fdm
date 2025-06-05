@@ -81,7 +81,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * @returns The JSX element for the soil analysis upload form.
  */
 export default function FarmFieldSoilAnalysisUploadBlock() {
-
     return (
         <div className="space-y-6">
             <SoilAnalysisUploadForm />
@@ -161,6 +160,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Submit to NMI API
         const soilAnalysis = await extractSoilAnalysis(formData)
+
+        // Validate required fields exist
+        if (!soilAnalysis.a_depth_lower) {
+            throw new Error("Missing required a_depth_lower value")
+        }
+        if (!soilAnalysis.b_sampling_date) {
+            throw new Error("Missing required b_sampling_date")
+        }
+        if (!soilAnalysis.a_depth_upper) {
+            throw new Error("Missing required a_depth_upper value")
+        }
 
         // Add soil analysis
         const soilAnalysisId = await addSoilAnalysis(
