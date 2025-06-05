@@ -266,7 +266,7 @@ export function SoilAnalysisUploadForm() {
                                             {isSubmitting ? (
                                                 <div className="flex items-center space-x-2">
                                                     <LoadingSpinner />
-                                                    <span>Opslaan...</span>
+                                                    <span>Uploaden...</span>
                                                 </div>
                                             ) : (
                                                 "Upload analyse"
