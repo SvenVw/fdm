@@ -160,6 +160,15 @@ export async function extractSoilAnalysis(formData: FormData) {
     const result = await responseApi.json()
     const response = result.data
 
+    // Validate response structure
+    if (
+        !response.fields ||
+        !Array.isArray(response.fields) ||
+        response.fields.length === 0
+    ) {
+        throw new Error("Invalid API response: no fields found")
+    }
+
     // Process the response
     const field = response.fields[0]
 
