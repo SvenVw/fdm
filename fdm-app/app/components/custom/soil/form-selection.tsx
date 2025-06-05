@@ -13,6 +13,19 @@ export function SoilAnalysisFormSelection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Card className="w-auto">
                 <CardHeader>
+                    <CardTitle>Analyse uploaden</CardTitle>
+                    <CardDescription>
+                        Analyseformulier uploaden en inlezen
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-between">
+                    <Button asChild>
+                        <NavLink to={"./upload"}>Kies</NavLink>
+                    </Button>
+                </CardFooter>
+            </Card>
+            <Card className="w-auto">
+                <CardHeader>
                     <CardTitle>Bodemanalyse</CardTitle>
                     <CardDescription>
                         Analyseformulier voor een standaard bodemanalyse
@@ -60,19 +73,6 @@ export function SoilAnalysisFormSelection() {
                 <CardFooter className="flex justify-between">
                     <Button asChild>
                         <NavLink to={"./all"}>Kies</NavLink>
-                    </Button>
-                </CardFooter>
-            </Card>
-            <Card className="w-auto">
-                <CardHeader>
-                    <CardTitle>Analyse uploaden</CardTitle>
-                    <CardDescription>
-                        Analyseformulier uploaden en controleren
-                    </CardDescription>
-                </CardHeader>
-                <CardFooter className="flex justify-between">
-                    <Button asChild>
-                        <NavLink to={"./upload"}>Kies</NavLink>
                     </Button>
                 </CardFooter>
             </Card>
