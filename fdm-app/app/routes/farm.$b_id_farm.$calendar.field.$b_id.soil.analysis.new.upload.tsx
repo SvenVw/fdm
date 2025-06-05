@@ -3,15 +3,12 @@ import {
     getField,
     getSoilParametersDescription,
 } from "@svenvw/fdm-core"
-import { ArrowLeft } from "lucide-react"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
-    NavLink,
     data,
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
-import { Button } from "~/components/ui/button"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
