@@ -1,42 +1,22 @@
-import {
-    addSoilAnalysis,
-    getField,
-    getSoilParametersDescription,
-} from "@svenvw/fdm-core"
+import { getField, getSoilParametersDescription } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
-import {
-    type ActionFunctionArgs,
-    type LoaderFunctionArgs,
-    NavLink,
-    data,
-    useLoaderData,
-} from "react-router"
-import { redirectWithSuccess } from "remix-toast"
-import { SoilAnalysisForm } from "~/components/custom/soil/form"
-import { FormSchema } from "~/components/custom/soil/formschema"
+import { type LoaderFunctionArgs, NavLink, data } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { SoilAnalysisFormSelection } from "../components/custom/soil/form-selection"
+import { SoilAnalysisFormSelection } from "~/components/custom/soil/form-selection"
 
 /**
- * Loader function for the soil data page of a specific farm field.
+ * Loader function for the soil analysis selection page.
  *
- * This function fetches the necessary data for rendering the soil data page, including
- * field details, soil analyses, current soil data, and soil parameter descriptions.
- * It validates the presence of the farm ID (`b_id_farm`) and field ID (`b_id`) in the
- * route parameters and retrieves the user session.
+ * Fetches the field details to ensure the field exists and is accessible.
  *
  * @param request - The HTTP request object.
- * @param params - The route parameters, including `b_id_farm` and `b_id`.
- * @returns An object containing the field details, current soil data, soil parameter descriptions, and soil analyses.
- *
- * @throws {Response} If the farm ID is missing (HTTP 400).
- * @throws {Error} If the field ID is missing (HTTP 400).
- * @throws {Error} If the field is not found (HTTP 404).
+ * @param params - The route parameters containing `b_id_farm` and `b_id`.
+ * @returns An object containing the field details.
+ * @throws {Response} If the farm ID or field ID is missing, or if the field is not found.
  */
 export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
@@ -70,13 +50,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get soil parameter descriptions
-        const soilParameterDescription = getSoilParametersDescription()
-
         // Return user information from loader
         return {
             field: field,
-            soilParameterDescription: soilParameterDescription,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -84,15 +60,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Component that renders the soil analysis creation form for a specific field.
+ * Renders the soil analysis form selection component.
  *
- * This component displays a page header with description, a back button,
- * and the SoilAnalysisForm component for adding a new soil analysis.
- * It uses data loaded by the loader function to provide soil parameter descriptions.
+ * This component allows the user to choose the type of soil analysis form to fill.
  */
 export default function FarmFieldSoilOverviewBlock() {
-    const loaderData = useLoaderData<typeof loader>()
-
     return (
         <div className="space-y-6">
             <div className="space-y-4">
