@@ -184,7 +184,6 @@ export async function extractSoilAnalysis(formData: FormData) {
 
     // Select the a_* parameters
     const soilAnalysis: { [key: string]: string | number | Date } = {}
-    Object.keys(field).filter((key) => key.startsWith("a_"))
     for (const key of Object.keys(field).filter((key) =>
         key.startsWith("a_"),
     )) {
