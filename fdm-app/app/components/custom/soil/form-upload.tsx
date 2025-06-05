@@ -23,6 +23,7 @@ import { cn } from "@/app/lib/utils"
 import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
 import { Progress } from "~/components/ui/progress"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Separator } from "../../ui/separator"
 
 type UploadStatus = "idle" | "uploading" | "success" | "error"
 
@@ -41,10 +42,10 @@ export function SoilAnalysisUploadForm() {
 
     const actionData = useActionData<{
         message?: string
-        fieldErrors?: Record<string, string[]> 
+        fieldErrors?: Record<string, string[]>
         formErrors?: string[]
-    } | null>() 
-    const navigation = useNavigation() 
+    } | null>()
+    const navigation = useNavigation()
 
     // Determine if the form is currently submitting
     const isSubmitting = navigation.state === "submitting"
@@ -63,14 +64,14 @@ export function SoilAnalysisUploadForm() {
             const timer = setTimeout(() => {
                 setUploadStatus("idle")
                 setUploadProgress(0)
-                form.reset() 
+                form.reset()
             }, 2000)
             return () => clearTimeout(timer)
         } else {
             setUploadStatus("idle")
             setUploadProgress(0)
         }
-    }, [isSubmitting, actionData, form.reset]) 
+    }, [isSubmitting, actionData, form.reset])
 
     // Handle file change to display the file name
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,7 +115,7 @@ export function SoilAnalysisUploadForm() {
                             method="post"
                             encType="multipart/form-data"
                         >
-                            <fieldset disabled={isSubmitting}>                                   
+                            <fieldset disabled={isSubmitting}>
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-1 gap-4">
                                         <FormField
@@ -130,10 +131,8 @@ export function SoilAnalysisUploadForm() {
                                                 },
                                             }) => (
                                                 <FormItem>
-                                                    <div>                                                                                                  
-                                                        Bodemanalyse
-                                                    </div>
-                                                    <div>                                             
+                                                    <div>Bodemanalyse</div>
+                                                    <div>
                                                         <div
                                                             className={cn(
                                                                 "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
@@ -250,7 +249,7 @@ export function SoilAnalysisUploadForm() {
                                                                 )}
                                                             </label>
                                                         </div>
-                                                    </div>                            
+                                                    </div>
                                                     <FormDescription />
                                                     <FormMessage />
                                                 </FormItem>
@@ -281,8 +280,20 @@ export function SoilAnalysisUploadForm() {
                 </CardContent>
                 <CardFooter className="flex flex-col items-start">
                     <p className="text-sm text-muted-foreground">
-                        De volgende labs worden op dit moment ondersteunt: ?
+                        De volgende labs worden op dit moment ondersteunt:
                     </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
+                        {["Eurofins Agro", "HLB", "ALNN", "Altic", "Dumea", "Fertilab", "Koch", "Roba", "SoilTech", "Laboratorium Zeeuws-Vlaanderen"].map(
+                            (lab, index) => (
+                                <div
+                                    key={index}
+                                    className="border rounded-md p-2 text-center text-sm"
+                                >
+                                    {lab}
+                                </div>
+                            ),
+                        )}
+                    </div>
                 </CardFooter>
             </Card>
         </div>
