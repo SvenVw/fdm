@@ -195,13 +195,19 @@ export async function extractSoilAnalysis(formData: FormData) {
         soilAnalysis.b_soil_type = field.b_soiltype_agr
     }
     if (field.b_depth) {
-        soilAnalysis.a_depth_upper = Number(
-            field.b_depth.split("-")[0],
-        ) as number
-        soilAnalysis.a_depth_lower = Number(
-            field.b_depth.split("-")[1],
-        ) as number
+        const depthParts = field.b_depth.split("-")
+        if (depthParts.length !== 2) {
+            throw new Error(`Invalid depth format: ${field.b_depth}`)
+        }
+        soilAnalysis.a_depth_upper = Number(depthParts[0]) as number
+        soilAnalysis.a_depth_lower = Number(depthParts[1]) as number
+        // Validate that the conversion to numbers was successful
+        if (
+            Number.isNaN(soilAnalysis.a_depth_upper) ||
+            Number.isNaN(soilAnalysis.a_depth_lower)
+        ) {
+            throw new Error(`Invalid numeric depth values: ${field.b_depth}`)
+        }
     }
-
     return soilAnalysis
 }
