@@ -145,17 +145,13 @@ const soilParameterEstimatesSchema = z.object({
 export async function extractSoilAnalysis(formData: FormData) {
     const nmiApiKey = getNmiApiKey()
 
-
-    const responseApi = await fetch(
-        "https://api.nmi-agro.nl/soilreader",
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${nmiApiKey}`,
-            },
-            body: formData,
+    const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${nmiApiKey}`,
         },
-    )
+        body: formData,
+    })
 
     if (!responseApi.ok) {
         throw new Error("Request to NMI API failed")
@@ -163,24 +159,26 @@ export async function extractSoilAnalysis(formData: FormData) {
 
     const result = await responseApi.json()
     const response = result.data
-    console.log(response)
 
     // Process the response
     const field = response.fields[0]
 
     // Select the a_* parameters
-    const soilAnalysis: { [key: string]: string | number | Date } = Object.keys(field)
-        .filter(key => key.startsWith("a_"))
+    const soilAnalysis: { [key: string]: string | number | Date } = Object.keys(
+        field,
+    )
+        .filter((key) => key.startsWith("a_"))
         .reduce((obj, key) => {
             return {
                 ...obj,
-                [key]: field[key]
+                [key]: field[key],
             }
         }, {})
 
     // Check if soil parameters are returned
-    if (Object.keys(soilAnalysis).length === 0) {
-        throw new Error('Invalid soil analysis')
+    if (Object.keys(soilAnalysis).length <= 1) {
+        // a_source is returned with invalid soil analysis
+        throw new Error("Invalid soil analysis")
     }
 
     // Process the other parameters
@@ -191,10 +189,13 @@ export async function extractSoilAnalysis(formData: FormData) {
         soilAnalysis.b_soil_type = field.b_soiltype_agr
     }
     if (field.b_depth) {
-        soilAnalysis.a_depth_upper = Number(field.b_depth.split("-")[0]) as number
-        soilAnalysis.a_depth_lower = Number(field.b_depth.split("-")[1]) as number
+        soilAnalysis.a_depth_upper = Number(
+            field.b_depth.split("-")[0],
+        ) as number
+        soilAnalysis.a_depth_lower = Number(
+            field.b_depth.split("-")[1],
+        ) as number
     }
 
     return soilAnalysis
-
 }
