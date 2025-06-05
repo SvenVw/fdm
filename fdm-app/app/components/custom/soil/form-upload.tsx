@@ -23,7 +23,6 @@ import { cn } from "@/app/lib/utils"
 import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
 import { Progress } from "~/components/ui/progress"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { Separator } from "../../ui/separator"
 
 type UploadStatus = "idle" | "uploading" | "success" | "error"
 
@@ -158,14 +157,7 @@ export function SoilAnalysisUploadForm() {
                                                                         event
                                                                             .target
                                                                             .files?.[0],
-                                                                    )
-                                                                    setFileName(
-                                                                        event
-                                                                            .target
-                                                                            .files?.[0]
-                                                                            ?.name ||
-                                                                            null,
-                                                                    )
+                                                                    )                                                 
                                                                     handleFileChange(
                                                                         event,
                                                                     )
@@ -283,16 +275,25 @@ export function SoilAnalysisUploadForm() {
                         De volgende labs worden op dit moment ondersteunt:
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                        {["Eurofins Agro", "HLB", "ALNN", "Altic", "Dumea", "Fertilab", "Koch", "Roba", "SoilTech", "Laboratorium Zeeuws-Vlaanderen"].map(
-                            (lab, index) => (
-                                <div
-                                    key={index}
-                                    className="border rounded-md p-2 text-center text-sm"
-                                >
-                                    {lab}
-                                </div>
-                            ),
-                        )}
+                        {[
+                            "Eurofins Agro",
+                            "HLB",
+                            "ALNN",
+                            "Altic",
+                            "Dumea",
+                            "Fertilab",
+                            "Koch",
+                            "Roba",
+                            "SoilTech",
+                            "Laboratorium Zeeuws-Vlaanderen",
+                        ].map((lab) => (
+                            <div
+                                key={lab}
+                                className="border rounded-md p-2 text-center text-sm"
+                            >
+                                {lab}
+                            </div>
+                        ))}
                     </div>
                 </CardFooter>
             </Card>
