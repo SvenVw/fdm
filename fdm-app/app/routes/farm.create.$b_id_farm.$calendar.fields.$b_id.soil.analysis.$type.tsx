@@ -172,7 +172,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues,
         )
 
-        return redirectWithSuccess(`../${b_id}`, {
+        return redirectWithSuccess("../", {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {
