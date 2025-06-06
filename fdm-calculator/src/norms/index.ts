@@ -1,3 +1,4 @@
+import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/fosfaatgebruiksnorm"
 import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
 
 export function createFunctionsForNorms(b_region: string, year: number) {
@@ -9,7 +10,7 @@ export function createFunctionsForNorms(b_region: string, year: number) {
                 collectInputForNormForNitrogen: undefined,
                 calculateNormForManure: undefined,
                 collectInputForNormForManure: undefined,
-                calculateNormForPhosphate: undefined,
+                calculateNormForPhosphate: getNL2025FosfaatGebruiksNorm,
                 collectInputForNormForPhosphate: undefined,
             }
         } else  {
