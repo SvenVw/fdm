@@ -1,6 +1,10 @@
 import { getSoilParametersDescription } from "@svenvw/fdm-core"
 
-export function getSoilParametersForSoilAnalysisType(soilAnalysisType: string) {
+export function getSoilParametersForSoilAnalysisType(
+    soilAnalysisType: "standard" | "all" | "nmin" | "derogation"
+) {
+    // …rest of the function body unchanged…
+}
     let soilParameters = []
     if (soilAnalysisType === "standard") {
         soilParameters = [
