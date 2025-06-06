@@ -46,10 +46,10 @@ export interface FosfaatGebruiksnormResult {
    */
   normValue: number;
   /**
-   * The phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
+   * The cultivation and phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
    * that was determined from the soil analysis values and used to derive the norm.
    */
-  fosfaatKlasse: FosfaatKlasse;
+  normSource: string
 }
 
 /**
@@ -167,6 +167,7 @@ export function getNL2025FosfaatGebruiksNorm(
 
   // Select the specific norm based on whether it's grassland or arable land.
   const normValue = is_grasland ? normsForKlasse.grasland : normsForKlasse.bouwland;
+  const normSource = is_grasland ? `Grasland: ${fosfaatKlasse}}` : `Bouwland: ${fosfaatKlasse}`;
 
-  return { normValue, fosfaatKlasse };
+  return { normValue, normSource };
 }

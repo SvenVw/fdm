@@ -167,7 +167,7 @@ export interface GebruiksnormResult {
    * The cultivation name according to RVO's "Tabel 2 Stikstof landbouwgrond 2025"
    * that was used to determine the legal limit.
    */
-  cultivationNameTabel2: string;
+  normSource: string;
 }
 
 /**
@@ -391,5 +391,5 @@ export function getNL2025StikstofGebruiksNorm(
 
   let normValue = is_nv_area ? normsForRegion.nv_area : normsForRegion.standard;
 
-  return { normValue: normValue, cultivationNameTabel2: selectedStandard.cultivation_rvo_table2 };
+  return { normValue: normValue, normSource: selectedStandard.cultivation_rvo_table2 };
 }
