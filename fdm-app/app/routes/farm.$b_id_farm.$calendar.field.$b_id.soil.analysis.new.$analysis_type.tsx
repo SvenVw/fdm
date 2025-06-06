@@ -19,7 +19,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getSoilParametersForSoilAnalysisType } from "~/components/custom/soil/form-selection"
+import { getSoilParametersForSoilAnalysisType } from "~/components/custom/soil/parameters.server"
 
 /**
  * Loader function for the soil data page of a specific farm field.
