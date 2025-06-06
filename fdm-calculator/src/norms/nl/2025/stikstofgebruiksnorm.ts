@@ -1,4 +1,4 @@
-import nitrogenStandardsData from './nitrogen-standards-data.json';
+import nitrogenStandardsData from './stikstofgebruiksnorm-data.json';
 
 // Define types for the imported data for better type safety
 interface NitrogenStandard {
@@ -162,7 +162,7 @@ function getNormsForCultivation(
 
 /**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen based on cultivation, region, and other factors.
- * @param b_lu_brp - The BRP cultivation code (e.g., "nl_265").
+ * @param b_lu_catalogue - The BRP cultivation code (e.g., "nl_265").
  * @param latitude - The latitude of the field.
  * @param longitude - The longitude of the field.
  * @param b_lu_end - The termination date of the cultivation.
@@ -170,8 +170,8 @@ function getNormsForCultivation(
  * @param b_lu_variety - Optional. The specific variety of the cultivation (e.g., potato variety).
  * @returns The nitrogen usage standard in kg N per hectare, or null if not found.
  */
-export function getGebruiksnormStikstof(
-  b_lu_brp: string,
+export function getNL2025StikstofGebruiksNorm(
+  b_lu_catalogue: string,
   latitude: number,
   longitude: number,
   b_lu_end: Date,
@@ -181,18 +181,18 @@ export function getGebruiksnormStikstof(
 ): GebruiksnormResult | null {
   // Find matching nitrogen standard data based on b_lu_catalogue_match
   let matchingStandards: NitrogenStandard[] = nitrogenStandardsData.filter(
-    (ns: NitrogenStandard) => ns.b_lu_catalogue_match.includes(b_lu_brp)
+    (ns: NitrogenStandard) => ns.b_lu_catalogue_match.includes(b_lu_catalogue)
   );
 
   if (matchingStandards.length === 0) {
-    console.warn(`No matching nitrogen standard found for b_lu_brp ${b_lu_brp}.`);
+    console.warn(`No matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue}.`);
     return null;
   }
 
   const region = getRegion(latitude, longitude);
 
   // Handle specific cases for potatoes based on variety
-  // This logic assumes that the b_lu_brp for potatoes will match one of the potato entries
+  // This logic assumes that the b_lu_catalogue for potatoes will match one of the potato entries
   // and then the variety_type will further refine it.
   if (b_lu_variety) {
     const varietyLower = b_lu_variety.toLowerCase();
@@ -220,7 +220,7 @@ export function getGebruiksnormStikstof(
   if (matchingStandards.length === 1) {
     selectedStandard = matchingStandards[0];
   } else if (matchingStandards.length > 1) {
-    // If multiple standards match b_lu_brp, try to find a more specific one
+    // If multiple standards match b_lu_catalogue, try to find a more specific one
     // This could be based on variety_type for potatoes, or other criteria if added later
     if (b_lu_variety) {
       const varietyLower = b_lu_variety.toLowerCase(); // Define varietyLower here
@@ -244,7 +244,7 @@ export function getGebruiksnormStikstof(
   }
 
   if (!selectedStandard) {
-    console.warn(`No specific matching nitrogen standard found for b_lu_brp ${b_lu_brp} with variety ${b_lu_variety || 'N/A'} in region ${region}.`);
+    console.warn(`No specific matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue} with variety ${b_lu_variety || 'N/A'} in region ${region}.`);
     return null;
   }
 
