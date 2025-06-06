@@ -1,0 +1,1993 @@
+[
+  {
+    "cultivation_rvo_table2": "Grasland met beweiden",
+    "b_lu_catalogue_match": ["nl_265", "nl_331", "nl_332", "nl_336", "nl_2301", "nl_2302", "nl_3718", "nl_3720", "nl_3523"],
+    "type": "grasland",
+    "norms": {
+      "klei": { "standard": 345, "nv_area": 276 },
+      "zand_nwc": { "standard": 250, "nv_area": 200 },
+      "zand_zuid": { "standard": 250, "nv_area": 200 },
+      "loss": { "standard": 250, "nv_area": 200 },
+      "veen": { "standard": 265, "nv_area": 212 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Grasland met volledig maaien",
+    "b_lu_catalogue_match": ["nl_265", "nl_331", "nl_332", "nl_336", "nl_2301", "nl_2302", "nl_3718", "nl_3720", "nl_3523"],
+    "type": "grasland",
+    "norms": {
+      "klei": { "standard": 385, "nv_area": 308 },
+      "zand_nwc": { "standard": 320, "nv_area": 256 },
+      "zand_zuid": { "standard": 320, "nv_area": 256 },
+      "loss": { "standard": 320, "nv_area": 256 },
+      "veen": { "standard": 300, "nv_area": 240 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland van 1 januari tot minstens 15 april",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 1, "period_start_day": 1,
+    "period_end_month": 4, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 60, "nv_area": 48 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 50, "nv_area": 40 },
+      "loss": { "standard": 50, "nv_area": 40 },
+      "veen": { "standard": 50, "nv_area": 40 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland van 1 januari tot minstens 15 mei",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 1, "period_start_day": 1,
+    "period_end_month": 5, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 90, "nv_area": 72 },
+      "zand_zuid": { "standard": 90, "nv_area": 72 },
+      "loss": { "standard": 90, "nv_area": 72 },
+      "veen": { "standard": 90, "nv_area": 72 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland van 1 januari tot minstens 15 augustus",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 1, "period_start_day": 1,
+    "period_end_month": 8, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 250, "nv_area": 200 },
+      "zand_nwc": { "standard": 210, "nv_area": 168 },
+      "zand_zuid": { "standard": 210, "nv_area": 168 },
+      "loss": { "standard": 210, "nv_area": 168 },
+      "veen": { "standard": 210, "nv_area": 168 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland van 1 januari tot minstens 15 september",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 1, "period_start_day": 1,
+    "period_end_month": 9, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 280, "nv_area": 224 },
+      "zand_nwc": { "standard": 235, "nv_area": 188 },
+      "zand_zuid": { "standard": 235, "nv_area": 188 },
+      "loss": { "standard": 235, "nv_area": 188 },
+      "veen": { "standard": 235, "nv_area": 188 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland van 1 januari tot minstens 15 oktober",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 1, "period_start_day": 1,
+    "period_end_month": 10, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 310, "nv_area": 248 },
+      "zand_nwc": { "standard": 250, "nv_area": 200 },
+      "zand_zuid": { "standard": 250, "nv_area": 200 },
+      "loss": { "standard": 250, "nv_area": 200 },
+      "veen": { "standard": 265, "nv_area": 212 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland vanaf 15 april tot minstens 15 oktober",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 4, "period_start_day": 15,
+    "period_end_month": 10, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 310, "nv_area": 248 },
+      "zand_nwc": { "standard": 250, "nv_area": 200 },
+      "zand_zuid": { "standard": 250, "nv_area": 200 },
+      "loss": { "standard": 250, "nv_area": 200 },
+      "veen": { "standard": 265, "nv_area": 212 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland vanaf 15 mei tot minstens 15 oktober",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 5, "period_start_day": 15,
+    "period_end_month": 10, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 280, "nv_area": 224 },
+      "zand_nwc": { "standard": 235, "nv_area": 188 },
+      "zand_zuid": { "standard": 235, "nv_area": 188 },
+      "loss": { "standard": 235, "nv_area": 188 },
+      "veen": { "standard": 235, "nv_area": 188 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland vanaf 15 augustus tot minstens 15 oktober",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 8, "period_start_day": 15,
+    "period_end_month": 10, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 95, "nv_area": 76 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland vanaf 15 september tot minstens 15 oktober",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 9, "period_start_day": 15,
+    "period_end_month": 10, "period_end_day": 15,
+    "norms": {
+      "klei": { "standard": 30, "nv_area": 24 },
+      "zand_nwc": { "standard": 25, "nv_area": 20 },
+      "zand_zuid": { "standard": 25, "nv_area": 20 },
+      "loss": { "standard": 25, "nv_area": 20 },
+      "veen": { "standard": 25, "nv_area": 20 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tijdelijk grasland vanaf 15 oktober",
+    "b_lu_catalogue_match": ["nl_266"],
+    "type": "grasland_tijdelijk",
+    "period_start_month": 10, "period_start_day": 15,
+    "period_end_month": 12, "period_end_day": 31,
+    "norms": {
+      "klei": { "standard": 0, "nv_area": 0 },
+      "zand_nwc": { "standard": 0, "nv_area": 0 },
+      "zand_zuid": { "standard": 0, "nv_area": 0 },
+      "loss": { "standard": 0, "nv_area": 0 },
+      "veen": { "standard": 0, "nv_area": 0 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Consumptieaardappelrassen hoge norm",
+    "b_lu_catalogue_match": ["nl_2014", "nl_1909", "nl_1910", "nl_2951", "nl_3792"],
+    "type": "aardappel",
+    "variety_type": "consumptie_hoge_norm",
+    "varieties": ["Adora", "Annabelle", "Bintje", "Carlita", "Courage", "Draga", "Felsina", "Fontane", "Innovator", "Inova", "Jaerla", "Lady Blanca", "Lady Olympia", "Lady Rosetta", "Liseta", "Maritiema", "Marlen", "Miranda", "Ramos", "Redstar", "Sante", "Satellite", "Victoria", "VR 808", "Zorba"],
+    "norms": {
+      "klei": { "standard": 275, "nv_area": 220 },
+      "zand_nwc": { "standard": 260, "nv_area": 208 },
+      "zand_zuid": { "standard": 208, "nv_area": 166 },
+      "loss": { "standard": 204, "nv_area": 163 },
+      "veen": { "standard": 270, "nv_area": 216 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Consumptieaardappelrassen overig",
+    "b_lu_catalogue_match": ["nl_2014", "nl_1909", "nl_1910", "nl_2951", "nl_3792"],
+    "type": "aardappel",
+    "variety_type": "consumptie_overig",
+    "varieties": [],
+    "norms": {
+      "klei": { "standard": 250, "nv_area": 200 },
+      "zand_nwc": { "standard": 235, "nv_area": 188 },
+      "zand_zuid": { "standard": 188, "nv_area": 150 },
+      "loss": { "standard": 184, "nv_area": 147 },
+      "veen": { "standard": 245, "nv_area": 196 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Consumptieaardappelrassen lage norm",
+    "b_lu_catalogue_match": ["nl_2014", "nl_1909", "nl_1910", "nl_2951", "nl_3792"],
+    "type": "aardappel",
+    "variety_type": "consumptie_lage_norm",
+    "varieties": ["Agria", "Allure", "Alpha", "Aprilia", "Asterix", "Aziza", "Ballys", "Baraka", "Bartina", "Ceasar", "Dore", "Eigenheimer", "El Paso", "Futura", "Gloria", "Irene", "Maradonna", "Markies", "Milva", "Minerva", "Mondial", "Morene", "Mozart", "Producent", "Remarka", "Rodeo", "Safari", "Saphire", "Simply Red", "Spirit", "Terra Gold", "Ukama", "Vision"],
+    "norms": {
+      "klei": { "standard": 225, "nv_area": 180 },
+      "zand_nwc": { "standard": 210, "nv_area": 168 },
+      "zand_zuid": { "standard": 168, "nv_area": 134 },
+      "loss": { "standard": 164, "nv_area": 131 },
+      "veen": { "standard": 220, "nv_area": 176 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Consumptieaardappel, vroeg (loofvernietiging voor 15 juli)",
+    "b_lu_catalogue_match": ["nl_1911", "nl_1912"],
+    "type": "aardappel",
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 96, "nv_area": 77 },
+      "loss": { "standard": 96, "nv_area": 77 },
+      "veen": { "standard": 120, "nv_area": 96 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Pootaardappelrassen hoge norm",
+    "b_lu_catalogue_match": ["nl_1928", "nl_1929", "nl_2015", "nl_2016", "nl_3730", "nl_3731"],
+    "type": "aardappel",
+    "variety_type": "poot_hoge_norm",
+    "varieties": ["Adora", "Agata", "Annabelle", "Arinda", "Berber", "Binella", "Climax", "Donald", "Elisabeth", "Fontane", "Gloria", "Inova", "Jaerla", "Junior", "Lady Rosetta", "Lady Olympia", "Leyla", "Linzer Delikatess", "Miriam", "Orinana", "Premiere", "Primura", "Prior", "Rikea", "Romano", "Satellite", "Sirco", "Sirtema", "Tresor", "Ukama"],
+    "norms": {
+      "klei": { "standard": 140, "nv_area": 112 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Pootaardappelrassen overig",
+    "b_lu_catalogue_match": ["nl_1928", "nl_1929", "nl_2015", "nl_2016", "nl_3730", "nl_3731"],
+    "type": "aardappel",
+    "variety_type": "poot_overig",
+    "varieties": [],
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 120, "nv_area": 96 },
+      "loss": { "standard": 120, "nv_area": 96 },
+      "veen": { "standard": 120, "nv_area": 96 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Pootaardappelrassen lage norm",
+    "b_lu_catalogue_match": ["nl_1928", "nl_1929", "nl_2015", "nl_2016", "nl_3730", "nl_3731"],
+    "type": "aardappel",
+    "variety_type": "poot_lage_norm",
+    "varieties": ["Arcade", "Astarte", "Asterix", "Baraka", "Bartina", "Diamant", "Dolce Vita", "Elles", "Elvira", "Everest", "Florijn", "Kardal", "Karnico", "Maradonna", "Mondial", "Morene", "Mozart", "Picasso", "Remarka", "Resonant", "Rodeo", "Saphire", "Sifra", "Simply Red", "Sofia (AR 93-272)", "Spirit", "Van Gogh", "Vebesta", "Vento", "Voyager"],
+    "norms": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 100, "nv_area": 80 },
+      "zand_zuid": { "standard": 100, "nv_area": 80 },
+      "loss": { "standard": 100, "nv_area": 80 },
+      "veen": { "standard": 100, "nv_area": 80 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Pootaardappelen, uitgroeiteelt (loofvernietiging na 15 augustus)",
+    "b_lu_catalogue_match": ["nl_1928", "nl_1929", "nl_2015", "nl_2016", "nl_3730", "nl_3731"],
+    "type": "aardappel",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Zetmeelaardappelen",
+    "b_lu_catalogue_match": ["nl_859", "nl_2017", "nl_3732"],
+    "type": "aardappel",
+    "norms": {
+      "klei": { "standard": 240, "nv_area": 192 },
+      "zand_nwc": { "standard": 230, "nv_area": 184 },
+      "zand_zuid": { "standard": 184, "nv_area": 147 },
+      "loss": { "standard": 184, "nv_area": 147 },
+      "veen": { "standard": 230, "nv_area": 184 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Suikerbieten",
+    "b_lu_catalogue_match": ["nl_256"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 145, "nv_area": 116 },
+      "zand_zuid": { "standard": 116, "nv_area": 93 },
+      "loss": { "standard": 116, "nv_area": 93 },
+      "veen": { "standard": 145, "nv_area": 116 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Cichorei",
+    "b_lu_catalogue_match": ["nl_511"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 70, "nv_area": 56 },
+      "zand_nwc": { "standard": 70, "nv_area": 56 },
+      "zand_zuid": { "standard": 70, "nv_area": 56 },
+      "loss": { "standard": 70, "nv_area": 56 },
+      "veen": { "standard": 70, "nv_area": 56 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Voederbieten",
+    "b_lu_catalogue_match": ["nl_257", "nl_2651"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 165, "nv_area": 132 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 132, "nv_area": 106 },
+      "loss": { "standard": 132, "nv_area": 106 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Wintertarwe",
+    "b_lu_catalogue_match": ["nl_233"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 245, "nv_area": 196 },
+      "zand_nwc": { "standard": 160, "nv_area": 128 },
+      "zand_zuid": { "standard": 160, "nv_area": 128 },
+      "loss": { "standard": 190, "nv_area": 152 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Zomertarwe",
+    "b_lu_catalogue_match": ["nl_234"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Wintergerst",
+    "b_lu_catalogue_match": ["nl_235"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 140, "nv_area": 112 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Zomergerst",
+    "b_lu_catalogue_match": ["nl_236"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 80, "nv_area": 64 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Triticale",
+    "b_lu_catalogue_match": ["nl_314"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 160, "nv_area": 128 },
+      "zand_nwc": { "standard": 150, "nv_area": 120 },
+      "zand_zuid": { "standard": 120, "nv_area": 96 },
+      "loss": { "standard": 120, "nv_area": 96 },
+      "veen": { "standard": 150, "nv_area": 120 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Winterrogge",
+    "b_lu_catalogue_match": ["nl_237", "nl_7130"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 140, "nv_area": 112 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Haver",
+    "b_lu_catalogue_match": ["nl_238", "nl_670", "nl_6636"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 100, "nv_area": 80 },
+      "zand_zuid": { "standard": 100, "nv_area": 80 },
+      "loss": { "standard": 100, "nv_area": 80 },
+      "veen": { "standard": 100, "nv_area": 80 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Maïs, bedrijven met derogatie",
+    "b_lu_catalogue_match": ["nl_259", "nl_316", "nl_317", "nl_814", "nl_1935", "nl_2032"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 160, "nv_area": 128 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 112, "nv_area": 90 },
+      "loss": { "standard": 112, "nv_area": 90 },
+      "veen": { "standard": 150, "nv_area": 120 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Maïs, bedrijven zonder derogatie",
+    "b_lu_catalogue_match": ["nl_259", "nl_316", "nl_317", "nl_814", "nl_1935", "nl_2032"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 185, "nv_area": 148 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 112, "nv_area": 90 },
+      "loss": { "standard": 112, "nv_area": 90 },
+      "veen": { "standard": 150, "nv_area": 120 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Luzerne, eerste jaar",
+    "b_lu_catalogue_match": ["nl_258"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 40, "nv_area": 32 },
+      "zand_nwc": { "standard": 40, "nv_area": 32 },
+      "zand_zuid": { "standard": 40, "nv_area": 32 },
+      "loss": { "standard": 40, "nv_area": 32 },
+      "veen": { "standard": 40, "nv_area": 32 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Luzerne, volgende jaren",
+    "b_lu_catalogue_match": ["nl_258"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 0, "nv_area": 0 },
+      "zand_nwc": { "standard": 0, "nv_area": 0 },
+      "zand_zuid": { "standard": 0, "nv_area": 0 },
+      "loss": { "standard": 0, "nv_area": 0 },
+      "veen": { "standard": 0, "nv_area": 0 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Gras voor industriële verwerking (inzaai in september en eerste jaar)",
+    "b_lu_catalogue_match": ["nl_3805"],
+    "type": "gras",
+    "norms": {
+      "klei": { "standard": 30, "nv_area": 24 },
+      "zand_nwc": { "standard": 25, "nv_area": 20 },
+      "zand_zuid": { "standard": 25, "nv_area": 20 },
+      "loss": { "standard": 25, "nv_area": 20 },
+      "veen": { "standard": 25, "nv_area": 20 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Gras voor industriële verwerking (inzaai voor 15 mei en volgende jaren)",
+    "b_lu_catalogue_match": ["nl_3805"],
+    "type": "gras",
+    "norms": {
+      "klei": { "standard": 310, "nv_area": 248 },
+      "zand_nwc": { "standard": 250, "nv_area": 200 },
+      "zand_zuid": { "standard": 250, "nv_area": 200 },
+      "loss": { "standard": 250, "nv_area": 200 },
+      "veen": { "standard": 265, "nv_area": 212 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, Engels raaigras, 1e jaars",
+    "b_lu_catalogue_match": ["nl_1919", "nl_2030", "nl_3506", "nl_6750"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 165, "nv_area": 132 },
+      "zand_nwc": { "standard": 150, "nv_area": 120 },
+      "zand_zuid": { "standard": 120, "nv_area": 96 },
+      "loss": { "standard": 120, "nv_area": 96 },
+      "veen": { "standard": 155, "nv_area": 124 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, Engels raaigras, overjarig",
+    "b_lu_catalogue_match": ["nl_2031", "nl_3506"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, rietzwenkgras",
+    "b_lu_catalogue_match": ["nl_1915", "nl_3516", "nl_3807", "nl_6782"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 140, "nv_area": 112 },
+      "zand_nwc": { "standard": 130, "nv_area": 104 },
+      "zand_zuid": { "standard": 104, "nv_area": 83 },
+      "loss": { "standard": 104, "nv_area": 83 },
+      "veen": { "standard": 135, "nv_area": 108 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, rietzwenkgras, volgteelt",
+    "b_lu_catalogue_match": ["nl_1915", "nl_3516", "nl_3807", "nl_6782"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 60, "nv_area": 48 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 40, "nv_area": 32 },
+      "loss": { "standard": 40, "nv_area": 32 },
+      "veen": { "standard": 55, "nv_area": 44 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, veldbeemd",
+    "b_lu_catalogue_match": ["nl_1916", "nl_3523", "nl_6746", "nl_6788"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 130, "nv_area": 104 },
+      "zand_nwc": { "standard": 110, "nv_area": 80 },
+      "zand_zuid": { "standard": 100, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 105, "nv_area": 84 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, veldbeemd, volgteelt",
+    "b_lu_catalogue_match": ["nl_1916", "nl_3523", "nl_6746", "nl_6788"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 60, "nv_area": 48 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 40, "nv_area": 32 },
+      "loss": { "standard": 40, "nv_area": 32 },
+      "veen": { "standard": 55, "nv_area": 44 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, roodzwenkgras, 1e jaars",
+    "b_lu_catalogue_match": ["nl_1917", "nl_3808", "nl_6784"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 85, "nv_area": 68 },
+      "zand_nwc": { "standard": 75, "nv_area": 60 },
+      "zand_zuid": { "standard": 60, "nv_area": 48 },
+      "loss": { "standard": 60, "nv_area": 48 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, roodzwenkgras, 1e jaars, volgteelt",
+    "b_lu_catalogue_match": ["nl_1917", "nl_3808", "nl_6784"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 35, "nv_area": 28 },
+      "zand_nwc": { "standard": 35, "nv_area": 28 },
+      "zand_zuid": { "standard": 28, "nv_area": 22 },
+      "loss": { "standard": 28, "nv_area": 22 },
+      "veen": { "standard": 35, "nv_area": 28 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, roodzwenkgras, overjarig",
+    "b_lu_catalogue_match": ["nl_1918", "nl_3808", "nl_6784"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 115, "nv_area": 92 },
+      "zand_nwc": { "standard": 105, "nv_area": 84 },
+      "zand_zuid": { "standard": 84, "nv_area": 67 },
+      "loss": { "standard": 84, "nv_area": 67 },
+      "veen": { "standard": 110, "nv_area": 88 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, roodzwenkgras, overjarig, volgteelt",
+    "b_lu_catalogue_match": ["nl_1918", "nl_3808", "nl_6784"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 45, "nv_area": 36 },
+      "zand_nwc": { "standard": 45, "nv_area": 36 },
+      "zand_zuid": { "standard": 36, "nv_area": 29 },
+      "loss": { "standard": 36, "nv_area": 29 },
+      "veen": { "standard": 45, "nv_area": 36 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, westerwolds",
+    "b_lu_catalogue_match": ["nl_1919", "nl_3513", "nl_6790"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 100, "nv_area": 80 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 105, "nv_area": 84 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, Italiaans",
+    "b_lu_catalogue_match": ["nl_1920", "nl_3512", "nl_6754"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 130, "nv_area": 104 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 96, "nv_area": 77 },
+      "loss": { "standard": 96, "nv_area": 77 },
+      "veen": { "standard": 125, "nv_area": 100 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, overig",
+    "b_lu_catalogue_match": ["nl_383", "nl_1914", "nl_1919", "nl_6768"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 64, "nv_area": 51 },
+      "loss": { "standard": 64, "nv_area": 51 },
+      "veen": { "standard": 85, "nv_area": 68 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaad, overig, volgteelt",
+    "b_lu_catalogue_match": ["nl_383", "nl_1914", "nl_1919", "nl_6768"],
+    "type": "graszaad",
+    "norms": {
+      "klei": { "standard": 45, "nv_area": 36 },
+      "zand_nwc": { "standard": 45, "nv_area": 36 },
+      "zand_zuid": { "standard": 36, "nv_area": 29 },
+      "loss": { "standard": 36, "nv_area": 29 },
+      "veen": { "standard": 45, "nv_area": 36 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszoden",
+    "b_lu_catalogue_match": ["nl_1921"],
+    "type": "gras",
+    "norms": {
+      "klei": { "standard": 340, "nv_area": 272 },
+      "zand_nwc": { "standard": 340, "nv_area": 272 },
+      "zand_zuid": { "standard": 272, "nv_area": 218 },
+      "loss": { "standard": 272, "nv_area": 218 },
+      "veen": { "standard": 340, "nv_area": 272 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Ui, overig",
+    "b_lu_catalogue_match": ["nl_262", "nl_263", "nl_1931", "nl_1932", "nl_1933", "nl_1934", "nl_6660", "nl_6664", "nl_1021", "nl_6749"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 120, "nv_area": 96 },
+      "loss": { "standard": 120, "nv_area": 96 },
+      "veen": { "standard": 120, "nv_area": 96 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Zaaiui",
+    "b_lu_catalogue_match": ["nl_262", "nl_6660", "nl_6664"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 120, "nv_area": 96 },
+      "loss": { "standard": 120, "nv_area": 96 },
+      "veen": { "standard": 120, "nv_area": 96 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Winterui, 2e jaars plantui",
+    "b_lu_catalogue_match": ["nl_1933"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 155, "nv_area": 124 },
+      "zand_zuid": { "standard": 124, "nv_area": 99 },
+      "loss": { "standard": 124, "nv_area": 99 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    },
+    "winterteelt_na_31_12": {
+      "klei": { "standard": 130, "nv_area": 104 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 96, "nv_area": 77 },
+      "loss": { "standard": 96, "nv_area": 77 },
+      "veen": { "standard": 125, "nv_area": 100 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Blauwmaanzaad",
+    "b_lu_catalogue_match": ["nl_247"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 100, "nv_area": 80 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 105, "nv_area": 84 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Karwij",
+    "b_lu_catalogue_match": ["nl_246"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 112, "nv_area": 90 },
+      "loss": { "standard": 112, "nv_area": 90 },
+      "veen": { "standard": 145, "nv_area": 116 }
+    },
+    "winterteelt_na_31_12": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 64, "nv_area": 51 },
+      "loss": { "standard": 64, "nv_area": 51 },
+      "veen": { "standard": 85, "nv_area": 68 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Koolzaad, winter",
+    "b_lu_catalogue_match": ["nl_1922", "nl_7124"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 205, "nv_area": 164 },
+      "zand_nwc": { "standard": 190, "nv_area": 152 },
+      "zand_zuid": { "standard": 152, "nv_area": 122 },
+      "loss": { "standard": 152, "nv_area": 122 },
+      "veen": { "standard": 195, "nv_area": 156 }
+    },
+    "winterteelt_voor_31_12": {
+      "klei": { "standard": 45, "nv_area": 36 },
+      "zand_nwc": { "standard": 45, "nv_area": 36 },
+      "zand_zuid": { "standard": 36, "nv_area": 29 },
+      "loss": { "standard": 36, "nv_area": 29 },
+      "veen": { "standard": 45, "nv_area": 36 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Koolzaad, zomer",
+    "b_lu_catalogue_match": ["nl_1923"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 96, "nv_area": 77 },
+      "loss": { "standard": 96, "nv_area": 77 },
+      "veen": { "standard": 120, "nv_area": 96 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vlas",
+    "b_lu_catalogue_match": ["nl_249", "nl_666", "nl_944", "nl_3736"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 70, "nv_area": 56 },
+      "zand_nwc": { "standard": 70, "nv_area": 56 },
+      "zand_zuid": { "standard": 56, "nv_area": 45 },
+      "loss": { "standard": 56, "nv_area": 45 },
+      "veen": { "standard": 70, "nv_area": 56 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Akkerbouwgewassen, overig",
+    "b_lu_catalogue_match": ["nl_1925", "nl_1927", "nl_1950", "nl_1959", "nl_513", "nl_515", "nl_636", "nl_652", "nl_653", "nl_654", "nl_655", "nl_656", "nl_658", "nl_659", "nl_660", "nl_661", "nl_663", "nl_664", "nl_665", "nl_1022", "nl_1032", "nl_1033", "nl_1034", "nl_1035", "nl_1044", "nl_1045", "nl_1046", "nl_6521", "nl_6767", "nl_6801", "nl_6802"],
+    "type": "akkerbouw",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Spinazie, 1e teelt",
+    "b_lu_catalogue_match": ["nl_2773"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 260, "nv_area": 208 },
+      "zand_nwc": { "standard": 190, "nv_area": 152 },
+      "zand_zuid": { "standard": 152, "nv_area": 122 },
+      "loss": { "standard": 152, "nv_area": 122 },
+      "veen": { "standard": 200, "nv_area": 160 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Spinazie, volgteelt",
+    "b_lu_catalogue_match": ["nl_2773"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 185, "nv_area": 148 },
+      "zand_nwc": { "standard": 145, "nv_area": 116 },
+      "zand_zuid": { "standard": 116, "nv_area": 93 },
+      "loss": { "standard": 116, "nv_area": 93 },
+      "veen": { "standard": 150, "nv_area": 120 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Slasoorten, 1e teelt",
+    "b_lu_catalogue_match": ["nl_2767", "nl_2769", "nl_2771"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 132, "nv_area": 106 },
+      "loss": { "standard": 132, "nv_area": 106 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Slasoorten, volgteelt",
+    "b_lu_catalogue_match": ["nl_2767", "nl_2769", "nl_2771"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 105, "nv_area": 84 },
+      "zand_nwc": { "standard": 105, "nv_area": 84 },
+      "zand_zuid": { "standard": 84, "nv_area": 67 },
+      "loss": { "standard": 84, "nv_area": 67 },
+      "veen": { "standard": 105, "nv_area": 84 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Andijvie, 1e teelt",
+    "b_lu_catalogue_match": ["nl_2708"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 170, "nv_area": 136 },
+      "zand_zuid": { "standard": 136, "nv_area": 109 },
+      "loss": { "standard": 136, "nv_area": 109 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Andijvie, volgteelt",
+    "b_lu_catalogue_match": ["nl_2708"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 90, "nv_area": 72 },
+      "zand_zuid": { "standard": 72, "nv_area": 58 },
+      "loss": { "standard": 72, "nv_area": 58 },
+      "veen": { "standard": 90, "nv_area": 72 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Selderij, bleek/groen",
+    "b_lu_catalogue_match": ["nl_2765"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Prei",
+    "b_lu_catalogue_match": ["nl_2749", "nl_2799", "nl_2801"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 245, "nv_area": 196 },
+      "zand_nwc": { "standard": 225, "nv_area": 180 },
+      "zand_zuid": { "standard": 180, "nv_area": 144 },
+      "loss": { "standard": 180, "nv_area": 144 },
+      "veen": { "standard": 235, "nv_area": 188 }
+    },
+    "winterteelt_na_31_12": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 90, "nv_area": 72 },
+      "zand_zuid": { "standard": 72, "nv_area": 58 },
+      "loss": { "standard": 72, "nv_area": 58 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Bladgewassen, overig, eenmalige oogst",
+    "b_lu_catalogue_match": ["nl_2791", "nl_3502", "nl_3503"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 112, "nv_area": 90 },
+      "loss": { "standard": 112, "nv_area": 90 },
+      "veen": { "standard": 145, "nv_area": 116 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Bladgewassen, overig, meermalige oogst",
+    "b_lu_catalogue_match": ["nl_2791"],
+    "type": "bladgewas",
+    "norms": {
+      "klei": { "standard": 275, "nv_area": 220 },
+      "zand_nwc": { "standard": 250, "nv_area": 200 },
+      "zand_zuid": { "standard": 200, "nv_area": 160 },
+      "loss": { "standard": 200, "nv_area": 160 },
+      "veen": { "standard": 260, "nv_area": 208 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Spruitkool",
+    "b_lu_catalogue_match": ["nl_2777"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 290, "nv_area": 232 },
+      "zand_nwc": { "standard": 265, "nv_area": 212 },
+      "zand_zuid": { "standard": 212, "nv_area": 170 },
+      "loss": { "standard": 212, "nv_area": 170 },
+      "veen": { "standard": 275, "nv_area": 220 }
+    },
+    "winterteelt_na_31_12": {
+      "klei": { "standard": 50, "nv_area": 40 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 40, "nv_area": 32 },
+      "loss": { "standard": 40, "nv_area": 32 },
+      "veen": { "standard": 50, "nv_area": 40 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Witte kool",
+    "b_lu_catalogue_match": ["nl_2789"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 320, "nv_area": 256 },
+      "zand_nwc": { "standard": 290, "nv_area": 232 },
+      "zand_zuid": { "standard": 232, "nv_area": 186 },
+      "loss": { "standard": 232, "nv_area": 186 },
+      "veen": { "standard": 305, "nv_area": 244 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Rode kool",
+    "b_lu_catalogue_match": ["nl_2759"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 285, "nv_area": 228 },
+      "zand_nwc": { "standard": 260, "nv_area": 208 },
+      "zand_zuid": { "standard": 208, "nv_area": 166 },
+      "loss": { "standard": 208, "nv_area": 166 },
+      "veen": { "standard": 270, "nv_area": 216 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Savooiekool",
+    "b_lu_catalogue_match": ["nl_2761"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 285, "nv_area": 228 },
+      "zand_nwc": { "standard": 260, "nv_area": 208 },
+      "zand_zuid": { "standard": 208, "nv_area": 166 },
+      "loss": { "standard": 208, "nv_area": 166 },
+      "veen": { "standard": 270, "nv_area": 216 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Spitskool",
+    "b_lu_catalogue_match": ["nl_2775"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 285, "nv_area": 228 },
+      "zand_nwc": { "standard": 260, "nv_area": 208 },
+      "zand_zuid": { "standard": 208, "nv_area": 166 },
+      "loss": { "standard": 208, "nv_area": 166 },
+      "veen": { "standard": 270, "nv_area": 216 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Bloemkool",
+    "b_lu_catalogue_match": ["nl_2713", "nl_2795", "nl_2797"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 230, "nv_area": 184 },
+      "zand_nwc": { "standard": 210, "nv_area": 168 },
+      "zand_zuid": { "standard": 168, "nv_area": 134 },
+      "loss": { "standard": 168, "nv_area": 134 },
+      "veen": { "standard": 220, "nv_area": 176 }
+    },
+    "winterteelt_na_31_12": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 110, "nv_area": 88 },
+      "zand_zuid": { "standard": 88, "nv_area": 70 },
+      "loss": { "standard": 88, "nv_area": 70 },
+      "veen": { "standard": 115, "nv_area": 92 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Broccoli",
+    "b_lu_catalogue_match": ["nl_2719"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 270, "nv_area": 216 },
+      "zand_nwc": { "standard": 235, "nv_area": 188 },
+      "zand_zuid": { "standard": 188, "nv_area": 150 },
+      "loss": { "standard": 188, "nv_area": 150 },
+      "veen": { "standard": 245, "nv_area": 196 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Chinese kool",
+    "b_lu_catalogue_match": ["nl_2721"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 155, "nv_area": 124 },
+      "zand_zuid": { "standard": 124, "nv_area": 99 },
+      "loss": { "standard": 124, "nv_area": 99 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Boerenkool",
+    "b_lu_catalogue_match": ["nl_2715"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 155, "nv_area": 124 },
+      "zand_zuid": { "standard": 124, "nv_area": 99 },
+      "loss": { "standard": 124, "nv_area": 99 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Paksoi",
+    "b_lu_catalogue_match": ["nl_2745"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 132, "nv_area": 106 },
+      "loss": { "standard": 132, "nv_area": 106 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Raapstelen",
+    "b_lu_catalogue_match": ["nl_2753"],
+    "type": "koolgewas",
+    "norms": {
+      "klei": { "standard": 140, "nv_area": 112 },
+      "zand_nwc": { "standard": 130, "nv_area": 104 },
+      "zand_zuid": { "standard": 104, "nv_area": 83 },
+      "loss": { "standard": 104, "nv_area": 83 },
+      "veen": { "standard": 135, "nv_area": 108 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Kruiden, bladgewas, eenmalige oogst",
+    "b_lu_catalogue_match": ["nl_2743", "nl_1030", "nl_1037", "nl_6749", "nl_6766", "nl_6792"],
+    "type": "kruiden",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 112, "nv_area": 90 },
+      "loss": { "standard": 112, "nv_area": 90 },
+      "veen": { "standard": 145, "nv_area": 116 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Kruiden, bladgewas, meermalig oogsten",
+    "b_lu_catalogue_match": ["nl_2743", "nl_1030", "nl_1037", "nl_6749", "nl_6766", "nl_6792"],
+    "type": "kruiden",
+    "norms": {
+      "klei": { "standard": 275, "nv_area": 220 },
+      "zand_nwc": { "standard": 250, "nv_area": 200 },
+      "zand_zuid": { "standard": 200, "nv_area": 160 },
+      "loss": { "standard": 200, "nv_area": 160 },
+      "veen": { "standard": 260, "nv_area": 208 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Kruiden, wortelgewassen",
+    "b_lu_catalogue_match": ["nl_2743", "nl_1019", "nl_1023", "nl_1028", "nl_1036"],
+    "type": "kruiden",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Kruiden, zaadgewassen",
+    "b_lu_catalogue_match": ["nl_2743", "nl_1020", "nl_1024", "nl_1029", "nl_1031", "nl_1038", "nl_1043"],
+    "type": "kruiden",
+    "norms": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 90, "nv_area": 72 },
+      "zand_zuid": { "standard": 72, "nv_area": 58 },
+      "loss": { "standard": 72, "nv_area": 58 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Aardbei (wachtbed, vermeerdering)",
+    "b_lu_catalogue_match": ["nl_2700", "nl_2701", "nl_2704", "nl_2705"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 110, "nv_area": 88 },
+      "zand_zuid": { "standard": 88, "nv_area": 70 },
+      "loss": { "standard": 88, "nv_area": 70 },
+      "veen": { "standard": 115, "nv_area": 92 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Aardbei (productie)",
+    "b_lu_catalogue_match": ["nl_2702", "nl_2706"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 155, "nv_area": 124 },
+      "zand_zuid": { "standard": 124, "nv_area": 99 },
+      "loss": { "standard": 124, "nv_area": 99 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    },
+    "winterteelt_na_31_12": {
+      "klei": { "standard": 80, "nv_area": 64 },
+      "zand_nwc": { "standard": 70, "nv_area": 56 },
+      "zand_zuid": { "standard": 56, "nv_area": 45 },
+      "loss": { "standard": 56, "nv_area": 45 },
+      "veen": { "standard": 75, "nv_area": 60 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Komkommerachtigen (augurk, courgette, meloen, pompoen)",
+    "b_lu_catalogue_match": ["nl_2729", "nl_2731", "nl_2733", "nl_2735", "nl_2723"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 190, "nv_area": 152 },
+      "zand_nwc": { "standard": 175, "nv_area": 140 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 180, "nv_area": 144 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Suikermaïs",
+    "b_lu_catalogue_match": ["nl_814"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Stam/stokboon, vers",
+    "b_lu_catalogue_match": ["nl_2779", "nl_2781", "nl_854"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 110, "nv_area": 88 },
+      "zand_zuid": { "standard": 88, "nv_area": 70 },
+      "loss": { "standard": 88, "nv_area": 70 },
+      "veen": { "standard": 115, "nv_area": 92 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Landbouwstambonen, rijp zaad",
+    "b_lu_catalogue_match": ["nl_242", "nl_243", "nl_311", "nl_853", "nl_7121"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 135, "nv_area": 108 },
+      "zand_nwc": { "standard": 135, "nv_area": 108 },
+      "zand_zuid": { "standard": 108, "nv_area": 86 },
+      "loss": { "standard": 108, "nv_area": 86 },
+      "veen": { "standard": 135, "nv_area": 108 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Veld- en tuinbonen, vers + rijp zaad",
+    "b_lu_catalogue_match": ["nl_243", "nl_311", "nl_853", "nl_854", "nl_7121"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 50, "nv_area": 40 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 40, "nv_area": 32 },
+      "loss": { "standard": 40, "nv_area": 32 },
+      "veen": { "standard": 50, "nv_area": 40 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tuinbonen, vers/peulen",
+    "b_lu_catalogue_match": ["nl_854", "nl_2747"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 75, "nv_area": 60 },
+      "zand_nwc": { "standard": 75, "nv_area": 60 },
+      "zand_zuid": { "standard": 75, "nv_area": 60 },
+      "loss": { "standard": 75, "nv_area": 60 },
+      "veen": { "standard": 75, "nv_area": 60 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Erwt, vers + rijp zaad",
+    "b_lu_catalogue_match": ["nl_239", "nl_240", "nl_241", "nl_244", "nl_308", "nl_2650", "nl_6767"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 30, "nv_area": 24 },
+      "zand_nwc": { "standard": 30, "nv_area": 24 },
+      "zand_zuid": { "standard": 30, "nv_area": 24 },
+      "loss": { "standard": 30, "nv_area": 24 },
+      "veen": { "standard": 30, "nv_area": 24 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Peul",
+    "b_lu_catalogue_match": ["nl_2747"],
+    "type": "vruchtgewas",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 85, "nv_area": 68 },
+      "zand_zuid": { "standard": 68, "nv_area": 54 },
+      "loss": { "standard": 68, "nv_area": 54 },
+      "veen": { "standard": 85, "nv_area": 68 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Asperge (excl. opkweek)",
+    "b_lu_catalogue_match": ["nl_2710"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 85, "nv_area": 68 },
+      "zand_nwc": { "standard": 75, "nv_area": 60 },
+      "zand_zuid": { "standard": 60, "nv_area": 48 },
+      "loss": { "standard": 60, "nv_area": 48 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Knolselderij",
+    "b_lu_catalogue_match": ["nl_2725"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Knolvenkel/venkel",
+    "b_lu_catalogue_match": ["nl_2727"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 132, "nv_area": 106 },
+      "loss": { "standard": 132, "nv_area": 106 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Koolraap",
+    "b_lu_catalogue_match": ["nl_2737"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 155, "nv_area": 124 },
+      "zand_zuid": { "standard": 124, "nv_area": 99 },
+      "loss": { "standard": 124, "nv_area": 99 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Koolrabi",
+    "b_lu_catalogue_match": ["nl_2739"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 180, "nv_area": 144 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 132, "nv_area": 106 },
+      "loss": { "standard": 132, "nv_area": 106 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Kroten/rode bieten",
+    "b_lu_catalogue_match": ["nl_2741"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 185, "nv_area": 148 },
+      "zand_nwc": { "standard": 170, "nv_area": 136 },
+      "zand_zuid": { "standard": 136, "nv_area": 109 },
+      "loss": { "standard": 136, "nv_area": 109 },
+      "veen": { "standard": 175, "nv_area": 140 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Winterpeen/waspeen",
+    "b_lu_catalogue_match": ["nl_2785", "nl_2783"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 110, "nv_area": 88 },
+      "zand_zuid": { "standard": 110, "nv_area": 88 },
+      "loss": { "standard": 110, "nv_area": 88 },
+      "veen": { "standard": 110, "nv_area": 88 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Bospeen",
+    "b_lu_catalogue_match": ["nl_2717"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 50, "nv_area": 40 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 50, "nv_area": 40 },
+      "loss": { "standard": 50, "nv_area": 40 },
+      "veen": { "standard": 50, "nv_area": 40 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Rabarber",
+    "b_lu_catalogue_match": ["nl_2755"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 250, "nv_area": 200 },
+      "zand_nwc": { "standard": 230, "nv_area": 184 },
+      "zand_zuid": { "standard": 184, "nv_area": 147 },
+      "loss": { "standard": 184, "nv_area": 147 },
+      "veen": { "standard": 240, "nv_area": 192 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Radijs",
+    "b_lu_catalogue_match": ["nl_2757"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 80, "nv_area": 64 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 64, "nv_area": 51 },
+      "loss": { "standard": 64, "nv_area": 51 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Schorseneer",
+    "b_lu_catalogue_match": ["nl_2763"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 170, "nv_area": 136 },
+      "zand_zuid": { "standard": 170, "nv_area": 136 },
+      "loss": { "standard": 170, "nv_area": 136 },
+      "veen": { "standard": 170, "nv_area": 136 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Witlof",
+    "b_lu_catalogue_match": ["nl_2787"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 100, "nv_area": 80 },
+      "zand_zuid": { "standard": 100, "nv_area": 80 },
+      "loss": { "standard": 100, "nv_area": 80 },
+      "veen": { "standard": 100, "nv_area": 80 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Stengel/knol/wortelgewassen, overig",
+    "b_lu_catalogue_match": ["nl_2793", "nl_1949", "nl_7122", "nl_6632", "nl_3521"],
+    "type": "stengel_knol_wortelgewas",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 185, "nv_area": 148 },
+      "zand_zuid": { "standard": 148, "nv_area": 118 },
+      "loss": { "standard": 148, "nv_area": 118 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Niet-vlinderbloemige groenbemesters",
+    "b_lu_catalogue_match": ["nl_427", "nl_2299", "nl_346", "nl_347", "nl_428", "nl_655", "nl_669", "nl_670", "nl_671", "nl_3504", "nl_3505", "nl_3507", "nl_3508", "nl_3517", "nl_3519", "nl_3520", "nl_7125", "nl_7126", "nl_7129", "nl_7131", "nl_6748", "nl_6751", "nl_6753", "nl_6755", "nl_6783", "nl_6785", "nl_6787", "nl_6789", "nl_6791"],
+    "type": "groenbemester",
+    "norms": {
+      "klei": { "standard": 60, "nv_area": 48 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 50, "nv_area": 40 },
+      "loss": { "standard": 50, "nv_area": 40 },
+      "veen": { "standard": 60, "nv_area": 48 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vlinderbloemige groenbemesters",
+    "b_lu_catalogue_match": ["nl_426", "nl_2298", "nl_3500", "nl_3511", "nl_3515", "nl_3518", "nl_3524", "nl_799", "nl_800", "nl_801", "nl_802", "nl_803", "nl_6756", "nl_6758", "nl_6760", "nl_6762", "nl_6764"],
+    "type": "groenbemester",
+    "norms": {
+      "klei": { "standard": 0, "nv_area": 0 },
+      "zand_nwc": { "standard": 0, "nv_area": 0 },
+      "zand_zuid": { "standard": 0, "nv_area": 0 },
+      "loss": { "standard": 0, "nv_area": 0 },
+      "veen": { "standard": 0, "nv_area": 0 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Graszaadstoppel ter vernietiging in najaar of vroege voorjaar",
+    "b_lu_catalogue_match": ["nl_383", "nl_1914", "nl_1915", "nl_1916", "nl_1917", "nl_1918", "nl_1919", "nl_1920", "nl_2030", "nl_2031", "nl_3506", "nl_3512", "nl_3513", "nl_3516", "nl_3522", "nl_3523", "nl_6746", "nl_6750", "nl_6752", "nl_6754", "nl_6768", "nl_6782", "nl_6784", "nl_6786", "nl_6788", "nl_6790"],
+    "type": "groenbemester",
+    "norms": {
+      "klei": { "standard": 60, "nv_area": 48 },
+      "zand_nwc": { "standard": 50, "nv_area": 40 },
+      "zand_zuid": { "standard": 50, "nv_area": 40 },
+      "loss": { "standard": 50, "nv_area": 40 },
+      "veen": { "standard": 60, "nv_area": 48 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Acidanthera",
+    "b_lu_catalogue_match": [],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 255, "nv_area": 204 },
+      "zand_nwc": { "standard": 240, "nv_area": 192 },
+      "zand_zuid": { "standard": 240, "nv_area": 192 },
+      "loss": { "standard": 240, "nv_area": 192 },
+      "veen": { "standard": 240, "nv_area": 192 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Anemone coronaria",
+    "b_lu_catalogue_match": [],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 130, "nv_area": 104 },
+      "zand_nwc": { "standard": 125, "nv_area": 100 },
+      "zand_zuid": { "standard": 125, "nv_area": 100 },
+      "loss": { "standard": 125, "nv_area": 100 },
+      "veen": { "standard": 125, "nv_area": 100 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Fritillaria imperialis",
+    "b_lu_catalogue_match": [],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 135, "nv_area": 108 },
+      "zand_nwc": { "standard": 130, "nv_area": 104 },
+      "zand_zuid": { "standard": 130, "nv_area": 104 },
+      "loss": { "standard": 130, "nv_area": 104 },
+      "veen": { "standard": 130, "nv_area": 104 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Hyacint",
+    "b_lu_catalogue_match": ["nl_970", "nl_971", "nl_999", "nl_1016", "nl_1017", "nl_1018"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 220, "nv_area": 176 },
+      "zand_nwc": { "standard": 210, "nv_area": 168 },
+      "zand_zuid": { "standard": 210, "nv_area": 168 },
+      "loss": { "standard": 210, "nv_area": 168 },
+      "veen": { "standard": 210, "nv_area": 168 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Iris, grofbollig",
+    "b_lu_catalogue_match": ["nl_973", "nl_974", "nl_1000", "nl_1051", "nl_1052"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 170, "nv_area": 136 },
+      "zand_nwc": { "standard": 160, "nv_area": 128 },
+      "zand_zuid": { "standard": 160, "nv_area": 128 },
+      "loss": { "standard": 160, "nv_area": 128 },
+      "veen": { "standard": 160, "nv_area": 128 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Iris, fijnbollig",
+    "b_lu_catalogue_match": ["nl_973", "nl_974", "nl_1000", "nl_1051", "nl_1052"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 140, "nv_area": 112 },
+      "zand_nwc": { "standard": 135, "nv_area": 108 },
+      "zand_zuid": { "standard": 135, "nv_area": 108 },
+      "loss": { "standard": 135, "nv_area": 108 },
+      "veen": { "standard": 135, "nv_area": 108 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Krokus, grote gele",
+    "b_lu_catalogue_match": ["nl_976", "nl_977", "nl_1001"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Krokus, overig",
+    "b_lu_catalogue_match": ["nl_976", "nl_977", "nl_1001"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 85, "nv_area": 68 },
+      "zand_zuid": { "standard": 85, "nv_area": 68 },
+      "loss": { "standard": 85, "nv_area": 68 },
+      "veen": { "standard": 85, "nv_area": 68 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Narcis",
+    "b_lu_catalogue_match": ["nl_982", "nl_983", "nl_1003"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 145, "nv_area": 116 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tulp",
+    "b_lu_catalogue_match": ["nl_985", "nl_986", "nl_1004"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 190, "nv_area": 152 },
+      "zand_zuid": { "standard": 190, "nv_area": 152 },
+      "loss": { "standard": 190, "nv_area": 152 },
+      "veen": { "standard": 190, "nv_area": 152 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Dahlia",
+    "b_lu_catalogue_match": ["nl_964", "nl_965", "nl_997"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 105, "nv_area": 84 },
+      "zand_zuid": { "standard": 105, "nv_area": 84 },
+      "loss": { "standard": 105, "nv_area": 84 },
+      "veen": { "standard": 105, "nv_area": 84 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Gladiool, pitten",
+    "b_lu_catalogue_match": ["nl_967", "nl_968", "nl_998"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 260, "nv_area": 208 },
+      "zand_nwc": { "standard": 245, "nv_area": 196 },
+      "zand_zuid": { "standard": 245, "nv_area": 196 },
+      "loss": { "standard": 245, "nv_area": 196 },
+      "veen": { "standard": 245, "nv_area": 196 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Gladiool, kralen",
+    "b_lu_catalogue_match": ["nl_967", "nl_968", "nl_998"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 190, "nv_area": 152 },
+      "zand_nwc": { "standard": 180, "nv_area": 144 },
+      "zand_zuid": { "standard": 180, "nv_area": 144 },
+      "loss": { "standard": 180, "nv_area": 144 },
+      "veen": { "standard": 180, "nv_area": 144 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Knolbegonia",
+    "b_lu_catalogue_match": [],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 145, "nv_area": 116 },
+      "zand_zuid": { "standard": 145, "nv_area": 116 },
+      "loss": { "standard": 145, "nv_area": 116 },
+      "veen": { "standard": 145, "nv_area": 116 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Lelie",
+    "b_lu_catalogue_match": ["nl_979", "nl_980", "nl_1002"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 155, "nv_area": 124 },
+      "zand_nwc": { "standard": 145, "nv_area": 116 },
+      "zand_zuid": { "standard": 145, "nv_area": 116 },
+      "loss": { "standard": 145, "nv_area": 116 },
+      "veen": { "standard": 145, "nv_area": 116 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Zantedeschia",
+    "b_lu_catalogue_match": ["nl_988", "nl_989", "nl_1005"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 120, "nv_area": 96 },
+      "zand_nwc": { "standard": 120, "nv_area": 96 },
+      "zand_zuid": { "standard": 120, "nv_area": 96 },
+      "loss": { "standard": 120, "nv_area": 96 },
+      "veen": { "standard": 120, "nv_area": 96 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Bloembollengewassen, overig",
+    "b_lu_catalogue_match": ["nl_176", "nl_1006", "nl_1007", "nl_1010", "nl_1011", "nl_1012", "nl_1013", "nl_1014", "nl_1015", "nl_1025", "nl_1026", "nl_1027", "nl_6795", "nl_6796", "nl_6797", "nl_6803", "nl_6804", "nl_6805"],
+    "type": "bloembol",
+    "norms": {
+      "klei": { "standard": 165, "nv_area": 132 },
+      "zand_nwc": { "standard": 155, "nv_area": 124 },
+      "zand_zuid": { "standard": 155, "nv_area": 124 },
+      "loss": { "standard": 155, "nv_area": 124 },
+      "veen": { "standard": 155, "nv_area": 124 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Appel",
+    "b_lu_catalogue_match": ["nl_1095", "nl_1096"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Blauwe bes",
+    "b_lu_catalogue_match": ["nl_1869"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 95, "nv_area": 76 },
+      "zand_zuid": { "standard": 95, "nv_area": 76 },
+      "loss": { "standard": 95, "nv_area": 76 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Braam",
+    "b_lu_catalogue_match": ["nl_2327"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Framboos",
+    "b_lu_catalogue_match": ["nl_2326"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Kers",
+    "b_lu_catalogue_match": ["nl_1872", "nl_2328"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Peer",
+    "b_lu_catalogue_match": ["nl_1097", "nl_1098"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Pruim",
+    "b_lu_catalogue_match": ["nl_1870"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Rode bes",
+    "b_lu_catalogue_match": ["nl_2325"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 140, "nv_area": 112 },
+      "zand_zuid": { "standard": 140, "nv_area": 112 },
+      "loss": { "standard": 140, "nv_area": 112 },
+      "veen": { "standard": 140, "nv_area": 112 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Wijnbouw",
+    "b_lu_catalogue_match": ["nl_1099"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 100, "nv_area": 80 },
+      "zand_nwc": { "standard": 95, "nv_area": 76 },
+      "zand_zuid": { "standard": 95, "nv_area": 76 },
+      "loss": { "standard": 95, "nv_area": 76 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Zwarte bes",
+    "b_lu_catalogue_match": ["nl_1873"],
+    "type": "fruitteelt",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 165, "nv_area": 132 },
+      "zand_zuid": { "standard": 165, "nv_area": 132 },
+      "loss": { "standard": 165, "nv_area": 132 },
+      "veen": { "standard": 165, "nv_area": 132 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Buitenbloemen hoge norm",
+    "b_lu_catalogue_match": ["nl_175", "nl_991", "nl_994", "nl_1010", "nl_1013", "nl_1016", "nl_1025", "nl_1039", "nl_6797", "nl_6805"],
+    "type": "buitenbloem",
+    "varieties": ["Alchemilla mollis", "Carthamus", "Gypsophila paniculata", "Lymonium", "Lysimachia", "Paeonia", "Solidago", "Veronica"],
+    "norms": {
+      "klei": { "standard": 200, "nv_area": 160 },
+      "zand_nwc": { "standard": 200, "nv_area": 160 },
+      "zand_zuid": { "standard": 200, "nv_area": 160 },
+      "loss": { "standard": 200, "nv_area": 160 },
+      "veen": { "standard": 200, "nv_area": 160 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Buitenbloemen overig",
+    "b_lu_catalogue_match": ["nl_175", "nl_991", "nl_994", "nl_1010", "nl_1013", "nl_1016", "nl_1025", "nl_1039", "nl_6797", "nl_6805", "nl_174", "nl_992", "nl_995", "nl_1011", "nl_1014", "nl_1017", "nl_1026", "nl_1040", "nl_1050", "nl_1046"],
+    "type": "buitenbloem",
+    "varieties": [],
+    "norms": {
+      "klei": { "standard": 150, "nv_area": 120 },
+      "zand_nwc": { "standard": 150, "nv_area": 120 },
+      "zand_zuid": { "standard": 150, "nv_area": 120 },
+      "loss": { "standard": 150, "nv_area": 120 },
+      "veen": { "standard": 150, "nv_area": 120 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Tagetes",
+    "b_lu_catalogue_match": ["nl_346", "nl_347", "nl_1930"],
+    "type": "buitenbloem",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 90, "nv_area": 72 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Laanbomen: onderstammen",
+    "b_lu_catalogue_match": ["nl_1070", "nl_1084"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 40, "nv_area": 32 },
+      "zand_nwc": { "standard": 40, "nv_area": 32 },
+      "zand_zuid": { "standard": 40, "nv_area": 32 },
+      "loss": { "standard": 40, "nv_area": 32 },
+      "veen": { "standard": 40, "nv_area": 32 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Laanbomen: spillen",
+    "b_lu_catalogue_match": ["nl_1072", "nl_1086"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 90, "nv_area": 72 },
+      "zand_zuid": { "standard": 90, "nv_area": 72 },
+      "loss": { "standard": 90, "nv_area": 72 },
+      "veen": { "standard": 90, "nv_area": 72 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Laanbomen: opzetters",
+    "b_lu_catalogue_match": ["nl_1071", "nl_1085"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 115, "nv_area": 92 },
+      "zand_nwc": { "standard": 115, "nv_area": 92 },
+      "zand_zuid": { "standard": 115, "nv_area": 92 },
+      "loss": { "standard": 115, "nv_area": 92 },
+      "veen": { "standard": 115, "nv_area": 92 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Sierheesters",
+    "b_lu_catalogue_match": ["nl_1075", "nl_1089"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 75, "nv_area": 60 },
+      "zand_nwc": { "standard": 75, "nv_area": 60 },
+      "zand_zuid": { "standard": 75, "nv_area": 60 },
+      "loss": { "standard": 75, "nv_area": 60 },
+      "veen": { "standard": 75, "nv_area": 60 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Coniferen (inclusief kerstsparren en dennen)",
+    "b_lu_catalogue_match": ["nl_1074", "nl_1088", "nl_796"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 80, "nv_area": 64 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Rozen (inclusief zaailingen, onderstammen)",
+    "b_lu_catalogue_match": ["nl_1073", "nl_1087"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 70, "nv_area": 56 },
+      "zand_nwc": { "standard": 70, "nv_area": 56 },
+      "zand_zuid": { "standard": 70, "nv_area": 56 },
+      "loss": { "standard": 70, "nv_area": 56 },
+      "veen": { "standard": 70, "nv_area": 56 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Bos- en Haagplantsoen",
+    "b_lu_catalogue_match": ["nl_1067", "nl_1081"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 95, "nv_area": 76 },
+      "zand_nwc": { "standard": 95, "nv_area": 76 },
+      "zand_zuid": { "standard": 95, "nv_area": 76 },
+      "loss": { "standard": 95, "nv_area": 76 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vaste planten",
+    "b_lu_catalogue_match": ["nl_1080", "nl_1094", "nl_229", "nl_294", "nl_3806", "nl_657"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 175, "nv_area": 140 },
+      "zand_nwc": { "standard": 175, "nv_area": 140 },
+      "zand_zuid": { "standard": 175, "nv_area": 140 },
+      "loss": { "standard": 175, "nv_area": 140 },
+      "veen": { "standard": 175, "nv_area": 140 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vruchtbomen: onderstammen",
+    "b_lu_catalogue_match": ["nl_1078", "nl_1092"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 30, "nv_area": 24 },
+      "zand_nwc": { "standard": 30, "nv_area": 24 },
+      "zand_zuid": { "standard": 30, "nv_area": 24 },
+      "loss": { "standard": 30, "nv_area": 24 },
+      "veen": { "standard": 30, "nv_area": 24 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vruchtbomen: moerbomen",
+    "b_lu_catalogue_match": ["nl_1077", "nl_1091"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 110, "nv_area": 88 },
+      "zand_zuid": { "standard": 110, "nv_area": 88 },
+      "loss": { "standard": 110, "nv_area": 88 },
+      "veen": { "standard": 110, "nv_area": 88 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vruchtbomen, overig",
+    "b_lu_catalogue_match": ["nl_1079", "nl_1093", "nl_212", "nl_1100", "nl_1697", "nl_1698", "nl_2645", "nl_1047", "nl_2628"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 135, "nv_area": 108 },
+      "zand_nwc": { "standard": 105, "nv_area": 84 },
+      "zand_zuid": { "standard": 105, "nv_area": 84 },
+      "loss": { "standard": 105, "nv_area": 84 },
+      "veen": { "standard": 105, "nv_area": 84 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Trek- en besheesters",
+    "b_lu_catalogue_match": ["nl_1076", "nl_1090", "nl_1874"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 80, "nv_area": 64 },
+      "zand_nwc": { "standard": 80, "nv_area": 64 },
+      "zand_zuid": { "standard": 80, "nv_area": 64 },
+      "loss": { "standard": 80, "nv_area": 64 },
+      "veen": { "standard": 80, "nv_area": 64 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Snijgroen",
+    "b_lu_catalogue_match": ["nl_1876"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 95, "nv_area": 76 },
+      "zand_nwc": { "standard": 95, "nv_area": 76 },
+      "zand_zuid": { "standard": 95, "nv_area": 76 },
+      "loss": { "standard": 95, "nv_area": 76 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Ericaceae",
+    "b_lu_catalogue_match": ["nl_1069", "nl_1083"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 70, "nv_area": 56 },
+      "zand_nwc": { "standard": 70, "nv_area": 56 },
+      "zand_zuid": { "standard": 70, "nv_area": 56 },
+      "loss": { "standard": 70, "nv_area": 56 },
+      "veen": { "standard": 70, "nv_area": 56 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Buxus",
+    "b_lu_catalogue_match": ["nl_1068", "nl_1082"],
+    "type": "boomkwekerij",
+    "norms": {
+      "klei": { "standard": 95, "nv_area": 76 },
+      "zand_nwc": { "standard": 95, "nv_area": 76 },
+      "zand_zuid": { "standard": 95, "nv_area": 76 },
+      "loss": { "standard": 95, "nv_area": 76 },
+      "veen": { "standard": 95, "nv_area": 76 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Snelgroeiende houtsoorten voor biomassaproductie",
+    "b_lu_catalogue_match": ["nl_794", "nl_795", "nl_2297"],
+    "type": "bosbouw",
+    "norms": {
+      "klei": { "standard": 90, "nv_area": 72 },
+      "zand_nwc": { "standard": 90, "nv_area": 72 },
+      "zand_zuid": { "standard": 90, "nv_area": 72 },
+      "loss": { "standard": 90, "nv_area": 72 },
+      "veen": { "standard": 90, "nv_area": 72 }
+    }
+  },
+  {
+    "cultivation_rvo_table2": "Vaste norm op bedrijfsniveau",
+    "b_lu_catalogue_match": [],
+    "type": "vaste_norm",
+    "norms": {
+      "klei": { "standard": 110, "nv_area": 88 },
+      "zand_nwc": { "standard": 110, "nv_area": 88 },
+      "zand_zuid": { "standard": 110, "nv_area": 88 },
+      "loss": { "standard": 110, "nv_area": 88 },
+      "veen": { "standard": 110, "nv_area": 88 }
+    }
+  }
+]
