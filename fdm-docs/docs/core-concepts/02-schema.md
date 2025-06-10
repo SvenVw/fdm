@@ -11,7 +11,7 @@ This document provides a comprehensive overview of the Farm Data Model (FDM) dat
 The FDM database is organized into three distinct PostgreSQL schemas:
 
 1.  **`fdm`**: Contains the core tables related to farm management, fields, cultivations, fertilizers, soil data, etc.
-2.  **`fdm-authn`**: Handles authentication, storing user accounts, sessions, and related information. This schema is largely managed by the [`better-auth`](https://github.com/BetterStackHQ/better-auth) library.
+2.  **`fdm-authn`**: Handles authentication, storing user accounts, sessions, organizations, and related information.
 3.  **`fdm-authz`**: Manages authorization, defining roles, permissions, and maintaining an audit trail.
 
 ---
@@ -99,6 +99,12 @@ This schema holds the primary data related to farm operations.
 | **b_lu_harvestable**| `harvestableEnum`           | Not Null    | Indicates if/how the cultivation is typically harvested ('none', 'once', 'multiple'). |
 | **b_lu_hcat3**      | `text`                      |             | Hierarchical grouping code (e.g., from EuroCrops).                                 |
 | **b_lu_hcat3_name** | `text`                      |             | Human-readable name of the hierarchical grouping.                                  |
+| **b_lu_croprotation**| `rotationEnum`             |             | Crop rotation category for the cultivation.                                        |
+| **b_lu_yield**      | `numeric` (custom)         |             | Typical yield of the cultivation.                                                  |
+| **b_lu_hi**         | `numeric` (custom)         |             | Harvest index (ratio of harvested biomass to total biomass).                       |
+| **b_lu_n_harvestable**| `numeric` (custom)       |             | Nitrogen content in the harvested portion.                                         |
+| **b_lu_n_residue**  | `numeric` (custom)         |             | Nitrogen content in the crop residue.                                              |
+| **b_n_fixation**    | `numeric` (custom)         |             | Nitrogen fixation rate (for legumes).                                              |
 | **hash**            | `text`                      |             | A hash value representing the content of the catalogue entry, for change tracking. |
 | **created**         | `timestamp with time zone`  | Not Null    | Timestamp when this record was created (default: now()).                           |
 | **updated**         | `timestamp with time zone`  |             | Timestamp when this record was last updated.                                       |
@@ -109,6 +115,10 @@ This schema holds the primary data related to farm operations.
 ##### `harvestableEnum`
 *   **Name**: `b_lu_harvestable`
 *   **Possible values**: `none`, `once`, `multiple`
+
+##### `rotationEnum`
+*   **Name**: `b_lu_croprotation`
+*   **Possible values**: `other`, `clover`, `nature`, `potato`, `grass`, `rapeseed`, `starch`, `maize`, `cereal`, `sugarbeet`, `alfalfa`, `catchcrop`
 
 #### **`cultivations`**
 **Purpose**: Represents an instance of a cultivation being grown, linking it to its catalogue definition.
@@ -146,18 +156,19 @@ This schema holds the primary data related to farm operations.
 |-------------|-----------------------------|----------------------------------------------|-----------------------------------------------------------------|
 | **b_lu**    | `text`                      | Primary Key, Foreign Key (references `cultivations.b_lu`) | Identifier of the cultivation instance ending.                  |
 | **b_lu_end**| `timestamp with time zone`  |                                              | Timestamp indicating the end of the cultivation (e.g., final harvest, termination). |
+| **m_cropresidue**| `boolean`                |                                              | Indicates if crop residue was left on the field.                |
 | **created** | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).        |
 | **updated** | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                    |
 
 #### **`cultivationCatalogueSelecting`**
 **Purpose**: Indicates which cultivation catalogues are actively selected or used by a specific farm.
 
-| Column        | Type                        | Constraints                                  | Description                                                     |
-|---------------|-----------------------------|----------------------------------------------|-----------------------------------------------------------------|
-| **b_id_farm** | `text`                      | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm selecting the catalogue source.          |
-| **b_lu_source**| `text`                     | Not Null                                     | Identifier of the cultivation catalogue source being selected. |
-| **created**   | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).        |
-| **updated**   | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                    |
+| Column        | Type                        | Constraints                                                        | Description                                                     |
+|---------------|-----------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------|
+| **b_id_farm** | `text`                      | Not Null, Foreign Key (references `farms.b_id_farm`)               | Identifier of the farm selecting the catalogue source.          |
+| **b_lu_source**| `text`                     | Not Null                                                           | Identifier of the cultivation catalogue source being selected. |
+| **created**   | `timestamp with time zone`  | Not Null                                                           | Timestamp when this record was created (default: now()).        |
+| **updated**   | `timestamp with time zone`  |                                                                    | Timestamp when this record was last updated.                    |
 
 **Constraints:**
 *   Primary Key on (`b_id_farm`, `b_lu_source`).
@@ -215,7 +226,7 @@ This schema holds the primary data related to farm operations.
 **Purpose**: Records a specific harvesting event, linking the cultivation instance to the resulting harvestable product.
 
 | Column             | Type                        | Constraints                                                  | Description                                                              |
-|--------------------|-----------------------------|--------------------------------------------------------------|--------------------------------------------------------------------------|
+|--------------------|-----------------------------|----------------------------------------------|--------------------------------------------------------------------------|
 | **b_id_harvesting**| `text`                     | Primary Key                                                  | Unique identifier for this harvesting event.                             |
 | **b_id_harvestable**| `text`                     | Not Null, Foreign Key (references `harvestables.b_id_harvestable`) | Identifier of the harvestable product obtained from this event.          |
 | **b_lu**           | `text`                      | Not Null, Foreign Key (references `cultivations.b_lu`)       | Identifier of the cultivation instance that was harvested.               |
@@ -240,7 +251,43 @@ This schema holds the primary data related to farm operations.
 | **p_dm**           | `numeric` (custom)         |             | Dry Matter content (%).                                                        |
 | **p_density**      | `numeric` (custom)         |             | Density (e.g., kg/m³).                                                         |
 | **p_om**           | `numeric` (custom)         |             | Organic Matter content (%).                                                    |
-| ... *(many more nutrient columns like p_n_rt, p_p_rt, p_k_rt, etc.)* | `numeric` (custom) |           | Content of various macro/micro-nutrients and elements.                       |
+| **p_a**            | `numeric` (custom)         |             | Ammonium content (%).                                                          |
+| **p_hc**           | `numeric` (custom)         |             | Humic content (%).                                                             |
+| **p_eom**          | `numeric` (custom)         |             | Effective Organic Matter (%).                                                  |
+| **p_eoc**          | `numeric` (custom)         |             | Effective Organic Carbon (%).                                                  |
+| **p_c_rt**         | `numeric` (custom)         |             | Total Carbon content (%).                                                      |
+| **p_c_of**         | `numeric` (custom)         |             | Organic Carbon content (%).                                                    |
+| **p_c_if**         | `numeric` (custom)         |             | Inorganic Carbon content (%).                                                  |
+| **p_c_fr**         | `numeric` (custom)         |             | Carbon content in fresh matter (%).                                            |
+| **p_cn_of**        | `numeric` (custom)         |             | Carbon to Nitrogen ratio in organic fraction.                                  |
+| **p_n_rt**         | `numeric` (custom)         |             | Total Nitrogen content (%).                                                    |
+| **p_n_if**         | `numeric` (custom)         |             | Inorganic Nitrogen content (%).                                                |
+| **p_n_of**         | `numeric` (custom)         |             | Organic Nitrogen content (%).                                                  |
+| **p_n_wc**         | `numeric` (custom)         |             | Water-soluble Nitrogen content (%).                                            |
+| **p_p_rt**         | `numeric` (custom)         |             | Total Phosphorus content (%).                                                  |
+| **p_k_rt**         | `numeric` (custom)         |             | Total Potassium content (%).                                                   |
+| **p_mg_rt**        | `numeric` (custom)         |             | Total Magnesium content (%).                                                   |
+| **p_ca_rt**        | `numeric` (custom)         |             | Total Calcium content (%).                                                     |
+| **p_ne**           | `numeric` (custom)         |             | Neutralizing equivalent (%).                                                   |
+| **p_s_rt**         | `numeric` (custom)         |             | Total Sulfur content (%).                                                      |
+| **p_s_wc**         | `numeric` (custom)         |             | Water-soluble Sulfur content (%).                                              |
+| **p_cu_rt**        | `numeric` (custom)         |             | Total Copper content (%).                                                      |
+| **p_zn_rt**        | `numeric` (custom)         |             | Total Zinc content (%).                                                        |
+| **p_na_rt**        | `numeric` (custom)         |             | Total Sodium content (%).                                                      |
+| **p_si_rt**        | `numeric` (custom)         |             | Total Silicon content (%).                                                     |
+| **p_b_rt**         | `numeric` (custom)         |             | Total Boron content (%).                                                       |
+| **p_mn_rt**        | `numeric` (custom)         |             | Total Manganese content (%).                                                   |
+| **p_ni_rt**        | `numeric` (custom)         |             | Total Nickel content (%).                                                      |
+| **p_fe_rt**        | `numeric` (custom)         |             | Total Iron content (%).                                                        |
+| **p_mo_rt**        | `numeric` (custom)         |             | Total Molybdenum content (%).                                                  |
+| **p_co_rt**        | `numeric` (custom)         |             | Total Cobalt content (%).                                                      |
+| **p_as_rt**        | `numeric` (custom)         |             | Total Arsenic content (%).                                                     |
+| **p_cd_rt**        | `numeric` (custom)         |             | Total Cadmium content (%).                                                     |
+| **p_cr_rt**        | `numeric` (custom)         |             | Total Chromium content (%).                                                    |
+| **p_cr_vi**        | `numeric` (custom)         |             | Chromium VI content (%).                                                       |
+| **p_pb_rt**        | `numeric` (custom)         |             | Total Lead content (%).                                                        |
+| **p_hg_rt**        | `numeric` (custom)         |             | Total Mercury content (%).                                                     |
+| **p_cl_rt**        | `numeric` (custom)         |             | Total Chlorine content (%).                                                    |
 | **p_type_manure**  | `boolean`                   |             | Flag indicating if it's a manure type fertilizer.                              |
 | **p_type_mineral** | `boolean`                   |             | Flag indicating if it's a mineral type fertilizer.                             |
 | **p_type_compost** | `boolean`                   |             | Flag indicating if it's a compost type fertilizer.                             |
@@ -310,12 +357,12 @@ This schema holds the primary data related to farm operations.
 #### **`fertilizerCatalogueEnabling`**
 **Purpose**: Indicates which fertilizer catalogue sources are actively enabled or used by a specific farm.
 
-| Column      | Type                        | Constraints                                  | Description                                                        |
-|-------------|-----------------------------|----------------------------------------------|--------------------------------------------------------------------|
-| **b_id_farm**| `text`                     | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm enabling the catalogue source.              |
-| **p_source** | `text`                      | Not Null                                     | Identifier of the fertilizer catalogue source being enabled.       |
-| **created** | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).           |
-| **updated** | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                       |
+| Column      | Type                        | Constraints                                                        | Description                                                        |
+|-------------|-----------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------|
+| **b_id_farm**| `text`                     | Not Null, Foreign Key (references `farms.b_id_farm`)               | Identifier of the farm enabling the catalogue source.              |
+| **p_source** | `text`                      | Not Null                                                           | Identifier of the fertilizer catalogue source being enabled.       |
+| **created** | `timestamp with time zone`  | Not Null                                                           | Timestamp when this record was created (default: now()).           |
+| **updated** | `timestamp with time zone`  |                                                                    | Timestamp when this record was last updated.                       |
 
 **Constraints:**
 *   Primary Key on (`b_id_farm`, `p_source`).
@@ -331,12 +378,44 @@ This schema holds the primary data related to farm operations.
 |-------------------|-----------------------------|-------------|---------------------------------------------------------------------|
 | **a_id**          | `text`                      | Primary Key | Unique identifier for the soil analysis record.                     |
 | **a_date**        | `timestamp with time zone`  |             | Timestamp indicating when the analysis was performed or reported.   |
-| **a_source**      | `text`                      |             | Source or laboratory that performed the analysis.                   |
-| **a_p_al**        | `numeric` (custom)         |             | P-Al value (Phosphate extracted with Ammonium Lactate).             |
-| **a_p_cc**        | `numeric` (custom)         |             | P-CaCl2 value (Plant-available Phosphorus extracted with CaCl2).    |
-| **a_som_loi**     | `numeric` (custom)         |             | Soil Organic Matter content determined by Loss on Ignition (%).     |
+| **a_source**      | `soilAnalysisSourceEnum`    |             | Laboratory that performed the analysis.                             |
+| **a_al_ox**       | `numeric` (custom)         |             | Aluminum extracted with oxalate (mmol Al/kg).                       |
+| **a_c_of**        | `numeric` (custom)         |             | Organic carbon content (g C/g).                                     |
+| **a_ca_co**       | `numeric` (custom)         |             | Calcium, total soil reserve (mmol+/kg).                             |
+| **a_ca_co_po**    | `numeric` (custom)         |             | Calcium saturation degree (%).                                      |
+| **a_caco3_if**    | `numeric` (custom)         |             | Carbonate lime (%).                                                 |
+| **a_cec_co**      | `numeric` (custom)         |             | Cation Exchange Capacity (mmol+/kg).                                |
+| **a_clay_mi**     | `numeric` (custom)         |             | Clay content (%).                                                   |
+| **a_cn_fr**       | `numeric` (custom)         |             | Carbon / Nitrogen ratio (-).                                        |
+| **a_com_fr**      | `numeric` (custom)         |             | Carbon / Organic matter ratio (-).                                  |
+| **a_cu_cc**       | `numeric` (custom)         |             | Copper, plant available (µg Cu/kg).                                 |
+| **a_density_sa**  | `numeric` (custom)         |             | Bulk density (g/cm³).                                               |
+| **a_fe_ox**       | `numeric` (custom)         |             | Iron extracted with oxalate (mmol Fe/kg).                           |
+| **a_k_cc**        | `numeric` (custom)         |             | Potassium, plant available (mg K/kg).                               |
+| **a_k_co**        | `numeric` (custom)         |             | Potassium, total soil reserve (mmol+/kg).                           |
+| **a_k_co_po**     | `numeric` (custom)         |             | Potassium saturation degree (%).                                    |
+| **a_mg_cc**       | `numeric` (custom)         |             | Magnesium, plant available (mg Mg/kg).                              |
+| **a_mg_co**       | `numeric` (custom)         |             | Magnesium, total soil reserve (mmol+ Mg/kg).                        |
+| **a_mg_co_po**    | `numeric` (custom)         |             | Magnesium saturation degree (%).                                    |
+| **a_n_pmn**       | `numeric` (custom)         |             | Potentially mineralizable Nitrogen (mg N/kg).                       |
+| **a_n_rt**        | `numeric` (custom)         |             | Nitrogen, total soil reserve (mg N/g).                              |
+| **a_nh4_cc**      | `numeric` (custom)         |             | Ammonium (NH4-N) (mg N/l).                                          |
+| **a_nmin_cc**     | `numeric` (custom)         |             | Available nitrogen reserve (kg N/ha).                               |
+| **a_no3_cc**      | `numeric` (custom)         |             | Nitrate (NO3-N) (mg N/l).                                           |
+| **a_p_al**        | `numeric` (custom)         |             | Total phosphate content (mg P2O5/100 g).                            |
+| **a_p_cc**        | `numeric` (custom)         |             | Phosphorus, plant available (mg P/kg).                              |
+| **a_p_ox**        | `numeric` (custom)         |             | Phosphorus extracted with oxalate (mmol P/kg).                      |
+| **a_p_rt**        | `numeric` (custom)         |             | Phosphorus, total soil reserve (g P/kg).                            |
+| **a_p_sg**        | `numeric` (custom)         |             | Phosphorus saturation degree (%).                                   |
+| **a_p_wa**        | `numeric` (custom)         |             | Phosphate extracted with water (mg P2O5/l).                         |
+| **a_ph_cc**       | `numeric` (custom)         |             | Acidity measured with CaCl2 extraction (-).                         |
+| **a_s_rt**        | `numeric` (custom)         |             | Sulfur, total soil reserve (mg S/kg).                               |
+| **a_sand_mi**     | `numeric` (custom)         |             | Sand content (%).                                                   |
+| **a_silt_mi**     | `numeric` (custom)         |             | Silt content (%).                                                   |
+| **a_som_loi**     | `numeric` (custom)         |             | Organic matter content determined by Loss on Ignition (%).          |
+| **a_zn_cc**       | `numeric` (custom)         |             | Zinc, plant available (µg Zn/kg).                                   |
 | **b_gwl_class**   | `gwlClassEnum`              |             | Groundwater level classification.                                   |
-| **b_soiltype_agr**| `soiltypeEnum`              |             | Agricultural soil type classification.                              |
+| **b_soiltype_agr**| `soiltypeEnum`              |             | Agricultural soil type.                                             |
 | **created**       | `timestamp with time zone`  | Not Null    | Timestamp when this record was created (default: now()).            |
 | **updated**       | `timestamp with time zone`  |             | Timestamp when this record was last updated.                        |
 
@@ -348,6 +427,10 @@ This schema holds the primary data related to farm operations.
 *   **Name**: `b_gwl_class`
 *   **Possible values**: `II`, `IV`, `IIIb`, `V`, `VI`, `VII`, `Vb`, `-`, `Va`, `III`, `VIII`, `sVI`, `I`, `IIb`, `sVII`, `IVu`, `bVII`, `sV`, `sVb`, `bVI`, `IIIa`
 
+##### `soilAnalysisSourceEnum`
+*   **Name**: `a_source`
+*   **Possible values**: `nl-rva-l122` (Eurofins Agro Testing Wageningen B.V.), `nl-rva-l136` (Nutrilab B.V.), `nl-rva-l264` (Normec Robalab B.V.), `nl-rva-l320` (Agrarisch Laboratorium Noord-Nederland/Alnn B.V.), `nl-rva-l335` (Normec Groen Agro Control), `nl-rva-l610` (Normec Dumea B.V.), `nl-rva-l648` (Fertilab B.V.), `nl-rva-l697` (Care4Agro B.V.), `nl-other-nmi` (NMI BodemSchat), `other` (Ander laboratorium)
+
 #### **`soilSampling`**
 **Purpose**: Records the details of a soil sampling event, linking a field location to a soil analysis.
 
@@ -356,7 +439,8 @@ This schema holds the primary data related to farm operations.
 | **b_id_sampling**     | `text`                      | Primary Key                                  | Unique identifier for the soil sampling event.                           |
 | **b_id**              | `text`                      | Not Null, Foreign Key (references `fields.b_id`) | Identifier of the field where the sample was taken.                      |
 | **a_id**              | `text`                      | Not Null, Foreign Key (references `soilAnalysis.a_id`) | Identifier of the analysis performed on this sample.                   |
-| **b_depth**           | `numeric` (custom)         |                                              | Depth at which the soil sample was taken (units may vary, e.g., cm).   |
+| **a_depth_upper**     | `numeric` (custom)         | Not Null, Default: 0                         | Upper depth of the soil sample (e.g., cm).                               |
+| **a_depth_lower**     | `numeric` (custom)         |                                              | Lower depth of the soil sample (e.g., cm).                               |
 | **b_sampling_date**   | `timestamp with time zone`  |                                              | Timestamp when the sample was collected.                                 |
 | **b_sampling_geometry**| `geometry` (MultiPoint, SRID 4326) |      | MultiPoint geometry representing the location(s) where the sample(s) were taken. See Custom Types section. |
 | **created**           | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).                 |
@@ -366,7 +450,7 @@ This schema holds the primary data related to farm operations.
 
 ## `fdm-authn` Schema (Authentication)
 
-This schema handles user authentication, sessions, accounts, and related functionalities.
+This schema handles user authentication, sessions, accounts, organizations, and related functionalities.
 
 **Note:** This schema is largely defined and managed by the [`better-auth`](https://github.com/BetterStackHQ/better-auth) library. While the specific table structures are documented here for completeness, refer to the `better-auth` documentation for the most detailed information on its implementation and usage.
 
@@ -382,6 +466,8 @@ This schema handles user authentication, sessions, accounts, and related functio
 | **image**       | `text`      |                      | URL to the user's profile image.                 |
 | **createdAt**   | `timestamp` | Not Null             | Timestamp when the user account was created.     |
 | **updatedAt**   | `timestamp` | Not Null             | Timestamp when the user account was last updated. |
+| **username**    | `text`      | Unique               | User's unique username.                          |
+| **displayUsername**| `text`   |                      | User's display username.                         |
 | **firstname**   | `text`      |                      | User's first name.                               |
 | **surname**     | `text`      |                      | User's surname.                                  |
 | **lang**        | `text`      | Not Null             | User's preferred language code (e.g., 'en', 'nl'). |
@@ -391,7 +477,7 @@ This schema handles user authentication, sessions, accounts, and related functio
 **Purpose**: Stores active user sessions.
 
 | Column      | Type        | Constraints                               | Description                                      |
-|-------------|-------------|-------------------------------------------|--------------------------------------------------|
+|-------------|-----------------------------|-------------------------------------------|--------------------------------------------------|
 | **id**      | `text`      | Primary Key                               | Unique identifier for the session.               |
 | **expiresAt**| `timestamp` | Not Null                                  | Timestamp when the session expires.              |
 | **token**   | `text`      | Not Null, Unique                          | The session token.                               |
@@ -400,6 +486,7 @@ This schema handles user authentication, sessions, accounts, and related functio
 | **ipAddress**| `text`      |                                           | IP address associated with the session.          |
 | **userAgent**| `text`      |                                           | User agent string of the client.                 |
 | **userId**  | `text`      | Not Null, Foreign Key (references `user.id`, onDelete: cascade) | Identifier of the user associated with the session. |
+| **activeOrganizationId**| `text`|                                           | Identifier of the user's currently active organization. |
 
 #### **`account`**
 **Purpose**: Links user accounts to external authentication providers (e.g., OAuth providers) or stores credentials for password-based login.
@@ -431,6 +518,42 @@ This schema handles user authentication, sessions, accounts, and related functio
 | **expiresAt**| `timestamp` | Not Null    | Timestamp when the verification token expires.   |
 | **createdAt**| `timestamp` |             | Timestamp when the verification record was created. |
 | **updatedAt**| `timestamp` |             | Timestamp when the verification record was last updated. |
+
+#### **`organization`**
+**Purpose**: Stores information about organizations in a multi-tenant setup.
+
+| Column       | Type                        | Constraints | Description                                      |
+|--------------|-----------------------------|-------------|--------------------------------------------------|
+| **id**       | `text`                      | Primary Key | Unique identifier for the organization.          |
+| **name**     | `text`                      | Not Null    | Name of the organization.                        |
+| **slug**     | `text`                      | Unique      | URL-friendly unique identifier for the organization. |
+| **logo**     | `text`                      |             | URL to the organization's logo.                  |
+| **createdAt**| `timestamp`                 | Not Null    | Timestamp when the organization was created.     |
+| **metadata** | `text`                      |             | JSON string for additional organization metadata. |
+
+#### **`member`**
+**Purpose**: Links users to organizations and defines their role within that organization.
+
+| Column          | Type                        | Constraints                                  | Description                                      |
+|-----------------|-----------------------------|----------------------------------------------|--------------------------------------------------|
+| **id**          | `text`                      | Primary Key                                  | Unique identifier for the membership record.     |
+| **organizationId**| `text`                    | Not Null, Foreign Key (references `organization.id`, onDelete: cascade) | Identifier of the organization.                  |
+| **userId**      | `text`                      | Not Null, Foreign Key (references `user.id`, onDelete: cascade) | Identifier of the user.                          |
+| **role**        | `text`                      | Not Null    | Role of the user within the organization (e.g., 'admin', 'member'). |
+| **createdAt**   | `timestamp`                 | Not Null    | Timestamp when the membership was created.       |
+
+#### **`invitation`**
+**Purpose**: Stores invitations for users to join an organization.
+
+| Column       | Type                        | Constraints                                  | Description                                      |
+|--------------|-----------------------------|----------------------------------------------|--------------------------------------------------|
+| **id**       | `text`                      | Primary Key                                  | Unique identifier for the invitation.            |
+| **organizationId**| `text`                   | Not Null, Foreign Key (references `organization.id`, onDelete: cascade) | Identifier of the organization sending the invitation. |
+| **email**    | `text`                      | Not Null    | Email address of the invited user.               |
+| **role**     | `text`                      |             | Proposed role for the invited user.              |
+| **status**   | `text`                      | Not Null    | Status of the invitation (e.g., 'pending', 'accepted', 'declined'). |
+| **expiresAt**| `timestamp`                 | Not Null    | Timestamp when the invitation expires.           |
+| **inviterId**| `text`                      | Not Null, Foreign Key (references `user.id`, onDelete: cascade) | Identifier of the user who sent the invitation.  |
 
 #### **`rateLimit`**
 **Purpose**: Used for tracking and enforcing rate limits on certain actions.
