@@ -46,7 +46,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { Controls } from "~/components/custom/atlas/atlas-controls"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
 
 // Meta
 export const meta: MetaFunction = () => {
