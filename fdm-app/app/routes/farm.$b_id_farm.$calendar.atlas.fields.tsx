@@ -1,8 +1,6 @@
 import {
-    GeolocateControl,
     Layer,
     Map as MapGL,
-    NavigationControl,
 } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
@@ -20,6 +18,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { Controls } from "~/components/custom/atlas/atlas-controls"
 
 export const meta: MetaFunction = () => {
     return [
@@ -130,8 +129,7 @@ export default function FarmAtlasFieldsBlock() {
                 mapboxAccessToken={loaderData.mapboxToken}
                 interactiveLayerIds={[id]}
             >
-                <GeolocateControl />
-                <NavigationControl />
+                <Controls onViewportChange={viewState.onViewportChange} />
                 <FieldsSourceNotClickable id={id} fieldsData={fields}>
                     <Layer {...fieldsSavedStyle} />
                 </FieldsSourceNotClickable>

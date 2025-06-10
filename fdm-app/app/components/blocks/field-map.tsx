@@ -1,8 +1,19 @@
 import type { FeatureCollection } from "geojson"
-import { useMemo } from "react"
-import { Layer, Map as MapGL, Source } from "react-map-gl"
+import { useState, useEffect } from "react"
+import { Layer, Source } from "react-map-gl"
+import MapGL, {MapError, ViewStateChangeInfo } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
-import geojsonExtent from "@mapbox/geojson-extent"
+import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
+import { Controls } from "~/components/custom/atlas/atlas-controls"
+import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+
+type MapViewport = {
+    longitude: number
+    latitude: number
+    zoom: number
+    bounds?: [number, number, number, number]
+    fitBoundsOptions?: { padding: number }
+}
 
 interface FieldMapType {
     b_geojson: FeatureCollection
@@ -30,40 +41,39 @@ const brpFieldsLineStyle = {
 
 export function FieldMap(props: FieldMapType) {
     const mapboxToken = props.mapboxToken
+    const [viewport, setViewport] = useState<MapViewport>({
+        longitude: 4.895168,
+        latitude: 52.370216,
+        zoom: 9,
+    })
 
-    // Convert geometry to geoJSON
-    const bounds = useMemo(() => {
-        try {
-            return geojsonExtent(props.b_geojson)
-        } catch (error) {
-            console.error("Failed to calculate bounds:", error)
-            return [-180, -90, 180, 90] // Default world bounds
-        }
+    useEffect(() => {
+        const initial = getViewState(props.b_geojson)
+        const [minLng, minLat, maxLng, maxLat] = initial.bounds
+        setViewport((currentViewport) => ({
+            ...currentViewport,
+            longitude: (minLng + maxLng) / 2,
+            latitude: (minLat + maxLat) / 2,
+            zoom: 9, 
+            bounds: initial.bounds as [number, number, number, number],
+            fitBoundsOptions: initial.fitBoundsOptions,
+        }))
     }, [props.b_geojson])
 
     return (
         <MapGL
-            initialViewState={{
-                bounds: bounds,
-                fitBoundsOptions: {
-                    padding: 40,
-                },
-            }}
+            {...(viewport as any)}
             style={{ width: "100%", height: "100%" }}
-            interactive={false}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
-            mapboxAccessToken={mapboxToken}
-            onError={(e) => console.error("Map error:", e)}
+            mapboxApiAccessToken={mapboxToken}
+            onMove={(evt: ViewStateChangeInfo) => setViewport(evt.viewState as MapViewport)}
+            onError={(e: MapError) => console.error("Map error:", e)}
         >
-            <Source
-                id="fieldMap"
-                type="geojson"
-                data={props.b_geojson}
-                onError={(e) => console.error("Source loading error:", e)}
-            >
+            <Source id="fieldMap" type="geojson" data={props.b_geojson}>
                 <Layer {...brpFieldsFillStyle} />
                 <Layer {...brpFieldsLineStyle} />
             </Source>
+            <Controls onViewportChange={setViewport} />
         </MapGL>
     )
 }

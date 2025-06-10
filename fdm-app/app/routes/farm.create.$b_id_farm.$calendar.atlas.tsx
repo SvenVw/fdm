@@ -6,12 +6,7 @@ import {
 } from "@svenvw/fdm-core"
 import type { Feature, GeoJsonProperties, Polygon } from "geojson"
 import { useState } from "react"
-import {
-    GeolocateControl,
-    Layer,
-    Map as MapGL,
-    NavigationControl,
-} from "react-map-gl/mapbox"
+import { Layer, Map as MapGL } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -46,6 +41,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { Controls } from "~/components/custom/atlas/atlas-controls"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -170,8 +166,11 @@ export default function Index() {
                                     fieldsSelectedId,
                                 ]}
                             >
-                                <GeolocateControl />
-                                <NavigationControl />
+                                <Controls
+                                    onViewportChange={
+                                        viewState.onViewportChange
+                                    }
+                                />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
