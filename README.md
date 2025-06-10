@@ -24,7 +24,7 @@ FDM comprises several interconnected packages, each serving a distinct purpose:
 
 * **`fdm-data`:** Extends `fdm-core` with pre-defined catalogues of data records (fertilizers, cultivations). Users can select from existing catalogues or easily create their own, streamlining data entry and ensuring consistency.
 
-* **`fdm-calculator`:**  (planned) This package will enable domain-specific calculations based on the data stored within the FDM schema, providing valuable insights and decision support tools.
+*   **`fdm-calculator`:**  This package provides functions to calculate nutrient doses and nitrogen balance at both farm and field levels, offering valuable insights and decision support tools based on the FDM schema.
 
 * **`fdm-app`:** A React application offering a user-friendly interface for visualizing and managing farm data.  Utilizes `fdm-core` for database interaction and provides a practical demonstration of FDM's capabilities.
 
