@@ -101,7 +101,7 @@ export function getSoilParametersForSoilAnalysisType(
             "a_density_sa",
         ]
     } else {
-        throw new Error("Unsupported soil analysis type")
+        throw new Error(`Unsupported soil analysis type: ${soilAnalysisType}. Supported types: standard, all, nmin, derogation`)
     }
 
     // Get soil parameter descriptions
