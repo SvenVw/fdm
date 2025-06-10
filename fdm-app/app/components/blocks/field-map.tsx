@@ -1,7 +1,8 @@
 import type { FeatureCollection } from "geojson"
 import { useState, useEffect } from "react"
 import { Layer, Source } from "react-map-gl"
-import MapGL, { type MapError, type ViewStateChangeInfo } from "react-map-gl"
+import type { MapError, ViewStateChangeInfo } from "react-map-gl"
+import { Map as MapGL } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
 import { Controls } from "~/components/custom/atlas/atlas-controls"
@@ -54,7 +55,7 @@ export function FieldMap(props: FieldMapType) {
             ...currentViewport,
             longitude: (minLng + maxLng) / 2,
             latitude: (minLat + maxLat) / 2,
-            zoom: 9, 
+            zoom: 9,
             bounds: initial.bounds as [number, number, number, number],
             fitBoundsOptions: initial.fitBoundsOptions,
         }))
@@ -65,8 +66,10 @@ export function FieldMap(props: FieldMapType) {
             {...viewport}
             style={{ width: "100%", height: "100%" }}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
-            mapboxApiAccessToken={mapboxToken}
-            onMove={(evt: ViewStateChangeInfo) => setViewport(evt.viewState as MapViewport)}
+            mapboxAccessToken={mapboxToken}
+            onMove={(evt: ViewStateChangeInfo) =>
+                setViewport(evt.viewState as MapViewport)
+            }
             onError={(e: MapError) => console.error("Map error:", e)}
         >
             <Source id="fieldMap" type="geojson" data={props.b_geojson}>
