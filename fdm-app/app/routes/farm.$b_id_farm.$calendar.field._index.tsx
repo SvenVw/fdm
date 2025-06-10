@@ -7,8 +7,7 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -25,9 +24,9 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarm } from "../components/custom/header/farm"
-import { HeaderField } from "../components/custom/header/field"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderField } from "~/components/blocks/header/field"
 
 export const meta: MetaFunction = () => {
     return [

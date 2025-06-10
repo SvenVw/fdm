@@ -8,8 +8,8 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { HarvestForm } from "~/components/custom/harvest/form"
-import { FormSchema } from "~/components/custom/harvest/schema"
+import { HarvestForm } from "~/components/blocks/harvest/form"
+import { FormSchema } from "~/components/blocks/harvest/schema"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"

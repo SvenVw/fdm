@@ -3,7 +3,7 @@ import { format } from "date-fns/format"
 import { Eye, Trash2 } from "lucide-react"
 import { NavLink, useFetcher } from "react-router"
 import { Button } from "~/components/ui/button"
-import { LoadingSpinner } from "../loadingspinner"
+import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { HarvestableType } from "./types"
 
 export function HarvestsList({

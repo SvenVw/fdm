@@ -6,10 +6,10 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { HeaderBalance } from "~/components/custom/header/balance"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarm } from "~/components/custom/header/farm"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { HeaderBalance } from "~/components/blocks/header/balance"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
