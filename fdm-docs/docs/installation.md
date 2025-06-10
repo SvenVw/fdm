@@ -7,7 +7,7 @@ title: Installation & Setup
 
 This guide covers how to install the Farm Data Model (FDM) packages for use in your own projects, and how to set up the monorepo for contributing to FDM development.
 
-**Alpha Software Warning**: FDM is currently in an alpha stage of development. This means the software is under active development, and while core functionalities are stable, there may still be significant changes to its API and schema before the 1.0.0 release. **Until version 1.0.0, database schema migrations are not automatically handled for all breaking changes, and manual intervention might be required for schema updates between versions**. Please use caution and be prepared for potential breaking changes. We encourage you to experiment and provide feedback.
+[!WARNING] FDM is currently in an alpha stage of development.FDM is currently in an alpha stage of development. This means the software is under active development, and while core functionalities are stable, there may still be significant changes to its API and schema before the 1.0.0 release. **Until version 1.0.0, database schema migrations are not automatically handled for all breaking changes, and manual intervention might be required for schema updates between versions**. Please use caution and be prepared for potential breaking changes. We encourage you to experiment and provide feedback.
 
 ## Using FDM Packages
 

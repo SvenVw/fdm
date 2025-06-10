@@ -5,7 +5,7 @@ The `fdm-calculator` package is a key component of the Farm Data Model (FDM) pro
 ## Key Features
 
 *   **Nutrient Dose Calculation:** Calculate optimal nutrient doses based on various factors.
-*   **Nutrient Balance Calculation:** Determine nutrient balances at both farm and field levels. Currently nitrogen is implemented, and other nutrients planned.
+*   **Nutrient Balance Calculation:** Determine nutrient balances at both farm and field levels. Currently, nitrogen is implemented, and other nutrients planned.
 *   **Economic Analysis:**  Analyze the economic viability of different farming strategies and provide insights into cost optimization (*planned*). 
 *   **Environmental Impact Assessments:** Estimate the environmental footprint of farming activities, including greenhouse gas emissions and leaching of nitrogen and phosphate to the environment (*planned*).
 *   **Integration with FDM Core:** Seamlessly integrates with `fdm-core` to access and process farm data directly from the database.
