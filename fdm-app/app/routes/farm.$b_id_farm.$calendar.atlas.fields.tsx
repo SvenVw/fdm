@@ -1,6 +1,9 @@
+import { useCallback, useState } from "react"
 import {
     Layer,
     Map as MapGL,
+    type ViewStateChangeEvent,
+    type ViewState,
 } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
@@ -72,7 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
         const features = fields.map((field) => {
             const feature = {
-                type: "Feature",
+                type: "Feature" as const,
                 properties: {
                     b_id: field.b_id,
                     b_name: field.b_name,
@@ -116,20 +119,41 @@ export default function FarmAtlasFieldsBlock() {
 
     const id = "fieldsSaved"
     const fields = loaderData.savedFields
-    const viewState = getViewState(fields)
+    const initialViewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
+
+    const [viewState, setViewState] = useState<ViewState>(initialViewState as ViewState)
+
+    const onViewportChange = useCallback(
+        (event: ViewStateChangeEvent) => {
+            setViewState(event.viewState)
+        },
+        [],
+    )
 
     return (
         <>
             <MapGL
                 {...viewState}
-                style={{ height: "calc(100vh - 64px - 123px)", width: "100%" }}
+                style={{ height: "calc(100vh - 64px - 147px)", width: "100%" }}
                 interactive={true}
                 mapStyle={loaderData.mapboxStyle}
                 mapboxAccessToken={loaderData.mapboxToken}
                 interactiveLayerIds={[id]}
+                onMove={onViewportChange}
             >
-                <Controls onViewportChange={viewState.onViewportChange} />
+                <Controls
+                    onViewportChange={({ longitude, latitude, zoom }) =>
+                        setViewState((currentViewState) => ({
+                            ...currentViewState,
+                            longitude,
+                            latitude,
+                            zoom,
+                            pitch: currentViewState.pitch, // Ensure pitch is carried over
+                            bearing: currentViewState.bearing, // Ensure bearing is carried over
+                        }))
+                    }
+                />
                 <FieldsSourceNotClickable id={id} fieldsData={fields}>
                     <Layer {...fieldsSavedStyle} />
                 </FieldsSourceNotClickable>

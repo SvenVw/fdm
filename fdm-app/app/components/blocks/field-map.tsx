@@ -1,7 +1,7 @@
 import type { FeatureCollection } from "geojson"
 import { useState, useEffect } from "react"
 import { Layer, Source } from "react-map-gl"
-import MapGL, {MapError, ViewStateChangeInfo } from "react-map-gl"
+import MapGL, { type MapError, type ViewStateChangeInfo } from "react-map-gl"
 import "mapbox-gl/dist/mapbox-gl.css"
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
 import { Controls } from "~/components/custom/atlas/atlas-controls"
@@ -62,7 +62,7 @@ export function FieldMap(props: FieldMapType) {
 
     return (
         <MapGL
-            {...(viewport as any)}
+            {...viewport}
             style={{ width: "100%", height: "100%" }}
             mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
             mapboxApiAccessToken={mapboxToken}

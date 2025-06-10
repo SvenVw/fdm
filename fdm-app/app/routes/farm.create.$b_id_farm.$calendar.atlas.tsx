@@ -5,8 +5,13 @@ import {
     getFarm,
 } from "@svenvw/fdm-core"
 import type { Feature, GeoJsonProperties, Polygon } from "geojson"
-import { useState } from "react"
-import { Layer, Map as MapGL } from "react-map-gl/mapbox"
+import { useCallback, useState } from "react"
+import {
+    Layer,
+    Map as MapGL,
+    type ViewStateChangeEvent,
+    type ViewState,
+} from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -109,8 +114,17 @@ export default function Index() {
 
     const fieldsAvailableId = "fieldsAvailable"
     // const fields = loaderData.savedFields
-    const viewState = getViewState(null)
+    const initialViewState = getViewState(null)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
+
+    const [viewState, setViewState] = useState<ViewState>(initialViewState as ViewState)
+
+    const onViewportChange = useCallback(
+        (event: ViewStateChangeEvent) => {
+            setViewState(event.viewState)
+        },
+        [],
+    )
 
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
@@ -155,7 +169,7 @@ export default function Index() {
                             <MapGL
                                 {...viewState}
                                 style={{
-                                    height: "calc(100vh - 64px - 123px)",
+                                    height: "calc(100vh - 64px - 147px)",
                                     width: "100%",
                                 }}
                                 interactive={true}
@@ -165,10 +179,18 @@ export default function Index() {
                                     fieldsAvailableId,
                                     fieldsSelectedId,
                                 ]}
+                                onMove={onViewportChange}
                             >
                                 <Controls
-                                    onViewportChange={
-                                        viewState.onViewportChange
+                                    onViewportChange={({ longitude, latitude, zoom }) =>
+                                        setViewState((currentViewState) => ({
+                                            ...currentViewState,
+                                            longitude,
+                                            latitude,
+                                            zoom,
+                                            pitch: currentViewState.pitch,
+                                            bearing: currentViewState.bearing,
+                                        }))
                                     }
                                 />
 
