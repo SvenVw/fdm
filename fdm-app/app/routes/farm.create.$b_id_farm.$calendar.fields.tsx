@@ -143,11 +143,17 @@ export default function Index() {
                         </div>
                     </div>
                     <Separator className="my-6" />
-                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                        <aside className="-mx-4 lg:w-1/5">
-                            <SidebarPage items={loaderData.sidebarPageItems} />
-                        </aside>
-                        <Outlet />
+                    <div className="space-y-6 pb-0">
+                        <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
+                            <aside className="lg:w-1/5">
+                                <SidebarPage
+                                    items={loaderData.sidebarPageItems}
+                                />
+                            </aside>
+                            <div className="flex-1">
+                                <Outlet />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
