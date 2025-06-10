@@ -19,7 +19,6 @@ function getBounds(fields: FeatureCollection | null) {
 export function getViewState(fields: FeatureCollection | null) {
     if (fields) {
         const bounds = getBounds(fields)
-        console.log("bounds", bounds)
 
         const viewState = {
             bounds: bounds,
