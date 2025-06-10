@@ -1,5 +1,4 @@
 import {
-    PrincipalId,
     addFarm,
     addFertilizer,
     enableCultivationCatalogue,
@@ -14,23 +13,14 @@ import type {
 import { Form, useLoaderData } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { Farm } from "~/components/blocks/farm"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
-import { Separator } from "~/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarmCreate } from "../components/custom/header/create-farm"
+import { Header } from "~/components/custom/header/base"
+import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
 import {
     Card,
     CardContent,
@@ -38,7 +28,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "../components/ui/card"
+} from "~/components/ui/card"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import {
     FormControl,
