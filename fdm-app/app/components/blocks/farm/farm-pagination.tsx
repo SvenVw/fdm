@@ -4,7 +4,7 @@ import {
     PaginationItem,
     PaginationLink,
 } from "~/components/ui/pagination"
-import type { PaginationItems } from "./farm.d"
+import type { PaginationItems } from "./farm"
 
 interface PaginationLayoutProps {
     items: PaginationItems

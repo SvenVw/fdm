@@ -1,4 +1,4 @@
-import NitrogenBalanceDetails from "@/app/components/custom/balance/nitrogen-details"
+import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
 import {
     type NitrogenBalanceNumeric,
     calculateNitrogenBalance,
@@ -12,7 +12,6 @@ import {
     ArrowUpFromLine,
     CircleAlert,
     CircleCheck,
-    House,
 } from "lucide-react"
 import {
     type LoaderFunctionArgs,
@@ -39,7 +38,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
+import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {

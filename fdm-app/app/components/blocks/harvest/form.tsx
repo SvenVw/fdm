@@ -22,7 +22,7 @@ import {
     PopoverTrigger,
 } from "~/components/ui/popover"
 import { cn } from "~/lib/utils"
-import { LoadingSpinner } from "../loadingspinner"
+import { LoadingSpinner } from "../../custom/loadingspinner"
 import { FormSchema } from "./schema"
 
 export function HarvestForm({

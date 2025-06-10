@@ -6,8 +6,8 @@ import {
     data,
 } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarPage } from "~/components/custom/sidebar-page"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
