@@ -17,9 +17,21 @@ function getBounds(fields: FeatureCollection | null) {
 }
 
 export function getViewState(fields: FeatureCollection | null) {
-    const bounds = getBounds(fields)
+    if (fields) {
+        const bounds = getBounds(fields)
+        console.log("bounds", bounds)
+
+        const viewState = {
+            bounds: bounds,
+            fitBoundsOptions: { padding: 100 },
+            // pitch: 0, // Default pitch
+            // bearing: 0, // Default bearing
+            padding: { top: 0, bottom: 0, left: 0, right: 0 }, // Default padding
+        }
+        return viewState
+    }
+
     const viewState = {
-        bounds: bounds,
         fitBoundsOptions: { padding: 100 },
         longitude: 4.9, // Default longitude for initial view
         latitude: 52.2, // Default latitude for initial view
