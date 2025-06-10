@@ -6,7 +6,6 @@ import {
     revokePrincipalFromFarm,
     updateRoleOfPrincipalAtFarm,
 } from "@svenvw/fdm-core"
-import { is } from "drizzle-orm"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -16,8 +15,8 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { AccessInfoCard } from "~/components/custom/access/access-info-card"
-import { AccessManagementCard } from "~/components/custom/access/access-management-card"
+import { AccessInfoCard } from "~/components/blocks/access/access-info-card"
+import { AccessManagementCard } from "~/components/blocks/access/access-management-card"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -30,7 +29,7 @@ import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"

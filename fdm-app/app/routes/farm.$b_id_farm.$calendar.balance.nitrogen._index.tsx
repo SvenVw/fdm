@@ -9,10 +9,8 @@ import {
     ArrowRight,
     ArrowRightLeft,
     ArrowUpFromLine,
-    Check,
     CircleAlert,
     CircleCheck,
-    House,
 } from "lucide-react"
 import {
     type LoaderFunctionArgs,
@@ -33,10 +31,10 @@ import {
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
-import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
-import { LoadingSpinner } from "../components/custom/loadingspinner"
-import { Skeleton } from "../components/ui/skeleton"
-import { getTimeframe } from "../lib/calendar"
+import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Skeleton } from "~/components/ui/skeleton"
+import { getTimeframe } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

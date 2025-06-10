@@ -24,12 +24,12 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { Combobox } from "~/components/custom/combobox"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { SoilDataCards } from "~/components/custom/soil/cards"
+import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Button } from "~/components/ui/button"
 import {
     Card,

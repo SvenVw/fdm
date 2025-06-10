@@ -3,9 +3,9 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { Header } from "~/components/custom/header/base"
-import { HeaderUser } from "~/components/custom/header/user"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderUser } from "~/components/blocks/header/user"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import {
     Card,

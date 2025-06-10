@@ -5,15 +5,15 @@ import {
     data,
     useLoaderData,
 } from "react-router"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import {
     type Fertilizer,
     columns,
-} from "~/components/custom/fertilizer/columns"
-import { DataTable } from "~/components/custom/fertilizer/table"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarm } from "~/components/custom/header/farm"
-import { HeaderFertilizer } from "~/components/custom/header/fertilizer"
+} from "~/components/blocks/fertilizer/columns"
+import { DataTable } from "~/components/blocks/fertilizer/table"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
