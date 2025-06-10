@@ -1,10 +1,10 @@
 import { reactRouter } from "@react-router/dev/vite"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig({
-    plugins: [reactRouter(), tsconfigPaths(), tailwindcss(),],
+    plugins: [reactRouter(), tsconfigPaths(), tailwindcss()],
     envPrefix: "PUBLIC_",
     define: {
         global: {},
@@ -20,6 +20,9 @@ export default defineConfig({
                     }
                     if (id.includes("app/components/ui")) {
                         return "components/ui"
+                    }
+                    if (id.includes("app/components/blocks")) {
+                        return "components/blocks"
                     }
                     if (id.includes("app/components/custom")) {
                         return "components/custom"

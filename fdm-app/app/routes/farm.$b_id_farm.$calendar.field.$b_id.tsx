@@ -7,9 +7,8 @@ import {
     redirect,
     useLoaderData,
 } from "react-router"
-import { FarmContent } from "~/components/custom/farm/farm-content"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -17,9 +16,9 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarm } from "../components/custom/header/farm"
-import { HeaderField } from "../components/custom/header/field"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderField } from "~/components/blocks/header/field"
 
 // Meta
 export const meta: MetaFunction = () => {

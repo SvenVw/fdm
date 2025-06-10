@@ -21,21 +21,21 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 import {
     FieldsPanelHover,
     FieldsPanelSelection,
     FieldsPanelZoom,
-} from "~/components/custom/atlas/atlas-panels"
+} from "~/components/blocks/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceSelected,
-} from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
+} from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"

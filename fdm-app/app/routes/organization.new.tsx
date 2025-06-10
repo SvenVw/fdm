@@ -13,7 +13,7 @@ import {
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {

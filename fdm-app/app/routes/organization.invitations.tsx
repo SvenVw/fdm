@@ -31,7 +31,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FarmTitle } from "../components/custom/farm/farm-title"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 
 // Define the type for a single invitation
 type InvitationType = {

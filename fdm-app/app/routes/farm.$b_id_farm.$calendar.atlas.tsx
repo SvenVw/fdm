@@ -9,18 +9,16 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { HeaderAtlas } from "../components/custom/header/atlas"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarm } from "../components/custom/header/farm"
-import { useCalendarStore } from "../store/calendar"
+import { HeaderAtlas } from "~/components/blocks/header/atlas"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
 
 // Meta
 export const meta: MetaFunction = () => {

@@ -1,5 +1,4 @@
 import {
-    PrincipalId,
     addFarm,
     addFertilizer,
     enableCultivationCatalogue,
@@ -11,26 +10,38 @@ import type {
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import { useLoaderData } from "react-router"
+import { Form, useLoaderData } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { Farm } from "~/components/blocks/farm"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
-import { Separator } from "~/components/ui/separator"
-import { SidebarInset, SidebarTrigger } from "~/components/ui/sidebar"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarmCreate } from "../components/custom/header/create-farm"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import {
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
+import { Button } from "~/components/ui/button"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -67,17 +78,92 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function AddFarmPage() {
     const loaderData = useLoaderData<typeof loader>()
+
+    const form = useRemixForm<z.infer<typeof FormSchema>>({
+        mode: "onTouched",
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            b_name_farm: loaderData.b_name_farm ?? "",
+        },
+    })
     return (
         <SidebarInset>
             <Header action={undefined}>
                 <HeaderFarmCreate b_name_farm={undefined} />
             </Header>
             <main>
-                <Farm
-                    b_name_farm={loaderData.b_name_farm}
-                    action={"/farm/create"}
-                    FormSchema={FormSchema}
-                />
+                <div className="flex h-screen items-center justify-center">
+                    <Card className="w-[350px]">
+                        <RemixFormProvider {...form}>
+                            <Form
+                                id="formFarm"
+                                onSubmit={form.handleSubmit}
+                                method="POST"
+                            >
+                                <fieldset
+                                    disabled={form.formState.isSubmitting}
+                                >
+                                    <CardHeader>
+                                        <CardTitle>Bedrijf</CardTitle>
+                                        <CardDescription>
+                                            Wat voor soort bedrijf heb je?
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="grid w-full items-center gap-4">
+                                            <div className="flex flex-col space-y-1.5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="b_name_farm"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                Bedrijfsnaam{" "}
+                                                                <span className="text-red-500">
+                                                                    *
+                                                                </span>
+                                                            </FormLabel>
+                                                            <FormControl>
+                                                                <Input
+                                                                    placeholder="Bv. Jansen V.O.F."
+                                                                    aria-required="true"
+                                                                    {...field}
+                                                                />
+                                                            </FormControl>
+                                                            <FormDescription />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="flex justify-between">
+                                        <Button
+                                            variant="outline"
+                                            type="button"
+                                            onClick={() =>
+                                                window.history.back()
+                                            }
+                                        >
+                                            Terug
+                                        </Button>
+                                        <Button type="submit">
+                                            {form.formState.isSubmitting ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <LoadingSpinner />
+                                                    <span>Opslaan...</span>
+                                                </div>
+                                            ) : (
+                                                "Volgende"
+                                            )}
+                                        </Button>
+                                    </CardFooter>
+                                </fieldset>
+                            </Form>
+                        </RemixFormProvider>
+                    </Card>
+                </div>
             </main>
         </SidebarInset>
     )

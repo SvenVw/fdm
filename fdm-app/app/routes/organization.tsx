@@ -5,12 +5,12 @@ import type { LoaderFunctionArgs } from "react-router"
 import { redirect } from "react-router"
 import { useLoaderData } from "react-router"
 import { Outlet } from "react-router-dom"
-import { Header } from "~/components/custom/header/base"
-import { HeaderOrganization } from "~/components/custom/header/organization"
-import { SidebarPlatform } from "~/components/custom/sidebar/platform"
-import { SidebarSupport } from "~/components/custom/sidebar/support"
-import { SidebarTitle } from "~/components/custom/sidebar/title"
-import { SidebarUser } from "~/components/custom/sidebar/user"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderOrganization } from "~/components/blocks/header/organization"
+import { SidebarPlatform } from "~/components/blocks/sidebar/platform"
+import { SidebarSupport } from "~/components/blocks/sidebar/support"
+import { SidebarTitle } from "~/components/blocks/sidebar/title"
+import { SidebarUser } from "~/components/blocks/sidebar/user"
 import {
     Sidebar,
     SidebarContent,

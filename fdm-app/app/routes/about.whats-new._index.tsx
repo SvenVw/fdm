@@ -8,21 +8,14 @@ import {
     useLoaderData,
 } from "react-router"
 import remarkGfm from "remark-gfm"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-} from "~/components/ui/breadcrumb"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
-import { SidebarTrigger } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { HeaderAbout } from "../components/custom/header/about"
-import { Header } from "../components/custom/header/base"
+import { HeaderAbout } from "~/components/blocks/header/about"
+import { Header } from "~/components/blocks/header/base"
 
 export const meta: MetaFunction = () => {
     return [

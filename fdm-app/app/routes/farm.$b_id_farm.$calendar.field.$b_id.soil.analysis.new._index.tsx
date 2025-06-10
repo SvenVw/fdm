@@ -1,26 +1,20 @@
 import {
-    addSoilAnalysis,
     getField,
     getSoilParametersDescription,
 } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
-    type ActionFunctionArgs,
     type LoaderFunctionArgs,
     NavLink,
     data,
     useLoaderData,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
-import { SoilAnalysisForm } from "~/components/custom/soil/form"
-import { FormSchema } from "~/components/custom/soil/formschema"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { SoilAnalysisFormSelection } from "../components/custom/soil/form-selection"
+import { SoilAnalysisFormSelection } from "~/components/blocks/soil/form-selection"
 
 /**
  * Loader function for the soil data page of a specific farm field.

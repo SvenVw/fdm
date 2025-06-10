@@ -4,11 +4,11 @@ import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { redirect } from "react-router"
 import { useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
-import { SidebarApps } from "~/components/custom/sidebar/apps"
-import { SidebarFarm } from "~/components/custom/sidebar/farm"
-import { SidebarSupport } from "~/components/custom/sidebar/support"
-import { SidebarTitle } from "~/components/custom/sidebar/title"
-import { SidebarUser } from "~/components/custom/sidebar/user"
+import { SidebarApps } from "~/components/blocks/sidebar/apps"
+import { SidebarFarm } from "~/components/blocks/sidebar/farm"
+import { SidebarSupport } from "~/components/blocks/sidebar/support"
+import { SidebarTitle } from "~/components/blocks/sidebar/title"
+import { SidebarUser } from "~/components/blocks/sidebar/user"
 import {
     Sidebar,
     SidebarContent,

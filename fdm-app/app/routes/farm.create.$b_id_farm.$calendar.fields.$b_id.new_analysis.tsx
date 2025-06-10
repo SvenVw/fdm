@@ -12,8 +12,8 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { SoilAnalysisForm } from "~/components/custom/soil/form"
-import { FormSchema } from "~/components/custom/soil/formschema"
+import { SoilAnalysisForm } from "~/components/blocks/soil/form"
+import { FormSchema } from "~/components/blocks/soil/formschema"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
