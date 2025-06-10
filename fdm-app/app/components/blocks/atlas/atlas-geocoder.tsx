@@ -30,23 +30,32 @@ class GeocoderControlClass implements IControl {
         })
 
         this._geocoder.on("result", (e: { result: GeocoderResult }) => {
-            if (props.onResult) {
-                props.onResult(e.result)
-            }
-            if (props.onViewportChange) {
-                const { center, bbox } = e.result
-                const [minLng, minLat, maxLng, maxLat] = bbox || [
-                    center[0],
-                    center[1],
-                    center[0],
-                    center[1],
-                ]
-                const newViewport = {
-                    longitude: (minLng + maxLng) / 2,
-                    latitude: (minLat + maxLat) / 2,
-                    zoom: 14, // Default zoom
+            try {
+                if (!e.result || !e.result.center) {
+                    console.warn("Invalid geocoder result:", e.result)
+                    return
                 }
-                props.onViewportChange(newViewport)
+
+                if (props.onResult) {
+                    props.onResult(e.result)
+                }
+                if (props.onViewportChange) {
+                    const { center, bbox } = e.result
+                    const [minLng, minLat, maxLng, maxLat] = bbox || [
+                        center[0],
+                        center[1],
+                        center[0],
+                        center[1],
+                    ]
+                    const newViewport = {
+                        longitude: (minLng + maxLng) / 2,
+                        latitude: (minLat + maxLat) / 2,
+                        zoom: 14, // Default zoom
+                    }
+                    props.onViewportChange(newViewport)
+                }
+            } catch (error) {
+                console.error("Error handling geocoder result:", error)
             }
         })
     }
