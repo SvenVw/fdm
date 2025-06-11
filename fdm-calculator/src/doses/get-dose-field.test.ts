@@ -8,7 +8,6 @@ import {
     addField,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, inject, it } from "vitest"
-import type { Dose } from "./d"
 import { getDoseForField } from "./get-dose-field"
 
 describe("getDoseForField", () => {
@@ -128,14 +127,25 @@ describe("getDoseForField", () => {
             new Date(),
         )
 
-        const expectedDose: Dose = {
-            p_dose_n: 2,
-            p_dose_nw: 0,
-            p_dose_p2o5: 1,
-            p_dose_k2o: 0.5,
+        const expectedResult = {
+            dose: {
+                p_dose_n: 2,
+                p_dose_nw: 0,
+                p_dose_p2o5: 1,
+                p_dose_k2o: 0.5,
+            },
+            applications: [
+                {
+                    p_app_id: expect.any(String), // p_app_id is dynamically generated
+                    p_dose_n: 2,
+                    p_dose_nw: 0,
+                    p_dose_p2o5: 1,
+                    p_dose_k2o: 0.5,
+                },
+            ],
         }
         expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(
-            expectedDose,
+            expectedResult,
         )
     })
 
@@ -170,14 +180,17 @@ describe("getDoseForField", () => {
             "lease",
         )
 
-        const expectedDose: Dose = {
-            p_dose_n: 0,
-            p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+        const expectedResult = {
+            dose: {
+                p_dose_n: 0,
+                p_dose_nw: 0,
+                p_dose_p2o5: 0,
+                p_dose_k2o: 0,
+            },
+            applications: [],
         }
         expect(await getDoseForField({ fdm, principal_id, b_id })).toEqual(
-            expectedDose,
+            expectedResult,
         )
     })
 })
