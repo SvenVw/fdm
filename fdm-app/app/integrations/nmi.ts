@@ -153,6 +153,18 @@ export async function getNutrientAdvice(
         throw new Error("NMI API key not configured")
     }
 
+    const soilData: Record<string, number | string> = {}
+    for (const key in currentSoilData) {
+        if (currentSoilData[key].parameter === "a_nmin_cc") {
+            if (currentSoilData[key].a_depth_lower <= 30) {
+                soilData.a_nmin_cc_d30 = currentSoilData[key].value
+            } else if (currentSoilData[key].a_depth_lower <= 60) {
+                soilData.a_nmin_cc_d60 = currentSoilData[key].value
+            }
+        }
+        soilData[currentSoilData[key].parameter] = currentSoilData[key].value
+    }
+
     // Transform a_nmin_cc withy depth
     let a_nmin_cc_d30: number | undefined
     let a_nmin_cc_d60: number | undefined
@@ -168,10 +180,10 @@ export async function getNutrientAdvice(
     const body = {
         a_lon: b_centroid[0],
         a_lat: b_centroid[1],
-        b_lu_brp: [b_lu_catalogue],
+        b_lu_brp: [b_lu_catalogue.split("_")[1]],
         a_nmin_cc_d30: a_nmin_cc_d30,
         a_nmin_cc_d60: a_nmin_cc_d60,
-        ...currentSoilData,
+        ...soilData,
     }
 
     // Send request to NMI API
@@ -181,8 +193,9 @@ export async function getNutrientAdvice(
             method: "POST",
             headers: {
                 Authorization: `Bearer ${nmiApiKey}`,
+                "Content-Type": "application/json",
             },
-            body: body,
+            body: JSON.stringify(body),
         },
     )
 
@@ -191,7 +204,7 @@ export async function getNutrientAdvice(
     }
 
     const result = await responseApi.json()
-    const response = result.data
+    const response = result.data.year
 
     return response
 }
