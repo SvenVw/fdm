@@ -1,10 +1,31 @@
-import { getField } from "@svenvw/fdm-core"
-import type { LoaderFunctionArgs, MetaFunction } from "react-router"
+import {
+    getCultivation,
+    getCultivations,
+    getCurrentSoilData,
+    getField,
+} from "@svenvw/fdm-core"
+import {
+    useLoaderData,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+} from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { getNutrientAdvice } from "~/integrations/nmi"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
+import { Target } from "lucide-react"
+import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
+import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
+import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -51,8 +72,36 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const field = await getField(fdm, session.principal_id, b_id)
 
+        const currentSoilData = await getCurrentSoilData(
+            fdm,
+            session.principal_id,
+            b_id,
+        )
+
+        const cultivations = await getCultivations(
+            fdm,
+            session.principal_id,
+            b_id,
+            timeframe,
+        )
+
+        // For now take the first cultivation
+        const b_lu_catalogue = cultivations[0].b_lu_catalogue
+
+        // Request nutrient advice
+        const nutrientAdvice = await getNutrientAdvice(
+            b_lu_catalogue,
+            field.b_centroid,
+            currentSoilData,
+        )
+        // console.log(nutrientAdvice)
+
+        const nutrientsDescription = getNutrientsDescription()
+
         return {
             field: field,
+            nutrientAdvice: nutrientAdvice,
+            nutrientsDescription: nutrientsDescription,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -60,5 +109,40 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function FieldNutrientAdviceBlock() {
-    return null
+    const { nutrientAdvice, nutrientsDescription } = useLoaderData()
+
+    const primaryNutrients = nutrientsDescription.filter(
+        (item: NutrientDescription) => item.type === "primary",
+    )
+    // console.log(primaryNutrients)
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    NPK
+                </CardTitle>
+                <CardDescription>
+                    Essentiële nutriënten voor een optimale groei en
+                    ontwikkeling van gewassen
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {primaryNutrients.map((nutrient: NutrientDescription) => (
+                        // console.log(nutrientAdvice[nutrient.adviceParameter])
+                        // return (
+                        <NutrientCard
+                            key={nutrient.symbol}
+                            description={nutrient}
+                            advice={nutrientAdvice[nutrient.adviceParameter]}
+                            // applications={fertilizerApplications[nutrient.symbol as keyof typeof fertilizerApplications] || []}
+                        />
+                        // )
+                        
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    )
 }
