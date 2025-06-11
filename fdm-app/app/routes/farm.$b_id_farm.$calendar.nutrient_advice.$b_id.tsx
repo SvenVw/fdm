@@ -12,7 +12,7 @@ import {
     type MetaFunction,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -73,6 +73,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
         const field = await getField(fdm, session.principal_id, b_id)
 
@@ -94,8 +95,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
         )
 
-        const doses = calculateDose({applications: fertilizerApplications, fertilizers})
-        console.log(doses)
+        const doses = calculateDose({
+            applications: fertilizerApplications,
+            fertilizers,
+        })
 
         const cultivations = await getCultivations(
             fdm,
@@ -112,7 +115,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             field.b_centroid,
             currentSoilData,
         )
-        // console.log(nutrientAdvice)
 
         const nutrientsDescription = getNutrientsDescription()
 
@@ -123,6 +125,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             doses: doses,
             fertilizerApplications: fertilizerApplications,
             fertilizers: fertilizers,
+            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -131,11 +134,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FieldNutrientAdviceBlock() {
     const {
+        field,
         nutrientAdvice,
         nutrientsDescription,
         doses,
         fertilizerApplications,
         fertilizers,
+        calendar
     } = useLoaderData()
 
     const primaryNutrients = nutrientsDescription.filter(
@@ -157,8 +162,6 @@ export default function FieldNutrientAdviceBlock() {
             <CardContent>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {primaryNutrients.map((nutrient: NutrientDescription) => (
-                        // console.log(nutrientAdvice[nutrient.adviceParameter])
-                        // return (
                         <NutrientCard
                             key={nutrient.symbol}
                             description={nutrient}
@@ -166,9 +169,8 @@ export default function FieldNutrientAdviceBlock() {
                             doses={doses}
                             fertilizerApplications={fertilizerApplications}
                             fertilizers={fertilizers}
-                            // applications={fertilizerApplications[nutrient.symbol as keyof typeof fertilizerApplications] || []}
+                            to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                         />
-                        // )
                     ))}
                 </div>
             </CardContent>

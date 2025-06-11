@@ -143,7 +143,7 @@ export default function FarmBalanceNitrogenBlock() {
             <main>
                 <FarmTitle
                     title={"Bemestingsadvies"}
-                    description={"Bekijk je Bemestingsadvies."}
+                    description={"Advies volgens Handboek Bodem en Bemesting (CBAV) en Adviesbasis Bemesting (CBGV)."}
                 />
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">

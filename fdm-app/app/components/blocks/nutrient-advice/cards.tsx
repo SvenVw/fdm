@@ -2,6 +2,17 @@ import { useState } from "react"
 import type { NutrientDescription } from "./types"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "~/components/ui/collapsible"
+import { Button } from "~/components/ui/button"
+import { ChevronDown, ChevronUp } from "lucide-react"
+import { Separator } from "~/components/ui/separator"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
+import { NavLink } from "react-router"
 // import { Badge } from "../../ui/badge"
 
 export function NutrientCard({
@@ -10,21 +21,20 @@ export function NutrientCard({
     doses,
     fertilizerApplications,
     fertilizers,
+    to,
 }: {
     description: NutrientDescription
     advice: number
     doses: any
     fertilizerApplications: any
     fertilizers: any
+    to: string
 }) {
     const [isExpanded, setIsExpanded] = useState(false)
     //   const recommendation = getRecommendationLevel(nutrient.value, nutrient.max)
     const doseTotal = doses.dose[description.doseParameter]
-    console.log(doseTotal)
     const percentage =
         advice > 0 ? Math.min((doseTotal / advice) * 100, 100) : 0
-    console.log(description)
-    console.log(advice)
     return (
         <Card className="relative">
             <CardHeader className="pb-2">
@@ -59,35 +69,78 @@ export function NutrientCard({
                     </div>
                 )}
 
-                {/* {applications.length > 0 && applications[0].name !== "No application required" && (
-          <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between p-0 h-auto">
-                <span className="text-sm font-medium">View Applications</span>
-                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 mt-3">
-              <Separator />
-              <div className="space-y-3">
-                {applications.map((app, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-muted/50 rounded">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">{app.name}</p>
-                      <p className="text-xs text-muted-foreground">{app.timing}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-bold">
-                        {app.contribution} {nutrient.unit.split("/")[0]}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{app.amount} kg/ha</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
-        )} */}
+                {fertilizerApplications.length > 0 && (
+                    <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+                        <CollapsibleTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                className="w-full justify-between p-0 h-auto"
+                            >
+                                <span className="text-sm font-medium">
+                                    Bemestingen
+                                </span>
+                                {isExpanded ? (
+                                    <ChevronUp className="h-4 w-4" />
+                                ) : (
+                                    <ChevronDown className="h-4 w-4" />
+                                )}
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-2 mt-3">
+                            <Separator />
+                            <div className="space-y-3">
+                                {doses.applications.map((app) => {
+                                    const dose = app[description.doseParameter]
+                                    if (dose === 0) {
+                                        return null
+                                    }
+                                    const fertilizerApplication =
+                                        fertilizerApplications.find(
+                                            (x) => x.p_app_id === app.p_app_id,
+                                        )
+                                    const fertilizer = fertilizers.find(
+                                        (x) =>
+                                            x.p_id_catalogue ===
+                                            fertilizerApplication.p_id_catalogue,
+                                    )
+                                    return (
+                                        <div
+                                            key={app.p_app_id}
+                                            className="flex justify-between items-center p-2 bg-muted/50 rounded"
+                                        >
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-medium">
+                                                    <NavLink to={to}>
+                                                        {fertilizer.p_name_nl}
+                                                    </NavLink>
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {format(
+                                                        fertilizerApplication.p_app_date,
+                                                        "PP",
+                                                        { locale: nl },
+                                                    )}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm font-bold">
+                                                    {dose.toFixed(0)}{" "}
+                                                    {description.unit}
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {
+                                                        fertilizerApplication.p_app_amount
+                                                    }
+                                                    {" kg/ha"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
+                )}
             </CardContent>
         </Card>
     )
