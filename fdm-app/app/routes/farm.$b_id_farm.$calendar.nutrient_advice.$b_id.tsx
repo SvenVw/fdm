@@ -24,7 +24,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Target } from "lucide-react"
+import { Tally1, Tally2, Tally3, Target } from "lucide-react"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
@@ -140,40 +140,116 @@ export default function FieldNutrientAdviceBlock() {
         doses,
         fertilizerApplications,
         fertilizers,
-        calendar
+        calendar,
     } = useLoaderData()
 
     const primaryNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "primary",
     )
+    const secondaryNutrients = nutrientsDescription.filter(
+        (item: NutrientDescription) => item.type === "secondary",
+    )
+    const traceNutrients = nutrientsDescription.filter(
+        (item: NutrientDescription) => item.type === "trace",
+    )
     // console.log(primaryNutrients)
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    NPK
-                </CardTitle>
-                <CardDescription>
-                    Essentiële nutriënten voor een optimale groei en
-                    ontwikkeling van gewassen
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {primaryNutrients.map((nutrient: NutrientDescription) => (
-                        <NutrientCard
-                            key={nutrient.symbol}
-                            description={nutrient}
-                            advice={nutrientAdvice[nutrient.adviceParameter]}
-                            doses={doses}
-                            fertilizerApplications={fertilizerApplications}
-                            fertilizers={fertilizers}
-                            to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                        />
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 gap-12">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Tally1 className="h-5 w-5" />
+                        NPK
+                    </CardTitle>
+                    <CardDescription>
+                        Essentiële nutriënten voor een optimale groei en
+                        ontwikkeling van gewassen
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {primaryNutrients.map(
+                            (nutrient: NutrientDescription) => (
+                                <NutrientCard
+                                    key={nutrient.symbol}
+                                    description={nutrient}
+                                    advice={
+                                        nutrientAdvice[nutrient.adviceParameter]
+                                    }
+                                    doses={doses}
+                                    fertilizerApplications={
+                                        fertilizerApplications
+                                    }
+                                    fertilizers={fertilizers}
+                                    to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
+                                />
+                            ),
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Tally2 className="h-5 w-5" />
+                        Organische stof en secondaire nutriënten
+                    </CardTitle>
+                    <CardDescription>
+                        Ondersteunende nutriënten die essentieel zijn voor de
+                        gezondheid van de bodem en de ontwikkeling van planten
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {secondaryNutrients.map(
+                            (nutrient: NutrientDescription) => (
+                                <NutrientCard
+                                    key={nutrient.symbol}
+                                    description={nutrient}
+                                    advice={
+                                        nutrientAdvice[nutrient.adviceParameter]
+                                    }
+                                    doses={doses}
+                                    fertilizerApplications={
+                                        fertilizerApplications
+                                    }
+                                    fertilizers={fertilizers}
+                                    to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
+                                />
+                            ),
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Tally3 className="h-5 w-5" />
+                        Spoorelementen
+                    </CardTitle>
+                    <CardDescription>
+                        Essentiële micronutriënten voor een optimale gezondheid
+                        en ontwikkeling van planten
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {traceNutrients.map((nutrient: NutrientDescription) => (
+                            <NutrientCard
+                                key={nutrient.symbol}
+                                description={nutrient}
+                                advice={
+                                    nutrientAdvice[nutrient.adviceParameter]
+                                }
+                                doses={doses}
+                                fertilizerApplications={fertilizerApplications}
+                                fertilizers={fertilizers}
+                                to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
+                            />
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     )
 }
