@@ -36,7 +36,6 @@ export function HeaderNutrientAdvice({
                     Bemestingsadvies
                 </BreadcrumbLink>
             </BreadcrumbItem>
-            <BreadcrumbSeparator />
             {b_id ? (
                 <>
                     <BreadcrumbSeparator />
