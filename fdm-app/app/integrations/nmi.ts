@@ -1,6 +1,6 @@
 import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
-import { z } from "zod"
+import { number, z } from "zod"
 import { serverConfig } from "~/lib/config.server"
 
 export function getNmiApiKey() {
@@ -141,3 +141,57 @@ const soilParameterEstimatesSchema = z.object({
     b_gwl_class: z.string(),
     a_source: z.string(),
 })
+
+export async function getNutrientAdvice(
+    b_lu_catalogue: string,
+    b_centroid: [number, number],
+    currentSoilData: any,
+) {
+    const nmiApiKey = getNmiApiKey()
+
+    if (!nmiApiKey) {
+        throw new Error("NMI API key not configured")
+    }
+
+    // Transform a_nmin_cc withy depth
+    let a_nmin_cc_d30: number | undefined
+    let a_nmin_cc_d60: number | undefined
+    if (Object.keys(currentSoilData).includes("a_nmin_cc_")) {
+        if (currentSoilData.a_depth_lower <= 30) {
+            a_nmin_cc_d30 = currentSoilData.a_nmin_cc
+        } else if (currentSoilData.a_depth_lower <= 60) {
+            a_nmin_cc_d60 = currentSoilData.a_nmin_cc
+        }
+    }
+
+    // Create request body
+    const body = {
+        a_lon: b_centroid[0],
+        a_lat: b_centroid[1],
+        b_lu_brp: [b_lu_catalogue],
+        a_nmin_cc_d30: a_nmin_cc_d30,
+        a_nmin_cc_d60: a_nmin_cc_d60,
+        ...currentSoilData,
+    }
+
+    // Send request to NMI API
+    const responseApi = await fetch(
+        "https://api.nmi-agro.nl/bemestingsplan/nutrients",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${nmiApiKey}`,
+            },
+            body: body,
+        },
+    )
+
+    if (!responseApi.ok) {
+        throw new Error("Request to NMI API failed")
+    }
+
+    const result = await responseApi.json()
+    const response = result.data
+
+    return response
+}
