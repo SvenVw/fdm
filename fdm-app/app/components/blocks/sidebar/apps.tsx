@@ -2,6 +2,7 @@ import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
 import {
     ArrowRightLeft,
+    BookOpenText,
     GitPullRequestArrow,
     MapIcon,
     Scale,
@@ -104,7 +105,7 @@ export function SidebarApps() {
                         {nutrientAdviceLink ? (
                             <SidebarMenuButton asChild>
                                 <NavLink to={nutrientAdviceLink}>
-                                    <ArrowRightLeft />
+                                    <BookOpenText />
                                     <span>Bemestingsadvies</span>
                                 </NavLink>
                             </SidebarMenuButton>
@@ -114,7 +115,7 @@ export function SidebarApps() {
                                 className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
                             >
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
-                                    <ArrowRightLeft />
+                                    <BookOpenText />
                                     <span>Bemestingsadvies</span>
                                 </span>
                             </SidebarMenuButton>
