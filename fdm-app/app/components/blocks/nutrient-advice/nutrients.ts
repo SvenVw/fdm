@@ -6,22 +6,25 @@ export function getNutrientsDescription(): NutrientDescription[] {
             name: "Stikstof, werkzaam",
             symbol: "N",
             type: "primary",
+            unit: "kg N/ha",
             adviceParameter: "d_n_req",
-            adviceUnit: "kg N/ha",
+            doseParameter: "p_dose_nw"
         },
         {
             name: "Fosfaat",
             symbol: "P",
             type: "primary",
+            unit: "kg P2O5/ha",
             adviceParameter: "d_p_req",
-            adviceUnit: "kg P2O5/ha",
+            doseParameter: "p_dose_p2o5"
         },
         {
             name: "Kalium",
             symbol: "K",
             type: "primary",
+            unit: "kg K2O/ha",
             adviceParameter: "d_k_req",
-            adviceUnit: "kg K2O/ha",
+            doseParameter: "p_dose_k2o"
         },
     ]
     return nutrientDescription

@@ -2,6 +2,8 @@ import {
     getCultivation,
     getCultivations,
     getCurrentSoilData,
+    getFertilizerApplications,
+    getFertilizers,
     getField,
 } from "@svenvw/fdm-core"
 import {
@@ -26,6 +28,8 @@ import { Target } from "lucide-react"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
+import { calculateDose } from "@svenvw/fdm-calculator"
+import { fertilizerApplication } from "../../../fdm-core/dist/db/schema"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -78,13 +82,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id,
         )
 
+        const fertilizerApplications = await getFertilizerApplications(
+            fdm,
+            session.principal_id,
+            b_id,
+            timeframe,
+        )
+        const fertilizers = await getFertilizers(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
+        const doses = calculateDose({applications: fertilizerApplications, fertilizers})
+        console.log(doses)
+
         const cultivations = await getCultivations(
             fdm,
             session.principal_id,
             b_id,
             timeframe,
         )
-
         // For now take the first cultivation
         const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
@@ -102,6 +120,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             field: field,
             nutrientAdvice: nutrientAdvice,
             nutrientsDescription: nutrientsDescription,
+            doses: doses,
+            fertilizerApplications: fertilizerApplications,
+            fertilizers: fertilizers,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -109,7 +130,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function FieldNutrientAdviceBlock() {
-    const { nutrientAdvice, nutrientsDescription } = useLoaderData()
+    const {
+        nutrientAdvice,
+        nutrientsDescription,
+        doses,
+        fertilizerApplications,
+        fertilizers,
+    } = useLoaderData()
 
     const primaryNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "primary",
@@ -136,10 +163,12 @@ export default function FieldNutrientAdviceBlock() {
                             key={nutrient.symbol}
                             description={nutrient}
                             advice={nutrientAdvice[nutrient.adviceParameter]}
+                            doses={doses}
+                            fertilizerApplications={fertilizerApplications}
+                            fertilizers={fertilizers}
                             // applications={fertilizerApplications[nutrient.symbol as keyof typeof fertilizerApplications] || []}
                         />
                         // )
-                        
                     ))}
                 </div>
             </CardContent>

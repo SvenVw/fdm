@@ -1,23 +1,28 @@
 import { useState } from "react"
 import type { NutrientDescription } from "./types"
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Progress } from "~/components/ui/progress"
 // import { Badge } from "../../ui/badge"
 
 export function NutrientCard({
     description,
     advice,
+    doses,
+    fertilizerApplications,
+    fertilizers,
 }: {
     description: NutrientDescription
     advice: number
+    doses: any
+    fertilizerApplications: any
+    fertilizers: any
 }) {
     const [isExpanded, setIsExpanded] = useState(false)
     //   const recommendation = getRecommendationLevel(nutrient.value, nutrient.max)
-    //   const percentage = nutrient.max ? Math.min((nutrient.value / nutrient.max) * 100, 100) : 0
+    const doseTotal = doses.dose[description.doseParameter]
+    console.log(doseTotal)
+    const percentage =
+        advice > 0 ? Math.min((doseTotal / advice) * 100, 100) : 0
     console.log(description)
     console.log(advice)
     return (
@@ -41,18 +46,18 @@ export function NutrientCard({
                         {advice.toLocaleString()}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                        {description.adviceUnit}
+                        {description.unit}
                     </div>
                 </div>
-                {/* {nutrient.max && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Application Level</span>
-              <span>{percentage.toFixed(0)}%</span>
-            </div>
-            <Progress value={percentage} className="h-3" />
-          </div>
-        )} */}
+                {advice > 0 && (
+                    <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                            <span>Bemestingsniveau</span>
+                            <span>{percentage.toFixed(0)}%</span>
+                        </div>
+                        <Progress value={percentage} className="h-3" />
+                    </div>
+                )}
 
                 {/* {applications.length > 0 && applications[0].name !== "No application required" && (
           <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
