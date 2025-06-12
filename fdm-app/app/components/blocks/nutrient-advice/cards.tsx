@@ -13,6 +13,7 @@ import { Separator } from "~/components/ui/separator"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { NavLink } from "react-router"
+import { cn } from "@/app/lib/utils"
 // import { Badge } from "../../ui/badge"
 
 export function NutrientCard({
@@ -33,8 +34,7 @@ export function NutrientCard({
     const [isExpanded, setIsExpanded] = useState(false)
     //   const recommendation = getRecommendationLevel(nutrient.value, nutrient.max)
     const doseTotal = doses.dose[description.doseParameter]
-    const percentage =
-        advice > 0 ? Math.min((doseTotal / advice) * 100, 100) : 0
+    const percentage = advice > 0 ? (doseTotal / advice) * 100 : 0
     return (
         <Card className="relative">
             <CardHeader className="pb-2">
@@ -65,7 +65,14 @@ export function NutrientCard({
                             <span>Bemestingsniveau</span>
                             <span>{percentage.toFixed(0)}%</span>
                         </div>
-                        <Progress value={percentage} className="h-3" />
+                        <Progress
+                            value={percentage}
+                            className={cn(
+                                percentage > 100
+                                    ? "[&>div]:bg-orange-500  h-3"
+                                    : "h-3",
+                            )}
+                        />
                     </div>
                 )}
 
