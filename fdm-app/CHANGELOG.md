@@ -1,5 +1,15 @@
 # Changelog fdm-app
 
+## 0.19.4
+
+### Patch Changes
+
+- 59723e9: Make content parameters optional when adding a custom fertilizer
+- 3bd7ca5: Fix exception in fertilizer application form when no fertilizer is selected
+- 4c34442: Fix disabling of the update field form in the create farm wizard during submission
+- e199f76: Fix visibility of custom fertilizers in the fertilizer list
+- 3009a33: Fix exception in the update field form in the farm creation wizard
+
 ## 0.19.3
 
 ### Patch Changes
