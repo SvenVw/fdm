@@ -35,6 +35,11 @@ export function NutrientCard({
     //   const recommendation = getRecommendationLevel(nutrient.value, nutrient.max)
     const doseTotal = doses.dose[description.doseParameter]
     const percentage = advice > 0 ? (doseTotal / advice) * 100 : 0
+    const numberOfApplicationsForNutrient = doses.applications.filter(
+        (x) => x[description.doseParameter] > 0,
+    ).length
+
+    console.log(numberOfApplicationsForNutrient)
     return (
         <Card className="relative">
             <CardHeader className="pb-2">
@@ -76,7 +81,8 @@ export function NutrientCard({
                     </div>
                 )}
 
-                {fertilizerApplications.length > 0 && (
+                {fertilizerApplications.length > 0 &&
+                numberOfApplicationsForNutrient > 0 ? (
                     <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
                         <CollapsibleTrigger asChild>
                             <Button
@@ -147,6 +153,8 @@ export function NutrientCard({
                             </div>
                         </CollapsibleContent>
                     </Collapsible>
+                ) : (
+                    <p className="text-sm text-muted-foreground">{`Geen bemestingen met ${description.name.toLocaleLowerCase()}`}</p>
                 )}
             </CardContent>
         </Card>
