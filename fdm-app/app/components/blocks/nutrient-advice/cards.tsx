@@ -14,7 +14,6 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 import { NavLink } from "react-router"
 import { cn } from "@/app/lib/utils"
-// import { Badge } from "../../ui/badge"
 
 export function NutrientCard({
     description,
@@ -32,14 +31,12 @@ export function NutrientCard({
     to: string
 }) {
     const [isExpanded, setIsExpanded] = useState(false)
-    //   const recommendation = getRecommendationLevel(nutrient.value, nutrient.max)
     const doseTotal = doses.dose[description.doseParameter]
     const percentage = advice > 0 ? (doseTotal / advice) * 100 : 0
     const numberOfApplicationsForNutrient = doses.applications.filter(
         (x) => x[description.doseParameter] > 0,
     ).length
 
-    console.log(numberOfApplicationsForNutrient)
     return (
         <Card className="relative">
             <CardHeader className="pb-2">
@@ -52,7 +49,6 @@ export function NutrientCard({
                             {description.name}
                         </CardTitle>
                     </div>
-                    {/* <Badge variant={recommendation.variant}>{recommendation.level}</Badge> */}
                 </div>
             </CardHeader>
             <CardContent className="space-y-4">
