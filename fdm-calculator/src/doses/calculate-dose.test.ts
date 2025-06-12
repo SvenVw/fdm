@@ -22,8 +22,8 @@ describe("calculateDose", () => {
 
         expect(result.dose.p_dose_n).toBeCloseTo(20)
         expect(result.dose.p_dose_nw).toBeCloseTo(15)
-        expect(result.dose.p_dose_p2o5).toBeCloseTo(5)
-        expect(result.dose.p_dose_k2o).toBeCloseTo(6)
+        expect(result.dose.p_dose_p).toBeCloseTo(5)
+        expect(result.dose.p_dose_k).toBeCloseTo(6)
 
         // Expected individual application doses
         expect(result.applications).toHaveLength(2)
@@ -31,15 +31,15 @@ describe("calculateDose", () => {
             p_app_id: "app1",
             p_dose_n: 10,
             p_dose_nw: 5,
-            p_dose_p2o5: 5,
-            p_dose_k2o: 3,
+            p_dose_p: 5,
+            p_dose_k: 3,
         })
         expect(result.applications[1]).toEqual({
             p_app_id: "app2",
             p_dose_n: 10,
             p_dose_nw: 10,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 3,
+            p_dose_p: 0,
+            p_dose_k: 3,
         })
     })
 
@@ -54,8 +54,8 @@ describe("calculateDose", () => {
         expect(result.dose).toEqual({
             p_dose_n: 0,
             p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+            p_dose_p: 0,
+            p_dose_k: 0,
         })
     })
 
@@ -70,8 +70,8 @@ describe("calculateDose", () => {
         expect(result.dose).toEqual({
             p_dose_n: 0,
             p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+            p_dose_p: 0,
+            p_dose_k: 0,
         })
     })
 
@@ -111,23 +111,23 @@ describe("calculateDose", () => {
 
         expect(result.dose.p_dose_n).toBeCloseTo(10)
         expect(result.dose.p_dose_nw).toBeCloseTo(5)
-        expect(result.dose.p_dose_p2o5).toBeCloseTo(5)
-        expect(result.dose.p_dose_k2o).toBeCloseTo(3)
+        expect(result.dose.p_dose_p).toBeCloseTo(5)
+        expect(result.dose.p_dose_k).toBeCloseTo(3)
 
         expect(result.applications).toHaveLength(2)
         expect(result.applications[0]).toEqual({
             p_app_id: "app1",
             p_dose_n: 10,
             p_dose_nw: 5,
-            p_dose_p2o5: 5,
-            p_dose_k2o: 3,
+            p_dose_p: 5,
+            p_dose_k: 3,
         })
         expect(result.applications[1]).toEqual({
             p_app_id: "app2",
             p_dose_n: 0,
             p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+            p_dose_p: 0,
+            p_dose_k: 0,
         })
     })
 
@@ -140,8 +140,8 @@ describe("calculateDose", () => {
         expect(result.dose).toEqual({
             p_dose_n: 0,
             p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+            p_dose_p: 0,
+            p_dose_k: 0,
         })
         expect(result.applications).toHaveLength(0)
     })
@@ -155,16 +155,16 @@ describe("calculateDose", () => {
         expect(result.dose).toEqual({
             p_dose_n: 0,
             p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+            p_dose_p: 0,
+            p_dose_k: 0,
         })
         expect(result.applications).toHaveLength(1)
         expect(result.applications[0]).toEqual({
             p_app_id: "app1",
             p_dose_n: 0,
             p_dose_nw: 0,
-            p_dose_p2o5: 0,
-            p_dose_k2o: 0,
+            p_dose_p: 0,
+            p_dose_k: 0,
         })
     })
 })

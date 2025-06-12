@@ -16,7 +16,7 @@ export function getNutrientsDescription(): NutrientDescription[] {
             type: "primary",
             unit: "kg P2O5/ha",
             adviceParameter: "d_p_req",
-            doseParameter: "p_dose_p2o5"
+            doseParameter: "p_dose_p",
         },
         {
             name: "Kalium",
@@ -24,7 +24,7 @@ export function getNutrientsDescription(): NutrientDescription[] {
             type: "primary",
             unit: "kg K2O/ha",
             adviceParameter: "d_k_req",
-            doseParameter: "p_dose_k2o"
+            doseParameter: "p_dose_k",
         },
     ]
     return nutrientDescription

@@ -131,16 +131,16 @@ describe("getDoseForField", () => {
             dose: {
                 p_dose_n: 2,
                 p_dose_nw: 0,
-                p_dose_p2o5: 1,
-                p_dose_k2o: 0.5,
+                p_dose_p: 1,
+                p_dose_k: 0.5,
             },
             applications: [
                 {
                     p_app_id: expect.any(String), // p_app_id is dynamically generated
                     p_dose_n: 2,
                     p_dose_nw: 0,
-                    p_dose_p2o5: 1,
-                    p_dose_k2o: 0.5,
+                    p_dose_p: 1,
+                    p_dose_k: 0.5,
                 },
             ],
         }
@@ -184,8 +184,8 @@ describe("getDoseForField", () => {
             dose: {
                 p_dose_n: 0,
                 p_dose_nw: 0,
-                p_dose_p2o5: 0,
-                p_dose_k2o: 0,
+                p_dose_p: 0,
+                p_dose_k: 0,
             },
             applications: [],
         }

@@ -9,7 +9,7 @@ import type { Dose } from "./d"
  * @param applications An array of fertilizer application objects, each with a `p_id` (fertilizer ID) and `p_app_amount` (amount applied in kg/ha).
  * @param fertilizers An array of fertilizer objects, each with a `p_id` (fertilizer ID) and nutrient rates (`p_n_rt`, `p_p_rt`, `p_k_rt`) in g/kg, expected to be non-negative.
  * @returns An object containing:
- *   - `dose`: An object with the total doses in kg/ha for `p_dose_n` (nitrogen), `p_dose_nw` (workable nitrogen - adjusted by the `p_n_wc` coefficient), `p_dose_p2o5` (phosphate as P2O5), and `p_dose_k2o` (potassium as K2O).
+ *   - `dose`: An object with the total doses in kg/ha for `p_dose_n` (nitrogen), `p_dose_nw` (workable nitrogen - adjusted by the `p_n_wc` coefficient), `p_dose_p` (phosphate as P2O5), and `p_dose_k` (potassium as K2O).
  *   - `applications`: An array of individual application doses, each with `p_app_id` and the calculated doses in kg/ha.
  * @throws {Error} If any fertilizer application amount or nutrient rate is negative.
  *
@@ -30,12 +30,12 @@ import type { Dose } from "./d"
  * const result = calculateDose({ applications, fertilizers });
  * console.log(result.dose);
  * // Expected output (approximately):
- * // { p_dose_n: 20, p_dose_nw: 10, p_dose_p2o5: 5, p_dose_k2o: 6 }
+ * // { p_dose_n: 20, p_dose_nw: 10, p_dose_p: 5, p_dose_k: 6 }
  * console.log(result.applications);
  * // Expected output (approximately):
  * // [
- * //   { p_app_id: "app1", p_dose_n: 10, p_dose_nw: 5, p_dose_p2o5: 5, p_dose_k2o: 3 },
- * //   { p_app_id: "app2", p_dose_n: 10, p_dose_nw: 10, p_dose_p2o5: 0, p_dose_k2o: 3 }
+ * //   { p_app_id: "app1", p_dose_n: 10, p_dose_nw: 5, p_dose_p: 5, p_dose_k: 3 },
+ * //   { p_app_id: "app2", p_dose_n: 10, p_dose_nw: 10, p_dose_p: 0, p_dose_k: 3 }
  * // ]
  * ```
  */
@@ -72,8 +72,8 @@ export function calculateDose({
                 p_app_id: application.p_app_id,
                 p_dose_n: 0,
                 p_dose_nw: 0,
-                p_dose_p2o5: 0,
-                p_dose_k2o: 0,
+                p_dose_p: 0,
+                p_dose_k: 0,
             }
         }
 
@@ -88,19 +88,19 @@ export function calculateDose({
             (fertilizer.p_n_wc ?? 1)
 
         // Calculate phosphate dose
-        const p_dose_p2o5 =
+        const p_dose_p =
             application.p_app_amount * ((fertilizer.p_p_rt ?? 0) / 1000) // Convert from g P2O5/ kg to kg P2O5 / kg
 
         // Calculate potassium dose
-        const p_dose_k2o =
+        const p_dose_k =
             application.p_app_amount * ((fertilizer.p_k_rt ?? 0) / 1000) // Convert from g K2O/ kg to kg K2O / kg
 
         return {
             p_app_id: application.p_app_id,
             p_dose_n: p_dose_n,
             p_dose_nw: p_dose_nw,
-            p_dose_p2o5: p_dose_p2o5,
-            p_dose_k2o: p_dose_k2o,
+            p_dose_p: p_dose_p,
+            p_dose_k: p_dose_k,
         }
     })
 
@@ -110,11 +110,11 @@ export function calculateDose({
             return {
                 p_dose_n: acc.p_dose_n + curr.p_dose_n,
                 p_dose_nw: acc.p_dose_nw + curr.p_dose_nw,
-                p_dose_p2o5: acc.p_dose_p2o5 + curr.p_dose_p2o5,
-                p_dose_k2o: acc.p_dose_k2o + curr.p_dose_k2o,
+                p_dose_p: acc.p_dose_p + curr.p_dose_p,
+                p_dose_k: acc.p_dose_k + curr.p_dose_k,
             }
         },
-        { p_dose_n: 0, p_dose_nw: 0, p_dose_p2o5: 0, p_dose_k2o: 0 },
+        { p_dose_n: 0, p_dose_nw: 0, p_dose_p: 0, p_dose_k: 0 },
     )
 
     return {
