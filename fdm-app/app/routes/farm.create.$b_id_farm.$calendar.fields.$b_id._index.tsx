@@ -77,7 +77,7 @@ const FormSchema = z.object({
         }),
     b_area: z.coerce.number({
         required_error: "Oppervlakte van perceel is verplicht",
-    }),
+    }).optional(),
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
@@ -306,19 +306,28 @@ export default function Index() {
                                                     </FormItem>
                                                 )}
                                             />
-                                            <div className="col-span-2 items-center gap-4">
-                                                <Combobox
-                                                    options={
-                                                        loaderData.cultivationOptions
-                                                    }
-                                                    form={form}
-                                                    name={"b_lu_catalogue"}
-                                                    label={"Hoofdgewas"}
-                                                    defaultValue={
-                                                        loaderData.b_lu_catalogue
-                                                    }
-                                                />
-                                            </div>
+                                            <FormField
+                                                control={form.control}
+                                                name="b_lu_catalogue"
+                                                render={({ field }) => (
+                                                    <FormItem className="col-span-2 items-center gap-4">
+                                                        <Combobox
+                                                            options={
+                                                                loaderData.cultivationOptions
+                                                            }
+                                                            form={form}
+                                                            name={"b_lu_catalogue"}
+                                                            label={"Hoofdgewas"}
+                                                            defaultValue={
+                                                                loaderData.b_lu_catalogue
+                                                            }
+                                                        />
+                                                        <Input type="hidden" {...field} />
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
                                     </CardContent>
                                     <CardFooter>
