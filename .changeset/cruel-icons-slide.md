@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-At add custom fertilizer make the various content parameters optional
+Make content parameters optional when adding a custom fertilizer

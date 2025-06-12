@@ -303,8 +303,7 @@ export default function Index() {
                                                         <FormControl>
                                                             <Input
                                                                 {...field}
-                                                                type="text"
-                                                                required
+                                                                type="text"                                                            
                                                             />
                                                         </FormControl>
                                                         <FormDescription />

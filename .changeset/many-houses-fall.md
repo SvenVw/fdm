@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Fix that custom fertilizer becomes visible in the list of fertilizers
+Fix visibility of custom fertilizers in the fertilizer list

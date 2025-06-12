@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Fix that at update field form in create farm wizard during form submitting the form is disabled
+Fix disabling of the update field form in the create farm wizard during submission
