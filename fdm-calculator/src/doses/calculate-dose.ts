@@ -2,41 +2,36 @@ import type { FertilizerApplication, Fertilizer } from "@svenvw/fdm-core"
 import type { Dose } from "./d"
 
 /**
- * Calculates the cumulative doses of nitrogen, phosphate (as P2O5), and potassium (as K2O) applied to a field.
+ * Calculates the cumulative nutrient doses from a series of fertilizer applications.
  *
- * This function iterates over each fertilizer application to determine its contribution to the overall nutrient dose by matching it with a corresponding fertilizer. For each application, it calculates the nutrient dose by multiplying the application amount by the fertilizer's nutrient rate and then sums all doses into a total dose object.
+ * This function processes an array of fertilizer applications, matching each with its corresponding fertilizer definition to calculate the dose of each nutrient. The nutrient rates are converted from grams or milligrams per kilogram to kilograms per kilogram and then multiplied by the application amount to determine the dose in kg/ha.
  *
- * @param applications An array of fertilizer application objects, each with a `p_id` (fertilizer ID) and `p_app_amount` (amount applied in kg/ha).
- * @param fertilizers An array of fertilizer objects, each with a `p_id` (fertilizer ID) and nutrient rates (`p_n_rt`, `p_p_rt`, `p_k_rt`) in g/kg, expected to be non-negative.
+ * @param applications An array of fertilizer application objects, each specifying the fertilizer `p_id` and the applied amount `p_app_amount` in kg/ha.
+ * @param fertilizers An array of fertilizer objects, providing the nutrient rates for each fertilizer. Nutrient rates are expected to be non-negative.
  * @returns An object containing:
- *   - `dose`: An object with the total doses in kg/ha for `p_dose_n` (nitrogen), `p_dose_nw` (workable nitrogen - adjusted by the `p_n_wc` coefficient), `p_dose_p` (phosphate as P2O5), and `p_dose_k` (potassium as K2O).
- *   - `applications`: An array of individual application doses, each with `p_app_id` and the calculated doses in kg/ha.
- * @throws {Error} If any fertilizer application amount or nutrient rate is negative.
+ *   - `dose`: An object with the total cumulative doses for all nutrients in kg/ha.
+ *   - `applications`: An array of objects, each detailing the individual nutrient doses for each fertilizer application.
+ * @throws {Error} If any application amount or nutrient rate is negative, ensuring data integrity.
  *
  * @example
  * ```typescript
  * import { calculateDose } from "./calculate-dose";
  *
  * const applications = [
- *   { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 }, // 100 kg/ha
- *   { p_app_id: "app2", p_id: "fert2", p_app_amount: 50 },  // 50 kg/ha
+ *   { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
+ *   { p_app_id: "app2", p_id: "fert2", p_app_amount: 50 },
  * ];
  *
  * const fertilizers = [
- *   { p_id: "fert1", p_n_rt: 100, p_p_rt: 50, p_k_rt: 30, p_n_wc: 0.5 }, // 100 g N/kg, 50 g P2O5/kg, 30 g K2O/kg
- *   { p_id: "fert2", p_n_rt: 200, p_p_rt: 0, p_k_rt: 60, p_n_wc: 1.0 },  // 200 g N/kg, 0 g P2O5/kg, 60 g K2O/kg
+ *   { p_id: "fert1", p_n_rt: 100, p_p_rt: 50, p_k_rt: 30, p_n_wc: 0.5, p_s_rt: 20, p_mg_rt: 10 },
+ *   { p_id: "fert2", p_n_rt: 200, p_p_rt: 0, p_k_rt: 60, p_n_wc: 1.0, p_cu_rt: 5, p_zn_rt: 3 },
  * ];
  *
  * const result = calculateDose({ applications, fertilizers });
  * console.log(result.dose);
- * // Expected output (approximately):
- * // { p_dose_n: 20, p_dose_nw: 10, p_dose_p: 5, p_dose_k: 6 }
+ * // Expected output: { p_dose_n: 20, p_dose_nw: 15, p_dose_p: 5, p_dose_k: 6, p_dose_s: 2, p_dose_mg: 1, ... }
  * console.log(result.applications);
- * // Expected output (approximately):
- * // [
- * //   { p_app_id: "app1", p_dose_n: 10, p_dose_nw: 5, p_dose_p: 5, p_dose_k: 3 },
- * //   { p_app_id: "app2", p_dose_n: 10, p_dose_nw: 10, p_dose_p: 0, p_dose_k: 3 }
- * // ]
+ * // Expected output: [ { p_app_id: "app1", p_dose_n: 10, ... }, { p_app_id: "app2", p_dose_n: 10, ... } ]
  * ```
  */
 export function calculateDose({
@@ -46,79 +41,95 @@ export function calculateDose({
     applications: FertilizerApplication[]
     fertilizers: Fertilizer[]
 }): { dose: Dose; applications: Dose[] } {
-    // Validate non-negative values
     if (applications.some((app) => app.p_app_amount < 0)) {
         throw new Error("Application amounts must be non-negative")
     }
+
+    const nutrientRates = [
+        "p_n_rt",
+        "p_p_rt",
+        "p_k_rt",
+        "p_eoc",
+        "p_s_rt",
+        "p_mg_rt",
+        "p_ca_rt",
+        "p_na_rt",
+        "p_cu_rt",
+        "p_zn_rt",
+        "p_co_rt",
+        "p_mn_rt",
+        "p_mo_rt",
+        "p_b_rt",
+    ]
     if (
-        fertilizers.some(
-            (fert) =>
-                (fert.p_n_rt && fert.p_n_rt < 0) ||
-                (fert.p_p_rt && fert.p_p_rt < 0) ||
-                (fert.p_k_rt && fert.p_k_rt < 0),
+        fertilizers.some((fert) =>
+            nutrientRates.some((rate) => (fert[rate] ? fert[rate] < 0 : false)),
         )
     ) {
         throw new Error("Nutrient rates must be non-negative")
     }
 
-    const doses = applications.map((application) => {
-        const fertilizer = fertilizers.find(
-            (fertilizer) => fertilizer.p_id === application.p_id,
-        )
+    const initialDose: Dose = {
+        p_dose_n: 0,
+        p_dose_nw: 0,
+        p_dose_p: 0,
+        p_dose_k: 0,
+        p_dose_eoc: 0,
+        p_dose_s: 0,
+        p_dose_mg: 0,
+        p_dose_ca: 0,
+        p_dose_na: 0,
+        p_dose_cu: 0,
+        p_dose_zn: 0,
+        p_dose_co: 0,
+        p_dose_mn: 0,
+        p_dose_mo: 0,
+        p_dose_b: 0,
+    }
 
-        // Check if fertilizer exists before accessing properties
-        if (!fertilizer) {
-            return {
-                p_app_id: application.p_app_id,
-                p_dose_n: 0,
-                p_dose_nw: 0,
-                p_dose_p: 0,
-                p_dose_k: 0,
-            }
+    const totalDose = { ...initialDose }
+    const applicationDoses: Dose[] = []
+
+    for (const application of applications) {
+        const fertilizer = fertilizers.find((f) => f.p_id === application.p_id)
+        const currentDose = { ...initialDose, p_app_id: application.p_app_id }
+
+        if (fertilizer) {
+            const amount = application.p_app_amount
+            currentDose.p_dose_n = amount * ((fertilizer.p_n_rt ?? 0) / 1000)
+            currentDose.p_dose_nw =
+                currentDose.p_dose_n * (fertilizer.p_n_wc ?? 1)
+            currentDose.p_dose_p = amount * ((fertilizer.p_p_rt ?? 0) / 1000)
+            currentDose.p_dose_k = amount * ((fertilizer.p_k_rt ?? 0) / 1000)
+            currentDose.p_dose_eoc = amount * ((fertilizer.p_eoc ?? 0) / 1000)
+            currentDose.p_dose_s = amount * ((fertilizer.p_s_rt ?? 0) / 1000)
+            currentDose.p_dose_mg = amount * ((fertilizer.p_mg_rt ?? 0) / 1000)
+            currentDose.p_dose_ca = amount * ((fertilizer.p_ca_rt ?? 0) / 1000)
+            currentDose.p_dose_na =
+                amount * ((fertilizer.p_na_rt ?? 0) / 1000000)
+            currentDose.p_dose_cu =
+                amount * ((fertilizer.p_cu_rt ?? 0) / 1000000)
+            currentDose.p_dose_zn =
+                amount * ((fertilizer.p_zn_rt ?? 0) / 1000000)
+            currentDose.p_dose_co =
+                amount * ((fertilizer.p_co_rt ?? 0) / 1000000)
+            currentDose.p_dose_mn =
+                amount * ((fertilizer.p_mn_rt ?? 0) / 1000000)
+            currentDose.p_dose_mo =
+                amount * ((fertilizer.p_mo_rt ?? 0) / 1000000)
+            currentDose.p_dose_b = amount * ((fertilizer.p_b_rt ?? 0) / 1000000)
         }
 
-        // Calculate total nitrogen dose
-        const p_dose_n =
-            application.p_app_amount * ((fertilizer.p_n_rt ?? 0) / 1000) // Convert from g N / kg to kg N / kg
-
-        // Calculate workable nitrogen dose
-        const p_dose_nw =
-            application.p_app_amount *
-            ((fertilizer.p_n_rt ?? 0) / 1000) * // Convert from g N / kg to kg N / kg
-            (fertilizer.p_n_wc ?? 1)
-
-        // Calculate phosphate dose
-        const p_dose_p =
-            application.p_app_amount * ((fertilizer.p_p_rt ?? 0) / 1000) // Convert from g P2O5/ kg to kg P2O5 / kg
-
-        // Calculate potassium dose
-        const p_dose_k =
-            application.p_app_amount * ((fertilizer.p_k_rt ?? 0) / 1000) // Convert from g K2O/ kg to kg K2O / kg
-
-        return {
-            p_app_id: application.p_app_id,
-            p_dose_n: p_dose_n,
-            p_dose_nw: p_dose_nw,
-            p_dose_p: p_dose_p,
-            p_dose_k: p_dose_k,
-        }
-    })
-
-    // Reduce the doses from the applications into a single dose
-    const totalDose = doses.reduce(
-        (acc, curr) => {
-            return {
-                p_dose_n: acc.p_dose_n + curr.p_dose_n,
-                p_dose_nw: acc.p_dose_nw + curr.p_dose_nw,
-                p_dose_p: acc.p_dose_p + curr.p_dose_p,
-                p_dose_k: acc.p_dose_k + curr.p_dose_k,
+        applicationDoses.push(currentDose)
+        for (const key of Object.keys(totalDose) as (keyof Dose)[]) {
+            if (key !== "p_app_id") {
+                totalDose[key] += currentDose[key]
             }
-        },
-        { p_dose_n: 0, p_dose_nw: 0, p_dose_p: 0, p_dose_k: 0 },
-    )
+        }
+    }
 
     return {
         dose: totalDose,
-        applications: doses,
+        applications: applicationDoses,
     }
 }
