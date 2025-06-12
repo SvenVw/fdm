@@ -75,9 +75,11 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van perceel moet minimaal 3 karakters bevatten",
         }),
-    b_area: z.coerce.number({
-        required_error: "Oppervlakte van perceel is verplicht",
-    }).optional(),
+    b_area: z.coerce
+        .number({
+            required_error: "Oppervlakte van perceel is verplicht",
+        })
+        .optional(),
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
@@ -257,7 +259,11 @@ export default function Index() {
             <div className="grid grid-cols-4 gap-6">
                 <div className="col-span-2">
                     <RemixFormProvider {...form}>
-                        <Form id="formField" method="post">
+                        <Form
+                            id="formField"
+                            method="POST"
+                            onSubmit={form.handleSubmit}
+                        >
                             <fieldset disabled={form.formState.isSubmitting}>
                                 <Card>
                                     <CardHeader>
@@ -316,13 +322,18 @@ export default function Index() {
                                                                 loaderData.cultivationOptions
                                                             }
                                                             form={form}
-                                                            name={"b_lu_catalogue"}
+                                                            name={
+                                                                "b_lu_catalogue"
+                                                            }
                                                             label={"Hoofdgewas"}
                                                             defaultValue={
                                                                 loaderData.b_lu_catalogue
                                                             }
                                                         />
-                                                        <Input type="hidden" {...field} />
+                                                        <Input
+                                                            type="hidden"
+                                                            {...field}
+                                                        />
                                                         <FormDescription />
                                                         <FormMessage />
                                                     </FormItem>
