@@ -24,12 +24,16 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Tally1, Tally2, Tally3, Target } from "lucide-react"
+import { Tally1, Tally2, Tally3 } from "lucide-react"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
 import { calculateDose } from "@svenvw/fdm-calculator"
-import { fertilizerApplication } from "../../../fdm-core/dist/db/schema"
+import {
+    NutrientKPICardForNutrientDeficit,
+    NutrientKPICardForNutrientExcess,
+    NutrientKPICardForTotalApplications,
+} from "~/components/blocks/nutrient-advice/kpi"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -188,6 +192,25 @@ export default function FieldNutrientAdviceBlock() {
                     </div>
                 </CardContent>
             </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <NutrientKPICardForTotalApplications
+                    doses={doses}
+                    fertilizerApplications={fertilizerApplications}
+                />
+
+                  <NutrientKPICardForNutrientDeficit
+                    descriptions={nutrientsDescription}
+                    advices={nutrientAdvice}
+                    doses={doses}
+                />
+
+                <NutrientKPICardForNutrientExcess
+                    descriptions={nutrientsDescription}
+                    advices={nutrientAdvice}
+                    doses={doses}
+                />
+            </div>
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
