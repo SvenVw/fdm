@@ -1,10 +1,7 @@
 import { useState } from "react"
 import type { NutrientDescription } from "./types"
 import type { Dose } from "@svenvw/fdm-calculator"
-import type {
-    Fertilizer,
-    FertilizerApplication,
-} from "@svenvw/fdm-core"
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import {
     Card,
     CardContent,
@@ -60,11 +57,11 @@ export function NutrientCard({
     to,
 }: NutrientCardProps) {
     const [isExpanded, setIsExpanded] = useState(false)
-    const doseTotal = doses.dose[description.doseParameter]
+    const doseTotal =
+        (doses.dose[description.doseParameter] as number | undefined) ?? 0
     const percentage = advice > 0 ? (doseTotal / advice) * 100 : 0
     const numberOfApplicationsForNutrient = doses.applications.filter(
-        (x) =>
-            (x[description.doseParameter as keyof Dose] as number) > 0,
+        (x) => (x[description.doseParameter as keyof Dose] as number) > 0,
     ).length
 
     return (
@@ -195,7 +192,7 @@ export function NutrientCard({
             {description.symbol === "N" || description.symbol === "P" ? (
                 <CardFooter>
                     <p className="text-xs text-muted-foreground">
-                        <span className="flex gap-2 items-center">                        
+                        <span className="flex gap-2 items-center">
                             <TriangleAlert className="h-4 w-4" />
                             Advies kan hoger zijn dan gebruiksnorm
                         </span>
