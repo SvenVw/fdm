@@ -1,7 +1,7 @@
-import { CurrentSoilData } from "@svenvw/fdm-core"
+import type { CurrentSoilData } from "@svenvw/fdm-core"
 import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
-import { number, z } from "zod"
+import { z } from "zod"
 import { serverConfig } from "~/lib/config.server"
 
 export function getNmiApiKey() {
@@ -154,16 +154,18 @@ export async function getNutrientAdvice(
         throw new Error("NMI API key not configured")
     }
 
+    let a_nmin_cc_d30: number | undefined
+    let a_nmin_cc_d60: number | undefined
     const soilData: Record<string, number | string> = {}
-    for (const key in currentSoilData) {
-        if (currentSoilData[key].parameter === "a_nmin_cc") {
-            if (currentSoilData[key].a_depth_lower <= 30) {
-                soilData.a_nmin_cc_d30 = currentSoilData[key].value
-            } else if (currentSoilData[key].a_depth_lower <= 60) {
-                soilData.a_nmin_cc_d60 = currentSoilData[key].value
+    for (const item of currentSoilData) {
+        if (item.parameter === "a_nmin_cc") {
+            if (item.a_depth_lower <= 30) {
+                a_nmin_cc_d30 = item.value
+            } else if (item.a_depth_lower <= 60) {
+                a_nmin_cc_d60 = item.value
             }
         }
-        soilData[currentSoilData[key].parameter] = currentSoilData[key].value
+        soilData[item.parameter] = item.value
     }
 
     // Create request body
