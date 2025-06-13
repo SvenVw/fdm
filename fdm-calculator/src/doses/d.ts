@@ -19,6 +19,7 @@
  * @property p_dose_b - The dose of boron (B) in kg/ha.
  */
 export interface Dose {
+    [key: string]: string | number | undefined
     p_app_id?: string
     p_dose_n: number
     p_dose_nw: number

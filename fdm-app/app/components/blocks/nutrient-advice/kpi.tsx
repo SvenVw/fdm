@@ -2,14 +2,30 @@ import { ArrowDownToLine, Gauge, Leaf, Sprout } from "lucide-react"
 import { Card, CardContent, CardFooter } from "~/components/ui/card"
 import type { NutrientDescription } from "./types"
 import { Badge } from "~/components/ui/badge"
+import type { Dose } from "@svenvw/fdm-calculator"
+import type { FertilizerApplication } from "@svenvw/fdm-core"
 
+/**
+ * Props for the NutrientKPICardForTotalApplications component.
+ * @param doses - The applied doses of the nutrient.
+ * @param fertilizerApplications - The list of fertilizer applications.
+ */
+export type NutrientKPICardForTotalApplicationsProps = {
+    doses: {
+        dose: Record<string, number>
+        applications: Dose[]
+    }
+    fertilizerApplications: FertilizerApplication[]
+}
+
+/**
+ * A card that displays the total number of fertilizer applications.
+ * @param props - The props for the component.
+ */
 export function NutrientKPICardForTotalApplications({
     doses,
     fertilizerApplications,
-}: {
-    doses: any
-    fertilizerApplications: any
-}) {
+}: NutrientKPICardForTotalApplicationsProps) {
     const numberOfFertilizerApplications = fertilizerApplications.length
     const numberOfNutrientsApplied = Object.values(doses.dose).filter(
         (value) => value > 0,
@@ -42,15 +58,30 @@ export function NutrientKPICardForTotalApplications({
     )
 }
 
+/**
+ * Props for the NutrientKPICardForNutrientDeficit component.
+ * @param descriptions - The descriptions of the nutrients.
+ * @param advices - The recommended amounts of the nutrients.
+ * @param doses - The applied doses of the nutrients.
+ */
+export type NutrientKPICardForNutrientDeficitProps = {
+    descriptions: NutrientDescription[]
+    advices: Record<string, number>
+    doses: {
+        dose: Record<string, number>
+        applications: Dose[]
+    }
+}
+
+/**
+ * A card that displays the nutrients that are in deficit.
+ * @param props - The props for the component.
+ */
 export function NutrientKPICardForNutrientDeficit({
     descriptions,
     advices,
     doses,
-}: {
-    descriptions: NutrientDescription[]
-    advices: any
-    doses: any
-}) {
+}: NutrientKPICardForNutrientDeficitProps) {
     const deficitThreshold = 90
 
     const deficitNutrients = descriptions
@@ -68,7 +99,6 @@ export function NutrientKPICardForNutrientDeficit({
             return null
         })
         .filter((x) => x !== null)
-    // excessNutrients = []
 
     return (
         <Card
@@ -128,15 +158,30 @@ export function NutrientKPICardForNutrientDeficit({
     )
 }
 
+/**
+ * Props for the NutrientKPICardForNutrientExcess component.
+ * @param descriptions - The descriptions of the nutrients.
+ * @param advices - The recommended amounts of the nutrients.
+ * @param doses - The applied doses of the nutrients.
+ */
+export type NutrientKPICardForNutrientExcessProps = {
+    descriptions: NutrientDescription[]
+    advices: Record<string, number>
+    doses: {
+        dose: Record<string, number>
+        applications: Dose[]
+    }
+}
+
+/**
+ * A card that displays the nutrients that are in excess.
+ * @param props - The props for the component.
+ */
 export function NutrientKPICardForNutrientExcess({
     descriptions,
     advices,
     doses,
-}: {
-    descriptions: NutrientDescription[]
-    advices: any
-    doses: any
-}) {
+}: NutrientKPICardForNutrientExcessProps) {
     const excessThreshold = 105
 
     const excessNutrients = descriptions
@@ -154,7 +199,6 @@ export function NutrientKPICardForNutrientExcess({
             return null
         })
         .filter((x) => x !== null && x !== "EOC")
-    // excessNutrients = []
 
     return (
         <Card

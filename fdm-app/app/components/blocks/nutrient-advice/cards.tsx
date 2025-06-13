@@ -1,5 +1,10 @@
 import { useState } from "react"
 import type { NutrientDescription } from "./types"
+import type { Dose } from "@svenvw/fdm-calculator"
+import type {
+    Fertilizer,
+    FertilizerApplication,
+} from "@svenvw/fdm-core"
 import {
     Card,
     CardContent,
@@ -21,6 +26,31 @@ import { nl } from "date-fns/locale"
 import { NavLink } from "react-router"
 import { cn } from "@/app/lib/utils"
 
+/**
+ * Props for the NutrientCard component.
+ * @param description - The description of the nutrient.
+ * @param advice - The recommended amount of the nutrient.
+ * @param doses - The applied doses of the nutrient.
+ * @param fertilizerApplications - The list of fertilizer applications.
+ * @param fertilizers - The list of fertilizers.
+ * @param to - The link to the fertilizer application page.
+ */
+export type NutrientCardProps = {
+    description: NutrientDescription
+    advice: number
+    doses: {
+        dose: Record<string, number>
+        applications: Dose[]
+    }
+    fertilizerApplications: FertilizerApplication[]
+    fertilizers: Fertilizer[]
+    to: string
+}
+
+/**
+ * A card that displays the advice and application of a single nutrient.
+ * @param props - The props for the component.
+ */
 export function NutrientCard({
     description,
     advice,
@@ -28,19 +58,13 @@ export function NutrientCard({
     fertilizerApplications,
     fertilizers,
     to,
-}: {
-    description: NutrientDescription
-    advice: number
-    doses: any
-    fertilizerApplications: any
-    fertilizers: any
-    to: string
-}) {
+}: NutrientCardProps) {
     const [isExpanded, setIsExpanded] = useState(false)
     const doseTotal = doses.dose[description.doseParameter]
     const percentage = advice > 0 ? (doseTotal / advice) * 100 : 0
     const numberOfApplicationsForNutrient = doses.applications.filter(
-        (x) => x[description.doseParameter] > 0,
+        (x) =>
+            (x[description.doseParameter as keyof Dose] as number) > 0,
     ).length
 
     return (
@@ -107,7 +131,9 @@ export function NutrientCard({
                             <Separator />
                             <div className="space-y-3">
                                 {doses.applications.map((app) => {
-                                    const dose = app[description.doseParameter]
+                                    const dose = app[
+                                        description.doseParameter as keyof Dose
+                                    ] as number
                                     if (dose === 0) {
                                         return null
                                     }
@@ -118,8 +144,13 @@ export function NutrientCard({
                                     const fertilizer = fertilizers.find(
                                         (x) =>
                                             x.p_id_catalogue ===
-                                            fertilizerApplication.p_id_catalogue,
+                                            fertilizerApplication?.p_id_catalogue,
                                     )
+
+                                    if (!fertilizerApplication || !fertilizer) {
+                                        return null
+                                    }
+
                                     return (
                                         <div
                                             key={app.p_app_id}
@@ -133,7 +164,7 @@ export function NutrientCard({
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {format(
-                                                        fertilizerApplication.p_app_date,
+                                                        fertilizerApplication?.p_app_date,
                                                         "PP",
                                                         { locale: nl },
                                                     )}
@@ -146,7 +177,7 @@ export function NutrientCard({
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {
-                                                        fertilizerApplication.p_app_amount
+                                                        fertilizerApplication?.p_app_amount
                                                     }
                                                     {" kg/ha"}
                                                 </p>
