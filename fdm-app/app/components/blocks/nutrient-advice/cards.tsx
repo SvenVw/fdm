@@ -1,6 +1,12 @@
 import { useState } from "react"
 import type { NutrientDescription } from "./types"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
 import {
     Collapsible,
@@ -8,7 +14,7 @@ import {
     CollapsibleTrigger,
 } from "~/components/ui/collapsible"
 import { Button } from "~/components/ui/button"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp, TriangleAlert } from "lucide-react"
 import { Separator } from "~/components/ui/separator"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
@@ -155,6 +161,16 @@ export function NutrientCard({
                     <p className="text-sm text-muted-foreground">{`Geen bemestingen met ${description.name.toLocaleLowerCase()}`}</p>
                 )}
             </CardContent>
+            {description.symbol === "N" || description.symbol === "P" ? (
+                <CardFooter>
+                    <p className="text-xs text-muted-foreground">
+                        <span className="flex gap-2 items-center">                        
+                            <TriangleAlert className="h-4 w-4" />
+                            Advies kan hoger zijn dan gebruiksnorm
+                        </span>
+                    </p>
+                </CardFooter>
+            ) : null}
         </Card>
     )
 }
