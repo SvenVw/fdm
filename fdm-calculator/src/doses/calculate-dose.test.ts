@@ -129,17 +129,14 @@ describe("calculateDose", () => {
         )
     })
 
-    it("should handle missing fertilizers by returning zero doses", () => {
+    it("should throw an error for missing fertilizers", () => {
         const applications = [
             { p_app_id: "app1", p_id: "fert_missing", p_app_amount: 100 },
         ]
         const fertilizers = [{ p_id: "fert1" }]
-        const { dose, applications: appDoses } = calculateDose({
-            applications,
-            fertilizers,
-        })
-        expect(dose).toEqual(initialDose)
-        expect(appDoses[0]).toEqual({ ...initialDose, p_app_id: "app1" })
+        expect(() => calculateDose({ applications, fertilizers })).toThrow(
+            "Fertilizer fert_missing not found for application app1",
+        )
     })
 
     it("should handle empty applications array", () => {
@@ -151,15 +148,15 @@ describe("calculateDose", () => {
         expect(applications).toHaveLength(0)
     })
 
-    it("should handle empty fertilizers array", () => {
+    it("should throw an error for empty fertilizers array", () => {
         const applications = [
             { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
         ]
-        const { dose, applications: appDoses } = calculateDose({
-            applications,
-            fertilizers: [],
-        })
-        expect(dose).toEqual(initialDose)
-        expect(appDoses[0]).toEqual({ ...initialDose, p_app_id: "app1" })
+        expect(() =>
+            calculateDose({
+                applications,
+                fertilizers: [],
+            }),
+        ).toThrow("Fertilizer fert1 not found for application app1")
     })
 })
