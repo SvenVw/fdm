@@ -166,17 +166,6 @@ export async function getNutrientAdvice(
         soilData[currentSoilData[key].parameter] = currentSoilData[key].value
     }
 
-    // Transform a_nmin_cc withy depth
-    let a_nmin_cc_d30: number | undefined
-    let a_nmin_cc_d60: number | undefined
-    if (Object.keys(currentSoilData).includes("a_nmin_cc_")) {
-        if (currentSoilData.a_depth_lower <= 30) {
-            a_nmin_cc_d30 = currentSoilData.a_nmin_cc
-        } else if (currentSoilData.a_depth_lower <= 60) {
-            a_nmin_cc_d60 = currentSoilData.a_nmin_cc
-        }
-    }
-
     // Create request body
     const body = {
         a_lon: b_centroid[0],
