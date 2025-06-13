@@ -90,8 +90,13 @@ export function calculateDose({
     const totalDose = { ...initialDose }
     const applicationDoses: Dose[] = []
 
-    for (const application of applications) {
+    for (const application of applications) {       
         const fertilizer = fertilizers.find((f) => f.p_id === application.p_id)
+        if (!fertilizer) {
+            throw new Error(
+                `Fertilizer ${application.p_id} not found for application ${application.p_app_id}`,
+            )
+        }
         const currentDose = { ...initialDose, p_app_id: application.p_app_id }
 
         if (fertilizer) {
