@@ -1,3 +1,4 @@
+import { CurrentSoilData } from "@svenvw/fdm-core"
 import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
 import { number, z } from "zod"
@@ -145,7 +146,7 @@ const soilParameterEstimatesSchema = z.object({
 export async function getNutrientAdvice(
     b_lu_catalogue: string,
     b_centroid: [number, number],
-    currentSoilData: any,
+    currentSoilData: CurrentSoilData,
 ) {
     const nmiApiKey = getNmiApiKey()
 
