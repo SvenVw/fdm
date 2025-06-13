@@ -56,10 +56,7 @@ export function HeaderNutrientAdvice({
                                         key={option.b_id}
                                     >
                                         <NavLink
-                                            to={currentPath.replace(
-                                                `/nutrient_advice/${b_id}`,
-                                                `/nutrient_advice/${option.b_id}`,
-                                            )}
+                                            to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${option.b_id}`}
                                         >
                                             {option.b_name}
                                         </NavLink>
