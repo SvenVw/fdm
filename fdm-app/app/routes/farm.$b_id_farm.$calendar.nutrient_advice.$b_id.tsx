@@ -112,6 +112,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id,
             timeframe,
         )
+        if (!cultivations.length) {
+            throw handleLoaderError("missing: cultivations")
+        }
         // For now take the first cultivation
         const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
@@ -210,7 +213,7 @@ export default function FieldNutrientAdviceBlock() {
                     fertilizerApplications={fertilizerApplications}
                 />
 
-                  <NutrientKPICardForNutrientDeficit
+                <NutrientKPICardForNutrientDeficit
                     descriptions={nutrientsDescription}
                     advices={nutrientAdvice}
                     doses={doses}
