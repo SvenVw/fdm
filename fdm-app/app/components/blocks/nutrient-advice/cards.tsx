@@ -69,9 +69,11 @@ export function NutrientCard({
                         <Progress
                             value={percentage}
                             className={cn(
-                                percentage > 100
-                                    ? "[&>div]:bg-orange-500  h-3"
-                                    : "h-3",
+                                percentage > 100 && description.symbol === "EOC"
+                                    ? "[&>div]:bg-green-500 h-3"
+                                    : percentage > 100
+                                      ? "[&>div]:bg-orange-500  h-3"
+                                      : "h-3",
                             )}
                         />
                     </div>
