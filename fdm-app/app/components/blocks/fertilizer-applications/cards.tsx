@@ -115,7 +115,7 @@ function constructCards(dose: Dose) {
         {
             title: "Fosfaat, totaal",
             shortname: "P2O5",
-            value: dose.p_dose_p2o5,
+            value: dose.p_dose_p,
             unit: "kg/ha",
             limit: undefined,
             advice: undefined,
@@ -123,7 +123,7 @@ function constructCards(dose: Dose) {
         {
             title: "Kalium, totaal",
             shortname: "K2O",
-            value: dose.p_dose_k2o,
+            value: dose.p_dose_k,
             unit: "kg/ha",
             limit: undefined,
             advice: undefined,

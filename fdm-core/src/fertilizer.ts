@@ -124,7 +124,7 @@ export async function addFertilizerToCatalogue(
         p_co_rt: schema.fertilizersCatalogueTypeInsert["p_co_rt"]
         p_as_rt: schema.fertilizersCatalogueTypeInsert["p_as_rt"]
         p_cd_rt: schema.fertilizersCatalogueTypeInsert["p_cd_rt"]
-        pr_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
+        p_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
         p_cr_vi: schema.fertilizersCatalogueTypeInsert["p_cr_vi"]
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]

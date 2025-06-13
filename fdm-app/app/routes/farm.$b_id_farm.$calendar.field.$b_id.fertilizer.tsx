@@ -119,7 +119,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             field: field,
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
-            dose: dose,
+            dose: dose.dose,
         }
     } catch (error) {
         throw handleLoaderError(error)
