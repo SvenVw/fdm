@@ -160,11 +160,13 @@ export function NutrientCard({
                                                     </NavLink>
                                                 </p>
                                                 <p className="text-xs text-muted-foreground">
-                                                    {format(
-                                                        fertilizerApplication?.p_app_date,
-                                                        "PP",
-                                                        { locale: nl },
-                                                    )}
+                                                    {fertilizerApplication?.p_app_date
+                                                        ? format(
+                                                              fertilizerApplication?.p_app_date,
+                                                              "PP",
+                                                              { locale: nl },
+                                                          )
+                                                        : null}
                                                 </p>
                                             </div>
                                             <div className="text-right">
