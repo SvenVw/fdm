@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.19.5
+
+### Patch Changes
+
+- a3ede17: Redirect all subdomains, except .dev, to original hostname
+
 ## 0.19.4
 
 ### Patch Changes
