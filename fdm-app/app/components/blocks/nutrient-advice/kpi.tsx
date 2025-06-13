@@ -4,6 +4,8 @@ import type { NutrientDescription } from "./types"
 import { Badge } from "~/components/ui/badge"
 import type { Dose } from "@svenvw/fdm-calculator"
 import type { FertilizerApplication } from "@svenvw/fdm-core"
+import { useNavigation } from "react-router"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 
 /**
  * Props for the NutrientKPICardForTotalApplications component.
@@ -26,6 +28,7 @@ export function NutrientKPICardForTotalApplications({
     doses,
     fertilizerApplications,
 }: NutrientKPICardForTotalApplicationsProps) {
+    const navigation = useNavigation()
     const numberOfFertilizerApplications = fertilizerApplications.length
     const numberOfNutrientsApplied = Object.values(doses.dose).filter(
         (value) => value > 0,
@@ -41,13 +44,19 @@ export function NutrientKPICardForTotalApplications({
                             </span>
                         </div>
                         <p className="text-2xl font-bold">
-                            {numberOfFertilizerApplications}
+                            {navigation.state !== "loading" ? (
+                                numberOfFertilizerApplications
+                            ) : (
+                                <LoadingSpinner />
+                            )}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                            {numberOfNutrientsApplied === 1
-                                ? `Voor ${numberOfNutrientsApplied} nutriënt`
-                                : `Voor ${numberOfNutrientsApplied} nutriënten`}
-                        </p>
+                        {navigation.state !== "loading" ? (
+                            <p className="text-xs text-muted-foreground">
+                                {numberOfNutrientsApplied === 1
+                                    ? `Voor ${numberOfNutrientsApplied} nutriënt`
+                                    : `Voor ${numberOfNutrientsApplied} nutriënten`}
+                            </p>
+                        ) : null}
                     </div>
                     <div className="p-3 bg-primary/10 rounded-full">
                         <ArrowDownToLine className="h-6 w-6 text-primary" />
@@ -82,6 +91,7 @@ export function NutrientKPICardForNutrientDeficit({
     advices,
     doses,
 }: NutrientKPICardForNutrientDeficitProps) {
+    const navigation = useNavigation()
     const deficitThreshold = 90
 
     const deficitNutrients = descriptions
@@ -103,9 +113,11 @@ export function NutrientKPICardForNutrientDeficit({
     return (
         <Card
             className={
-                deficitNutrients.length > 0
-                    ? "border-l-4 border-l-red-500"
-                    : "border-l-4 border-l-green-500"
+                navigation.state === "loading"
+                    ? "border-l-4 border-l-black"
+                    : deficitNutrients.length > 0
+                      ? "border-l-4 border-l-red-500"
+                      : "border-l-4 border-l-green-500"
             }
         >
             <CardContent className="p-4">
@@ -118,32 +130,42 @@ export function NutrientKPICardForNutrientDeficit({
                             </span>
                         </div>
                         <p className="text-2xl font-bold">
-                            {deficitNutrients.length}
+                            {navigation.state !== "loading" ? (
+                                deficitNutrients.length
+                            ) : (
+                                <LoadingSpinner />
+                            )}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-1">
-                            {deficitNutrients.map((symbol) => (
-                                <Badge
-                                    key={symbol}
-                                    variant="outline"
-                                    className="text-xs"
-                                >
-                                    {symbol}
-                                </Badge>
-                            ))}
+                            {navigation.state !== "loading"
+                                ? deficitNutrients.map((symbol) => (
+                                      <Badge
+                                          key={symbol}
+                                          variant="outline"
+                                          className="text-xs"
+                                      >
+                                          {symbol}
+                                      </Badge>
+                                  ))
+                                : null}
                         </div>
                     </div>
                     <div
                         className={
-                            deficitNutrients.length > 0
-                                ? "p-3 bg-red-500/10 rounded-full"
-                                : "p-3 bg-green-500/10 rounded-full"
+                            navigation.state === "loading"
+                                ? "p-3 bg-black/10 rounded-full"
+                                : deficitNutrients.length > 0
+                                  ? "p-3 bg-red-500/10 rounded-full"
+                                  : "p-3 bg-green-500/10 rounded-full"
                         }
                     >
                         <Sprout
                             className={
-                                deficitNutrients.length > 0
-                                    ? "h-6 w-6 text-red-500"
-                                    : "h-6 w-6 text-green-500"
+                                navigation.state === "loading"
+                                    ? "h-6 w-6 text-black"
+                                    : deficitNutrients.length > 0
+                                      ? "h-6 w-6 text-red-500"
+                                      : "h-6 w-6 text-green-500"
                             }
                         />
                     </div>
@@ -182,6 +204,7 @@ export function NutrientKPICardForNutrientExcess({
     advices,
     doses,
 }: NutrientKPICardForNutrientExcessProps) {
+    const navigation = useNavigation()
     const excessThreshold = 105
 
     const excessNutrients = descriptions
@@ -203,9 +226,11 @@ export function NutrientKPICardForNutrientExcess({
     return (
         <Card
             className={
-                excessNutrients.length > 0
-                    ? "border-l-4 border-l-orange-500"
-                    : "border-l-4 border-l-green-500"
+                navigation.state === "loading"
+                    ? "border-l-4 border-l-black"
+                    : excessNutrients.length > 0
+                      ? "border-l-4 border-l-orange-500"
+                      : "border-l-4 border-l-green-500"
             }
         >
             <CardContent className="p-4">
@@ -218,18 +243,24 @@ export function NutrientKPICardForNutrientExcess({
                             </span>
                         </div>
                         <p className="text-2xl font-bold">
-                            {excessNutrients.length}
+                            {navigation.state !== "loading" ? (
+                                excessNutrients.length
+                            ) : (
+                                <LoadingSpinner />
+                            )}
                         </p>
                         <div className="flex flex-wrap gap-1 mt-1">
-                            {excessNutrients.map((symbol) => (
-                                <Badge
-                                    key={symbol}
-                                    variant="outline"
-                                    className="text-xs"
-                                >
-                                    {symbol}
-                                </Badge>
-                            ))}
+                            {navigation.state !== "loading"
+                                ? excessNutrients.map((symbol) => (
+                                      <Badge
+                                          key={symbol}
+                                          variant="outline"
+                                          className="text-xs"
+                                      >
+                                          {symbol}
+                                      </Badge>
+                                  ))
+                                : null}
                         </div>
                     </div>
                     <div
@@ -241,9 +272,11 @@ export function NutrientKPICardForNutrientExcess({
                     >
                         <Leaf
                             className={
-                                excessNutrients.length > 0
-                                    ? "h-6 w-6 text-orange-500"
-                                    : "h-6 w-6 text-green-500"
+                                navigation.state === "loading"
+                                    ? "h-6 w-6 text-black"
+                                    : excessNutrients.length > 0
+                                      ? "h-6 w-6 text-red-500"
+                                      : "h-6 w-6 text-green-500"
                             }
                         />
                     </div>

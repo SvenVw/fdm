@@ -8,6 +8,7 @@ import {
 } from "@svenvw/fdm-core"
 import {
     useLoaderData,
+    useNavigation,
     type LoaderFunctionArgs,
     type MetaFunction,
 } from "react-router"
@@ -28,6 +29,7 @@ import { Tally1, Tally2, Tally3 } from "lucide-react"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     NutrientKPICardForNutrientDeficit,
@@ -146,6 +148,7 @@ export default function FieldNutrientAdviceBlock() {
         fertilizers,
         calendar,
     } = useLoaderData()
+    const navigation = useNavigation()
 
     const primaryNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "primary",
@@ -171,25 +174,33 @@ export default function FieldNutrientAdviceBlock() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {primaryNutrients.map(
-                            (nutrient: NutrientDescription) => (
-                                <NutrientCard
-                                    key={nutrient.symbol}
-                                    description={nutrient}
-                                    advice={
-                                        nutrientAdvice[nutrient.adviceParameter]
-                                    }
-                                    doses={doses}
-                                    fertilizerApplications={
-                                        fertilizerApplications
-                                    }
-                                    fertilizers={fertilizers}
-                                    to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                                />
-                            ),
-                        )}
-                    </div>
+                    {navigation.state === "loading" ? (
+                        <div className="flex justify-center items-center h-48">
+                            <LoadingSpinner className="h-16 w-16" />
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {primaryNutrients.map(
+                                (nutrient: NutrientDescription) => (
+                                    <NutrientCard
+                                        key={nutrient.symbol}
+                                        description={nutrient}
+                                        advice={
+                                            nutrientAdvice[
+                                                nutrient.adviceParameter
+                                            ]
+                                        }
+                                        doses={doses}
+                                        fertilizerApplications={
+                                            fertilizerApplications
+                                        }
+                                        fertilizers={fertilizers}
+                                        to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
+                                    />
+                                ),
+                            )}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 
@@ -223,25 +234,33 @@ export default function FieldNutrientAdviceBlock() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {secondaryNutrients.map(
-                            (nutrient: NutrientDescription) => (
-                                <NutrientCard
-                                    key={nutrient.symbol}
-                                    description={nutrient}
-                                    advice={
-                                        nutrientAdvice[nutrient.adviceParameter]
-                                    }
-                                    doses={doses}
-                                    fertilizerApplications={
-                                        fertilizerApplications
-                                    }
-                                    fertilizers={fertilizers}
-                                    to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                                />
-                            ),
-                        )}
-                    </div>
+                    {navigation.state === "loading" ? (
+                        <div className="flex justify-center items-center h-48">
+                            <LoadingSpinner className="h-16 w-16" />
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {secondaryNutrients.map(
+                                (nutrient: NutrientDescription) => (
+                                    <NutrientCard
+                                        key={nutrient.symbol}
+                                        description={nutrient}
+                                        advice={
+                                            nutrientAdvice[
+                                                nutrient.adviceParameter
+                                            ]
+                                        }
+                                        doses={doses}
+                                        fertilizerApplications={
+                                            fertilizerApplications
+                                        }
+                                        fertilizers={fertilizers}
+                                        to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
+                                    />
+                                ),
+                            )}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
             <Card>
@@ -256,21 +275,33 @@ export default function FieldNutrientAdviceBlock() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {traceNutrients.map((nutrient: NutrientDescription) => (
-                            <NutrientCard
-                                key={nutrient.symbol}
-                                description={nutrient}
-                                advice={
-                                    nutrientAdvice[nutrient.adviceParameter]
-                                }
-                                doses={doses}
-                                fertilizerApplications={fertilizerApplications}
-                                fertilizers={fertilizers}
-                                to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                            />
-                        ))}
-                    </div>
+                    {navigation.state === "loading" ? (
+                        <div className="flex justify-center items-center h-48">
+                            <LoadingSpinner className="h-16 w-16" />
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {traceNutrients.map(
+                                (nutrient: NutrientDescription) => (
+                                    <NutrientCard
+                                        key={nutrient.symbol}
+                                        description={nutrient}
+                                        advice={
+                                            nutrientAdvice[
+                                                nutrient.adviceParameter
+                                            ]
+                                        }
+                                        doses={doses}
+                                        fertilizerApplications={
+                                            fertilizerApplications
+                                        }
+                                        fertilizers={fertilizers}
+                                        to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
+                                    />
+                                ),
+                            )}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>
