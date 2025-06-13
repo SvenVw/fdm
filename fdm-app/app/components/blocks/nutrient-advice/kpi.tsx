@@ -221,6 +221,7 @@ export function NutrientKPICardForNutrientExcess({
             }
             return null
         })
+        // EOC (Effective Organic Carbon) is excluded from excess calculations as higher values are generally beneficial
         .filter((x) => x !== null && x !== "EOC")
 
     return (
