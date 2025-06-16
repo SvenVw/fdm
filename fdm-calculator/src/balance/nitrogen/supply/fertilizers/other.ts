@@ -30,16 +30,13 @@ export function calculateNitrogenSupplyByOtherFertilizers(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
             )
         }
-        const p_type_manure = fertilizerDetail.p_type_manure
-        const p_type_mineral = fertilizerDetail.p_type_mineral
-        const p_type_compost = fertilizerDetail.p_type_compost
         const p_n_rt = new Decimal(fertilizerDetail.p_n_rt)
 
         // If the fertilizer used is not of the type other fertilizers
         if (
-            p_type_manure === true ||
-            p_type_mineral === true ||
-            p_type_compost === true
+            fertilizerDetail.p_type === "manure" ||
+            fertilizerDetail.p_type === "mineral" ||
+            fertilizerDetail.p_type === "compost"
         ) {
             return {
                 id: application.p_app_id,

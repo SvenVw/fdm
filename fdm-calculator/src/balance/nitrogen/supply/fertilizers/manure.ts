@@ -36,11 +36,10 @@ export function calculateNitrogenSupplyByManure(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
             )
         }
-        const p_type_manure = fertilizerDetail.p_type_manure
         const p_n_rt = new Decimal(fertilizerDetail.p_n_rt)
 
         // If the fertilizer used is not of the type manure
-        if (p_type_manure === false) {
+        if (fertilizerDetail.p_type !== "manure") {
             return {
                 id: application.p_app_id,
                 value: new Decimal(0),
