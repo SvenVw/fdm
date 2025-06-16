@@ -54,7 +54,7 @@ export function getNutrientsDescription(): NutrientDescription[] {
             name: "Calcium",
             symbol: "Ca",
             type: "secondary",
-            unit: "kg Ca/ha",
+            unit: "kg CaO/ha",
             adviceParameter: "d_ca_req",
             doseParameter: "p_dose_ca",
         },
