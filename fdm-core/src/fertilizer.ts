@@ -1188,7 +1188,11 @@ export function getFertilizerParametersDescription(
             type: "enum",
             category: "general",
             description: "Type meststof",
-            options: ["manure", "mineral", "compost"],
+            options: [
+                { value: "manure", label: "Dierlijke mest" },
+                { value: "mineral", label: "Kunstmest" },
+                { value: "compost", label: "Compost" },
+            ],
         },
     ]
 
