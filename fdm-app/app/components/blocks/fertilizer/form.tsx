@@ -8,7 +8,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { Textarea } from "~/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
     FormField,
@@ -22,11 +21,12 @@ import { RemixFormProvider, type useRemixForm } from "remix-hook-form"
 import { Form } from "react-router"
 import { Button } from "~/components/ui/button"
 import type { FertilizerParameters } from "@svenvw/fdm-core"
+import { Checkbox } from "~/components/ui/checkbox"
 
 export interface FertilizerParameterDescriptionItem {
     parameter: FertilizerParameters
     unit: string
-    type: "numeric" | "enum" | "date" | "text"
+    type: "numeric" | "enum" | "date" | "text" | "enum_multi"
     name: string
     description: string
     category:
@@ -38,7 +38,7 @@ export interface FertilizerParameterDescriptionItem {
         | "physical"
     min?: number
     max?: number
-    options?: unknown
+    options?: { label: string; value: string }[]
 }
 
 export type FertilizerParameterDescription =
@@ -130,6 +130,72 @@ export function FertilizerForm({
                                         })}
                                     </SelectContent>
                                 </Select>
+                            ) : param.type === "enum_multi" ? (
+                                <div className="space-y-2">
+                                    {param.options?.map((option) => (
+                                        <FormField
+                                            key={option.value}
+                                            control={form.control}
+                                            name={
+                                                param.parameter as FormSchemaKeys
+                                            }
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem
+                                                        key={option.value}
+                                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={
+                                                                    Array.isArray(
+                                                                        field.value,
+                                                                    ) &&
+                                                                    field.value.includes(
+                                                                        option.value,
+                                                                    )
+                                                                }
+                                                                onCheckedChange={(
+                                                                    checked,
+                                                                ) => {
+                                                                    const currentValues =
+                                                                        Array.isArray(
+                                                                            field.value,
+                                                                        )
+                                                                            ? field.value
+                                                                            : []
+                                                                    if (
+                                                                        checked
+                                                                    ) {
+                                                                        field.onChange(
+                                                                            [
+                                                                                ...currentValues,
+                                                                                option.value,
+                                                                            ],
+                                                                        )
+                                                                    } else {
+                                                                        field.onChange(
+                                                                            currentValues.filter(
+                                                                                (
+                                                                                    value,
+                                                                                ) =>
+                                                                                    value !==
+                                                                                    option.value,
+                                                                            ),
+                                                                        )
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal">
+                                                            {option.label}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             ) : null}
                         </FormControl>
                         {param.description && (
@@ -181,7 +247,7 @@ export function FertilizerForm({
                                                 </div>
                                             ),
                                         )}
-                                    </div>                                   
+                                    </div>
                                 </CardContent>
                             </Card>
                         ))}

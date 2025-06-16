@@ -230,4 +230,11 @@ export const FormSchema = z.object({
     p_pb_rt: z.coerce.number().optional(),
     p_hg_rt: z.coerce.number().optional(),
     p_cl_rt: z.coerce.number().optional(),
+    p_app_method_options: z
+        .array(z.string(), {
+            required_error: "Selecteer minimaal 1 methode",
+        })
+        .refine((value) => value.some((item) => item), {
+            message: "Selecteer minimaal 1 methode",
+        }),
 })
