@@ -133,9 +133,7 @@ export async function addFertilizerToCatalogue(
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
-        p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
-        p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
-        p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
+        p_type: "manure" | "mineral" | "compost" | null
     },
 ): Promise<schema.fertilizersCatalogueTypeSelect["p_id_catalogue"]> {
     try {
@@ -154,6 +152,9 @@ export async function addFertilizerToCatalogue(
             p_id_catalogue: p_id_catalogue,
             p_source: b_id_farm,
             hash: null,
+            p_type_manure: properties.p_type === "manure",
+            p_type_mineral: properties.p_type === "mineral",
+            p_type_compost: properties.p_type === "compost",
         }
         input.hash = await hashFertilizer(input)
 
@@ -335,7 +336,24 @@ export async function getFertilizer(
             .where(eq(schema.fertilizers.p_id, p_id))
             .limit(1)
 
-        return fertilizer[0]
+        const result = fertilizer[0]
+        if (!result) {
+            throw new Error("Fertilizer not found")
+        }
+
+        let p_type: "manure" | "mineral" | "compost" | null = null
+        if (result.p_type_manure) {
+            p_type = "manure"
+        } else if (result.p_type_mineral) {
+            p_type = "mineral"
+        } else if (result.p_type_compost) {
+            p_type = "compost"
+        }
+
+        return {
+            ...result,
+            p_type,
+        }
     } catch (err) {
         throw handleError(err, "Exception for getFertilizer", {
             p_id,
@@ -404,9 +422,7 @@ export async function updateFertilizerFromCatalogue(
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
-        p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
-        p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
-        p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
+        p_type: "manure" | "mineral" | "compost" | null
     }>,
 ): Promise<void> {
     try {
@@ -434,10 +450,14 @@ export async function updateFertilizerFromCatalogue(
         if (existingFertilizer.length === 0) {
             throw new Error("Fertilizer does not exist in catalogue")
         }
-        const updatedProperties = {
+
+        const updatedProperties: schema.fertilizersCatalogueTypeInsert = {
             ...existingFertilizer[0],
             ...properties,
             hash: null,
+            p_type_manure: properties.p_type === "manure",
+            p_type_mineral: properties.p_type === "mineral",
+            p_type_compost: properties.p_type === "compost",
         }
         updatedProperties.hash = await hashFertilizer(updatedProperties)
 
@@ -565,7 +585,20 @@ export async function getFertilizers(
             .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
             .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
-        return fertilizers
+        return fertilizers.map((f: any) => {
+            let p_type: "manure" | "mineral" | "compost" | null = null
+            if (f.p_type_manure) {
+                p_type = "manure"
+            } else if (f.p_type_mineral) {
+                p_type = "mineral"
+            } else if (f.p_type_compost) {
+                p_type = "compost"
+            }
+            return {
+                ...f,
+                p_type,
+            }
+        })
     } catch (err) {
         throw handleError(err, "Exception for getFertilizers", {
             b_id_farm,
@@ -1119,44 +1152,23 @@ export function getFertilizerParametersDescription(
             max: 1000000,
         },
         {
-            parameter: "p_co_rt",
-            unit: "mg Co/kg",
-            name: "Co",
+            parameter: "p_cl_rt",
+            unit: "g Cl/kg",
+            name: "Cl",
             type: "numeric",
-            category: "trace",
-            description: "Koper",
+            category: "heavy_metals",
+            description: "Chloor",
             min: 0,
             max: 1000000,
         },
         {
-            parameter: "p_mn_rt",
-            unit: "mg Mn/kg",
-            name: "Mn",
-            type: "numeric",
-            category: "trace",
-            description: "Mangaan",
-            min: 0,
-            max: 1000000,
-        },
-        {
-            parameter: "p_mo_rt",
-            unit: "mg Mn/kg",
-            name: "Mo",
-            type: "numeric",
-            category: "trace",
-            description: "Molybdeen",
-            min: 0,
-            max: 1000000,
-        },
-        {
-            parameter: "p_b_rt",
-            unit: "mg B/kg",
-            name: "B",
-            type: "numeric",
-            category: "trace",
-            description: "boor",
-            min: 0,
-            max: 1000000,
+            parameter: "p_type",
+            unit: "",
+            name: "Type",
+            type: "enum",
+            category: "general",
+            description: "Type meststof",
+            options: ["manure", "mineral", "compost"],
         },
     ]
 

@@ -126,9 +126,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
 
@@ -201,9 +199,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
 
@@ -276,9 +272,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
 
@@ -364,9 +358,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
 
@@ -460,9 +452,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
         })
@@ -674,9 +664,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
             const updatedProperties = {
@@ -788,9 +776,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
 
