@@ -49,11 +49,13 @@ type FormSchemaKeys = keyof z.infer<typeof FormSchema>
 type FertilizerFormNewProps = {
     fertilizerParameters: FertilizerParameterDescription
     form: ReturnType<typeof useRemixForm<z.infer<typeof FormSchema>>>
+    editable?: boolean
 }
 
 export function FertilizerForm({
     fertilizerParameters,
     form,
+    editable = true,
 }: FertilizerFormNewProps) {
     const categories = [
         {
@@ -231,7 +233,9 @@ export function FertilizerForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
+                <fieldset
+                    disabled={form.formState.isSubmitting || !editable}
+                >
                     <div className="space-y-6">
                         {categories.map((category) => (
                             <Card key={category.name}>
@@ -252,17 +256,19 @@ export function FertilizerForm({
                             </Card>
                         ))}
                     </div>
-                    <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={form.formState.isSubmitting}
-                        >
-                            {form.formState.isSubmitting
-                                ? "Meststof toevoegen..."
-                                : "Meststof toevoegen"}
-                        </Button>
-                    </div>
+                    {editable && (
+                        <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={form.formState.isSubmitting}
+                            >
+                                {form.formState.isSubmitting
+                                    ? "Meststof opslaan..."
+                                    : "Meststof opslaan"}
+                            </Button>
+                        </div>
+                    )}
                 </fieldset>
             </Form>
         </RemixFormProvider>
