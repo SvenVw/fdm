@@ -129,6 +129,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             p_pb_rt: undefined,
             p_hg_rt: undefined,
             p_cl_rt: undefined,
+            p_app_method_options: undefined,
         }
 
         // Get the available fertilizers
@@ -214,6 +215,7 @@ export default function FarmFertilizerBlock() {
             p_pb_rt: fertilizer.p_pb_rt,
             p_hg_rt: fertilizer.p_hg_rt,
             p_cl_rt: fertilizer.p_cl_rt,
+            p_app_method_options: fertilizer.p_app_method_options,
         },
     })
 
@@ -261,6 +263,7 @@ export default function FarmFertilizerBlock() {
             p_pb_rt: fertilizer.p_pb_rt,
             p_hg_rt: fertilizer.p_hg_rt,
             p_cl_rt: fertilizer.p_cl_rt,
+            p_app_method_options: fertilizer.p_app_method_options,
         })
     }, [fertilizer, form.reset])
 
@@ -364,6 +367,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 p_pb_rt: formValues.p_pb_rt,
                 p_hg_rt: formValues.p_hg_rt,
                 p_cl_rt: formValues.p_cl_rt,
+                p_app_method_options: formValues.p_app_method_options,
             },
         )
 
