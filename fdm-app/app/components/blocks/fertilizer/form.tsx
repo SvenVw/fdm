@@ -1,16 +1,15 @@
 import type { z } from "zod"
 import type { FormSchema } from "~/components/blocks/fertilizer/formschema"
 import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { Textarea } from "~/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
+import { Textarea } from "~/components/ui/textarea"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
     FormField,
     FormItem,
@@ -19,21 +18,13 @@ import {
     FormDescription,
     FormMessage,
 } from "~/components/ui/form"
-import { cn } from "~/lib/utils"
-import { RemixFormProvider } from "remix-hook-form"
+import { RemixFormProvider, type useRemixForm } from "remix-hook-form"
 import { Form } from "react-router"
-import { Button } from "../../ui/button"
-
-// Define types directly to avoid import issues
-export type FertilizerParameters = keyof z.infer<typeof FormSchema>
+import { Button } from "~/components/ui/button"
+import type { FertilizerParameters } from "@svenvw/fdm-core"
 
 export interface FertilizerParameterDescriptionItem {
-    parameter:
-        | Exclude<
-              FertilizerParameters,
-              "p_type_manure" | "p_type_mineral" | "p_type_compost"
-          >
-        | "p_type" // Add p_type back for description purposes
+    parameter: FertilizerParameters
     unit: string
     type: "numeric" | "enum" | "date" | "text"
     name: string
@@ -57,7 +48,7 @@ type FormSchemaKeys = keyof z.infer<typeof FormSchema>
 
 type FertilizerFormNewProps = {
     fertilizerParameters: FertilizerParameterDescription
-    form: any
+    form: ReturnType<typeof useRemixForm<z.infer<typeof FormSchema>>>
 }
 
 export function FertilizerForm({
@@ -68,31 +59,34 @@ export function FertilizerForm({
         {
             name: "general",
             title: "Algemeen",
-            description: "Algemene informatie over de meststof.",
         },
-        {
-            name: "physical",
-            title: "Fysieke eigenschappen",
-            description: "Fysieke eigenschappen van de meststof.",
-        },
+
         {
             name: "primary",
             title: "Primaire nutriënten",
-            description: "Belangrijkste nutriënten (N, P, K).",
         },
         {
             name: "secondary",
-            title: "Secundaire nutriënten",
-            description: "Secundaire nutriënten (S, Mg, Ca, Na).",
+            title: "OS & Secundaire nutriënten",
+        },
+        {
+            name: "physical",
+            title: "Fysische eigenschappen",
         },
         {
             name: "trace",
             title: "Sporenelementen",
-            description: "Sporenelementen (Cu, Zn, Co, etc.).",
         },
     ]
 
     const getParameterInput = (param: FertilizerParameterDescriptionItem) => {
+        if (
+            param.parameter === "p_source" ||
+            param.parameter === "p_id_catalogue"
+        ) {
+            return null
+        }
+
         return (
             <FormField
                 control={form.control}
@@ -103,9 +97,8 @@ export function FertilizerForm({
                             {param.name} {param.unit && `(${param.unit})`}
                         </FormLabel>
                         <FormControl>
-                            {param.parameter === "p_description" ? (
-                                <Textarea {...field} />
-                            ) : (
+                            {param.type === "numeric" ||
+                            param.type === "text" ? (
                                 <Input
                                     type={
                                         param.type === "numeric"
@@ -114,7 +107,30 @@ export function FertilizerForm({
                                     }
                                     {...field}
                                 />
-                            )}
+                            ) : param.type === "enum" ? (
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={String(field.value)}
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecteer een type" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {param.options?.map((option) => {
+                                            return (
+                                                <SelectItem
+                                                    key={option.value}
+                                                    value={option.value}
+                                                >
+                                                    {option.label}
+                                                </SelectItem>
+                                            )
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                            ) : null}
                         </FormControl>
                         {param.description && (
                             <FormDescription>
@@ -133,14 +149,6 @@ export function FertilizerForm({
             acc: Record<string, FertilizerParameterDescription[number][]>,
             param: FertilizerParameterDescription[number],
         ) => {
-            // Exclude p_id_catalogue and p_source as they are not user editable
-            if (
-                param.parameter === "p_id_catalogue" ||
-                param.parameter === "p_source" ||
-                param.parameter === "p_app_method_options"
-            ) {
-                return acc
-            }
             if (!acc[param.category]) {
                 acc[param.category] = []
             }
@@ -166,109 +174,14 @@ export function FertilizerForm({
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                        {groupedParameters[category.name]
-                                            ?.filter(
-                                                (param) =>
-                                                    param.parameter !==
-                                                        "p_id_catalogue" &&
-                                                    param.parameter !==
-                                                        "p_source" &&
-                                                    param.parameter !==
-                                                        "p_app_method_options",
-                                            )
-                                            .map((param) => (
+                                        {groupedParameters[category.name]?.map(
+                                            (param) => (
                                                 <div key={param.parameter}>
                                                     {getParameterInput(param)}
                                                 </div>
-                                            ))}
-                                    </div>
-                                    {category.name === "general" && (
-                                        <FormField
-                                            control={form.control}
-                                            name="p_type_manure" // Use one of the boolean fields for validation
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-2 mb-6">
-                                                    <FormLabel>
-                                                        Type meststof
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <RadioGroup
-                                                            onValueChange={(
-                                                                value: string,
-                                                            ) => {
-                                                                form.setValue(
-                                                                    "p_type_manure",
-                                                                    value ===
-                                                                        "manure",
-                                                                )
-                                                                form.setValue(
-                                                                    "p_type_mineral",
-                                                                    value ===
-                                                                        "mineral",
-                                                                )
-                                                                form.setValue(
-                                                                    "p_type_compost",
-                                                                    value ===
-                                                                        "compost",
-                                                                )
-                                                            }}
-                                                            defaultValue={
-                                                                form.getValues(
-                                                                    "p_type_manure",
-                                                                )
-                                                                    ? "manure"
-                                                                    : form.getValues(
-                                                                            "p_type_mineral",
-                                                                        )
-                                                                      ? "mineral"
-                                                                      : form.getValues(
-                                                                              "p_type_compost",
-                                                                          )
-                                                                        ? "compost"
-                                                                        : ""
-                                                            }
-                                                        >
-                                                            <FormItem className="flex items-center space-x-2">
-                                                                <FormControl>
-                                                                    <RadioGroupItem
-                                                                        value="manure"
-                                                                        id="manure"
-                                                                    />
-                                                                </FormControl>
-                                                                <FormLabel>
-                                                                    Dierlijke
-                                                                    mest
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                            <FormItem className="flex items-center space-x-2">
-                                                                <FormControl>
-                                                                    <RadioGroupItem
-                                                                        value="compost"
-                                                                        id="compost"
-                                                                    />
-                                                                </FormControl>
-                                                                <FormLabel>
-                                                                    Compost
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                            <FormItem className="flex items-center space-x-2">
-                                                                <FormControl>
-                                                                    <RadioGroupItem
-                                                                        value="mineral"
-                                                                        id="mineral"
-                                                                    />
-                                                                </FormControl>
-                                                                <FormLabel>
-                                                                    Kunstmest
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                        </RadioGroup>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    )}
+                                            ),
+                                        )}
+                                    </div>                                   
                                 </CardContent>
                             </Card>
                         ))}

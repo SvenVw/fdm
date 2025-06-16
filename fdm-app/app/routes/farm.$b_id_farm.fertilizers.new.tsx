@@ -88,9 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             p_id: undefined, // Added p_id
             p_source: b_id_farm,
             p_name_nl: undefined,
-            p_type_manure: undefined,
-            p_type_mineral: undefined,
-            p_type_compost: undefined,
+            p_type: undefined,
             p_dm: undefined,
             p_density: undefined,
             p_om: undefined,
@@ -175,9 +173,7 @@ export default function FarmFertilizerBlock() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             p_name_nl: fertilizer.p_name_nl,
-            p_type_manure: fertilizer.p_type_manure,
-            p_type_mineral: fertilizer.p_type_mineral,
-            p_type_compost: fertilizer.p_type_compost,
+            p_type: fertilizer.p_type,
             p_dm: fertilizer.p_dm,
             p_density: fertilizer.p_density,
             p_om: fertilizer.p_om,
@@ -224,9 +220,7 @@ export default function FarmFertilizerBlock() {
     useEffect(() => {
         form.reset({
             p_name_nl: fertilizer.p_name_nl,
-            p_type_manure: fertilizer.p_type_manure,
-            p_type_mineral: fertilizer.p_type_mineral,
-            p_type_compost: fertilizer.p_type_compost,
+            p_type: fertilizer.p_type,
             p_dm: fertilizer.p_dm,
             p_density: fertilizer.p_density,
             p_om: fertilizer.p_om,
@@ -329,9 +323,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 p_name_nl: formValues.p_name_nl,
                 p_name_en: formValues.p_name_en,
                 p_description: formValues.p_description,
-                p_type_manure: formValues.p_type_manure,
-                p_type_mineral: formValues.p_type_mineral,
-                p_type_compost: formValues.p_type_compost,
+                p_type: formValues.p_type,
                 p_dm: formValues.p_dm,
                 p_density: formValues.p_density,
                 p_om: formValues.p_om,
@@ -367,7 +359,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 p_co_rt: formValues.p_co_rt,
                 p_as_rt: formValues.p_as_rt,
                 p_cd_rt: formValues.p_cd_rt,
-                pr_cr_rt: formValues.p_cr_rt, // Changed to pr_cr_rt to match error
+                p_cr_rt: formValues.p_cr_rt,
                 p_cr_vi: formValues.p_cr_vi,
                 p_pb_rt: formValues.p_pb_rt,
                 p_hg_rt: formValues.p_hg_rt,

@@ -7,9 +7,9 @@ export const FormSchema = z.object({
     }),
     p_name_en: z.string().optional(),
     p_description: z.string().optional(),
-    p_type_manure: z.boolean().optional(),
-    p_type_mineral: z.boolean().optional(),
-    p_type_compost: z.boolean().optional(),
+    p_type: z.enum(["manure", "mineral", "compost"], {
+        required_error: "Type is verplicht",
+    }),
     p_dm: z.coerce
         .number({
             invalid_type_error: "Ongeldige waarde",
