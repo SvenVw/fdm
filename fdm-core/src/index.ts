@@ -57,6 +57,9 @@ export {
 export type {
     Fertilizer,
     FertilizerApplication,
+    FertilizerParameters,
+    FertilizerParameterDescription,
+    FertilizerParameterDescriptionItem,
 } from "./fertilizer.d"
 export {
     addCultivationToCatalogue,
