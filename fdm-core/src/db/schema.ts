@@ -142,15 +142,19 @@ export type fertilizerAcquiringTypeInsert =
     typeof fertilizerAcquiring.$inferInsert
 
 // Define fertilizers application table
-export const applicationMethodEnum = fdmSchema.enum("p_app_method", [
-    "slotted coulter",
-    "incorporation",
-    "injection",
-    "spraying",
-    "broadcasting",
-    "spoke wheel",
-    "pocket placement",
-])
+export const applicationMethodOptions = [
+    { value: "slotted coulter", label: "Zodenbemester / Sleepvoet" },
+    { value: "incorporation", label: "Inwerken" },
+    { value: "injection", label: "Injecteren" },
+    { value: "spraying", label: "Spuiten" },
+    { value: "broadcasting", label: "Breedwerpig uitstrooien" },
+    { value: "spoke wheel", label: "Spaakwiel" },
+    { value: "pocket placement", label: "Plantgat" },
+]
+export const applicationMethodEnum = fdmSchema.enum(
+    "p_app_method",
+    applicationMethodOptions.map((x) => x.value) as [string, ...string[]],
+)
 export const fertilizerApplication = fdmSchema.table(
     "fertilizer_applying",
     {
