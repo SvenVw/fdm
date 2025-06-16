@@ -21,6 +21,7 @@ import {
     getFertilizer,
     getFertilizerApplication,
     getFertilizerApplications,
+    getFertilizerParametersDescription,
     getFertilizers,
     getFertilizersFromCatalogue,
     removeFertilizer,
@@ -1036,5 +1037,48 @@ describe("Fertilizer Data Model", () => {
                 ),
             ).rejects.toThrowError("Exception for addFertilizerApplication")
         })
+    })
+})
+
+describe("getFertilizerParametersDescription", () => {
+    it("should return the correct fertilizer parameter descriptions for NL-nl locale", () => {
+        const descriptions = getFertilizerParametersDescription("NL-nl")
+        expect(descriptions).toHaveLength(42)
+        for (const description of descriptions) {
+            expect(description).toHaveProperty("parameter")
+            expect(description).toHaveProperty("unit")
+            expect(description).toHaveProperty("name")
+            expect(description).toHaveProperty("type")
+            expect(description).toHaveProperty("description")
+            expect(description).toHaveProperty("category")
+            if (description.type === "enum") {
+                expect(description).toHaveProperty("options")
+            }
+        }
+    })
+
+    it("should throw an error for unsupported locales", () => {
+        expect(() => getFertilizerParametersDescription("en-US")).toThrowError(
+            "Unsupported locale",
+        )
+        expect(() => getFertilizerParametersDescription("de-DE")).toThrowError(
+            "Unsupported locale",
+        )
+    })
+
+    it("should return the correct fertilizer parameter descriptions for default locale", () => {
+        const descriptions = getFertilizerParametersDescription()
+        expect(descriptions).toHaveLength(42)
+        for (const description of descriptions) {
+            expect(description).toHaveProperty("parameter")
+            expect(description).toHaveProperty("unit")
+            expect(description).toHaveProperty("name")
+            expect(description).toHaveProperty("type")
+            expect(description).toHaveProperty("description")
+            expect(description).toHaveProperty("category")
+            if (description.type === "enum") {
+                expect(description).toHaveProperty("options")
+            }
+        }
     })
 })

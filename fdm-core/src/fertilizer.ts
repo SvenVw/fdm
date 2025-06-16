@@ -7,7 +7,12 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { Fertilizer, FertilizerApplication } from "./fertilizer.d"
+import type {
+    FertilizefrParameterDescription,
+    Fertilizer,
+    FertilizerApplication,
+    FertilizerParameterDescription,
+} from "./fertilizer.d"
 import type { Timeframe } from "./timeframe"
 
 /**
@@ -906,4 +911,255 @@ export async function getFertilizerApplications(
             b_id,
         })
     }
+}
+
+/**
+ * Retrieves a description of the available fertilizer parameters.
+ *
+ * This function returns an array of objects, each describing a fertilizer parameter.
+ * Each description includes the parameter's name, unit, type (numeric or enum),
+ * a human-readable name, a detailed description, and optional constraints like
+ * minimum and maximum values or a list of valid options for enum types.
+ *
+ * @param locale - The locale for which to retrieve the descriptions. Currently only 'NL-nl' is supported.
+ * @returns An array of fertilizerParameterDescriptionItem objects.
+ * @throws {Error} If an unsupported locale is provided.
+ */
+export function getFertilizerParametersDescription(
+    locale = "NL-nl",
+): FertilizerParameterDescription {
+    if (locale !== "NL-nl") throw new Error("Unsupported locale")
+    const fertilizerParameterDescription: FertilizerParameterDescription = [
+        {
+            parameter: "p_id_catalogue",
+            unit: "",
+            name: "ID",
+            type: "text",
+            category: "general",
+            description: "Catalogu ID van meststof",
+        },
+        {
+            parameter: "p_source",
+            unit: "",
+            name: "Bron",
+            type: "text",
+            category: "general",
+            description: "Gegevensbron van meststof",
+        },
+        {
+            parameter: "p_name_nl",
+            unit: "",
+            name: "Naam",
+            type: "text",
+            category: "general",
+            description: "Nederlandse naam van meststof",
+        },
+        // {
+        //     parameter: "p_name_en",
+        //     unit: "",
+        //     name: "Naam (Engels)",
+        //     type: "text",
+        //     category: "general",
+        //     description: "Engelse naam van meststof",
+        // },
+        // {
+        //     parameter: "p_description",
+        //     unit: "",
+        //     name: "Beschrijving",
+        //     type: "text",
+        //     category: "general",
+        //     description: "Beschrijvingen en/of opmerkingen over de meststof",
+        // },
+        {
+            parameter: "p_app_method_options",
+            unit: "",
+            name: "Toedieningsmethodes",
+            type: "enum",
+            category: "general",
+            description: "Toedieningsmethodes beschikbaar voor deze methode",
+            options: schema.applicationMethodOptions,
+        },
+        {
+            parameter: "p_dm",
+            unit: "g/kg",
+            name: "Droge stofgehalte",
+            type: "numeric",
+            category: "physical",
+            description: "",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_density",
+            unit: "kg/l",
+            name: "Dichtheid",
+            type: "numeric",
+            category: "physical",
+            description: "",
+            min: 0.00016,
+            max: 17.31,
+        },
+        {
+            parameter: "p_n_rt",
+            unit: "g N/kg",
+            name: "N",
+            type: "numeric",
+            category: "primary",
+            description: "Stikstof, totaal",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_n_wc",
+            unit: "-",
+            name: "N-werking",
+            type: "numeric",
+            category: "primary",
+            description: "Stikstof, werkingscoëfficient",
+            min: 0,
+            max: 1,
+        },
+        {
+            parameter: "p_p_rt",
+            unit: "g P2O5/kg",
+            name: "P",
+            type: "numeric",
+            category: "primary",
+            description: "Fosfaat",
+            min: 0,
+            max: 4583,
+        },
+        {
+            parameter: "p_k_rt",
+            unit: "g K2O/kg",
+            name: "K",
+            type: "numeric",
+            category: "primary",
+            description: "Kalium",
+            min: 0,
+            max: 2409.2,
+        },
+        {
+            parameter: "p_eoc",
+            unit: "g EOC/kg",
+            name: "EOC",
+            type: "numeric",
+            category: "secondary",
+            description: "Koolstof, effectief",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_s_rt",
+            unit: "g SO3/kg",
+            name: "S",
+            type: "numeric",
+            category: "secondary",
+            description: "Zwavel",
+            min: 0,
+            max: 2497.2,
+        },
+        {
+            parameter: "p_mg_rt",
+            unit: "g MgO/kg",
+            name: "Mg",
+            type: "numeric",
+            category: "secondary",
+            description: "Magnesium",
+            min: 0,
+            max: 1659,
+        },
+        {
+            parameter: "p_ca_rt",
+            unit: "g CaO/kg",
+            name: "Ca",
+            type: "numeric",
+            category: "secondary",
+            description: "Calcium",
+            min: 0,
+            max: 1399.2,
+        },
+        {
+            parameter: "p_na_rt",
+            unit: "g Na2O/kg",
+            name: "Na",
+            type: "numeric",
+            category: "secondary",
+            description: "Calcium",
+            min: 0,
+            max: 2695900,
+        },
+        {
+            parameter: "p_cu_rt",
+            unit: "mg Cu/kg",
+            name: "Cu",
+            type: "numeric",
+            category: "trace",
+            description: "Koper",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_zn_rt",
+            unit: "mg Zn/kg",
+            name: "Zn",
+            type: "numeric",
+            category: "trace",
+            description: "Koper",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_co_rt",
+            unit: "mg Co/kg",
+            name: "Co",
+            type: "numeric",
+            category: "trace",
+            description: "Koper",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_co_rt",
+            unit: "mg Co/kg",
+            name: "Co",
+            type: "numeric",
+            category: "trace",
+            description: "Koper",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_mn_rt",
+            unit: "mg Mn/kg",
+            name: "Mn",
+            type: "numeric",
+            category: "trace",
+            description: "Mangaan",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_mo_rt",
+            unit: "mg Mn/kg",
+            name: "Mo",
+            type: "numeric",
+            category: "trace",
+            description: "Molybdeen",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_b_rt",
+            unit: "mg B/kg",
+            name: "B",
+            type: "numeric",
+            category: "trace",
+            description: "boor",
+            min: 0,
+            max: 1000000,
+        },
+    ]
+
+    return fertilizerParameterDescription
 }

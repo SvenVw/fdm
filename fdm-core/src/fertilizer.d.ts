@@ -45,3 +45,69 @@ export interface FertilizerApplication {
     p_app_date: Date | null
     p_app_id: string
 }
+
+export type FertilizerParameters =
+    | "p_id_catalogue"
+    | "p_source"
+    | "p_name_nl"
+    | "p_name_en"
+    | "p_description"
+    | "p_app_method_options"
+    | "p_dm"
+    | "p_density"
+    | "p_om"
+    | "p_a"
+    | "p_hc"
+    | "p_eom"
+    | "p_eoc"
+    | "p_c_rt"
+    | "p_c_of"
+    | "p_c_if"
+    | "p_c_fr"
+    | "p_cn_of"
+    | "p_n_rt"
+    | "p_n_if"
+    | "p_n_of"
+    | "p_n_wc"
+    | "p_p_rt"
+    | "p_k_rt"
+    | "p_mg_rt"
+    | "p_ca_rt"
+    | "p_ne"
+    | "p_s_rt"
+    | "p_s_wc"
+    | "p_cu_rt"
+    | "p_zn_rt"
+    | "p_na_rt"
+    | "p_si_rt"
+    | "p_b_rt"
+    | "p_mn_rt"
+    | "p_ni_rt"
+    | "p_fe_rt"
+    | "p_mo_rt"
+    | "p_co_rt"
+    | "p_as_rt"
+    | "p_cd_rt"
+    | "p_cr_rt"
+    | "p_cr_vi"
+    | "p_pb_rt"
+    | "p_hg_rt"
+    | "p_cl_rt"
+    | "p_type_manure"
+    | "p_type_mineral"
+    | "p_type_compost"
+
+export interface FertilizerParameterDescriptionItem {
+    parameter: FertilizerParameters
+    unit: string
+    type: "numeric" | "enum" | "date" | "text"
+    name: string
+    description: string
+    category: "general" | "primary" | "secondary" | "trace" | "heavy_metals" | "physical"
+    min?: number
+    max?: number
+    options?: schema.applicationMethodOptions
+}
+
+export type FertilizerParameterDescription =
+    FertilizerParameterDescriptionItem[]

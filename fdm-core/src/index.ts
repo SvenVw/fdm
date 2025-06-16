@@ -52,6 +52,7 @@ export {
     removeFertilizerApplication,
     getFertilizerApplication,
     getFertilizerApplications,
+    getFertilizerParametersDescription,
 } from "./fertilizer"
 export type {
     Fertilizer,
