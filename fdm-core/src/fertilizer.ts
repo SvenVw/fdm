@@ -1021,7 +1021,7 @@ export function getFertilizerParametersDescription(
             name: "Toedieningsmethodes",
             type: "enum_multi",
             category: "general",
-            description: "Toedieningsmethodes beschikbaar voor deze methode",
+            description: "Toedieningsmethodes mogelijk voor deze meststof",
             options: schema.applicationMethodOptions,
         },
         {
