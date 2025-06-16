@@ -102,10 +102,16 @@ export type FertilizerParameters =
 export interface FertilizerParameterDescriptionItem {
     parameter: FertilizerParameters
     unit: string
-    type: "numeric" | "enum" | "date" | "text"
+    type: "numeric" | "enum" | "enum_multi" | "date" | "text"
     name: string
     description: string
-    category: "general" | "primary" | "secondary" | "trace" | "heavy_metals" | "physical"
+    category:
+        | "general"
+        | "primary"
+        | "secondary"
+        | "trace"
+        | "heavy_metals"
+        | "physical"
     min?: number
     max?: number
     options?: schema.applicationMethodOptions

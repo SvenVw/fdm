@@ -1003,10 +1003,23 @@ export function getFertilizerParametersDescription(
         //     description: "Beschrijvingen en/of opmerkingen over de meststof",
         // },
         {
+            parameter: "p_type",
+            unit: "",
+            name: "Type",
+            type: "enum",
+            category: "general",
+            description: "Typering van de meststof",
+            options: [
+                { value: "manure", label: "Dierlijke mest" },
+                { value: "mineral", label: "Kunstmest" },
+                { value: "compost", label: "Compost" },
+            ],
+        },
+        {
             parameter: "p_app_method_options",
             unit: "",
             name: "Toedieningsmethodes",
-            type: "enum",
+            type: "enum_multi",
             category: "general",
             description: "Toedieningsmethodes beschikbaar voor deze methode",
             options: schema.applicationMethodOptions,
@@ -1180,19 +1193,6 @@ export function getFertilizerParametersDescription(
             description: "Boor",
             min: 0,
             max: 1000000,
-        },
-        {
-            parameter: "p_type",
-            unit: "",
-            name: "Type",
-            type: "enum",
-            category: "general",
-            description: "Type meststof",
-            options: [
-                { value: "manure", label: "Dierlijke mest" },
-                { value: "mineral", label: "Kunstmest" },
-                { value: "compost", label: "Compost" },
-            ],
         },
     ]
 
