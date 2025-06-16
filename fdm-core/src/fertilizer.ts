@@ -8,7 +8,6 @@ import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type {
-    FertilizefrParameterDescription,
     Fertilizer,
     FertilizerApplication,
     FertilizerParameterDescription,
