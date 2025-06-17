@@ -406,7 +406,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
                     ) {
                         await tx
                             .update(schema.fertilizersCatalogue)
-                            .set({ hash: hash })
+                            .set({ ...item, hash: hash })
                             .where(
                                 eq(
                                     schema.fertilizersCatalogue.p_id_catalogue,
@@ -454,7 +454,7 @@ async function syncCultivationCatalogue(fdm: FdmType) {
                     ) {
                         await tx
                             .update(schema.cultivationsCatalogue)
-                            .set({ hash: hash })
+                            .set({ ...item, hash: hash })
                             .where(
                                 eq(
                                     schema.cultivationsCatalogue.b_lu_catalogue,
