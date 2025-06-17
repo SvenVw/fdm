@@ -188,6 +188,7 @@ export const fertilizersCatalogue = fdmSchema.table(
         p_name_nl: text().notNull(),
         p_name_en: text(),
         p_description: text(),
+        p_app_method_options: applicationMethodEnum().array(),
         p_dm: numericCasted(),
         p_density: numericCasted(),
         p_om: numericCasted(),
