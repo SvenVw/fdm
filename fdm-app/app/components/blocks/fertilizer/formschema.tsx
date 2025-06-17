@@ -368,7 +368,8 @@ export const FormSchema = z
             return true
         },
         {
-            message: "N-werkingscoëfficiënt is verplicht als meststof stikstofbevat",
+            message:
+                "N-werkingscoëfficiënt is verplicht als meststof stikstofbevat",
             path: ["p_n_wc"],
         },
     )
