@@ -1,8 +1,11 @@
+import type { ApplicationMethods } from "@svenvw/fdm-data"
+
 export interface Fertilizer {
     p_id: string
     p_name_nl: string | null
     p_name_en: string | null
     p_description: string | null
+    p_app_method_options: ApplicationMethods[] | null
     p_app_amount: number | null
     p_date_acquiring: Date | null
     p_picking_date: Date | null
@@ -45,7 +48,7 @@ export interface FertilizerApplication {
     p_id_catalogue: string
     p_name_nl: string | null
     p_app_amount: number | null
-    p_app_method: string | null
+    p_app_method: ApplicationMethods | null
     p_app_date: Date | null
     p_app_id: string
 }

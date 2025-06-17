@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm"
 import { createId } from "./id"
 
-import { hashFertilizer } from "@svenvw/fdm-data"
+import { type CatalogueFertilizerItem, hashFertilizer } from "@svenvw/fdm-data"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -93,6 +93,7 @@ export async function addFertilizerToCatalogue(
         p_name_nl: schema.fertilizersCatalogueTypeInsert["p_name_nl"]
         p_name_en: schema.fertilizersCatalogueTypeInsert["p_name_en"]
         p_description: schema.fertilizersCatalogueTypeInsert["p_description"]
+        p_app_method_options: schema.fertilizersCatalogueTypeInsert["p_app_method_options"]
         p_dm: schema.fertilizersCatalogueTypeInsert["p_dm"]
         p_density: schema.fertilizersCatalogueTypeInsert["p_density"]
         p_om: schema.fertilizersCatalogueTypeInsert["p_om"]
@@ -156,7 +157,9 @@ export async function addFertilizerToCatalogue(
             p_type_mineral: properties.p_type === "mineral",
             p_type_compost: properties.p_type === "compost",
         }
-        input.hash = await hashFertilizer(input)
+        input.hash = await hashFertilizer(
+            input as unknown as CatalogueFertilizerItem,
+        )
 
         // Insert the farm in the db
         await fdm.insert(schema.fertilizersCatalogue).values(input)
@@ -269,6 +272,7 @@ export async function getFertilizer(
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
+                p_app_method_options: schema.fertilizersCatalogue.p_app_method_options,
                 p_acquiring_amount:
                     schema.fertilizerAcquiring.p_acquiring_amount,
                 p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
@@ -382,6 +386,7 @@ export async function updateFertilizerFromCatalogue(
         p_name_nl: schema.fertilizersCatalogueTypeInsert["p_name_nl"]
         p_name_en: schema.fertilizersCatalogueTypeInsert["p_name_en"]
         p_description: schema.fertilizersCatalogueTypeInsert["p_description"]
+        p_app_method_options: schema.fertilizersCatalogueTypeInsert["p_app_method_options"]
         p_dm: schema.fertilizersCatalogueTypeInsert["p_dm"]
         p_density: schema.fertilizersCatalogueTypeInsert["p_density"]
         p_om: schema.fertilizersCatalogueTypeInsert["p_om"]
@@ -459,7 +464,9 @@ export async function updateFertilizerFromCatalogue(
             p_type_mineral: properties.p_type === "mineral",
             p_type_compost: properties.p_type === "compost",
         }
-        updatedProperties.hash = await hashFertilizer(updatedProperties)
+        updatedProperties.hash = await hashFertilizer(
+            updatedProperties as unknown as CatalogueFertilizerItem,
+        )
 
         await fdm
             .update(schema.fertilizersCatalogue)
@@ -518,6 +525,7 @@ export async function getFertilizers(
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
+                p_app_method_options: schema.fertilizersCatalogue.p_app_method_options,
                 p_acquiring_amount:
                     schema.fertilizerAcquiring.p_acquiring_amount,
                 p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
@@ -585,7 +593,7 @@ export async function getFertilizers(
             .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
             .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
-        return fertilizers.map((f: any) => {
+        return fertilizers.map((f: (typeof fertilizers)[number]) => {
             let p_type: "manure" | "mineral" | "compost" | null = null
             if (f.p_type_manure) {
                 p_type = "manure"

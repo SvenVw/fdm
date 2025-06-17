@@ -8,6 +8,7 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometry, numericCasted } from "./schema-custom-types"
+import type { ApplicationMethods } from "@svenvw/fdm-data"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm")
@@ -150,7 +151,7 @@ export const applicationMethodOptions = [
     { value: "broadcasting", label: "Breedwerpig uitstrooien" },
     { value: "spoke wheel", label: "Spaakwiel" },
     { value: "pocket placement", label: "Plantgat" },
-]
+] satisfies { value: ApplicationMethods; label: string }[]
 export const applicationMethodEnum = fdmSchema.enum(
     "p_app_method",
     applicationMethodOptions.map((x) => x.value) as [string, ...string[]],

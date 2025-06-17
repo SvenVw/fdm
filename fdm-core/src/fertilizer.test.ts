@@ -86,6 +86,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: ["injection", "incorporation"],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -159,6 +160,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -232,6 +234,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -318,6 +321,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -376,8 +380,9 @@ describe("Fertilizer Data Model", () => {
 
             await removeFertilizer(fdm, p_id)
 
-            const fertilizer = await getFertilizer(fdm, p_id)
-            expect(fertilizer).toBeUndefined()
+            await expect(getFertilizer(fdm, p_id)).rejects.toThrow(
+                "Exception for getFertilizer",
+            )
         })
 
         it("should return empty array when no catalogues are enabled", async () => {
@@ -412,6 +417,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl: "Test Fertilizer",
                     p_name_en: "Test Fertilizer (EN)",
                     p_description: "This is a test fertilizer",
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -624,6 +630,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl: "Test Fertilizer 2",
                     p_name_en: "Test Fertilizer (EN) 2",
                     p_description: "This is a test fertilizer 2",
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -736,6 +743,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -1029,7 +1037,7 @@ describe("Fertilizer Data Model", () => {
 describe("getFertilizerParametersDescription", () => {
     it("should return the correct fertilizer parameter descriptions for NL-nl locale", () => {
         const descriptions = getFertilizerParametersDescription("NL-nl")
-        expect(descriptions).toHaveLength(42)
+        expect(descriptions).toHaveLength(22)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
@@ -1054,7 +1062,7 @@ describe("getFertilizerParametersDescription", () => {
 
     it("should return the correct fertilizer parameter descriptions for default locale", () => {
         const descriptions = getFertilizerParametersDescription()
-        expect(descriptions).toHaveLength(42)
+        expect(descriptions).toHaveLength(22)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
