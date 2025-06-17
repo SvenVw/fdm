@@ -41,6 +41,7 @@ describe("getCatalogueSrm", async () => {
             expect(item).toHaveProperty("p_name_nl")
             expect(item).toHaveProperty("p_name_en")
             expect(item).toHaveProperty("p_description")
+            expect(item).toHaveProperty("p_app_method_options")
             expect(item).toHaveProperty("p_dm")
             expect(item).toHaveProperty("p_density")
             expect(item).toHaveProperty("p_om")
