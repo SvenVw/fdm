@@ -20,22 +20,38 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
 ) {
     try {
         const formData = await request.formData()
+        const formObject = Object.fromEntries(formData) as Record<
+            string,
+            FormDataEntryValue | unknown[]
+        >
 
         // Trim all values and remove quotation marks
         // Note: Somewhere additional quotation marks are added, preferably that is not the case, but this workaround removes them
-        for (const key of formData.keys()) {
-            const value = formData.get(key)
-            if (typeof value === "string" && key !== "b_geometry") {
-                formData.set(key, value.replace(/['"]+/g, "").trim())
+        for (const key in formObject) {
+            const value = formObject[key]
+
+            if (typeof value === "string") {
+                // Check if the value is a JSON array string
+                if (
+                    value.startsWith("[") &&
+                    value.endsWith("]") &&
+                    key !== "b_geometry"
+                ) {
+                    try {
+                        formObject[key] = JSON.parse(value)
+                    } catch (e) {
+                        // Not a valid JSON, so leave it as a string
+                    }
+                } else if (key !== "b_geometry") {
+                    formObject[key] = value.replace(/['"]+/g, "").trim()
+                }
 
                 // Daypicker returns 01 Jan 1970 if no date is selected. This workaround removes the date if it is 01 Jan 1970
                 if (value === "1970-01-01T00:00:00.000Z") {
-                    formData.delete(key)
+                    delete formObject[key]
                 }
             }
         }
-
-        const formObject = Object.fromEntries(formData)
         const parsedData = schema.safeParse(formObject)
 
         if (!parsedData.success) {
