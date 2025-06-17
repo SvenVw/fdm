@@ -133,7 +133,7 @@ export function FertilizerForm({
                                     </SelectContent>
                                 </Select>
                             ) : param.type === "enum_multi" ? (
-                                <div className="space-y-2">
+                                <div className="grid xl:grid-cols-2 space-y-2">
                                     {param.options?.map((option) => (
                                         <FormField
                                             key={option.value}
