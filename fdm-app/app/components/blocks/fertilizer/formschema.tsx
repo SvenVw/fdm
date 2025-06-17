@@ -360,3 +360,15 @@ export const FormSchema = z
             }),
     })
     .partial()
+    .refine(
+        (data) => {
+            if (data.p_n_rt && data.p_n_wc === undefined) {
+                return false
+            }
+            return true
+        },
+        {
+            message: "N-werkingscoëfficiënt is verplicht als meststof stikstofbevat",
+            path: ["p_n_wc"],
+        },
+    )
