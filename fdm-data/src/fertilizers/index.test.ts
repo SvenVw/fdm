@@ -30,7 +30,6 @@ describe("getFertilizersCatalogue", () => {
 })
 
 describe("getCatalogueSrm", async () => {
-    const originalSrm = require("./catalogues/srm.json")
     it("should return an array of CatalogueFertilizerItem", async () => {
         const catalogue = await getCatalogueSrm()
         expect(Array.isArray(catalogue)).toBe(true)

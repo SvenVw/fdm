@@ -692,7 +692,6 @@ describe("Fertilizer Data Model", () => {
     describe("Fertilizer Application", () => {
         let b_id: string
         let p_id: string
-        let p_id_catalogue: string
 
         beforeAll(async () => {
             const farmName = "Test Farm"
