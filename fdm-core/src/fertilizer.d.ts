@@ -1,5 +1,4 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
-import type { applicationMethodOptions } from "./db/schema"
 
 export interface Fertilizer {
     p_id: string
@@ -38,8 +37,9 @@ export interface Fertilizer {
     p_pb_rt: number | null
     p_hg_rt: number | null
     p_cl_rt: number | null
-    p_type: "manure" | "mineral" | "compost" | null
+    p_type: FertilizerType | null
 }
+type FertilizerType = "manure" | "mineral" | "compost"
 
 export interface FertilizerApplication {
     p_id: string
@@ -115,7 +115,7 @@ export interface FertilizerParameterDescriptionItem {
         | "physical"
     min?: number
     max?: number
-    options?: typeof applicationMethodOptions
+    options?: { value: FertilizerType | ApplicationMethods; label: string }[]
 }
 
 export type FertilizerParameterDescription =
