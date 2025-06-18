@@ -457,22 +457,23 @@ export async function updateFertilizerFromCatalogue(
             throw new Error("Fertilizer does not exist in catalogue")
         }
 
+        const { p_type, ...rest } = properties
         const updatedProperties: schema.fertilizersCatalogueTypeInsert = {
             ...existingFertilizer[0],
-            ...properties,
+            ...rest,
             hash: null,
             // Preserve current flags when p_type is not provided
             p_type_manure:
-                properties.p_type !== undefined
-                    ? properties.p_type === "manure"
+                p_type !== undefined
+                    ? p_type === "manure"
                     : existingFertilizer[0].p_type_manure,
             p_type_mineral:
-                properties.p_type !== undefined
-                    ? properties.p_type === "mineral"
+                p_type !== undefined
+                    ? p_type === "mineral"
                     : existingFertilizer[0].p_type_mineral,
             p_type_compost:
-                properties.p_type !== undefined
-                    ? properties.p_type === "compost"
+                p_type !== undefined
+                    ? p_type === "compost"
                     : existingFertilizer[0].p_type_compost,
         }
         updatedProperties.hash = await hashFertilizer(
