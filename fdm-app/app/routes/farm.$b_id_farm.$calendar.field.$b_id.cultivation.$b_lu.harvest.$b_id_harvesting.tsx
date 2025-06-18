@@ -17,6 +17,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getCalendar } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -80,6 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        const calendar = getCalendar(params)
 
         // Get details of cultivation
         const cultivation = await getCultivation(
@@ -106,6 +108,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation: cultivation,
             harvest: harvest,
             b_id_farm: b_id_farm,
+            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -137,7 +140,7 @@ export default function FarmFieldsOverviewBlock() {
                 </div>
                 <div className="flex justify-end">
                     <NavLink
-                        to={`/farm/${loaderData.b_id_farm}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
+                        to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
                         className={"ml-auto"}
                     >
                         <Button>{"Terug"}</Button>
@@ -191,6 +194,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        const calendar = await getCalendar(params)
 
         // Collect form entry
         const formValues = await extractFormValuesFromRequest(
@@ -209,7 +213,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/field/${b_id}/cultivation/${b_lu}`,
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
             {
                 message: "Oogst is toegevoegd! 🎉",
             },
