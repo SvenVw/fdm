@@ -2,4 +2,4 @@
 "@svenvw/fdm-data": minor
 ---
 
-Make various types available
+Expose the `ApplicationMethods` union type in the `@svenvw/fdm-data` package

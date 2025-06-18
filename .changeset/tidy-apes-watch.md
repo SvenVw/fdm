@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Add parameter `p_app_method_options` to `fertilizer_catalogue` to represent the possible methods that can be used to apply the fertilizer
+Add the parameter `p_app_method_options` to `fertilizer_catalogue` to represent the possible methods that can be used to apply the fertilizer

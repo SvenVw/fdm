@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add application method to form for fertilizer application
+Add an application-method field to the fertilizer-application form

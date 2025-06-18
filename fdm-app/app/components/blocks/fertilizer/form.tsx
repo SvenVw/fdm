@@ -99,16 +99,16 @@ export function FertilizerForm({
                             {param.name} {param.unit && `(${param.unit})`}
                         </FormLabel>
                         <FormControl>
-                            {param.type === "numeric" ||
-                            param.type === "text" ? (
+                            {param.type === "numeric" ? (
                                 <Input
-                                    type={
-                                        param.type === "numeric"
-                                            ? "number"
-                                            : "text"
-                                    }
+                                    type="number"
+                                    min={param.min}
+                                    max={param.max}
+                                    step={"any"}
                                     {...field}
                                 />
+                            ) : param.type === "text" ? (
+                                <Input type="text" {...field} />
                             ) : param.type === "enum" ? (
                                 <Select
                                     onValueChange={field.onChange}
@@ -233,9 +233,7 @@ export function FertilizerForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset
-                    disabled={form.formState.isSubmitting || !editable}
-                >
+                <fieldset disabled={form.formState.isSubmitting || !editable}>
                     <div className="space-y-6">
                         {categories.map((category) => (
                             <Card key={category.name}>

@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Show application method for each application in the list of fertilizer applications
+Display the application method for each fertilizer application in the list
