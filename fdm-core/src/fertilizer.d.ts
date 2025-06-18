@@ -38,9 +38,6 @@ export interface Fertilizer {
     p_pb_rt: number | null
     p_hg_rt: number | null
     p_cl_rt: number | null
-    p_type_manure: boolean | null
-    p_type_mineral: boolean | null
-    p_type_compost: boolean | null
     p_type: "manure" | "mineral" | "compost" | null
 }
 
