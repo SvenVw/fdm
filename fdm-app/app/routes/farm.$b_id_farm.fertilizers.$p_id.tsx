@@ -9,7 +9,6 @@ import {
 import {
     updateFertilizerFromCatalogue,
 } from "@svenvw/fdm-core"
-import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -104,7 +103,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             return {
                 p_id: fertilizer.p_id,
-                p_name_nl: fertilizer.p_name_nl,
+            p_name_nl: fertilizer.p_name_nl || "",
             }
         })
 
@@ -186,9 +185,10 @@ export default function FarmFertilizerBlock() {
             p_pb_rt: fertilizer.p_pb_rt,
             p_hg_rt: fertilizer.p_hg_rt,
             p_cl_rt: fertilizer.p_cl_rt,
-            p_app_method_options: fertilizer.p_app_method_options,
+            p_app_method_options: fertilizer.p_app_method_options || [],
         },
     })
+
 
     return (
         <SidebarInset>

@@ -138,7 +138,7 @@ export default function FarmFertilizerBlock() {
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            p_name_nl: undefined,
+            p_name_nl: "",
             p_type: fertilizer.p_type,
             p_dm: fertilizer.p_dm,
             p_density: fertilizer.p_density,

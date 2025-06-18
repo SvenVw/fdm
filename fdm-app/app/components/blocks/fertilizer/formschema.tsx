@@ -2,14 +2,16 @@ import { z } from "zod"
 
 export const FormSchema = z
     .object({
-        p_name_nl: z.string({
-            required_error: "Naam is verplicht",
-            invalid_type_error: "Ongeldige waarde",
-        }),
+        p_name_nl: z
+            .string({
+                required_error: "Naam is verplicht",
+                invalid_type_error: "Ongeldige waarde",
+            })
+            .min(1, { message: "Geef een naam op voor deze meststof" }),
         p_name_en: z.string().optional(),
         p_description: z.string().optional(),
         p_type: z.enum(["manure", "mineral", "compost"], {
-            required_error: "Type is verplicht",
+            required_error: "Kies het type meststof",
         }),
         p_dm: z.preprocess(
             (val) => (val === "" || val === null ? undefined : val),

@@ -55,7 +55,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizer = {
             p_id: undefined, // Added p_id
             p_source: b_id_farm,
-            p_name_nl: undefined,
+            p_name_nl: "",
             p_type: undefined,
             p_dm: undefined,
             p_density: undefined,
@@ -97,7 +97,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             p_pb_rt: undefined,
             p_hg_rt: undefined,
             p_cl_rt: undefined,
-            p_app_method_options: undefined,
+            p_app_method_options: [],
         }
 
         // Get the available fertilizers
