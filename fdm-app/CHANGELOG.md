@@ -1,5 +1,13 @@
 # Changelog fdm-app
 
+## 0.19.6
+
+### Patch Changes
+
+- f2b1fc6: Fixes redirects at harvest details page
+- Updated dependencies [94a82f6]
+  - @svenvw/fdm-calculator@0.3.3
+
 ## 0.19.5
 
 ### Patch Changes

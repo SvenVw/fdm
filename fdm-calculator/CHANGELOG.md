@@ -1,5 +1,11 @@
 # fdm-calculator
 
+## 0.3.3
+
+### Patch Changes
+
+- 94a82f6: Fix at balance calculation to convert null values to 0 and prevent exception due to Decimal
+
 ## 0.3.2
 
 ### Patch Changes

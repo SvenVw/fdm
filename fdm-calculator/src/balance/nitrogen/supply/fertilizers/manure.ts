@@ -36,7 +36,7 @@ export function calculateNitrogenSupplyByManure(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
             )
         }
-        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt)
+        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt ?? 0)
 
         // If the fertilizer used is not of the type manure
         if (fertilizerDetail.p_type !== "manure") {
@@ -47,7 +47,7 @@ export function calculateNitrogenSupplyByManure(
         }
 
         // Calculate for this application the amount of Nitrogen supplied by manure
-        const p_app_amount = new Decimal(application.p_app_amount)
+        const p_app_amount = new Decimal(application.p_app_amount ?? 0)
         const applicationValue = p_app_amount.times(p_n_rt).dividedBy(1000) // convert from g N to kg N
 
         return {
