@@ -33,7 +33,7 @@ export function calculateNitrogenSupplyByOtherFertilizers(
         const p_type_manure = fertilizerDetail.p_type_manure
         const p_type_mineral = fertilizerDetail.p_type_mineral
         const p_type_compost = fertilizerDetail.p_type_compost
-        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt)
+        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt ?? 0)
 
         // If the fertilizer used is not of the type other fertilizers
         if (
@@ -48,7 +48,7 @@ export function calculateNitrogenSupplyByOtherFertilizers(
         }
 
         // Calculate for this application the amount of Nitrogen supplied by other fertilizers
-        const p_app_amount = new Decimal(application.p_app_amount)
+        const p_app_amount = new Decimal(application.p_app_amount ?? 0)
         const applicationValue = p_app_amount.times(p_n_rt).dividedBy(1000) // convert from g N to kg N
 
         return {

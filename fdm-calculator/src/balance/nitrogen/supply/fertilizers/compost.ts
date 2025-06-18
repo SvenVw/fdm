@@ -38,7 +38,7 @@ export function calculateNitrogenSupplyByCompost(
         }
 
         const p_type_compost = fertilizerDetail.p_type_compost
-        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt).dividedBy(1000) // Convert from g N / kg to kg N / kg
+        const p_n_rt = new Decimal(fertilizerDetail.p_n_rt ?? 0).dividedBy(1000) // Convert from g N / kg to kg N / kg
 
         // If the fertilizer used is not of the type compost
         if (p_type_compost === false) {
@@ -49,7 +49,7 @@ export function calculateNitrogenSupplyByCompost(
         }
 
         // Calculate for this application the amount of Nitrogen supplied by compost
-        const p_app_amount = new Decimal(application.p_app_amount)
+        const p_app_amount = new Decimal(application.p_app_amount ?? 0)
         const applicationValue = p_app_amount.times(p_n_rt)
 
         return {
