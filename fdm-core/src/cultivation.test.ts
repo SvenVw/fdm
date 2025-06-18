@@ -204,7 +204,7 @@ describe("Cultivation Data Model", () => {
                     b_lu_source: b_lu_source,
                     b_lu_name: "test-name",
                     b_lu_name_en: "test-name-en",
-                    b_lu_harvestable: "none",
+                    b_lu_harvestable: "invalid-value",
                     b_lu_hcat3: "test-hcat3",
                     b_lu_hcat3_name: "test-hcat3-name",
                     b_lu_croprotation: "cereal",
