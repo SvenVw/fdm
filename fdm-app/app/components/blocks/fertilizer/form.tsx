@@ -112,7 +112,11 @@ export function FertilizerForm({
                             ) : param.type === "enum" ? (
                                 <Select
                                     onValueChange={field.onChange}
-                                    defaultValue={String(field.value)}
+                                    defaultValue={
+                                        field.value
+                                            ? String(field.value)
+                                            : undefined
+                                    }
                                 >
                                     <FormControl>
                                         <SelectTrigger>
