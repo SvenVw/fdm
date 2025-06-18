@@ -136,6 +136,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
             dose: dose,
+            applicationMethodOptions: applicationMethods.options,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -175,6 +176,9 @@ export default function FarmFieldsOverviewBlock() {
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
+                        }
+                        applicationMethodOptions={
+                            loaderData.applicationMethodOptions
                         }
                         fetcher={fetcher}
                     />

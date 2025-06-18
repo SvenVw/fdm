@@ -160,6 +160,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
             dose: dose,
+            applicationMethodOptions: applicationMethods.options,
         }
     } catch (error) {
         return handleLoaderError(error)
@@ -197,6 +198,9 @@ export default function Index() {
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
+                        }
+                        applicationMethodOptions={
+                            loaderData.applicationMethodOptions
                         }
                         fetcher={fetcher}
                     />
