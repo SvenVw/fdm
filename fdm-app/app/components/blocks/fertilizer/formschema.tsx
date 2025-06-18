@@ -357,7 +357,7 @@ export const FormSchema = z
             .array(z.string(), {
                 required_error: "Selecteer minimaal 1 methode",
             })
-            .refine((value) => value.some((item) => item), {
+            .refine((value) => value.every((item) => item), {
                 message: "Selecteer minimaal 1 methode",
             }),
     })
