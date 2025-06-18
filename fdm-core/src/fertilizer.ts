@@ -272,7 +272,8 @@ export async function getFertilizer(
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
-                p_app_method_options: schema.fertilizersCatalogue.p_app_method_options,
+                p_app_method_options:
+                    schema.fertilizersCatalogue.p_app_method_options,
                 p_acquiring_amount:
                     schema.fertilizerAcquiring.p_acquiring_amount,
                 p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
@@ -460,9 +461,19 @@ export async function updateFertilizerFromCatalogue(
             ...existingFertilizer[0],
             ...properties,
             hash: null,
-            p_type_manure: properties.p_type === "manure",
-            p_type_mineral: properties.p_type === "mineral",
-            p_type_compost: properties.p_type === "compost",
+            // Preserve current flags when p_type is not provided
+            p_type_manure:
+                properties.p_type !== undefined
+                    ? properties.p_type === "manure"
+                    : existingFertilizer[0].p_type_manure,
+            p_type_mineral:
+                properties.p_type !== undefined
+                    ? properties.p_type === "mineral"
+                    : existingFertilizer[0].p_type_mineral,
+            p_type_compost:
+                properties.p_type !== undefined
+                    ? properties.p_type === "compost"
+                    : existingFertilizer[0].p_type_compost,
         }
         updatedProperties.hash = await hashFertilizer(
             updatedProperties as unknown as CatalogueFertilizerItem,
@@ -525,7 +536,8 @@ export async function getFertilizers(
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
-                p_app_method_options: schema.fertilizersCatalogue.p_app_method_options,
+                p_app_method_options:
+                    schema.fertilizersCatalogue.p_app_method_options,
                 p_acquiring_amount:
                     schema.fertilizerAcquiring.p_acquiring_amount,
                 p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
