@@ -83,7 +83,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerParameterDescription =
             getFertilizerParametersDescription()
         const applicationMethods = fertilizerParameterDescription.find(
-            (x: { parameter: string }) => x.parameter === "p_app_method_options",
+            (x: { parameter: string }) =>
+                x.parameter === "p_app_method_options",
         )
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
@@ -243,7 +244,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { p_id, p_app_amount, p_app_date } = formValues
+            const { p_id, p_app_amount, p_app_date, p_app_method } = formValues
 
             // Get the cultivation details for this cultivation
             const cultivationPlan = await getCultivationPlan(
@@ -267,7 +268,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         b_id,
                         p_id,
                         p_app_amount,
-                        undefined,
+                        p_app_method,
                         p_app_date,
                     )
                 }),

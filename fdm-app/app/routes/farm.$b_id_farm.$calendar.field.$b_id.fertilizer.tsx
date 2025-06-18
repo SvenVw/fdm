@@ -216,7 +216,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { p_id, p_app_amount, p_app_date } = formValues
+            const { p_id, p_app_amount, p_app_date, p_app_method } = formValues
 
             await addFertilizerApplication(
                 fdm,
@@ -224,7 +224,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id,
                 p_id,
                 p_app_amount,
-                undefined,
+                p_app_method,
                 p_app_date,
             )
 
