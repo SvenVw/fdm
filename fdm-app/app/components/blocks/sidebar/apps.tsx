@@ -2,6 +2,7 @@ import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmStore } from "@/app/store/farm"
 import {
     ArrowRightLeft,
+    BookOpenText,
     GitPullRequestArrow,
     MapIcon,
     Scale,
@@ -42,6 +43,15 @@ export function SidebarApps() {
         nutrientBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance`
     } else {
         nutrientBalanceLink = undefined
+    }
+
+    let nutrientAdviceLink: string | undefined
+    if (isCreateFarmWizard) {
+        nutrientAdviceLink = undefined
+    } else if (farmId) {
+        nutrientAdviceLink = `/farm/${farmId}/${selectedCalendar}/nutrient_advice`
+    } else {
+        nutrientAdviceLink = undefined
     }
 
     const omBalanceLink = undefined
@@ -87,6 +97,26 @@ export function SidebarApps() {
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <ArrowRightLeft />
                                     <span>Nutriëntenbalans</span>
+                                </span>
+                            </SidebarMenuButton>
+                        )}
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        {nutrientAdviceLink ? (
+                            <SidebarMenuButton asChild>
+                                <NavLink to={nutrientAdviceLink}>
+                                    <BookOpenText />
+                                    <span>Bemestingsadvies</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <BookOpenText />
+                                    <span>Bemestingsadvies</span>
                                 </span>
                             </SidebarMenuButton>
                         )}

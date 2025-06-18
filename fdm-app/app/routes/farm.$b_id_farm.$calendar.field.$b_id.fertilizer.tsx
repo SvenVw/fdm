@@ -135,7 +135,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             field: field,
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
-            dose: dose,
+            dose: dose.dose,
             applicationMethodOptions: applicationMethods.options,
         }
     } catch (error) {
