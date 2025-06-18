@@ -6,9 +6,15 @@ export interface FertilizerApplication {
     p_app_date: Date
 }
 
+import type { ApplicationMethods } from "@svenvw/fdm-data"
+
 export interface FertilizerOption {
     value: string
     label: string
+    applicationMethodOptions: {
+        value: ApplicationMethods
+        label: string
+    }[]
 }
 
 export interface FertilizerApplicationsFormProps {

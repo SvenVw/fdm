@@ -2,6 +2,7 @@ import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
+    getFertilizerParametersDescription,
     getFertilizers,
     getField,
     removeFertilizerApplication,
@@ -93,11 +94,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
+        const fertilizerParameterDescription =
+            getFertilizerParametersDescription()
+        const applicationMethods = fertilizerParameterDescription.find(
+            (x) => x.parameter === "p_app_method_options",
+        )
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
+            const applicationMethodOptions =
+                fertilizer.p_app_method_options.map((option) => {
+                    return {
+                        value: option,
+                        label: applicationMethods.options.find(
+                            (x) => x.value === option,
+                        ).label,
+                    }
+                })
             return {
                 value: fertilizer.p_id,
                 label: fertilizer.p_name_nl,
+                applicationMethodOptions: applicationMethodOptions,
             }
         })
 
@@ -154,7 +170,6 @@ export default function FarmFieldsOverviewBlock() {
                     <FertilizerApplicationForm
                         options={loaderData.fertilizerOptions}
                         action={location.pathname}
-                        fetcher={fetcher}
                     />
                     <Separator className="my-4" />
                     <FertilizerApplicationsList
