@@ -1,4 +1,5 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
+import type { applicationMethodOptions } from "./db/schema"
 
 export interface Fertilizer {
     p_id: string
@@ -117,7 +118,7 @@ export interface FertilizerParameterDescriptionItem {
         | "physical"
     min?: number
     max?: number
-    options?: schema.applicationMethodOptions
+    options?: typeof applicationMethodOptions
 }
 
 export type FertilizerParameterDescription =
