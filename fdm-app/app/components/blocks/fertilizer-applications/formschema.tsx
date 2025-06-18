@@ -12,7 +12,7 @@ export const FormSchema = z.object({
         .finite({
             message: "Hoeveelheid moet een geheel getal zijn",
         }),
-    p_app_method: z.string(),
+    p_app_method: z.string().min(1, "Toepassingsmethode is verplicht"),
     p_app_date: z.coerce.date({
         required_error: "Datum is verplicht",
         invalid_type_error: "Datum is ongeldig",
