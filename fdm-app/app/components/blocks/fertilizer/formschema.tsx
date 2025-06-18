@@ -359,7 +359,6 @@ export const FormSchema = z
                 message: "Selecteer minimaal 1 methode",
             }),
     })
-    .partial()
     .refine(
         (data) => {
             if (data.p_n_rt && data.p_n_wc === undefined) {
