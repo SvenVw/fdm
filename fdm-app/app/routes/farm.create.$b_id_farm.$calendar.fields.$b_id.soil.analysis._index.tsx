@@ -6,7 +6,7 @@ import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { SoilAnalysisFormSelection } from "~/components/custom/soil/form-selection"
+import { SoilAnalysisFormSelection } from "~/components/blocks/soil/form-selection"
 
 /**
  * Loader function for the soil analysis selection page.
