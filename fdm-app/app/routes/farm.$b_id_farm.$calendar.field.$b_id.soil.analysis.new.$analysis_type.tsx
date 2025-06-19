@@ -1,7 +1,4 @@
-import {
-    addSoilAnalysis,
-    getField,
-} from "@svenvw/fdm-core"
+import { addSoilAnalysis, getField } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
     type ActionFunctionArgs,
@@ -19,7 +16,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getSoilParametersForSoilAnalysisType } from "~/components/custom/soil/parameters.server"
+import { getSoilParametersForSoilAnalysisType } from "~/components/blocks/soil/parameters.server"
 
 /**
  * Loader function for the soil data page of a specific farm field.

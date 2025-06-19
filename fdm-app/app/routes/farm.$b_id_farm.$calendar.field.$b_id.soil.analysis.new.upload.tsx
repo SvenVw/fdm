@@ -19,7 +19,7 @@ import { fileTypeFromBuffer } from "file-type"
 import {
     FormSchema,
     SoilAnalysisUploadForm,
-} from "~/components/custom/soil/form-upload"
+} from "~/components/blocks/soil/form-upload"
 
 /**
  * Loader function for the soil analysis upload page.
