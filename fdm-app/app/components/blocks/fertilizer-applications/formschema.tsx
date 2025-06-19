@@ -12,11 +12,12 @@ export const FormSchema = z.object({
         .finite({
             message: "Hoeveelheid moet een geheel getal zijn",
         }),
+    p_app_method: z.string().min(1, "Toepassingsmethode is verplicht"),
     p_app_date: z.coerce.date({
         required_error: "Datum is verplicht",
         invalid_type_error: "Datum is ongeldig",
     }),
-    p_id: z.coerce.string({
+    p_id: z.string({
         // TODO: Validate against the options that are available
         required_error: "Keuze van meststof is verplicht",
         invalid_type_error: "Meststof is ongeldig",

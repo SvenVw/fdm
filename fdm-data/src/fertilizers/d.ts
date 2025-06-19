@@ -1,11 +1,21 @@
 export type CatalogueFertilizerName = "srm"
 
+export type ApplicationMethods =
+    | "slotted coulter"
+    | "incorporation"
+    | "injection"
+    | "spraying"
+    | "broadcasting"
+    | "spoke wheel"
+    | "pocket placement"
+
 export interface CatalogueFertilizerItem {
     p_source: CatalogueFertilizerName | string
     p_id_catalogue: string
     p_name_nl: string
     p_name_en?: string | null | undefined
     p_description?: string | null | undefined
+    p_app_method_options?: ApplicationMethods[] | null | undefined
     p_dm?: number | null
     p_density?: number | null
     p_om?: number | null

@@ -2,12 +2,18 @@ import { format } from "date-fns"
 import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { FertilizerApplication } from "./types.d"
+import type { ApplicationMethods } from "@svenvw/fdm-data"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,
+    applicationMethodOptions,
     fetcher,
 }: {
     fertilizerApplications: FertilizerApplication[]
+    applicationMethodOptions: {
+        value: ApplicationMethods
+        label: string
+    }[]
     fetcher: {
         state: string
         submit: (
@@ -21,6 +27,7 @@ export function FertilizerApplicationsList({
 
         fetcher.submit({ p_app_id }, { method: "DELETE" })
     }
+
     return (
         <div className="space-y-4">
             {/* <div className="text-sm font-medium">Meststoffen</div> */}
@@ -34,7 +41,15 @@ export function FertilizerApplicationsList({
                             <p className="text-sm font-medium leading-none">
                                 {application.p_name_nl}
                             </p>
-                            {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
+                            <p className="text-sm text-muted-foreground">
+                                {application.p_app_method
+                                    ? applicationMethodOptions.find(
+                                          (x) =>
+                                              x.value ===
+                                              application.p_app_method,
+                                      )?.label
+                                    : "Toedieningsmethode niet bekend"}
+                            </p>
                         </div>
                         <div>
                             <p className="text-sm font-light leading-none">

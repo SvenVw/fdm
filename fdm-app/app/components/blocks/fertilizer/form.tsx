@@ -1,25 +1,5 @@
-import type { UseFormReturn } from "react-hook-form"
-import { Form } from "react-router"
-import { RemixFormProvider } from "remix-hook-form"
-import type { ZodType, z } from "zod"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormMessage,
-} from "~/components/ui/form"
+import type { z } from "zod"
+import type { FormSchema } from "~/components/blocks/fertilizer/formschema"
 import { Input } from "~/components/ui/input"
 import {
     Select,
@@ -28,26 +8,228 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import type { Fertilizer } from "./columns"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    FormField,
+    FormItem,
+    FormLabel,
+    FormControl,
+    FormDescription,
+    FormMessage,
+} from "~/components/ui/form"
+import { RemixFormProvider, type useRemixForm } from "remix-hook-form"
+import { Form } from "react-router"
+import { Button } from "~/components/ui/button"
+import type { FertilizerParameters } from "@svenvw/fdm-core"
+import { Checkbox } from "~/components/ui/checkbox"
+
+export interface FertilizerParameterDescriptionItem {
+    parameter: FertilizerParameters
+    unit: string
+    type: "numeric" | "enum" | "date" | "text" | "enum_multi"
+    name: string
+    description: string
+    category:
+        | "general"
+        | "primary"
+        | "secondary"
+        | "trace"
+        | "heavy_metals"
+        | "physical"
+    min?: number
+    max?: number
+    options?: { label: string; value: string }[]
+}
+
+export type FertilizerParameterDescription =
+    FertilizerParameterDescriptionItem[]
+
+type FormSchemaKeys = keyof z.infer<typeof FormSchema>
+
+type FertilizerFormNewProps = {
+    fertilizerParameters: FertilizerParameterDescription
+    form: ReturnType<typeof useRemixForm<z.infer<typeof FormSchema>>>
+    editable?: boolean
+}
 
 export function FertilizerForm({
-    fertilizer,
+    fertilizerParameters,
     form,
-    editable,
-    farm,
-}: {
-    fertilizer: Fertilizer
-    form: UseFormReturn<
-        z.infer<typeof import("./formschema").FormSchema>,
-        ZodType,
-        undefined
-    >
-    editable: boolean
-    farm: {
-        b_id_farm: string
-        b_name_farm: string
+    editable = true,
+}: FertilizerFormNewProps) {
+    const categories = [
+        {
+            name: "general",
+            title: "Algemeen",
+        },
+
+        {
+            name: "primary",
+            title: "Primaire nutriënten",
+        },
+        {
+            name: "secondary",
+            title: "OS & Secundaire nutriënten",
+        },
+        {
+            name: "physical",
+            title: "Fysische eigenschappen",
+        },
+        {
+            name: "trace",
+            title: "Sporenelementen",
+        },
+    ]
+
+    const getParameterInput = (param: FertilizerParameterDescriptionItem) => {
+        if (
+            param.parameter === "p_source" ||
+            param.parameter === "p_id_catalogue"
+        ) {
+            return null
+        }
+
+        return (
+            <FormField
+                control={form.control}
+                name={param.parameter as FormSchemaKeys}
+                render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>
+                            {param.name} {param.unit && `(${param.unit})`}
+                        </FormLabel>
+                        <FormControl>
+                            {param.type === "numeric" ? (
+                                <Input
+                                    type="number"
+                                    min={param.min}
+                                    max={param.max}
+                                    step={"any"}
+                                    {...field}
+                                />
+                            ) : param.type === "text" ? (
+                                <Input type="text" {...field} />
+                            ) : param.type === "enum" ? (
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={
+                                        field.value
+                                            ? String(field.value)
+                                            : undefined
+                                    }
+                                >
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecteer een type" />
+                                        </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                        {param.options?.map((option) => {
+                                            return (
+                                                <SelectItem
+                                                    key={option.value}
+                                                    value={option.value}
+                                                >
+                                                    {option.label}
+                                                </SelectItem>
+                                            )
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                            ) : param.type === "enum_multi" ? (
+                                <div className="grid xl:grid-cols-2 space-y-2">
+                                    {param.options?.map((option) => (
+                                        <FormField
+                                            key={option.value}
+                                            control={form.control}
+                                            name={
+                                                param.parameter as FormSchemaKeys
+                                            }
+                                            render={({ field }) => {
+                                                return (
+                                                    <FormItem
+                                                        key={option.value}
+                                                        className="flex flex-row items-start space-x-3 space-y-0"
+                                                    >
+                                                        <FormControl>
+                                                            <Checkbox
+                                                                checked={
+                                                                    Array.isArray(
+                                                                        field.value,
+                                                                    ) &&
+                                                                    field.value.includes(
+                                                                        option.value,
+                                                                    )
+                                                                }
+                                                                onCheckedChange={(
+                                                                    checked,
+                                                                ) => {
+                                                                    const currentValues =
+                                                                        Array.isArray(
+                                                                            field.value,
+                                                                        )
+                                                                            ? field.value
+                                                                            : []
+                                                                    if (
+                                                                        checked
+                                                                    ) {
+                                                                        field.onChange(
+                                                                            [
+                                                                                ...currentValues,
+                                                                                option.value,
+                                                                            ],
+                                                                        )
+                                                                    } else {
+                                                                        field.onChange(
+                                                                            currentValues.filter(
+                                                                                (
+                                                                                    value,
+                                                                                ) =>
+                                                                                    value !==
+                                                                                    option.value,
+                                                                            ),
+                                                                        )
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </FormControl>
+                                                        <FormLabel className="font-normal">
+                                                            {option.label}
+                                                        </FormLabel>
+                                                    </FormItem>
+                                                )
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            ) : null}
+                        </FormControl>
+                        {param.description && (
+                            <FormDescription>
+                                {param.description}
+                            </FormDescription>
+                        )}
+                        <FormMessage />
+                    </FormItem>
+                )}
+            />
+        )
     }
-}) {
+
+    const groupedParameters = fertilizerParameters.reduce(
+        (
+            acc: Record<string, FertilizerParameterDescription[number][]>,
+            param: FertilizerParameterDescription[number],
+        ) => {
+            if (!acc[param.category]) {
+                acc[param.category] = []
+            }
+            acc[param.category].push(param)
+            return acc
+        },
+        {} as Record<string, FertilizerParameterDescription[number][]>,
+    )
+
     return (
         <RemixFormProvider {...form}>
             <Form
@@ -55,426 +237,40 @@ export function FertilizerForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
-                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                        <Card className="w-full">
-                            <CardHeader>
-                                <CardTitle>Algemene informatie</CardTitle>
-                                <CardDescription>
-                                    Details over de meststof
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 gap-4">
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className="font-medium">Naam</span>
-                                    <div className="flex items-center gap-2">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_name_nl"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center gap-2">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-full text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_name_nl}</span>
+                <fieldset disabled={form.formState.isSubmitting || !editable}>
+                    <div className="space-y-6">
+                        {categories.map((category) => (
+                            <Card key={category.name}>
+                                <CardHeader>
+                                    <CardTitle>{category.title}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                        {groupedParameters[category.name]?.map(
+                                            (param) => (
+                                                <div key={param.parameter}>
+                                                    {getParameterInput(param)}
+                                                </div>
+                                            ),
                                         )}
                                     </div>
-                                </div>
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className="font-medium">
-                                        Catalogus
-                                    </span>
-                                    <span className="flex items-center gap-2">
-                                        {fertilizer.p_source ===
-                                        farm.b_id_farm ? (
-                                            <Badge variant="default">
-                                                {farm.b_name_farm}
-                                            </Badge>
-                                        ) : (
-                                            <Badge variant="default">
-                                                {fertilizer.p_source}
-                                            </Badge>
-                                        )}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className="font-medium">Type</span>
-                                    {editable ? (
-                                        <FormField
-                                            control={form.control}
-                                            name="p_type"
-                                            render={({ field }) => (
-                                                <FormItem className="flex items-center gap-2">
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        defaultValue={
-                                                            field.value
-                                                        }
-                                                        name={field.name}
-                                                        disabled={
-                                                            field.disabled
-                                                        }
-                                                        className="w-full text-right"
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Kies het type" />
-                                                        </SelectTrigger>
-
-                                                        <SelectContent>
-                                                            <SelectItem value="mineral">
-                                                                Kunstmest
-                                                            </SelectItem>
-                                                            <SelectItem value="manure">
-                                                                Mest
-                                                            </SelectItem>
-                                                            <SelectItem value="compost">
-                                                                Compost
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormDescription />
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    ) : (
-                                        <span className="flex items-center gap-2">
-                                            {fertilizer.p_type_manure ? (
-                                                <Badge
-                                                    className="bg-amber-600 text-white hover:bg-amber-700"
-                                                    variant="default"
-                                                >
-                                                    Mest
-                                                </Badge>
-                                            ) : null}
-                                            {fertilizer.p_type_compost ? (
-                                                <Badge
-                                                    className="bg-green-600 text-white hover:bg-green-700"
-                                                    variant="default"
-                                                >
-                                                    Compost
-                                                </Badge>
-                                            ) : null}
-                                            {fertilizer.p_type_mineral ? (
-                                                <Badge
-                                                    className="bg-blue-600 text-white hover:bg-blue-700"
-                                                    variant="default"
-                                                >
-                                                    Kunstmest
-                                                </Badge>
-                                            ) : null}
-                                        </span>
-                                    )}
-                                </div>
-                            </CardContent>
-                            {editable && (
-                                <CardFooter className="w-full">
-                                    <Button
-                                        type="submit"
-                                        disabled={form.formState.isSubmitting}
-                                    >
-                                        {form.formState.isSubmitting && (
-                                            <LoadingSpinner />
-                                        )}
-                                        Opslaan
-                                    </Button>
-                                </CardFooter>
-                            )}
-                        </Card>
-                        <Card className="w-full">
-                            <CardHeader>
-                                <CardTitle>Samenstelling</CardTitle>
-                                <CardDescription>
-                                    De gehalten van deze meststof
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 gap-4">
-                                <div className="grid grid-cols-[2fr_1fr_auto] gap-4 items-center">
-                                    {/* Stikstof Row */}
-                                    <div className="font-medium">Stikstof</div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_n_rt"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_n_rt}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g N / kg
-                                    </div>
-
-                                    {/* Stikstof, werkingscoëfficiënt Row */}
-                                    <div className="font-medium">
-                                        Stikstof, werkingscoëfficiënt
-                                    </div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_n_wc"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_n_wc}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        -
-                                    </div>
-                                    {/* Fosfaat Row */}
-                                    <div className="font-medium">Fosfaat</div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_p_rt"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_p_rt}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g P2O5 / kg
-                                    </div>
-
-                                    {/* Kalium Row */}
-                                    <div className="font-medium">Kalium</div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_k_rt"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_k_rt}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g K2O / kg
-                                    </div>
-
-                                    {/* Organische stof Row */}
-                                    <div className="font-medium">
-                                        Organische stof
-                                    </div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_om"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_om}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g OS / kg
-                                    </div>
-
-                                    {/* Koolstof, effectief Row */}
-                                    <div className="font-medium">
-                                        Koolstof, effectief
-                                    </div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_eoc"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_eoc}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g EOC / kg
-                                    </div>
-
-                                    {/* Zwavel Row */}
-                                    <div className="font-medium">Zwavel</div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_s_rt"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_s_rt}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g SO3 / kg
-                                    </div>
-
-                                    {/* Calcium (Ca) Row */}
-                                    <div className="font-medium">Calcium</div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_ca_rt"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_ca_rt}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g CaO / kg
-                                    </div>
-
-                                    {/* Magnesium (Mg) Row */}
-                                    <div className="font-medium">Magnesium</div>
-                                    <div className="flex items-center justify-end">
-                                        {editable ? (
-                                            <FormField
-                                                control={form.control}
-                                                name="p_mg_rt"
-                                                render={({ field }) => (
-                                                    <FormItem className="flex items-center">
-                                                        <FormControl>
-                                                            <Input
-                                                                {...field}
-                                                                className="w-24 text-right"
-                                                            />
-                                                        </FormControl>
-                                                        <FormDescription />
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ) : (
-                                            <span>{fertilizer.p_mg_rt}</span>
-                                        )}
-                                    </div>
-                                    <div className="font-medium text-muted-foreground">
-                                        g MgO / kg
-                                    </div>
-                                </div>
-                            </CardContent>
-                            {editable && (
-                                <CardFooter className="w-full">
-                                    <Button
-                                        type="submit"
-                                        disabled={form.formState.isSubmitting}
-                                    >
-                                        {form.formState.isSubmitting && (
-                                            <LoadingSpinner />
-                                        )}
-                                        Opslaan
-                                    </Button>
-                                </CardFooter>
-                            )}
-                        </Card>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
+                    {editable && (
+                        <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={form.formState.isSubmitting}
+                            >
+                                {form.formState.isSubmitting
+                                    ? "Meststof opslaan..."
+                                    : "Meststof opslaan"}
+                            </Button>
+                        </div>
+                    )}
                 </fieldset>
             </Form>
         </RemixFormProvider>

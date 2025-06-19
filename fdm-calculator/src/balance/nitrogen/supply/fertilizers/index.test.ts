@@ -42,40 +42,32 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 "mineral1",
                 {
                     p_id_catalogue: "mineral1",
-                    p_type_compost: false,
                     p_n_rt: 20,
-                    p_type_manure: false,
-                    p_type_mineral: true,
+                    p_type: "mineral",
                 },
             ],
             [
                 "manure1",
                 {
                     p_id_catalogue: "manure1",
-                    p_type_compost: false,
                     p_n_rt: 15,
-                    p_type_manure: true,
-                    p_type_mineral: false,
+                    p_type: "manure",
                 },
             ],
             [
                 "compost1",
                 {
                     p_id_catalogue: "compost1",
-                    p_type_compost: true,
                     p_n_rt: 10,
-                    p_type_manure: false,
-                    p_type_mineral: false,
+                    p_type: "compost",
                 },
             ],
             [
                 "other1",
                 {
                     p_id_catalogue: "other1",
-                    p_type_compost: false,
                     p_n_rt: 10,
-                    p_type_manure: false,
-                    p_type_mineral: false,
+                    p_type: "other",
                 },
             ],
         ])
@@ -107,10 +99,8 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 "mineral1",
                 {
                     p_id_catalogue: "mineral1",
-                    p_type_compost: false,
                     p_n_rt: 20,
-                    p_type_manure: false,
-                    p_type_mineral: true,
+                    p_type: "mineral",
                 },
             ],
         ])

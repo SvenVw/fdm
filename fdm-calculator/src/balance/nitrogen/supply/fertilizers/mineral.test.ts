@@ -36,20 +36,16 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
                 "app1",
                 {
                     p_id_catalogue: "app1",
-                    p_type_compost: false,
                     p_n_rt: 20,
-                    p_type_manure: false,
-                    p_type_mineral: true,
+                    p_type: "mineral",
                 },
             ],
             [
                 "app2",
                 {
                     p_id_catalogue: "app2",
-                    p_type_compost: false,
                     p_n_rt: 15,
-                    p_type_manure: false,
-                    p_type_mineral: true,
+                    p_type: "mineral",
                 },
             ],
         ])

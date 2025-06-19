@@ -389,9 +389,7 @@ export type FertilizerDetail = Pick<
     Fertilizer,
     | "p_id_catalogue"
     | "p_n_rt" // Total nitrogen content (g N / kg fertilizer)
-    | "p_type_manure"
-    | "p_type_mineral"
-    | "p_type_compost"
+    | "p_type"
 >
 
 /**

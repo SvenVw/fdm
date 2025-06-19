@@ -527,12 +527,17 @@ describe("Catalogues", () => {
                 // Should not reach here
                 expect(true).toBe(false)
             } catch (error) {
-                expect(error.message).toContain(
+                const err = error as Error & { context: unknown }
+                expect(err.message).toContain(
                     "Exception for getEnabledCultivationCatalogues",
                 )
-                expect(error.context).toBeDefined()
-                expect(error.context.principal_id).toBe(principal_id)
-                expect(error.context.b_id_farm).toBe(b_id_farm)
+                expect(err.context).toBeDefined()
+                expect((err.context as { principal_id: string }).principal_id).toBe(
+                    principal_id,
+                )
+                expect((err.context as { b_id_farm: string }).b_id_farm).toBe(
+                    b_id_farm,
+                )
             }
         })
 
@@ -662,6 +667,48 @@ describe("Catalogues syncing", () => {
         expect(itemSynced[0].hash).toBe(item[0].hash)
     })
 
+    it("should update all columns of a fertilizer when the hash changes", async () => {
+        await syncCatalogues(fdm)
+
+        const item = await fdm
+            .select()
+            .from(schema.fertilizersCatalogue)
+            .where(isNotNull(schema.fertilizersCatalogue.hash))
+            .orderBy(schema.fertilizersCatalogue.p_id_catalogue)
+            .limit(1)
+
+        const updatedItem = {
+            ...item[0],
+            p_name_nl: "Updated Name",
+            hash: "new_hash",
+        }
+
+        await fdm
+            .update(schema.fertilizersCatalogue)
+            .set(updatedItem)
+            .where(
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    item[0].p_id_catalogue,
+                ),
+            )
+
+        await syncCatalogues(fdm)
+
+        const syncedItem = await fdm
+            .select()
+            .from(schema.fertilizersCatalogue)
+            .where(
+                eq(
+                    schema.fertilizersCatalogue.p_id_catalogue,
+                    item[0].p_id_catalogue,
+                ),
+            )
+            .limit(1)
+
+        expect(syncedItem[0].p_name_nl).not.toBe("Updated Name")
+    })
+
     it("should update cultivation catalogue", async () => {
         await syncCatalogues(fdm)
 
@@ -718,5 +765,47 @@ describe("Catalogues syncing", () => {
             )
         expect(itemSynced[0].b_lu_catalogue).toBeDefined()
         expect(itemSynced[0].hash).toBe(item[0].hash)
+    })
+
+    it("should update all columns of a cultivation when the hash changes", async () => {
+        await syncCatalogues(fdm)
+
+        const item = await fdm
+            .select()
+            .from(schema.cultivationsCatalogue)
+            .where(isNotNull(schema.cultivationsCatalogue.hash))
+            .orderBy(schema.cultivationsCatalogue.b_lu_catalogue)
+            .limit(1)
+
+        const updatedItem = {
+            ...item[0],
+            b_lu_name: "Updated Name",
+            hash: "new_hash",
+        }
+
+        await fdm
+            .update(schema.cultivationsCatalogue)
+            .set(updatedItem)
+            .where(
+                eq(
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                    item[0].b_lu_catalogue,
+                ),
+            )
+
+        await syncCatalogues(fdm)
+
+        const syncedItem = await fdm
+            .select()
+            .from(schema.cultivationsCatalogue)
+            .where(
+                eq(
+                    schema.cultivationsCatalogue.b_lu_catalogue,
+                    item[0].b_lu_catalogue,
+                ),
+            )
+            .limit(1)
+
+        expect(syncedItem[0].b_lu_name).not.toBe("Updated Name")
     })
 })

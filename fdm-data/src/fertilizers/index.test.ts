@@ -30,7 +30,6 @@ describe("getFertilizersCatalogue", () => {
 })
 
 describe("getCatalogueSrm", async () => {
-    const originalSrm = require("./catalogues/srm.json")
     it("should return an array of CatalogueFertilizerItem", async () => {
         const catalogue = await getCatalogueSrm()
         expect(Array.isArray(catalogue)).toBe(true)
@@ -41,6 +40,7 @@ describe("getCatalogueSrm", async () => {
             expect(item).toHaveProperty("p_name_nl")
             expect(item).toHaveProperty("p_name_en")
             expect(item).toHaveProperty("p_description")
+            expect(item).toHaveProperty("p_app_method_options")
             expect(item).toHaveProperty("p_dm")
             expect(item).toHaveProperty("p_density")
             expect(item).toHaveProperty("p_om")
