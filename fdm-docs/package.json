@@ -19,9 +19,9 @@
         "preinstall": "npx only-allow pnpm"
     },
     "dependencies": {
-        "@docusaurus/core": "3.8.0",
-        "@docusaurus/faster": "^3.8.0",
-        "@docusaurus/preset-classic": "3.8.0",
+        "@docusaurus/core": "3.8.1",
+        "@docusaurus/faster": "^3.8.1",
+        "@docusaurus/preset-classic": "3.8.1",
         "@mdx-js/react": "^3.1.0",
         "clsx": "^2.1.1",
         "lucide-react": "^0.511.0",
@@ -30,16 +30,20 @@
         "react-dom": "^19.1.0"
     },
     "devDependencies": {
-        "@docusaurus/module-type-aliases": "3.8.0",
-        "@docusaurus/tsconfig": "3.8.0",
-        "@docusaurus/types": "3.8.0",
+        "@docusaurus/module-type-aliases": "3.8.1",
+        "@docusaurus/tsconfig": "3.8.1",
+        "@docusaurus/types": "3.8.1",
         "docusaurus-plugin-typedoc": "^1.4.0",
         "typedoc": "catalog:",
-        "typedoc-plugin-markdown": "^4.6.3",
+        "typedoc-plugin-markdown": "^4.6.4",
         "typescript": "catalog:"
     },
     "browserslist": {
-        "production": [">0.5%", "not dead", "not op_mini all"],
+        "production": [
+            ">0.5%",
+            "not dead",
+            "not op_mini all"
+        ],
         "development": [
             "last 3 chrome version",
             "last 3 firefox version",
