@@ -18,11 +18,7 @@ import {
 } from "~/components/ui/form"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
-import {
-    type FieldValues,
-    type UseFormReturn,
-    type Path,
-} from "react-hook-form"
+import type { FieldValues, UseFormReturn, Path } from "react-hook-form"
 
 function parseDateString(dateString: string): Date | undefined {
     const parts = dateString.split(/[-./]/) // Split by -, ., or /
@@ -184,15 +180,15 @@ export function DatePicker<TFieldValues extends FieldValues>({
                                         setOpen(false)
                                         setIsInputValid(true) // Set valid on calendar select
                                     }}
-                                    disabled={(date) =>
-                                        date < new Date("1970-01-01")
-                                    }
+                                    startMonth={new Date(1970, 0)}
+                                    endMonth={new Date(2030, 11)}
                                     locale={nl}
                                     className="rounded-lg border shadow-sm"
                                 />
                             </PopoverContent>
                         </Popover>
                     </div>
+                    <FormDescription>{description}</FormDescription>
                     <FormMessage>
                         {!isInputValid ? "Ongeldige datum" : null}
                     </FormMessage>
