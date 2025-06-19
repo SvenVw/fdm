@@ -10,6 +10,7 @@ import { StrictMode, startTransition, useEffect } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { HydratedRouter } from "react-router/dom"
 import { clientConfig } from "~/lib/config"
+import { PostHogProvider } from 'posthog-js/react'
 
 if (clientConfig.analytics.sentry) {
     const sentryConfig = clientConfig.analytics.sentry
@@ -64,36 +65,34 @@ if (clientConfig.analytics.sentry) {
     })
 }
 
-function PosthogInit() {
-    const posthogConfig = clientConfig.analytics.posthog
+const posthogConfig = clientConfig.analytics.posthog
+console.log(posthogConfig)
 
-    if (posthogConfig) {
-        useEffect(() => {
-            try {
-                posthog.init(posthogConfig.key, {
-                    api_host: posthogConfig.host,
-                    person_profiles: "always",
-                    loaded: () => {},
-                })
-            } catch (error) {
-                console.error("Failed to initialize PostHog:", error)
-            }
-        }, [posthogConfig])
-    } else {
-        console.warn(
-            "PostHog not initialized - missing or invalid configuration",
-        )
-    }
-
-    return null
+if (posthogConfig) {
+    useEffect(() => {
+        try {
+            posthog.init(posthogConfig.key, {
+                api_host: posthogConfig.host,
+                person_profiles: "always",
+                loaded: () => {},
+            })
+        } catch (error) {
+            console.error("Failed to initialize PostHog:", error)
+        }
+    }, [posthogConfig])
+} else {
+    console.warn(
+        "PostHog not initialized - missing or invalid configuration",
+    )
 }
 
 startTransition(() => {
     hydrateRoot(
         document,
         <StrictMode>
-            <HydratedRouter />
-            <PosthogInit />
+            <PostHogProvider client={posthog}>
+                <HydratedRouter />
+            </PostHogProvider>
         </StrictMode>,
     )
 })
