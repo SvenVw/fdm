@@ -1,9 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { getField, updateField } from "@svenvw/fdm-core"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
 import { useEffect } from "react"
-import { Form } from "react-hook-form"
+import { Form } from "react-router"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -16,7 +14,6 @@ import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -26,11 +23,6 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "~/components/ui/popover"
 import {
     Select,
     SelectContent,
@@ -44,7 +36,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { cn } from "~/lib/utils"
+import { DatePicker } from "~/components/custom/date-picker"
 
 export const meta: MetaFunction = () => {
     return [
@@ -207,136 +199,19 @@ export default function FarmFieldsOverviewBlock() {
                                 />
                             </div>
                             <div className="flex flex-col space-y-1.5">
-                                <FormField
-                                    control={form.control}
-                                    name="b_start"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>
-                                                Vanaf wanneer in gebruik?
-                                            </FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={cn(
-                                                                "w-[240px] pl-3 text-left font-normal",
-                                                                !field.value &&
-                                                                    "text-muted-foreground",
-                                                            )}
-                                                        >
-                                                            {field.value ? (
-                                                                format(
-                                                                    field.value,
-                                                                    "d MMM yyyy",
-                                                                )
-                                                            ) : (
-                                                                <span>
-                                                                    Kies een
-                                                                    datum
-                                                                </span>
-                                                            )}
-                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent
-                                                    className="w-auto p-0"
-                                                    align="start"
-                                                >
-                                                    <Calendar
-                                                        mode="single"
-                                                        selected={field.value}
-                                                        onSelect={
-                                                            field.onChange
-                                                        }
-                                                        disabled={(date) =>
-                                                            date <
-                                                            new Date(
-                                                                "1970-01-01",
-                                                            )
-                                                        }
-                                                        initialFocus
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormDescription>
-                                                Optioneel
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                <DatePicker
+                                    form={form}
+                                    name={"b_start"}
+                                    label={"Vanaf wanneer in gebruik?"}
+                                    description={""}
                                 />
                             </div>
                             <div className="flex flex-col space-y-1.5">
-                                <FormField
-                                    control={form.control}
-                                    name="b_end"
-                                    render={({ field }) => (
-                                        <FormItem className="flex flex-col">
-                                            <FormLabel>
-                                                Tot wanneer in gebruik?
-                                            </FormLabel>
-                                            <Popover>
-                                                <PopoverTrigger asChild>
-                                                    <FormControl>
-                                                        <Button
-                                                            variant={"outline"}
-                                                            className={cn(
-                                                                "w-[240px] pl-3 text-left font-normal",
-                                                                !field.value &&
-                                                                    "text-muted-foreground",
-                                                            )}
-                                                        >
-                                                            {field.value ? (
-                                                                format(
-                                                                    field.value,
-                                                                    "d MMM yyyy",
-                                                                )
-                                                            ) : (
-                                                                <span>
-                                                                    Kies een
-                                                                    datum
-                                                                </span>
-                                                            )}
-                                                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                        </Button>
-                                                    </FormControl>
-                                                </PopoverTrigger>
-                                                <PopoverContent
-                                                    className="w-auto p-0"
-                                                    align="start"
-                                                >
-                                                    <Calendar
-                                                        mode="single"
-                                                        selected={field.value}
-                                                        onSelect={
-                                                            field.onChange
-                                                        }
-                                                        disabled={(date) =>
-                                                            date <
-                                                                new Date(
-                                                                    "1970-01-01",
-                                                                ) ||
-                                                            date >
-                                                                new Date(
-                                                                    new Date().getFullYear() +
-                                                                        10,
-                                                                    11,
-                                                                    31,
-                                                                )
-                                                        }
-                                                        initialFocus
-                                                    />
-                                                </PopoverContent>
-                                            </Popover>
-                                            <FormDescription>
-                                                Optioneel
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
+                                <DatePicker
+                                    form={form}
+                                    name={"b_end"}
+                                    label={"Tot wanneer in gebruik?"}
+                                    description={"Optioneel"}
                                 />
                             </div>
                         </div>
