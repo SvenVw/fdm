@@ -18,7 +18,11 @@ import {
 } from "~/components/ui/form"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
-import { type FieldValues, type UseFormReturn, type Path } from "react-hook-form"
+import {
+    type FieldValues,
+    type UseFormReturn,
+    type Path,
+} from "react-hook-form"
 
 function parseDateString(dateString: string): Date | undefined {
     const parts = dateString.split(/[-./]/) // Split by -, ., or /
@@ -189,10 +193,9 @@ export function DatePicker<TFieldValues extends FieldValues>({
                             </PopoverContent>
                         </Popover>
                     </div>
-                    <FormDescription>{description}</FormDescription>
-                    {!isInputValid && (
-                        <FormMessage>Ongeldige datum</FormMessage>
-                    )}
+                    <FormMessage>
+                        {!isInputValid ? "Ongeldige datum" : null}
+                    </FormMessage>
                 </FormItem>
             )}
         />

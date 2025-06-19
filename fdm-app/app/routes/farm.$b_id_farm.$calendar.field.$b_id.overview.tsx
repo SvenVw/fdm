@@ -284,4 +284,15 @@ const FormSchema = z.object({
     b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
     b_start: z.coerce.date().optional(),
     b_end: z.coerce.date().optional(),
-})
+}).refine(
+    (schema) => {
+        if (schema.b_start && schema.b_end) {
+            return schema.b_end > schema.b_start
+        }
+        return true
+    },
+    {
+        message: "Einddatum moet na de startdatum zijn",
+        path: ["b_end"],
+    },
+)
