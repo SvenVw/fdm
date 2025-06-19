@@ -37,6 +37,10 @@ export interface ServerConfig {
         sentry?: {
             auth_token: string
         } | null
+        posthog?: {
+            key: string
+            host: string
+        } | null
     }
     mail?: {
         postmark: {
