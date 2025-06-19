@@ -6,7 +6,7 @@
 
 import * as Sentry from "@sentry/react"
 import posthog from "posthog-js"
-import { StrictMode, startTransition, useEffect } from "react"
+import { StrictMode, startTransition} from "react"
 import { hydrateRoot } from "react-dom/client"
 import { HydratedRouter } from "react-router/dom"
 import { clientConfig } from "~/lib/config"
@@ -66,20 +66,16 @@ if (clientConfig.analytics.sentry) {
 }
 
 const posthogConfig = clientConfig.analytics.posthog
-console.log(posthogConfig)
-
 if (posthogConfig) {
-    useEffect(() => {
-        try {
-            posthog.init(posthogConfig.key, {
-                api_host: posthogConfig.host,
-                person_profiles: "always",
-                loaded: () => {},
-            })
-        } catch (error) {
-            console.error("Failed to initialize PostHog:", error)
-        }
-    }, [posthogConfig])
+    try {
+        posthog.init(posthogConfig.key, {
+            api_host: posthogConfig.host,
+            person_profiles: "always",
+            loaded: () => {},
+        })
+    } catch (error) {
+        console.error("Failed to initialize PostHog:", error)
+    }
 } else {
     console.warn(
         "PostHog not initialized - missing or invalid configuration",
