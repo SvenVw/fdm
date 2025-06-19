@@ -1197,7 +1197,7 @@ export function getFertilizerParametersDescription(
         },
         {
             parameter: "p_mo_rt",
-            unit: "mg Mn/kg",
+            unit: "mg Mo/kg",
             name: "Mo",
             type: "numeric",
             category: "trace",
