@@ -53,6 +53,7 @@ export function DatePicker({
     )
     const [month, setMonth] = React.useState<Date | undefined>(date)
     const [value, setValue] = React.useState(formatDate(date))
+    const [isInputValid, setIsInputValid] = React.useState(true)
 
     React.useEffect(() => {
         const formDate = form.getValues(name)
@@ -60,6 +61,7 @@ export function DatePicker({
             setDate(formDate)
             setMonth(formDate)
             setValue(formatDate(formDate))
+            setIsInputValid(true)
         }
     }, [form, name, date])
 
@@ -68,7 +70,7 @@ export function DatePicker({
             control={form.control}
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-col gap-3 w-[240px]">
+                <FormItem className="flex flex-col w-[240px]">
                     <FormLabel>{label}</FormLabel>
                     <div className="relative flex gap-2">
                         <FormControl>
@@ -84,8 +86,10 @@ export function DatePicker({
                                         setDate(newDate)
                                         setMonth(newDate)
                                         field.onChange(newDate)
+                                        setIsInputValid(true)
                                     } else {
                                         field.onChange(undefined)
+                                        setIsInputValid(false)
                                     }
                                 }}
                                 onKeyDown={(e) => {
@@ -124,19 +128,21 @@ export function DatePicker({
                                         setValue(formatDate(selectedDate))
                                         field.onChange(selectedDate)
                                         setOpen(false)
+                                        setIsInputValid(true)
                                     }}
                                     disabled={(date) =>
                                         date < new Date("1970-01-01")
                                     }
                                     locale={nl}
-                                    className="rounded-lg border shadow-sm"
-                                    initialFocus
+                                    className="rounded-lg border shadow-sm"                          
                                 />
                             </PopoverContent>
                         </Popover>
                     </div>
                     <FormDescription>{description}</FormDescription>
-                    <FormMessage />
+                    {!isInputValid && (
+                        <FormMessage>Ongeldige datum</FormMessage>
+                    )}
                 </FormItem>
             )}
         />
