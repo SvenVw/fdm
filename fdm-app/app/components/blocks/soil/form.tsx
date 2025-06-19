@@ -194,6 +194,7 @@ export function SoilAnalysisForm(props: {
                                 if (x.type === "date") {
                                     return (
                                         <DatePicker
+                                            key={x.parameter}
                                             form={form}
                                             name={x.parameter}
                                             label={x.name}
