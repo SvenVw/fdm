@@ -19,6 +19,38 @@ import {
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
 
+function parseDateString(dateString: string): Date | undefined {
+    const parts = dateString.split(/[-./]/) // Split by -, ., or /
+    if (parts.length === 3) {
+        const day = Number.parseInt(parts[0], 10)
+        const month = Number.parseInt(parts[1], 10)
+        let year = Number.parseInt(parts[2], 10)
+
+        // Handle two-digit year (e.g., 24 for 2024)
+        if (year < 100) {
+            const currentYear = new Date().getFullYear()
+            if (year < currentYear + 20) {
+                year += 2000 // Assume 21st century
+            } else {
+                year += 1900 // Assume 20st century
+            }
+        }
+
+        const date = new Date(year, month - 1, day) // Month is 0-indexed
+        if (
+            isValidDate(date) &&
+            date.getDate() === day &&
+            date.getMonth() === month - 1 &&
+            date.getFullYear() === year
+        ) {
+            return date
+        }
+    }
+    // Fallback to default Date parsing for other formats
+    const defaultDate = new Date(dateString)
+    return isValidDate(defaultDate) ? defaultDate : undefined
+}
+
 function formatDate(date: Date | undefined) {
     if (!date) {
         return ""
@@ -70,7 +102,7 @@ export function DatePicker({
             control={form.control}
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-col w-[240px]">
+                <FormItem className="flex flex-col gap-3 w-[240px]">
                     <FormLabel>{label}</FormLabel>
                     <div className="relative flex gap-2">
                         <FormControl>
@@ -80,16 +112,19 @@ export function DatePicker({
                                 placeholder="Kies een datum"
                                 className="bg-background pr-10"
                                 onChange={(e) => {
-                                    const newDate = new Date(e.target.value)
+                                    const newDate = parseDateString(
+                                        e.target.value,
+                                    ) // Use parseDateString
                                     setValue(e.target.value)
-                                    if (isValidDate(newDate)) {
+                                    if (newDate && isValidDate(newDate)) {
+                                        // Check if newDate is defined and valid
                                         setDate(newDate)
                                         setMonth(newDate)
                                         field.onChange(newDate)
-                                        setIsInputValid(true)
+                                        setIsInputValid(true) // Set valid
                                     } else {
                                         field.onChange(undefined)
-                                        setIsInputValid(false)
+                                        setIsInputValid(false) // Set invalid
                                     }
                                 }}
                                 onKeyDown={(e) => {
@@ -128,13 +163,13 @@ export function DatePicker({
                                         setValue(formatDate(selectedDate))
                                         field.onChange(selectedDate)
                                         setOpen(false)
-                                        setIsInputValid(true)
+                                        setIsInputValid(true) // Set valid on calendar select
                                     }}
                                     disabled={(date) =>
                                         date < new Date("1970-01-01")
                                     }
                                     locale={nl}
-                                    className="rounded-lg border shadow-sm"                          
+                                    className="rounded-lg border shadow-sm"
                                 />
                             </PopoverContent>
                         </Popover>
