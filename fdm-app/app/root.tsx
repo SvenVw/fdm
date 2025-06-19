@@ -23,12 +23,10 @@ import { Toaster } from "~/components/ui/sonner"
 import { clientConfig } from "~/lib/config"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
-import reactDayPickerStyle  from "react-day-picker/dist/style.css?url"
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: styles },
     { rel: "stylesheet", href: mapBoxStyle },
-    { rel: "stylesheet", href: reactDayPickerStyle },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
         rel: "preconnect",
