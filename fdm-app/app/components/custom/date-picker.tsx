@@ -1,4 +1,4 @@
-import * as React from "react"
+import React from "react"
 import { CalendarIcon } from "lucide-react"
 import { Button } from "~/components/ui/button"
 import { Calendar } from "~/components/ui/calendar"
@@ -18,6 +18,7 @@ import {
 } from "~/components/ui/form"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
+import { type FieldValues, type UseFormReturn, type Path } from "react-hook-form"
 
 function parseDateString(dateString: string): Date | undefined {
     const parts = dateString.split(/[-./]/) // Split by -, ., or /
@@ -68,19 +69,19 @@ function isValidDate(date: Date | undefined) {
     return !Number.isNaN(date.getTime())
 }
 
-interface DatePickerProps {
-    form: any
-    name: string
+interface DatePickerProps<TFieldValues extends FieldValues> {
+    form: UseFormReturn<TFieldValues>
+    name: Path<TFieldValues> // Use Path for better type inference with react-hook-form
     label: string
     description: string
 }
 
-export function DatePicker({
+export function DatePicker<TFieldValues extends FieldValues>({
     form,
     name,
     label,
     description,
-}: DatePickerProps) {
+}: DatePickerProps<TFieldValues>) {
     const [open, setOpen] = React.useState(false)
     const [date, setDate] = React.useState<Date | undefined>(
         form.getValues(name),
@@ -90,14 +91,17 @@ export function DatePicker({
     const [isInputValid, setIsInputValid] = React.useState(true)
 
     React.useEffect(() => {
-        const formDate = form.getValues(name)
-        if (formDate && formDate.getTime() !== date?.getTime()) {
-            setDate(formDate)
-            setMonth(formDate) // Set month to the selected date
-            setValue(formatDate(formDate))
-            setIsInputValid(true)
-        } else if (!formDate && date !== undefined) {
-            // If formDate becomes undefined and date was previously defined
+        const formDate: unknown = form.getValues(name) // Explicitly type as unknown
+        // Check if formDate is a valid Date object before using it
+        if (formDate instanceof Date && isValidDate(formDate)) {
+            if (formDate.getTime() !== date?.getTime()) {
+                setDate(formDate)
+                setMonth(formDate) // Set month to the selected date
+                setValue(formatDate(formDate))
+                setIsInputValid(true)
+            }
+        } else if (date !== undefined) {
+            // If formDate is undefined or invalid, and date was previously defined
             setDate(undefined)
             setMonth(new Date()) // Reset month to current month
             setValue("") // Clear input value
