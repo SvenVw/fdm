@@ -47,7 +47,7 @@ export function calculateNitrogenSupplyByOtherFertilizers(
 
         // Calculate for this application the amount of Nitrogen supplied by other fertilizers
         const p_app_amount = new Decimal(application.p_app_amount ?? 0)
-        const applicationValue = p_app_amount.times(p_n_rt).dividedBy(1000) // convert from g N to kg N
+        const applicationValue = p_app_amount.times(p_n_rt)
 
         return {
             id: application.p_app_id,
