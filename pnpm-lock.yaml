@@ -191,7 +191,7 @@ importers:
         specifier: ^4.0.5
         version: 4.0.5
       radix-ui:
-        specifier: latest
+        specifier: ^1.4.2
         version: 1.4.2(@types/react-dom@19.1.5(@types/react@19.1.6))(@types/react@19.1.6)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
         specifier: ^19.1.0

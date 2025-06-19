@@ -51,7 +51,7 @@
         "posthog-js": "^1.248.0",
         "posthog-node": "^4.18.0",
         "postmark": "^4.0.5",
-        "radix-ui": "latest",
+        "radix-ui": "^1.4.2",
         "react": "^19.1.0",
         "react-day-picker": "9.7.0",
         "react-dom": "^19.1.0",
