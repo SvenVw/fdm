@@ -30,9 +30,11 @@ function parseDateString(dateString: string): Date | undefined {
         if (year < 100) {
             const currentYear = new Date().getFullYear()
             if (year < currentYear + 20) {
-                year += 2000 // Assume 21st century
+                // Assume 21st century if within 20 years of current year
+                year += 2000
             } else {
-                year += 1900 // Assume 20st century
+                // Otherwise assume 20th century
+                year += 1900
             }
         }
 
@@ -83,7 +85,7 @@ export function DatePicker({
     const [date, setDate] = React.useState<Date | undefined>(
         form.getValues(name),
     )
-    const [month, setMonth] = React.useState<Date | undefined>(date)
+    const [month, setMonth] = React.useState<Date>(date || new Date()) // Initialize month to current date if 'date' is undefined
     const [value, setValue] = React.useState(formatDate(date))
     const [isInputValid, setIsInputValid] = React.useState(true)
 
@@ -91,8 +93,14 @@ export function DatePicker({
         const formDate = form.getValues(name)
         if (formDate && formDate.getTime() !== date?.getTime()) {
             setDate(formDate)
-            setMonth(formDate)
+            setMonth(formDate) // Set month to the selected date
             setValue(formatDate(formDate))
+            setIsInputValid(true)
+        } else if (!formDate && date !== undefined) {
+            // If formDate becomes undefined and date was previously defined
+            setDate(undefined)
+            setMonth(new Date()) // Reset month to current month
+            setValue("") // Clear input value
             setIsInputValid(true)
         }
     }, [form, name, date])
@@ -102,7 +110,7 @@ export function DatePicker({
             control={form.control}
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-col gap-3 w-[240px]">
+                <FormItem className="flex flex-col w-[240px]">
                     <FormLabel>{label}</FormLabel>
                     <div className="relative flex gap-2">
                         <FormControl>
@@ -115,14 +123,15 @@ export function DatePicker({
                                     const newDate = parseDateString(
                                         e.target.value,
                                     ) // Use parseDateString
-                                    setValue(e.target.value)
                                     if (newDate && isValidDate(newDate)) {
                                         // Check if newDate is defined and valid
                                         setDate(newDate)
                                         setMonth(newDate)
+                                        setValue(formatDate(newDate)) // Set value to formatted date
                                         field.onChange(newDate)
                                         setIsInputValid(true) // Set valid
                                     } else {
+                                        setValue(e.target.value) // Keep invalid text for a moment
                                         field.onChange(undefined)
                                         setIsInputValid(false) // Set invalid
                                     }
@@ -143,7 +152,9 @@ export function DatePicker({
                                     className="absolute top-1/2 right-2 size-6 -translate-y-1/2"
                                 >
                                     <CalendarIcon className="size-3.5" />
-                                    <span className="sr-only">Select date</span>
+                                    <span className="sr-only">
+                                        Kies een datum
+                                    </span>
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent
