@@ -2,7 +2,7 @@ import { lookupPrincipal } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router-dom"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
-import { fdm } from "../lib/fdm.server"
+import { fdm } from "~/lib/fdm.server"
 
 // Define the expected return type from lookupPrincipal based on previous usage
 type CorePrincipal = {

@@ -1,7 +1,6 @@
 import {
     addSoilAnalysis,
     getField,
-    getSoilParametersDescription,
 } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
@@ -20,6 +19,7 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getSoilParametersForSoilAnalysisType } from "~/components/custom/soil/parameters.server"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -69,13 +69,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get soil parameter descriptions
-        const soilParameterDescription = getSoilParametersDescription()
+              // Get the parameters for the soil analysis
+        const soilAnalysisType = params.analysis_type
+        if (!soilAnalysisType) {
+            throw data("Type of soil analysis required", {
+                status: 400,
+                statusText: "Type of soil analysis required",
+            })
+        }
+        const soilAnalysisParameterDescription =
+            getSoilParametersForSoilAnalysisType(soilAnalysisType)
 
         // Return user information from loader
         return {
             field: field,
-            soilParameterDescription: soilParameterDescription,
+            soilParameterDescription: soilAnalysisParameterDescription,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -172,7 +180,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             formValues,
         )
 
-        return redirectWithSuccess(`../${b_id}`, {
+        return redirectWithSuccess("../", {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {

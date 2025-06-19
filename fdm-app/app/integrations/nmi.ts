@@ -143,6 +143,85 @@ const soilParameterEstimatesSchema = z.object({
     a_source: z.string(),
 })
 
+export async function extractSoilAnalysis(formData: FormData) {
+    const nmiApiKey = getNmiApiKey()
+
+    if (!nmiApiKey) {
+        throw new Error("NMI API key not configured")
+    }
+
+    // Validate that FormData contains a file
+    const file = formData.get("file") as File
+    if (!file || !(file instanceof File)) {
+        throw new Error("No file provided in FormData")
+    }
+
+    const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${nmiApiKey}`,
+        },
+        body: formData,
+    })
+
+    if (!responseApi.ok) {
+        throw new Error("Request to NMI API failed")
+    }
+
+    const result = await responseApi.json()
+    const response = result.data
+
+    // Validate response structure
+    if (
+        !response.fields ||
+        !Array.isArray(response.fields) ||
+        response.fields.length === 0
+    ) {
+        throw new Error("Invalid API response: no fields found")
+    }
+
+    // Process the response
+    const field = response.fields[0]
+
+    // Select the a_* parameters
+    const soilAnalysis: { [key: string]: string | number | Date } = {}
+    for (const key of Object.keys(field).filter((key) =>
+        key.startsWith("a_"),
+    )) {
+        soilAnalysis[key] = field[key]
+    }
+
+    // Check if soil parameters are returned
+    if (Object.keys(soilAnalysis).length <= 1) {
+        // a_source is returned with invalid soil analysis
+        throw new Error("Invalid soil analysis")
+    }
+
+    // Process the other parameters
+    if (field.b_date) {
+        soilAnalysis.b_sampling_date = new Date(field.b_date)
+    }
+    if (field.b_soiltype_agr) {
+        soilAnalysis.b_soil_type = field.b_soiltype_agr
+    }
+    if (field.b_depth) {
+        const depthParts = field.b_depth.split("-")
+        if (depthParts.length !== 2) {
+            throw new Error(`Invalid depth format: ${field.b_depth}`)
+        }
+        soilAnalysis.a_depth_upper = Number(depthParts[0]) as number
+        soilAnalysis.a_depth_lower = Number(depthParts[1]) as number
+        // Validate that the conversion to numbers was successful
+        if (
+            Number.isNaN(soilAnalysis.a_depth_upper) ||
+            Number.isNaN(soilAnalysis.a_depth_lower)
+        ) {
+            throw new Error(`Invalid numeric depth values: ${field.b_depth}`)
+        }
+    }
+    return soilAnalysis
+}
+
 export async function getNutrientAdvice(
     b_lu_catalogue: string,
     b_centroid: [number, number],

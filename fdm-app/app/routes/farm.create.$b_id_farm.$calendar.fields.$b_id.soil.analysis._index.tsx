@@ -1,20 +1,12 @@
-import {
-    getField,
-    getSoilParametersDescription,
-} from "@svenvw/fdm-core"
+import { getField } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
-import {
-    type LoaderFunctionArgs,
-    NavLink,
-    data,
-    useLoaderData,
-} from "react-router"
+import { type LoaderFunctionArgs, NavLink, data } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { SoilAnalysisFormSelection } from "~/components/blocks/soil/form-selection"
+import { SoilAnalysisFormSelection } from "~/components/custom/soil/form-selection"
 
 /**
  * Loader function for the soil analysis selection page.
@@ -83,7 +75,7 @@ export default function FarmFieldSoilOverviewBlock() {
                     </p>
                 </div>
                 <Button asChild>
-                    <NavLink to="../soil">
+                    <NavLink to="../">
                         <ArrowLeft />
                         Terug
                     </NavLink>

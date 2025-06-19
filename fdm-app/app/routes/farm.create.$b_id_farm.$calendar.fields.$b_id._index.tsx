@@ -17,10 +17,10 @@ import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     type MetaFunction,
+    useLoaderData,
     NavLink,
     data,
 } from "react-router"
-import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -403,7 +403,7 @@ export default function Index() {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <Button asChild>
-                                    <NavLink to="./new_analysis">
+                                    <NavLink to={`../${loaderData.b_id}/soil/analysis`}>
                                         <Plus />
                                         Bodemanalyse toevoegen
                                     </NavLink>
