@@ -8,6 +8,7 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometry, numericCasted } from "./schema-custom-types"
+import type { ApplicationMethods } from "@svenvw/fdm-data"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm")
@@ -142,15 +143,19 @@ export type fertilizerAcquiringTypeInsert =
     typeof fertilizerAcquiring.$inferInsert
 
 // Define fertilizers application table
-export const applicationMethodEnum = fdmSchema.enum("p_app_method", [
-    "slotted coulter",
-    "incorporation",
-    "injection",
-    "spraying",
-    "broadcasting",
-    "spoke wheel",
-    "pocket placement",
-])
+export const applicationMethodOptions = [
+    { value: "slotted coulter", label: "Zodenbemester / Sleepvoet" },
+    { value: "incorporation", label: "Inwerken" },
+    { value: "injection", label: "Injecteren" },
+    { value: "spraying", label: "Spuiten" },
+    { value: "broadcasting", label: "Breedwerpig uitstrooien" },
+    { value: "spoke wheel", label: "Spaakwiel" },
+    { value: "pocket placement", label: "Plantgat" },
+] satisfies { value: ApplicationMethods; label: string }[]
+export const applicationMethodEnum = fdmSchema.enum(
+    "p_app_method",
+    applicationMethodOptions.map((x) => x.value) as [string, ...string[]],
+)
 export const fertilizerApplication = fdmSchema.table(
     "fertilizer_applying",
     {
@@ -184,6 +189,7 @@ export const fertilizersCatalogue = fdmSchema.table(
         p_name_nl: text().notNull(),
         p_name_en: text(),
         p_description: text(),
+        p_app_method_options: applicationMethodEnum().array(),
         p_dm: numericCasted(),
         p_density: numericCasted(),
         p_om: numericCasted(),

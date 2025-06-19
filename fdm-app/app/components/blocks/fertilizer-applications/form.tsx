@@ -22,9 +22,16 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
 import { cn } from "~/lib/utils"
-import { Combobox } from "../../custom/combobox"
-import { LoadingSpinner } from "../../custom/loadingspinner"
+import { Combobox } from "~/components/custom/combobox"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
@@ -40,10 +47,19 @@ export function FertilizerApplicationForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             p_id: undefined,
+            p_app_method: undefined,
             p_app_amount: undefined,
             p_app_date: new Date(),
         },
     })
+    const p_id = form.watch("p_id")
+    const selectedFertilizer = options.find((option) => option.value === p_id)
+
+    useEffect(() => {
+        if (p_id) {
+            form.setValue("p_app_method", "")
+        }
+    }, [p_id, form.setValue])
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {
@@ -75,6 +91,43 @@ export function FertilizerApplicationForm({
                                 }
                             />
                         </div>
+                        <FormField
+                            control={form.control}
+                            name="p_app_method"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Toedingsmethode
+                                        <span className="text-red-500">*</span>
+                                    </FormLabel>
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        value={field.value ?? ""}
+                                        disabled={!selectedFertilizer}
+                                    >
+                                        <FormControl>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Selecteer een methode" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {selectedFertilizer?.applicationMethodOptions?.map(
+                                                (option) => (
+                                                    <SelectItem
+                                                        key={option.value}
+                                                        value={option.value}
+                                                    >
+                                                        {option.label}
+                                                    </SelectItem>
+                                                ),
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                    <FormDescription />
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <div>
                             <FormField
                                 control={form.control}
@@ -182,7 +235,7 @@ export function FertilizerApplicationForm({
                                 )}
                             />
                         </div>
-                        <div className="justify-end items-end">
+                        <div className="flex justify-end items-baseline">
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">

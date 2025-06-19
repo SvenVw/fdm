@@ -1,4 +1,8 @@
-import type { CatalogueFertilizer, CatalogueFertilizerItem } from "../d"
+import type {
+    ApplicationMethods,
+    CatalogueFertilizer,
+    CatalogueFertilizerItem,
+} from "../d"
 import { hashFertilizer } from "../hash"
 import srm from "./srm.json"
 
@@ -20,6 +24,12 @@ export async function getCatalogueSrm(): Promise<CatalogueFertilizer> {
             p_name_nl: fertilizer.p_name_nl,
             p_name_en: null,
             p_description: null,
+            p_app_method_options:
+                fertilizer.p_app_method_options === undefined
+                    ? null
+                    : (fertilizer.p_app_method_options.split(
+                          "||",
+                      ) as ApplicationMethods[]),
             p_dm: fertilizer.p_dm === undefined ? null : fertilizer.p_dm,
             p_density:
                 fertilizer.p_density === undefined

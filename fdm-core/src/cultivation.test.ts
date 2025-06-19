@@ -671,6 +671,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_id_farm,
                 {
+                    p_app_method_options: null,
                     p_name_nl,
                     p_name_en,
                     p_description,
@@ -714,9 +715,7 @@ describe("Cultivation Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_type: "manure",
                 },
             )
 
@@ -1140,13 +1139,17 @@ describe("getCultivationsFromCatalogue error handling", () => {
             )
             // Should not reach here
             expect.fail("Expected an error to be thrown")
-        } catch (err: any) {
+        } catch (err) {
+            type ErrorWithContext = Error & {
+                context: { principal_id: string; b_id_farm: string }
+            }
+            const e = err as ErrorWithContext
             // Check that error was handled correctly
-            expect(err).toBeDefined()
-            expect(err.message).toContain(
+            expect(e).toBeDefined()
+            expect(e.message).toContain(
                 "Exception for getCultivationsFromCatalogue",
             )
-            expect(err.context).toEqual({
+            expect(e.context).toEqual({
                 principal_id,
                 b_id_farm,
             })

@@ -2,6 +2,7 @@ import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getFertilizerApplications,
+    getFertilizerParametersDescription,
     getFertilizers,
     getField,
     removeFertilizerApplication,
@@ -93,11 +94,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
+        const fertilizerParameterDescription =
+            getFertilizerParametersDescription()
+        const applicationMethods = fertilizerParameterDescription.find(
+            (x) => x.parameter === "p_app_method_options",
+        )
+        if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
+            const applicationMethodOptions = fertilizer.p_app_method_options
+                .map((opt) => {
+                    const meta = applicationMethods.options.find(
+                        (x) => x.value === opt,
+                    )
+                    return meta ? { value: opt, label: meta.label } : undefined
+                })
+                .filter(Boolean)
             return {
                 value: fertilizer.p_id,
                 label: fertilizer.p_name_nl,
+                applicationMethodOptions: applicationMethodOptions,
             }
         })
 
@@ -120,6 +136,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
             dose: dose.dose,
+            applicationMethodOptions: applicationMethods.options,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -154,12 +171,14 @@ export default function FarmFieldsOverviewBlock() {
                     <FertilizerApplicationForm
                         options={loaderData.fertilizerOptions}
                         action={location.pathname}
-                        fetcher={fetcher}
                     />
                     <Separator className="my-4" />
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
+                        }
+                        applicationMethodOptions={
+                            loaderData.applicationMethodOptions
                         }
                         fetcher={fetcher}
                     />
@@ -201,7 +220,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { p_id, p_app_amount, p_app_date } = formValues
+            const { p_id, p_app_amount, p_app_date, p_app_method } = formValues
 
             await addFertilizerApplication(
                 fdm,
@@ -209,7 +228,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id,
                 p_id,
                 p_app_amount,
-                undefined,
+                p_app_method,
                 p_app_date,
             )
 
