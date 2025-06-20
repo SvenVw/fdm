@@ -216,6 +216,34 @@ export type NitrogenEmissionAmmoniaFertilizers = {
          * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
          */
         applications: { id: string; value: Decimal }[]
+    },
+     /**
+     * Ammonia nitrogen emissions specifically from compost.
+     */
+    compost: {
+        /**
+         * The total amount of ammonia nitrogen emitted from compost.
+         */
+        total: Decimal
+        /**
+         * A detailed list of individual compost applications.
+         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
+         */
+        applications: { id: string; value: Decimal }[]
+    }
+     /**
+     * Ammonia nitrogen emissions specifically from other.
+     */
+    other: {
+        /**
+         * The total amount of ammonia nitrogen emitted from other.
+         */
+        total: Decimal
+        /**
+         * A detailed list of individual other applications.
+         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
+         */
+        applications: { id: string; value: Decimal }[]
     }
 }
 

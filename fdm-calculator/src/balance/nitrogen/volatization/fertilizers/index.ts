@@ -4,7 +4,7 @@ import type {
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
-// import { calculateNitrogenVolatilizationByCompost } from "./compost"
+import { calculateAmmoniaEmissionsByCompost } from "./compost"
 import { calculateAmmoniaEmissionsByManure } from "./manure"
 // import { calculateNitrogenVolatilizationByMineralFertilizers } from "./mineral"
 // import { calculateNitrogenVolatilizationByOtherFertilizers } from "./other"
@@ -39,12 +39,13 @@ export function calculateAmmoniaEmissionsByFertilizers(
         fertilizerDetailsMap,
     )
 
-    // // Calculate the amount of ammonia emitted by compost
-    // const fertilizersVolatilizationCompost =
-    //     calculateNitrogenVolatilizationByCompost(
-    //         fertilizerApplications,
-    //         fertilizerDetailsMap,
-    //     )
+    // Calculate the amount of ammonia emitted by compost
+     const fertilizersAmmoniaEmissionsCompost = calculateAmmoniaEmissionsByCompost(
+        cultivations,
+        fertilizerApplications,
+        cultivationDetailsMap,
+        fertilizerDetailsMap,
+    )
 
     // // Calculate the amount of ammonia emitted by othyer fertilizers
     // const fertilizersVolatilizationOther =
@@ -56,7 +57,7 @@ export function calculateAmmoniaEmissionsByFertilizers(
     // Calculate the total amount of ammonia emitted by fertilizers
     const fertilizersTotal = fertilizersAmmoniaEmissionsnMineral.total
         .add(fertilizersAmmoniaEmissionsManure.total)
-        .add(fertilizersVolatilizationCompost.total)
+        .add(fertilizersAmmoniaEmissionsCompost.total)
         .add(fertilizersVolatilizationOther.total)
 
     const fertilizers = {

@@ -71,7 +71,7 @@ export function calculateAmmoniaEmissionsByManure(
     }
 }
 
-function determineManureAmmoniaEmmissionFactor(
+export function determineManureAmmoniaEmmissionFactor(
     fertilizerApplication: FertilizerApplication,
     cultivations: FieldInput["cultivations"],
     cultivationDetails: Map<string, CultivationDetail>,
