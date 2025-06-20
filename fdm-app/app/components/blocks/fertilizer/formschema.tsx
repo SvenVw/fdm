@@ -137,6 +137,34 @@ export const FormSchema = z
                 })
                 .optional(),
         ),
+        p_no3_rt: z.preprocess(
+            (val) => (val === "" || val === null ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Ongeldige waarde",
+                })
+                .min(0, {
+                    message: "Waarde mag niet negatief zijn",
+                })
+                .max(1000, {
+                    message: "Waarde mag niet groter zijn dan 1000",
+                })
+                .optional(),
+        ),
+        p_nh4_rt: z.preprocess(
+            (val) => (val === "" || val === null ? undefined : val),
+            z.coerce
+                .number({
+                    invalid_type_error: "Ongeldige waarde",
+                })
+                .min(0, {
+                    message: "Waarde mag niet negatief zijn",
+                })
+                .max(1000, {
+                    message: "Waarde mag niet groter zijn dan 1000",
+                })
+                .optional(),
+        ),
         p_p_rt: z.preprocess(
             (val) => (val === "" || val === null ? undefined : val),
             z.coerce
@@ -373,5 +401,29 @@ export const FormSchema = z
             message:
                 "N-werkingscoëfficiënt is verplicht als meststof stikstofbevat",
             path: ["p_n_wc"],
+        },
+    )
+    .refine(
+        (data) => {
+            if (
+                data.p_n_rt &&
+                data.p_no3_rt &&
+                data.p_nh4_rt &&
+                data.p_no3_rt + data.p_nh4_rt > data.p_n_rt
+            ) {
+                return false
+            }
+            if (data.p_n_rt && data.p_no3_rt && data.p_no3_rt > data.p_n_rt) {
+                return false
+            }
+            if (data.p_n_rt && data.p_nh4_rt && data.p_nh4_rt > data.p_n_rt) {
+                return false
+            }
+            return true
+        },
+        {
+            message:
+                "Totaal stikstof kan niet groter zijn dan de som van nitraat en ammonium",
+            path: ["p_n_rt"],
         },
     )
