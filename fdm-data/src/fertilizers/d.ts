@@ -3,11 +3,14 @@ export type CatalogueFertilizerName = "srm"
 export type ApplicationMethods =
     | "slotted coulter"
     | "incorporation"
+    | "incorporation_2tracks"
     | "injection"
+    | "injection_shallow"
     | "spraying"
     | "broadcasting"
     | "spoke wheel"
     | "pocket placement"
+    | "narrowband"
 
 export interface CatalogueFertilizerItem {
     p_source: CatalogueFertilizerName | string

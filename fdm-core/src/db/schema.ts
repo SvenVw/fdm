@@ -145,12 +145,15 @@ export type fertilizerAcquiringTypeInsert =
 // Define fertilizers application table
 export const applicationMethodOptions = [
     { value: "slotted coulter", label: "Zodenbemester / Sleepvoet" },
-    { value: "incorporation", label: "Inwerken" },
-    { value: "injection", label: "Injecteren" },
+    { value: "incorporation", label: "Onderwerken in 1 werkgang" },
+    { value: "incorporation_2tracks", label: "Onderwerken in 2 werkgangen" },
+    { value: "injection", label: "Mestinjectie" },
+    { value: "injection_shallow", label: "In sleufjes in de grond" },
     { value: "spraying", label: "Spuiten" },
     { value: "broadcasting", label: "Breedwerpig uitstrooien" },
     { value: "spoke wheel", label: "Spaakwiel" },
     { value: "pocket placement", label: "Plantgat" },
+    { value: "narrowband", label: "In strookjes op de grond" },
 ] satisfies { value: ApplicationMethods; label: string }[]
 export const applicationMethodEnum = fdmSchema.enum(
     "p_app_method",
