@@ -34,6 +34,7 @@ import {
     SelectValue,
 } from "~/components/ui/select"
 import { cn } from "~/lib/utils"
+import { DatePicker } from "../../custom/date-picker"
 
 export function SoilAnalysisForm(props: {
     soilAnalysis: SoilAnalysis | undefined
@@ -192,75 +193,12 @@ export function SoilAnalysisForm(props: {
 
                                 if (x.type === "date") {
                                     return (
-                                        <FormField
-                                            control={form.control}
-                                            name={x.parameter}
+                                        <DatePicker
                                             key={x.parameter}
-                                            render={({ field }) => (
-                                                <FormItem className="">
-                                                    <FormLabel>
-                                                        {x.name}
-                                                    </FormLabel>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <FormControl>
-                                                                <Button
-                                                                    variant={
-                                                                        "outline"
-                                                                    }
-                                                                    className={cn(
-                                                                        "w-full text-left font-normal",
-                                                                        !field.value &&
-                                                                            "text-muted-foreground",
-                                                                    )}
-                                                                >
-                                                                    {field.value ? (
-                                                                        format(
-                                                                            field.value,
-                                                                            "yyyy-MM-dd",
-                                                                        )
-                                                                    ) : (
-                                                                        <span>
-                                                                            Kies
-                                                                            een
-                                                                            datum
-                                                                        </span>
-                                                                    )}
-                                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                                </Button>
-                                                            </FormControl>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent
-                                                            className="w-auto p-0"
-                                                            align="start"
-                                                        >
-                                                            <Calendar
-                                                                mode="single"
-                                                                selected={
-                                                                    field.value
-                                                                }
-                                                                onSelect={
-                                                                    field.onChange
-                                                                }
-                                                                locale={nl}
-                                                                disabled={(
-                                                                    date,
-                                                                ) =>
-                                                                    date <
-                                                                    new Date(
-                                                                        "1970-01-01",
-                                                                    )
-                                                                }
-                                                                initialFocus
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    <FormDescription>
-                                                        {x.description}
-                                                    </FormDescription>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
+                                            form={form}
+                                            name={x.parameter}
+                                            label={x.name}
+                                            description={x.description}
                                         />
                                     )
                                 }

@@ -1,13 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { CalendarIcon } from "lucide-react"
 import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -18,22 +14,17 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "~/components/ui/popover"
-import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { cn } from "~/lib/utils"
 import { Combobox } from "~/components/custom/combobox"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
+import { DatePicker } from "~/components/custom/date-picker"
 
 export function FertilizerApplicationForm({
     options,
@@ -181,58 +172,11 @@ export function FertilizerApplicationForm({
                         </div>
 
                         <div>
-                            <FormField
-                                control={form.control}
-                                name="p_app_date"
-                                render={({ field }) => (
-                                    <FormItem className="">
-                                        <FormLabel>Datum</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-full text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "yyyy-MM-dd",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Kies een datum
-                                                            </span>
-                                                        )}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    locale={nl}
-                                                    disabled={(date) =>
-                                                        date <
-                                                        new Date("1970-01-01")
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormDescription />
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                            <DatePicker
+                                form={form}
+                                name={"p_app_date"}
+                                label={"Datum"}
+                                description={""}
                             />
                         </div>
                         <div className="flex justify-end items-baseline">

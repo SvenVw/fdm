@@ -1,12 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns/format"
-import { nl } from "date-fns/locale/nl"
-import { CalendarIcon } from "lucide-react"
-import { Form } from "react-hook-form"
+import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -16,14 +12,9 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "~/components/ui/popover"
-import { cn } from "~/lib/utils"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { FormSchema } from "./schema"
+import { DatePicker } from "~/components/custom/date-picker"
 
 export function HarvestForm({
     b_lu_yield,
@@ -168,60 +159,11 @@ export function HarvestForm({
                                     </FormItem>
                                 )}
                             /> */}
-                            <FormField
-                                control={form.control}
-                                name="b_lu_harvest_date"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col">
-                                        <FormLabel>Oogstdatum</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "yyyy-MM-dd",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Kies een datum
-                                                            </span>
-                                                        )}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    locale={nl}
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        date <
-                                                        new Date("1970-01-01")
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormDescription>
-                                            Kan ook inwerkdatum zijn
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
+                            <DatePicker
+                                form={form}
+                                name={"b_lu_harvest_date"}
+                                label={"Oogstdatum"}
+                                description={"Kan ook inwerkdatum zijn"}
                             />
                         </div>
                         <div>
