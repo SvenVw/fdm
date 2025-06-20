@@ -350,7 +350,7 @@ export type FieldInput = {
     field: Pick<Field, "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end">
     cultivations: Pick<
         Cultivation,
-        "b_lu" | "b_lu_catalogue" | "m_cropresidue"
+        "b_lu" | "b_lu_start" | "b_lu_end" | "b_lu_catalogue" | "m_cropresidue"
     >[]
     harvests: Harvest[]
     soilAnalyses: Pick<
@@ -389,6 +389,8 @@ export type FertilizerDetail = Pick<
     Fertilizer,
     | "p_id_catalogue"
     | "p_n_rt" // Total nitrogen content (g N / kg fertilizer)
+    | "p_no3_rt" // Nitrate content (g N / kg fertilizer)
+    | "p_nh4_rt" // Ammonium content (g N / kg fertilizer)
     | "p_type"
 >
 
