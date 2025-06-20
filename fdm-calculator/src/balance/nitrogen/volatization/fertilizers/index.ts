@@ -1,3 +1,4 @@
+import { Decimal } from "decimal.js"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -6,6 +7,7 @@ import type {
 } from "../../types"
 import { calculateAmmoniaEmissionsByCompost } from "./compost"
 import { calculateAmmoniaEmissionsByManure } from "./manure"
+import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
 // import { calculateNitrogenVolatilizationByMineralFertilizers } from "./mineral"
 // import { calculateNitrogenVolatilizationByOtherFertilizers } from "./other"
 
@@ -40,32 +42,33 @@ export function calculateAmmoniaEmissionsByFertilizers(
     )
 
     // Calculate the amount of ammonia emitted by compost
-     const fertilizersAmmoniaEmissionsCompost = calculateAmmoniaEmissionsByCompost(
-        cultivations,
-        fertilizerApplications,
-        cultivationDetailsMap,
-        fertilizerDetailsMap,
-    )
+    const fertilizersAmmoniaEmissionsCompost =
+        calculateAmmoniaEmissionsByCompost(
+            cultivations,
+            fertilizerApplications,
+            cultivationDetailsMap,
+            fertilizerDetailsMap,
+        )
 
-    // // Calculate the amount of ammonia emitted by othyer fertilizers
-    // const fertilizersVolatilizationOther =
-    //     calculateNitrogenVolatilizationByOtherFertilizers(
-    //         fertilizerApplications,
-    //         fertilizerDetailsMap,
-    //     )
+    // Calculate the amount of ammonia emitted by othyer fertilizers
+    const fertilizersAmmoniaEmissionsByOtherFertilizers =
+        calculateAmmoniaEmissionsByOtherFertilizers(
+            fertilizerApplications,
+            fertilizerDetailsMap,
+        )
 
     // Calculate the total amount of ammonia emitted by fertilizers
     const fertilizersTotal = fertilizersAmmoniaEmissionsnMineral.total
         .add(fertilizersAmmoniaEmissionsManure.total)
         .add(fertilizersAmmoniaEmissionsCompost.total)
-        .add(fertilizersVolatilizationOther.total)
+        .add(fertilizersAmmoniaEmissionsByOtherFertilizers.total)
 
     const fertilizers = {
         total: fertilizersTotal,
         mineral: fertilizersVolatilizationMineral,
         manure: fertilizersAmmoniaEmissionsManure,
-        compost: fertilizersVolatilizationCompost,
-        other: fertilizersVolatilizationOther,
+        compost: fertilizersAmmoniaEmissionsCompost,
+        other: fertilizersAmmoniaEmissionsByOtherFertilizers,
     }
     return fertilizers
 }
