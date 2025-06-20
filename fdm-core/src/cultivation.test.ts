@@ -710,10 +710,12 @@ describe("Cultivation Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_cl_rt: 390,
                     p_type: "manure",
                 },
@@ -1133,7 +1135,7 @@ describe("getCultivationsFromCatalogue error handling", () => {
         // Act & Assert
         try {
             await getCultivationsFromCatalogue(
-                mockFdm as any,
+                mockFdm as FdmServerType,
                 principal_id,
                 b_id_farm,
             )

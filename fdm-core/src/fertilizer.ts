@@ -110,6 +110,8 @@ export async function addFertilizerToCatalogue(
         p_n_if: schema.fertilizersCatalogueTypeInsert["p_n_if"]
         p_n_of: schema.fertilizersCatalogueTypeInsert["p_n_of"]
         p_n_wc: schema.fertilizersCatalogueTypeInsert["p_n_wc"]
+        p_no3_rt: schema.fertilizersCatalogueTypeInsert["p_no3_rt"]
+        p_nh4_rt: schema.fertilizersCatalogueTypeInsert["p_nh4_rt"]
         p_p_rt: schema.fertilizersCatalogueTypeInsert["p_p_rt"]
         p_k_rt: schema.fertilizersCatalogueTypeInsert["p_k_rt"]
         p_mg_rt: schema.fertilizersCatalogueTypeInsert["p_mg_rt"]
@@ -294,6 +296,8 @@ export async function getFertilizer(
                 p_n_if: schema.fertilizersCatalogue.p_n_if,
                 p_n_of: schema.fertilizersCatalogue.p_n_of,
                 p_n_wc: schema.fertilizersCatalogue.p_n_wc,
+                p_no3_rt: schema.fertilizersCatalogue.p_no3_rt,
+                p_nh4_rt: schema.fertilizersCatalogue.p_nh4_rt,
                 p_p_rt: schema.fertilizersCatalogue.p_p_rt,
                 p_k_rt: schema.fertilizersCatalogue.p_k_rt,
                 p_mg_rt: schema.fertilizersCatalogue.p_mg_rt,
@@ -404,6 +408,8 @@ export async function updateFertilizerFromCatalogue(
         p_n_if: schema.fertilizersCatalogueTypeInsert["p_n_if"]
         p_n_of: schema.fertilizersCatalogueTypeInsert["p_n_of"]
         p_n_wc: schema.fertilizersCatalogueTypeInsert["p_n_wc"]
+        p_no3_rt: schema.fertilizersCatalogueTypeInsert["p_no3_rt"]
+        p_nh4_rt: schema.fertilizersCatalogueTypeInsert["p_nh4_rt"]
         p_p_rt: schema.fertilizersCatalogueTypeInsert["p_p_rt"]
         p_k_rt: schema.fertilizersCatalogueTypeInsert["p_k_rt"]
         p_mg_rt: schema.fertilizersCatalogueTypeInsert["p_mg_rt"]
@@ -559,6 +565,8 @@ export async function getFertilizers(
                 p_n_if: schema.fertilizersCatalogue.p_n_if,
                 p_n_of: schema.fertilizersCatalogue.p_n_of,
                 p_n_wc: schema.fertilizersCatalogue.p_n_wc,
+                p_no3_rt: schema.fertilizersCatalogue.p_no3_rt,
+                p_nh4_rt: schema.fertilizersCatalogue.p_nh4_rt,
                 p_p_rt: schema.fertilizersCatalogue.p_p_rt,
                 p_k_rt: schema.fertilizersCatalogue.p_k_rt,
                 p_mg_rt: schema.fertilizersCatalogue.p_mg_rt,
@@ -1084,6 +1092,26 @@ export function getFertilizerParametersDescription(
             description: "Stikstof, werkingscoëfficient",
             min: 0,
             max: 1,
+        },
+        {
+            parameter: "p_no3_rt",
+            unit: "g N/kg",
+            name: "NO3",
+            type: "numeric",
+            category: "primary",
+            description: "Nitraat",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_nh4_rt",
+            unit: "g N/kg",
+            name: "NH4",
+            type: "numeric",
+            category: "primary",
+            description: "Ammonium",
+            min: 0,
+            max: 1000,
         },
         {
             parameter: "p_p_rt",
