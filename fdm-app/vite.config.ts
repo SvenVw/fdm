@@ -9,6 +9,9 @@ export default defineConfig({
     define: {
         global: {},
     },
+    ssr: {
+        noExternal: ['posthog-js', 'posthog-js/react']
+    },
     build: {
         sourcemap: process.env.NODE_ENV === "development",
         target: "ES2022",
