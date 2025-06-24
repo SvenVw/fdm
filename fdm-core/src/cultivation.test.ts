@@ -717,6 +717,7 @@ describe("Cultivation Data Model", () => {
                     p_no3_rt: 400,
                     p_nh4_rt: 410,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )

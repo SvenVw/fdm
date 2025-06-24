@@ -129,6 +129,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -207,6 +208,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -283,6 +285,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -372,6 +375,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -470,6 +474,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -685,6 +690,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -799,7 +805,8 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type: "manure",
+                    p_ef_nh3: 0.8,
+                    p_type: "mineral",
                 },
             )
 
