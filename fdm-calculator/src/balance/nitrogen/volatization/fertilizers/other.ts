@@ -5,6 +5,19 @@ import type {
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
 
+/**
+ * Calculates the ammonia emissions from "other" fertilizer types.
+ *
+ * This function iterates through fertilizer applications and filters out known
+ * types (manure, mineral, compost). For any remaining "other" fertilizer types,
+ * the ammonia emission is currently set to 0 as no specific calculation method
+ * is available.
+ *
+ * @param fertilizerApplications - An array of fertilizer application records.
+ * @param fertilizerDetailsMap - A Map where keys are fertilizer catalogue IDs and values are detailed fertilizer information.
+ * @returns An object containing the total ammonia emissions from other fertilizers and a breakdown by individual application.
+ * @throws Error if a fertilizer application references a non-existent fertilizer detail.
+ */
 export function calculateAmmoniaEmissionsByOtherFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,

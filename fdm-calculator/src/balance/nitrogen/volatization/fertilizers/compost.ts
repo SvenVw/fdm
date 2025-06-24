@@ -7,6 +7,20 @@ import type {
 } from "../../types"
 import { determineManureAmmoniaEmmissionFactor } from "./manure"
 
+/**
+ * Calculates the ammonia emissions specifically from compost applications.
+ *
+ * This function iterates through fertilizer applications, filters for compost types,
+ * determines the appropriate emission factor, and calculates the ammonia emissions
+ * for each relevant application. It then aggregates these values to provide a total.
+ *
+ * @param cultivations - An array of cultivation records for the field.
+ * @param fertilizerApplications - An array of fertilizer application records.
+ * @param cultivationDetailsMap - A Map where keys are cultivation IDs and values are detailed cultivation information.
+ * @param fertilizerDetailsMap - A Map where keys are fertilizer catalogue IDs and values are detailed fertilizer information.
+ * @returns An object containing the total ammonia emissions from compost and a breakdown by individual application.
+ * @throws Error if a fertilizer application references a non-existent fertilizer detail.
+ */
 export function calculateAmmoniaEmissionsByCompost(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],

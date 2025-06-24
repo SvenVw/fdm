@@ -7,6 +7,21 @@ import type {
 } from "../../types"
 import type { FertilizerApplication } from "@svenvw/fdm-core"
 
+/**
+ * Calculates the ammonia emissions specifically from manure applications.
+ *
+ * This function processes each fertilizer application, identifies manure types,
+ * determines the appropriate emission factor using `determineManureAmmoniaEmmissionFactor`,
+ * and calculates the ammonia emissions for each relevant application. It then aggregates
+ * these values to provide a total.
+ *
+ * @param cultivations - An array of cultivation records for the field.
+ * @param fertilizerApplications - An array of fertilizer application records.
+ * @param cultivationDetailsMap - A Map where keys are cultivation IDs and values are detailed cultivation information.
+ * @param fertilizerDetailsMap - A Map where keys are fertilizer catalogue IDs and values are detailed fertilizer information.
+ * @returns An object containing the total ammonia emissions from manure and a breakdown by individual application.
+ * @throws Error if a fertilizer application references a non-existent fertilizer detail.
+ */
 export function calculateAmmoniaEmissionsByManure(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
@@ -71,6 +86,20 @@ export function calculateAmmoniaEmissionsByManure(
     }
 }
 
+/**
+ * Determines the ammonia emission factor for manure applications based on
+ * application method and the presence of grassland or cropland.
+ *
+ * This function checks the cultivation type at the time of fertilizer application
+ * (grassland, cropland, or bare soil) and applies a specific emission factor
+ * based on the application method.
+ *
+ * @param fertilizerApplication - The specific fertilizer application record.
+ * @param cultivations - An array of cultivation records for the field.
+ * @param cultivationDetails - A Map where keys are cultivation IDs and values are detailed cultivation information.
+ * @returns A Decimal representing the ammonia emission factor.
+ * @throws Error if an unsupported application method is provided for the given land type.
+ */
 export function determineManureAmmoniaEmmissionFactor(
     fertilizerApplication: FertilizerApplication,
     cultivations: FieldInput["cultivations"],

@@ -5,6 +5,19 @@ import type {
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
 
+/**
+ * Calculates the ammonia emissions specifically from mineral fertilizer applications.
+ *
+ * This function iterates through fertilizer applications, filters for mineral types,
+ * determines the appropriate emission factor (either from `p_ef_nh3` or by calling
+ * `determineMineralAmmoniaEmmissionFactor`), and calculates the ammonia emissions
+ * for each relevant application. It then aggregates these values to provide a total.
+ *
+ * @param fertilizerApplications - An array of fertilizer application records.
+ * @param fertilizerDetailsMap - A Map where keys are fertilizer catalogue IDs and values are detailed fertilizer information.
+ * @returns An object containing the total ammonia emissions from mineral fertilizers and a breakdown by individual application.
+ * @throws Error if a fertilizer application references a non-existent fertilizer detail.
+ */
 export function calculateAmmoniaEmissionsByMineralFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
@@ -69,6 +82,16 @@ export function calculateAmmoniaEmissionsByMineralFertilizers(
     }
 }
 
+/**
+ * Determines the ammonia emission factor for mineral fertilizers based on their
+ * nitrogen, nitrate, ammonium, and sulfur content, and the presence of an inhibitor.
+ *
+ * This function calculates the emission factor using a specific formula that
+ * considers various nutrient components and a boolean flag for inhibitor presence.
+ *
+ * @param fertilizerDetail - The detailed information for a specific mineral fertilizer.
+ * @returns A Decimal representing the calculated ammonia emission factor.
+ */
 export function determineMineralAmmoniaEmmissionFactor(
     fertilizerDetail: FertilizerDetail,
 ): Decimal {
