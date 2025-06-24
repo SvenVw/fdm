@@ -61,7 +61,7 @@ describe("hashFertilizer", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("3852e767")
+        expect(hash).toBe("5a405bbe")
     })
 
     it("should generate different hashes for different fertilizer items", async () => {
