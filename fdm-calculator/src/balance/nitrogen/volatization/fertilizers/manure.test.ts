@@ -1,6 +1,13 @@
 import { describe, it, expect } from "vitest"
-import { calculateAmmoniaEmissionsByManure, determineManureAmmoniaEmmissionFactor } from "./manure"
-import type { CultivationDetail, FertilizerDetail, FieldInput } from "../../types"
+import {
+    calculateAmmoniaEmissionsByManure,
+    determineManureAmmoniaEmmissionFactor,
+} from "./manure"
+import type {
+    CultivationDetail,
+    FertilizerDetail,
+    FieldInput,
+} from "../../types"
 import type { FertilizerApplication } from "@svenvw/fdm-core"
 
 describe("calculateAmmoniaEmissionsByManure", () => {
@@ -35,7 +42,8 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             {
                 p_app_id: "app1",
                 p_id_catalogue: "manure1",
-                p_app_amount: 1000, 
+                p_name_nl: "meststof1",
+                p_app_amount: 1000,
                 p_app_date: new Date("2023-06-01"),
                 p_app_method: "broadcasting",
                 p_id: "app1",
@@ -43,6 +51,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             {
                 p_app_id: "app2",
                 p_id_catalogue: "manure2",
+                p_name_nl: "meststof2",
                 p_app_amount: 500,
                 p_app_date: new Date("2023-07-01"),
                 p_app_method: "narrowband",
@@ -54,7 +63,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
                 "grassland_type",
                 {
                     b_lu_catalogue: "grassland_type",
-                    b_lu_croprotation: "grassland",
+                    b_lu_croprotation: "grass",
                     b_lu_yield: null,
                     b_lu_hi: null,
                     b_lu_n_harvestable: null,
@@ -116,6 +125,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             {
                 p_app_id: "app1",
                 p_id_catalogue: "mineral1",
+                p_name_nl: "meststof1",
                 p_app_amount: 1000,
                 p_app_date: new Date("2023-06-01"),
                 p_app_method: "broadcasting",
@@ -157,6 +167,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             {
                 p_app_id: "app1",
                 p_id_catalogue: "nonExistent",
+                p_name_nl: "meststof1",
                 p_app_amount: 1000,
                 p_app_date: new Date("2023-06-01"),
                 p_app_method: "broadcasting",
@@ -183,7 +194,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
             "grassland_type",
             {
                 b_lu_catalogue: "grassland_type",
-                b_lu_croprotation: "grassland",
+                b_lu_croprotation: "grass",
                 b_lu_yield: null,
                 b_lu_hi: null,
                 b_lu_n_harvestable: null,
@@ -209,6 +220,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "broadcasting",
@@ -236,6 +248,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "narrowband",
@@ -263,6 +276,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "narrowband",
@@ -290,6 +304,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "broadcasting",
@@ -309,6 +324,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "unsupported_method",
@@ -330,7 +346,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
                 cultivationDetailsMap,
             ),
         ).toThrowError(
-            "Unsupported application method unsupported_method for app1 on grassland",
+            "Unsupported application method unsupported_method for meststof1 (app1) on grassland",
         )
     })
 
@@ -338,6 +354,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "unsupported_method",
@@ -359,7 +376,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
                 cultivationDetailsMap,
             ),
         ).toThrowError(
-            "Unsupported application method unsupported_method for app1 for cropland",
+            "Unsupported application method unsupported_method for meststof1 (app1)  for cropland",
         )
     })
 
@@ -367,6 +384,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
+            p_name_nl: "meststof1",
             p_app_amount: 1000,
             p_app_date: new Date("2023-06-01"),
             p_app_method: "unsupported_method",
@@ -380,7 +398,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
                 cultivationDetailsMap,
             ),
         ).toThrowError(
-            "Unsupported application method unsupported_method for app1 for bare soil",
+            "Unsupported application method unsupported_method for meststof1 (app1) for bare soil",
         )
     })
 })

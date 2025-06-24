@@ -94,7 +94,7 @@ export function calculateDose({
         const fertilizer = fertilizers.find((f) => f.p_id_catalogue === application.p_id_catalogue)
         if (!fertilizer) {
             throw new Error(
-                `Fertilizer ${application.p_id} not found for application ${application.p_app_id}`,
+                `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,
             )
         }
         const currentDose = { ...initialDose, p_app_id: application.p_app_id }

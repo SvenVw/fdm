@@ -53,7 +53,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
                 "grassland_type",
                 {
                     b_lu_catalogue: "grassland_type",
-                    b_lu_croprotation: "grassland",
+                    b_lu_croprotation: "grass",
                     b_lu_yield: null,
                     b_lu_hi: null,
                     b_lu_n_harvestable: null,
@@ -208,7 +208,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
                 "grassland_type",
                 {
                     b_lu_catalogue: "grassland_type",
-                    b_lu_croprotation: "grassland",
+                    b_lu_croprotation: "grass",
                     b_lu_yield: null,
                     b_lu_hi: null,
                     b_lu_n_harvestable: null,
