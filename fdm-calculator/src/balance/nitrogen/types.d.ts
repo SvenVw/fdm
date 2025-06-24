@@ -216,8 +216,8 @@ export type NitrogenEmissionAmmoniaFertilizers = {
          * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
          */
         applications: { id: string; value: Decimal }[]
-    },
-     /**
+    }
+    /**
      * Ammonia nitrogen emissions specifically from compost.
      */
     compost: {
@@ -231,7 +231,7 @@ export type NitrogenEmissionAmmoniaFertilizers = {
          */
         applications: { id: string; value: Decimal }[]
     }
-     /**
+    /**
      * Ammonia nitrogen emissions specifically from other.
      */
     other: {
@@ -419,6 +419,8 @@ export type FertilizerDetail = Pick<
     | "p_n_rt" // Total nitrogen content (g N / kg fertilizer)
     | "p_no3_rt" // Nitrate content (g N / kg fertilizer)
     | "p_nh4_rt" // Ammonium content (g N / kg fertilizer)
+    | "p_s_rt" // Sulfur content (g SO3 / kg fertilizer)
+    | "p_ef_nh3" // Ammonia emmission factor
     | "p_type"
 >
 

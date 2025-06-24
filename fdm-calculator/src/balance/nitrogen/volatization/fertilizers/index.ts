@@ -1,4 +1,3 @@
-import { Decimal } from "decimal.js"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -8,8 +7,7 @@ import type {
 import { calculateAmmoniaEmissionsByCompost } from "./compost"
 import { calculateAmmoniaEmissionsByManure } from "./manure"
 import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
-// import { calculateNitrogenVolatilizationByMineralFertilizers } from "./mineral"
-// import { calculateNitrogenVolatilizationByOtherFertilizers } from "./other"
+import { calculateAmmoniaEmissionsByMineralFertilizers } from "./mineral"
 
 /**
  * Calculates the total ammonia emission from all fertilizer sources (mineral, manure, compost and other fertilizers).
@@ -27,11 +25,11 @@ export function calculateAmmoniaEmissionsByFertilizers(
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenEmissionAmmoniaFertilizers {
     // Calculate the amount of ammonia emitted by mineral fertilizers
-    // const fertilizersVolatilizationMineral =
-    //     calculateNitrogenVolatilizationByMineralFertilizers(
-    //         fertilizerApplications,
-    //         fertilizerDetailsMap,
-    //     )
+    const fertilizersAmmoniaEmissionsMineral =
+        calculateAmmoniaEmissionsByMineralFertilizers(
+            fertilizerApplications,
+            fertilizerDetailsMap,
+        )
 
     // Calculate the amount of ammonia emitted by manure
     const fertilizersAmmoniaEmissionsManure = calculateAmmoniaEmissionsByManure(
@@ -58,14 +56,14 @@ export function calculateAmmoniaEmissionsByFertilizers(
         )
 
     // Calculate the total amount of ammonia emitted by fertilizers
-    const fertilizersTotal = fertilizersAmmoniaEmissionsnMineral.total
+    const fertilizersTotal = fertilizersAmmoniaEmissionsMineral.total
         .add(fertilizersAmmoniaEmissionsManure.total)
         .add(fertilizersAmmoniaEmissionsCompost.total)
         .add(fertilizersAmmoniaEmissionsByOtherFertilizers.total)
 
     const fertilizers = {
         total: fertilizersTotal,
-        mineral: fertilizersVolatilizationMineral,
+        mineral: fertilizersAmmoniaEmissionsMineral,
         manure: fertilizersAmmoniaEmissionsManure,
         compost: fertilizersAmmoniaEmissionsCompost,
         other: fertilizersAmmoniaEmissionsByOtherFertilizers,
