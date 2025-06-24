@@ -191,13 +191,93 @@ Crop residues (e.g., straw, stover, roots) contain significant amounts of nitrog
 
 ### 3.3. Nitrogen Volatilization (kg N / ha)
 
-Nitrogen lost to the atmosphere, primarily as ammonia (NH3). This is calculated as a negative value. This is currently not implemented yet, but will be soon made available.
+Nitrogen volatilization refers to the loss of nitrogen to the atmosphere, primarily in the form of ammonia (NH₃) gas. This process is a significant pathway for nitrogen loss from agricultural systems, reducing the efficiency of nitrogen use and contributing to air pollution. The amount of ammonia volatilized depends on various factors, including the type of fertilizer, application method, environmental conditions, and soil properties.
 
-*  **Components (based on data types):**
-    *  **Ammonia from Fertilizers:** Expected to depend on fertilizer type (mineral, manure), application method, and N content.
-    *  **Ammonia from Crop Residues:** Expected to depend on residue type, N content, and incorporation.
-    *  **Ammonia from Grazing:** Currently not calculated.
-*  The total N volatilized is the sum of these components.
+The calculations for ammonia emissions are derived from the **NEMA model (Nutrient Emission Model for Agriculture)**, a Dutch model used to estimate nutrient losses from agricultural sources.
+
+The total N volatilized is the sum of ammonia emissions from fertilizers and crop residues. Ammonia from grazing is currently not calculated.
+
+#### 3.3.1. Ammonia from Fertilizers
+
+Ammonia emissions from fertilizers are calculated differently depending on the fertilizer type.
+
+*   **Manure, Compost, and Other Organic Fertilizers:**
+    For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the fraction of nitrogen that is readily available for volatilization.
+
+    *   **Formula:**
+        ```latex
+        \text{NH}_3\text{ Emission (kg N / ha)} = \text{Application Amount (kg / ha)} \times \text{TAN Content (fraction)} \times \text{Emission Factor (fraction)}
+        ```
+        Where:
+        *   `Application Amount`: `p_app_amount` (kg / ha) - The total amount of fertilizer applied.
+        *   `TAN Content`: `p_nh4_rt` (fraction) - The fraction of total nitrogen that is in ammoniacal form.
+        *   `Emission Factor`: A dimensionless factor representing the proportion of TAN that is volatilized as ammonia. This factor is determined by the application method and the type of land (grassland, cropland, or bare soil) at the time of application.
+
+    *   **Emission Factors for Manure and Compost:**
+        | Application Method    | Grassland | Cropland | Bare Soil |
+        | :-------------------- | :-------- | :------- | :-------- |
+        | Broadcasting          | 0.68      | N/A      | 0.69      |
+        | Narrowband            | 0.264     | 0.36     | 0.36      |
+        | Slotted Coulters      | 0.217     | N/A      | 0.30      |
+        | Shallow Injection     | 0.17      | 0.24     | 0.25      |
+        | Incorporation         | N/A       | N/A      | 0.22      |
+        | Incorporation 2 Tracks| N/A       | N/A      | 0.46      |
+
+        *Note: "N/A" indicates that the method is not typically used or supported for that land type in the calculation model, and will result in an error if attempted.*
+
+*   **Mineral Fertilizers:**
+    For mineral fertilizers, the emission is calculated based on the **total nitrogen content (`p_n_rt`)** of the fertilizer and the **emission factor**.
+
+    *   **Formula:**
+        ```latex
+        \text{NH}_3\text{ Emission (kg N / ha)} = \text{Application Amount (kg / ha)} \times \text{Total N Content (fraction)} \times \text{Emission Factor (fraction)}
+        ```
+        Where:
+        *   `Application Amount`: `p_app_amount` (kg / ha).
+        *   `Total N Content`: `p_n_rt` (fraction).
+        *   `Emission Factor`: `p_ef_nh3` (fraction). This factor can be directly provided in the `FertilizerDetail`. If it is not provided, it is calculated using an empirical formula based on the fertilizer's composition:
+
+        ```latex
+        \text{Emission Factor} = (p_{n\_org}^2 \times K_1) + (p_{no3\_rt} \times p_{s\_rt} \times K_2) + (p_{nh4\_rt}^2 \times K_3)
+        ```
+        Where:
+        *   `p_n_org`: Organic nitrogen content (calculated as `p_n_rt - p_no3_rt - p_nh4_rt`).
+        *   `p_no3_rt`: Nitrate content.
+        *   `p_nh4_rt`: Ammonium content (TAN).
+        *   `p_s_rt`: Sulfur content.
+        *   `K_1`, `K_2`, `K_3`: Empirical constants.
+            *   If an inhibitor is present: `K_1 = 3.166 \times 10^{-5}`
+            *   If no inhibitor: `K_1 = 7.021 \times 10^{-5}`
+            *   `K_2 = -4.308 \times 10^{-5}`
+            *   `K_3 = 2.498 \times 10^{-4}`
+        *Note: Currently, the presence of an inhibitor (`p_inhibitor`) is hardcoded to `false` in the calculation.*
+
+
+
+#### 3.3.2. Ammonia from Crop Residues
+
+Ammonia emissions from crop residues occur when residues are left on the field and decompose, releasing nitrogen compounds that can volatilize. The calculation of these emissions is based on the amount of nitrogen in the crop residues and a specific emission factor.
+
+*   **Formula per cultivation:**
+    ```latex
+    \text{NH}_3\text{ Emission (kg N / ha)} = \text{Residue N Content (kg N / ha)} \times \text{Emission Factor (fraction)}
+    ```
+    Where:
+    *   `Residue N Content`: The amount of nitrogen contained in the crop residues left on the field. This is derived from the `Residue_Mass` (calculated in Section 3.2.2) and the `N_Content_Residue` (`b_lu_n_residue` from `CultivationCatalogue`).
+    *   `Emission Factor`: This factor is calculated based on the nitrogen content of the crop residue in g/kg dry matter (`b_lu_n_residue`).
+
+    *   **Emission Factor Formula:**
+        ```latex
+        \text{Emission Factor} = (0.41 \times \text{b_lu_n_residue (g/kg dry matter)}) - 5.42
+        ```
+        Where:
+        *   `b_lu_n_residue`: Nitrogen content of the crop residue in grams per kilogram of dry matter (`b_lu_n_residue` from `CultivationCatalogue`).
+
+*Note: Ammonia emissions from crop residues are only calculated if the `m_cropresidue` flag is `false` or `null`, indicating that residues are incorporated into the soil rather than removed.*
+
+#### 3.3.3. Ammonia from Grazing
+
+Ammonia emissions from grazing are currently not calculated in the FDM Calculator and are set to `0`.
 
 ## 4. Field and Farm Level Balance
 
