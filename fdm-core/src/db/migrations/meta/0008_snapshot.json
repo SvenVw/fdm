@@ -1,5 +1,5 @@
 {
-  "id": "d33e76a6-9032-4605-bbee-7412525d5ed8",
+  "id": "53213c69-6894-40ed-96e7-82174b93fe6b",
   "prevId": "c4d35681-e2ca-4cb7-b632-7c00b025dc3d",
   "version": "7",
   "dialect": "postgresql",
@@ -1199,6 +1199,12 @@
         },
         "p_cl_rt": {
           "name": "p_cl_rt",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "p_ef_nh3": {
+          "name": "p_ef_nh3",
           "type": "numeric",
           "primaryKey": false,
           "notNull": false
@@ -2853,11 +2859,14 @@
       "values": [
         "slotted coulter",
         "incorporation",
+        "incorporation 2 tracks",
         "injection",
+        "shallow injection",
         "spraying",
         "broadcasting",
         "spoke wheel",
-        "pocket placement"
+        "pocket placement",
+        "narrowband"
       ]
     },
     "fdm.b_gwl_class": {
