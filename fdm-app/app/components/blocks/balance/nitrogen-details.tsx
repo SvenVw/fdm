@@ -288,7 +288,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                         item.b_id_harvesting === harvest.id,
                                 )
                                 if (!harvestDetails) {
-                                    console.error(`Harvest not found for id: ${harvest.id}`)
+                                    console.error(
+                                        `Harvest not found for id: ${harvest.id}`,
+                                    )
                                     return null
                                 }
 
@@ -299,7 +301,9 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                                             harvestDetails.b_lu,
                                     )
                                 if (!cultivationDetails) {
-                                    console.error(`Cultivation not found for harvest: ${harvest.id}`)
+                                    console.error(
+                                        `Cultivation not found for harvest: ${harvest.id}`,
+                                    )
                                     return null
                                 }
 
@@ -370,16 +374,208 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
+    const renderAmmoniaEmissions = (
+        ammonia: NitrogenVolatilizationNumeric["ammonia"],
+        fieldInput: FieldInput,
+    ) => {
+        const sectionKey = "ammonia"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Ammoniak (Totaal): {ammonia.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <Accordion type="multiple" className="ml-4">
+                        {/* Render Fertilizers */}
+                        {renderFertilizersVolatilization(
+                            ammonia.fertilizers,
+                            fieldInput,
+                        )}
+
+                        {/* Render Residues */}
+                        {renderResiduesVolatilization(
+                            ammonia.residues,
+                            fieldInput,
+                        )}
+                    </Accordion>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderFertilizersVolatilization = (
+        fertilizers: NitrogenVolatilizationNumeric["ammonia"]["fertilizers"],
+        fieldInput: FieldInput,
+    ) => {
+        const sectionKey = "volatilization.ammonia.fertilizers"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Bemesting (Totaal): {fertilizers.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <Accordion type="multiple" className="ml-4">
+                        {/* Render Mineral Fertilizers */}
+                        {renderFertilizerVolatilizations(
+                            fertilizers.mineral,
+                            fieldInput,
+                            "Minerale meststoffen",
+                            "volatilization.ammonia.fertilizers.mineral",
+                        )}
+
+                        {/* Render Manure */}
+                        {renderFertilizerVolatilizations(
+                            fertilizers.manure,
+                            fieldInput,
+                            "Mest",
+                            "volatilization.ammonia.fertilizers.manure",
+                        )}
+
+                        {/* Render Compost */}
+                        {renderFertilizerVolatilizations(
+                            fertilizers.compost,
+                            fieldInput,
+                            "Compost",
+                            "volatilization.ammonia.fertilizers.compost",
+                        )}
+
+                        {/* Render other fertilizers */}
+                        {renderFertilizerVolatilizations(
+                            fertilizers.other,
+                            fieldInput,
+                            "Overig",
+                            "volatilization.ammonia.fertilizers.other",
+                        )}
+                    </Accordion>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderResiduesVolatilization = (
+        residues: NitrogenVolatilizationNumeric["ammonia"]["residues"],
+        fieldInput: FieldInput,
+    ) => {
+        const sectionKey = "volatilization.ammonia.residues"
+
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    Gewasresten (Totaal): {residues.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {residues.cultivations.map(
+                            (cult: { id: string; value: number }) => {
+                                if (cult.value === 0) {
+                                    return null
+                                }
+
+                                const cultivation =
+                                    fieldInput.cultivations.find(
+                                        (cultivation: { b_lu: string }) =>
+                                            cultivation.b_lu === cult.id,
+                                    )
+                                return cultivation ? (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/cultivation/${cultivation.b_lu}`}
+                                        key={cult.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {cultivation.b_lu_name}:{" "}
+                                            {cult.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                ) : null
+                            },
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
+    const renderFertilizerVolatilizations = (
+        applications: {
+            total: number
+            applications: Array<{ id: string; value: number }>
+        },
+        fieldInput: FieldInput,
+        title: string,
+        sectionKey: string,
+    ) => {
+        return (
+            <AccordionItem value={sectionKey}>
+                <AccordionTrigger>
+                    {title} (Totaal): {applications.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <ul className="ml-6 list-disc list-outside space-y-1">
+                        {applications.applications.map(
+                            (app: { id: string; value: number }) => {
+                                if (app.value === 0) {
+                                    return null
+                                }
+                                const application =
+                                    fieldInput.fertilizerApplications.find(
+                                        (fa: { p_app_id: string }) =>
+                                            fa.p_app_id === app.id,
+                                    )
+                                if (
+                                    !application ||
+                                    !application.p_name_nl ||
+                                    !application.p_app_date
+                                ) {
+                                    console.error(
+                                        `Application not found for id: ${app.id}`,
+                                    )
+                                    return null
+                                }
+                                return (
+                                    <NavLink
+                                        to={`../../${calendar}/field/${fieldInput.field.b_id}/fertilizer`}
+                                        key={app.id}
+                                    >
+                                        <li className="text-sm text-muted-foreground hover:underline">
+                                            {application.p_name_nl} op{" "}
+                                            {format(
+                                                application.p_app_date,
+                                                "PP",
+                                                { locale: nl },
+                                            )}
+                                            : {app.value} kg N / ha
+                                        </li>
+                                    </NavLink>
+                                )
+                            },
+                        )}
+                    </ul>
+                </AccordionContent>
+            </AccordionItem>
+        )
+    }
+
     const renderVolatilization = (
         volatilization: NitrogenVolatilizationNumeric,
+        fieldInput: FieldInput,
     ) => {
         const sectionKey = "volatilization"
 
         return (
             <AccordionItem value={sectionKey}>
-                <p className="flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all text-left">
-                    Emissie (Totaal): -
-                </p>
+                <AccordionTrigger>
+                    Emissie (Totaal): {volatilization.total} kg N / ha
+                </AccordionTrigger>
+                <AccordionContent>
+                    <Accordion type="multiple" className="ml-4">
+                        {renderAmmoniaEmissions(
+                            volatilization.ammonia,
+                            fieldInput,
+                        )}
+                    </Accordion>
+                </AccordionContent>
             </AccordionItem>
         )
     }
@@ -389,7 +585,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
             <Accordion type="multiple" className="w-full">
                 {renderSupply(balanceData.supply, fieldInput)}
                 {renderRemoval(balanceData.removal, fieldInput)}
-                {renderVolatilization(balanceData.volatilization)}
+                {renderVolatilization(balanceData.volatilization, fieldInput)}
             </Accordion>
         </div>
     )
