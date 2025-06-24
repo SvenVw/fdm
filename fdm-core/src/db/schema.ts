@@ -146,9 +146,9 @@ export type fertilizerAcquiringTypeInsert =
 export const applicationMethodOptions = [
     { value: "slotted coulter", label: "Zodenbemester / Sleepvoet" },
     { value: "incorporation", label: "Onderwerken in 1 werkgang" },
-    { value: "incorporation_2tracks", label: "Onderwerken in 2 werkgangen" },
+    { value: "incorporation 2 tracks", label: "Onderwerken in 2 werkgangen" },
     { value: "injection", label: "Mestinjectie" },
-    { value: "injection_shallow", label: "In sleufjes in de grond" },
+    { value: "shallow injection", label: "In sleufjes in de grond" },
     { value: "spraying", label: "Spuiten" },
     { value: "broadcasting", label: "Breedwerpig uitstrooien" },
     { value: "spoke wheel", label: "Spaakwiel" },

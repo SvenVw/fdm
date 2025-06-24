@@ -118,7 +118,7 @@ export function determineManureAmmoniaEmmissionFactor(
         if (p_app_method === "slotted coulter") {
             return new Decimal(0.217)
         }
-        if (p_app_method === "injection_shallow") {
+        if (p_app_method === "shallow injection") {
             return new Decimal(0.17)
         }
         throw new Error(
@@ -129,7 +129,7 @@ export function determineManureAmmoniaEmmissionFactor(
         if (p_app_method === "narrowband") {
             return new Decimal(0.36)
         }
-        if (p_app_method === "injection_shallow") {
+        if (p_app_method === "shallow injection") {
             return new Decimal(0.24)
         }
         throw new Error(
@@ -141,7 +141,7 @@ export function determineManureAmmoniaEmmissionFactor(
     if (p_app_method === "broadcasting") {
         return new Decimal(0.69)
     }
-    if (p_app_method === "incorporation_2tracks") {
+    if (p_app_method === "incorporation 2 tracks") {
         return new Decimal(0.46)
     }
     if (p_app_method === "narrowband") {
@@ -150,7 +150,7 @@ export function determineManureAmmoniaEmmissionFactor(
     if (p_app_method === "slotted coulter") {
         return new Decimal(0.3)
     }
-    if (p_app_method === "shallow injection_shallow") {
+    if (p_app_method === "shallow shallow injection") {
         return new Decimal(0.25)
     }
     if (p_app_method === "incorporation") {
