@@ -41,7 +41,7 @@ export function calculateNitrogenVolatilization(
     )
 
     const ammonia = {
-        total: residues.total, // Ammonia total should include residues total
+        total: fertilizers.total.add(residues.total), // Ammonia total should include fertilizers total and residues total
         fertilizers: fertilizers,
         residues: residues,
         grazing: undefined, // Grazing volatilization not yet implemented
