@@ -105,6 +105,7 @@ export function determineManureAmmoniaEmmissionFactor(
     cultivations: FieldInput["cultivations"],
     cultivationDetails: Map<string, CultivationDetail>,
 ) {
+    const p_app_name = fertilizerApplication.p_name_nl
     const p_id = fertilizerApplication.p_id
     const p_app_date = fertilizerApplication.p_app_date
     const p_app_method = fertilizerApplication.p_app_method
@@ -126,7 +127,7 @@ export function determineManureAmmoniaEmmissionFactor(
     })
     const isGrasslands = currentCultvations.map((x) => {
         const type = cultivationDetails.get(x.b_lu_catalogue)
-        if (type?.b_lu_croprotation === "grassland") {
+        if (type?.b_lu_croprotation === "grass") {
             return true
         }
         return false
@@ -151,7 +152,7 @@ export function determineManureAmmoniaEmmissionFactor(
             return new Decimal(0.17)
         }
         throw new Error(
-            `Unsupported application method ${p_app_method} for ${p_id} on grassland`,
+            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) on grassland`,
         )
     }
     if (isCropland) {
@@ -162,7 +163,7 @@ export function determineManureAmmoniaEmmissionFactor(
             return new Decimal(0.24)
         }
         throw new Error(
-            `Unsupported application method ${p_app_method} for ${p_id} for cropland`,
+            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id})  for cropland`,
         )
     }
 
@@ -189,6 +190,6 @@ export function determineManureAmmoniaEmmissionFactor(
         return new Decimal(0.264)
     }
     throw new Error(
-        `Unsupported application method ${p_app_method} for ${p_id} for bare soil`,
+        `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
     )
 }
