@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { calculateAmmoniaEmissionsByMineralFertilizers, determineMineralAmmoniaEmmissionFactor } from "./mineral"
+import { calculateAmmoniaEmissionsByMineralFertilizers, determineMineralAmmoniaEmissionFactor } from "./mineral"
 import type { FertilizerDetail, FieldInput } from "../../types"
 
 describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
@@ -170,7 +170,7 @@ describe("determineMineralAmmoniaEmmissionFactor", () => {
             p_ef_nh3: null,
         }
 
-        const result = determineMineralAmmoniaEmmissionFactor(fertilizerDetail)
+        const result = determineMineralAmmoniaEmissionFactor(fertilizerDetail)
 
         // p_n_org = 0.8 - 0.2 - 0.3 = 0.3
         // a = 0.3^2 * 7.021e-5 = 0.09 * 7.021e-5 = 6.3189e-6
@@ -196,7 +196,7 @@ describe("determineMineralAmmoniaEmmissionFactor", () => {
             p_ef_nh3: null,
         }
 
-        const result = determineMineralAmmoniaEmmissionFactor(fertilizerDetail)
+        const result = determineMineralAmmoniaEmissionFactor(fertilizerDetail)
 
         // All values default to 0, so p_n_org = 0, a = 0, b = 0, c = 0
         // EF = 0
