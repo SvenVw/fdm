@@ -1,14 +1,25 @@
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
+import Decimal from "decimal.js"
 import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
-import type { FertilizerDetail, FieldInput } from "../../types"
+import type { FertilizerDetail, FieldInput, CultivationDetail } from "../../types"
+
+// Mock the determineManureAmmoniaEmmissionFactor function
+vi.mock("./manure", () => ({
+    determineManureAmmoniaEmmissionFactor: vi.fn(() => new Decimal(0.1)), // Mocked emission factor
+}))
 
 describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
+    const mockCultivations: FieldInput["cultivations"] = []
+    const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
+
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         const result = calculateAmmoniaEmissionsByOtherFertilizers(
+            mockCultivations,
             fertilizerApplications,
+            mockCultivationDetailsMap,
             fertilizerDetailsMap,
         )
 
@@ -16,7 +27,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
         expect(result.applications).toEqual([])
     })
 
-    it("should return 0 for applications of type manure, mineral, or compost", () => {
+    it("should calculate emissions for applications of type manure, mineral, or compost", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
             {
                 p_app_id: "app1",
@@ -49,7 +60,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
                 {
                     p_id_catalogue: "manure1",
                     p_type: "manure",
-                    p_nh4_rt: 0.5,
+                    p_nh4_rt: 0.5, 
                     p_n_rt: null,
                     p_no3_rt: null,
                     p_s_rt: null,
@@ -83,18 +94,25 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
         ])
 
         const result = calculateAmmoniaEmissionsByOtherFertilizers(
+            mockCultivations,
             fertilizerApplications,
+            mockCultivationDetailsMap,
             fertilizerDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBe(0)
+        // Expected values: p_app_amount * p_nh4_rt * emissionFactor / 1000
+        // app1: 1000 * 0.5 * 0.1 / 1000 = 0.05
+        // app2: 500 * 0.8 * 0.1 / 1000 = 0.04
+        // app3: 200 * 0.4 * 0.1 / 1000 = 0.008
+
+        expect(result.total.toNumber()).toBeCloseTo(0.05 + 0.04 + 0.008)
         expect(result.applications.length).toBe(3)
-        expect(result.applications[0].value.toNumber()).toBe(0)
-        expect(result.applications[1].value.toNumber()).toBe(0)
-        expect(result.applications[2].value.toNumber()).toBe(0)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.05)
+        expect(result.applications[1].value.toNumber()).toBeCloseTo(0.04)
+        expect(result.applications[2].value.toNumber()).toBeCloseTo(0.008)
     })
 
-    it("should return 0 for applications of 'other' type as no calculation method is available", () => {
+    it("should return 0 for applications of 'other' type as per current function logic", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
             {
                 p_app_id: "app1",
@@ -121,7 +139,9 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
         ])
 
         const result = calculateAmmoniaEmissionsByOtherFertilizers(
+            mockCultivations,
             fertilizerApplications,
+            mockCultivationDetailsMap,
             fertilizerDetailsMap,
         )
 
@@ -146,7 +166,9 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
 
         expect(() =>
             calculateAmmoniaEmissionsByOtherFertilizers(
+                mockCultivations,
                 fertilizerApplications,
+                mockCultivationDetailsMap,
                 fertilizerDetailsMap,
             ),
         ).toThrowError("Fertilizer application app1 has no fertilizerDetails")

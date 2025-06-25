@@ -51,7 +51,9 @@ export function calculateAmmoniaEmissionsByFertilizers(
     // Calculate the amount of ammonia emitted by othyer fertilizers
     const fertilizersAmmoniaEmissionsByOtherFertilizers =
         calculateAmmoniaEmissionsByOtherFertilizers(
+            cultivations,
             fertilizerApplications,
+            cultivationDetailsMap,
             fertilizerDetailsMap,
         )
 

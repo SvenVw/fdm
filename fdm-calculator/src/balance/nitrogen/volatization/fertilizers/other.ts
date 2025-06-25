@@ -1,9 +1,11 @@
 import Decimal from "decimal.js"
 import type {
+    CultivationDetail,
     FertilizerDetail,
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
+import { determineManureAmmoniaEmmissionFactor } from "./manure"
 
 /**
  * Calculates the ammonia emissions from "other" fertilizer types.
@@ -13,13 +15,17 @@ import type {
  * the ammonia emission is currently set to 0 as no specific calculation method
  * is available.
  *
+ * @param cultivations - An array of cultivation records for the field.
  * @param fertilizerApplications - An array of fertilizer application records.
+ * @param cultivationDetailsMap - A Map where keys are cultivation IDs and values are detailed cultivation information.
  * @param fertilizerDetailsMap - A Map where keys are fertilizer catalogue IDs and values are detailed fertilizer information.
  * @returns An object containing the total ammonia emissions from other fertilizers and a breakdown by individual application.
  * @throws Error if a fertilizer application references a non-existent fertilizer detail.
  */
 export function calculateAmmoniaEmissionsByOtherFertilizers(
+    cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
+    cultivationDetailsMap: Map<string, CultivationDetail>,
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenEmissionAmmoniaFertilizers["other"] {
     if (fertilizerApplications.length === 0) {
@@ -39,12 +45,13 @@ export function calculateAmmoniaEmissionsByOtherFertilizers(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
             )
         }
+        const p_nh4_rt = new Decimal(fertilizerDetail.p_nh4_rt ?? 0)
 
         // If the fertilizer used is not of the type other fertilizers
         if (
-            fertilizerDetail.p_type === "manure" ||
-            fertilizerDetail.p_type === "mineral" ||
-            fertilizerDetail.p_type === "compost"
+            fertilizerDetail.p_type !== "manure" &&
+            fertilizerDetail.p_type !== "mineral" &&
+            fertilizerDetail.p_type !== "compost"
         ) {
             return {
                 id: application.p_app_id,
@@ -52,10 +59,23 @@ export function calculateAmmoniaEmissionsByOtherFertilizers(
             }
         }
 
-        // As no calculation method is available for other fertilizers, set the emission to 0
+        // Determine emission factor
+        const emissionFactor = determineManureAmmoniaEmmissionFactor(
+            application,
+            cultivations,
+            cultivationDetailsMap,
+        )
+
+        // Calculate for this application the amount of Nitrogen supplied by manure
+        const p_app_amount = new Decimal(application.p_app_amount ?? 0)
+        const applicationValue = p_app_amount
+            .times(p_nh4_rt)
+            .times(emissionFactor)
+            .dividedBy(1000) // convert from g N to kg N
+
         return {
             id: application.p_app_id,
-            value: new Decimal(0),
+            value: applicationValue,
         }
     })
 
