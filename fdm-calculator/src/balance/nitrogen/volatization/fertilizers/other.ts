@@ -12,8 +12,7 @@ import { determineManureAmmoniaEmissionFactor } from "./manure"
  *
  * This function iterates through fertilizer applications and filters out known
  * types (manure, mineral, compost). For any remaining "other" fertilizer types,
- * the ammonia emission is currently set to 0 as no specific calculation method
- * is available.
+ * the ammonia emission is currently calculated like manure and other organic fertilizers.
  *
  * @param cultivations - An array of cultivation records for the field.
  * @param fertilizerApplications - An array of fertilizer application records.
