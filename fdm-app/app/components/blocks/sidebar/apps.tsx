@@ -141,7 +141,7 @@ export function SidebarApps() {
                             </SidebarMenuButton>
                         )}
                         <SidebarMenuBadge>
-                            <Badge>Binnenkort</Badge>
+                            <Badge variant={"outline"}>Binnenkort</Badge>
                         </SidebarMenuBadge>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
@@ -164,7 +164,7 @@ export function SidebarApps() {
                             </SidebarMenuButton>
                         )}
                         <SidebarMenuBadge>
-                            <Badge>Binnenkort</Badge>
+                            <Badge variant={"outline"}>Binnenkort</Badge>
                         </SidebarMenuBadge>
                     </SidebarMenuItem>
                 </SidebarMenu>
