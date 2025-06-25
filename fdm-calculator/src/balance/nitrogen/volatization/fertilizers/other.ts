@@ -21,7 +21,7 @@ import type {
 export function calculateAmmoniaEmissionsByOtherFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
-): NitrogenEmissionAmmoniaFertilizers["compost"] {
+): NitrogenEmissionAmmoniaFertilizers["other"] {
     if (fertilizerApplications.length === 0) {
         return {
             total: new Decimal(0),
