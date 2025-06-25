@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-At nitrogen balance show the total ammount of ammonia emitted and the details on field level
+In the nitrogen balance, show the total amount of ammonia emitted and provide field-level details.

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import {
     calculateAmmoniaEmissionsByManure,
-    determineManureAmmoniaEmmissionFactor,
+    determineManureAmmoniaEmissionFactor,
 } from "./manure"
 import type {
     CultivationDetail,
@@ -188,7 +188,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
     })
 })
 
-describe("determineManureAmmoniaEmmissionFactor", () => {
+describe("determineManureAmmoniaEmissionFactor", () => {
     const cultivationDetailsMap = new Map<string, CultivationDetail>([
         [
             "grassland_type",
@@ -236,7 +236,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
             },
         ]
         expect(
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
@@ -264,7 +264,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
             },
         ]
         expect(
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
@@ -292,7 +292,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
             },
         ]
         expect(
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
@@ -312,7 +312,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         }
         const cultivations: FieldInput["cultivations"] = [] // No cultivations means bare soil
         expect(
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
@@ -340,7 +340,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
             },
         ]
         expect(() =>
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
@@ -370,7 +370,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
             },
         ]
         expect(() =>
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
@@ -392,7 +392,7 @@ describe("determineManureAmmoniaEmmissionFactor", () => {
         }
         const cultivations: FieldInput["cultivations"] = []
         expect(() =>
-            determineManureAmmoniaEmmissionFactor(
+            determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,

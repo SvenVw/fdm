@@ -3,9 +3,9 @@ import Decimal from "decimal.js"
 import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
 import type { FertilizerDetail, FieldInput, CultivationDetail } from "../../types"
 
-// Mock the determineManureAmmoniaEmmissionFactor function
+// Mock the determineManureAmmoniaEmissionFactor function
 vi.mock("./manure", () => ({
-    determineManureAmmoniaEmmissionFactor: vi.fn(() => new Decimal(0.1)), // Mocked emission factor
+    determineManureAmmoniaEmissionFactor: vi.fn(() => new Decimal(0.1)), // Mocked emission factor
 }))
 
 describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {

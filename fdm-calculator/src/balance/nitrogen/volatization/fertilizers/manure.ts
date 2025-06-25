@@ -11,7 +11,7 @@ import type { FertilizerApplication } from "@svenvw/fdm-core"
  * Calculates the ammonia emissions specifically from manure applications.
  *
  * This function processes each fertilizer application, identifies manure types,
- * determines the appropriate emission factor using `determineManureAmmoniaEmmissionFactor`,
+ * determines the appropriate emission factor using `determineManureAmmoniaEmissionFactor`,
  * and calculates the ammonia emissions for each relevant application. It then aggregates
  * these values to provide a total.
  *
@@ -56,7 +56,7 @@ export function calculateAmmoniaEmissionsByManure(
         }
 
         // Determine emission factor
-        const emissionFactor = determineManureAmmoniaEmmissionFactor(
+        const emissionFactor = determineManureAmmoniaEmissionFactor(
             application,
             cultivations,
             cultivationDetailsMap,
@@ -100,7 +100,7 @@ export function calculateAmmoniaEmissionsByManure(
  * @returns A Decimal representing the ammonia emission factor.
  * @throws Error if an unsupported application method is provided for the given land type.
  */
-export function determineManureAmmoniaEmmissionFactor(
+export function determineManureAmmoniaEmissionFactor(
     fertilizerApplication: FertilizerApplication,
     cultivations: FieldInput["cultivations"],
     cultivationDetails: Map<string, CultivationDetail>,

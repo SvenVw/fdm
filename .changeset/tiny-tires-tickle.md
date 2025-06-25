@@ -2,4 +2,4 @@
 "@svenvw/fdm-docs": minor
 ---
 
-Add documentation about ammonia emission calculation at nitrogen balance calculation explaination
+Add documentation explaining ammonia-emission calculation in the nitrogen-balance section.

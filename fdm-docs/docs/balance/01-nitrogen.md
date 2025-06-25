@@ -205,9 +205,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
     For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the fraction of nitrogen that is readily available for volatilization.
 
     *   **Formula:**
-        ```latex
-        \text{NH}_3\text{ Emission (kg N / ha)} = \text{Application Amount (kg / ha)} \times \text{TAN Content (fraction)} \times \text{Emission Factor (fraction)}
-        ```
+        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (fraction) * Emission Factor (fraction)`
         Where:
         *   `Application Amount`: `p_app_amount` (kg / ha) - The total amount of fertilizer applied.
         *   `TAN Content`: `p_nh4_rt` (fraction) - The fraction of total nitrogen that is in ammoniacal form.
@@ -229,27 +227,24 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
     For mineral fertilizers, the emission is calculated based on the **total nitrogen content (`p_n_rt`)** of the fertilizer and the **emission factor**.
 
     *   **Formula:**
-        ```latex
-        \text{NH}_3\text{ Emission (kg N / ha)} = \text{Application Amount (kg / ha)} \times \text{Total N Content (fraction)} \times \text{Emission Factor (fraction)}
-        ```
+        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * Total N Content (fraction) * Emission Factor (fraction)`
         Where:
         *   `Application Amount`: `p_app_amount` (kg / ha).
         *   `Total N Content`: `p_n_rt` (fraction).
         *   `Emission Factor`: `p_ef_nh3` (fraction). This factor can be directly provided in the `FertilizerDetail`. If it is not provided, it is calculated using an empirical formula based on the fertilizer's composition:
 
-        ```latex
-        \text{Emission Factor} = (p_{n\_org}^2 \times K_1) + (p_{no3\_rt} \times p_{s\_rt} \times K_2) + (p_{nh4\_rt}^2 \times K_3)
-        ```
+        `Emission Factor = p_n_org^2 * K_1 + p_no3_rt * p_s_rt * K_2 + p_nh4_rt^2 * K_3`
+
         Where:
         *   `p_n_org`: Organic nitrogen content (calculated as `p_n_rt - p_no3_rt - p_nh4_rt`).
         *   `p_no3_rt`: Nitrate content.
         *   `p_nh4_rt`: Ammonium content (TAN).
         *   `p_s_rt`: Sulfur content.
         *   `K_1`, `K_2`, `K_3`: Empirical constants.
-            *   If an inhibitor is present: `K_1 = 3.166 \times 10^{-5}`
-            *   If no inhibitor: `K_1 = 7.021 \times 10^{-5}`
-            *   `K_2 = -4.308 \times 10^{-5}`
-            *   `K_3 = 2.498 \times 10^{-4}`
+            *   If an inhibitor is present: `K_1 = 3.166 * 10^-5`
+            *   If no inhibitor: `K_1 = 7.021 * 10^-5`
+            *   `K_2 = -4.308 * 10^-5`
+            *   `K_3 = 2.498 * 10^-4`
         *Note: Currently, the presence of an inhibitor (`p_inhibitor`) is hardcoded to `false` in the calculation.*
 
 
@@ -259,17 +254,13 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
 Ammonia emissions from crop residues occur when residues are left on the field and decompose, releasing nitrogen compounds that can volatilize. The calculation of these emissions is based on the amount of nitrogen in the crop residues and a specific emission factor.
 
 *   **Formula per cultivation:**
-    ```latex
-    \text{NH}_3\text{ Emission (kg N / ha)} = \text{Residue N Content (kg N / ha)} \times \text{Emission Factor (fraction)}
-    ```
+    `NH3 Emission (kg N / ha) = Residue N Content (kg N / ha) * \Emission Factor (fraction)`
     Where:
     *   `Residue N Content`: The amount of nitrogen contained in the crop residues left on the field. This is derived from the `Residue_Mass` (calculated in Section 3.2.2) and the `N_Content_Residue` (`b_lu_n_residue` from `CultivationCatalogue`).
     *   `Emission Factor`: This factor is calculated based on the nitrogen content of the crop residue in g/kg dry matter (`b_lu_n_residue`).
 
     *   **Emission Factor Formula:**
-        ```latex
-        \text{Emission Factor} = (0.41 \times \text{b_lu_n_residue (g/kg dry matter)}) - 5.42
-        ```
+        `Emission Factor = (0.41 * b_lu_n_residue (g/kg dry matter)) - 5.42`
         Where:
         *   `b_lu_n_residue`: Nitrogen content of the crop residue in grams per kilogram of dry matter (`b_lu_n_residue` from `CultivationCatalogue`).
 

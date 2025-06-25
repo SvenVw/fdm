@@ -5,7 +5,7 @@ import type {
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
-import { determineManureAmmoniaEmmissionFactor } from "./manure"
+import { determineManureAmmoniaEmissionFactor } from "./manure"
 
 /**
  * Calculates the ammonia emissions from "other" fertilizer types.
@@ -60,7 +60,7 @@ export function calculateAmmoniaEmissionsByOtherFertilizers(
         }
 
         // Determine emission factor
-        const emissionFactor = determineManureAmmoniaEmmissionFactor(
+        const emissionFactor = determineManureAmmoniaEmissionFactor(
             application,
             cultivations,
             cultivationDetailsMap,
