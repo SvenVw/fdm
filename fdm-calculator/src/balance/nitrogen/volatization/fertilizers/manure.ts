@@ -180,7 +180,7 @@ export function determineManureAmmoniaEmmissionFactor(
     if (p_app_method === "slotted coulter") {
         return new Decimal(0.3)
     }
-    if (p_app_method === "shallow shallow injection") {
+    if (p_app_method === "shallow injection") {
         return new Decimal(0.25)
     }
     if (p_app_method === "incorporation") {
