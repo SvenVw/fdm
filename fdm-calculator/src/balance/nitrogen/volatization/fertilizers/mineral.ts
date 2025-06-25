@@ -88,6 +88,11 @@ export function calculateAmmoniaEmissionsByMineralFertilizers(
  *
  * This function calculates the emission factor using a specific formula that
  * considers various nutrient components and a boolean flag for inhibitor presence.
+ * 
+ * Formula coefficients:
+ * - Organic N squared coefficient: 3.166e-5 (with inhibitor) or 7.021e-5 (without)
+ * - NO3 × S coefficient: -4.308e-5
+ * - NH4 squared coefficient: 2.498e-4
  *
  * @param fertilizerDetail - The detailed information for a specific mineral fertilizer.
  * @returns A Decimal representing the calculated ammonia emission factor.
