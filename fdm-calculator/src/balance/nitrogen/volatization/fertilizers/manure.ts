@@ -186,9 +186,6 @@ export function determineManureAmmoniaEmmissionFactor(
     if (p_app_method === "incorporation") {
         return new Decimal(0.22)
     }
-    if (p_app_method === "narrowband") {
-        return new Decimal(0.264)
-    }
     throw new Error(
         `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
     )
