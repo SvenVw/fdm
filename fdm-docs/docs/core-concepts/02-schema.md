@@ -244,7 +244,7 @@ This schema holds the primary data related to farm operations.
 | Column             | Type                        | Constraints | Description                                                                    |
 |--------------------|-----------------------------|-------------|--------------------------------------------------------------------------------|
 | **p_id_catalogue** | `text`                      | Primary Key | Unique identifier for the fertilizer type in the catalogue.                    |
-| **p_source**       | `text`                      | Not Null    | Identifier for the source of this catalogue entry (e.g., 'SRM', 'NMI').        |
+| **p_source**       | `text`                      | Not Null    | Identifier for the source of this catalogue entry (e.g., 'baat', 'srm').        |
 | **p_name_nl**      | `text`                      | Not Null    | Name of the fertilizer (often in Dutch).                                       |
 | **p_name_en**      | `text`                      |             | English name of the fertilizer.                                                |
 | **p_description**  | `text`                      |             | Additional descriptive text about the fertilizer.                              |
