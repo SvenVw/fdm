@@ -377,9 +377,12 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
 
 async function syncFertilizerCatalogue(fdm: FdmType) {
     const srmCatalogue = await getFertilizersCatalogue("srm")
+    const baatCatalogue = await getFertilizersCatalogue("baat")
+    const fertilizersCatalogue = [...srmCatalogue, ...baatCatalogue]
+
     await fdm.transaction(async (tx: FdmServerType) => {
         try {
-            for (const item of srmCatalogue) {
+            for (const item of fertilizersCatalogue) {
                 const hash = await hashFertilizer(item)
                 const existing = await tx
                     .select({ hash: schema.fertilizersCatalogue.hash })
