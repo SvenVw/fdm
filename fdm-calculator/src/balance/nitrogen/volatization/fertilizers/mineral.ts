@@ -55,7 +55,7 @@ export function calculateAmmoniaEmissionsByMineralFertilizers(
         if (p_ef_nh3) {
             emissionFactor = new Decimal(p_ef_nh3)
         } else {
-            emissionFactor = determineMineralAmmoniaEmmissionFactor(application)
+            emissionFactor = determineMineralAmmoniaEmissionFactor(application)
         }
 
         // Calculate for this application the amount of Nitrogen supplied by mineral fertilizer
@@ -92,7 +92,7 @@ export function calculateAmmoniaEmissionsByMineralFertilizers(
  * @param fertilizerDetail - The detailed information for a specific mineral fertilizer.
  * @returns A Decimal representing the calculated ammonia emission factor.
  */
-export function determineMineralAmmoniaEmmissionFactor(
+export function determineMineralAmmoniaEmissionFactor(
     fertilizerDetail: FertilizerDetail,
 ): Decimal {
     const p_n_rt = new Decimal(fertilizerDetail.p_n_rt ?? 0)
