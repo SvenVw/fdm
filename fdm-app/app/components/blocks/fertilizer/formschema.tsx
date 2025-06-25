@@ -423,7 +423,7 @@ export const FormSchema = z
         },
         {
             message:
-                "Totaal stikstof kan niet groter zijn dan de som van nitraat en ammonium",
+                "De som van nitraat en ammonium kan niet groter zijn dan het totale stikstofgehalte",
             path: ["p_n_rt"],
         },
     )
