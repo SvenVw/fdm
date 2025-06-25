@@ -73,6 +73,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             p_n_if: undefined,
             p_n_of: undefined,
             p_n_wc: undefined,
+            p_no3_rt: undefined,
+            p_nh4_rt: undefined,
             p_p_rt: undefined,
             p_k_rt: undefined,
             p_mg_rt: undefined,
