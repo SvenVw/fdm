@@ -238,6 +238,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 p_n_if: formValues.p_n_if,
                 p_n_of: formValues.p_n_of,
                 p_n_wc: formValues.p_n_wc,
+                p_no3_rt: formValues.p_no3_rt,
+                p_nh4_rt: formValues.p_nh4_rt,
                 p_p_rt: formValues.p_p_rt,
                 p_k_rt: formValues.p_k_rt,
                 p_mg_rt: formValues.p_mg_rt,
@@ -262,6 +264,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 p_pb_rt: formValues.p_pb_rt,
                 p_hg_rt: formValues.p_hg_rt,
                 p_cl_rt: formValues.p_cl_rt,
+                p_ef_nh3: undefined,
                 p_app_method_options: formValues.p_app_method_options,
             },
         )
