@@ -202,11 +202,11 @@ export default function FarmAFieldCultivationBlock() {
 
     return (
         <div className="space-y-6">
-            <div>
+            {/* <div>
                 <p className="text-sm text-muted-foreground">
                     Vul de oogsten in voor dit gewas.
                 </p>
-            </div>
+            </div> */}
             <Separator />
             <div className="grid grid-cols-2 gap-8">
                 <Card>

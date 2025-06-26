@@ -21,6 +21,15 @@ import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-appl
 import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { FertilizerApplicationsList } from "~/components/blocks/fertilizer-applications/list"
+import { Button } from "~/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "~/components/ui/dialog"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -166,13 +175,28 @@ export default function FarmFieldsOverviewBlock() {
                 </p>
             </div>
             <Separator />
-            <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                    <FertilizerApplicationForm
-                        options={loaderData.fertilizerOptions}
-                        action={location.pathname}
-                    />
-                    <Separator className="my-4" />
+            <div className="flex justify-end">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button>Bemesting toevoegen</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[800px]">
+                        <DialogHeader>
+                            <DialogTitle>Bemesting toevoegen</DialogTitle>
+                            <DialogDescription>
+                                Voeg een nieuwe bemestingstoepassing toe aan het
+                                perceel.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <FertilizerApplicationForm
+                            options={loaderData.fertilizerOptions}
+                            action={location.pathname}
+                        />
+                    </DialogContent>
+                </Dialog>
+            </div>
+            <div className="grid 2xl:grid-cols-3 gap-8">
+                <div className="2xl:col-span-2">
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
@@ -183,9 +207,7 @@ export default function FarmFieldsOverviewBlock() {
                         fetcher={fetcher}
                     />
                 </div>
-                <div>
-                    <FertilizerApplicationsCards dose={loaderData.dose} />
-                </div>
+                <FertilizerApplicationsCards dose={loaderData.dose} />
             </div>
         </div>
     )

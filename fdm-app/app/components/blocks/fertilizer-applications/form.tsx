@@ -67,29 +67,26 @@ export function FertilizerApplicationForm({
                 method="post"
             >
                 <fieldset disabled={form.formState.isSubmitting}>
-                    <div className="grid grid-cols-1 xl2:grid-cols-5 items-end gap-x-3 justify-between">
-                        <div className="col-span-2">
-                            {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
-                            <Combobox
-                                options={options}
-                                form={form}
-                                name="p_id"
-                                label={
-                                    <span>
-                                        Meststof
-                                        <span className="text-red-500">*</span>
-                                    </span>
-                                }
-                            />
-                        </div>
+                    <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
+                        {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
+                        <Combobox
+                            options={options}
+                            form={form}
+                            name="p_id"
+                            label={
+                                <span>
+                                    Meststof
+                                    <span className="text-red-500">*</span>
+                                </span>
+                            }
+                        />
                         <FormField
                             control={form.control}
                             name="p_app_method"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Toedingsmethode
-                                        <span className="text-red-500">*</span>
+                                        Toedieningsmethode                     
                                     </FormLabel>
                                     <Select
                                         onValueChange={field.onChange}
@@ -126,10 +123,7 @@ export function FertilizerApplicationForm({
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>
-                                            Hoeveelheid
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
+                                            Hoeveelheid                           
                                         </FormLabel>
                                         <FormControl>
                                             <Input
@@ -170,7 +164,6 @@ export function FertilizerApplicationForm({
                                 )}
                             />
                         </div>
-
                         <div>
                             <DatePicker
                                 form={form}
@@ -179,7 +172,8 @@ export function FertilizerApplicationForm({
                                 description={""}
                             />
                         </div>
-                        <div className="flex justify-end items-baseline">
+                        <div className="invisible"/>
+                        <div className="ml-auto">
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">

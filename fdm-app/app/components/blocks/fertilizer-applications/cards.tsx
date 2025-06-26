@@ -25,7 +25,10 @@ function FertilizerApplicationsCard({
                 <p className="text-xs text-muted-foreground">{shortname}</p>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="text-2xl font-bold">{`${Math.round(value)} ${unit}`}</div>
+                <div className="flex items-baseline space-x-2">
+                    <div className="text-2xl font-bold">{`${Math.round(value)}`}</div>
+                    <div className="text-sm text-muted-foreground">{unit}</div>
+                </div>
                 <div className="grid grid-cols-2 items-center space-x-2">
                     <TooltipProvider>
                         <Tooltip>
@@ -77,7 +80,7 @@ export function FertilizerApplicationsCards({ dose }: { dose: Dose }) {
     const cards = constructCards(dose)
 
     return (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-4 2xl:grid-cols-2">
             {cards.map((card: FertilizerApplicationsCardProps) => (
                 <FertilizerApplicationsCard
                     key={card.title}
