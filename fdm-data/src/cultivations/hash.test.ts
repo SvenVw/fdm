@@ -12,6 +12,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -19,7 +25,7 @@ describe("hashCultivation", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("9e15c11b")
+        expect(hash).toBe("c514800f")
     })
 
     it("should generate different hashes for different cultivation items", async () => {
@@ -31,6 +37,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -42,6 +54,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -60,6 +78,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -82,6 +106,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -104,6 +134,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -127,6 +163,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -150,6 +192,12 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "once",
             b_lu_hcat3: "hcat3",
             b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
             hash: null,
         }
 
@@ -158,9 +206,20 @@ describe("hashCultivation", () => {
             b_lu_harvestable: "multiple",
         }
 
+        const cultivation3: CatalogueCultivationItem = {
+            ...cultivation1,
+            b_lu_croprotation: "grass",
+        }
+
         const hash1 = await hashCultivation(cultivation1)
         const hash2 = await hashCultivation(cultivation2)
+        const hash3 = await hashCultivation(cultivation3)
+
+        console.log(hash1)
+        console.log(hash2)
+        console.log(hash3)
 
         expect(hash1).not.toBe(hash2)
+        expect(hash1).not.toBe(hash3)
     })
 })
