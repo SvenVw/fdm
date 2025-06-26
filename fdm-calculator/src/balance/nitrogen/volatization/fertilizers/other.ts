@@ -48,9 +48,9 @@ export function calculateAmmoniaEmissionsByOtherFertilizers(
 
         // If the fertilizer used is not of the type other fertilizers
         if (
-            fertilizerDetail.p_type !== "manure" &&
-            fertilizerDetail.p_type !== "mineral" &&
-            fertilizerDetail.p_type !== "compost"
+            fertilizerDetail.p_type === "manure" ||
+            fertilizerDetail.p_type === "mineral" ||
+            fertilizerDetail.p_type === "compost"
         ) {
             return {
                 id: application.p_app_id,
