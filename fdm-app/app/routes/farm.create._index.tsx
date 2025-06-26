@@ -203,7 +203,7 @@ export async function action({ request }: ActionFunctionArgs) {
             fdm,
             session.principal_id,
             b_id_farm,
-            "srm",
+            "baat",
         )
         // Enable catalogue with custom user fertilizers
         await enableFertilizerCatalogue(

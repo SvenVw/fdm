@@ -27,8 +27,8 @@ The `fdm-data` package extends the Farm Data Model (FDM) core functionality by p
 ```typescript
 import { getFertilizersCatalogue } from "@svenvw/fdm-data";
 
-// Get the SRM fertilizer catalogue
-const srmCatalogue = getFertilizersCatalogue("srm");
+// Get the BAAT fertilizer catalogue
+const baatCatalogue = getFertilizersCatalogue("baat");
 
-// Now you can use the srmCatalogue data
-console.log(srmCatalogue[0]) // Logs the first entry of the srm fertilizer catalogue
+// Now you can use the baatCatalogue data
+console.log(baatCatalogue[0]) // Logs the first entry of the baat fertilizer catalogue

@@ -1,3 +1,4 @@
+import { getCatalogueBaat } from "./catalogues/baat"
 import { getCatalogueSrm } from "./catalogues/srm"
 import type { CatalogueFertilizer, CatalogueFertilizerName } from "./d"
 
@@ -8,7 +9,7 @@ import type { CatalogueFertilizer, CatalogueFertilizerName } from "./d"
  * fertilizer catalogue based on the provided `catalogueName`.
  *
  * @param catalogueName - The name of the desired fertilizer catalogue.
- *                        Currently supported names are: "srm".
+ *                        Currently supported names are: "srm" and "baat".
  * @returns An array of `CatalogueFertilizerItem` objects representing the
  *          requested fertilizer catalogue.
  * @returns A Promise that resolves to an array of `CatalogueFertilizerItem` objects.
@@ -27,6 +28,9 @@ export async function getFertilizersCatalogue(
     // Get the specified catalogue
     if (catalogueName === "srm") {
         return await getCatalogueSrm()
+    }
+    if (catalogueName === "baat") {
+        return await getCatalogueBaat()
     }
     throw new Error(`catalogue ${catalogueName} is not recognized`)
 }

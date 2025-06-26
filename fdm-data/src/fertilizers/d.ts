@@ -1,4 +1,4 @@
-export type CatalogueFertilizerName = "srm"
+export type CatalogueFertilizerName = "srm" | "baat"
 
 export type ApplicationMethods =
     | "slotted coulter"

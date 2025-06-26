@@ -23,7 +23,7 @@ Catalogues within `fdm-data` are typically structured as TypeScript files export
 *   A unique identifier (e.g., `b_lu_catalogue`, `p_id_catalogue`).
 *   Human-readable names (often in multiple languages, e.g., `p_name_nl`, `p_name_en`).
 *   Relevant attributes specific to the catalogue type (e.g., nutrient content for fertilizers, harvestability for cultivations).
-*   A source identifier (e.g., `b_lu_source`, `p_source`) indicating the origin of the catalogue data (e.g., 'BRP', 'SRM', 'NMI').
+*   A source identifier (e.g., `b_lu_source`, `p_source`) indicating the origin of the catalogue data (e.g., 'BRP', 'baat', 'NMI').
 *   A hash for tracking changes to the entry.
 
 **Using Existing Catalogues:**
@@ -38,7 +38,7 @@ Refer to the **Using Catalogues (`fdm-data`)** guide in the "Getting Started" se
 
 ## Contributing New Catalogue Data Sources
 
-The `fdm-data` package is designed to be extensible. If you have a standardized data source for cultivations or fertilizers (e.g., an official regional list, an updated BRP or SRM version) that isn't already included, you can contribute it. This involves adding a new data source for the *existing* catalogue types (cultivations or fertilizers).
+The `fdm-data` package is designed to be extensible. If you have a standardized data source for cultivations or fertilizers (e.g., an official regional list, an updated BRP or BAAT version) that isn't already included, you can contribute it. This involves adding a new data source for the *existing* catalogue types (cultivations or fertilizers).
 
 **Process:**
 
