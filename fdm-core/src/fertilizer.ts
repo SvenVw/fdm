@@ -1,13 +1,17 @@
 import { and, asc, desc, eq, gte, inArray, lte } from "drizzle-orm"
 import { createId } from "./id"
 
-import { hashFertilizer } from "@svenvw/fdm-data"
+import { type CatalogueFertilizerItem, hashFertilizer } from "@svenvw/fdm-data"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
-import type { Fertilizer, FertilizerApplication } from "./fertilizer.d"
+import type {
+    Fertilizer,
+    FertilizerApplication,
+    FertilizerParameterDescription,
+} from "./fertilizer.d"
 import type { Timeframe } from "./timeframe"
 
 /**
@@ -89,6 +93,7 @@ export async function addFertilizerToCatalogue(
         p_name_nl: schema.fertilizersCatalogueTypeInsert["p_name_nl"]
         p_name_en: schema.fertilizersCatalogueTypeInsert["p_name_en"]
         p_description: schema.fertilizersCatalogueTypeInsert["p_description"]
+        p_app_method_options: schema.fertilizersCatalogueTypeInsert["p_app_method_options"]
         p_dm: schema.fertilizersCatalogueTypeInsert["p_dm"]
         p_density: schema.fertilizersCatalogueTypeInsert["p_density"]
         p_om: schema.fertilizersCatalogueTypeInsert["p_om"]
@@ -105,6 +110,8 @@ export async function addFertilizerToCatalogue(
         p_n_if: schema.fertilizersCatalogueTypeInsert["p_n_if"]
         p_n_of: schema.fertilizersCatalogueTypeInsert["p_n_of"]
         p_n_wc: schema.fertilizersCatalogueTypeInsert["p_n_wc"]
+        p_no3_rt: schema.fertilizersCatalogueTypeInsert["p_no3_rt"]
+        p_nh4_rt: schema.fertilizersCatalogueTypeInsert["p_nh4_rt"]
         p_p_rt: schema.fertilizersCatalogueTypeInsert["p_p_rt"]
         p_k_rt: schema.fertilizersCatalogueTypeInsert["p_k_rt"]
         p_mg_rt: schema.fertilizersCatalogueTypeInsert["p_mg_rt"]
@@ -124,14 +131,13 @@ export async function addFertilizerToCatalogue(
         p_co_rt: schema.fertilizersCatalogueTypeInsert["p_co_rt"]
         p_as_rt: schema.fertilizersCatalogueTypeInsert["p_as_rt"]
         p_cd_rt: schema.fertilizersCatalogueTypeInsert["p_cd_rt"]
-        pr_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
+        p_cr_rt: schema.fertilizersCatalogueTypeInsert["p_cr_rt"]
         p_cr_vi: schema.fertilizersCatalogueTypeInsert["p_cr_vi"]
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
-        p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
-        p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
-        p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
+        p_ef_nh3: schema.fertilizersCatalogueTypeInsert["p_ef_nh3"]
+        p_type: "manure" | "mineral" | "compost" | null
     },
 ): Promise<schema.fertilizersCatalogueTypeSelect["p_id_catalogue"]> {
     try {
@@ -150,8 +156,13 @@ export async function addFertilizerToCatalogue(
             p_id_catalogue: p_id_catalogue,
             p_source: b_id_farm,
             hash: null,
+            p_type_manure: properties.p_type === "manure",
+            p_type_mineral: properties.p_type === "mineral",
+            p_type_compost: properties.p_type === "compost",
         }
-        input.hash = await hashFertilizer(input)
+        input.hash = await hashFertilizer(
+            input as unknown as CatalogueFertilizerItem,
+        )
 
         // Insert the farm in the db
         await fdm.insert(schema.fertilizersCatalogue).values(input)
@@ -264,6 +275,8 @@ export async function getFertilizer(
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
+                p_app_method_options:
+                    schema.fertilizersCatalogue.p_app_method_options,
                 p_acquiring_amount:
                     schema.fertilizerAcquiring.p_acquiring_amount,
                 p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
@@ -284,6 +297,8 @@ export async function getFertilizer(
                 p_n_if: schema.fertilizersCatalogue.p_n_if,
                 p_n_of: schema.fertilizersCatalogue.p_n_of,
                 p_n_wc: schema.fertilizersCatalogue.p_n_wc,
+                p_no3_rt: schema.fertilizersCatalogue.p_no3_rt,
+                p_nh4_rt: schema.fertilizersCatalogue.p_nh4_rt,
                 p_p_rt: schema.fertilizersCatalogue.p_p_rt,
                 p_k_rt: schema.fertilizersCatalogue.p_k_rt,
                 p_mg_rt: schema.fertilizersCatalogue.p_mg_rt,
@@ -308,6 +323,7 @@ export async function getFertilizer(
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
                 p_cl_rt: schema.fertilizersCatalogue.p_cl_rt,
+                p_ef_nh3: schema.fertilizersCatalogue.p_ef_nh3,
                 p_type_manure: schema.fertilizersCatalogue.p_type_manure,
                 p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
                 p_type_compost: schema.fertilizersCatalogue.p_type_compost,
@@ -331,7 +347,24 @@ export async function getFertilizer(
             .where(eq(schema.fertilizers.p_id, p_id))
             .limit(1)
 
-        return fertilizer[0]
+        const result = fertilizer[0]
+        if (!result) {
+            throw new Error("Fertilizer not found")
+        }
+
+        let p_type: "manure" | "mineral" | "compost" | null = null
+        if (result.p_type_manure) {
+            p_type = "manure"
+        } else if (result.p_type_mineral) {
+            p_type = "mineral"
+        } else if (result.p_type_compost) {
+            p_type = "compost"
+        }
+
+        return {
+            ...result,
+            p_type,
+        }
     } catch (err) {
         throw handleError(err, "Exception for getFertilizer", {
             p_id,
@@ -360,6 +393,7 @@ export async function updateFertilizerFromCatalogue(
         p_name_nl: schema.fertilizersCatalogueTypeInsert["p_name_nl"]
         p_name_en: schema.fertilizersCatalogueTypeInsert["p_name_en"]
         p_description: schema.fertilizersCatalogueTypeInsert["p_description"]
+        p_app_method_options: schema.fertilizersCatalogueTypeInsert["p_app_method_options"]
         p_dm: schema.fertilizersCatalogueTypeInsert["p_dm"]
         p_density: schema.fertilizersCatalogueTypeInsert["p_density"]
         p_om: schema.fertilizersCatalogueTypeInsert["p_om"]
@@ -376,6 +410,8 @@ export async function updateFertilizerFromCatalogue(
         p_n_if: schema.fertilizersCatalogueTypeInsert["p_n_if"]
         p_n_of: schema.fertilizersCatalogueTypeInsert["p_n_of"]
         p_n_wc: schema.fertilizersCatalogueTypeInsert["p_n_wc"]
+        p_no3_rt: schema.fertilizersCatalogueTypeInsert["p_no3_rt"]
+        p_nh4_rt: schema.fertilizersCatalogueTypeInsert["p_nh4_rt"]
         p_p_rt: schema.fertilizersCatalogueTypeInsert["p_p_rt"]
         p_k_rt: schema.fertilizersCatalogueTypeInsert["p_k_rt"]
         p_mg_rt: schema.fertilizersCatalogueTypeInsert["p_mg_rt"]
@@ -400,9 +436,8 @@ export async function updateFertilizerFromCatalogue(
         p_pb_rt: schema.fertilizersCatalogueTypeInsert["p_pb_rt"]
         p_hg_rt: schema.fertilizersCatalogueTypeInsert["p_hg_rt"]
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
-        p_type_manure: schema.fertilizersCatalogueTypeInsert["p_type_manure"]
-        p_type_mineral: schema.fertilizersCatalogueTypeInsert["p_type_mineral"]
-        p_type_compost: schema.fertilizersCatalogueTypeInsert["p_type_compost"]
+        p_ef_nh3: schema.fertilizersCatalogueTypeInsert["p_ef_nh3"]
+        p_type: "manure" | "mineral" | "compost" | null
     }>,
 ): Promise<void> {
     try {
@@ -430,12 +465,29 @@ export async function updateFertilizerFromCatalogue(
         if (existingFertilizer.length === 0) {
             throw new Error("Fertilizer does not exist in catalogue")
         }
-        const updatedProperties = {
+
+        const { p_type, ...rest } = properties
+        const updatedProperties: schema.fertilizersCatalogueTypeInsert = {
             ...existingFertilizer[0],
-            ...properties,
+            ...rest,
             hash: null,
+            // Preserve current flags when p_type is not provided
+            p_type_manure:
+                p_type !== undefined
+                    ? p_type === "manure"
+                    : existingFertilizer[0].p_type_manure,
+            p_type_mineral:
+                p_type !== undefined
+                    ? p_type === "mineral"
+                    : existingFertilizer[0].p_type_mineral,
+            p_type_compost:
+                p_type !== undefined
+                    ? p_type === "compost"
+                    : existingFertilizer[0].p_type_compost,
         }
-        updatedProperties.hash = await hashFertilizer(updatedProperties)
+        updatedProperties.hash = await hashFertilizer(
+            updatedProperties as unknown as CatalogueFertilizerItem,
+        )
 
         await fdm
             .update(schema.fertilizersCatalogue)
@@ -494,6 +546,8 @@ export async function getFertilizers(
                 p_name_nl: schema.fertilizersCatalogue.p_name_nl,
                 p_name_en: schema.fertilizersCatalogue.p_name_en,
                 p_description: schema.fertilizersCatalogue.p_description,
+                p_app_method_options:
+                    schema.fertilizersCatalogue.p_app_method_options,
                 p_acquiring_amount:
                     schema.fertilizerAcquiring.p_acquiring_amount,
                 p_acquiring_date: schema.fertilizerAcquiring.p_acquiring_date,
@@ -514,6 +568,8 @@ export async function getFertilizers(
                 p_n_if: schema.fertilizersCatalogue.p_n_if,
                 p_n_of: schema.fertilizersCatalogue.p_n_of,
                 p_n_wc: schema.fertilizersCatalogue.p_n_wc,
+                p_no3_rt: schema.fertilizersCatalogue.p_no3_rt,
+                p_nh4_rt: schema.fertilizersCatalogue.p_nh4_rt,
                 p_p_rt: schema.fertilizersCatalogue.p_p_rt,
                 p_k_rt: schema.fertilizersCatalogue.p_k_rt,
                 p_mg_rt: schema.fertilizersCatalogue.p_mg_rt,
@@ -538,6 +594,7 @@ export async function getFertilizers(
                 p_pb_rt: schema.fertilizersCatalogue.p_pb_rt,
                 p_hg_rt: schema.fertilizersCatalogue.p_hg_rt,
                 p_cl_rt: schema.fertilizersCatalogue.p_cl_rt,
+                p_ef_nh3: schema.fertilizersCatalogue.p_ef_nh3,
                 p_type_manure: schema.fertilizersCatalogue.p_type_manure,
                 p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
                 p_type_compost: schema.fertilizersCatalogue.p_type_compost,
@@ -561,7 +618,20 @@ export async function getFertilizers(
             .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
             .orderBy(asc(schema.fertilizersCatalogue.p_name_nl))
 
-        return fertilizers
+        return fertilizers.map((f: (typeof fertilizers)[number]) => {
+            let p_type: "manure" | "mineral" | "compost" | null = null
+            if (f.p_type_manure) {
+                p_type = "manure"
+            } else if (f.p_type_mineral) {
+                p_type = "mineral"
+            } else if (f.p_type_compost) {
+                p_type = "compost"
+            }
+            return {
+                ...f,
+                p_type,
+            }
+        })
     } catch (err) {
         throw handleError(err, "Exception for getFertilizers", {
             b_id_farm,
@@ -906,4 +976,278 @@ export async function getFertilizerApplications(
             b_id,
         })
     }
+}
+
+/**
+ * Retrieves a description of the available fertilizer parameters.
+ *
+ * This function returns an array of objects, each describing a fertilizer parameter.
+ * Each description includes the parameter's name, unit, type (numeric or enum),
+ * a human-readable name, a detailed description, and optional constraints like
+ * minimum and maximum values or a list of valid options for enum types.
+ *
+ * @param locale - The locale for which to retrieve the descriptions. Currently only 'NL-nl' is supported.
+ * @returns An array of fertilizerParameterDescriptionItem objects.
+ * @throws {Error} If an unsupported locale is provided.
+ */
+export function getFertilizerParametersDescription(
+    locale = "NL-nl",
+): FertilizerParameterDescription {
+    if (locale !== "NL-nl") throw new Error("Unsupported locale")
+    const fertilizerParameterDescription: FertilizerParameterDescription = [
+        {
+            parameter: "p_id_catalogue",
+            unit: "",
+            name: "ID",
+            type: "text",
+            category: "general",
+            description: "Catalogu ID van meststof",
+        },
+        {
+            parameter: "p_source",
+            unit: "",
+            name: "Bron",
+            type: "text",
+            category: "general",
+            description: "Gegevensbron van meststof",
+        },
+        {
+            parameter: "p_name_nl",
+            unit: "",
+            name: "Naam",
+            type: "text",
+            category: "general",
+            description: "Nederlandse naam van meststof",
+        },
+        // {
+        //     parameter: "p_name_en",
+        //     unit: "",
+        //     name: "Naam (Engels)",
+        //     type: "text",
+        //     category: "general",
+        //     description: "Engelse naam van meststof",
+        // },
+        // {
+        //     parameter: "p_description",
+        //     unit: "",
+        //     name: "Beschrijving",
+        //     type: "text",
+        //     category: "general",
+        //     description: "Beschrijvingen en/of opmerkingen over de meststof",
+        // },
+        {
+            parameter: "p_type",
+            unit: "",
+            name: "Type",
+            type: "enum",
+            category: "general",
+            description: "Typering van de meststof",
+            options: [
+                { value: "manure", label: "Dierlijke mest" },
+                { value: "mineral", label: "Kunstmest" },
+                { value: "compost", label: "Compost" },
+            ],
+        },
+        {
+            parameter: "p_app_method_options",
+            unit: "",
+            name: "Toedieningsmethodes",
+            type: "enum_multi",
+            category: "general",
+            description: "Toedieningsmethodes mogelijk voor deze meststof",
+            options: schema.applicationMethodOptions,
+        },
+        {
+            parameter: "p_dm",
+            unit: "g/kg",
+            name: "Droge stofgehalte",
+            type: "numeric",
+            category: "physical",
+            description: "",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_density",
+            unit: "kg/l",
+            name: "Dichtheid",
+            type: "numeric",
+            category: "physical",
+            description: "",
+            min: 0.00016,
+            max: 17.31,
+        },
+        {
+            parameter: "p_n_rt",
+            unit: "g N/kg",
+            name: "N",
+            type: "numeric",
+            category: "primary",
+            description: "Stikstof, totaal",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_n_wc",
+            unit: "-",
+            name: "N-werking",
+            type: "numeric",
+            category: "primary",
+            description: "Stikstof, werkingscoëfficient",
+            min: 0,
+            max: 1,
+        },
+        {
+            parameter: "p_no3_rt",
+            unit: "g N/kg",
+            name: "NO3",
+            type: "numeric",
+            category: "primary",
+            description: "Nitraat",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_nh4_rt",
+            unit: "g N/kg",
+            name: "NH4",
+            type: "numeric",
+            category: "primary",
+            description: "Ammonium",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_p_rt",
+            unit: "g P2O5/kg",
+            name: "P",
+            type: "numeric",
+            category: "primary",
+            description: "Fosfaat",
+            min: 0,
+            max: 4583,
+        },
+        {
+            parameter: "p_k_rt",
+            unit: "g K2O/kg",
+            name: "K",
+            type: "numeric",
+            category: "primary",
+            description: "Kalium",
+            min: 0,
+            max: 2409.2,
+        },
+        {
+            parameter: "p_eoc",
+            unit: "g EOC/kg",
+            name: "EOC",
+            type: "numeric",
+            category: "secondary",
+            description: "Koolstof, effectief",
+            min: 0,
+            max: 1000,
+        },
+        {
+            parameter: "p_s_rt",
+            unit: "g SO3/kg",
+            name: "S",
+            type: "numeric",
+            category: "secondary",
+            description: "Zwavel",
+            min: 0,
+            max: 2497.2,
+        },
+        {
+            parameter: "p_mg_rt",
+            unit: "g MgO/kg",
+            name: "Mg",
+            type: "numeric",
+            category: "secondary",
+            description: "Magnesium",
+            min: 0,
+            max: 1659,
+        },
+        {
+            parameter: "p_ca_rt",
+            unit: "g CaO/kg",
+            name: "Ca",
+            type: "numeric",
+            category: "secondary",
+            description: "Calcium",
+            min: 0,
+            max: 1399.2,
+        },
+        {
+            parameter: "p_na_rt",
+            unit: "g Na2O/kg",
+            name: "Na",
+            type: "numeric",
+            category: "secondary",
+            description: "Natrium",
+            min: 0,
+            max: 2695900,
+        },
+        {
+            parameter: "p_cu_rt",
+            unit: "mg Cu/kg",
+            name: "Cu",
+            type: "numeric",
+            category: "trace",
+            description: "Koper",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_zn_rt",
+            unit: "mg Zn/kg",
+            name: "Zn",
+            type: "numeric",
+            category: "trace",
+            description: "Zink",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_co_rt",
+            unit: "mg Co/kg",
+            name: "Co",
+            type: "numeric",
+            category: "trace",
+            description: "Kobalt",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_mn_rt",
+            unit: "mg Mn/kg",
+            name: "Mn",
+            type: "numeric",
+            category: "trace",
+            description: "Mangaan",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_mo_rt",
+            unit: "mg Mo/kg",
+            name: "Mo",
+            type: "numeric",
+            category: "trace",
+            description: "Molybdeen",
+            min: 0,
+            max: 1000000,
+        },
+        {
+            parameter: "p_b_rt",
+            unit: "mg B/kg",
+            name: "B",
+            type: "numeric",
+            category: "trace",
+            description: "Boor",
+            min: 0,
+            max: 1000000,
+        },
+    ]
+
+    return fertilizerParameterDescription
 }

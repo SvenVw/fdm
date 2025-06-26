@@ -1,4 +1,8 @@
-import type { CatalogueFertilizer, CatalogueFertilizerItem } from "../d"
+import type {
+    ApplicationMethods,
+    CatalogueFertilizer,
+    CatalogueFertilizerItem,
+} from "../d"
 import { hashFertilizer } from "../hash"
 import srm from "./srm.json"
 
@@ -20,6 +24,12 @@ export async function getCatalogueSrm(): Promise<CatalogueFertilizer> {
             p_name_nl: fertilizer.p_name_nl,
             p_name_en: null,
             p_description: null,
+            p_app_method_options:
+                fertilizer.p_app_method_options === undefined
+                    ? null
+                    : (fertilizer.p_app_method_options.split(
+                          "||",
+                      ) as ApplicationMethods[]),
             p_dm: fertilizer.p_dm === undefined ? null : fertilizer.p_dm,
             p_density:
                 fertilizer.p_density === undefined
@@ -40,6 +50,10 @@ export async function getCatalogueSrm(): Promise<CatalogueFertilizer> {
             p_n_if: fertilizer.p_n_if === undefined ? null : fertilizer.p_n_if,
             p_n_of: fertilizer.p_n_of === undefined ? null : fertilizer.p_n_of,
             p_n_wc: fertilizer.p_n_wc === undefined ? null : fertilizer.p_n_wc,
+            p_no3_rt:
+                fertilizer.p_no3_rt === undefined ? null : fertilizer.p_no3_rt,
+            p_nh4_rt:
+                fertilizer.p_nh4_rt === undefined ? null : fertilizer.p_nh4_rt,
             p_p_rt: fertilizer.p_p_rt === undefined ? null : fertilizer.p_p_rt,
             p_k_rt: fertilizer.p_k_rt === undefined ? null : fertilizer.p_k_rt,
             p_mg_rt:

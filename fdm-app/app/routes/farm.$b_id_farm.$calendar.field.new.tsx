@@ -24,20 +24,22 @@ import {
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import {
     FieldsPanelHover,
     FieldsPanelZoom,
-} from "~/components/custom/atlas/atlas-panels"
+} from "~/components/blocks/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceNotClickable,
-} from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import { FarmHeader } from "~/components/custom/farm/farm-header"
-import FieldDetailsDialog from "~/components/custom/field/form"
-import { FormSchema } from "~/components/custom/field/schema"
+} from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import FieldDetailsDialog from "~/components/blocks/field/form"
+import { FormSchema } from "~/components/blocks/field/schema"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderField } from "~/components/blocks/header/field"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
@@ -49,9 +51,6 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { useCalendarStore } from "~/store/calendar"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarm } from "../components/custom/header/farm"
-import { HeaderField } from "../components/custom/header/field"
 
 // Meta
 export const meta: MetaFunction = () => {

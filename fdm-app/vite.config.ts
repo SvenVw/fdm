@@ -1,12 +1,16 @@
 import { reactRouter } from "@react-router/dev/vite"
+import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
 export default defineConfig({
-    plugins: [reactRouter(), tsconfigPaths()],
+    plugins: [reactRouter(), tsconfigPaths(), tailwindcss()],
     envPrefix: "PUBLIC_",
     define: {
         global: {},
+    },
+    ssr: {
+        noExternal: ["posthog-js", "posthog-js/react"],
     },
     build: {
         sourcemap: process.env.NODE_ENV === "development",
@@ -19,6 +23,9 @@ export default defineConfig({
                     }
                     if (id.includes("app/components/ui")) {
                         return "components/ui"
+                    }
+                    if (id.includes("app/components/blocks")) {
+                        return "components/blocks"
                     }
                     if (id.includes("app/components/custom")) {
                         return "components/custom"

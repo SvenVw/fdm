@@ -15,7 +15,7 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
     return (
         <nav
             className={cn(
-                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 truncate",
+                "flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 max-w-xs",
                 className,
             )}
             {...props}
@@ -29,7 +29,7 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
                     className={cn(
                         buttonVariants({ variant: "ghost" }),
                         pathname.startsWith(item.to)
-                            ? "bg-muted hover:bg-muted"
+                            ? "bg-muted hover:bg-muted "
                             : "hover:bg-transparent hover:underline",
                         "justify-start",
                     )}

@@ -24,7 +24,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-
 /**
  * Checks for an existing user session and redirects authenticated users.
  *
@@ -98,14 +97,18 @@ export default function SignIn() {
                         </div>
                         <Card>
                             <CardHeader>
-                                <CardTitle>Controleer je e-mail inbox</CardTitle>
+                                <CardTitle>
+                                    Controleer je e-mail inbox
+                                </CardTitle>
                                 <CardDescription>
-                                    Een tijdelijke aanmeldlink is naar je e-mailadres gestuurd.
+                                    Een tijdelijke aanmeldlink is naar je
+                                    e-mailadres gestuurd.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-muted-foreground">
-                                    De aanmeldlink is 5 minuten geldig en kan maar één keer worden gebruikt.
+                                    De aanmeldlink is 5 minuten geldig en kan
+                                    maar één keer worden gebruikt.
                                 </p>
                             </CardContent>
                             <CardFooter className="flex justify-center">
@@ -124,8 +127,8 @@ export default function SignIn() {
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <img
-                        src="https://images.unsplash.com/photo-1579453595942-875f14733d57?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxjb2xsZWN0aW9uLXBhZ2V8Mnx5RXA1MmpJaHRsSXx8ZW58MHx8fHx8"
-                        alt='Photo by <a href="https://unsplash.com/@currogo?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Curro GO</a> on <a href="https://unsplash.com/photos/green-grass-field-under-white-clouds-during-daytime-0ydoaXqdSFk?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
+                        src="https://images.unsplash.com/photo-1662127245625-a72f1ad7e6ca?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                        alt='Photo by <a href="https://unsplash.com/@datingjungle?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Datingjungle</a> on <a href="https://unsplash.com/photos/a-river-running-through-a-green-landscape-IXYb976ga5E?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>'
                         width="1920"
                         height="1080"
                         loading="lazy"

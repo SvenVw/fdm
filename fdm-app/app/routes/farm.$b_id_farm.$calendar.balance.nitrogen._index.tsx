@@ -9,10 +9,8 @@ import {
     ArrowRight,
     ArrowRightLeft,
     ArrowUpFromLine,
-    Check,
     CircleAlert,
     CircleCheck,
-    House,
 } from "lucide-react"
 import {
     type LoaderFunctionArgs,
@@ -23,6 +21,8 @@ import {
     useLocation,
     useNavigation,
 } from "react-router"
+import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Card,
     CardContent,
@@ -30,13 +30,11 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
-import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
-import { LoadingSpinner } from "../components/custom/loadingspinner"
-import { Skeleton } from "../components/ui/skeleton"
-import { getTimeframe } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -199,10 +197,14 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? <LoadingSpinner /> : "-"}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.volatilization
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Berekening van emissie volgt later
+                                    kg N / ha
                                 </p>
                             </CardContent>
                         </Card>

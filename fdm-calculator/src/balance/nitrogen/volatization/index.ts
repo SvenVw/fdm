@@ -1,9 +1,10 @@
-import { Decimal } from "decimal.js"
 import type {
     CultivationDetail,
+    FertilizerDetail,
     FieldInput,
     NitrogenVolatilization,
 } from "../types"
+import { calculateAmmoniaEmissionsByFertilizers } from "./fertilizers"
 import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
 
 /**
@@ -19,9 +20,19 @@ import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
 export function calculateNitrogenVolatilization(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
+    fertilizerApplications: FieldInput["fertilizerApplications"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
+    fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenVolatilization {
-    /** Calculate the total amount of Nitrogen volatilized as Ammonia */
+    /** Calculate the total amount of Nitrogen volatilized as Ammonia by fertilizer application */
+    const fertilizers = calculateAmmoniaEmissionsByFertilizers(
+        cultivations,
+        fertilizerApplications,
+        cultivationDetailsMap,
+        fertilizerDetailsMap,
+    )
+
+    /** Calculate the total amount of Nitrogen volatilized as Ammonia by crop residues */
     const residues = calculateNitrogenVolatizationViaAmmoniaByResidue(
         cultivations,
         harvests,
@@ -29,18 +40,8 @@ export function calculateNitrogenVolatilization(
     )
 
     const ammonia = {
-        total: residues.total, // Ammonia total should include residues total
-        fertilizers: {
-            total: Decimal(0), // Fertilizers volatilization not yet implemented
-            mineral: {
-                total: Decimal(0),
-                applications: [],
-            },
-            manure: {
-                total: Decimal(0),
-                applications: [],
-            },
-        },
+        total: fertilizers.total.add(residues.total), // Ammonia total should include fertilizers total and residues total
+        fertilizers: fertilizers,
         residues: residues,
         grazing: undefined, // Grazing volatilization not yet implemented
     }

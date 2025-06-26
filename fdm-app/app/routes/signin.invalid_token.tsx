@@ -24,7 +24,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-
 /**
  * Checks for an existing user session and redirects authenticated users.
  *
@@ -98,11 +97,15 @@ export default function SignIn() {
                         </div>
                         <Card>
                             <CardHeader>
-                                <CardTitle>Aanmeldlink is niet meer geldig</CardTitle>
+                                <CardTitle>
+                                    Aanmeldlink is niet meer geldig
+                                </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-muted-foreground">
-                                    Helaas is de aanmeldlink niet meer geldig. De link is slechts 5 minuten geldig en kan maar één keer gebruikt worden.
+                                    Helaas is de aanmeldlink niet meer geldig.
+                                    De link is slechts 5 minuten geldig en kan
+                                    maar één keer gebruikt worden.
                                 </p>
                             </CardContent>
                             <CardFooter className="flex justify-center">
@@ -115,9 +118,8 @@ export default function SignIn() {
                                         Terug naar aanmelden
                                     </NavLink>
                                 </Button>
-
                             </CardFooter>
-                        </Card>    
+                        </Card>
                     </div>
                 </div>
                 <div className="hidden bg-muted lg:block">

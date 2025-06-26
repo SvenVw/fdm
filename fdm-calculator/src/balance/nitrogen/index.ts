@@ -157,7 +157,9 @@ export async function calculateNitrogenBalanceField(
     const volatilization = calculateNitrogenVolatilization(
         cultivations,
         harvests,
+        fertilizerApplications,
         cultivationDetailsMap,
+        fertilizerDetailsMap,
     )
 
     // Calculate the target for the Nitrogen balance

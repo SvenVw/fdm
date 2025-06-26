@@ -2,6 +2,7 @@ import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     addFertilizerApplication,
     getCultivationPlan,
+    getFertilizerParametersDescription,
     getFertilizers,
     removeFertilizerApplication,
 } from "@svenvw/fdm-core"
@@ -15,10 +16,19 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { FertilizerApplicationsCards } from "~/components/custom/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "~/components/custom/fertilizer-applications/form"
-import { FormSchema } from "~/components/custom/fertilizer-applications/formschema"
-import { FertilizerApplicationsList } from "~/components/custom/fertilizer-applications/list"
+import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-applications/cards"
+import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
+import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
+import { FertilizerApplicationsList } from "~/components/blocks/fertilizer-applications/list"
+import { Button } from "~/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "~/components/ui/dialog"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -79,11 +89,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session.principal_id,
             b_id_farm,
         )
+        const fertilizerParameterDescription =
+            getFertilizerParametersDescription()
+        const applicationMethods = fertilizerParameterDescription.find(
+            (x) => x.parameter === "p_app_method_options",
+        )
+        if (!applicationMethods) throw new Error("Parameter metadata missing")
         // Map fertilizers to options for the combobox
         const fertilizerOptions = fertilizers.map((fertilizer) => {
+            const applicationMethodOptions = fertilizer.p_app_method_options
+                .map((opt) => {
+                    const meta = applicationMethods.options.find(
+                        (x) => x.value === opt,
+                    )
+                    return meta ? { value: opt, label: meta.label } : undefined
+                })
+                .filter(Boolean)
             return {
                 value: fertilizer.p_id,
                 label: fertilizer.p_name_nl,
+                applicationMethodOptions: applicationMethodOptions,
             }
         })
 
@@ -142,7 +167,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             fertilizerOptions: fertilizerOptions,
             fertilizerApplications: fertilizerApplications,
-            dose: dose,
+            dose: dose.dose,
+            applicationMethodOptions: applicationMethods.options,
         }
     } catch (error) {
         return handleLoaderError(error)
@@ -167,27 +193,43 @@ export default function Index() {
 
     return (
         <div className="space-y-6">
-            <p className="text-sm text-muted-foreground">
+            {/* <p className="text-sm text-muted-foreground">
                 Vul de bemesting op bouwplanniveau in voor dit gewas.
-            </p>
-            <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                    <FertilizerApplicationForm
-                        options={loaderData.fertilizerOptions}
-                        action={location.pathname}
-                        fetcher={fetcher}
-                    />
-                    <Separator className="my-4" />
+            </p> */}
+            <Separator />
+            <div className="flex justify-end">
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button>Bemesting toevoegen</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[800px]">
+                        <DialogHeader>
+                            <DialogTitle>Bemesting toevoegen</DialogTitle>
+                            <DialogDescription>
+                                Voeg een nieuwe bemestingstoepassing toe aan het
+                                perceel.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <FertilizerApplicationForm
+                            options={loaderData.fertilizerOptions}
+                            action={location.pathname}
+                        />
+                    </DialogContent>
+                </Dialog>
+            </div>
+            <div className="grid 2xl:grid-cols-3 gap-8">
+                <div className="2xl:col-span-2">
                     <FertilizerApplicationsList
                         fertilizerApplications={
                             loaderData.fertilizerApplications
                         }
+                        applicationMethodOptions={
+                            loaderData.applicationMethodOptions
+                        }
                         fetcher={fetcher}
                     />
                 </div>
-                <div>
-                    <FertilizerApplicationsCards dose={loaderData.dose} />
-                </div>
+                <FertilizerApplicationsCards dose={loaderData.dose} />
             </div>
         </div>
     )
@@ -228,7 +270,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 FormSchema,
             )
-            const { p_id, p_app_amount, p_app_date } = formValues
+            const { p_id, p_app_amount, p_app_date, p_app_method } = formValues
 
             // Get the cultivation details for this cultivation
             const cultivationPlan = await getCultivationPlan(
@@ -252,7 +294,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         b_id,
                         p_id,
                         p_app_amount,
-                        undefined,
+                        p_app_method,
                         p_app_date,
                     )
                 }),

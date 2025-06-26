@@ -26,10 +26,10 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@changesets/cli": "^2.29.3",
-        "turbo": "^2.5.3"
+        "@changesets/cli": "^2.29.4",
+        "turbo": "^2.5.4"
     },
-    "packageManager": "pnpm@10.9.0",
+    "packageManager": "pnpm@10.12.1",
     "pnpm": {
         "packageExtensions": {
             "vite-plugin-dts": {
@@ -51,6 +51,7 @@
             "@sentry-internal/node-cpu-profiler",
             "@sentry/cli",
             "@swc/core",
+            "@tailwindcss/oxide",
             "core-js",
             "core-js-pure",
             "esbuild"

@@ -45,6 +45,10 @@ export const serverConfig: ServerConfig = {
         sentry: {
             auth_token: String(process.env.SENTRY_AUTH_TOKEN),
         },
+        posthog: {
+            key: String(process.env.PUBLIC_POSTHOG_KEY),
+            host: String(process.env.PUBLIC_POSTHOG_HOST),
+        },
     },
 
     // Mail

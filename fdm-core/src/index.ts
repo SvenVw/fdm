@@ -52,10 +52,14 @@ export {
     removeFertilizerApplication,
     getFertilizerApplication,
     getFertilizerApplications,
+    getFertilizerParametersDescription,
 } from "./fertilizer"
 export type {
     Fertilizer,
     FertilizerApplication,
+    FertilizerParameters,
+    FertilizerParameterDescription,
+    FertilizerParameterDescriptionItem,
 } from "./fertilizer.d"
 export {
     addCultivationToCatalogue,

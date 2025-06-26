@@ -1,7 +1,7 @@
 import { getOrganizationsForUser } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import {

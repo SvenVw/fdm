@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-calculator",
     "private": false,
-    "version": "0.3.3",
+    "version": "0.4.0",
     "description": "Calculate various insights based on the Farm Data Model",
     "license": "MIT",
     "homepage": "https://github.com/SvenVw/fdm",
@@ -23,9 +23,7 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
@@ -47,17 +45,19 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
-        "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^12.1.2",
+        "@rollup/plugin-commonjs": "catalog:",
+        "@rollup/plugin-node-resolve": "catalog:",
+        "@rollup/plugin-terser": "catalog:",
+        "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-core": "workspace:*",
         "@vitest/coverage-v8": "catalog:",
-        "postgres": "^3.4.5",
-        "rollup": "^4.40.2",
-        "rollup-plugin-polyfill-node": "^0.13.0",
+        "postgres": "^3.4.7",
+        "rollup": "catalog:",
+        "rollup-plugin-polyfill-node": "catalog:",
+        "typedoc": "catalog:",
+        "typedoc-plugin-missing-exports": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.9.0"
+    "packageManager": "pnpm@10.12.1"
 }

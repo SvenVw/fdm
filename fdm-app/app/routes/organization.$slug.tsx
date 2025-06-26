@@ -1,29 +1,20 @@
 import {
     cancelPendingInvitation,
     getOrganization,
-    getOrganizationsForUser,
     getPendingInvitationsForOrganization,
     getUsersInOrganization,
     inviteUserToOrganization,
     removeUserFromOrganization,
     updateRoleOfUserAtOrganization,
 } from "@svenvw/fdm-core"
-import { username } from "better-auth/plugins/username"
 import { formatDistanceToNow } from "date-fns"
 import { nl } from "date-fns/locale"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
-import { NavLink, useLoaderData } from "react-router-dom"
+import { useLoaderData } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { Badge } from "~/components/ui/badge"
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-} from "~/components/ui/breadcrumb"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -32,23 +23,20 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
-import { SidebarTrigger } from "~/components/ui/sidebar"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
-import { Input } from "../components/ui/input"
+import { Input } from "~/components/ui/input"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../components/ui/select"
-import { serverConfig } from "../lib/config.server"
-import { renderInvitationEmail, sendEmail } from "../lib/email.server"
+} from "~/components/ui/select"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
+import { renderInvitationEmail, sendEmail } from "~/lib/email.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!params.slug) {

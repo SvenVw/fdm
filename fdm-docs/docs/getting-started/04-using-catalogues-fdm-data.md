@@ -17,18 +17,18 @@ The `@svenvw/fdm-data` package exports arrays containing the raw catalogue entri
 // Example: Importing raw cultivation and fertilizer catalogues
 import { 
     cultivationsCatalogueBRPCrops, 
-    fertilizersCatalogueSRM 
+    fertilizersCatalogueBaat 
 } from '@svenvw/fdm-data';
 
 console.log('Total BRP Crops in package:', cultivationsCatalogueBRPCrops.length);
-console.log('Total SRM Fertilizers in package:', fertilizersCatalogueSRM.length);
+console.log('Total BAAT Fertilizers in package:', fertilizersCatalogueBaat.length);
 
 // Example: Finding a specific entry's ID from the raw data
 const wheatEntry = cultivationsCatalogueBRPCrops.find(c => c.b_lu_name === 'Winter wheat');
 const wheatCatalogueId = wheatEntry?.b_lu_catalogue; 
 // Use wheatCatalogueId when calling fdm-core functions like addCultivation
 
-const manureEntry = fertilizersCatalogueSRM.find(f => f.p_name_nl === 'Rundveedrijfmest');
+const manureEntry = fertilizersCatalogueBAAT.find(f => f.p_name_nl === 'Rundveedrijfmest');
 const manureCatalogueId = manureEntry?.p_id_catalogue;
 // Use manureCatalogueId when calling fdm-core functions like addFertilizer
 ```

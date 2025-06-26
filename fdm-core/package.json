@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.21.1",
+    "version": "0.22.0",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -27,9 +27,7 @@
             }
         }
     },
-    "files": [
-        "dist"
-    ],
+    "files": ["dist"],
     "scripts": {
         "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate-authn": "pnpm dlx @better-auth/cli generate --config /src/db/generator/authn.ts --output ./src/db/schema-authn.ts --y",
@@ -46,34 +44,34 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
-        "@rollup/plugin-commonjs": "^28.0.3",
-        "@rollup/plugin-node-resolve": "^16.0.1",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^12.1.2",
-        "@svenvw/fdm-data": "workspace:^0.13.1",
-        "@types/node": "^22.15.16",
+        "@rollup/plugin-commonjs": "catalog:",
+        "@rollup/plugin-node-resolve": "catalog:",
+        "@rollup/plugin-terser": "catalog:",
+        "@rollup/plugin-typescript": "catalog:",
+        "@svenvw/fdm-data": "workspace:^0.14.0",
+        "@types/node": "^22.15.32",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.0",
-        "globals": "^16.1.0",
-        "rollup": "^4.40.2",
-        "rollup-plugin-polyfill-node": "^0.13.0",
-        "typedoc": "^0.28.4",
-        "typedoc-plugin-missing-exports": "^3.1.0",
+        "globals": "^16.2.0",
+        "rollup": "catalog:",
+        "rollup-plugin-polyfill-node": "catalog:",
+        "typedoc": "catalog:",
+        "typedoc-plugin-missing-exports": "catalog:",
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.2.17",
+        "@electric-sql/pglite": "^0.3.3",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.5",
-        "postgres": "^3.4.5",
+        "postgres": "^3.4.7",
         "unique-username-generator": "^1.4.0"
     },
-    "packageManager": "pnpm@10.9.0",
+    "packageManager": "pnpm@10.12.1",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }

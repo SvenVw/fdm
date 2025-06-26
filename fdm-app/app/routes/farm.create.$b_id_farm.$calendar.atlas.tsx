@@ -5,12 +5,12 @@ import {
     getFarm,
 } from "@svenvw/fdm-core"
 import type { Feature, GeoJsonProperties, Polygon } from "geojson"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import {
-    GeolocateControl,
     Layer,
     Map as MapGL,
-    NavigationControl,
+    type ViewState,
+    type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
@@ -21,21 +21,22 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
-import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import { generateFeatureClass } from "~/components/custom/atlas/atlas-functions"
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
+import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 import {
     FieldsPanelHover,
     FieldsPanelSelection,
     FieldsPanelZoom,
-} from "~/components/custom/atlas/atlas-panels"
+} from "~/components/blocks/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
     FieldsSourceSelected,
-} from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
-import { Header } from "~/components/custom/header/base"
-import { HeaderFarmCreate } from "~/components/custom/header/create-farm"
+} from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
@@ -113,8 +114,16 @@ export default function Index() {
 
     const fieldsAvailableId = "fieldsAvailable"
     // const fields = loaderData.savedFields
-    const viewState = getViewState(null)
+    const initialViewState = getViewState(null)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
+
+    const [viewState, setViewState] = useState<ViewState>(
+        initialViewState as ViewState,
+    )
+
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
+    }, [])
 
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
@@ -159,7 +168,7 @@ export default function Index() {
                             <MapGL
                                 {...viewState}
                                 style={{
-                                    height: "calc(100vh - 64px - 123px)",
+                                    height: "calc(100vh - 64px - 147px)",
                                     width: "100%",
                                 }}
                                 interactive={true}
@@ -169,9 +178,24 @@ export default function Index() {
                                     fieldsAvailableId,
                                     fieldsSelectedId,
                                 ]}
+                                onMove={onViewportChange}
                             >
-                                <GeolocateControl />
-                                <NavigationControl />
+                                <Controls
+                                    onViewportChange={({
+                                        longitude,
+                                        latitude,
+                                        zoom,
+                                    }) =>
+                                        setViewState((currentViewState) => ({
+                                            ...currentViewState,
+                                            longitude,
+                                            latitude,
+                                            zoom,
+                                            pitch: currentViewState.pitch,
+                                            bearing: currentViewState.bearing,
+                                        }))
+                                    }
+                                />
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
