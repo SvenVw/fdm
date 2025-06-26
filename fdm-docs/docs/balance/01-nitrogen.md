@@ -202,13 +202,13 @@ The total N volatilized is the sum of ammonia emissions from fertilizers and cro
 Ammonia emissions from fertilizers are calculated differently depending on the fertilizer type.
 
 *   **Manure, Compost, and Other Organic Fertilizers:**
-    For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the fraction of nitrogen that is readily available for volatilization.
+    For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the amount of nitrogen that is readily available for volatilization.
 
     *   **Formula:**
-        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (fraction) * Emission Factor (fraction)`
+        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (g N / kg) * Emission Factor (fraction)`
         Where:
         *   `Application Amount`: `p_app_amount` (kg / ha) - The total amount of fertilizer applied.
-        *   `TAN Content`: `p_nh4_rt` (fraction) - The fraction of total nitrogen that is in ammoniacal form.
+        *   `TAN Content`: `p_nh4_rt` (g N / kg) - The amount of total nitrogen that is in ammoniacal form.
         *   `Emission Factor`: A dimensionless factor representing the proportion of TAN that is volatilized as ammonia. This factor is determined by the application method and the type of land (grassland, cropland, or bare soil) at the time of application.
 
     *   **Emission Factors for Manure and Compost:**
