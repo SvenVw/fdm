@@ -29,32 +29,29 @@ export function HarvestsList({
 
     return (
         <div>
-            {/* <div className="text-sm font-medium">Meststoffen</div> */}
-            <div className="grid gap-6">
                 {harvests && harvests.length > 0 ? (
                     <div className="space-y-6">
                         <div className="space-y-3">
                             {harvests.map((harvest) => (
                                 <div
-                                    className="grid grid-cols-4 gap-x-3 items-center"
+                                    className="grid grid-cols-4 items-center"
                                     key={harvest.b_id_harvesting}
                                 >
-                                    <div>
+                                    
                                         <p className="text-sm font-medium leading-none">
                                             {format(
                                                 harvest.b_lu_harvest_date,
                                                 "yyyy-MM-dd",
                                             )}
                                         </p>
-                                    </div>
+                                    
                                     <div className="col-span-2">
-                                        <p className="text-sm font-light leading-none">
+                                        <p className="text-sm text-muted-foreground leading-none">
                                             {`${harvest.harvestable?.harvestable_analyses?.[0]?.b_lu_yield ?? "–"} kg DS/ha`}
                                         </p>
                                         {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
                                     </div>
-                                    <div className="grid grid-cols-2 justify-self-end gap-x-3">
-                                        <div className="">
+                                    <div className="grid grid-cols-2 gap-x-2">                                       
                                             <Button
                                                 variant="default"
                                                 aria-label="Beijken"
@@ -65,9 +62,7 @@ export function HarvestsList({
                                                 >
                                                     <Eye />
                                                 </NavLink>
-                                            </Button>
-                                        </div>
-                                        <div className="">
+                                            </Button>                                    
                                             <Button
                                                 variant="destructive"
                                                 disabled={
@@ -95,12 +90,12 @@ export function HarvestsList({
                                                 ) : (
                                                     <Trash2 />
                                                 )}
-                                            </Button>
-                                        </div>
+                                            </Button>                                     
                                     </div>
                                 </div>
                             ))}
                         </div>
+                        {canAddHarvest ? (
                         <div>
                             <Button
                                 aria-label="Voeg oogst toe"
@@ -118,7 +113,7 @@ export function HarvestsList({
                                     Oogst toevoegen
                                 </NavLink>
                             </Button>
-                        </div>
+                        </div>) : null}
                     </div>
                 ) : canAddHarvest ? (
                     <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
@@ -149,6 +144,5 @@ export function HarvestsList({
                     </div>
                 )}
             </div>
-        </div>
     )
 }

@@ -24,6 +24,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -207,20 +208,40 @@ export default function FarmAFieldCultivationBlock() {
                 </p>
             </div>
             <Separator />
-            <div className="grid 2xl:grid-cols-2 gap-8">
-                <CultivationForm
+            <div className="grid grid-cols-2 gap-8">
+     
+                 <Card>
+                    <CardHeader>
+                     <CardTitle>
+                        {loaderData.b_lu_harvestable === "multiple" ? "Oogsten" : "Oogst"}                      
+                    </CardTitle>
+                    </CardHeader>           
+                    <CardContent>
+                        {loaderData.b_lu_harvestable === "none" ? <p className="text-muted-foreground">Dit gewas kan niet geoogst worden.</p> :    <HarvestsList
+                            harvests={loaderData.harvests}
+                            b_lu_harvestable={loaderData.b_lu_harvestable}
+                            state={fetcher.state}
+                />}  
+                              
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                     <CardTitle>
+                        Gewasdetails
+                    </CardTitle>
+                    </CardHeader>           
+                    <CardContent>
+                        <CultivationForm
                     b_lu_catalogue={loaderData.b_lu_catalogue}
                     b_lu_start={loaderData.b_lu_start}
                     b_lu_end={loaderData.b_lu_end}
                     options={loaderData.cultivationOptions}
                     action={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`}
-                />
-                <div>{null}</div>
-                <HarvestsList
-                    harvests={loaderData.harvests}
-                    b_lu_harvestable={loaderData.b_lu_harvestable}
-                    state={fetcher.state}
-                />
+                /> 
+                    </CardContent>
+                </Card>
+                
             </div>
         </div>
     )

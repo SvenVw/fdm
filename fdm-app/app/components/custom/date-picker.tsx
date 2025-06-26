@@ -114,7 +114,7 @@ export function DatePicker<TFieldValues extends FieldValues>({
             control={form.control}
             name={name}
             render={({ field }) => (
-                <FormItem className="flex flex-col w-[240px]">
+                <FormItem className="flex flex-col">
                     <FormLabel>{label}</FormLabel>
                     <div className="relative flex gap-2">
                         <FormControl>
