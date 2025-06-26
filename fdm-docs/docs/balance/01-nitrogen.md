@@ -57,7 +57,10 @@ Accurate N balance calculation relies on comprehensive input data that captures 
 *  **Catalogue Data:** Standardized data from catalogues ensures consistency and provides default values for various crop and fertilizer characteristics, which are essential for modeling when specific field-level data is unavailable.
     *  `FertilizerCatalogue` (`FertilizerDetail`):
         *  Total N content (`p_n_rt`, g N / kg).
-        *  Type flags: `p_type_mineral`, `p_type_manure`, `p_type_compost` (booleans).
+        *  Nitrate content (`p_no3_rt`, g N / kg)
+        *  Ammonium content (`p_nh4_rt`, g N/ kg)
+        *  Sulfur content (`p_s_rt`, g SO3 / kg)
+        *  Type flag: `p_type` ("manure", "mineral", "compost" or `null`).
     *  `CultivationCatalogue` (`CultivationDetail`):
         *  Default yield (`b_lu_yield`, kg / ha).
         *  Default N content of harvestable product (`b_lu_n_harvestable`, g N / kg).
@@ -212,7 +215,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
         *   `Emission Factor`: A dimensionless factor representing the proportion of TAN that is volatilized as ammonia. This factor is determined by the application method and the type of land (grassland, cropland, or bare soil) at the time of application.
 
     *   **Emission Factors for Manure and Compost:**
-    
+
         | Application Method    | Grassland | Cropland | Bare Soil |
         | :-------------------- | :-------- | :------- | :-------- |
         | Broadcasting          | 0.68      | N/A      | 0.69      |
