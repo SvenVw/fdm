@@ -1,7 +1,7 @@
 import { getSoilParametersDescription } from "@svenvw/fdm-core"
 
 export function getSoilParametersForSoilAnalysisType(
-    soilAnalysisType: "standard" | "all" | "nmin" | "derogation"
+    soilAnalysisType: "standard" | "all" | "nmin" | "derogation",
 ) {
     let soilParameters = []
     if (soilAnalysisType === "standard") {
@@ -99,7 +99,9 @@ export function getSoilParametersForSoilAnalysisType(
             "a_density_sa",
         ]
     } else {
-        throw new Error(`Unsupported soil analysis type: ${soilAnalysisType}. Supported types: standard, all, nmin, derogation`)
+        throw new Error(
+            `Unsupported soil analysis type: ${soilAnalysisType}. Supported types: standard, all, nmin, derogation`,
+        )
     }
 
     // Get soil parameter descriptions

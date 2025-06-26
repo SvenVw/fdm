@@ -24,7 +24,6 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-
 /**
  * Checks for an existing user session and redirects authenticated users.
  *
@@ -98,14 +97,18 @@ export default function SignIn() {
                         </div>
                         <Card>
                             <CardHeader>
-                                <CardTitle>Controleer je e-mail inbox</CardTitle>
+                                <CardTitle>
+                                    Controleer je e-mail inbox
+                                </CardTitle>
                                 <CardDescription>
-                                    Een tijdelijke aanmeldlink is naar je e-mailadres gestuurd.
+                                    Een tijdelijke aanmeldlink is naar je
+                                    e-mailadres gestuurd.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-muted-foreground">
-                                    De aanmeldlink is 5 minuten geldig en kan maar één keer worden gebruikt.
+                                    De aanmeldlink is 5 minuten geldig en kan
+                                    maar één keer worden gebruikt.
                                 </p>
                             </CardContent>
                             <CardFooter className="flex justify-center">

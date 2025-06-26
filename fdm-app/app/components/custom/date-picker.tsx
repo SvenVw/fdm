@@ -1,13 +1,10 @@
-import React from "react"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
 import { CalendarIcon } from "lucide-react"
+import React from "react"
+import type { FieldValues, Path, UseFormReturn } from "react-hook-form"
 import { Button } from "~/components/ui/button"
 import { Calendar } from "~/components/ui/calendar"
-import { Input } from "~/components/ui/input"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "~/components/ui/popover"
 import {
     FormControl,
     FormDescription,
@@ -16,9 +13,12 @@ import {
     FormLabel,
     FormMessage,
 } from "~/components/ui/form"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale"
-import type { FieldValues, UseFormReturn, Path } from "react-hook-form"
+import { Input } from "~/components/ui/input"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "~/components/ui/popover"
 
 function parseDateString(dateString: string): Date | undefined {
     const parts = dateString.split(/[-./]/) // Split by -, ., or /

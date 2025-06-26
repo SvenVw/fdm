@@ -1,6 +1,9 @@
-import { describe, it, expect } from "vitest"
-import { calculateAmmoniaEmissionsByMineralFertilizers, determineMineralAmmoniaEmissionFactor } from "./mineral"
+import { describe, expect, it } from "vitest"
 import type { FertilizerDetail, FieldInput } from "../../types"
+import {
+    calculateAmmoniaEmissionsByMineralFertilizers,
+    determineMineralAmmoniaEmissionFactor,
+} from "./mineral"
 
 describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
@@ -33,8 +36,8 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
                 {
                     p_id_catalogue: "mineral1",
                     p_type: "mineral",
-                    p_n_rt: 0.8, 
-                    p_ef_nh3: 0.1, 
+                    p_n_rt: 0.8,
+                    p_ef_nh3: 0.1,
                     p_nh4_rt: null,
                     p_no3_rt: null,
                     p_s_rt: null,
@@ -59,7 +62,7 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
             {
                 p_app_id: "app1",
                 p_id_catalogue: "mineral2",
-                p_app_amount: 1000, 
+                p_app_amount: 1000,
                 p_app_date: new Date("2023-06-01"),
                 p_app_method: "broadcasting",
                 p_id: "app1",
@@ -71,9 +74,9 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
                 {
                     p_id_catalogue: "mineral2",
                     p_type: "mineral",
-                    p_n_rt: 0.8, 
-                    p_no3_rt: 0.2, 
-                    p_nh4_rt: 0.3, 
+                    p_n_rt: 0.8,
+                    p_no3_rt: 0.2,
+                    p_nh4_rt: 0.3,
                     p_s_rt: 0.1,
                     p_ef_nh3: null, // No predefined emission factor
                 },
@@ -163,10 +166,10 @@ describe("determineMineralAmmoniaEmmissionFactor", () => {
         const fertilizerDetail: FertilizerDetail = {
             p_id_catalogue: "mineral1",
             p_type: "mineral",
-            p_n_rt: 0.8, 
-            p_no3_rt: 0.2, 
-            p_nh4_rt: 0.3, 
-            p_s_rt: 0.1, 
+            p_n_rt: 0.8,
+            p_no3_rt: 0.2,
+            p_nh4_rt: 0.3,
+            p_s_rt: 0.1,
             p_ef_nh3: null,
         }
 

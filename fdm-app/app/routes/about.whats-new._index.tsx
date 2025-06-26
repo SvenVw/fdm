@@ -9,13 +9,13 @@ import {
 } from "react-router"
 import remarkGfm from "remark-gfm"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { HeaderAbout } from "~/components/blocks/header/about"
+import { Header } from "~/components/blocks/header/base"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { HeaderAbout } from "~/components/blocks/header/about"
-import { Header } from "~/components/blocks/header/base"
 
 export const meta: MetaFunction = () => {
     return [

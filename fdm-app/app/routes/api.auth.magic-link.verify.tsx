@@ -1,28 +1,32 @@
 import { redirect } from "react-router"
 import { auth } from "~/lib/auth.server"
-import { handleLoaderError } from "~/lib/error";
+import { handleLoaderError } from "~/lib/error"
 
 export async function loader({ request }: { request: Request }) {
-    const url = new URL(request.url);
-    const callbackUrlParam = url.searchParams.get("callbackUrl") || "/farm";
+    const url = new URL(request.url)
+    const callbackUrlParam = url.searchParams.get("callbackUrl") || "/farm"
 
     // Validate callback URL to prevent open redirects
-    const callbackUrl = callbackUrlParam.startsWith("/") ||
+    const callbackUrl =
+        callbackUrlParam.startsWith("/") ||
         callbackUrlParam.startsWith(url.origin)
-        ? callbackUrlParam
-        : "/farm";
+            ? callbackUrlParam
+            : "/farm"
 
     try {
         // Delegate to better-auth's handler for verification and session creation
         const authResponse = await auth.handler(request)
 
         // Check if token is valid
-        const location = String(authResponse.headers.get('location'))
+        const location = String(authResponse.headers.get("location"))
         if (!location) {
-            throw new Error('No location header')
+            throw new Error("No location header")
         }
-        if (location.match(/INVALID_TOKEN/) || location.match(/EXPIRED_TOKEN/)) {
-            return redirect('/signin/invalid_token')
+        if (
+            location.match(/INVALID_TOKEN/) ||
+            location.match(/EXPIRED_TOKEN/)
+        ) {
+            return redirect("/signin/invalid_token")
         }
 
         // Redirect to callback page and set session cookie

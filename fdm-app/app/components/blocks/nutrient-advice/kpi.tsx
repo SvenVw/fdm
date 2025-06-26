@@ -1,11 +1,11 @@
-import { ArrowDownToLine, Gauge, Leaf, Sprout } from "lucide-react"
-import { Card, CardContent, CardFooter } from "~/components/ui/card"
-import type { NutrientDescription } from "./types"
-import { Badge } from "~/components/ui/badge"
 import type { Dose } from "@svenvw/fdm-calculator"
 import type { FertilizerApplication } from "@svenvw/fdm-core"
+import { ArrowDownToLine, Gauge, Leaf, Sprout } from "lucide-react"
 import { useNavigation } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Badge } from "~/components/ui/badge"
+import { Card, CardContent, CardFooter } from "~/components/ui/card"
+import type { NutrientDescription } from "./types"
 
 /**
  * Props for the NutrientKPICardForTotalApplications component.

@@ -1,8 +1,8 @@
+import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
 import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { FertilizerApplication } from "./types.d"
-import type { ApplicationMethods } from "@svenvw/fdm-data"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,

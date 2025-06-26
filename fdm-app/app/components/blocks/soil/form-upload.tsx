@@ -1,4 +1,12 @@
+import { cn } from "@/app/lib/utils"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Form, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { z } from "zod"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -7,7 +15,6 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Form, useActionData, useNavigation } from "react-router"
 import {
     FormDescription,
     FormField,
@@ -15,14 +22,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { Button } from "~/components/ui/button"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useEffect, useState } from "react"
-import { cn } from "@/app/lib/utils"
-import { AlertCircle, CheckCircle, FileUp, Upload } from "lucide-react"
 import { Progress } from "~/components/ui/progress"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 
 type UploadStatus = "idle" | "uploading" | "success" | "error"
 
@@ -157,7 +157,7 @@ export function SoilAnalysisUploadForm() {
                                                                         event
                                                                             .target
                                                                             .files?.[0],
-                                                                    )                                                 
+                                                                    )
                                                                     handleFileChange(
                                                                         event,
                                                                     )

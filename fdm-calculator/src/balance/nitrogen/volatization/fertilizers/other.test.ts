@@ -1,7 +1,11 @@
-import { describe, it, expect, vi } from "vitest"
 import Decimal from "decimal.js"
+import { describe, expect, it, vi } from "vitest"
+import type {
+    CultivationDetail,
+    FertilizerDetail,
+    FieldInput,
+} from "../../types"
 import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
-import type { FertilizerDetail, FieldInput, CultivationDetail } from "../../types"
 
 // Mock the determineManureAmmoniaEmissionFactor function
 vi.mock("./manure", () => ({
@@ -60,7 +64,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
                 {
                     p_id_catalogue: "manure1",
                     p_type: "manure",
-                    p_nh4_rt: 0.5, 
+                    p_nh4_rt: 0.5,
                     p_n_rt: null,
                     p_no3_rt: null,
                     p_s_rt: null,

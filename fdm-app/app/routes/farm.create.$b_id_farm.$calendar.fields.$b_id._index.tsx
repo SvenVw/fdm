@@ -17,9 +17,9 @@ import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useLoaderData,
     NavLink,
     data,
+    useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
@@ -27,9 +27,9 @@ import { z } from "zod"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Combobox } from "~/components/custom/combobox"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -303,7 +303,7 @@ export default function Index() {
                                                         <FormControl>
                                                             <Input
                                                                 {...field}
-                                                                type="text"                                                            
+                                                                type="text"
                                                             />
                                                         </FormControl>
                                                         <FormDescription />
@@ -403,7 +403,9 @@ export default function Index() {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <Button asChild>
-                                    <NavLink to={`../${loaderData.b_id}/soil/analysis`}>
+                                    <NavLink
+                                        to={`../${loaderData.b_id}/soil/analysis`}
+                                    >
                                         <Plus />
                                         Bodemanalyse toevoegen
                                     </NavLink>

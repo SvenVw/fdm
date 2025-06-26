@@ -12,6 +12,7 @@ import type { MetaFunction } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
+import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -36,7 +37,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { DatePicker } from "~/components/custom/date-picker"
 
 export const meta: MetaFunction = () => {
     return [
@@ -277,22 +277,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 // Form Schema
-const FormSchema = z.object({
-    b_name: z.string().min(3, {
-        message: "Naam van perceel moet minimaal 3 karakters bevatten",
-    }),
-    b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
-    b_start: z.coerce.date().optional(),
-    b_end: z.coerce.date().optional(),
-}).refine(
-    (schema) => {
-        if (schema.b_start && schema.b_end) {
-            return schema.b_end > schema.b_start
-        }
-        return true
-    },
-    {
-        message: "Einddatum moet na de startdatum zijn",
-        path: ["b_end"],
-    },
-)
+const FormSchema = z
+    .object({
+        b_name: z.string().min(3, {
+            message: "Naam van perceel moet minimaal 3 karakters bevatten",
+        }),
+        b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
+        b_start: z.coerce.date().optional(),
+        b_end: z.coerce.date().optional(),
+    })
+    .refine(
+        (schema) => {
+            if (schema.b_start && schema.b_end) {
+                return schema.b_end > schema.b_start
+            }
+            return true
+        },
+        {
+            message: "Einddatum moet na de startdatum zijn",
+            path: ["b_end"],
+        },
+    )

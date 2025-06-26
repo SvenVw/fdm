@@ -159,7 +159,7 @@ export async function calculateNitrogenBalanceField(
         harvests,
         fertilizerApplications,
         cultivationDetailsMap,
-        fertilizerDetailsMap
+        fertilizerDetailsMap,
     )
 
     // Calculate the target for the Nitrogen balance

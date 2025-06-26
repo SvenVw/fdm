@@ -2,8 +2,8 @@ import { useCallback, useState } from "react"
 import {
     Layer,
     Map as MapGL,
-    type ViewStateChangeEvent,
     type ViewState,
+    type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
@@ -11,6 +11,7 @@ import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
@@ -21,7 +22,6 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { Controls } from "~/components/blocks/atlas/atlas-controls"
 
 export const meta: MetaFunction = () => {
     return [
@@ -122,14 +122,13 @@ export default function FarmAtlasFieldsBlock() {
     const initialViewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
 
-    const [viewState, setViewState] = useState<ViewState>(initialViewState as ViewState)
-
-    const onViewportChange = useCallback(
-        (event: ViewStateChangeEvent) => {
-            setViewState(event.viewState)
-        },
-        [],
+    const [viewState, setViewState] = useState<ViewState>(
+        initialViewState as ViewState,
     )
+
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
+    }, [])
 
     return (
         <>

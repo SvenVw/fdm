@@ -1,7 +1,4 @@
-import {
-    addSoilAnalysis,
-    getField,
-} from "@svenvw/fdm-core"
+import { addSoilAnalysis, getField } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
     type ActionFunctionArgs,
@@ -13,13 +10,13 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { SoilAnalysisForm } from "~/components/blocks/soil/form"
 import { FormSchema } from "~/components/blocks/soil/formschema"
+import { getSoilParametersForSoilAnalysisType } from "~/components/blocks/soil/parameters.server"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { getSoilParametersForSoilAnalysisType } from "~/components/blocks/soil/parameters.server"
 
 /**
  * Loader function for the soil data page of a specific farm field.
@@ -69,7 +66,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-              // Get the parameters for the soil analysis
+        // Get the parameters for the soil analysis
         const soilAnalysisType = params.analysis_type
         if (!soilAnalysisType) {
             throw data("Type of soil analysis required", {

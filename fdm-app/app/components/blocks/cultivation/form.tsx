@@ -4,11 +4,11 @@ import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { Combobox } from "~/components/custom/combobox"
+import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { FormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
-import { DatePicker } from "~/components/custom/date-picker"
 
 export function CultivationForm({
     b_lu_catalogue,
@@ -28,9 +28,9 @@ export function CultivationForm({
     })
 
     useEffect(() => {
-        form.setValue("b_lu_catalogue", b_lu_catalogue ?? "");
-        form.setValue("b_lu_start", b_lu_start ?? new Date());
-        form.setValue("b_lu_end", b_lu_end);
+        form.setValue("b_lu_catalogue", b_lu_catalogue ?? "")
+        form.setValue("b_lu_start", b_lu_start ?? new Date())
+        form.setValue("b_lu_end", b_lu_end)
     }, [b_lu_catalogue, b_lu_start, b_lu_end, form.setValue])
 
     return (
@@ -63,14 +63,14 @@ export function CultivationForm({
                                 name={"b_lu_start"}
                                 label={"Zaaidatum"}
                                 description={""}
-                            />                
+                            />
                             <DatePicker
                                 form={form}
                                 name={"b_lu_end"}
                                 label={"Einddatum"}
                                 description={""}
                             />
-                        </div>                  
+                        </div>
                         <div className="">
                             <Button type="submit" className="w-full">
                                 {form.formState.isSubmitting ? (

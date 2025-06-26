@@ -1,4 +1,4 @@
-import type { FertilizerApplication, Fertilizer } from "@svenvw/fdm-core"
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import type { Dose } from "./d"
 
 /**
@@ -90,8 +90,10 @@ export function calculateDose({
     const totalDose = { ...initialDose }
     const applicationDoses: Dose[] = []
 
-    for (const application of applications) {       
-        const fertilizer = fertilizers.find((f) => f.p_id_catalogue === application.p_id_catalogue)
+    for (const application of applications) {
+        const fertilizer = fertilizers.find(
+            (f) => f.p_id_catalogue === application.p_id_catalogue,
+        )
         if (!fertilizer) {
             throw new Error(
                 `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,

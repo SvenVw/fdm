@@ -209,39 +209,42 @@ export default function FarmAFieldCultivationBlock() {
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-8">
-     
-                 <Card>
+                <Card>
                     <CardHeader>
-                     <CardTitle>
-                        {loaderData.b_lu_harvestable === "multiple" ? "Oogsten" : "Oogst"}                      
-                    </CardTitle>
-                    </CardHeader>           
+                        <CardTitle>
+                            {loaderData.b_lu_harvestable === "multiple"
+                                ? "Oogsten"
+                                : "Oogst"}
+                        </CardTitle>
+                    </CardHeader>
                     <CardContent>
-                        {loaderData.b_lu_harvestable === "none" ? <p className="text-muted-foreground">Dit gewas kan niet geoogst worden.</p> :    <HarvestsList
-                            harvests={loaderData.harvests}
-                            b_lu_harvestable={loaderData.b_lu_harvestable}
-                            state={fetcher.state}
-                />}  
-                              
+                        {loaderData.b_lu_harvestable === "none" ? (
+                            <p className="text-muted-foreground">
+                                Dit gewas kan niet geoogst worden.
+                            </p>
+                        ) : (
+                            <HarvestsList
+                                harvests={loaderData.harvests}
+                                b_lu_harvestable={loaderData.b_lu_harvestable}
+                                state={fetcher.state}
+                            />
+                        )}
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader>
-                     <CardTitle>
-                        Gewasdetails
-                    </CardTitle>
-                    </CardHeader>           
+                        <CardTitle>Gewasdetails</CardTitle>
+                    </CardHeader>
                     <CardContent>
                         <CultivationForm
-                    b_lu_catalogue={loaderData.b_lu_catalogue}
-                    b_lu_start={loaderData.b_lu_start}
-                    b_lu_end={loaderData.b_lu_end}
-                    options={loaderData.cultivationOptions}
-                    action={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`}
-                /> 
+                            b_lu_catalogue={loaderData.b_lu_catalogue}
+                            b_lu_start={loaderData.b_lu_start}
+                            b_lu_end={loaderData.b_lu_end}
+                            options={loaderData.cultivationOptions}
+                            action={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`}
+                        />
                     </CardContent>
                 </Card>
-                
             </div>
         </div>
     )

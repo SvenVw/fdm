@@ -64,7 +64,8 @@ export function calculateNitrogenRemovalByResidue(
                 const analysisWithYield =
                     harvest.harvestable.harvestable_analyses.find(
                         (analysis: { b_lu_yield: number | undefined }) =>
-                            analysis.b_lu_yield !== undefined && analysis.b_lu_yield !== null,
+                            analysis.b_lu_yield !== undefined &&
+                            analysis.b_lu_yield !== null,
                     )
                 if (analysisWithYield) {
                     yieldForThisHarvest = new Decimal(
@@ -97,7 +98,9 @@ export function calculateNitrogenRemovalByResidue(
         const b_lu_hi_res = new Decimal(1).minus(b_lu_hi)
 
         // Get the Nitrogen content of the crop residues
-        const b_lu_n_residue = new Decimal(cultivationDetail.b_lu_n_residue ?? 0)
+        const b_lu_n_residue = new Decimal(
+            cultivationDetail.b_lu_n_residue ?? 0,
+        )
 
         // Calculate the amount of Nitrogen removed by crop residues of this cultivation
         const removal = b_lu_yield

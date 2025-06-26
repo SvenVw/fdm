@@ -1,3 +1,4 @@
+import type { ApplicationMethods } from "@svenvw/fdm-data"
 import {
     boolean,
     index,
@@ -8,7 +9,6 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometry, numericCasted } from "./schema-custom-types"
-import type { ApplicationMethods } from "@svenvw/fdm-data"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm")

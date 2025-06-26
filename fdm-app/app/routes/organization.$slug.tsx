@@ -14,6 +14,7 @@ import { useLoaderData } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -22,12 +23,6 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Input } from "~/components/ui/input"
 import {
     Select,
@@ -36,7 +31,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import { Separator } from "~/components/ui/separator"
+import { getSession } from "~/lib/auth.server"
 import { renderInvitationEmail, sendEmail } from "~/lib/email.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     if (!params.slug) {

@@ -1,14 +1,13 @@
+import { FertilizerForm } from "@/app/components/blocks/fertilizer/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getFarm,
     getFarms,
     getFertilizer,
-    getFertilizers,
     getFertilizerParametersDescription,
+    getFertilizers,
 } from "@svenvw/fdm-core"
-import {
-    updateFertilizerFromCatalogue,
-} from "@svenvw/fdm-core"
+import { updateFertilizerFromCatalogue } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -20,17 +19,16 @@ import { useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import type { z } from "zod"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { FertilizerForm } from "@/app/components/blocks/fertilizer/form"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 
 export const meta: MetaFunction = () => {
     return [
@@ -103,7 +101,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             return {
                 p_id: fertilizer.p_id,
-            p_name_nl: fertilizer.p_name_nl || "",
+                p_name_nl: fertilizer.p_name_nl || "",
             }
         })
 
@@ -190,7 +188,6 @@ export default function FarmFertilizerBlock() {
             p_app_method_options: fertilizer.p_app_method_options || [],
         },
     })
-
 
     return (
         <SidebarInset>

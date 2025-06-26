@@ -1,7 +1,11 @@
-import { useControl, type IControl } from "react-map-gl/mapbox"
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder"
+import type {
+    ControlPosition,
+    GeoJSONFeature,
+    Map as MapboxMap,
+} from "mapbox-gl"
+import { type IControl, useControl } from "react-map-gl/mapbox"
 import { getMapboxToken } from "~/integrations/mapbox"
-import type { GeoJSONFeature, Map as MapboxMap, ControlPosition } from "mapbox-gl"
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css"
 
 interface GeocoderResult extends GeoJSONFeature {
@@ -12,7 +16,11 @@ interface GeocoderResult extends GeoJSONFeature {
 type GeocoderControlProps = {
     marker?: boolean
     onResult?: (result: GeocoderResult) => void
-    onViewportChange?: (viewport: { longitude: number; latitude: number; zoom: number }) => void
+    onViewportChange?: (viewport: {
+        longitude: number
+        latitude: number
+        zoom: number
+    }) => void
 }
 
 class GeocoderControlClass implements IControl {

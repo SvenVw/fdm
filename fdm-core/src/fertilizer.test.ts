@@ -1059,7 +1059,7 @@ describe("Fertilizer Data Model", () => {
 describe("getFertilizerParametersDescription", () => {
     it("should return the correct fertilizer parameter descriptions for NL-nl locale", () => {
         const descriptions = getFertilizerParametersDescription("NL-nl")
-            expect(descriptions).toHaveLength(24)
+        expect(descriptions).toHaveLength(24)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")

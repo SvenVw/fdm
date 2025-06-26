@@ -9,6 +9,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
 import { NavLink, useLoaderData } from "react-router-dom"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -31,7 +32,6 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
 
 // Define the type for a single invitation
 type InvitationType = {

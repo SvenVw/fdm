@@ -48,7 +48,7 @@ export default function handleRequest(
             })
         }
     }
-    
+
     // Add cache control headers based on the request path
     const cacheHeaders = getCacheControlHeaders(request, reactRouterContext)
     cacheHeaders.forEach((value, key) => {

@@ -4,8 +4,8 @@ import type {
     FieldInput,
     NitrogenVolatilization,
 } from "../types"
-import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
 import { calculateAmmoniaEmissionsByFertilizers } from "./fertilizers"
+import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
 
 /**
  * Calculates the total nitrogen volatilization from a field, specifically through ammonia emissions from crop residues.

@@ -1,7 +1,7 @@
 export type NutrientDescription = {
-    name:  string,
+    name: string
     symbol: string
-    type: "primary" | "secondary" | "trace",
+    type: "primary" | "secondary" | "trace"
     unit: string
     adviceParameter: string
     doseParameter: string

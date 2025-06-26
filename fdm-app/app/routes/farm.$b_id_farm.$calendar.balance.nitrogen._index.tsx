@@ -21,6 +21,8 @@ import {
     useLocation,
     useNavigation,
 } from "react-router"
+import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Card,
     CardContent,
@@ -28,13 +30,11 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
-import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { Skeleton } from "~/components/ui/skeleton"
-import { getTimeframe } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

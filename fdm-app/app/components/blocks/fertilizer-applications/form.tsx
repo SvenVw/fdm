@@ -3,6 +3,9 @@ import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { Combobox } from "~/components/custom/combobox"
+import { DatePicker } from "~/components/custom/date-picker"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -20,11 +23,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { Combobox } from "~/components/custom/combobox"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
-import { DatePicker } from "~/components/custom/date-picker"
 
 export function FertilizerApplicationForm({
     options,

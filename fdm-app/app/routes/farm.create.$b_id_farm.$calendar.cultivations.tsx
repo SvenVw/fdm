@@ -1,10 +1,8 @@
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
-import {
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    data,
-} from "react-router"
+import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -13,8 +11,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { FarmContent } from "~/components/blocks/farm/farm-content"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -116,15 +112,15 @@ export default function Index() {
             </Header>
             <main>
                 <>
-                 <FarmTitle
-                                            title={"Bouwplan"}
-                                            description={
-                                                "Werk de eigenschappen per gewas in je bouwplan bij."
-                                            }
-                                        />
-                                        <FarmContent sidebarItems={loaderData.sidebarPageItems}>
-                                            <Outlet />
-                                        </FarmContent>
+                    <FarmTitle
+                        title={"Bouwplan"}
+                        description={
+                            "Werk de eigenschappen per gewas in je bouwplan bij."
+                        }
+                    />
+                    <FarmContent sidebarItems={loaderData.sidebarPageItems}>
+                        <Outlet />
+                    </FarmContent>
                 </>
             </main>
         </SidebarInset>

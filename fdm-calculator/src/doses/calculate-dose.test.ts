@@ -1,6 +1,6 @@
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import { describe, expect, it } from "vitest"
 import { calculateDose } from "./calculate-dose"
-import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 
 const initialDose = {
     p_dose_n: 0,
@@ -137,7 +137,11 @@ describe("calculateDose", () => {
 
     it("should throw an error for missing fertilizers", () => {
         const applications = [
-            { p_app_id: "app1", p_id_catalogue: "fert_missing", p_app_amount: 100 },
+            {
+                p_app_id: "app1",
+                p_id_catalogue: "fert_missing",
+                p_app_amount: 100,
+            },
         ]
         const fertilizers = [{ p_id_catalogue: "fert1" }]
         expect(() => calculateDose({ applications, fertilizers })).toThrow(

@@ -1,14 +1,14 @@
-import { describe, it, expect } from "vitest"
-import {
-    calculateAmmoniaEmissionsByManure,
-    determineManureAmmoniaEmissionFactor,
-} from "./manure"
+import type { FertilizerApplication } from "@svenvw/fdm-core"
+import { describe, expect, it } from "vitest"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
 } from "../../types"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
+import {
+    calculateAmmoniaEmissionsByManure,
+    determineManureAmmoniaEmissionFactor,
+} from "./manure"
 
 describe("calculateAmmoniaEmissionsByManure", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {

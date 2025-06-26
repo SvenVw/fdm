@@ -1,10 +1,10 @@
-import type { LoaderFunctionArgs } from "react-router"
-import { Link, NavLink, useLoaderData } from "react-router"
 import { getFertilizers } from "@svenvw/fdm-core"
 import type { Fertilizer } from "@svenvw/fdm-core"
+import type { LoaderFunctionArgs } from "react-router"
+import { Link, NavLink, useLoaderData } from "react-router"
+import { Card, CardContent } from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
-import { Card, CardContent } from "~/components/ui/card"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const { b_id_farm } = params
