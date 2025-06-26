@@ -57,7 +57,10 @@ Accurate N balance calculation relies on comprehensive input data that captures 
 *  **Catalogue Data:** Standardized data from catalogues ensures consistency and provides default values for various crop and fertilizer characteristics, which are essential for modeling when specific field-level data is unavailable.
     *  `FertilizerCatalogue` (`FertilizerDetail`):
         *  Total N content (`p_n_rt`, g N / kg).
-        *  Type flags: `p_type_mineral`, `p_type_manure`, `p_type_compost` (booleans).
+        *  Nitrate content (`p_no3_rt`, g N / kg)
+        *  Ammonium content (`p_nh4_rt`, g N/ kg)
+        *  Sulfur content (`p_s_rt`, g SO3 / kg)
+        *  Type flag: `p_type` ("manure", "mineral", "compost" or `null`).
     *  `CultivationCatalogue` (`CultivationDetail`):
         *  Default yield (`b_lu_yield`, kg / ha).
         *  Default N content of harvestable product (`b_lu_n_harvestable`, g N / kg).
@@ -202,16 +205,17 @@ The total N volatilized is the sum of ammonia emissions from fertilizers and cro
 Ammonia emissions from fertilizers are calculated differently depending on the fertilizer type.
 
 *   **Manure, Compost, and Other Organic Fertilizers:**
-    For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the fraction of nitrogen that is readily available for volatilization.
+    For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the amount of nitrogen that is readily available for volatilization.
 
     *   **Formula:**
-        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (fraction) * Emission Factor (fraction)`
+        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (g N / kg) / 1000 * Emission Factor (fraction)`
         Where:
         *   `Application Amount`: `p_app_amount` (kg / ha) - The total amount of fertilizer applied.
-        *   `TAN Content`: `p_nh4_rt` (fraction) - The fraction of total nitrogen that is in ammoniacal form.
+        *   `TAN Content`: `p_nh4_rt` (g N / kg) - The amount of total nitrogen that is in ammoniacal form.
         *   `Emission Factor`: A dimensionless factor representing the proportion of TAN that is volatilized as ammonia. This factor is determined by the application method and the type of land (grassland, cropland, or bare soil) at the time of application.
 
     *   **Emission Factors for Manure and Compost:**
+
         | Application Method    | Grassland | Cropland | Bare Soil |
         | :-------------------- | :-------- | :------- | :-------- |
         | Broadcasting          | 0.68      | N/A      | 0.69      |
@@ -227,7 +231,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
     For mineral fertilizers, the emission is calculated based on the **total nitrogen content (`p_n_rt`)** of the fertilizer and the **emission factor**.
 
     *   **Formula:**
-        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * Total N Content (fraction) * Emission Factor (fraction)`
+        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * Total N Content (g N / kg) * Emission Factor (fraction)`
         Where:
         *   `Application Amount`: `p_app_amount` (kg / ha).
         *   `Total N Content`: `p_n_rt` (fraction).
@@ -254,7 +258,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
 Ammonia emissions from crop residues occur when residues are left on the field and decompose, releasing nitrogen compounds that can volatilize. The calculation of these emissions is based on the amount of nitrogen in the crop residues and a specific emission factor.
 
 *   **Formula per cultivation:**
-    `NH3 Emission (kg N / ha) = Residue N Content (kg N / ha) * \Emission Factor (fraction)`
+    `NH3 Emission (kg N / ha) = Residue N Content (kg N / ha) * Emission Factor (fraction)`
     Where:
     *   `Residue N Content`: The amount of nitrogen contained in the crop residues left on the field. This is derived from the `Residue_Mass` (calculated in Section 3.2.2) and the `N_Content_Residue` (`b_lu_n_residue` from `CultivationCatalogue`).
     *   `Emission Factor`: This factor is calculated based on the nitrogen content of the crop residue in g/kg dry matter (`b_lu_n_residue`).
