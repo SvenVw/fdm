@@ -349,6 +349,8 @@ export async function getCultivation(
                 b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
+                b_lu_croprotation:
+                    schema.cultivationsCatalogue.b_lu_croprotation,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -436,6 +438,8 @@ export async function getCultivations(
                 b_lu_name_en: schema.cultivationsCatalogue.b_lu_name_en,
                 b_lu_hcat3: schema.cultivationsCatalogue.b_lu_hcat3,
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
+                b_lu_croprotation:
+                    schema.cultivationsCatalogue.b_lu_croprotation,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,

@@ -23,13 +23,13 @@ const initialDose = {
 describe("calculateDose", () => {
     it("should calculate all nutrient doses correctly", () => {
         const applications: FertilizerApplication[] = [
-            { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
-            { p_app_id: "app2", p_id: "fert2", p_app_amount: 50 },
+            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 100 },
+            { p_app_id: "app2", p_id_catalogue: "fert2", p_app_amount: 50 },
         ]
 
         const fertilizers: Fertilizer[] = [
             {
-                p_id: "fert1",
+                p_id_catalogue: "fert1",
                 p_n_rt: 100,
                 p_p_rt: 50,
                 p_k_rt: 30,
@@ -47,7 +47,7 @@ describe("calculateDose", () => {
                 p_b_rt: 1.5,
             },
             {
-                p_id: "fert2",
+                p_id_catalogue: "fert2",
                 p_n_rt: 200,
                 p_p_rt: 0,
                 p_k_rt: 60,
@@ -91,10 +91,16 @@ describe("calculateDose", () => {
 
     it("should handle zero application amounts correctly", () => {
         const applications = [
-            { p_app_id: "app1", p_id: "fert1", p_app_amount: 0 },
+            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 0 },
         ]
         const fertilizers = [
-            { p_id: "fert1", p_n_rt: 100, p_p_rt: 50, p_k_rt: 30, p_n_wc: 0.5 },
+            {
+                p_id_catalogue: "fert1",
+                p_n_rt: 100,
+                p_p_rt: 50,
+                p_k_rt: 30,
+                p_n_wc: 0.5,
+            },
         ]
         const { dose } = calculateDose({ applications, fertilizers })
         expect(dose).toEqual(initialDose)
@@ -102,18 +108,18 @@ describe("calculateDose", () => {
 
     it("should handle zero nutrient rates correctly", () => {
         const applications = [
-            { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
+            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 100 },
         ]
-        const fertilizers = [{ p_id: "fert1" }]
+        const fertilizers = [{ p_id_catalogue: "fert1" }]
         const { dose } = calculateDose({ applications, fertilizers })
         expect(dose).toEqual(initialDose)
     })
 
     it("should throw an error for negative application amounts", () => {
         const applications = [
-            { p_app_id: "app1", p_id: "fert1", p_app_amount: -100 },
+            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: -100 },
         ]
-        const fertilizers = [{ p_id: "fert1" }]
+        const fertilizers = [{ p_id_catalogue: "fert1" }]
         expect(() => calculateDose({ applications, fertilizers })).toThrow(
             "Application amounts must be non-negative",
         )
@@ -121,9 +127,9 @@ describe("calculateDose", () => {
 
     it("should throw an error for negative nutrient rates", () => {
         const applications = [
-            { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
+            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 100 },
         ]
-        const fertilizers = [{ p_id: "fert1", p_n_rt: -100 }]
+        const fertilizers = [{ p_id_catalogue: "fert1", p_n_rt: -100 }]
         expect(() => calculateDose({ applications, fertilizers })).toThrow(
             "Nutrient rates must be non-negative",
         )
@@ -131,9 +137,9 @@ describe("calculateDose", () => {
 
     it("should throw an error for missing fertilizers", () => {
         const applications = [
-            { p_app_id: "app1", p_id: "fert_missing", p_app_amount: 100 },
+            { p_app_id: "app1", p_id_catalogue: "fert_missing", p_app_amount: 100 },
         ]
-        const fertilizers = [{ p_id: "fert1" }]
+        const fertilizers = [{ p_id_catalogue: "fert1" }]
         expect(() => calculateDose({ applications, fertilizers })).toThrow(
             "Fertilizer fert_missing not found for application app1",
         )
@@ -142,7 +148,7 @@ describe("calculateDose", () => {
     it("should handle empty applications array", () => {
         const { dose, applications } = calculateDose({
             applications: [],
-            fertilizers: [{ p_id: "fert1" }],
+            fertilizers: [{ p_id_catalogue: "fert1" }],
         })
         expect(dose).toEqual(initialDose)
         expect(applications).toHaveLength(0)
@@ -150,7 +156,7 @@ describe("calculateDose", () => {
 
     it("should throw an error for empty fertilizers array", () => {
         const applications = [
-            { p_app_id: "app1", p_id: "fert1", p_app_amount: 100 },
+            { p_app_id: "app1", p_id_catalogue: "fert1", p_app_amount: 100 },
         ]
         expect(() =>
             calculateDose({

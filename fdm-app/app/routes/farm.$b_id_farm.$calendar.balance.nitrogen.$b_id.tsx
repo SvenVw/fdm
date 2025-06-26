@@ -226,10 +226,14 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? <LoadingSpinner /> : "-"}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.volatilization.total
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Berekening van emissie volgt later
+                                    kg N / ha
                                 </p>
                             </CardContent>
                         </Card>

@@ -103,6 +103,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -127,6 +129,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -145,6 +148,8 @@ describe("Fertilizer Data Model", () => {
             expect(fertilizer?.p_name_nl).toBe(p_name_nl)
             expect(fertilizer?.p_name_en).toBe(p_name_en)
             expect(fertilizer?.p_description).toBe(p_description)
+            expect(fertilizer?.p_no3_rt).toBe(400)
+            expect(fertilizer?.p_nh4_rt).toBe(410)
         })
 
         it("should add a new fertilizer", async () => {
@@ -177,6 +182,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -201,6 +208,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -251,6 +259,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -275,6 +285,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -338,6 +349,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -362,6 +375,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -434,6 +448,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -458,6 +474,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -647,6 +664,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -671,6 +690,7 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
+                    p_ef_nh3: null,
                     p_type: "manure",
                 },
             )
@@ -759,6 +779,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -783,7 +805,8 @@ describe("Fertilizer Data Model", () => {
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type: "manure",
+                    p_ef_nh3: 0.8,
+                    p_type: "mineral",
                 },
             )
 
@@ -1036,7 +1059,7 @@ describe("Fertilizer Data Model", () => {
 describe("getFertilizerParametersDescription", () => {
     it("should return the correct fertilizer parameter descriptions for NL-nl locale", () => {
         const descriptions = getFertilizerParametersDescription("NL-nl")
-        expect(descriptions).toHaveLength(22)
+            expect(descriptions).toHaveLength(24)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
@@ -1061,7 +1084,7 @@ describe("getFertilizerParametersDescription", () => {
 
     it("should return the correct fertilizer parameter descriptions for default locale", () => {
         const descriptions = getFertilizerParametersDescription()
-        expect(descriptions).toHaveLength(22)
+        expect(descriptions).toHaveLength(24)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")

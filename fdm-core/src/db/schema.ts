@@ -145,12 +145,15 @@ export type fertilizerAcquiringTypeInsert =
 // Define fertilizers application table
 export const applicationMethodOptions = [
     { value: "slotted coulter", label: "Zodenbemester / Sleepvoet" },
-    { value: "incorporation", label: "Inwerken" },
-    { value: "injection", label: "Injecteren" },
+    { value: "incorporation", label: "Onderwerken in 1 werkgang" },
+    { value: "incorporation 2 tracks", label: "Onderwerken in 2 werkgangen" },
+    { value: "injection", label: "Mestinjectie" },
+    { value: "shallow injection", label: "In sleufjes in de grond" },
     { value: "spraying", label: "Spuiten" },
     { value: "broadcasting", label: "Breedwerpig uitstrooien" },
     { value: "spoke wheel", label: "Spaakwiel" },
     { value: "pocket placement", label: "Plantgat" },
+    { value: "narrowband", label: "In strookjes op de grond" },
 ] satisfies { value: ApplicationMethods; label: string }[]
 export const applicationMethodEnum = fdmSchema.enum(
     "p_app_method",
@@ -206,6 +209,8 @@ export const fertilizersCatalogue = fdmSchema.table(
         p_n_if: numericCasted(),
         p_n_of: numericCasted(),
         p_n_wc: numericCasted(),
+        p_no3_rt: numericCasted(),
+        p_nh4_rt: numericCasted(),
         p_p_rt: numericCasted(),
         p_k_rt: numericCasted(),
         p_mg_rt: numericCasted(),
@@ -230,6 +235,7 @@ export const fertilizersCatalogue = fdmSchema.table(
         p_pb_rt: numericCasted(),
         p_hg_rt: numericCasted(),
         p_cl_rt: numericCasted(),
+        p_ef_nh3: numericCasted(),
         p_type_manure: boolean(),
         p_type_mineral: boolean(),
         p_type_compost: boolean(),

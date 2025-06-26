@@ -13,6 +13,8 @@ export interface Fertilizer {
     p_n_if: number | null
     p_n_of: number | null
     p_n_wc: number | null
+    p_no3_rt: number | null
+    p_nh4_rt: number | null
     p_p_rt: number | null
     p_k_rt: number | null
     p_mg_rt: number | null
@@ -37,6 +39,7 @@ export interface Fertilizer {
     p_pb_rt: number | null
     p_hg_rt: number | null
     p_cl_rt: number | null
+    p_ef_nh3: number | null
     p_type: FertilizerType | null
 }
 type FertilizerType = "manure" | "mineral" | "compost"
@@ -74,6 +77,8 @@ export type FertilizerParameters =
     | "p_n_if"
     | "p_n_of"
     | "p_n_wc"
+    | "p_no3_rt"
+    | "p_nh4_rt"
     | "p_p_rt"
     | "p_k_rt"
     | "p_mg_rt"
@@ -98,6 +103,7 @@ export type FertilizerParameters =
     | "p_pb_rt"
     | "p_hg_rt"
     | "p_cl_rt"
+    | "p_ef_nh3"
     | "p_type"
 
 export interface FertilizerParameterDescriptionItem {

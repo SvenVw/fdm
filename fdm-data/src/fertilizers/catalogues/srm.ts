@@ -50,6 +50,10 @@ export async function getCatalogueSrm(): Promise<CatalogueFertilizer> {
             p_n_if: fertilizer.p_n_if === undefined ? null : fertilizer.p_n_if,
             p_n_of: fertilizer.p_n_of === undefined ? null : fertilizer.p_n_of,
             p_n_wc: fertilizer.p_n_wc === undefined ? null : fertilizer.p_n_wc,
+            p_no3_rt:
+                fertilizer.p_no3_rt === undefined ? null : fertilizer.p_no3_rt,
+            p_nh4_rt:
+                fertilizer.p_nh4_rt === undefined ? null : fertilizer.p_nh4_rt,
             p_p_rt: fertilizer.p_p_rt === undefined ? null : fertilizer.p_p_rt,
             p_k_rt: fertilizer.p_k_rt === undefined ? null : fertilizer.p_k_rt,
             p_mg_rt:

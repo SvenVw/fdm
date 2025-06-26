@@ -57,6 +57,8 @@ describe("getCatalogueSrm", async () => {
             expect(item).toHaveProperty("p_n_if")
             expect(item).toHaveProperty("p_n_of")
             expect(item).toHaveProperty("p_n_wc")
+            expect(item).toHaveProperty("p_no3_rt")
+            expect(item).toHaveProperty("p_nh4_rt")
             expect(item).toHaveProperty("p_p_rt")
             expect(item).toHaveProperty("p_k_rt")
             expect(item).toHaveProperty("p_mg_rt")
