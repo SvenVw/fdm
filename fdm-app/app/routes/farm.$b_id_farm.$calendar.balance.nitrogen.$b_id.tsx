@@ -266,7 +266,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         removal={
                                             nitrogenBalanceResult.removal.total
                                         }
-                                        emission={
+                                        volatilization={
                                             nitrogenBalanceResult.volatilization
                                                 .total
                                         }
