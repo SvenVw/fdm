@@ -1,3 +1,4 @@
+import { calculateDose } from "@svenvw/fdm-calculator"
 import {
     getCultivation,
     getCultivations,
@@ -6,18 +7,22 @@ import {
     getFertilizers,
     getField,
 } from "@svenvw/fdm-core"
+import { Tally1, Tally2, Tally3 } from "lucide-react"
 import {
-    useLoaderData,
-    useNavigation,
     type LoaderFunctionArgs,
     type MetaFunction,
+    useLoaderData,
+    useNavigation,
 } from "react-router"
-import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { getNutrientAdvice } from "~/integrations/nmi"
+import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
+import {
+    NutrientKPICardForNutrientDeficit,
+    NutrientKPICardForNutrientExcess,
+    NutrientKPICardForTotalApplications,
+} from "~/components/blocks/nutrient-advice/kpi"
+import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
+import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     Card,
     CardContent,
@@ -25,17 +30,12 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Tally1, Tally2, Tally3 } from "lucide-react"
-import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
-import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
-import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { calculateDose } from "@svenvw/fdm-calculator"
-import {
-    NutrientKPICardForNutrientDeficit,
-    NutrientKPICardForNutrientExcess,
-    NutrientKPICardForTotalApplications,
-} from "~/components/blocks/nutrient-advice/kpi"
+import { getNutrientAdvice } from "~/integrations/nmi"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {

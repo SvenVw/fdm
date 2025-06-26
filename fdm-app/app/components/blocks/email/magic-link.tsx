@@ -60,8 +60,8 @@ export const MagicLinkEmail = ({
                         Hallo,
                     </Text>
                     <Text className="text-black text-[14px] leading-[24px]">
-                        U heeft een link aangevraagd om in te loggen
-                        bij {appName}. Klik op de knop hieronder om verder te gaan:
+                        U heeft een link aangevraagd om in te loggen bij{" "}
+                        {appName}. Klik op de knop hieronder om verder te gaan:
                     </Text>
                     <Section className="mt-[32px] mb-[32px] text-center">
                         <Button

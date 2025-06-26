@@ -1,5 +1,5 @@
-import { createFdmAuth } from "../../authentication";
-import { createFdmServer } from "../../fdm-server";
+import { createFdmAuth } from "../../authentication"
+import { createFdmServer } from "../../fdm-server"
 
 const host = String(process.env.POSTGRES_HOST)
 if (!process.env.POSTGRES_HOST) {
@@ -28,11 +28,13 @@ if (!process.env.POSTGRES_DB) {
 
 const googleAuth = {
     clientId: process.env.GOOGLE_CLIENT_ID || "mock_google_client_id",
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || "mock_google_client_secret",
+    clientSecret:
+        process.env.GOOGLE_CLIENT_SECRET || "mock_google_client_secret",
 }
 const microsoftAuth = {
     clientId: process.env.MICROSOFT_CLIENT_ID || "mock_ms_client_id",
-    clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "mock_ms_client_secret",
+    clientSecret:
+        process.env.MICROSOFT_CLIENT_SECRET || "mock_ms_client_secret",
 }
 
 const fdm = createFdmServer(host, port, user, password, database)

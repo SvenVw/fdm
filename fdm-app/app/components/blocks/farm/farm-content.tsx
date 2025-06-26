@@ -12,8 +12,8 @@ interface FarmContentProps {
 
 export function FarmContent({ sidebarItems, children }: FarmContentProps) {
     return (
-        <div className="space-y-6 px-10 pb-0">
-            <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-8 lg:space-y-0">
+        <div className="space-y-6 px-8 pb-0">
+            <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
                 {sidebarItems && (
                     <aside className="lg:w-1/5">
                         <SidebarPage items={sidebarItems} />

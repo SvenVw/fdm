@@ -1,7 +1,4 @@
-import {
-    getField,
-    getSoilParametersDescription,
-} from "@svenvw/fdm-core"
+import { getField, getSoilParametersDescription } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
     type LoaderFunctionArgs,
@@ -9,12 +6,12 @@ import {
     data,
     useLoaderData,
 } from "react-router"
+import { SoilAnalysisFormSelection } from "~/components/blocks/soil/form-selection"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { SoilAnalysisFormSelection } from "~/components/blocks/soil/form-selection"
 
 /**
  * Loader function for the soil analysis selection page.

@@ -8,6 +8,9 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderField } from "~/components/blocks/header/field"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -24,9 +27,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 
 export const meta: MetaFunction = () => {
     return [

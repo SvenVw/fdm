@@ -1,7 +1,12 @@
-import { useState } from "react"
-import type { NutrientDescription } from "./types"
+import { cn } from "@/app/lib/utils"
 import type { Dose } from "@svenvw/fdm-calculator"
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
+import { format } from "date-fns"
+import { nl } from "date-fns/locale"
+import { ChevronDown, ChevronUp, TriangleAlert } from "lucide-react"
+import { useState } from "react"
+import { NavLink } from "react-router"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -9,19 +14,14 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Progress } from "~/components/ui/progress"
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "~/components/ui/collapsible"
-import { Button } from "~/components/ui/button"
-import { ChevronDown, ChevronUp, TriangleAlert } from "lucide-react"
+import { Progress } from "~/components/ui/progress"
 import { Separator } from "~/components/ui/separator"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale"
-import { NavLink } from "react-router"
-import { cn } from "@/app/lib/utils"
+import type { NutrientDescription } from "./types"
 
 /**
  * Props for the NutrientCard component.

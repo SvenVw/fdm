@@ -1,4 +1,3 @@
-import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
 import {
     type NitrogenBalanceNumeric,
     calculateNitrogenBalance,
@@ -22,6 +21,8 @@ import {
     useLocation,
     useNavigation,
 } from "react-router"
+import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
+import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -38,7 +39,6 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -229,7 +229,8 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                     {isLoading ? (
                                         <LoadingSpinner />
                                     ) : (
-                                        nitrogenBalanceResult.volatilization.total
+                                        nitrogenBalanceResult.volatilization
+                                            .total
                                     )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">

@@ -9,13 +9,13 @@ import {
 } from "react-router"
 import remarkGfm from "remark-gfm"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { HeaderAbout } from "~/components/blocks/header/about"
+import { Header } from "~/components/blocks/header/base"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { HeaderAbout } from "~/components/blocks/header/about"
-import { Header } from "~/components/blocks/header/base"
 
 export const meta: MetaFunction = () => {
     return [
@@ -39,8 +39,44 @@ export interface UpdatePost {
 // Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
+        id: "update-2025-06-26",
+        title: "Juni 2025",
+        description: `
+### Stikstofbalans en Emissies
+
+*   **Ammoniakemissie in Stikstofbalans:** De stikstofbalans is uitgebreid met de berekening van ammoniakemissies. Dit geeft een completer beeld van de stikstofbalans op uw bedrijf en de impact op het milieu. Zowel de totale hoeveelheid uitgestoten ammoniak als de details op perceelsniveau worden nu weergegeven.
+
+### Meststoffenbeheer
+
+*   **Meststof als Sjabloon:** Bij het aanmaken van een nieuwe meststof kunt u nu een bestaande meststof als sjabloon gebruiken. Dit vereenvoudigt het toevoegen van vergelijkbare producten.
+*   **Verbeterd Ontwerp Meststofformulier:** Het ontwerp van de pagina voor het beheren van meststoffen is verbeterd, waardoor deze intuïtiever en duidelijker is in het gebruik.
+*   **Toedieningsmethode toevoegen:** Het is nu mogelijk om de toedieningsmethode voor elke mestgift te specificeren in het daarvoor bestemde formulier.
+*   **Weergave toedieningsmethode:** De gekozen toedieningsmethode voor elke mestgift wordt nu duidelijk weergegeven in de lijst met bemestingen.
+
+### Bemestingsadvies
+
+*   **Advies voor NPK, OS, secondaire nutrienten en spoorelelmenten:** Voor elk perceel kunt u nu het bemestingsadvies zien voor de verschillende nutriënten op basis van de handboeken van CBAV en CBGV.
+*   **Bijhouden van Bemestingsniveau:** Als u uw bemesting heeft ingevuld wordt voor elke nutrient bijgehouden hoeveel er al bemest is. Zie eenvoudig welke nutriënt een tekort heeft en welke al voldoende is toegediend.
+
+### PDF Upload voor bodemanalyses
+
+*   **Upload een Bodemanalyse:** Vanaf nu kunt u er voor kiezen om een pdf van een van de ondersteunde laba op te sturen en automatisch uit te lezen. Op deze manier kunt u eenvoudig de gegeven van uw bodemanalyse laten invoeren, zonder er veel moeite voor te doen.
+
+### Kaartfunctionaliteit
+
+*   **Zoekbalk op Interactieve Kaarten:** Er is een zoekbalk toegevoegd aan de interactieve kaarten, waarmee u adressen kunt opzoeken en hier direct naartoe kunt navigeren.
+
+### Overige Verbeteringen
+
+*   **Nieuwe Datumprikkers:** De datumprikkers zijn vervangen door een nieuw, gecombineerde component met uitgebreide functies, zoals een dropdown-selectie voor jaar en maand en de mogelijkheid om direct tekst in te voeren.
+*   **Standaard Meststoffencatalogus:** Voor nieuwe bedrijven wordt nu standaard de \`baat\`-catalogus voor meststoffen gebruikt in plaats van \`srm\`. 
+`,
+        date: new Date("2025-06-26"),
+        isNew: true,
+    },
+    {
         id: "update-2025-05-27",
-        title: "Nieuwe Functies & Uitgebreide Verbeteringen (Mei 2025)",
+        title: "Mei 2025",
         description: `Welkom bij de nieuwste update van ${clientConfig.name}! Lees snel verder wat er nieuw is!
 
 ## Uitgebreidere Bodemanalyse en Invoer
@@ -87,7 +123,7 @@ Ook aan de algemene werking van de app is gesleuteld:
     },
     {
         id: "update-2025-04-14",
-        title: "Nieuwe Functies & Uitgebreide Verbeteringen (April 2025)",
+        title: "April 2025",
         description: `Deze update introduceert een reeks nieuwe functies en significante verbeteringen, ontworpen om uw workflow binnen ${clientConfig.name} efficiënter en duidelijker te maken:
 
 **Nieuwe Pagina's & Functies voor Beter Beheer:**
@@ -98,7 +134,7 @@ Ook aan de algemene werking van de app is gesleuteld:
 
 **Verbeteringen in de 'Bedrijf Aanmaken' Wizard:**
 *   **Direct bodemanalyse Toevoegen:** U hoeft de wizard niet meer te verlaten om een nieuwe bodemanalyse toe te voegen. Dit kan nu direct tijdens het configureren van een perceel binnen de wizard, wat tijd bespaart.
-*   **Duidelijkere Bodem Component:** De manier waarop bodemgegevens worden gepresenteerd en hoe u ermee interacteert op de perceelpagina binnen de wizard, is volledig herzien. Dit zorgt voor een beter overzicht en minder kans op fouten bij het invoeren van bodemdata.
+*   **Duidelijker Bodem Component:** De manier waarop bodemgegevens worden gepresenteerd en hoe u ermee interacteert op de perceelpagina binnen de wizard, is volledig herzien. Dit zorgt voor een beter overzicht en minder kans op fouten bij het invoeren van bodemdata.
 *   **Overzichtelijker Percelen Pagina:** De layout van de pagina voor het beheren van percelen binnen de wizard is verbeterd voor een betere workflow en duidelijkheid.
 *   **Opgeloste Weergaveproblemen Oogst:** Eerdere problemen met het correct weergeven van de oogstlijst en de bijbehorende detailpagina's binnen de wizard zijn verholpen.
 *   **Voorkomen van Navigatiefouten:** Om te voorkomen dat u per ongeluk de wizard verlaat, worden de links in de zijbalk nu tijdelijk uitgeschakeld (niet klikbaar) terwijl u bezig bent met het aanmaken van een bedrijf.

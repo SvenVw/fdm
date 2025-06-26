@@ -1,3 +1,4 @@
+import type { FertilizerApplication } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
     CultivationDetail,
@@ -5,7 +6,6 @@ import type {
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
 
 /**
  * Calculates the ammonia emissions specifically from manure applications.

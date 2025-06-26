@@ -1,25 +1,25 @@
+import { LocalFileStorage } from "@mjackson/file-storage/local"
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
 import {
     addSoilAnalysis,
     getField,
     getSoilParametersDescription,
 } from "@svenvw/fdm-core"
+import { fileTypeFromBuffer } from "file-type"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
     data,
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
-import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
-import { LocalFileStorage } from "@mjackson/file-storage/local"
-import { extractSoilAnalysis } from "~/integrations/nmi"
-import { fileTypeFromBuffer } from "file-type"
 import {
     FormSchema,
     SoilAnalysisUploadForm,
 } from "~/components/blocks/soil/form-upload"
+import { extractSoilAnalysis } from "~/integrations/nmi"
+import { getSession } from "~/lib/auth.server"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 /**
  * Loader function for the soil analysis upload page.

@@ -6,8 +6,8 @@ import type {
 } from "../../types"
 import { calculateAmmoniaEmissionsByCompost } from "./compost"
 import { calculateAmmoniaEmissionsByManure } from "./manure"
-import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
 import { calculateAmmoniaEmissionsByMineralFertilizers } from "./mineral"
+import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
 
 /**
  * Calculates the total ammonia emission from all fertilizer sources (mineral, manure, compost and other fertilizers).

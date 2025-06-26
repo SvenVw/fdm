@@ -7,9 +7,9 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { HeaderNutrientAdvice } from "~/components/blocks/header/nutrient-advice"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderNutrientAdvice } from "~/components/blocks/header/nutrient-advice"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -143,7 +143,9 @@ export default function FarmBalanceNitrogenBlock() {
             <main>
                 <FarmTitle
                     title={"Bemestingsadvies"}
-                    description={"Advies volgens Handboek Bodem en Bemesting (CBAV) en Adviesbasis Bemesting (CBGV)."}
+                    description={
+                        "Advies volgens Handboek Bodem en Bemesting (CBAV) en Adviesbasis Bemesting (CBGV)."
+                    }
                 />
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">

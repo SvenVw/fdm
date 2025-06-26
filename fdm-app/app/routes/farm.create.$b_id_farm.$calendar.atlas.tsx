@@ -9,8 +9,8 @@ import { useCallback, useState } from "react"
 import {
     Layer,
     Map as MapGL,
-    type ViewStateChangeEvent,
     type ViewState,
+    type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
@@ -22,6 +22,7 @@ import {
 import { redirectWithSuccess } from "remix-toast"
 import { ClientOnly } from "remix-utils/client-only"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { generateFeatureClass } from "~/components/blocks/atlas/atlas-functions"
 import {
     FieldsPanelHover,
@@ -46,7 +47,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { Controls } from "~/components/blocks/atlas/atlas-controls"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -117,14 +117,13 @@ export default function Index() {
     const initialViewState = getViewState(null)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
-    const [viewState, setViewState] = useState<ViewState>(initialViewState as ViewState)
-
-    const onViewportChange = useCallback(
-        (event: ViewStateChangeEvent) => {
-            setViewState(event.viewState)
-        },
-        [],
+    const [viewState, setViewState] = useState<ViewState>(
+        initialViewState as ViewState,
     )
+
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
+    }, [])
 
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
@@ -182,7 +181,11 @@ export default function Index() {
                                 onMove={onViewportChange}
                             >
                                 <Controls
-                                    onViewportChange={({ longitude, latitude, zoom }) =>
+                                    onViewportChange={({
+                                        longitude,
+                                        latitude,
+                                        zoom,
+                                    }) =>
                                         setViewState((currentViewState) => ({
                                             ...currentViewState,
                                             longitude,

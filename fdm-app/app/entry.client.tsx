@@ -6,11 +6,11 @@
 
 import * as Sentry from "@sentry/react"
 import posthog from "posthog-js"
-import { StrictMode, startTransition} from "react"
+import { PostHogProvider } from "posthog-js/react"
+import { StrictMode, startTransition } from "react"
 import { hydrateRoot } from "react-dom/client"
 import { HydratedRouter } from "react-router/dom"
 import { clientConfig } from "~/lib/config"
-import { PostHogProvider } from 'posthog-js/react'
 
 if (clientConfig.analytics.sentry) {
     const sentryConfig = clientConfig.analytics.sentry
@@ -77,9 +77,7 @@ if (posthogConfig) {
         console.error("Failed to initialize PostHog:", error)
     }
 } else {
-    console.warn(
-        "PostHog not initialized - missing or invalid configuration",
-    )
+    console.warn("PostHog not initialized - missing or invalid configuration")
 }
 
 startTransition(() => {

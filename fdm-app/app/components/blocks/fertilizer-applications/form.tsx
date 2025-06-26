@@ -3,6 +3,9 @@ import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { Combobox } from "~/components/custom/combobox"
+import { DatePicker } from "~/components/custom/date-picker"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
     FormControl,
@@ -20,11 +23,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { Combobox } from "~/components/custom/combobox"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
-import { DatePicker } from "~/components/custom/date-picker"
 
 export function FertilizerApplicationForm({
     options,
@@ -67,30 +67,25 @@ export function FertilizerApplicationForm({
                 method="post"
             >
                 <fieldset disabled={form.formState.isSubmitting}>
-                    <div className="grid grid-cols-1 xl2:grid-cols-5 items-end gap-x-3 justify-between">
-                        <div className="col-span-2">
-                            {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
-                            <Combobox
-                                options={options}
-                                form={form}
-                                name="p_id"
-                                label={
-                                    <span>
-                                        Meststof
-                                        <span className="text-red-500">*</span>
-                                    </span>
-                                }
-                            />
-                        </div>
+                    <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
+                        {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
+                        <Combobox
+                            options={options}
+                            form={form}
+                            name="p_id"
+                            label={
+                                <span>
+                                    Meststof
+                                    <span className="text-red-500">*</span>
+                                </span>
+                            }
+                        />
                         <FormField
                             control={form.control}
                             name="p_app_method"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Toedingsmethode
-                                        <span className="text-red-500">*</span>
-                                    </FormLabel>
+                                    <FormLabel>Toedieningsmethode</FormLabel>
                                     <Select
                                         onValueChange={field.onChange}
                                         value={field.value ?? ""}
@@ -125,12 +120,7 @@ export function FertilizerApplicationForm({
                                 name="p_app_amount"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>
-                                            Hoeveelheid
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </FormLabel>
+                                        <FormLabel>Hoeveelheid</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
@@ -170,7 +160,6 @@ export function FertilizerApplicationForm({
                                 )}
                             />
                         </div>
-
                         <div>
                             <DatePicker
                                 form={form}
@@ -179,7 +168,8 @@ export function FertilizerApplicationForm({
                                 description={""}
                             />
                         </div>
-                        <div className="flex justify-end items-baseline">
+                        <div className="invisible" />
+                        <div className="ml-auto">
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">

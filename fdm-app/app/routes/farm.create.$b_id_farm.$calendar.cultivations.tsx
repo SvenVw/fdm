@@ -1,23 +1,16 @@
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
-import {
-    type LoaderFunctionArgs,
-    type MetaFunction,
-    NavLink,
-    data,
-} from "react-router"
+import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
 import { Outlet, useLoaderData } from "react-router"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { SidebarPage } from "~/components/custom/sidebar-page"
-import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { cn } from "~/lib/utils"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -118,51 +111,17 @@ export default function Index() {
                 <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
             </Header>
             <main>
-                <div className="space-y-6 p-10 pb-16">
-                    <div className="flex items-center">
-                        <div className="space-y-0.5">
-                            <h2 className="text-2xl font-bold tracking-tight">
-                                Bouwplan
-                            </h2>
-                            <p className="text-muted-foreground">
-                                Werk de eigenschappen per gewas in je bouwplan
-                                bij.
-                            </p>
-                        </div>
-
-                        <div className="ml-auto">
-                            <NavLink
-                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/access`}
-                                className={cn("ml-auto", {
-                                    "pointer-events-none":
-                                        loaderData.cultivationPlan.length === 0,
-                                })}
-                            >
-                                <Button
-                                    disabled={
-                                        loaderData.cultivationPlan.length === 0
-                                    }
-                                >
-                                    Volgende
-                                </Button>
-                            </NavLink>
-                        </div>
-                    </div>
-                    <Separator className="my-6" />
-                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                        {loaderData.sidebarPageItems && (
-                            <aside className="-mx-4 lg:w-1/5">
-                                <SidebarPage
-                                    items={loaderData.sidebarPageItems}
-                                />
-                            </aside>
-                        )}
-                        <div className="flex-2">
-                            {" "}
-                            <Outlet />
-                        </div>
-                    </div>
-                </div>
+                <>
+                    <FarmTitle
+                        title={"Bouwplan"}
+                        description={
+                            "Werk de eigenschappen per gewas in je bouwplan bij."
+                        }
+                    />
+                    <FarmContent sidebarItems={loaderData.sidebarPageItems}>
+                        <Outlet />
+                    </FarmContent>
+                </>
             </main>
         </SidebarInset>
     )

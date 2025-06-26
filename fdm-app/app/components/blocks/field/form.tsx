@@ -67,8 +67,8 @@ export default function FieldDetailsDialog({
         form.reset({
             b_name: fieldNameDefault,
             b_lu_catalogue: b_lu_catalogue,
-        });
-    }, [fieldNameDefault, b_lu_catalogue, form.reset]);
+        })
+    }, [fieldNameDefault, b_lu_catalogue, form.reset])
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

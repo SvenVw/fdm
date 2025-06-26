@@ -532,9 +532,9 @@ describe("Catalogues", () => {
                     "Exception for getEnabledCultivationCatalogues",
                 )
                 expect(err.context).toBeDefined()
-                expect((err.context as { principal_id: string }).principal_id).toBe(
-                    principal_id,
-                )
+                expect(
+                    (err.context as { principal_id: string }).principal_id,
+                ).toBe(principal_id)
                 expect((err.context as { b_id_farm: string }).b_id_farm).toBe(
                     b_id_farm,
                 )

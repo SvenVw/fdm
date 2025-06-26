@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-docs",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "private": true,
     "scripts": {
         "docusaurus": "docusaurus",
@@ -39,11 +39,7 @@
         "typescript": "catalog:"
     },
     "browserslist": {
-        "production": [
-            ">0.5%",
-            "not dead",
-            "not op_mini all"
-        ],
+        "production": [">0.5%", "not dead", "not op_mini all"],
         "development": [
             "last 3 chrome version",
             "last 3 firefox version",

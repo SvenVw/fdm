@@ -30,7 +30,7 @@ export function calculateNitrogenSupplyByOtherFertilizers(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
             )
         }
-        
+
         const p_n_rt = new Decimal(fertilizerDetail.p_n_rt ?? 0).dividedBy(1000) // Convert from g N / kg to kg N / kg
 
         // If the fertilizer used is not of the type other fertilizers

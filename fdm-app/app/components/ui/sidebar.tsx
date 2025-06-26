@@ -1,6 +1,6 @@
-import { Slot as SlotPrimitive } from "radix-ui"
 import { type VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
+import { Slot as SlotPrimitive } from "radix-ui"
 import * as React from "react"
 
 import { Button } from "~/components/ui/button"

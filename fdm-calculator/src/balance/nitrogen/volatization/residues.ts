@@ -95,11 +95,13 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
         }
 
         // Get the harvest index for crop residues
-        const b_lu_hi = new Decimal(cultivationDetail.b_lu_hi ??0)
+        const b_lu_hi = new Decimal(cultivationDetail.b_lu_hi ?? 0)
         const b_lu_hi_res = new Decimal(1).minus(b_lu_hi)
 
         // Get the Nitrogen content of the crop residues
-        const b_lu_n_residue = new Decimal(cultivationDetail.b_lu_n_residue ?? 0)
+        const b_lu_n_residue = new Decimal(
+            cultivationDetail.b_lu_n_residue ?? 0,
+        )
 
         // Calculate the Emission Factor
         let emissionFactor = new Decimal(0.41).times(b_lu_n_residue).minus(5.42)

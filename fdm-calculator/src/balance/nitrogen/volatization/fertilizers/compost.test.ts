@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
+import type {
+    CultivationDetail,
+    FertilizerDetail,
+    FieldInput,
+} from "../../types"
 import { calculateAmmoniaEmissionsByCompost } from "./compost"
-import type { CultivationDetail, FertilizerDetail, FieldInput } from "../../types"
 
 describe("calculateAmmoniaEmissionsByCompost", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
@@ -34,7 +38,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             {
                 p_app_id: "app1",
                 p_id_catalogue: "compost1",
-                p_app_amount: 1000, 
+                p_app_amount: 1000,
                 p_app_date: new Date("2023-06-01"),
                 p_app_method: "broadcasting",
                 p_id: "app1",
@@ -42,7 +46,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             {
                 p_app_id: "app2",
                 p_id_catalogue: "compost2",
-                p_app_amount: 500, 
+                p_app_amount: 500,
                 p_app_date: new Date("2023-07-01"),
                 p_app_method: "narrowband",
                 p_id: "app2",
@@ -66,9 +70,9 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             [
                 "compost1",
                 {
-                    p_id_catalogue: "compost1", 
+                    p_id_catalogue: "compost1",
                     p_type: "compost",
-                    p_nh4_rt: 0.5, 
+                    p_nh4_rt: 0.5,
                     p_n_rt: null,
                     p_no3_rt: null,
                     p_s_rt: null,
@@ -224,7 +228,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
                     p_id_catalogue: "compost1",
                     p_type: "compost",
                     p_nh4_rt: 0.5,
-                    p_n_rt: null, 
+                    p_n_rt: null,
                     p_no3_rt: null,
                     p_s_rt: null,
                     p_ef_nh3: null,

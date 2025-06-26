@@ -10,15 +10,15 @@ import {
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { HeaderAtlas } from "~/components/blocks/header/atlas"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { HeaderAtlas } from "~/components/blocks/header/atlas"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 
 // Meta
 export const meta: MetaFunction = () => {
