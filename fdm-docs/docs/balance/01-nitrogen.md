@@ -205,7 +205,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
     For these organic fertilizers, the emission is calculated based on the Total Ammoniacal Nitrogen (TAN) content, as this is the amount of nitrogen that is readily available for volatilization.
 
     *   **Formula:**
-        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (g N / kg) * Emission Factor (fraction)`
+        `NH3 Emission (kg N / ha) = Application Amount (kg / ha) * TAN Content (g N / kg) / 1000 * Emission Factor (fraction)`
         Where:
         *   `Application Amount`: `p_app_amount` (kg / ha) - The total amount of fertilizer applied.
         *   `TAN Content`: `p_nh4_rt` (g N / kg) - The amount of total nitrogen that is in ammoniacal form.
