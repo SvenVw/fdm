@@ -1,5 +1,46 @@
 # Changelog fdm-app
 
+## 0.20.0
+
+### Minor Changes
+
+- b1301fa: Add nutrient advice as new application
+- f548dea: Add the ability to upload a pdf with a soil analysis, extract the values and save it
+- 3f79b0e: Display the application method for each fertilizer application in the list
+- 32aefb9: Add to interactive maps a search bar as control to lookup addresses and navigate them to
+- be6469f: Combine datepickers into a single component and include new features as dropdown selection of year and month and text input
+- 36803f1: Add a feature to select an existing fertilizer as a template for new fertilizers
+- 2fb2db3: Improve the design of the fertilizer form page by making it more intuitive and clear.
+- 5f9e9e0: Add an application-method field to the fertilizer-application form
+- c865f44: In the nitrogen balance, show the total amount of ammonia emitted and provide field-level details.
+- 6a42aa0: For new farms use the `baat` catalogue for fertilizers instead of `srm`
+
+### Patch Changes
+
+- c962751: Replace the `p_type_*` boolean flags with the unified `p_type` field across all fertilizer functions
+- 691af1d: Update and migrate to next version of radix-ui
+- 14e57e6: Update to tailwind v4
+- 14e57e6: Update to react 19
+- Updated dependencies [ce5ffa8]
+- Updated dependencies [b6721b4]
+- Updated dependencies [955f854]
+- Updated dependencies [093784b]
+- Updated dependencies [e37b6f0]
+- Updated dependencies [780e8c4]
+- Updated dependencies [ac05d8b]
+- Updated dependencies [7f95233]
+- Updated dependencies [5d0a80b]
+- Updated dependencies [a58b367]
+- Updated dependencies [afe2a32]
+- Updated dependencies [fbbdc57]
+- Updated dependencies [e6c0fa3]
+- Updated dependencies [2c6251c]
+- Updated dependencies [75693e4]
+- Updated dependencies [a898e30]
+  - @svenvw/fdm-core@0.22.0
+  - @svenvw/fdm-calculator@0.4.0
+  - @svenvw/fdm-data@0.14.0
+
 ## 0.19.6
 
 ### Patch Changes

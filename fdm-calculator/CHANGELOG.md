@@ -1,5 +1,26 @@
 # fdm-calculator
 
+## 0.4.0
+
+### Minor Changes
+
+- 5d0a80b: Expand number of nutrients in output of `calculateDose`
+- fbbdc57: Add doses of individual applications to the output of `calculateDose`
+- 2c6251c: Add calculation of ammonia emissions to nitrogen balance calculation.
+
+### Patch Changes
+
+- 955f854: Fix unit conversion at calculation of N supply by other fertilizers
+- Updated dependencies [ce5ffa8]
+- Updated dependencies [b6721b4]
+- Updated dependencies [780e8c4]
+- Updated dependencies [ac05d8b]
+- Updated dependencies [a58b367]
+- Updated dependencies [afe2a32]
+- Updated dependencies [e6c0fa3]
+- Updated dependencies [75693e4]
+  - @svenvw/fdm-core@0.22.0
+
 ## 0.3.3
 
 ### Patch Changes

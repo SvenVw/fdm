@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-calculator",
     "private": false,
-    "version": "0.3.3",
+    "version": "0.4.0",
     "description": "Calculate various insights based on the Farm Data Model",
     "license": "MIT",
     "homepage": "https://github.com/SvenVw/fdm",
