@@ -85,9 +85,7 @@ export function FertilizerApplicationForm({
                             name="p_app_method"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Toedieningsmethode                     
-                                    </FormLabel>
+                                    <FormLabel>Toedieningsmethode</FormLabel>
                                     <Select
                                         onValueChange={field.onChange}
                                         value={field.value ?? ""}
@@ -122,9 +120,7 @@ export function FertilizerApplicationForm({
                                 name="p_app_amount"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>
-                                            Hoeveelheid                           
-                                        </FormLabel>
+                                        <FormLabel>Hoeveelheid</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
@@ -172,7 +168,7 @@ export function FertilizerApplicationForm({
                                 description={""}
                             />
                         </div>
-                        <div className="invisible"/>
+                        <div className="invisible" />
                         <div className="ml-auto">
                             <Button type="submit">
                                 {form.formState.isSubmitting ? (

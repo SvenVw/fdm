@@ -96,10 +96,10 @@ export function FertilizerApplicationsList({
                                 Je hebt nog geen bemesting ingevuld...
                             </h1>
                             <p className="text-sm text-muted-foreground">
-                                Voeg een bemesting toe om gegevens zoals, meststof, hoeveelheid en
-                                datum bij te houden.
+                                Voeg een bemesting toe om gegevens zoals,
+                                meststof, hoeveelheid en datum bij te houden.
                             </p>
-                        </div>              
+                        </div>
                     </div>
                 )}
             </div>

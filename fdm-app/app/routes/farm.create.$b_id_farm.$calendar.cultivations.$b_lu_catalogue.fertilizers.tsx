@@ -20,6 +20,15 @@ import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-appl
 import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { FertilizerApplicationsList } from "~/components/blocks/fertilizer-applications/list"
+import { Button } from "~/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "~/components/ui/dialog"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -27,8 +36,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
-import { Button } from "~/components/ui/button"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -189,7 +196,7 @@ export default function Index() {
             {/* <p className="text-sm text-muted-foreground">
                 Vul de bemesting op bouwplanniveau in voor dit gewas.
             </p> */}
-            <Separator/>
+            <Separator />
             <div className="flex justify-end">
                 <Dialog>
                     <DialogTrigger asChild>
