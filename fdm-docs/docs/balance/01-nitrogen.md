@@ -212,6 +212,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
         *   `Emission Factor`: A dimensionless factor representing the proportion of TAN that is volatilized as ammonia. This factor is determined by the application method and the type of land (grassland, cropland, or bare soil) at the time of application.
 
     *   **Emission Factors for Manure and Compost:**
+    
         | Application Method    | Grassland | Cropland | Bare Soil |
         | :-------------------- | :-------- | :------- | :-------- |
         | Broadcasting          | 0.68      | N/A      | 0.69      |
@@ -254,7 +255,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
 Ammonia emissions from crop residues occur when residues are left on the field and decompose, releasing nitrogen compounds that can volatilize. The calculation of these emissions is based on the amount of nitrogen in the crop residues and a specific emission factor.
 
 *   **Formula per cultivation:**
-    `NH3 Emission (kg N / ha) = Residue N Content (kg N / ha) * \Emission Factor (fraction)`
+    `NH3 Emission (kg N / ha) = Residue N Content (kg N / ha) * Emission Factor (fraction)`
     Where:
     *   `Residue N Content`: The amount of nitrogen contained in the crop residues left on the field. This is derived from the `Residue_Mass` (calculated in Section 3.2.2) and the `N_Content_Residue` (`b_lu_n_residue` from `CultivationCatalogue`).
     *   `Emission Factor`: This factor is calculated based on the nitrogen content of the crop residue in g/kg dry matter (`b_lu_n_residue`).
