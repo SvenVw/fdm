@@ -215,10 +215,6 @@ describe("hashCultivation", () => {
         const hash2 = await hashCultivation(cultivation2)
         const hash3 = await hashCultivation(cultivation3)
 
-        console.log(hash1)
-        console.log(hash2)
-        console.log(hash3)
-
         expect(hash1).not.toBe(hash2)
         expect(hash1).not.toBe(hash3)
     })
