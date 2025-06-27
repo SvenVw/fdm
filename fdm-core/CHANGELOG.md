@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.22.1
+
+### Patch Changes
+
+- Updated dependencies [ffd1b3e]
+  - @svenvw/fdm-data@0.14.1
+
 ## 0.22.0
 
 ### Minor Changes
