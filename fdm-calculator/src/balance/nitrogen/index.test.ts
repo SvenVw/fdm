@@ -78,9 +78,11 @@ describe("calculateNitrogenBalance", () => {
                 {
                     p_id_catalogue: "fertilizer1",
                     p_n_rt: 10,
-                    p_type_manure: false,
-                    p_type_mineral: true,
-                    p_type_compost: false,
+                    p_type: "mineral",
+                    p_no3_rt: 2,
+                    p_nh4_rt: 8,
+                    p_s_rt: 20,
+                    p_ef_nh3: null             
                 },
             ],
             cultivationDetails: [

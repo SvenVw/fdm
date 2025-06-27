@@ -232,8 +232,8 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                         balance={nitrogenBalanceResult.balance}
                                         supply={nitrogenBalanceResult.supply}
                                         removal={nitrogenBalanceResult.removal}
-                                        emission={
-                                            nitrogenBalanceResult.emission
+                                        volatilization={
+                                            nitrogenBalanceResult.volatilization
                                         }
                                     />
                                 )}

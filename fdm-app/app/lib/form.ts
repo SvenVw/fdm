@@ -47,7 +47,7 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
                 }
 
                 // Daypicker returns 01 Jan 1970 if no date is selected. This workaround removes the date if it is 01 Jan 1970
-                if (value === "1970-01-01T00:00:00.000Z") {
+                if (value === '"1970-01-01T00:00:00.000Z"') {
                     delete formObject[key]
                 }
             }
