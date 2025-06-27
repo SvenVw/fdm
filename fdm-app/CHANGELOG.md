@@ -1,5 +1,18 @@
 # Changelog fdm-app
 
+## 0.20.1
+
+### Patch Changes
+
+- 4e8c707: Fix showing emission values at nitrogen balance chart
+- f942466: Fix saving form when parameter is of type Date, not filled in and optional
+- Updated dependencies [ffd1b3e]
+- Updated dependencies [7c36ecc]
+- Updated dependencies [3e73281]
+  - @svenvw/fdm-data@0.14.1
+  - @svenvw/fdm-calculator@0.4.1
+  - @svenvw/fdm-core@0.22.1
+
 ## 0.20.0
 
 ### Minor Changes

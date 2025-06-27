@@ -1,5 +1,13 @@
 # fdm-calculator
 
+## 0.4.1
+
+### Patch Changes
+
+- 7c36ecc: Fix calculation of ammonia emission by other fertilizers by excluding manure, mineral and compost
+- 3e73281: Switch to return 0 for unsupported application methods for organic fertilizers at NH3 emission
+  - @svenvw/fdm-core@0.22.1
+
 ## 0.4.0
 
 ### Minor Changes
