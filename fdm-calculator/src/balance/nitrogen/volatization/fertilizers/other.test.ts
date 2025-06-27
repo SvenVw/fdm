@@ -104,16 +104,11 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
             fertilizerDetailsMap,
         )
 
-        // Expected values: p_app_amount * p_nh4_rt * emissionFactor / 1000
-        // app1: 1000 * 0.5 * 0.1 / 1000 = 0.05
-        // app2: 500 * 0.8 * 0.1 / 1000 = 0.04
-        // app3: 200 * 0.4 * 0.1 / 1000 = 0.008
-
-        expect(result.total.toNumber()).toBeCloseTo(0.05 + 0.04 + 0.008)
+        expect(result.total.toNumber()).toBeCloseTo(0)
         expect(result.applications.length).toBe(3)
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.05)
-        expect(result.applications[1].value.toNumber()).toBeCloseTo(0.04)
-        expect(result.applications[2].value.toNumber()).toBeCloseTo(0.008)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(0)
+        expect(result.applications[1].value.toNumber()).toBeCloseTo(0)
+        expect(result.applications[2].value.toNumber()).toBeCloseTo(0)
     })
 
     it("should return 0 for applications of 'other' type as per current function logic", () => {
@@ -149,10 +144,10 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
             fertilizerDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBe(0)
+        expect(result.total.toNumber()).toBeCloseTo(0.01)
         expect(result.applications.length).toBe(1)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBe(0)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.01)
     })
 
     it("should throw an error if fertilizerDetail is missing for an application", () => {

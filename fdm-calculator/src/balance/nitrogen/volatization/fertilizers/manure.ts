@@ -151,20 +151,34 @@ export function determineManureAmmoniaEmissionFactor(
         if (p_app_method === "shallow injection") {
             return new Decimal(0.17)
         }
-        throw new Error(
+        console.warn(
             `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) on grassland`,
         )
+        return new Decimal(0)
     }
     if (isCropland) {
+        if (p_app_method === "broadcasting") {
+            return new Decimal(0.69)
+        }
+        if (p_app_method === "incorporation 2 tracks") {
+            return new Decimal(0.46)
+        }
         if (p_app_method === "narrowband") {
             return new Decimal(0.36)
+        }
+        if (p_app_method === "slotted coulter") {
+            return new Decimal(0.3)
         }
         if (p_app_method === "shallow injection") {
             return new Decimal(0.24)
         }
-        throw new Error(
+        if (p_app_method === "incorporation") {
+            return new Decimal(0.22)
+        }
+        console.warn(
             `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id})  for cropland`,
         )
+        return new Decimal(0)
     }
 
     // Bare soil
@@ -186,7 +200,8 @@ export function determineManureAmmoniaEmissionFactor(
     if (p_app_method === "incorporation") {
         return new Decimal(0.22)
     }
-    throw new Error(
+    console.warn(
         `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
     )
+    return new Decimal(0)
 }

@@ -320,7 +320,7 @@ describe("determineManureAmmoniaEmissionFactor", () => {
         ).toBe(0.69)
     })
 
-    it("should throw error for unsupported method on grassland", () => {
+    it("should  return 0 for unsupported method on grassland", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
@@ -339,18 +339,16 @@ describe("determineManureAmmoniaEmissionFactor", () => {
                 m_cropresidue: null,
             },
         ]
-        expect(() =>
+        expect(
             determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
-            ),
-        ).toThrowError(
-            "Unsupported application method unsupported_method for meststof1 (app1) on grassland",
-        )
+            ).toNumber(),
+        ).toBe(0)
     })
 
-    it("should throw error for unsupported method on cropland", () => {
+    it("should return 0 for unsupported method on cropland", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
@@ -369,18 +367,16 @@ describe("determineManureAmmoniaEmissionFactor", () => {
                 m_cropresidue: null,
             },
         ]
-        expect(() =>
+        expect(
             determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
-            ),
-        ).toThrowError(
-            "Unsupported application method unsupported_method for meststof1 (app1)  for cropland",
-        )
+            ).toNumber(),
+        ).toBe(0)
     })
 
-    it("should throw error for unsupported method on bare soil", () => {
+    it("should return 0 for unsupported method on bare soil", () => {
         const fertilizerApplication: FertilizerApplication = {
             p_app_id: "app1",
             p_id_catalogue: "manure1",
@@ -391,14 +387,12 @@ describe("determineManureAmmoniaEmissionFactor", () => {
             p_id: "app1",
         }
         const cultivations: FieldInput["cultivations"] = []
-        expect(() =>
+        expect(
             determineManureAmmoniaEmissionFactor(
                 fertilizerApplication,
                 cultivations,
                 cultivationDetailsMap,
-            ),
-        ).toThrowError(
-            "Unsupported application method unsupported_method for meststof1 (app1) for bare soil",
-        )
+            ).toNumber(),
+        ).toBe(0)
     })
 })

@@ -12,18 +12,18 @@ export function NitrogenBalanceChart({
     balance,
     supply,
     removal,
-    emission,
+    volatilization,
 }: {
     balance: number
     supply: number
     removal: number | undefined
-    emission: number | undefined
+    volatilization: number | undefined
 }): JSX.Element {
     const chartData = [
         {
             supply: supply,
             removal: removal ? Math.abs(removal) : undefined,
-            emission: emission ? Math.abs(emission) : undefined,
+            volatilization: volatilization ? Math.abs(volatilization) : undefined,
         },
     ]
 
@@ -36,7 +36,7 @@ export function NitrogenBalanceChart({
             label: "Afvoer",
             color: "hsl(var(--chart-2))",
         },
-        emission: {
+        volatilization: {
             label: "Emissie",
             color: "hsl(var(--chart-3))",
         },
@@ -79,8 +79,8 @@ export function NitrogenBalanceChart({
                     stackId={"b"}
                 />
                 <Bar
-                    dataKey="emission"
-                    fill="var(--color-emission)"
+                    dataKey="volatilization"
+                    fill="var(--color-volatilization)"
                     radius={5}
                     stackId={"b"}
                 />
