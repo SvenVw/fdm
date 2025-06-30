@@ -6,12 +6,10 @@ export function createFunctionsForNorms(b_region: string, year: number) {
     if (b_region === "NL") {
         if (year === 2025) {
             return {
+                collectInputForNorms: undefined,
                 calculateNormForNitrogen: getNL2025StikstofGebruiksNorm,
-                collectInputForNormForNitrogen: undefined,
                 calculateNormForManure: getNL2025DierlijkeMestGebruiksNorm,
-                collectInputForNormForManure: undefined,
                 calculateNormForPhosphate: getNL2025FosfaatGebruiksNorm,
-                collectInputForNormForPhosphate: undefined,
             }
         }
         throw new Error("Year not supported")
@@ -26,14 +24,10 @@ export function createFunctionsForFertilizerApplicationFilling(
     if (b_region === "NL") {
         if (year === 2025) {
             return {
+                collectInputForFertilizerApplicationFilling: undefined,
                 calculateFertilizerApplicationFillingForNitrogen: undefined,
-                collectInputForFertilizerApplicationFillingForNitrogen:
-                    undefined,
                 calculateFertilizerApplicationFillingForManure: undefined,
-                collectInputForFertilizerApplicationFillingForManure: undefined,
                 calculateFertilizerApplicationFillingForPhosphate: undefined,
-                collectInputForFertilizerApplicationFillingForPhosphate:
-                    undefined,
             }
         }
         throw new Error("Year not supported")
