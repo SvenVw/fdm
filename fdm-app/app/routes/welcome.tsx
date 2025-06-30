@@ -1,10 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { updateUserProfile } from "@svenvw/fdm-core"
 import { Cookie } from "lucide-react"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
 import { Form, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Avatar, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -13,9 +17,6 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { auth, getSession } from "~/lib/auth.server"
-import { clientConfig } from "~/lib/config"
-import { handleLoaderError, handleActionError } from "~/lib/error"
 import {
     FormControl,
     FormDescription,
@@ -25,12 +26,11 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { extractFormValuesFromRequest } from "../lib/form"
-import { redirectWithSuccess } from "remix-toast"
-import { updateUserProfile } from "@svenvw/fdm-core"
+import { auth, getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { Avatar, AvatarImage } from "~/components/ui/avatar"
+import { extractFormValuesFromRequest } from "../lib/form"
 
 export const meta: MetaFunction = () => {
     return [
@@ -89,7 +89,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
 }
 
- /**
+/**
  * Renders the welcome page for profile completion.
  *
  * This component displays a form for users to complete their profile by entering their firstname and surname.

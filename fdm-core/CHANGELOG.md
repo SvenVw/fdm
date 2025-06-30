@@ -1,5 +1,33 @@
 # Changelog fdm-core
 
+## 0.22.1
+
+### Patch Changes
+
+- Updated dependencies [ffd1b3e]
+  - @svenvw/fdm-data@0.14.1
+
+## 0.22.0
+
+### Minor Changes
+
+- ce5ffa8: Add parameter `p_ef_nh3` to the fertilizersCatalogue to represent the ammonia emission factor of a fertilizer.
+- 780e8c4: Add syncing of `baat` catalogue for fertilizers
+- a58b367: Add the new function `getSoilParameterDescription` to obtain details about fertilizer parameters
+- afe2a32: Add `b_lu_croprotation` to the output of `getCultivation` and `getCultivations`.
+- e6c0fa3: Add parameters `p_no3_rt` and `p_nh4_rt` to `fertilizerCatalogue`
+- 75693e4: Add the parameter `p_app_method_options` to `fertilizer_catalogue` to represent the possible methods that can be used to apply the fertilizer
+
+### Patch Changes
+
+- b6721b4: Fix typo for `p_cr_rt` at input of addFertilizerToCatalogue
+- ac05d8b: Fixes a bug in `syncCatalogue` where, when an item already exists but its hash has changed, the other properties were not updated
+- Updated dependencies [093784b]
+- Updated dependencies [e37b6f0]
+- Updated dependencies [7f95233]
+- Updated dependencies [a898e30]
+  - @svenvw/fdm-data@0.14.0
+
 ## 0.21.1
 
 ### Patch Changes

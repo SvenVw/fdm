@@ -21,6 +21,7 @@ import {
     getFertilizer,
     getFertilizerApplication,
     getFertilizerApplications,
+    getFertilizerParametersDescription,
     getFertilizers,
     getFertilizersFromCatalogue,
     removeFertilizer,
@@ -85,6 +86,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: ["injection", "incorporation"],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -101,6 +103,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -120,14 +124,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
 
@@ -145,6 +148,8 @@ describe("Fertilizer Data Model", () => {
             expect(fertilizer?.p_name_nl).toBe(p_name_nl)
             expect(fertilizer?.p_name_en).toBe(p_name_en)
             expect(fertilizer?.p_description).toBe(p_description)
+            expect(fertilizer?.p_no3_rt).toBe(400)
+            expect(fertilizer?.p_nh4_rt).toBe(410)
         })
 
         it("should add a new fertilizer", async () => {
@@ -160,6 +165,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -176,6 +182,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -195,14 +203,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
 
@@ -235,6 +242,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -251,6 +259,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -270,14 +280,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
 
@@ -323,6 +332,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -339,6 +349,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -358,14 +370,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
 
@@ -383,8 +394,9 @@ describe("Fertilizer Data Model", () => {
 
             await removeFertilizer(fdm, p_id)
 
-            const fertilizer = await getFertilizer(fdm, p_id)
-            expect(fertilizer).toBeUndefined()
+            await expect(getFertilizer(fdm, p_id)).rejects.toThrow(
+                "Exception for getFertilizer",
+            )
         })
 
         it("should return empty array when no catalogues are enabled", async () => {
@@ -419,6 +431,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl: "Test Fertilizer",
                     p_name_en: "Test Fertilizer (EN)",
                     p_description: "This is a test fertilizer",
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -435,6 +448,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -454,14 +469,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
         })
@@ -633,6 +647,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl: "Test Fertilizer 2",
                     p_name_en: "Test Fertilizer (EN) 2",
                     p_description: "This is a test fertilizer 2",
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -649,6 +664,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -668,14 +685,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
             const updatedProperties = {
@@ -696,7 +712,6 @@ describe("Fertilizer Data Model", () => {
     describe("Fertilizer Application", () => {
         let b_id: string
         let p_id: string
-        let p_id_catalogue: string
 
         beforeAll(async () => {
             const farmName = "Test Farm"
@@ -747,6 +762,7 @@ describe("Fertilizer Data Model", () => {
                     p_name_nl,
                     p_name_en,
                     p_description,
+                    p_app_method_options: [],
                     p_dm: 37,
                     p_density: 20,
                     p_om: 20,
@@ -763,6 +779,8 @@ describe("Fertilizer Data Model", () => {
                     p_n_if: 130,
                     p_n_of: 140,
                     p_n_wc: 150,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_p_rt: 160,
                     p_k_rt: 170,
                     p_mg_rt: 180,
@@ -782,14 +800,13 @@ describe("Fertilizer Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: 0.8,
+                    p_type: "mineral",
                 },
             )
 
@@ -1036,5 +1053,48 @@ describe("Fertilizer Data Model", () => {
                 ),
             ).rejects.toThrowError("Exception for addFertilizerApplication")
         })
+    })
+})
+
+describe("getFertilizerParametersDescription", () => {
+    it("should return the correct fertilizer parameter descriptions for NL-nl locale", () => {
+        const descriptions = getFertilizerParametersDescription("NL-nl")
+        expect(descriptions).toHaveLength(24)
+        for (const description of descriptions) {
+            expect(description).toHaveProperty("parameter")
+            expect(description).toHaveProperty("unit")
+            expect(description).toHaveProperty("name")
+            expect(description).toHaveProperty("type")
+            expect(description).toHaveProperty("description")
+            expect(description).toHaveProperty("category")
+            if (description.type === "enum") {
+                expect(description).toHaveProperty("options")
+            }
+        }
+    })
+
+    it("should throw an error for unsupported locales", () => {
+        expect(() => getFertilizerParametersDescription("en-US")).toThrowError(
+            "Unsupported locale",
+        )
+        expect(() => getFertilizerParametersDescription("de-DE")).toThrowError(
+            "Unsupported locale",
+        )
+    })
+
+    it("should return the correct fertilizer parameter descriptions for default locale", () => {
+        const descriptions = getFertilizerParametersDescription()
+        expect(descriptions).toHaveLength(24)
+        for (const description of descriptions) {
+            expect(description).toHaveProperty("parameter")
+            expect(description).toHaveProperty("unit")
+            expect(description).toHaveProperty("name")
+            expect(description).toHaveProperty("type")
+            expect(description).toHaveProperty("description")
+            expect(description).toHaveProperty("category")
+            if (description.type === "enum") {
+                expect(description).toHaveProperty("options")
+            }
+        }
     })
 })

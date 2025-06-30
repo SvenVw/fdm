@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-docs",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "private": true,
     "scripts": {
         "docusaurus": "docusaurus",
@@ -19,9 +19,9 @@
         "preinstall": "npx only-allow pnpm"
     },
     "dependencies": {
-        "@docusaurus/core": "3.8.0",
-        "@docusaurus/faster": "^3.8.0",
-        "@docusaurus/preset-classic": "3.8.0",
+        "@docusaurus/core": "3.8.1",
+        "@docusaurus/faster": "^3.8.1",
+        "@docusaurus/preset-classic": "3.8.1",
         "@mdx-js/react": "^3.1.0",
         "clsx": "^2.1.1",
         "lucide-react": "^0.511.0",
@@ -30,12 +30,12 @@
         "react-dom": "^19.1.0"
     },
     "devDependencies": {
-        "@docusaurus/module-type-aliases": "3.8.0",
-        "@docusaurus/tsconfig": "3.8.0",
-        "@docusaurus/types": "3.8.0",
+        "@docusaurus/module-type-aliases": "3.8.1",
+        "@docusaurus/tsconfig": "3.8.1",
+        "@docusaurus/types": "3.8.1",
         "docusaurus-plugin-typedoc": "^1.4.0",
         "typedoc": "catalog:",
-        "typedoc-plugin-markdown": "^4.6.3",
+        "typedoc-plugin-markdown": "^4.6.4",
         "typescript": "catalog:"
     },
     "browserslist": {

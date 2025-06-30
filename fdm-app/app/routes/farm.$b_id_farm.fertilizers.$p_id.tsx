@@ -1,12 +1,13 @@
+import { FertilizerForm } from "@/app/components/blocks/fertilizer/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getFarm,
     getFarms,
     getFertilizer,
+    getFertilizerParametersDescription,
     getFertilizers,
 } from "@svenvw/fdm-core"
 import { updateFertilizerFromCatalogue } from "@svenvw/fdm-core"
-import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     type LoaderFunctionArgs,
@@ -17,18 +18,17 @@ import {
 import { useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import type { z } from "zod"
-import { FarmTitle } from "~/components/custom/farm/farm-title"
-import { FertilizerForm } from "~/components/custom/fertilizer/form"
-import { FormSchema } from "~/components/custom/fertilizer/formschema"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { FormSchema } from "~/components/blocks/fertilizer/formschema"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Header } from "../components/custom/header/base"
-import { HeaderFarm } from "../components/custom/header/farm"
-import { HeaderFertilizer } from "../components/custom/header/fertilizer"
 
 export const meta: MetaFunction = () => {
     return [
@@ -90,6 +90,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get selected fertilizer
         const fertilizer = await getFertilizer(fdm, p_id)
+        const fertilizerParameters = getFertilizerParametersDescription()
 
         // Get the available fertilizers
         const fertilizers = await getFertilizers(
@@ -100,7 +101,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             return {
                 p_id: fertilizer.p_id,
-                p_name_nl: fertilizer.p_name_nl,
+                p_name_nl: fertilizer.p_name_nl || "",
             }
         })
 
@@ -119,6 +120,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
             editable: editable,
+            fertilizerParameters: fertilizerParameters,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -133,16 +135,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFertilizerBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const fertilizer = loaderData.fertilizer
-
-    fertilizer.p_type = ""
-    if (fertilizer.p_type_manure) {
-        fertilizer.p_type = "manure"
-    } else if (fertilizer.p_type_compost) {
-        fertilizer.p_type = "compost"
-    } else if (fertilizer.p_type_mineral) {
-        fertilizer.p_type = "mineral"
-    }
+    const { fertilizer, fertilizerParameters, editable } = loaderData
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -150,33 +143,51 @@ export default function FarmFertilizerBlock() {
         defaultValues: {
             p_name_nl: fertilizer.p_name_nl,
             p_type: fertilizer.p_type,
+            p_dm: fertilizer.p_dm,
+            p_density: fertilizer.p_density,
+            p_om: fertilizer.p_om,
+            p_a: fertilizer.p_a,
+            p_hc: fertilizer.p_hc,
+            p_eom: fertilizer.p_eom,
+            p_eoc: fertilizer.p_eoc,
+            p_c_rt: fertilizer.p_c_rt,
+            p_c_of: fertilizer.p_c_of,
+            p_c_if: fertilizer.p_c_if,
+            p_c_fr: fertilizer.p_c_fr,
+            p_cn_of: fertilizer.p_cn_of,
             p_n_rt: fertilizer.p_n_rt,
+            p_n_if: fertilizer.p_n_if,
+            p_n_of: fertilizer.p_n_of,
             p_n_wc: fertilizer.p_n_wc,
+            p_no3_rt: fertilizer.p_no3_rt,
+            p_nh4_rt: fertilizer.p_nh4_rt,
             p_p_rt: fertilizer.p_p_rt,
             p_k_rt: fertilizer.p_k_rt,
-            p_om: fertilizer.p_om,
-            p_eoc: fertilizer.p_eoc,
-            p_s_rt: fertilizer.p_s_rt,
-            p_ca_rt: fertilizer.p_ca_rt,
             p_mg_rt: fertilizer.p_mg_rt,
+            p_ca_rt: fertilizer.p_ca_rt,
+            p_ne: fertilizer.p_ne,
+            p_s_rt: fertilizer.p_s_rt,
+            p_s_wc: fertilizer.p_s_wc,
+            p_cu_rt: fertilizer.p_cu_rt,
+            p_zn_rt: fertilizer.p_zn_rt,
+            p_na_rt: fertilizer.p_na_rt,
+            p_si_rt: fertilizer.p_si_rt,
+            p_b_rt: fertilizer.p_b_rt,
+            p_mn_rt: fertilizer.p_mn_rt,
+            p_ni_rt: fertilizer.p_ni_rt,
+            p_fe_rt: fertilizer.p_fe_rt,
+            p_mo_rt: fertilizer.p_mo_rt,
+            p_co_rt: fertilizer.p_co_rt,
+            p_as_rt: fertilizer.p_as_rt,
+            p_cd_rt: fertilizer.p_cd_rt,
+            p_cr_rt: fertilizer.p_cr_rt,
+            p_cr_vi: fertilizer.p_cr_vi,
+            p_pb_rt: fertilizer.p_pb_rt,
+            p_hg_rt: fertilizer.p_hg_rt,
+            p_cl_rt: fertilizer.p_cl_rt,
+            p_app_method_options: fertilizer.p_app_method_options || [],
         },
     })
-
-    useEffect(() => {
-        form.reset({
-            p_name_nl: fertilizer.p_name_nl,
-            p_type: fertilizer.p_type,
-            p_n_rt: fertilizer.p_n_rt,
-            p_n_wc: fertilizer.p_n_wc,
-            p_p_rt: fertilizer.p_p_rt,
-            p_k_rt: fertilizer.p_k_rt,
-            p_om: fertilizer.p_om,
-            p_eoc: fertilizer.p_eoc,
-            p_s_rt: fertilizer.p_s_rt,
-            p_ca_rt: fertilizer.p_ca_rt,
-            p_mg_rt: fertilizer.p_mg_rt,
-        })
-    }, [fertilizer, form.reset])
 
     return (
         <SidebarInset>
@@ -204,10 +215,9 @@ export default function FarmFertilizerBlock() {
                 />
                 <div className="space-y-6 p-10 pb-0">
                     <FertilizerForm
-                        fertilizer={loaderData.fertilizer}
+                        fertilizerParameters={fertilizerParameters}
                         form={form}
-                        editable={loaderData.editable}
-                        farm={loaderData.farm}
+                        editable={editable}
                     />
                 </div>
             </main>
@@ -233,34 +243,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        const {
-            p_name_nl,
-            p_type,
-            p_n_rt,
-            p_n_wc,
-            p_p_rt,
-            p_k_rt,
-            p_om,
-            p_eoc,
-            p_s_rt,
-            p_ca_rt,
-            p_mg_rt,
-        } = formValues
-
-        let p_type_manure = false
-        let p_type_compost = false
-        let p_type_mineral = false
-        if (p_type === "manure") {
-            p_type_manure = true
-        }
-        if (p_type === "compost") {
-            p_type_compost = true
-        }
-        if (p_type === "mineral") {
-            p_type_mineral = true
-        }
-
         const fertilizer = await getFertilizer(fdm, p_id)
+        if (fertilizer.p_source !== b_id_farm) {
+            throw new Error("Forbidden")
+        }
         const p_id_catalogue = fertilizer.p_id_catalogue
 
         await updateFertilizerFromCatalogue(
@@ -268,21 +254,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             session.principal_id,
             b_id_farm,
             p_id_catalogue,
-            {
-                p_name_nl,
-                p_type_manure,
-                p_type_mineral,
-                p_type_compost,
-                p_n_rt,
-                p_n_wc,
-                p_p_rt,
-                p_k_rt,
-                p_om,
-                p_eoc,
-                p_s_rt,
-                p_ca_rt,
-                p_mg_rt,
-            },
+            formValues,
         )
 
         return dataWithSuccess(

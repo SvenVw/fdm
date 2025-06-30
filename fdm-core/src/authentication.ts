@@ -1,12 +1,12 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { organization, username, magicLink } from "better-auth/plugins"
+import { magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { generateFromEmail } from "unique-username-generator"
-import * as authNSchema from "./db/schema-authn"
-import type { FdmType } from "./fdm"
 import type { FdmAuth } from "./authentication.d"
+import * as authNSchema from "./db/schema-authn"
 import { handleError } from "./error"
+import type { FdmType } from "./fdm"
 
 /**
  * Initializes and configures the authentication system for the FDM application using Better Auth.

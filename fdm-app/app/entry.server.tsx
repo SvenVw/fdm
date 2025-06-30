@@ -28,6 +28,27 @@ export default function handleRequest(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     loadContext: AppLoadContext,
 ) {
+    const url = new URL(request.url)
+    const { hostname } = url
+
+    // Don't redirect for the dev subdomain
+    if (hostname.startsWith("dev.")) {
+        // Continue with the request
+    } else {
+        const parts = hostname.split(".")
+        // Redirect if there is a subdomain (more than 2 parts for .com, .nl, etc.)
+        if (parts.length > 2) {
+            const rootDomain = parts.slice(-2).join(".")
+            url.hostname = rootDomain
+            return new Response(null, {
+                status: 301,
+                headers: {
+                    Location: url.toString(),
+                },
+            })
+        }
+    }
+
     // Add cache control headers based on the request path
     const cacheHeaders = getCacheControlHeaders(request, reactRouterContext)
     cacheHeaders.forEach((value, key) => {

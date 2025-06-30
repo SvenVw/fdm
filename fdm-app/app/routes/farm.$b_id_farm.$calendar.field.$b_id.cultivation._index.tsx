@@ -15,9 +15,9 @@ import {
     useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { CultivationForm } from "~/components/custom/cultivation/form"
-import { CultivationList } from "~/components/custom/cultivation/list"
-import { FormSchema } from "~/components/custom/cultivation/schema"
+import { CultivationForm } from "~/components/blocks/cultivation/form"
+import { CultivationList } from "~/components/blocks/cultivation/list"
+import { FormSchema } from "~/components/blocks/cultivation/schema"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"

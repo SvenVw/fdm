@@ -1,0 +1,1 @@
+ALTER TABLE "fdm"."fertilizers_catalogue" ADD COLUMN "p_app_method_options" "fdm"."p_app_method"[];

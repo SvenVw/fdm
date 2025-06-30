@@ -32,20 +32,16 @@ describe("calculateNitrogenSupplyByCompost", () => {
                 "app1",
                 {
                     p_id_catalogue: "app1",
-                    p_type_compost: true,
                     p_n_rt: 20,
-                    p_type_manure: false,
-                    p_type_mineral: false,
+                    p_type: "compost",
                 },
             ],
             [
                 "app2",
                 {
                     p_id_catalogue: "app2",
-                    p_type_compost: true,
                     p_n_rt: 15,
-                    p_type_manure: false,
-                    p_type_mineral: false,
+                    p_type: "compost",
                 },
             ],
         ])

@@ -5,8 +5,8 @@
             "outputs": ["dist/**", "build/**"],
             "passThroughEnv": [
                 "SENTRY_AUTH_TOKEN",
-                "VITE_SENTRY_ORG",
-                "VITE_SENTRY_PROJECT"
+                "PUBLIC_SENTRY_ORG",
+                "PUBLIC_SENTRY_PROJECT"
             ],
             "dependsOn": ["^build"]
         },

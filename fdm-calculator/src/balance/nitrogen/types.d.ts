@@ -217,6 +217,34 @@ export type NitrogenEmissionAmmoniaFertilizers = {
          */
         applications: { id: string; value: Decimal }[]
     }
+    /**
+     * Ammonia nitrogen emissions specifically from compost.
+     */
+    compost: {
+        /**
+         * The total amount of ammonia nitrogen emitted from compost.
+         */
+        total: Decimal
+        /**
+         * A detailed list of individual compost applications.
+         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
+         */
+        applications: { id: string; value: Decimal }[]
+    }
+    /**
+     * Ammonia nitrogen emissions specifically from other.
+     */
+    other: {
+        /**
+         * The total amount of ammonia nitrogen emitted from other.
+         */
+        total: Decimal
+        /**
+         * A detailed list of individual other applications.
+         * Each entry includes the application's unique identifier (`id`) and the amount of ammonia nitrogen emitted (`value`).
+         */
+        applications: { id: string; value: Decimal }[]
+    }
 }
 
 /**
@@ -350,7 +378,7 @@ export type FieldInput = {
     field: Pick<Field, "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end">
     cultivations: Pick<
         Cultivation,
-        "b_lu" | "b_lu_catalogue" | "m_cropresidue"
+        "b_lu" | "b_lu_start" | "b_lu_end" | "b_lu_catalogue" | "m_cropresidue"
     >[]
     harvests: Harvest[]
     soilAnalyses: Pick<
@@ -389,9 +417,11 @@ export type FertilizerDetail = Pick<
     Fertilizer,
     | "p_id_catalogue"
     | "p_n_rt" // Total nitrogen content (g N / kg fertilizer)
-    | "p_type_manure"
-    | "p_type_mineral"
-    | "p_type_compost"
+    | "p_no3_rt" // Nitrate content (g N / kg fertilizer)
+    | "p_nh4_rt" // Ammonium content (g N / kg fertilizer)
+    | "p_s_rt" // Sulfur content (g SO3 / kg fertilizer)
+    | "p_ef_nh3" // Ammonia emmission factor
+    | "p_type"
 >
 
 /**

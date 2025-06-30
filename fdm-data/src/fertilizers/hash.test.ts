@@ -26,6 +26,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,
@@ -59,7 +61,7 @@ describe("hashFertilizer", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("3852e767")
+        expect(hash).toBe("5a405bbe")
     })
 
     it("should generate different hashes for different fertilizer items", async () => {
@@ -85,6 +87,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,
@@ -136,6 +140,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,
@@ -194,6 +200,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,
@@ -256,6 +264,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,
@@ -318,6 +328,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,
@@ -380,6 +392,8 @@ describe("hashFertilizer", () => {
             p_n_if: 130,
             p_n_of: 140,
             p_n_wc: 150,
+            p_no3_rt: 150,
+            p_nh4_rt: 150,
             p_p_rt: 160,
             p_k_rt: 170,
             p_mg_rt: 180,

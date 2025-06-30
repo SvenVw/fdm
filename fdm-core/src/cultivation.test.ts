@@ -671,6 +671,7 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_id_farm,
                 {
+                    p_app_method_options: null,
                     p_name_nl,
                     p_name_en,
                     p_description,
@@ -709,14 +710,15 @@ describe("Cultivation Data Model", () => {
                     p_co_rt: 320,
                     p_as_rt: 330,
                     p_cd_rt: 340,
-                    pr_cr_rt: 350,
+                    p_cr_rt: 350,
                     p_cr_vi: 360,
                     p_pb_rt: 370,
                     p_hg_rt: 380,
+                    p_no3_rt: 400,
+                    p_nh4_rt: 410,
                     p_cl_rt: 390,
-                    p_type_manure: true,
-                    p_type_mineral: false,
-                    p_type_compost: false,
+                    p_ef_nh3: null,
+                    p_type: "manure",
                 },
             )
 
@@ -1134,19 +1136,23 @@ describe("getCultivationsFromCatalogue error handling", () => {
         // Act & Assert
         try {
             await getCultivationsFromCatalogue(
-                mockFdm as any,
+                mockFdm as FdmServerType,
                 principal_id,
                 b_id_farm,
             )
             // Should not reach here
             expect.fail("Expected an error to be thrown")
-        } catch (err: any) {
+        } catch (err) {
+            type ErrorWithContext = Error & {
+                context: { principal_id: string; b_id_farm: string }
+            }
+            const e = err as ErrorWithContext
             // Check that error was handled correctly
-            expect(err).toBeDefined()
-            expect(err.message).toContain(
+            expect(e).toBeDefined()
+            expect(e.message).toContain(
                 "Exception for getCultivationsFromCatalogue",
             )
-            expect(err.context).toEqual({
+            expect(e.context).toEqual({
                 principal_id,
                 b_id_farm,
             })

@@ -1,19 +1,19 @@
 import {
-    createFdmAuth,
-    createDisplayUsername,
     type FdmAuth,
+    createDisplayUsername,
+    createFdmAuth,
 } from "@svenvw/fdm-core"
 import type { Session } from "better-auth"
 import type { GenericEndpointContext } from "better-auth"
+import { redirect } from "react-router"
 import { fdm } from "~/lib/fdm.server"
+import type { ExtendedUser } from "~/types/extended-user"
 import { serverConfig } from "./config.server"
 import {
     renderWelcomeEmail,
     sendEmail,
     sendMagicLinkEmailToUser,
 } from "./email.server"
-import type { ExtendedUser } from "~/types/extended-user"
-import { redirect } from "react-router"
 
 // Initialize better-auth instance for FDM
 export const auth: FdmAuth = createFdmAuth(

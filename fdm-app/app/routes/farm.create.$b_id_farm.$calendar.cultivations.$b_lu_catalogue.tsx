@@ -117,10 +117,6 @@ export default function Index() {
             title: "Bemesting",
             href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`,
         },
-        {
-            title: "Vanggewas",
-            href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/covercrop`,
-        },
     ]
 
     return (

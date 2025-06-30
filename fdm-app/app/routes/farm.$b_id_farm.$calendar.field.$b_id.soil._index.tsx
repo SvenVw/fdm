@@ -16,8 +16,8 @@ import {
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { SoilDataCards } from "~/components/custom/soil/cards"
-import { SoilAnalysesList } from "~/components/custom/soil/list"
+import { SoilDataCards } from "~/components/blocks/soil/cards"
+import { SoilAnalysesList } from "~/components/blocks/soil/list"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"

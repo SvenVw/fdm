@@ -10,6 +10,7 @@ import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import type { FdmServerType } from "./fdm-server.d"
 
 /**
  * Gets all enabled fertilizer catalogues for a farm.
@@ -376,9 +377,12 @@ export async function syncCatalogues(fdm: FdmType): Promise<void> {
 
 async function syncFertilizerCatalogue(fdm: FdmType) {
     const srmCatalogue = await getFertilizersCatalogue("srm")
-    await fdm.transaction(async (tx) => {
+    const baatCatalogue = await getFertilizersCatalogue("baat")
+    const fertilizersCatalogue = [...srmCatalogue, ...baatCatalogue]
+
+    await fdm.transaction(async (tx: FdmServerType) => {
         try {
-            for (const item of srmCatalogue) {
+            for (const item of fertilizersCatalogue) {
                 const hash = await hashFertilizer(item)
                 const existing = await tx
                     .select({ hash: schema.fertilizersCatalogue.hash })
@@ -405,7 +409,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
                     ) {
                         await tx
                             .update(schema.fertilizersCatalogue)
-                            .set({ hash: hash })
+                            .set({ ...item, hash: hash, updated: new Date() })
                             .where(
                                 eq(
                                     schema.fertilizersCatalogue.p_id_catalogue,
@@ -424,7 +428,7 @@ async function syncFertilizerCatalogue(fdm: FdmType) {
 async function syncCultivationCatalogue(fdm: FdmType) {
     const brpCatalogue = await getCultivationCatalogue("brp")
 
-    await fdm.transaction(async (tx) => {
+    await fdm.transaction(async (tx: FdmServerType) => {
         try {
             for (const item of brpCatalogue) {
                 const hash = await hashCultivation(item)
@@ -453,7 +457,7 @@ async function syncCultivationCatalogue(fdm: FdmType) {
                     ) {
                         await tx
                             .update(schema.cultivationsCatalogue)
-                            .set({ hash: hash })
+                            .set({ ...item, hash: hash, updated: new Date() })
                             .where(
                                 eq(
                                     schema.cultivationsCatalogue.b_lu_catalogue,

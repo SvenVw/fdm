@@ -19,17 +19,17 @@ import {
     type MetaFunction,
     NavLink,
     data,
+    useLoaderData,
 } from "react-router"
-import { useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
+import { SoilDataCards } from "~/components/blocks/soil/cards"
 import { Combobox } from "~/components/custom/combobox"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { SoilDataCards } from "~/components/custom/soil/cards"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -75,9 +75,11 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van perceel moet minimaal 3 karakters bevatten",
         }),
-    b_area: z.coerce.number({
-        required_error: "Oppervlakte van perceel is verplicht",
-    }),
+    b_area: z.coerce
+        .number({
+            required_error: "Oppervlakte van perceel is verplicht",
+        })
+        .optional(),
     b_lu_catalogue: z.string({
         required_error: "Hoofdgewas is verplicht",
     }),
@@ -257,7 +259,11 @@ export default function Index() {
             <div className="grid grid-cols-4 gap-6">
                 <div className="col-span-2">
                     <RemixFormProvider {...form}>
-                        <Form id="formField" method="post">
+                        <Form
+                            id="formField"
+                            method="POST"
+                            onSubmit={form.handleSubmit}
+                        >
                             <fieldset disabled={form.formState.isSubmitting}>
                                 <Card>
                                     <CardHeader>
@@ -298,7 +304,6 @@ export default function Index() {
                                                             <Input
                                                                 {...field}
                                                                 type="text"
-                                                                required
                                                             />
                                                         </FormControl>
                                                         <FormDescription />
@@ -306,19 +311,33 @@ export default function Index() {
                                                     </FormItem>
                                                 )}
                                             />
-                                            <div className="col-span-2 items-center gap-4">
-                                                <Combobox
-                                                    options={
-                                                        loaderData.cultivationOptions
-                                                    }
-                                                    form={form}
-                                                    name={"b_lu_catalogue"}
-                                                    label={"Hoofdgewas"}
-                                                    defaultValue={
-                                                        loaderData.b_lu_catalogue
-                                                    }
-                                                />
-                                            </div>
+                                            <FormField
+                                                control={form.control}
+                                                name="b_lu_catalogue"
+                                                render={({ field }) => (
+                                                    <FormItem className="col-span-2 items-center gap-4">
+                                                        <Combobox
+                                                            options={
+                                                                loaderData.cultivationOptions
+                                                            }
+                                                            form={form}
+                                                            name={
+                                                                "b_lu_catalogue"
+                                                            }
+                                                            label={"Hoofdgewas"}
+                                                            defaultValue={
+                                                                loaderData.b_lu_catalogue
+                                                            }
+                                                        />
+                                                        <Input
+                                                            type="hidden"
+                                                            {...field}
+                                                        />
+                                                        <FormDescription />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
                                     </CardContent>
                                     <CardFooter>
@@ -384,7 +403,9 @@ export default function Index() {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <Button asChild>
-                                    <NavLink to="./new_analysis">
+                                    <NavLink
+                                        to={`../${loaderData.b_id}/soil/analysis`}
+                                    >
                                         <Plus />
                                         Bodemanalyse toevoegen
                                     </NavLink>

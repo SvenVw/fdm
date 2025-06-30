@@ -1,5 +1,20 @@
 # fdm-data
 
+## 0.14.1
+
+### Patch Changes
+
+- ffd1b3e: Added test for new parameters at cultivation
+
+## 0.14.0
+
+### Minor Changes
+
+- 093784b: Add `p_no3_rt` and `p_nh4_rt` to SRM catalogue.
+- e37b6f0: Add `p_app_method_options` as parameter of Fertilizer Catalogue
+- 7f95233: Expose the `ApplicationMethods` union type in the `@svenvw/fdm-data` package
+- a898e30: Add `baat` as new catalogue for fertilizers
+
 ## 0.13.1
 
 ### Patch Changes

@@ -157,7 +157,9 @@ export async function calculateNitrogenBalanceField(
     const volatilization = calculateNitrogenVolatilization(
         cultivations,
         harvests,
+        fertilizerApplications,
         cultivationDetailsMap,
+        fertilizerDetailsMap,
     )
 
     // Calculate the target for the Nitrogen balance
@@ -197,7 +199,7 @@ export function calculateNitrogenBalancesFieldToFarm(
     // Explicitly state it returns the Decimal version
     // Calculate the total farm area
     const totalFarmArea = fields.reduce(
-        (sum, field) => sum.add(new Decimal(field.field.b_area)),
+        (sum, field) => sum.add(new Decimal(field.field.b_area ?? 0)),
         Decimal(0),
     )
 
@@ -219,7 +221,7 @@ export function calculateNitrogenBalancesFieldToFarm(
             )
             continue // Skip this iteration if fieldInput is not found
         }
-        const fieldArea = new Decimal(fieldInput.field.b_area)
+        const fieldArea = new Decimal(fieldInput.field.b_area ?? 0)
 
         totalFarmSupply = totalFarmSupply.add(
             fieldBalance.supply.total.times(fieldArea),

@@ -1,4 +1,3 @@
-import NitrogenBalanceDetails from "@/app/components/custom/balance/nitrogen-details"
 import {
     type NitrogenBalanceNumeric,
     calculateNitrogenBalance,
@@ -12,7 +11,6 @@ import {
     ArrowUpFromLine,
     CircleAlert,
     CircleCheck,
-    House,
 } from "lucide-react"
 import {
     type LoaderFunctionArgs,
@@ -23,6 +21,8 @@ import {
     useLocation,
     useNavigation,
 } from "react-router"
+import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
+import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -39,7 +39,6 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
-import { NitrogenBalanceChart } from "../components/custom/balance/nitrogen-chart"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -227,10 +226,15 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {isLoading ? <LoadingSpinner /> : "-"}
+                                    {isLoading ? (
+                                        <LoadingSpinner />
+                                    ) : (
+                                        nitrogenBalanceResult.volatilization
+                                            .total
+                                    )}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
-                                    Berekening van emissie volgt later
+                                    kg N / ha
                                 </p>
                             </CardContent>
                         </Card>
@@ -262,7 +266,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         removal={
                                             nitrogenBalanceResult.removal.total
                                         }
-                                        emission={
+                                        volatilization={
                                             nitrogenBalanceResult.volatilization
                                                 .total
                                         }

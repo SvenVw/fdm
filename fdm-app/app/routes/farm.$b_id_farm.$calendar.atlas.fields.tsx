@@ -1,19 +1,21 @@
+import { useCallback, useState } from "react"
 import {
-    GeolocateControl,
     Layer,
     Map as MapGL,
-    NavigationControl,
+    type ViewState,
+    type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
-import { ZOOM_LEVEL_FIELDS } from "~/components/custom/atlas/atlas"
-import { FieldsPanelHover } from "~/components/custom/atlas/atlas-panels"
-import { FieldsSourceNotClickable } from "~/components/custom/atlas/atlas-sources"
-import { getFieldsStyle } from "~/components/custom/atlas/atlas-styles"
-import { getViewState } from "~/components/custom/atlas/atlas-viewstate"
+import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
+import { Controls } from "~/components/blocks/atlas/atlas-controls"
+import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
+import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
+import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
+import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -73,7 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
         const features = fields.map((field) => {
             const feature = {
-                type: "Feature",
+                type: "Feature" as const,
                 properties: {
                     b_id: field.b_id,
                     b_name: field.b_name,
@@ -117,21 +119,40 @@ export default function FarmAtlasFieldsBlock() {
 
     const id = "fieldsSaved"
     const fields = loaderData.savedFields
-    const viewState = getViewState(fields)
+    const initialViewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
+
+    const [viewState, setViewState] = useState<ViewState>(
+        initialViewState as ViewState,
+    )
+
+    const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
+        setViewState(event.viewState)
+    }, [])
 
     return (
         <>
             <MapGL
                 {...viewState}
-                style={{ height: "calc(100vh - 64px - 123px)", width: "100%" }}
+                style={{ height: "calc(100vh - 64px - 147px)", width: "100%" }}
                 interactive={true}
                 mapStyle={loaderData.mapboxStyle}
                 mapboxAccessToken={loaderData.mapboxToken}
                 interactiveLayerIds={[id]}
+                onMove={onViewportChange}
             >
-                <GeolocateControl />
-                <NavigationControl />
+                <Controls
+                    onViewportChange={({ longitude, latitude, zoom }) =>
+                        setViewState((currentViewState) => ({
+                            ...currentViewState,
+                            longitude,
+                            latitude,
+                            zoom,
+                            pitch: currentViewState.pitch, // Ensure pitch is carried over
+                            bearing: currentViewState.bearing, // Ensure bearing is carried over
+                        }))
+                    }
+                />
                 <FieldsSourceNotClickable id={id} fieldsData={fields}>
                     <Layer {...fieldsSavedStyle} />
                 </FieldsSourceNotClickable>

@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm"
 import { beforeAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     createDisplayUsername,
@@ -5,11 +6,10 @@ import {
     splitFullName,
     updateUserProfile,
 } from "./authentication"
-import type { FdmType } from "./fdm"
-import * as authNSchema from "./db/schema-authn"
-import { createFdmServer } from "./fdm-server"
-import { eq } from "drizzle-orm"
 import type { FdmAuth } from "./authentication.d"
+import * as authNSchema from "./db/schema-authn"
+import type { FdmType } from "./fdm"
+import { createFdmServer } from "./fdm-server"
 import { createId } from "./id"
 
 describe("createFdmAuth", () => {

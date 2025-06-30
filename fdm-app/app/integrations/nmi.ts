@@ -1,3 +1,4 @@
+import type { CurrentSoilData } from "@svenvw/fdm-core"
 import centroid from "@turf/centroid"
 import type { Feature, Geometry, Polygon } from "geojson"
 import { z } from "zod"
@@ -141,3 +142,140 @@ const soilParameterEstimatesSchema = z.object({
     b_gwl_class: z.string(),
     a_source: z.string(),
 })
+
+export async function extractSoilAnalysis(formData: FormData) {
+    const nmiApiKey = getNmiApiKey()
+
+    if (!nmiApiKey) {
+        throw new Error("NMI API key not configured")
+    }
+
+    // Validate that FormData contains a file
+    const file = formData.get("file") as File
+    if (!file || !(file instanceof File)) {
+        throw new Error("No file provided in FormData")
+    }
+
+    const responseApi = await fetch("https://api.nmi-agro.nl/soilreader", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${nmiApiKey}`,
+        },
+        body: formData,
+    })
+
+    if (!responseApi.ok) {
+        throw new Error("Request to NMI API failed")
+    }
+
+    const result = await responseApi.json()
+    const response = result.data
+
+    // Validate response structure
+    if (
+        !response.fields ||
+        !Array.isArray(response.fields) ||
+        response.fields.length === 0
+    ) {
+        throw new Error("Invalid API response: no fields found")
+    }
+
+    // Process the response
+    const field = response.fields[0]
+
+    // Select the a_* parameters
+    const soilAnalysis: { [key: string]: string | number | Date } = {}
+    for (const key of Object.keys(field).filter((key) =>
+        key.startsWith("a_"),
+    )) {
+        soilAnalysis[key] = field[key]
+    }
+
+    // Check if soil parameters are returned
+    if (Object.keys(soilAnalysis).length <= 1) {
+        // a_source is returned with invalid soil analysis
+        throw new Error("Invalid soil analysis")
+    }
+
+    // Process the other parameters
+    if (field.b_date) {
+        soilAnalysis.b_sampling_date = new Date(field.b_date)
+    }
+    if (field.b_soiltype_agr) {
+        soilAnalysis.b_soil_type = field.b_soiltype_agr
+    }
+    if (field.b_depth) {
+        const depthParts = field.b_depth.split("-")
+        if (depthParts.length !== 2) {
+            throw new Error(`Invalid depth format: ${field.b_depth}`)
+        }
+        soilAnalysis.a_depth_upper = Number(depthParts[0]) as number
+        soilAnalysis.a_depth_lower = Number(depthParts[1]) as number
+        // Validate that the conversion to numbers was successful
+        if (
+            Number.isNaN(soilAnalysis.a_depth_upper) ||
+            Number.isNaN(soilAnalysis.a_depth_lower)
+        ) {
+            throw new Error(`Invalid numeric depth values: ${field.b_depth}`)
+        }
+    }
+    return soilAnalysis
+}
+
+export async function getNutrientAdvice(
+    b_lu_catalogue: string,
+    b_centroid: [number, number],
+    currentSoilData: CurrentSoilData,
+) {
+    const nmiApiKey = getNmiApiKey()
+
+    if (!nmiApiKey) {
+        throw new Error("NMI API key not configured")
+    }
+
+    let a_nmin_cc_d30: number | undefined
+    let a_nmin_cc_d60: number | undefined
+    const soilData: Record<string, number | string> = {}
+    for (const item of currentSoilData) {
+        if (item.parameter === "a_nmin_cc") {
+            if (item.a_depth_lower <= 30) {
+                a_nmin_cc_d30 = item.value
+            } else if (item.a_depth_lower <= 60) {
+                a_nmin_cc_d60 = item.value
+            }
+        }
+        soilData[item.parameter] = item.value
+    }
+
+    // Create request body
+    const body = {
+        a_lon: b_centroid[0],
+        a_lat: b_centroid[1],
+        b_lu_brp: [b_lu_catalogue.split("_")[1]],
+        a_nmin_cc_d30: a_nmin_cc_d30,
+        a_nmin_cc_d60: a_nmin_cc_d60,
+        ...soilData,
+    }
+
+    // Send request to NMI API
+    const responseApi = await fetch(
+        "https://api.nmi-agro.nl/bemestingsplan/nutrients",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${nmiApiKey}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        },
+    )
+
+    if (!responseApi.ok) {
+        throw new Error("Request to NMI API failed")
+    }
+
+    const result = await responseApi.json()
+    const response = result.data.year
+
+    return response
+}

@@ -1,5 +1,16 @@
 # fdm-docs
 
+## 0.5.0
+
+### Minor Changes
+
+- bfcd788: Update database tables description to be up-to-date with the definitions in `fdm-core`
+- c865f44: Add documentation explaining ammonia-emission calculation in the nitrogen-balance section.
+
+### Patch Changes
+
+- 14e57e6: Update to react 19
+
 ## 0.4.0
 
 ### Minor Changes

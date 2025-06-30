@@ -1,5 +1,83 @@
 # Changelog fdm-app
 
+## 0.20.1
+
+### Patch Changes
+
+- 4e8c707: Fix showing emission values at nitrogen balance chart
+- f942466: Fix saving form when parameter is of type Date, not filled in and optional
+- Updated dependencies [ffd1b3e]
+- Updated dependencies [7c36ecc]
+- Updated dependencies [3e73281]
+  - @svenvw/fdm-data@0.14.1
+  - @svenvw/fdm-calculator@0.4.1
+  - @svenvw/fdm-core@0.22.1
+
+## 0.20.0
+
+### Minor Changes
+
+- b1301fa: Add nutrient advice as new application
+- f548dea: Add the ability to upload a pdf with a soil analysis, extract the values and save it
+- 3f79b0e: Display the application method for each fertilizer application in the list
+- 32aefb9: Add to interactive maps a search bar as control to lookup addresses and navigate them to
+- be6469f: Combine datepickers into a single component and include new features as dropdown selection of year and month and text input
+- 36803f1: Add a feature to select an existing fertilizer as a template for new fertilizers
+- 2fb2db3: Improve the design of the fertilizer form page by making it more intuitive and clear.
+- 5f9e9e0: Add an application-method field to the fertilizer-application form
+- c865f44: In the nitrogen balance, show the total amount of ammonia emitted and provide field-level details.
+- 6a42aa0: For new farms use the `baat` catalogue for fertilizers instead of `srm`
+
+### Patch Changes
+
+- c962751: Replace the `p_type_*` boolean flags with the unified `p_type` field across all fertilizer functions
+- 691af1d: Update and migrate to next version of radix-ui
+- 14e57e6: Update to tailwind v4
+- 14e57e6: Update to react 19
+- Updated dependencies [ce5ffa8]
+- Updated dependencies [b6721b4]
+- Updated dependencies [955f854]
+- Updated dependencies [093784b]
+- Updated dependencies [e37b6f0]
+- Updated dependencies [780e8c4]
+- Updated dependencies [ac05d8b]
+- Updated dependencies [7f95233]
+- Updated dependencies [5d0a80b]
+- Updated dependencies [a58b367]
+- Updated dependencies [afe2a32]
+- Updated dependencies [fbbdc57]
+- Updated dependencies [e6c0fa3]
+- Updated dependencies [2c6251c]
+- Updated dependencies [75693e4]
+- Updated dependencies [a898e30]
+  - @svenvw/fdm-core@0.22.0
+  - @svenvw/fdm-calculator@0.4.0
+  - @svenvw/fdm-data@0.14.0
+
+## 0.19.6
+
+### Patch Changes
+
+- f2b1fc6: Fixes redirects at harvest details page
+- Updated dependencies [94a82f6]
+  - @svenvw/fdm-calculator@0.3.3
+
+## 0.19.5
+
+### Patch Changes
+
+- a3ede17: Redirect all subdomains, except .dev, to original hostname
+
+## 0.19.4
+
+### Patch Changes
+
+- 59723e9: Make content parameters optional when adding a custom fertilizer
+- 3bd7ca5: Fix exception in fertilizer application form when no fertilizer is selected
+- 4c34442: Fix disabling of the update field form in the create farm wizard during submission
+- e199f76: Fix visibility of custom fertilizers in the fertilizer list
+- 3009a33: Fix exception in the update field form in the farm creation wizard
+
 ## 0.19.3
 
 ### Patch Changes

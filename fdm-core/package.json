@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.21.1",
+    "version": "0.22.1",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -27,7 +27,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "coverage": "dotenvx run -- vitest run --coverage",
         "db:generate-authn": "pnpm dlx @better-auth/cli generate --config /src/db/generator/authn.ts --output ./src/db/schema-authn.ts --y",
@@ -48,8 +50,8 @@
         "@rollup/plugin-node-resolve": "catalog:",
         "@rollup/plugin-terser": "catalog:",
         "@rollup/plugin-typescript": "catalog:",
-        "@svenvw/fdm-data": "workspace:^0.13.1",
-        "@types/node": "^22.15.23",
+        "@svenvw/fdm-data": "workspace:^0.14.1",
+        "@types/node": "^22.15.32",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.0",
@@ -62,7 +64,7 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.3.2",
+        "@electric-sql/pglite": "^0.3.3",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
@@ -71,7 +73,7 @@
         "postgres": "^3.4.7",
         "unique-username-generator": "^1.4.0"
     },
-    "packageManager": "pnpm@10.11.0",
+    "packageManager": "pnpm@10.12.1",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }
