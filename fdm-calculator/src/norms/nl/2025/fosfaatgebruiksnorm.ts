@@ -1,55 +1,36 @@
-import fosfaatNormsData from './fosfaatgebruiksnorm-data.json';
+import type { CultivationCatalogue, FdmType } from "@svenvw/fdm-core"
+import fosfaatNormsData from "./fosfaatgebruiksnorm-data.json"
+import type {
+    FosfaatGebruiksnormInput,
+    FosfaatGebruiksnormResult,
+    FosfaatKlasse,
+    FosfaatNorm,
+} from "./types.d"
 
 /**
- * Represents the phosphate usage norm values for a specific phosphate class,
- * differentiated by grassland and arable land.
+ * Determines if a cultivation is a type of grassland based on its catalogue entry.
+ * @param fdm - An initialized FdmType instance for data access.
+ * @param b_id_farm - The ID of the farm.
+ * @param b_lu_catalogue - The cultivation catalogue code.
+ * @returns A promise that resolves to a boolean.
  */
-interface FosfaatNorm {
-  grasland: number;
-  bouwland: number;
-}
+async function isCultivationGrasland(
+    fdm: FdmType,
+    b_id_farm: string,
+    b_lu_catalogue: string,
+): Promise<boolean> {
+    const cultivationDetails = await fdm.getCultivationsFromCatalogue({
+        b_id_farm,
+        search_term: b_lu_catalogue,
+    })
 
-/**
- * Defines the possible phosphate classes based on RVO's "Tabel Fosfaatgebruiksnormen 2025".
- * These classes are determined by P-CaCl2 and P-Al soil analysis values.
- */
-type FosfaatKlasse = 'Arm' | 'Laag' | 'Neutraal' | 'Ruim' | 'Hoog';
-
-/**
- * Defines the input parameters required for the `getNL2025FosfaatGebruiksNorm` function.
- */
-export interface FosfaatGebruiksnormInput {
-  /**
-   * A boolean indicating whether the land is classified as grassland (`true`) or arable land (`false`).
-   * This determines which set of norms (grasland or bouwland) to apply.
-   */
-  is_grasland: boolean;
-  /**
-   * The P-CaCl2 (also known as P-PAE) value from a recent soil analysis report (in mg P2O5 per kg soil).
-   * This value, along with `a_p_al`, is used to determine the soil's phosphate class.
-   */
-  a_p_cc: number;
-  /**
-   * The P-Al value from a recent soil analysis report (in mg P2O5 per kg soil).
-   * This value, along with `a_p_cc`, is used to determine the soil's phosphate class.
-   */
-  a_p_al: number;
-}
-
-/**
- * The result object returned by the `getNL2025FosfaatGebruiksNorm` function,
- * containing the determined phosphate usage norm and the corresponding phosphate class.
- */
-export interface FosfaatGebruiksnormResult {
-  /**
-   * The determined phosphate usage standard in kg P2O5 per hectare.
-   */
-  normValue: number;
-  /**
-   * The cultivation and phosphate class ('Arm', 'Laag', 'Neutraal', 'Ruim', 'Hoog')
-   * that was determined from the soil analysis values and used to derive the norm.
-   */
-  normSource: string
+    return cultivationDetails.some(
+        (c: Partial<CultivationCatalogue>) =>
+            c.type === "grasland" ||
+            c.type === "grasland_tijdelijk" ||
+            c.type === "gras" ||
+            c.type === "graszaad",
+    )
 }
 
 /**
@@ -65,59 +46,69 @@ export interface FosfaatGebruiksnormResult {
  * @returns The determined `FosfaatKlasse`.
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page)}
  */
-function getFosfaatKlasse(a_p_cc: number, a_p_al: number, is_grasland: boolean): FosfaatKlasse {
-  if (is_grasland) {
-    // Logic for Grasland (Table 1)
-    if (a_p_cc < 0.8) {
-      if (a_p_al < 21) return 'Arm';
-      if (a_p_al <= 45) return 'Laag';
-      if (a_p_al <= 55) return 'Neutraal';
-      return 'Ruim'; // a_p_al > 55
-    } else if (a_p_cc <= 1.4) {
-      if (a_p_al < 21) return 'Arm';
-      if (a_p_al <= 30) return 'Laag';
-      if (a_p_al <= 45) return 'Neutraal';
-      return 'Ruim'; // a_p_al > 45
-    } else if (a_p_cc <= 2.4) {
-      if (a_p_al < 21) return 'Laag';
-      if (a_p_al <= 30) return 'Neutraal';
-      if (a_p_al <= 55) return 'Ruim';
-      return 'Hoog'; // a_p_al > 55
-    } else if (a_p_cc <= 3.4) {
-      if (a_p_al < 21) return 'Neutraal';
-      if (a_p_al <= 45) return 'Ruim';
-      return 'Hoog'; // a_p_al > 45
-    } else { // a_p_cc > 3.4
-      if (a_p_al < 31) return 'Ruim';
-      return 'Hoog'; // a_p_al >= 31
+function getFosfaatKlasse(
+    a_p_cc: number,
+    a_p_al: number,
+    is_grasland: boolean,
+): FosfaatKlasse {
+    if (is_grasland) {
+        // Logic for Grasland (Table 1)
+        if (a_p_cc < 0.8) {
+            if (a_p_al < 21) return "Arm"
+            if (a_p_al <= 45) return "Laag"
+            if (a_p_al <= 55) return "Neutraal"
+            return "Ruim" // a_p_al > 55
+        }
+        if (a_p_cc <= 1.4) {
+            if (a_p_al < 21) return "Arm"
+            if (a_p_al <= 30) return "Laag"
+            if (a_p_al <= 45) return "Neutraal"
+            return "Ruim" // a_p_al > 45
+        }
+        if (a_p_cc <= 2.4) {
+            if (a_p_al < 21) return "Laag"
+            if (a_p_al <= 30) return "Neutraal"
+            if (a_p_al <= 55) return "Ruim"
+            return "Hoog" // a_p_al > 55
+        }
+        if (a_p_cc <= 3.4) {
+            if (a_p_al < 21) return "Neutraal"
+            if (a_p_al <= 45) return "Ruim"
+            return "Hoog" // a_p_al > 45
+        }
+        // a_p_cc > 3.4
+        if (a_p_al < 31) return "Ruim"
+        return "Hoog" // a_p_al >= 31
     }
-  } else {
+
     // Logic for Bouwland (Table 2)
     if (a_p_cc < 0.8) {
-      if (a_p_al < 46) return 'Arm';
-      return 'Laag'; // a_p_al >= 46
-    } else if (a_p_cc <= 1.4) {
-      if (a_p_al < 46) return 'Arm';
-      if (a_p_al <= 55) return 'Laag';
-      return 'Neutraal'; // a_p_al > 55
-    } else if (a_p_cc <= 2.4) {
-      if (a_p_al < 31) return 'Arm';
-      if (a_p_al <= 45) return 'Laag';
-      if (a_p_al <= 55) return 'Neutraal';
-      return 'Ruim'; // a_p_al > 55
-    } else if (a_p_cc <= 3.4) {
-      if (a_p_al < 21) return 'Arm';
-      if (a_p_al <= 30) return 'Laag';
-      if (a_p_al <= 45) return 'Neutraal';
-      if (a_p_al <= 55) return 'Ruim';
-      return 'Hoog'; // a_p_al > 55
-    } else { // a_p_cc > 3.4
-      if (a_p_al < 31) return 'Laag';
-      if (a_p_al <= 45) return 'Neutraal';
-      if (a_p_al <= 55) return 'Ruim';
-      return 'Hoog'; // a_p_al > 55
+        if (a_p_al < 46) return "Arm"
+        return "Laag" // a_p_al >= 46
     }
-  }
+    if (a_p_cc <= 1.4) {
+        if (a_p_al < 46) return "Arm"
+        if (a_p_al <= 55) return "Laag"
+        return "Neutraal" // a_p_al > 55
+    }
+    if (a_p_cc <= 2.4) {
+        if (a_p_al < 31) return "Arm"
+        if (a_p_al <= 45) return "Laag"
+        if (a_p_al <= 55) return "Neutraal"
+        return "Ruim" // a_p_al > 55
+    }
+    if (a_p_cc <= 3.4) {
+        if (a_p_al < 21) return "Arm"
+        if (a_p_al <= 30) return "Laag"
+        if (a_p_al <= 45) return "Neutraal"
+        if (a_p_al <= 55) return "Ruim"
+        return "Hoog" // a_p_al > 55
+    }
+    // a_p_cc > 3.4
+    if (a_p_al < 31) return "Laag"
+    if (a_p_al <= 45) return "Neutraal"
+    if (a_p_al <= 55) return "Ruim"
+    return "Hoog" // a_p_al > 55
 }
 
 /**
@@ -149,25 +140,35 @@ function getFosfaatKlasse(a_p_cc: number, a_p_al: number, is_grasland: boolean):
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond | RVO Fosfaat landbouwgrond (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2025)}
  */
-export function getNL2025FosfaatGebruiksNorm(
-  input: FosfaatGebruiksnormInput
-): FosfaatGebruiksnormResult | null {
-  const { is_grasland, a_p_cc, a_p_al } = input;
+export async function getNL2025FosfaatGebruiksNorm(
+    input: FosfaatGebruiksnormInput,
+): Promise<FosfaatGebruiksnormResult | null> {
+    const { fdm, b_id_farm, b_lu_catalogue, a_p_cc, a_p_al } = input
 
-  // Determine the phosphate class based on soil analysis values and land type.
-  const fosfaatKlasse = getFosfaatKlasse(a_p_cc, a_p_al, is_grasland);
+    const is_grasland = await isCultivationGrasland(
+        fdm,
+        b_id_farm,
+        b_lu_catalogue,
+    )
 
-  // Retrieve the base norms for the determined phosphate class.
-  const normsForKlasse = fosfaatNormsData[fosfaatKlasse];
+    // Determine the phosphate class based on soil analysis values and land type.
+    const fosfaatKlasse = getFosfaatKlasse(a_p_cc, a_p_al, is_grasland)
 
-  if (!normsForKlasse) {
-    console.warn(`No phosphate norms found for class ${fosfaatKlasse}.`);
-    return null;
-  }
+    // Retrieve the base norms for the determined phosphate class.
+    const normsForKlasse = fosfaatNormsData[fosfaatKlasse]
 
-  // Select the specific norm based on whether it's grassland or arable land.
-  const normValue = is_grasland ? normsForKlasse.grasland : normsForKlasse.bouwland;
-  const normSource = is_grasland ? `Grasland: ${fosfaatKlasse}}` : `Bouwland: ${fosfaatKlasse}`;
+    if (!normsForKlasse) {
+        console.warn(`No phosphate norms found for class ${fosfaatKlasse}.`)
+        return null
+    }
 
-  return { normValue, normSource };
+    // Select the specific norm based on whether it's grassland or arable land.
+    const normValue = is_grasland
+        ? normsForKlasse.grasland
+        : normsForKlasse.bouwland
+    const normSource = is_grasland
+        ? `Grasland: ${fosfaatKlasse}}`
+        : `Bouwland: ${fosfaatKlasse}`
+
+    return { normValue, normSource }
 }

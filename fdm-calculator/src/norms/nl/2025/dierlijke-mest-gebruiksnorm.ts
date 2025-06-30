@@ -1,34 +1,21 @@
-/**
- * Defines the input parameters required for the `getNL2025DierlijkeMestGebruiksNorm` function.
- */
-export interface DierlijkeMestGebruiksnormInput {
-  /**
-   * A boolean indicating whether the farm has a derogation permit for 2025.
-   * Farms with derogation may have higher animal manure nitrogen norms.
-   */
-  is_derogatie_bedrijf: boolean;
-  /**
-   * A boolean indicating whether the specific parcel of land is located within a
-   * Nutriënt-Verontreinigd Gebied (NV-gebied). NV-areas have specific, often lower,
-   * derogation norms.
-   */
-  is_nv_gebied: boolean;
-}
+import type { Field } from "@svenvw/fdm-core"
+import type {
+    DierlijkeMestGebruiksnormInput,
+    DierlijkeMestGebruiksnormResult,
+} from "./types.d"
 
 /**
- * The result object returned by the `getNL2025DierlijkeMestGebruiksNorm` function,
- * containing the determined animal manure nitrogen usage norm and its source.
+ * Placeholder function to determine if a field is in an NV-area.
+ * In a real implementation, this would perform a spatial query.
+ * @param _field - The field object, containing geometry or centroid.
+ * @returns A promise that resolves to a boolean.
  */
-export interface DierlijkeMestGebruiksnormResult {
-  /**
-   * The determined usage standard for nitrogen from animal manure in kg N per hectare.
-   */
-  normValue: number;
-  /**
-   * A descriptive string indicating which rule or category was applied to determine the norm.
-   * Examples: "Standaard", "Derogatie - NV Gebied", "Derogatie - Buiten NV Gebied".
-   */
-  normSource: string;
+async function isFieldInNVGebied(
+    _field: Pick<Field, "b_id" | "b_centroid">,
+): Promise<boolean> {
+    // This function would typically use a service to check if the field's coordinates
+    // fall within a designated NV-area. For now, it returns a default value.
+    return Promise.resolve(false)
 }
 
 /**
@@ -57,26 +44,28 @@ export interface DierlijkeMestGebruiksnormResult {
  * @see {@link https://www.rvo.nl/onderwerpen/mest/derogatie | RVO Derogatie (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/met-nutrienten-verontreinigde-gebieden-nv-gebieden | RVO Met nutriënten verontreinigde gebieden (NV-gebieden) (official page)}
  */
-export function getNL2025DierlijkeMestGebruiksNorm(
-  input: DierlijkeMestGebruiksnormInput
-): DierlijkeMestGebruiksnormResult {
-  const { is_derogatie_bedrijf, is_nv_gebied } = input;
+export async function getNL2025DierlijkeMestGebruiksNorm(
+    input: DierlijkeMestGebruiksnormInput,
+): Promise<DierlijkeMestGebruiksnormResult> {
+    const { is_derogatie_bedrijf, field } = input
 
-  let normValue: number;
-  let normSource: string;
+    const is_nv_gebied = await isFieldInNVGebied(field)
 
-  if (is_derogatie_bedrijf) {
-    if (is_nv_gebied) {
-      normValue = 190;
-      normSource = "Derogatie - NV Gebied";
+    let normValue: number
+    let normSource: string
+
+    if (is_derogatie_bedrijf) {
+        if (is_nv_gebied) {
+            normValue = 190
+            normSource = "Derogatie - NV Gebied"
+        } else {
+            normValue = 200
+            normSource = "Derogatie - Buiten NV Gebied"
+        }
     } else {
-      normValue = 200;
-      normSource = "Derogatie - Buiten NV Gebied";
+        normValue = 170
+        normSource = "Standaard"
     }
-  } else {
-    normValue = 170;
-    normSource = "Standaard";
-  }
 
-  return { normValue, normSource };
+    return { normValue, normSource }
 }
