@@ -1,7 +1,7 @@
 import type { Field } from "@svenvw/fdm-core"
 import type {
-    DierlijkeMestGebruiksnormInput,
     DierlijkeMestGebruiksnormResult,
+    NL2025NormsInput,
 } from "./types.d"
 
 /**
@@ -45,9 +45,10 @@ async function isFieldInNVGebied(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/met-nutrienten-verontreinigde-gebieden-nv-gebieden | RVO Met nutriënten verontreinigde gebieden (NV-gebieden) (official page)}
  */
 export async function getNL2025DierlijkeMestGebruiksNorm(
-    input: DierlijkeMestGebruiksnormInput,
+    input: NL2025NormsInput,
 ): Promise<DierlijkeMestGebruiksnormResult> {
-    const { is_derogatie_bedrijf, field } = input
+    const is_derogatie_bedrijf = input. farm.is_derogatie_bedrijf || false
+    const field = input.field
 
     const is_nv_gebied = await isFieldInNVGebied(field)
 
@@ -64,7 +65,7 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
         }
     } else {
         normValue = 170
-        normSource = "Standaard"
+        normSource = "Geen derogatie"
     }
 
     return { normValue, normSource }

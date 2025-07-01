@@ -9,25 +9,10 @@ import type {
 /**
  * Represents the collected input for a single cultivation, required for NL 2025 norm calculations.
  */
-export type NL2025NormsInputForCultivation = {
-    /** The cultivation record from fdm-core. */
-    cultivation: Pick<
-        Cultivation,
-        "b_lu" | "b_lu_catalogue" | "b_lu_start" | "b_lu_end" | "b_lu_variety"
-    >
-    /** The most recent soil analysis data available before the start of the cultivation. */
-    soilAnalysis?: Pick<SoilAnalysis, "a_p_cc" | "a_p_al">
-}
-
-/**
- * Represents all the norm-related inputs for a single field.
- */
-export type NL2025NormsInputForField = {
-    /** The field record from fdm-core, including its ID and centroid for location-based checks. */
-    field: Pick<Field, "b_id" | "b_centroid">
-    /** An array of all cultivations on the field with their required norm inputs. */
-    cultivations: NL2025NormsInputForCultivation[]
-}
+export type NL2025NormsInputForCultivation = Pick<
+    Cultivation,
+    "b_lu" | "b_lu_catalogue" | "b_lu_start" | "b_lu_end" | "b_lu_variety"
+>
 
 /**
  * Represents the complete set of inputs required to calculate all NL 2025 norms for a given farm.
@@ -37,23 +22,12 @@ export type NL2025NormsInput = {
     farm: {
         is_derogatie_bedrijf: boolean
     }
-    /** An array of all fields belonging to the farm, each with their detailed norm inputs. */
-    fields: NL2025NormsInputForField[]
-}
-
-/**
- * Defines the input parameters required for the `getNL2025DierlijkeMestGebruiksNorm` function.
- */
-export interface DierlijkeMestGebruiksnormInput {
-    /**
-     * A boolean indicating whether the farm has a derogation permit for 2025.
-     * Farms with derogation may have higher animal manure nitrogen norms.
-     */
-    is_derogatie_bedrijf: boolean
-    /**
-     * The field for which the norm is being calculated. The centroid is used to determine if it's in an NV-area.
-     */
+    /** The field record from fdm-core, including its ID and centroid for location-based checks. */
     field: Pick<Field, "b_id" | "b_centroid">
+    /** An array of all cultivations on the field with their required norm inputs. */
+    cultivations: NL2025NormsInputForCultivation[]
+    /** The most recent soil analysis data available before the start of the cultivation. */
+    soilAnalysis: Pick<SoilAnalysis, "a_p_cc" | "a_p_al">
 }
 
 /**
@@ -86,28 +60,6 @@ export interface FosfaatNorm {
  * These classes are determined by P-CaCl2 and P-Al soil analysis values.
  */
 export type FosfaatKlasse = "Arm" | "Laag" | "Neutraal" | "Ruim" | "Hoog"
-
-/**
- * Defines the input parameters required for the `getNL2025FosfaatGebruiksNorm` function.
- */
-export interface FosfaatGebruiksnormInput {
-    /** An initialized FdmType instance for data access. */
-    fdm: FdmType
-    /** The ID of the farm to which the cultivation belongs. */
-    b_id_farm: string
-    /** The cultivation catalogue code, used to determine if it's grassland. */
-    b_lu_catalogue: string
-    /**
-     * The P-CaCl2 (also known as P-PAE) value from a recent soil analysis report (in mg P2O5 per kg soil).
-     * This value, along with `a_p_al`, is used to determine the soil's phosphate class.
-     */
-    a_p_cc: number
-    /**
-     * The P-Al value from a recent soil analysis report (in mg P2O5 per kg soil).
-     * This value, along with `a_p_cc`, is used to determine the soil's phosphate class.
-     */
-    a_p_al: number
-}
 
 /**
  * The result object returned by the `getNL2025FosfaatGebruiksNorm` function,
@@ -167,7 +119,7 @@ export interface NitrogenStandard {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
         zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
+        loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
     /**
@@ -185,7 +137,7 @@ export interface NitrogenStandard {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
         zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
+        loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
     /**
@@ -195,7 +147,7 @@ export interface NitrogenStandard {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
         zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
+        loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
     /**
@@ -205,7 +157,7 @@ export interface NitrogenStandard {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
         zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
+        loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
     /**
@@ -216,7 +168,7 @@ export interface NitrogenStandard {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
         zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
+        loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
     /**
@@ -227,7 +179,7 @@ export interface NitrogenStandard {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
         zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
+        loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
     /**
@@ -245,7 +197,7 @@ export interface NitrogenStandard {
             klei: { standard: number; nv_area: number }
             zand_nwc: { standard: number; nv_area: number }
             zand_zuid: { standard: number; nv_area: number }
-            loss: { standard: number; nv_area: number }
+            loess: { standard: number; nv_area: number }
             veen: { standard: number; nv_area: number }
         }
         // Note: winterteelt properties are removed from the top-level NitrogenStandard
@@ -254,14 +206,14 @@ export interface NitrogenStandard {
             klei: { standard: number; nv_area: number }
             zand_nwc: { standard: number; nv_area: number }
             zand_zuid: { standard: number; nv_area: number }
-            loss: { standard: number; nv_area: number }
+            loess: { standard: number; nv_area: number }
             veen: { standard: number; nv_area: number }
         }
         winterteelt_na_31_12?: {
             klei: { standard: number; nv_area: number }
             zand_nwc: { standard: number; nv_area: number }
             zand_zuid: { standard: number; nv_area: number }
-            loss: { standard: number; nv_area: number }
+            loess: { standard: number; nv_area: number }
             veen: { standard: number; nv_area: number }
         }
     }>
@@ -270,7 +222,7 @@ export interface NitrogenStandard {
 /**
  * Defines the valid keys for different soil regions in the Netherlands.
  */
-export type RegionKey = "klei" | "zand_nwc" | "zand_zuid" | "loss" | "veen"
+export type RegionKey = "klei" | "zand_nwc" | "zand_zuid" | "loess" | "veen"
 
 /**
  * A utility type to represent nitrogen norms structured by region.
@@ -293,12 +245,4 @@ export interface GebruiksnormResult {
      * that was used to determine the legal limit.
      */
     normSource: string
-}
-
-export interface StikstofGebruiksnormInput {
-    b_lu_catalogue: string
-    field: Pick<Field, "b_id" | "b_centroid">
-    b_lu_end: Date
-    b_lu_variety?: string
-    is_derogatie_bedrijf?: boolean
 }

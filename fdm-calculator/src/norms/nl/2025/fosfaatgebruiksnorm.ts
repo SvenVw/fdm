@@ -1,36 +1,24 @@
-import type { CultivationCatalogue, FdmType } from "@svenvw/fdm-core"
 import fosfaatNormsData from "./fosfaatgebruiksnorm-data.json"
+import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import type {
-    FosfaatGebruiksnormInput,
     FosfaatGebruiksnormResult,
     FosfaatKlasse,
-    FosfaatNorm,
+    NL2025NormsInput,
 } from "./types.d"
 
 /**
  * Determines if a cultivation is a type of grassland based on its catalogue entry.
- * @param fdm - An initialized FdmType instance for data access.
- * @param b_id_farm - The ID of the farm.
  * @param b_lu_catalogue - The cultivation catalogue code.
  * @returns A promise that resolves to a boolean.
  */
-async function isCultivationGrasland(
-    fdm: FdmType,
-    b_id_farm: string,
-    b_lu_catalogue: string,
-): Promise<boolean> {
-    const cultivationDetails = await fdm.getCultivationsFromCatalogue({
-        b_id_farm,
-        search_term: b_lu_catalogue,
-    })
+async function isCultivationGrasland(b_lu_catalogue: string): Promise<boolean> {
+    const graslandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
-    return cultivationDetails.some(
-        (c: Partial<CultivationCatalogue>) =>
-            c.type === "grasland" ||
-            c.type === "grasland_tijdelijk" ||
-            c.type === "gras" ||
-            c.type === "graszaad",
-    )
+    if (graslandCodes.includes(b_lu_catalogue)) {
+        return true
+    }
+
+    return false
 }
 
 /**
@@ -141,15 +129,20 @@ function getFosfaatKlasse(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2025)}
  */
 export async function getNL2025FosfaatGebruiksNorm(
-    input: FosfaatGebruiksnormInput,
+    input: NL2025NormsInput,
 ): Promise<FosfaatGebruiksnormResult | null> {
-    const { fdm, b_id_farm, b_lu_catalogue, a_p_cc, a_p_al } = input
+    const cultivations = input.cultivations
+    const a_p_cc = input.soilAnalysis.a_p_cc
+    const a_p_al = input.soilAnalysis.a_p_al
 
-    const is_grasland = await isCultivationGrasland(
-        fdm,
-        b_id_farm,
-        b_lu_catalogue,
-    )
+    if (!a_p_al || !a_p_cc) {
+        throw new Error(
+            "Missing soil analysis data for NL 2025 Fosfaatgebruiksnorm",
+        )
+    }
+
+    const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
+    const is_grasland = await isCultivationGrasland(b_lu_catalogue)
 
     // Determine the phosphate class based on soil analysis values and land type.
     const fosfaatKlasse = getFosfaatKlasse(a_p_cc, a_p_al, is_grasland)

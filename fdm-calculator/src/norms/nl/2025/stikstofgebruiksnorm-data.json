@@ -7,7 +7,7 @@
             "klei": { "standard": 345, "nv_area": 276 },
             "zand_nwc": { "standard": 250, "nv_area": 200 },
             "zand_zuid": { "standard": 250, "nv_area": 200 },
-            "loss": { "standard": 250, "nv_area": 200 },
+            "loess": { "standard": 250, "nv_area": 200 },
             "veen": { "standard": 265, "nv_area": 212 }
         }
     },
@@ -19,7 +19,7 @@
             "klei": { "standard": 385, "nv_area": 308 },
             "zand_nwc": { "standard": 320, "nv_area": 256 },
             "zand_zuid": { "standard": 320, "nv_area": 256 },
-            "loss": { "standard": 320, "nv_area": 256 },
+            "loess": { "standard": 320, "nv_area": 256 },
             "veen": { "standard": 300, "nv_area": 240 }
         }
     },
@@ -38,7 +38,7 @@
                     "klei": { "standard": 60, "nv_area": 48 },
                     "zand_nwc": { "standard": 50, "nv_area": 40 },
                     "zand_zuid": { "standard": 50, "nv_area": 40 },
-                    "loss": { "standard": 50, "nv_area": 40 },
+                    "loess": { "standard": 50, "nv_area": 40 },
                     "veen": { "standard": 50, "nv_area": 40 }
                 }
             },
@@ -52,7 +52,7 @@
                     "klei": { "standard": 110, "nv_area": 88 },
                     "zand_nwc": { "standard": 90, "nv_area": 72 },
                     "zand_zuid": { "standard": 90, "nv_area": 72 },
-                    "loss": { "standard": 90, "nv_area": 72 },
+                    "loess": { "standard": 90, "nv_area": 72 },
                     "veen": { "standard": 90, "nv_area": 72 }
                 }
             },
@@ -66,7 +66,7 @@
                     "klei": { "standard": 250, "nv_area": 200 },
                     "zand_nwc": { "standard": 210, "nv_area": 168 },
                     "zand_zuid": { "standard": 210, "nv_area": 168 },
-                    "loss": { "standard": 210, "nv_area": 168 },
+                    "loess": { "standard": 210, "nv_area": 168 },
                     "veen": { "standard": 210, "nv_area": 168 }
                 }
             },
@@ -80,7 +80,7 @@
                     "klei": { "standard": 280, "nv_area": 224 },
                     "zand_nwc": { "standard": 235, "nv_area": 188 },
                     "zand_zuid": { "standard": 235, "nv_area": 188 },
-                    "loss": { "standard": 235, "nv_area": 188 },
+                    "loess": { "standard": 235, "nv_area": 188 },
                     "veen": { "standard": 235, "nv_area": 188 }
                 }
             },
@@ -94,7 +94,7 @@
                     "klei": { "standard": 310, "nv_area": 248 },
                     "zand_nwc": { "standard": 250, "nv_area": 200 },
                     "zand_zuid": { "standard": 250, "nv_area": 200 },
-                    "loss": { "standard": 250, "nv_area": 200 },
+                    "loess": { "standard": 250, "nv_area": 200 },
                     "veen": { "standard": 265, "nv_area": 212 }
                 }
             },
@@ -108,7 +108,7 @@
                     "klei": { "standard": 310, "nv_area": 248 },
                     "zand_nwc": { "standard": 250, "nv_area": 200 },
                     "zand_zuid": { "standard": 250, "nv_area": 200 },
-                    "loss": { "standard": 250, "nv_area": 200 },
+                    "loess": { "standard": 250, "nv_area": 200 },
                     "veen": { "standard": 265, "nv_area": 212 }
                 }
             },
@@ -122,7 +122,7 @@
                     "klei": { "standard": 280, "nv_area": 224 },
                     "zand_nwc": { "standard": 235, "nv_area": 188 },
                     "zand_zuid": { "standard": 235, "nv_area": 188 },
-                    "loss": { "standard": 235, "nv_area": 188 },
+                    "loess": { "standard": 235, "nv_area": 188 },
                     "veen": { "standard": 235, "nv_area": 188 }
                 }
             },
@@ -136,7 +136,7 @@
                     "klei": { "standard": 95, "nv_area": 76 },
                     "zand_nwc": { "standard": 80, "nv_area": 64 },
                     "zand_zuid": { "standard": 80, "nv_area": 64 },
-                    "loss": { "standard": 80, "nv_area": 64 },
+                    "loess": { "standard": 80, "nv_area": 64 },
                     "veen": { "standard": 80, "nv_area": 64 }
                 }
             },
@@ -150,7 +150,7 @@
                     "klei": { "standard": 30, "nv_area": 24 },
                     "zand_nwc": { "standard": 25, "nv_area": 20 },
                     "zand_zuid": { "standard": 25, "nv_area": 20 },
-                    "loss": { "standard": 25, "nv_area": 20 },
+                    "loess": { "standard": 25, "nv_area": 20 },
                     "veen": { "standard": 25, "nv_area": 20 }
                 }
             },
@@ -164,7 +164,7 @@
                     "klei": { "standard": 0, "nv_area": 0 },
                     "zand_nwc": { "standard": 0, "nv_area": 0 },
                     "zand_zuid": { "standard": 0, "nv_area": 0 },
-                    "loss": { "standard": 0, "nv_area": 0 },
+                    "loess": { "standard": 0, "nv_area": 0 },
                     "veen": { "standard": 0, "nv_area": 0 }
                 }
             }
@@ -241,21 +241,21 @@
             "klei": { "standard": 275, "nv_area": 220 },
             "zand_nwc": { "standard": 260, "nv_area": 208 },
             "zand_zuid": { "standard": 208, "nv_area": 166 },
-            "loss": { "standard": 204, "nv_area": 163 },
+            "loess": { "standard": 204, "nv_area": 163 },
             "veen": { "standard": 270, "nv_area": 216 }
         },
         "norms_lage_norm": {
             "klei": { "standard": 225, "nv_area": 180 },
             "zand_nwc": { "standard": 210, "nv_area": 168 },
             "zand_zuid": { "standard": 168, "nv_area": 134 },
-            "loss": { "standard": 164, "nv_area": 131 },
+            "loess": { "standard": 164, "nv_area": 131 },
             "veen": { "standard": 220, "nv_area": 176 }
         },
         "norms_overig": {
             "klei": { "standard": 250, "nv_area": 200 },
             "zand_nwc": { "standard": 235, "nv_area": 188 },
             "zand_zuid": { "standard": 188, "nv_area": 150 },
-            "loss": { "standard": 184, "nv_area": 147 },
+            "loess": { "standard": 184, "nv_area": 147 },
             "veen": { "standard": 245, "nv_area": 196 }
         }
     },
@@ -267,7 +267,7 @@
             "klei": { "standard": 120, "nv_area": 96 },
             "zand_nwc": { "standard": 120, "nv_area": 96 },
             "zand_zuid": { "standard": 96, "nv_area": 77 },
-            "loss": { "standard": 96, "nv_area": 77 },
+            "loess": { "standard": 96, "nv_area": 77 },
             "veen": { "standard": 120, "nv_area": 96 }
         }
     },
@@ -343,21 +343,21 @@
             "klei": { "standard": 140, "nv_area": 112 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         },
         "norms_lage_norm": {
             "klei": { "standard": 100, "nv_area": 80 },
             "zand_nwc": { "standard": 100, "nv_area": 80 },
             "zand_zuid": { "standard": 100, "nv_area": 80 },
-            "loss": { "standard": 100, "nv_area": 80 },
+            "loess": { "standard": 100, "nv_area": 80 },
             "veen": { "standard": 100, "nv_area": 80 }
         },
         "norms_overig": {
             "klei": { "standard": 120, "nv_area": 96 },
             "zand_nwc": { "standard": 120, "nv_area": 96 },
             "zand_zuid": { "standard": 120, "nv_area": 96 },
-            "loss": { "standard": 120, "nv_area": 96 },
+            "loess": { "standard": 120, "nv_area": 96 },
             "veen": { "standard": 120, "nv_area": 96 }
         }
     },
@@ -376,7 +376,7 @@
             "klei": { "standard": 180, "nv_area": 144 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 165, "nv_area": 132 },
-            "loss": { "standard": 165, "nv_area": 132 },
+            "loess": { "standard": 165, "nv_area": 132 },
             "veen": { "standard": 170, "nv_area": 136 }
         }
     },
@@ -388,7 +388,7 @@
             "klei": { "standard": 240, "nv_area": 192 },
             "zand_nwc": { "standard": 230, "nv_area": 184 },
             "zand_zuid": { "standard": 184, "nv_area": 147 },
-            "loss": { "standard": 184, "nv_area": 147 },
+            "loess": { "standard": 184, "nv_area": 147 },
             "veen": { "standard": 230, "nv_area": 184 }
         }
     },
@@ -400,7 +400,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 145, "nv_area": 116 },
             "zand_zuid": { "standard": 116, "nv_area": 93 },
-            "loss": { "standard": 116, "nv_area": 93 },
+            "loess": { "standard": 116, "nv_area": 93 },
             "veen": { "standard": 145, "nv_area": 116 }
         }
     },
@@ -412,7 +412,7 @@
             "klei": { "standard": 70, "nv_area": 56 },
             "zand_nwc": { "standard": 70, "nv_area": 56 },
             "zand_zuid": { "standard": 70, "nv_area": 56 },
-            "loss": { "standard": 70, "nv_area": 56 },
+            "loess": { "standard": 70, "nv_area": 56 },
             "veen": { "standard": 70, "nv_area": 56 }
         }
     },
@@ -424,7 +424,7 @@
             "klei": { "standard": 165, "nv_area": 132 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 132, "nv_area": 106 },
-            "loss": { "standard": 132, "nv_area": 106 },
+            "loess": { "standard": 132, "nv_area": 106 },
             "veen": { "standard": 165, "nv_area": 132 }
         }
     },
@@ -436,7 +436,7 @@
             "klei": { "standard": 245, "nv_area": 196 },
             "zand_nwc": { "standard": 160, "nv_area": 128 },
             "zand_zuid": { "standard": 160, "nv_area": 128 },
-            "loss": { "standard": 190, "nv_area": 152 },
+            "loess": { "standard": 190, "nv_area": 152 },
             "veen": { "standard": 160, "nv_area": 128 }
         }
     },
@@ -448,7 +448,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -460,7 +460,7 @@
             "klei": { "standard": 140, "nv_area": 112 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -472,7 +472,7 @@
             "klei": { "standard": 80, "nv_area": 64 },
             "zand_nwc": { "standard": 80, "nv_area": 64 },
             "zand_zuid": { "standard": 80, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 80, "nv_area": 64 }
         }
     },
@@ -484,7 +484,7 @@
             "klei": { "standard": 160, "nv_area": 128 },
             "zand_nwc": { "standard": 150, "nv_area": 120 },
             "zand_zuid": { "standard": 120, "nv_area": 96 },
-            "loss": { "standard": 120, "nv_area": 96 },
+            "loess": { "standard": 120, "nv_area": 96 },
             "veen": { "standard": 150, "nv_area": 120 }
         }
     },
@@ -496,7 +496,7 @@
             "klei": { "standard": 140, "nv_area": 112 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -508,7 +508,7 @@
             "klei": { "standard": 100, "nv_area": 80 },
             "zand_nwc": { "standard": 100, "nv_area": 80 },
             "zand_zuid": { "standard": 100, "nv_area": 80 },
-            "loss": { "standard": 100, "nv_area": 80 },
+            "loess": { "standard": 100, "nv_area": 80 },
             "veen": { "standard": 100, "nv_area": 80 }
         }
     },
@@ -526,14 +526,14 @@
             "klei": { "standard": 160, "nv_area": 128 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 112, "nv_area": 90 },
-            "loss": { "standard": 112, "nv_area": 90 },
+            "loess": { "standard": 112, "nv_area": 90 },
             "veen": { "standard": 150, "nv_area": 120 }
         },
         "non_derogatie_norms": {
             "klei": { "standard": 185, "nv_area": 148 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 112, "nv_area": 90 },
-            "loss": { "standard": 112, "nv_area": 90 },
+            "loess": { "standard": 112, "nv_area": 90 },
             "veen": { "standard": 150, "nv_area": 120 }
         }
     },
@@ -548,7 +548,7 @@
                     "klei": { "standard": 40, "nv_area": 32 },
                     "zand_nwc": { "standard": 40, "nv_area": 32 },
                     "zand_zuid": { "standard": 40, "nv_area": 32 },
-                    "loss": { "standard": 40, "nv_area": 32 },
+                    "loess": { "standard": 40, "nv_area": 32 },
                     "veen": { "standard": 40, "nv_area": 32 }
                 }
             },
@@ -558,7 +558,7 @@
                     "klei": { "standard": 0, "nv_area": 0 },
                     "zand_nwc": { "standard": 0, "nv_area": 0 },
                     "zand_zuid": { "standard": 0, "nv_area": 0 },
-                    "loss": { "standard": 0, "nv_area": 0 },
+                    "loess": { "standard": 0, "nv_area": 0 },
                     "veen": { "standard": 0, "nv_area": 0 }
                 }
             }
@@ -575,7 +575,7 @@
                     "klei": { "standard": 30, "nv_area": 24 },
                     "zand_nwc": { "standard": 25, "nv_area": 20 },
                     "zand_zuid": { "standard": 25, "nv_area": 20 },
-                    "loss": { "standard": 25, "nv_area": 20 },
+                    "loess": { "standard": 25, "nv_area": 20 },
                     "veen": { "standard": 25, "nv_area": 20 }
                 }
             },
@@ -585,7 +585,7 @@
                     "klei": { "standard": 310, "nv_area": 248 },
                     "zand_nwc": { "standard": 250, "nv_area": 200 },
                     "zand_zuid": { "standard": 250, "nv_area": 200 },
-                    "loss": { "standard": 250, "nv_area": 200 },
+                    "loess": { "standard": 250, "nv_area": 200 },
                     "veen": { "standard": 265, "nv_area": 212 }
                 }
             }
@@ -609,7 +609,7 @@
                     "klei": { "standard": 165, "nv_area": 132 },
                     "zand_nwc": { "standard": 150, "nv_area": 120 },
                     "zand_zuid": { "standard": 120, "nv_area": 96 },
-                    "loss": { "standard": 120, "nv_area": 96 },
+                    "loess": { "standard": 120, "nv_area": 96 },
                     "veen": { "standard": 155, "nv_area": 124 }
                 }
             },
@@ -619,7 +619,7 @@
                     "klei": { "standard": 200, "nv_area": 160 },
                     "zand_nwc": { "standard": 185, "nv_area": 148 },
                     "zand_zuid": { "standard": 148, "nv_area": 118 },
-                    "loss": { "standard": 148, "nv_area": 118 },
+                    "loess": { "standard": 148, "nv_area": 118 },
                     "veen": { "standard": 190, "nv_area": 152 }
                 }
             }
@@ -639,7 +639,7 @@
             "klei": { "standard": 140, "nv_area": 112 },
             "zand_nwc": { "standard": 130, "nv_area": 104 },
             "zand_zuid": { "standard": 104, "nv_area": 83 },
-            "loss": { "standard": 104, "nv_area": 83 },
+            "loess": { "standard": 104, "nv_area": 83 },
             "veen": { "standard": 135, "nv_area": 108 }
         }
     },
@@ -657,7 +657,7 @@
             "klei": { "standard": 60, "nv_area": 48 },
             "zand_nwc": { "standard": 50, "nv_area": 40 },
             "zand_zuid": { "standard": 40, "nv_area": 32 },
-            "loss": { "standard": 40, "nv_area": 32 },
+            "loess": { "standard": 40, "nv_area": 32 },
             "veen": { "standard": 55, "nv_area": 44 }
         }
     },
@@ -675,7 +675,7 @@
             "klei": { "standard": 130, "nv_area": 104 },
             "zand_nwc": { "standard": 110, "nv_area": 80 },
             "zand_zuid": { "standard": 100, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 105, "nv_area": 84 }
         }
     },
@@ -693,7 +693,7 @@
             "klei": { "standard": 60, "nv_area": 48 },
             "zand_nwc": { "standard": 50, "nv_area": 40 },
             "zand_zuid": { "standard": 40, "nv_area": 32 },
-            "loss": { "standard": 40, "nv_area": 32 },
+            "loess": { "standard": 40, "nv_area": 32 },
             "veen": { "standard": 55, "nv_area": 44 }
         }
     },
@@ -714,7 +714,7 @@
                     "klei": { "standard": 85, "nv_area": 68 },
                     "zand_nwc": { "standard": 75, "nv_area": 60 },
                     "zand_zuid": { "standard": 60, "nv_area": 48 },
-                    "loss": { "standard": 60, "nv_area": 48 },
+                    "loess": { "standard": 60, "nv_area": 48 },
                     "veen": { "standard": 80, "nv_area": 64 }
                 }
             },
@@ -724,7 +724,7 @@
                     "klei": { "standard": 115, "nv_area": 92 },
                     "zand_nwc": { "standard": 105, "nv_area": 84 },
                     "zand_zuid": { "standard": 84, "nv_area": 67 },
-                    "loss": { "standard": 84, "nv_area": 67 },
+                    "loess": { "standard": 84, "nv_area": 67 },
                     "veen": { "standard": 110, "nv_area": 88 }
                 }
             }
@@ -747,7 +747,7 @@
                     "klei": { "standard": 35, "nv_area": 28 },
                     "zand_nwc": { "standard": 35, "nv_area": 28 },
                     "zand_zuid": { "standard": 28, "nv_area": 22 },
-                    "loss": { "standard": 28, "nv_area": 22 },
+                    "loess": { "standard": 28, "nv_area": 22 },
                     "veen": { "standard": 35, "nv_area": 28 }
                 }
             },
@@ -757,7 +757,7 @@
                     "klei": { "standard": 45, "nv_area": 36 },
                     "zand_nwc": { "standard": 45, "nv_area": 36 },
                     "zand_zuid": { "standard": 36, "nv_area": 29 },
-                    "loss": { "standard": 36, "nv_area": 29 },
+                    "loess": { "standard": 36, "nv_area": 29 },
                     "veen": { "standard": 45, "nv_area": 36 }
                 }
             }
@@ -771,7 +771,7 @@
             "klei": { "standard": 110, "nv_area": 88 },
             "zand_nwc": { "standard": 100, "nv_area": 80 },
             "zand_zuid": { "standard": 80, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 105, "nv_area": 84 }
         }
     },
@@ -783,7 +783,7 @@
             "klei": { "standard": 130, "nv_area": 104 },
             "zand_nwc": { "standard": 120, "nv_area": 96 },
             "zand_zuid": { "standard": 96, "nv_area": 77 },
-            "loss": { "standard": 96, "nv_area": 77 },
+            "loess": { "standard": 96, "nv_area": 77 },
             "veen": { "standard": 125, "nv_area": 100 }
         }
     },
@@ -802,7 +802,7 @@
             "klei": { "standard": 90, "nv_area": 72 },
             "zand_nwc": { "standard": 80, "nv_area": 64 },
             "zand_zuid": { "standard": 64, "nv_area": 51 },
-            "loss": { "standard": 64, "nv_area": 51 },
+            "loess": { "standard": 64, "nv_area": 51 },
             "veen": { "standard": 85, "nv_area": 68 }
         }
     },
@@ -814,7 +814,7 @@
             "klei": { "standard": 45, "nv_area": 36 },
             "zand_nwc": { "standard": 45, "nv_area": 36 },
             "zand_zuid": { "standard": 36, "nv_area": 29 },
-            "loss": { "standard": 36, "nv_area": 29 },
+            "loess": { "standard": 36, "nv_area": 29 },
             "veen": { "standard": 45, "nv_area": 36 }
         }
     },
@@ -826,7 +826,7 @@
             "klei": { "standard": 340, "nv_area": 272 },
             "zand_nwc": { "standard": 340, "nv_area": 272 },
             "zand_zuid": { "standard": 272, "nv_area": 218 },
-            "loss": { "standard": 272, "nv_area": 218 },
+            "loess": { "standard": 272, "nv_area": 218 },
             "veen": { "standard": 340, "nv_area": 272 }
         }
     },
@@ -838,7 +838,7 @@
             "klei": { "standard": 170, "nv_area": 136 },
             "zand_nwc": { "standard": 120, "nv_area": 96 },
             "zand_zuid": { "standard": 120, "nv_area": 96 },
-            "loss": { "standard": 120, "nv_area": 96 },
+            "loess": { "standard": 120, "nv_area": 96 },
             "veen": { "standard": 120, "nv_area": 96 }
         }
     },
@@ -850,7 +850,7 @@
             "klei": { "standard": 120, "nv_area": 96 },
             "zand_nwc": { "standard": 120, "nv_area": 96 },
             "zand_zuid": { "standard": 120, "nv_area": 96 },
-            "loss": { "standard": 120, "nv_area": 96 },
+            "loess": { "standard": 120, "nv_area": 96 },
             "veen": { "standard": 120, "nv_area": 96 }
         }
     },
@@ -862,7 +862,7 @@
             "klei": { "standard": 110, "nv_area": 88 },
             "zand_nwc": { "standard": 100, "nv_area": 80 },
             "zand_zuid": { "standard": 80, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 105, "nv_area": 84 }
         }
     },
@@ -874,7 +874,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 112, "nv_area": 90 },
-            "loss": { "standard": 112, "nv_area": 90 },
+            "loess": { "standard": 112, "nv_area": 90 },
             "veen": { "standard": 145, "nv_area": 116 }
         }
     },
@@ -889,7 +889,7 @@
                     "klei": { "standard": 205, "nv_area": 164 },
                     "zand_nwc": { "standard": 190, "nv_area": 152 },
                     "zand_zuid": { "standard": 152, "nv_area": 122 },
-                    "loss": { "standard": 152, "nv_area": 122 },
+                    "loess": { "standard": 152, "nv_area": 122 },
                     "veen": { "standard": 195, "nv_area": 156 }
                 }
             },
@@ -899,7 +899,7 @@
                     "klei": { "standard": 120, "nv_area": 96 },
                     "zand_nwc": { "standard": 120, "nv_area": 96 },
                     "zand_zuid": { "standard": 96, "nv_area": 77 },
-                    "loss": { "standard": 96, "nv_area": 77 },
+                    "loess": { "standard": 96, "nv_area": 77 },
                     "veen": { "standard": 120, "nv_area": 96 }
                 }
             }
@@ -913,7 +913,7 @@
             "klei": { "standard": 70, "nv_area": 56 },
             "zand_nwc": { "standard": 70, "nv_area": 56 },
             "zand_zuid": { "standard": 56, "nv_area": 45 },
-            "loss": { "standard": 56, "nv_area": 45 },
+            "loess": { "standard": 56, "nv_area": 45 },
             "veen": { "standard": 70, "nv_area": 56 }
         }
     },
@@ -933,7 +933,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 185, "nv_area": 148 },
             "zand_zuid": { "standard": 148, "nv_area": 118 },
-            "loss": { "standard": 148, "nv_area": 118 },
+            "loess": { "standard": 148, "nv_area": 118 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -948,7 +948,7 @@
                     "klei": { "standard": 260, "nv_area": 208 },
                     "zand_nwc": { "standard": 190, "nv_area": 152 },
                     "zand_zuid": { "standard": 152, "nv_area": 122 },
-                    "loss": { "standard": 152, "nv_area": 122 },
+                    "loess": { "standard": 152, "nv_area": 122 },
                     "veen": { "standard": 200, "nv_area": 160 }
                 }
             },
@@ -958,7 +958,7 @@
                     "klei": { "standard": 185, "nv_area": 148 },
                     "zand_nwc": { "standard": 145, "nv_area": 116 },
                     "zand_zuid": { "standard": 116, "nv_area": 93 },
-                    "loss": { "standard": 116, "nv_area": 93 },
+                    "loess": { "standard": 116, "nv_area": 93 },
                     "veen": { "standard": 150, "nv_area": 120 }
                 }
             }
@@ -972,7 +972,7 @@
             "klei": { "standard": 185, "nv_area": 148 },
             "zand_nwc": { "standard": 145, "nv_area": 116 },
             "zand_zuid": { "standard": 116, "nv_area": 93 },
-            "loss": { "standard": 116, "nv_area": 93 },
+            "loess": { "standard": 116, "nv_area": 93 },
             "veen": { "standard": 150, "nv_area": 120 }
         }
     },
@@ -995,7 +995,7 @@
                     "klei": { "standard": 180, "nv_area": 144 },
                     "zand_nwc": { "standard": 165, "nv_area": 132 },
                     "zand_zuid": { "standard": 132, "nv_area": 106 },
-                    "loss": { "standard": 132, "nv_area": 106 },
+                    "loess": { "standard": 132, "nv_area": 106 },
                     "veen": { "standard": 170, "nv_area": 136 }
                 }
             },
@@ -1005,7 +1005,7 @@
                     "klei": { "standard": 105, "nv_area": 84 },
                     "zand_nwc": { "standard": 105, "nv_area": 84 },
                     "zand_zuid": { "standard": 84, "nv_area": 67 },
-                    "loss": { "standard": 84, "nv_area": 67 },
+                    "loess": { "standard": 84, "nv_area": 67 },
                     "veen": { "standard": 105, "nv_area": 84 }
                 }
             }
@@ -1019,7 +1019,7 @@
             "klei": { "standard": 180, "nv_area": 144 },
             "zand_nwc": { "standard": 170, "nv_area": 136 },
             "zand_zuid": { "standard": 136, "nv_area": 109 },
-            "loss": { "standard": 136, "nv_area": 109 },
+            "loess": { "standard": 136, "nv_area": 109 },
             "veen": { "standard": 170, "nv_area": 136 }
         }
     },
@@ -1034,7 +1034,7 @@
                     "klei": { "standard": 180, "nv_area": 144 },
                     "zand_nwc": { "standard": 170, "nv_area": 136 },
                     "zand_zuid": { "standard": 136, "nv_area": 109 },
-                    "loss": { "standard": 136, "nv_area": 109 },
+                    "loess": { "standard": 136, "nv_area": 109 },
                     "veen": { "standard": 170, "nv_area": 136 }
                 }
             },
@@ -1044,7 +1044,7 @@
                     "klei": { "standard": 90, "nv_area": 72 },
                     "zand_nwc": { "standard": 90, "nv_area": 72 },
                     "zand_zuid": { "standard": 72, "nv_area": 58 },
-                    "loss": { "standard": 72, "nv_area": 58 },
+                    "loess": { "standard": 72, "nv_area": 58 },
                     "veen": { "standard": 90, "nv_area": 72 }
                 }
             }
@@ -1058,7 +1058,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 185, "nv_area": 148 },
             "zand_zuid": { "standard": 148, "nv_area": 118 },
-            "loss": { "standard": 148, "nv_area": 118 },
+            "loess": { "standard": 148, "nv_area": 118 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -1077,7 +1077,7 @@
             "klei": { "standard": 245, "nv_area": 196 },
             "zand_nwc": { "standard": 225, "nv_area": 180 },
             "zand_zuid": { "standard": 180, "nv_area": 144 },
-            "loss": { "standard": 180, "nv_area": 144 },
+            "loess": { "standard": 180, "nv_area": 144 },
             "veen": { "standard": 235, "nv_area": 188 }
         }
     },
@@ -1092,7 +1092,7 @@
                     "klei": { "standard": 150, "nv_area": 120 },
                     "zand_nwc": { "standard": 140, "nv_area": 112 },
                     "zand_zuid": { "standard": 112, "nv_area": 90 },
-                    "loss": { "standard": 112, "nv_area": 90 },
+                    "loess": { "standard": 112, "nv_area": 90 },
                     "veen": { "standard": 145, "nv_area": 116 }
                 }
             },
@@ -1102,7 +1102,7 @@
                     "klei": { "standard": 275, "nv_area": 220 },
                     "zand_nwc": { "standard": 250, "nv_area": 200 },
                     "zand_zuid": { "standard": 200, "nv_area": 160 },
-                    "loss": { "standard": 200, "nv_area": 160 },
+                    "loess": { "standard": 200, "nv_area": 160 },
                     "veen": { "standard": 260, "nv_area": 208 }
                 }
             }
@@ -1116,7 +1116,7 @@
             "klei": { "standard": 290, "nv_area": 232 },
             "zand_nwc": { "standard": 265, "nv_area": 212 },
             "zand_zuid": { "standard": 212, "nv_area": 170 },
-            "loss": { "standard": 212, "nv_area": 170 },
+            "loess": { "standard": 212, "nv_area": 170 },
             "veen": { "standard": 275, "nv_area": 220 }
         }
     },
@@ -1128,7 +1128,7 @@
             "klei": { "standard": 320, "nv_area": 256 },
             "zand_nwc": { "standard": 290, "nv_area": 232 },
             "zand_zuid": { "standard": 232, "nv_area": 186 },
-            "loss": { "standard": 232, "nv_area": 186 },
+            "loess": { "standard": 232, "nv_area": 186 },
             "veen": { "standard": 305, "nv_area": 244 }
         }
     },
@@ -1140,7 +1140,7 @@
             "klei": { "standard": 285, "nv_area": 228 },
             "zand_nwc": { "standard": 260, "nv_area": 208 },
             "zand_zuid": { "standard": 208, "nv_area": 166 },
-            "loss": { "standard": 208, "nv_area": 166 },
+            "loess": { "standard": 208, "nv_area": 166 },
             "veen": { "standard": 270, "nv_area": 216 }
         }
     },
@@ -1152,7 +1152,7 @@
             "klei": { "standard": 285, "nv_area": 228 },
             "zand_nwc": { "standard": 260, "nv_area": 208 },
             "zand_zuid": { "standard": 208, "nv_area": 166 },
-            "loss": { "standard": 208, "nv_area": 166 },
+            "loess": { "standard": 208, "nv_area": 166 },
             "veen": { "standard": 270, "nv_area": 216 }
         }
     },
@@ -1164,7 +1164,7 @@
             "klei": { "standard": 285, "nv_area": 228 },
             "zand_nwc": { "standard": 260, "nv_area": 208 },
             "zand_zuid": { "standard": 208, "nv_area": 166 },
-            "loss": { "standard": 208, "nv_area": 166 },
+            "loess": { "standard": 208, "nv_area": 166 },
             "veen": { "standard": 270, "nv_area": 216 }
         }
     },
@@ -1183,7 +1183,7 @@
             "klei": { "standard": 230, "nv_area": 184 },
             "zand_nwc": { "standard": 210, "nv_area": 168 },
             "zand_zuid": { "standard": 168, "nv_area": 134 },
-            "loss": { "standard": 168, "nv_area": 134 },
+            "loess": { "standard": 168, "nv_area": 134 },
             "veen": { "standard": 220, "nv_area": 176 }
         }
     },
@@ -1195,7 +1195,7 @@
             "klei": { "standard": 270, "nv_area": 216 },
             "zand_nwc": { "standard": 235, "nv_area": 188 },
             "zand_zuid": { "standard": 188, "nv_area": 150 },
-            "loss": { "standard": 188, "nv_area": 150 },
+            "loess": { "standard": 188, "nv_area": 150 },
             "veen": { "standard": 245, "nv_area": 196 }
         }
     },
@@ -1207,7 +1207,7 @@
             "klei": { "standard": 180, "nv_area": 144 },
             "zand_nwc": { "standard": 155, "nv_area": 124 },
             "zand_zuid": { "standard": 124, "nv_area": 99 },
-            "loss": { "standard": 124, "nv_area": 99 },
+            "loess": { "standard": 124, "nv_area": 99 },
             "veen": { "standard": 160, "nv_area": 128 }
         }
     },
@@ -1219,7 +1219,7 @@
             "klei": { "standard": 170, "nv_area": 136 },
             "zand_nwc": { "standard": 155, "nv_area": 124 },
             "zand_zuid": { "standard": 124, "nv_area": 99 },
-            "loss": { "standard": 124, "nv_area": 99 },
+            "loess": { "standard": 124, "nv_area": 99 },
             "veen": { "standard": 160, "nv_area": 128 }
         }
     },
@@ -1231,7 +1231,7 @@
             "klei": { "standard": 180, "nv_area": 144 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 132, "nv_area": 106 },
-            "loss": { "standard": 132, "nv_area": 106 },
+            "loess": { "standard": 132, "nv_area": 106 },
             "veen": { "standard": 170, "nv_area": 136 }
         }
     },
@@ -1243,7 +1243,7 @@
             "klei": { "standard": 140, "nv_area": 112 },
             "zand_nwc": { "standard": 130, "nv_area": 104 },
             "zand_zuid": { "standard": 104, "nv_area": 83 },
-            "loss": { "standard": 104, "nv_area": 83 },
+            "loess": { "standard": 104, "nv_area": 83 },
             "veen": { "standard": 135, "nv_area": 108 }
         }
     },
@@ -1258,7 +1258,7 @@
                     "klei": { "standard": 150, "nv_area": 120 },
                     "zand_nwc": { "standard": 140, "nv_area": 112 },
                     "zand_zuid": { "standard": 112, "nv_area": 90 },
-                    "loss": { "standard": 112, "nv_area": 90 },
+                    "loess": { "standard": 112, "nv_area": 90 },
                     "veen": { "standard": 145, "nv_area": 116 }
                 }
             },
@@ -1268,7 +1268,7 @@
                     "klei": { "standard": 275, "nv_area": 220 },
                     "zand_nwc": { "standard": 250, "nv_area": 200 },
                     "zand_zuid": { "standard": 200, "nv_area": 160 },
-                    "loss": { "standard": 200, "nv_area": 160 },
+                    "loess": { "standard": 200, "nv_area": 160 },
                     "veen": { "standard": 260, "nv_area": 208 }
                 }
             },
@@ -1278,7 +1278,7 @@
                     "klei": { "standard": 200, "nv_area": 160 },
                     "zand_nwc": { "standard": 185, "nv_area": 148 },
                     "zand_zuid": { "standard": 148, "nv_area": 118 },
-                    "loss": { "standard": 148, "nv_area": 118 },
+                    "loess": { "standard": 148, "nv_area": 118 },
                     "veen": { "standard": 190, "nv_area": 152 }
                 }
             },
@@ -1288,7 +1288,7 @@
                     "klei": { "standard": 100, "nv_area": 80 },
                     "zand_nwc": { "standard": 90, "nv_area": 72 },
                     "zand_zuid": { "standard": 72, "nv_area": 58 },
-                    "loss": { "standard": 72, "nv_area": 58 },
+                    "loess": { "standard": 72, "nv_area": 58 },
                     "veen": { "standard": 95, "nv_area": 76 }
                 }
             }
@@ -1314,7 +1314,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 112, "nv_area": 90 },
-            "loss": { "standard": 112, "nv_area": 90 },
+            "loess": { "standard": 112, "nv_area": 90 },
             "veen": { "standard": 145, "nv_area": 116 }
         }
     },
@@ -1326,7 +1326,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 185, "nv_area": 148 },
             "zand_zuid": { "standard": 148, "nv_area": 118 },
-            "loss": { "standard": 148, "nv_area": 118 },
+            "loess": { "standard": 148, "nv_area": 118 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -1338,7 +1338,7 @@
             "klei": { "standard": 100, "nv_area": 80 },
             "zand_nwc": { "standard": 90, "nv_area": 72 },
             "zand_zuid": { "standard": 72, "nv_area": 58 },
-            "loss": { "standard": 72, "nv_area": 58 },
+            "loess": { "standard": 72, "nv_area": 58 },
             "veen": { "standard": 95, "nv_area": 76 }
         }
     },
@@ -1350,7 +1350,7 @@
             "klei": { "standard": 120, "nv_area": 96 },
             "zand_nwc": { "standard": 110, "nv_area": 88 },
             "zand_zuid": { "standard": 88, "nv_area": 70 },
-            "loss": { "standard": 88, "nv_area": 70 },
+            "loess": { "standard": 88, "nv_area": 70 },
             "veen": { "standard": 115, "nv_area": 92 }
         }
     },
@@ -1362,7 +1362,7 @@
             "klei": { "standard": 170, "nv_area": 136 },
             "zand_nwc": { "standard": 155, "nv_area": 124 },
             "zand_zuid": { "standard": 124, "nv_area": 99 },
-            "loss": { "standard": 124, "nv_area": 99 },
+            "loess": { "standard": 124, "nv_area": 99 },
             "veen": { "standard": 160, "nv_area": 128 }
         }
     },
@@ -1385,7 +1385,7 @@
             "klei": { "standard": 190, "nv_area": 152 },
             "zand_nwc": { "standard": 175, "nv_area": 140 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 180, "nv_area": 144 }
         }
     },
@@ -1397,7 +1397,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 185, "nv_area": 148 },
             "zand_zuid": { "standard": 148, "nv_area": 118 },
-            "loss": { "standard": 148, "nv_area": 118 },
+            "loess": { "standard": 148, "nv_area": 118 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -1409,7 +1409,7 @@
             "klei": { "standard": 120, "nv_area": 96 },
             "zand_nwc": { "standard": 110, "nv_area": 88 },
             "zand_zuid": { "standard": 88, "nv_area": 70 },
-            "loss": { "standard": 88, "nv_area": 70 },
+            "loess": { "standard": 88, "nv_area": 70 },
             "veen": { "standard": 115, "nv_area": 92 }
         }
     },
@@ -1421,7 +1421,7 @@
             "klei": { "standard": 135, "nv_area": 108 },
             "zand_nwc": { "standard": 135, "nv_area": 108 },
             "zand_zuid": { "standard": 108, "nv_area": 86 },
-            "loss": { "standard": 108, "nv_area": 86 },
+            "loess": { "standard": 108, "nv_area": 86 },
             "veen": { "standard": 135, "nv_area": 108 }
         }
     },
@@ -1439,7 +1439,7 @@
             "klei": { "standard": 50, "nv_area": 40 },
             "zand_nwc": { "standard": 50, "nv_area": 40 },
             "zand_zuid": { "standard": 40, "nv_area": 32 },
-            "loss": { "standard": 40, "nv_area": 32 },
+            "loess": { "standard": 40, "nv_area": 32 },
             "veen": { "standard": 50, "nv_area": 40 }
         }
     },
@@ -1451,7 +1451,7 @@
             "klei": { "standard": 75, "nv_area": 60 },
             "zand_nwc": { "standard": 75, "nv_area": 60 },
             "zand_zuid": { "standard": 75, "nv_area": 60 },
-            "loss": { "standard": 75, "nv_area": 60 },
+            "loess": { "standard": 75, "nv_area": 60 },
             "veen": { "standard": 75, "nv_area": 60 }
         }
     },
@@ -1463,7 +1463,7 @@
             "klei": { "standard": 30, "nv_area": 24 },
             "zand_nwc": { "standard": 30, "nv_area": 24 },
             "zand_zuid": { "standard": 30, "nv_area": 24 },
-            "loss": { "standard": 30, "nv_area": 24 },
+            "loess": { "standard": 30, "nv_area": 24 },
             "veen": { "standard": 30, "nv_area": 24 }
         }
     },
@@ -1475,7 +1475,7 @@
             "klei": { "standard": 90, "nv_area": 72 },
             "zand_nwc": { "standard": 85, "nv_area": 68 },
             "zand_zuid": { "standard": 68, "nv_area": 54 },
-            "loss": { "standard": 68, "nv_area": 54 },
+            "loess": { "standard": 68, "nv_area": 54 },
             "veen": { "standard": 85, "nv_area": 68 }
         }
     },
@@ -1487,7 +1487,7 @@
             "klei": { "standard": 85, "nv_area": 68 },
             "zand_nwc": { "standard": 75, "nv_area": 60 },
             "zand_zuid": { "standard": 60, "nv_area": 48 },
-            "loss": { "standard": 60, "nv_area": 48 },
+            "loess": { "standard": 60, "nv_area": 48 },
             "veen": { "standard": 80, "nv_area": 64 }
         }
     },
@@ -1499,7 +1499,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 185, "nv_area": 148 },
             "zand_zuid": { "standard": 148, "nv_area": 118 },
-            "loss": { "standard": 148, "nv_area": 118 },
+            "loess": { "standard": 148, "nv_area": 118 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -1511,7 +1511,7 @@
             "klei": { "standard": 180, "nv_area": 144 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 132, "nv_area": 106 },
-            "loss": { "standard": 132, "nv_area": 106 },
+            "loess": { "standard": 132, "nv_area": 106 },
             "veen": { "standard": 170, "nv_area": 136 }
         }
     },
@@ -1523,7 +1523,7 @@
             "klei": { "standard": 170, "nv_area": 136 },
             "zand_nwc": { "standard": 155, "nv_area": 124 },
             "zand_zuid": { "standard": 124, "nv_area": 99 },
-            "loss": { "standard": 124, "nv_area": 99 },
+            "loess": { "standard": 124, "nv_area": 99 },
             "veen": { "standard": 160, "nv_area": 128 }
         }
     },
@@ -1535,7 +1535,7 @@
             "klei": { "standard": 180, "nv_area": 144 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 132, "nv_area": 106 },
-            "loss": { "standard": 132, "nv_area": 106 },
+            "loess": { "standard": 132, "nv_area": 106 },
             "veen": { "standard": 170, "nv_area": 136 }
         }
     },
@@ -1547,7 +1547,7 @@
             "klei": { "standard": 185, "nv_area": 148 },
             "zand_nwc": { "standard": 170, "nv_area": 136 },
             "zand_zuid": { "standard": 136, "nv_area": 109 },
-            "loss": { "standard": 136, "nv_area": 109 },
+            "loess": { "standard": 136, "nv_area": 109 },
             "veen": { "standard": 175, "nv_area": 140 }
         }
     },
@@ -1559,7 +1559,7 @@
             "klei": { "standard": 110, "nv_area": 88 },
             "zand_nwc": { "standard": 110, "nv_area": 88 },
             "zand_zuid": { "standard": 110, "nv_area": 88 },
-            "loss": { "standard": 110, "nv_area": 88 },
+            "loess": { "standard": 110, "nv_area": 88 },
             "veen": { "standard": 110, "nv_area": 88 }
         }
     },
@@ -1571,7 +1571,7 @@
             "klei": { "standard": 50, "nv_area": 40 },
             "zand_nwc": { "standard": 50, "nv_area": 40 },
             "zand_zuid": { "standard": 50, "nv_area": 40 },
-            "loss": { "standard": 50, "nv_area": 40 },
+            "loess": { "standard": 50, "nv_area": 40 },
             "veen": { "standard": 50, "nv_area": 40 }
         }
     },
@@ -1583,7 +1583,7 @@
             "klei": { "standard": 250, "nv_area": 200 },
             "zand_nwc": { "standard": 230, "nv_area": 184 },
             "zand_zuid": { "standard": 184, "nv_area": 147 },
-            "loss": { "standard": 184, "nv_area": 147 },
+            "loess": { "standard": 184, "nv_area": 147 },
             "veen": { "standard": 240, "nv_area": 192 }
         }
     },
@@ -1595,7 +1595,7 @@
             "klei": { "standard": 80, "nv_area": 64 },
             "zand_nwc": { "standard": 80, "nv_area": 64 },
             "zand_zuid": { "standard": 64, "nv_area": 51 },
-            "loss": { "standard": 64, "nv_area": 51 },
+            "loess": { "standard": 64, "nv_area": 51 },
             "veen": { "standard": 80, "nv_area": 64 }
         }
     },
@@ -1607,7 +1607,7 @@
             "klei": { "standard": 170, "nv_area": 136 },
             "zand_nwc": { "standard": 170, "nv_area": 136 },
             "zand_zuid": { "standard": 170, "nv_area": 136 },
-            "loss": { "standard": 170, "nv_area": 136 },
+            "loess": { "standard": 170, "nv_area": 136 },
             "veen": { "standard": 170, "nv_area": 136 }
         }
     },
@@ -1619,7 +1619,7 @@
             "klei": { "standard": 100, "nv_area": 80 },
             "zand_nwc": { "standard": 100, "nv_area": 80 },
             "zand_zuid": { "standard": 100, "nv_area": 80 },
-            "loss": { "standard": 100, "nv_area": 80 },
+            "loess": { "standard": 100, "nv_area": 80 },
             "veen": { "standard": 100, "nv_area": 80 }
         }
     },
@@ -1639,7 +1639,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 185, "nv_area": 148 },
             "zand_zuid": { "standard": 148, "nv_area": 118 },
-            "loss": { "standard": 148, "nv_area": 118 },
+            "loess": { "standard": 148, "nv_area": 118 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -1664,7 +1664,7 @@
             "klei": { "standard": 60, "nv_area": 48 },
             "zand_nwc": { "standard": 50, "nv_area": 40 },
             "zand_zuid": { "standard": 50, "nv_area": 40 },
-            "loss": { "standard": 50, "nv_area": 40 },
+            "loess": { "standard": 50, "nv_area": 40 },
             "veen": { "standard": 60, "nv_area": 48 }
         }
     },
@@ -1694,7 +1694,7 @@
             "klei": { "standard": 0, "nv_area": 0 },
             "zand_nwc": { "standard": 0, "nv_area": 0 },
             "zand_zuid": { "standard": 0, "nv_area": 0 },
-            "loss": { "standard": 0, "nv_area": 0 },
+            "loess": { "standard": 0, "nv_area": 0 },
             "veen": { "standard": 0, "nv_area": 0 }
         }
     },
@@ -1706,7 +1706,7 @@
             "klei": { "standard": 60, "nv_area": 48 },
             "zand_nwc": { "standard": 50, "nv_area": 40 },
             "zand_zuid": { "standard": 50, "nv_area": 40 },
-            "loss": { "standard": 50, "nv_area": 40 },
+            "loess": { "standard": 50, "nv_area": 40 },
             "veen": { "standard": 60, "nv_area": 48 }
         }
     },
@@ -1718,7 +1718,7 @@
             "klei": { "standard": 255, "nv_area": 204 },
             "zand_nwc": { "standard": 240, "nv_area": 192 },
             "zand_zuid": { "standard": 240, "nv_area": 192 },
-            "loss": { "standard": 240, "nv_area": 192 },
+            "loess": { "standard": 240, "nv_area": 192 },
             "veen": { "standard": 240, "nv_area": 192 }
         }
     },
@@ -1730,7 +1730,7 @@
             "klei": { "standard": 130, "nv_area": 104 },
             "zand_nwc": { "standard": 125, "nv_area": 100 },
             "zand_zuid": { "standard": 125, "nv_area": 100 },
-            "loss": { "standard": 125, "nv_area": 100 },
+            "loess": { "standard": 125, "nv_area": 100 },
             "veen": { "standard": 125, "nv_area": 100 }
         }
     },
@@ -1742,7 +1742,7 @@
             "klei": { "standard": 135, "nv_area": 108 },
             "zand_nwc": { "standard": 130, "nv_area": 104 },
             "zand_zuid": { "standard": 130, "nv_area": 104 },
-            "loss": { "standard": 130, "nv_area": 104 },
+            "loess": { "standard": 130, "nv_area": 104 },
             "veen": { "standard": 130, "nv_area": 104 }
         }
     },
@@ -1761,7 +1761,7 @@
             "klei": { "standard": 220, "nv_area": 176 },
             "zand_nwc": { "standard": 210, "nv_area": 168 },
             "zand_zuid": { "standard": 210, "nv_area": 168 },
-            "loss": { "standard": 210, "nv_area": 168 },
+            "loess": { "standard": 210, "nv_area": 168 },
             "veen": { "standard": 210, "nv_area": 168 }
         }
     },
@@ -1782,7 +1782,7 @@
                     "klei": { "standard": 170, "nv_area": 136 },
                     "zand_nwc": { "standard": 160, "nv_area": 128 },
                     "zand_zuid": { "standard": 160, "nv_area": 128 },
-                    "loss": { "standard": 160, "nv_area": 128 },
+                    "loess": { "standard": 160, "nv_area": 128 },
                     "veen": { "standard": 160, "nv_area": 128 }
                 }
             },
@@ -1792,7 +1792,7 @@
                     "klei": { "standard": 140, "nv_area": 112 },
                     "zand_nwc": { "standard": 135, "nv_area": 108 },
                     "zand_zuid": { "standard": 135, "nv_area": 108 },
-                    "loss": { "standard": 135, "nv_area": 108 },
+                    "loess": { "standard": 135, "nv_area": 108 },
                     "veen": { "standard": 135, "nv_area": 108 }
                 }
             }
@@ -1809,7 +1809,7 @@
                     "klei": { "standard": 175, "nv_area": 140 },
                     "zand_nwc": { "standard": 165, "nv_area": 132 },
                     "zand_zuid": { "standard": 165, "nv_area": 132 },
-                    "loss": { "standard": 165, "nv_area": 132 },
+                    "loess": { "standard": 165, "nv_area": 132 },
                     "veen": { "standard": 165, "nv_area": 132 }
                 }
             },
@@ -1819,7 +1819,7 @@
                     "klei": { "standard": 90, "nv_area": 72 },
                     "zand_nwc": { "standard": 85, "nv_area": 68 },
                     "zand_zuid": { "standard": 85, "nv_area": 68 },
-                    "loss": { "standard": 85, "nv_area": 68 },
+                    "loess": { "standard": 85, "nv_area": 68 },
                     "veen": { "standard": 85, "nv_area": 68 }
                 }
             }
@@ -1833,7 +1833,7 @@
             "klei": { "standard": 145, "nv_area": 116 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -1845,7 +1845,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 190, "nv_area": 152 },
             "zand_zuid": { "standard": 190, "nv_area": 152 },
-            "loss": { "standard": 190, "nv_area": 152 },
+            "loess": { "standard": 190, "nv_area": 152 },
             "veen": { "standard": 190, "nv_area": 152 }
         }
     },
@@ -1857,7 +1857,7 @@
             "klei": { "standard": 110, "nv_area": 88 },
             "zand_nwc": { "standard": 105, "nv_area": 84 },
             "zand_zuid": { "standard": 105, "nv_area": 84 },
-            "loss": { "standard": 105, "nv_area": 84 },
+            "loess": { "standard": 105, "nv_area": 84 },
             "veen": { "standard": 105, "nv_area": 84 }
         }
     },
@@ -1872,7 +1872,7 @@
                     "klei": { "standard": 260, "nv_area": 208 },
                     "zand_nwc": { "standard": 245, "nv_area": 196 },
                     "zand_zuid": { "standard": 245, "nv_area": 196 },
-                    "loss": { "standard": 245, "nv_area": 196 },
+                    "loess": { "standard": 245, "nv_area": 196 },
                     "veen": { "standard": 245, "nv_area": 196 }
                 }
             },
@@ -1882,7 +1882,7 @@
                     "klei": { "standard": 190, "nv_area": 152 },
                     "zand_nwc": { "standard": 180, "nv_area": 144 },
                     "zand_zuid": { "standard": 180, "nv_area": 144 },
-                    "loss": { "standard": 180, "nv_area": 144 },
+                    "loess": { "standard": 180, "nv_area": 144 },
                     "veen": { "standard": 180, "nv_area": 144 }
                 }
             }
@@ -1896,7 +1896,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 145, "nv_area": 116 },
             "zand_zuid": { "standard": 145, "nv_area": 116 },
-            "loss": { "standard": 145, "nv_area": 116 },
+            "loess": { "standard": 145, "nv_area": 116 },
             "veen": { "standard": 145, "nv_area": 116 }
         }
     },
@@ -1908,7 +1908,7 @@
             "klei": { "standard": 155, "nv_area": 124 },
             "zand_nwc": { "standard": 145, "nv_area": 116 },
             "zand_zuid": { "standard": 145, "nv_area": 116 },
-            "loss": { "standard": 145, "nv_area": 116 },
+            "loess": { "standard": 145, "nv_area": 116 },
             "veen": { "standard": 145, "nv_area": 116 }
         }
     },
@@ -1920,7 +1920,7 @@
             "klei": { "standard": 120, "nv_area": 96 },
             "zand_nwc": { "standard": 120, "nv_area": 96 },
             "zand_zuid": { "standard": 120, "nv_area": 96 },
-            "loss": { "standard": 120, "nv_area": 96 },
+            "loess": { "standard": 120, "nv_area": 96 },
             "veen": { "standard": 120, "nv_area": 96 }
         }
     },
@@ -1953,7 +1953,7 @@
             "klei": { "standard": 165, "nv_area": 132 },
             "zand_nwc": { "standard": 155, "nv_area": 124 },
             "zand_zuid": { "standard": 155, "nv_area": 124 },
-            "loss": { "standard": 155, "nv_area": 124 },
+            "loess": { "standard": 155, "nv_area": 124 },
             "veen": { "standard": 155, "nv_area": 124 }
         }
     },
@@ -1965,7 +1965,7 @@
             "klei": { "standard": 175, "nv_area": 140 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 165, "nv_area": 132 },
-            "loss": { "standard": 165, "nv_area": 132 },
+            "loess": { "standard": 165, "nv_area": 132 },
             "veen": { "standard": 165, "nv_area": 132 }
         }
     },
@@ -1977,7 +1977,7 @@
             "klei": { "standard": 100, "nv_area": 80 },
             "zand_nwc": { "standard": 95, "nv_area": 76 },
             "zand_zuid": { "standard": 95, "nv_area": 76 },
-            "loss": { "standard": 95, "nv_area": 76 },
+            "loess": { "standard": 95, "nv_area": 76 },
             "veen": { "standard": 95, "nv_area": 76 }
         }
     },
@@ -1989,7 +1989,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -2001,7 +2001,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -2013,7 +2013,7 @@
             "klei": { "standard": 175, "nv_area": 140 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 165, "nv_area": 132 },
-            "loss": { "standard": 165, "nv_area": 132 },
+            "loess": { "standard": 165, "nv_area": 132 },
             "veen": { "standard": 165, "nv_area": 132 }
         }
     },
@@ -2025,7 +2025,7 @@
             "klei": { "standard": 175, "nv_area": 140 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 165, "nv_area": 132 },
-            "loss": { "standard": 165, "nv_area": 132 },
+            "loess": { "standard": 165, "nv_area": 132 },
             "veen": { "standard": 165, "nv_area": 132 }
         }
     },
@@ -2037,7 +2037,7 @@
             "klei": { "standard": 175, "nv_area": 140 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 165, "nv_area": 132 },
-            "loss": { "standard": 165, "nv_area": 132 },
+            "loess": { "standard": 165, "nv_area": 132 },
             "veen": { "standard": 165, "nv_area": 132 }
         }
     },
@@ -2049,7 +2049,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 140, "nv_area": 112 },
             "zand_zuid": { "standard": 140, "nv_area": 112 },
-            "loss": { "standard": 140, "nv_area": 112 },
+            "loess": { "standard": 140, "nv_area": 112 },
             "veen": { "standard": 140, "nv_area": 112 }
         }
     },
@@ -2061,7 +2061,7 @@
             "klei": { "standard": 100, "nv_area": 80 },
             "zand_nwc": { "standard": 95, "nv_area": 76 },
             "zand_zuid": { "standard": 95, "nv_area": 76 },
-            "loss": { "standard": 95, "nv_area": 76 },
+            "loess": { "standard": 95, "nv_area": 76 },
             "veen": { "standard": 95, "nv_area": 76 }
         }
     },
@@ -2073,7 +2073,7 @@
             "klei": { "standard": 175, "nv_area": 140 },
             "zand_nwc": { "standard": 165, "nv_area": 132 },
             "zand_zuid": { "standard": 165, "nv_area": 132 },
-            "loss": { "standard": 165, "nv_area": 132 },
+            "loess": { "standard": 165, "nv_area": 132 },
             "veen": { "standard": 165, "nv_area": 132 }
         }
     },
@@ -2095,7 +2095,7 @@
             "klei": { "standard": 200, "nv_area": 160 },
             "zand_nwc": { "standard": 200, "nv_area": 160 },
             "zand_zuid": { "standard": 200, "nv_area": 160 },
-            "loss": { "standard": 200, "nv_area": 160 },
+            "loess": { "standard": 200, "nv_area": 160 },
             "veen": { "standard": 200, "nv_area": 160 }
         }
     },
@@ -2129,7 +2129,7 @@
             "klei": { "standard": 150, "nv_area": 120 },
             "zand_nwc": { "standard": 150, "nv_area": 120 },
             "zand_zuid": { "standard": 150, "nv_area": 120 },
-            "loss": { "standard": 150, "nv_area": 120 },
+            "loess": { "standard": 150, "nv_area": 120 },
             "veen": { "standard": 150, "nv_area": 120 }
         }
     },
@@ -2141,7 +2141,7 @@
             "klei": { "standard": 90, "nv_area": 72 },
             "zand_nwc": { "standard": 80, "nv_area": 64 },
             "zand_zuid": { "standard": 80, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 90, "nv_area": 72 }
         }
     },
@@ -2153,7 +2153,7 @@
             "klei": { "standard": 40, "nv_area": 32 },
             "zand_nwc": { "standard": 40, "nv_area": 32 },
             "zand_zuid": { "standard": 40, "nv_area": 32 },
-            "loss": { "standard": 40, "nv_area": 32 },
+            "loess": { "standard": 40, "nv_area": 32 },
             "veen": { "standard": 40, "nv_area": 32 }
         }
     },
@@ -2165,7 +2165,7 @@
             "klei": { "standard": 115, "nv_area": 92 },
             "zand_nwc": { "standard": 115, "nv_area": 92 },
             "zand_zuid": { "standard": 115, "nv_area": 92 },
-            "loss": { "standard": 115, "nv_area": 92 },
+            "loess": { "standard": 115, "nv_area": 92 },
             "veen": { "standard": 115, "nv_area": 92 }
         }
     },
@@ -2177,7 +2177,7 @@
             "klei": { "standard": 75, "nv_area": 60 },
             "zand_nwc": { "standard": 75, "nv_area": 60 },
             "zand_zuid": { "standard": 75, "nv_area": 60 },
-            "loss": { "standard": 75, "nv_area": 60 },
+            "loess": { "standard": 75, "nv_area": 60 },
             "veen": { "standard": 75, "nv_area": 60 }
         }
     },
@@ -2189,7 +2189,7 @@
             "klei": { "standard": 80, "nv_area": 64 },
             "zand_nwc": { "standard": 80, "nv_area": 64 },
             "zand_zuid": { "standard": 80, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 80, "nv_area": 64 }
         }
     },
@@ -2201,7 +2201,7 @@
             "klei": { "standard": 70, "nv_area": 56 },
             "zand_nwc": { "standard": 70, "nv_area": 56 },
             "zand_zuid": { "standard": 70, "nv_area": 56 },
-            "loss": { "standard": 70, "nv_area": 56 },
+            "loess": { "standard": 70, "nv_area": 56 },
             "veen": { "standard": 70, "nv_area": 56 }
         }
     },
@@ -2213,7 +2213,7 @@
             "klei": { "standard": 95, "nv_area": 76 },
             "zand_nwc": { "standard": 95, "nv_area": 76 },
             "zand_zuid": { "standard": 95, "nv_area": 76 },
-            "loss": { "standard": 95, "nv_area": 76 },
+            "loess": { "standard": 95, "nv_area": 76 },
             "veen": { "standard": 95, "nv_area": 76 }
         }
     },
@@ -2225,7 +2225,7 @@
             "klei": { "standard": 175, "nv_area": 140 },
             "zand_nwc": { "standard": 175, "nv_area": 140 },
             "zand_zuid": { "standard": 175, "nv_area": 140 },
-            "loss": { "standard": 175, "nv_area": 140 },
+            "loess": { "standard": 175, "nv_area": 140 },
             "veen": { "standard": 175, "nv_area": 140 }
         }
     },
@@ -2237,7 +2237,7 @@
             "klei": { "standard": 30, "nv_area": 24 },
             "zand_nwc": { "standard": 30, "nv_area": 24 },
             "zand_zuid": { "standard": 30, "nv_area": 24 },
-            "loss": { "standard": 30, "nv_area": 24 },
+            "loess": { "standard": 30, "nv_area": 24 },
             "veen": { "standard": 30, "nv_area": 24 }
         }
     },
@@ -2249,7 +2249,7 @@
             "klei": { "standard": 110, "nv_area": 88 },
             "zand_nwc": { "standard": 110, "nv_area": 88 },
             "zand_zuid": { "standard": 110, "nv_area": 88 },
-            "loss": { "standard": 110, "nv_area": 88 },
+            "loess": { "standard": 110, "nv_area": 88 },
             "veen": { "standard": 110, "nv_area": 88 }
         }
     },
@@ -2261,7 +2261,7 @@
             "klei": { "standard": 135, "nv_area": 108 },
             "zand_nwc": { "standard": 105, "nv_area": 84 },
             "zand_zuid": { "standard": 105, "nv_area": 84 },
-            "loss": { "standard": 105, "nv_area": 84 },
+            "loess": { "standard": 105, "nv_area": 84 },
             "veen": { "standard": 105, "nv_area": 84 }
         }
     },
@@ -2273,7 +2273,7 @@
             "klei": { "standard": 80, "nv_area": 64 },
             "zand_nwc": { "standard": 80, "nv_area": 64 },
             "zand_zuid": { "standard": 80, "nv_area": 64 },
-            "loss": { "standard": 80, "nv_area": 64 },
+            "loess": { "standard": 80, "nv_area": 64 },
             "veen": { "standard": 80, "nv_area": 64 }
         }
     },
@@ -2285,7 +2285,7 @@
             "klei": { "standard": 95, "nv_area": 76 },
             "zand_nwc": { "standard": 95, "nv_area": 76 },
             "zand_zuid": { "standard": 95, "nv_area": 76 },
-            "loss": { "standard": 95, "nv_area": 76 },
+            "loess": { "standard": 95, "nv_area": 76 },
             "veen": { "standard": 95, "nv_area": 76 }
         }
     },
@@ -2297,7 +2297,7 @@
             "klei": { "standard": 70, "nv_area": 56 },
             "zand_nwc": { "standard": 70, "nv_area": 56 },
             "zand_zuid": { "standard": 70, "nv_area": 56 },
-            "loss": { "standard": 70, "nv_area": 56 },
+            "loess": { "standard": 70, "nv_area": 56 },
             "veen": { "standard": 70, "nv_area": 56 }
         }
     },
@@ -2309,7 +2309,7 @@
             "klei": { "standard": 95, "nv_area": 76 },
             "zand_nwc": { "standard": 95, "nv_area": 76 },
             "zand_zuid": { "standard": 95, "nv_area": 76 },
-            "loss": { "standard": 95, "nv_area": 76 },
+            "loess": { "standard": 95, "nv_area": 76 },
             "veen": { "standard": 95, "nv_area": 76 }
         }
     },
@@ -2321,7 +2321,7 @@
             "klei": { "standard": 90, "nv_area": 72 },
             "zand_nwc": { "standard": 90, "nv_area": 72 },
             "zand_zuid": { "standard": 90, "nv_area": 72 },
-            "loss": { "standard": 90, "nv_area": 72 },
+            "loess": { "standard": 90, "nv_area": 72 },
             "veen": { "standard": 90, "nv_area": 72 }
         }
     },
@@ -2333,7 +2333,7 @@
             "klei": { "standard": 0, "nv_area": 0 },
             "zand_nwc": { "standard": 0, "nv_area": 0 },
             "zand_zuid": { "standard": 0, "nv_area": 0 },
-            "loss": { "standard": 0, "nv_area": 0 },
+            "loess": { "standard": 0, "nv_area": 0 },
             "veen": { "standard": 0, "nv_area": 0 }
         }
     }

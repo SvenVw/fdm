@@ -1,168 +1,22 @@
 import type { Field } from "@svenvw/fdm-core"
 import nitrogenStandardsData from "./stikstofgebruiksnorm-data.json"
-
-/**
- * Defines the structure for a single nitrogen standard entry,
- * based on the RVO's "Tabel 2 Stikstof landbouwgrond 2025" and related documents.
- * This interface supports various complexities like different norms for regions,
- * specific varieties, derogation status, and sub-types for temporary grasslands.
- */
-interface NitrogenStandard {
-    /**
-     * The cultivation name as it appears in RVO's "Tabel 2 Stikstof landbouwgrond 2025".
-     * This is used for descriptive purposes and as part of the function's return value.
-     * @example "Grasland", "Akkerbouwgewassen, mais"
-     */
-    cultivation_rvo_table2: string
-    /**
-     * An array of BRP (Basisregistratie Percelen) cultivation codes that match this standard.
-     * This allows a single standard entry to apply to multiple BRP codes.
-     * @example ["nl_265", "nl_331"]
-     */
-    b_lu_catalogue_match: string[]
-    /**
-     * A general type classification for the cultivation (e.g., "grasland", "aardappel", "akkerbouw").
-     * Used internally for conditional logic in norm determination.
-     */
-    type: string
-    /**
-     * Optional. A more specific classification for varieties, particularly for potatoes.
-     * @example "consumptie_overig", "poot_overig"
-     */
-    variety_type?: string
-    /**
-     * Optional. A list of specific varieties that fall under this standard.
-     * Used for filtering when a `b_lu_variety` is provided.
-     */
-    varieties?: string[]
-    /**
-     * Optional. The default nitrogen norms (standard and NV-area) per region.
-     * This is the most common structure for norms.
-     */
-    norms?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. A list of varieties that qualify for a 'high norm' for certain crops (e.g., potatoes).
-     */
-    varieties_hoge_norm?: string[]
-    /**
-     * Optional. A list of varieties that qualify for a 'low norm' for certain crops (e.g., potatoes).
-     */
-    varieties_lage_norm?: string[]
-    /**
-     * Optional. Nitrogen norms specifically for 'high norm' varieties, per region.
-     */
-    norms_hoge_norm?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms specifically for 'low norm' varieties, per region.
-     */
-    norms_lage_norm?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms for 'other' varieties when specific high/low norms don't apply.
-     */
-    norms_overig?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms specifically for farms with derogation status, per region.
-     * Applicable for certain crops like maize.
-     */
-    derogatie_norms?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms specifically for farms without derogation status, per region.
-     * Applicable for certain crops like maize.
-     */
-    non_derogatie_norms?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loss: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. An array of sub-types for a cultivation, each with its own norms and period descriptions.
-     * Used for crops like temporary grassland where norms vary based on the period of cultivation.
-     */
-    sub_types?: Array<{
-        omschrijving?: string
-        period_description?: string
-        period_start_month?: number
-        period_start_day?: number
-        period_end_month?: number
-        period_end_day?: number
-        norms: {
-            klei: { standard: number; nv_area: number }
-            zand_nwc: { standard: number; nv_area: number }
-            zand_zuid: { standard: number; nv_area: number }
-            loss: { standard: number; nv_area: number }
-            veen: { standard: number; nv_area: number }
-        }
-        // Note: winterteelt properties are removed from the top-level NitrogenStandard
-        // but are kept here within sub_types if specific sub-periods have them.
-        winterteelt_voor_31_12?: {
-            klei: { standard: number; nv_area: number }
-            zand_nwc: { standard: number; nv_area: number }
-            zand_zuid: { standard: number; nv_area: number }
-            loss: { standard: number; nv_area: number }
-            veen: { standard: number; nv_area: number }
-        }
-        winterteelt_na_31_12?: {
-            klei: { standard: number; nv_area: number }
-            zand_nwc: { standard: number; nv_area: number }
-            zand_zuid: { standard: number; nv_area: number }
-            loss: { standard: number; nv_area: number }
-            veen: { standard: number; nv_area: number }
-        }
-    }>
-}
-
-/**
- * Defines the valid keys for different soil regions in the Netherlands.
- */
-type RegionKey = "klei" | "zand_nwc" | "zand_zuid" | "loss" | "veen"
-
-/**
- * A utility type to represent nitrogen norms structured by region.
- */
-type NormsByRegion = {
-    [key in RegionKey]: { standard: number; nv_area: number }
-}
+import type {
+    GebruiksnormResult,
+    NitrogenStandard,
+    NL2025NormsInput,
+    NormsByRegion,
+    RegionKey,
+} from "./types"
+import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 
 /**
  * Placeholder function to determine if a field is in an NV-area.
  * In a real implementation, this would perform a spatial query.
- * @param _field - The field object, containing geometry or centroid.
+ * @param b_centroid
  * @returns A promise that resolves to a boolean.
  */
 async function isFieldInNVGebied(
-    _field: Pick<Field, "b_id" | "b_centroid">,
+    b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<boolean> {
     // This function would typically use a service to check if the field's coordinates
     // fall within a designated NV-area. For now, it returns a default value.
@@ -170,38 +24,24 @@ async function isFieldInNVGebied(
 }
 
 /**
- * The result object returned by the `getNL2025StikstofGebruiksNorm` function,
- * containing the calculated norm value and the name of the cultivation used for the calculation.
- */
-export interface GebruiksnormResult {
-    /**
-     * The determined nitrogen usage standard in kg N per hectare.
-     */
-    normValue: number
-    /**
-     * The cultivation name according to RVO's "Tabel 2 Stikstof landbouwgrond 2025"
-     * that was used to determine the legal limit.
-     */
-    normSource: string
-}
-
-/**
  * Placeholder for the function that determines the region based on latitude and longitude.
  * This function needs to be provided by the user.
  * For now, it returns a hardcoded 'klei' for demonstration purposes.
- * @param latitude - The latitude of the location.
- * @param longitude - The longitude of the location.
- * @returns The region key (e.g., 'klei', 'zand_nwc', 'loss').
+ * @param b_centroid
+ * @returns The region key (e.g., 'klei', 'zand_nwc', 'loess').
  * @todo Implement actual region determination logic based on lat/lon.
  */
-function getRegion(latitude: number, longitude: number): RegionKey {
+function getRegion(
+    b_centroid: Pick<Field, "latitude" | "longitude">,
+): RegionKey {
     // This is a placeholder. User will provide the actual implementation.
     // Example logic:
+    const { latitude, longitude } = b_centroid
     if (latitude > 52 && longitude > 5) return "zand_nwc" // Example: Northern/Western/Central Sand
     if (latitude < 52 && longitude > 5) return "zand_zuid" // Example: Southern Sand
     if (latitude > 51 && longitude < 5) return "klei" // Example: Clay
     if (latitude < 51 && longitude < 5) return "veen" // Example: Peat
-    return "loss" // Default or fallback
+    return "loess" // Default or fallback
 }
 
 /**
@@ -334,27 +174,27 @@ function getNormsForCultivation(
  * @see {@link https://www.rvo.nl/sites/default/files/2024-12/Tabel-2-Stikstof-landbouwgrond-2025_0.pdf | RVO Tabel 2 Stikstof landbouwgrond 2025}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiksnormen/stikstof-en-fosfaat/gebruiksnormen-stikstof | RVO Gebruiksnormen stikstof (official page)}
  */
-export interface StikstofGebruiksnormInput {
-    b_lu_catalogue: string
-    field: Pick<Field, "b_id" | "b_centroid">
-    b_lu_end: Date
-    b_lu_variety?: string
-    is_derogatie_bedrijf?: boolean
-}
-
 export async function getNL2025StikstofGebruiksNorm(
-    input: StikstofGebruiksnormInput,
+    input: NL2025NormsInput,
 ): Promise<GebruiksnormResult | null> {
-    const {
-        b_lu_catalogue,
-        field,
-        b_lu_end,
-        b_lu_variety,
-        is_derogatie_bedrijf,
-    } = input
+    const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf
+    const field = input.field
+    const cultivations = input.cultivations
 
-    const is_nv_area = await isFieldInNVGebied(field)
-    const [longitude, latitude] = field.b_centroid
+    // Determine hoofdteelt
+    const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
+    const cultivation = cultivations.find(
+        (c) => c.b_lu_catalogue === b_lu_catalogue,
+    )
+    if (!cultivation) {
+        throw new Error(
+            `Cultivation with b_lu_catalogue ${b_lu_catalogue} not found`,
+        )
+    }
+
+    // Determine region and NV gebied
+    const is_nv_area = await isFieldInNVGebied(field.b_centroid)
+    const region = getRegion(field.b_centroid)
 
     // Find matching nitrogen standard data based on b_lu_catalogue_match
     let matchingStandards: NitrogenStandard[] = nitrogenStandardsData.filter(
@@ -369,13 +209,11 @@ export async function getNL2025StikstofGebruiksNorm(
         return null
     }
 
-    const region = getRegion(latitude, longitude)
-
     // Handle specific cases for potatoes based on variety
     // This logic assumes that the b_lu_catalogue for potatoes will match one of the potato entries
     // and then the variety_type will further refine it.
-    if (b_lu_variety) {
-        const varietyLower = b_lu_variety.toLowerCase()
+    if (cultivation.b_lu_variety) {
+        const varietyLower = cultivation.b_lu_variety.toLowerCase()
         const filteredByVariety = matchingStandards.filter(
             (ns: NitrogenStandard) =>
                 ns.varieties?.some((v) => v.toLowerCase() === varietyLower),
@@ -404,8 +242,8 @@ export async function getNL2025StikstofGebruiksNorm(
     } else if (matchingStandards.length > 1) {
         // If multiple standards match b_lu_catalogue, try to find a more specific one
         // This could be based on variety_type for potatoes, or other criteria if added later
-        if (b_lu_variety) {
-            const varietyLower = b_lu_variety.toLowerCase() // Define varietyLower here
+        if (cultivation.b_lu_variety) {
+            const varietyLower = cultivation.b_lu_variety.toLowerCase() // Define varietyLower here
             const varietySpecific = matchingStandards.find(
                 (ns) =>
                     ns.varieties_hoge_norm?.some(
@@ -440,7 +278,7 @@ export async function getNL2025StikstofGebruiksNorm(
     if (!selectedStandard) {
         console.warn(
             `No specific matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue} with variety ${
-                b_lu_variety || "N/A"
+                cultivation.b_lu_variety || "N/A"
             } in region ${region}.`,
         )
         return null
@@ -448,9 +286,9 @@ export async function getNL2025StikstofGebruiksNorm(
 
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
-        b_lu_variety,
+        cultivation.b_lu_variety,
         is_derogatie_bedrijf,
-        b_lu_end,
+        cultivation.b_lu_end,
     )
 
     if (!applicableNorms) {
