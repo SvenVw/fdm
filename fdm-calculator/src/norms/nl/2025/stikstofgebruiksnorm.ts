@@ -17,6 +17,30 @@ import { getFdmPublicDataUrl } from "../../../balance/nitrogen"
  * @param b_centroid - An object with the latitude and longitude of the field's centroid.
  * @returns A promise that resolves to `true` if the field is in an NV-area, `false` otherwise.
  */
+// Helper function to check if a point is inside a single ring using the ray-casting algorithm.
+const isPointInRing = (point: [number, number], ring: number[][]) => {
+    let isInside = false
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0]
+        const yi = ring[i][1]
+        const xj = ring[j][0]
+        const yj = ring[j][1]
+        const intersect =
+            yi > point[1] !== yj > point[1] &&
+            point[0] < ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi
+        if (intersect) {
+            isInside = !isInside
+        }
+    }
+    return isInside
+}
+
+/**
+ * Determines if a field is in an NV-area by checking its coordinates against a flatgeobuffer file.
+ *
+ * @param b_centroid - An object with the latitude and longitude of the field's centroid.
+ * @returns A promise that resolves to `true` if the field is in an NV-area, `false` otherwise.
+ */
 async function isFieldInNVGebied(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<boolean> {
@@ -31,24 +55,6 @@ async function isFieldInNVGebied(
         minY: latitude - 0.00001,
         maxX: longitude + 0.00001,
         maxY: latitude + 0.00001,
-    }
-
-    // Helper function to check if a point is inside a single ring using the ray-casting algorithm.
-    const isPointInRing = (point: [number, number], ring: number[][]) => {
-        let isInside = false
-        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-            const xi = ring[i][0]
-            const yi = ring[i][1]
-            const xj = ring[j][0]
-            const yj = ring[j][1]
-            const intersect =
-                yi > point[1] !== yj > point[1] &&
-                point[0] < ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi
-            if (intersect) {
-                isInside = !isInside
-            }
-        }
-        return isInside
     }
 
     try {
@@ -103,24 +109,78 @@ async function isFieldInNVGebied(
 }
 
 /**
- * Placeholder for the function that determines the region based on latitude and longitude.
- * This function needs to be provided by the user.
- * For now, it returns a hardcoded 'klei' for demonstration purposes.
- * @param b_centroid
- * @returns The region key (e.g., 'klei', 'zand_nwc', 'loess').
- * @todo Implement actual region determination logic based on lat/lon.
+ * Determines the region based on latitude and longitude by checking its coordinates against a flatgeobuffer file.
+ *
+ * @param b_centroid - An object with the latitude and longitude of the field's centroid.
+ * @returns A promise that resolves to the `RegionKey` if the field is in a defined region, or throws an error otherwise.
  */
-function getRegion(
+async function getRegion(
     b_centroid: Pick<Field, "latitude" | "longitude">,
-): RegionKey {
-    // This is a placeholder. User will provide the actual implementation.
-    // Example logic:
+): Promise<RegionKey> {
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2024/gs.fgb`
+
     const { latitude, longitude } = b_centroid
-    if (latitude > 52 && longitude > 5) return "zand_nwc" // Example: Northern/Western/Central Sand
-    if (latitude < 52 && longitude > 5) return "zand_zuid" // Example: Southern Sand
-    if (latitude > 51 && longitude < 5) return "klei" // Example: Clay
-    if (latitude < 51 && longitude < 5) return "veen" // Example: Peat
-    return "loess" // Default or fallback
+
+    const rect = {
+        minX: longitude - 0.00001,
+        minY: latitude - 0.00001,
+        maxX: longitude + 0.00001,
+        maxY: latitude + 0.00001,
+    }
+
+    try {
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+        }
+        const stream = response.body
+        if (!stream) {
+            throw new Error("Response body is null")
+        }
+
+        for await (const feature of deserialize(stream, rect)) {
+            const geometry = feature.geometry
+            if (!geometry) {
+                continue
+            }
+
+            let inPolygon = false
+            if (geometry.type === "Polygon") {
+                for (const ring of geometry.coordinates) {
+                    if (isPointInRing([longitude, latitude], ring)) {
+                        inPolygon = !inPolygon
+                    }
+                }
+            } else if (geometry.type === "MultiPolygon") {
+                for (const polygon of geometry.coordinates) {
+                    let inMultiPolygon = false
+                    for (const ring of polygon) {
+                        if (isPointInRing([longitude, latitude], ring)) {
+                            inMultiPolygon = !inMultiPolygon
+                        }
+                    }
+                    if (inMultiPolygon) {
+                        inPolygon = true
+                        break
+                    }
+                }
+            }
+
+            if (inPolygon) {
+                const region = feature.properties?.region as RegionKey
+                if (region) {
+                    return region
+                }
+            }
+        }
+    } catch (err) {
+        throw new Error(`Error querying region flatgeobuffer: ${String(err)}`)
+    }
+
+    throw new Error(
+        `Could not determine region for coordinates: lat ${latitude}, lon ${longitude}`,
+    )
 }
 
 /**
@@ -273,7 +333,7 @@ export async function getNL2025StikstofGebruiksNorm(
 
     // Determine region and NV gebied
     const is_nv_area = await isFieldInNVGebied(field.b_centroid)
-    const region = getRegion(field.b_centroid)
+    const region = await getRegion(field.b_centroid)
 
     // Find matching nitrogen standard data based on b_lu_catalogue_match
     let matchingStandards: NitrogenStandard[] = nitrogenStandardsData.filter(
