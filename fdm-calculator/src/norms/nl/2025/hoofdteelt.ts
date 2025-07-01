@@ -30,7 +30,7 @@ export function determineNL2025Hoofdteelt(
         return "nl_6794"
     }
 
-    for (const  cultivation of cultivations) {
+    for (const cultivation of cultivations) {
         const cultivationStart = new Date(cultivation.b_lu_start)
         const cultivationEnd = new Date(cultivation.b_lu_end)
 
@@ -62,8 +62,9 @@ export function determineNL2025Hoofdteelt(
         }
     }
 
+    // If no cultivation is present between May 15th and July 15th, return "Groene braak, spontane opkomst"
     if (!hoofdteeltCatalogue) {
-        throw new Error("Unable to determine hoofdteelt")
+        return "nl_6794"
     }
 
     return hoofdteeltCatalogue

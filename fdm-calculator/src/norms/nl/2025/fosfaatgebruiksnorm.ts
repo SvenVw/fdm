@@ -130,7 +130,7 @@ function getFosfaatKlasse(
  */
 export async function getNL2025FosfaatGebruiksNorm(
     input: NL2025NormsInput,
-): Promise<FosfaatGebruiksnormResult | null> {
+): Promise<FosfaatGebruiksnormResult> {
     const cultivations = input.cultivations
     const a_p_cc = input.soilAnalysis.a_p_cc
     const a_p_al = input.soilAnalysis.a_p_al
@@ -151,8 +151,7 @@ export async function getNL2025FosfaatGebruiksNorm(
     const normsForKlasse = fosfaatNormsData[fosfaatKlasse]
 
     if (!normsForKlasse) {
-        console.warn(`No phosphate norms found for class ${fosfaatKlasse}.`)
-        return null
+        throw new Error(`No phosphate norms found for class ${fosfaatKlasse}.`)
     }
 
     // Select the specific norm based on whether it's grassland or arable land.

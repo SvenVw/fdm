@@ -47,7 +47,7 @@ async function isFieldInNVGebied(
 export async function getNL2025DierlijkeMestGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<DierlijkeMestGebruiksnormResult> {
-    const is_derogatie_bedrijf = input. farm.is_derogatie_bedrijf || false
+    const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
     const field = input.field
 
     const is_nv_gebied = await isFieldInNVGebied(field)
@@ -65,7 +65,7 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
         }
     } else {
         normValue = 170
-        normSource = "Geen derogatie"
+        normSource = "Standaard - geen derogatie"
     }
 
     return { normValue, normSource }

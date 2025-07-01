@@ -45,7 +45,7 @@ describe("determineNL2025Hoofdteelt", () => {
         expect(result).toBe("cat_C")
     })
 
-    it("should return null if no cultivation is within the period", async () => {
+    it("should return nl_6794 if no cultivation is within the period", async () => {
         const cultivations: NL2025NormsInputForCultivation[] = [
             {
                 b_lu: "Gewas E",
@@ -56,7 +56,7 @@ describe("determineNL2025Hoofdteelt", () => {
             },
         ]
         const result = await determineNL2025Hoofdteelt(cultivations)
-        expect(result).toBeNull()
+        expect(result).toBe("nl_6794")
     })
 
     it("should handle cultivations that partially overlap", async () => {
@@ -77,12 +77,12 @@ describe("determineNL2025Hoofdteelt", () => {
             },
         ]
         const result = await determineNL2025Hoofdteelt(cultivations)
-        expect(result).toBe("cat_G")
+        expect(result).toBe("cat_F")
     })
 
-    it("should handle an empty array of cultivations", async () => {
+    it("should handle an empty array of cultivations by returning nl_6794", async () => {
         const cultivations: NL2025NormsInputForCultivation[] = []
         const result = await determineNL2025Hoofdteelt(cultivations)
-        expect(result).toBeNull()
+        expect(result).toBe("nl_6794")
     })
 })

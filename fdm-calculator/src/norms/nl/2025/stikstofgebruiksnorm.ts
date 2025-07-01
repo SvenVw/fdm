@@ -109,9 +109,10 @@ const isPointInRing = (point: [number, number], ring: number[][]) => {
  * This approach ensures that the check is both accurate and performant, especially for large
  * geographical datasets.
  */
-async function isFieldInNVGebied(
+export async function isFieldInNVGebied(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<boolean> {
+    console.log("Check isFieldInNVGebied 1")
     const fdmPublicDataUrl = getFdmPublicDataUrl()
     const url = `${fdmPublicDataUrl}norms/nl/2025/nv-gebied.fgb`
 
@@ -124,12 +125,14 @@ async function isFieldInNVGebied(
         maxX: longitude + 0.00001,
         maxY: latitude + 0.00001,
     }
-
+    console.log("Check isFieldInNVGebied 2")
     try {
         const response = await fetch(url)
+        console.log("Check isFieldInNVGebied 3")
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
+        console.log("Check isFieldInNVGebied 4")
         const stream = response.body
         if (!stream) {
             throw new Error("Response body is null")
@@ -166,6 +169,7 @@ async function isFieldInNVGebied(
                 }
             }
         }
+        console.log("Check isFieldInNVGebied 5")
     } catch (err) {
         throw new Error(
             `Error querying NV-Gebied flatgeobuffer: ${String(err)}`,
@@ -209,7 +213,7 @@ async function isFieldInNVGebied(
  * This function is critical for applying region-specific nitrogen norms, as these norms
  * vary based on soil type.
  */
-async function getRegion(
+export async function getRegion(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<RegionKey> {
     const fdmPublicDataUrl = getFdmPublicDataUrl()
@@ -467,7 +471,7 @@ function getNormsForCultivation(
  */
 export async function getNL2025StikstofGebruiksNorm(
     input: NL2025NormsInput,
-): Promise<GebruiksnormResult | null> {
+): Promise<GebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf
     const field = input.field
     const cultivations = input.cultivations
@@ -494,10 +498,9 @@ export async function getNL2025StikstofGebruiksNorm(
     )
 
     if (matchingStandards.length === 0) {
-        console.warn(
+        throw new Error(
             `No matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue}.`,
         )
-        return null
     }
 
     // Handle specific cases for potatoes based on variety
@@ -567,12 +570,11 @@ export async function getNL2025StikstofGebruiksNorm(
     }
 
     if (!selectedStandard) {
-        console.warn(
+        throw new Error(
             `No specific matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue} with variety ${
                 cultivation.b_lu_variety || "N/A"
             } in region ${region}.`,
         )
-        return null
     }
 
     const applicableNorms = getNormsForCultivation(
@@ -583,20 +585,18 @@ export async function getNL2025StikstofGebruiksNorm(
     )
 
     if (!applicableNorms) {
-        console.warn(
+        throw new Error(
             `Applicable norms object is undefined for ${selectedStandard.cultivation_rvo_table2} in region ${region}.`,
         )
-        return null
     }
 
     const normsForRegion: { standard: number; nv_area: number } =
         applicableNorms[region]
 
     if (!normsForRegion) {
-        console.warn(
+        throw new Error(
             `No norms found for region ${region} for ${selectedStandard.cultivation_rvo_table2}.`,
         )
-        return null
     }
 
     const normValue = is_nv_area
