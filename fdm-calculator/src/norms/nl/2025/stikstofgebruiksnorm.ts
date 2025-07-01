@@ -1,4 +1,5 @@
 import type { Field } from "@svenvw/fdm-core"
+import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import nitrogenStandardsData from "./stikstofgebruiksnorm-data.json"
 import type {
     GebruiksnormResult,
@@ -8,19 +9,97 @@ import type {
     RegionKey,
 } from "./types"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import { getFdmPublicDataUrl } from "../../../balance/nitrogen"
 
 /**
- * Placeholder function to determine if a field is in an NV-area.
- * In a real implementation, this would perform a spatial query.
- * @param b_centroid
- * @returns A promise that resolves to a boolean.
+ * Determines if a field is in an NV-area by checking its coordinates against a flatgeobuffer file.
+ *
+ * @param b_centroid - An object with the latitude and longitude of the field's centroid.
+ * @returns A promise that resolves to `true` if the field is in an NV-area, `false` otherwise.
  */
 async function isFieldInNVGebied(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<boolean> {
-    // This function would typically use a service to check if the field's coordinates
-    // fall within a designated NV-area. For now, it returns a default value.
-    return Promise.resolve(false)
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2025/nv-gebied.fgb`
+
+    const { latitude, longitude } = b_centroid
+
+    // Create a small bounding box (1x1 meter) around the point for the spatial query
+    const rect = {
+        minX: longitude - 0.00001,
+        minY: latitude - 0.00001,
+        maxX: longitude + 0.00001,
+        maxY: latitude + 0.00001,
+    }
+
+    // Helper function to check if a point is inside a single ring using the ray-casting algorithm.
+    const isPointInRing = (point: [number, number], ring: number[][]) => {
+        let isInside = false
+        for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+            const xi = ring[i][0]
+            const yi = ring[i][1]
+            const xj = ring[j][0]
+            const yj = ring[j][1]
+            const intersect =
+                yi > point[1] !== yj > point[1] &&
+                point[0] < ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi
+            if (intersect) {
+                isInside = !isInside
+            }
+        }
+        return isInside
+    }
+
+    try {
+        const response = await fetch(url)
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+        }
+        const stream = response.body
+        if (!stream) {
+            throw new Error("Response body is null")
+        }
+
+        // Deserialize the flatgeobuffer stream into GeoJSON features within the specified bounding box
+        for await (const feature of deserialize(stream, rect)) {
+            const geometry = feature.geometry
+            if (!geometry) {
+                continue
+            }
+
+            if (geometry.type === "Polygon") {
+                let inPolygon = false
+                for (const ring of geometry.coordinates) {
+                    if (isPointInRing([longitude, latitude], ring)) {
+                        inPolygon = !inPolygon
+                    }
+                }
+                if (inPolygon) {
+                    return true
+                }
+            } else if (geometry.type === "MultiPolygon") {
+                for (const polygon of geometry.coordinates) {
+                    let inMultiPolygon = false
+                    for (const ring of polygon) {
+                        if (isPointInRing([longitude, latitude], ring)) {
+                            inMultiPolygon = !inMultiPolygon
+                        }
+                    }
+                    if (inMultiPolygon) {
+                        return true
+                    }
+                }
+            }
+        }
+    } catch (err) {
+        throw new Error(
+            `Error querying NV-Gebied flatgeobuffer: ${String(err)}`,
+        )
+    }
+
+    // If no intersecting polygons were found
+    return false
 }
 
 /**
