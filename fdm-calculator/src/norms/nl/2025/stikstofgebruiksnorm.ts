@@ -1,6 +1,6 @@
 import type { Field } from "@svenvw/fdm-core"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
-import nitrogenStandardsData from "./stikstofgebruiksnorm-data.json"
+import {nitrogenStandardsData} from "./stikstofgebruiksnorm-data"
 import type {
     GebruiksnormResult,
     NitrogenStandard,

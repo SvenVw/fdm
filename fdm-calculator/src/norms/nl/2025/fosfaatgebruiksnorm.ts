@@ -1,4 +1,4 @@
-import fosfaatNormsData from "./fosfaatgebruiksnorm-data.json"
+import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import type {
     FosfaatGebruiksnormResult,

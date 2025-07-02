@@ -336,9 +336,6 @@ importers:
       '@rollup/plugin-commonjs':
         specifier: 'catalog:'
         version: 28.0.6(rollup@4.44.1)
-      '@rollup/plugin-json':
-        specifier: 'catalog:'
-        version: 6.1.0(rollup@4.44.1)
       '@rollup/plugin-node-resolve':
         specifier: 'catalog:'
         version: 16.0.1(rollup@4.44.1)

@@ -48,7 +48,6 @@
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
         "@rollup/plugin-commonjs": "catalog:",
-        "@rollup/plugin-json": "catalog:",
         "@rollup/plugin-node-resolve": "catalog:",
         "@rollup/plugin-terser": "catalog:",
         "@rollup/plugin-typescript": "catalog:",

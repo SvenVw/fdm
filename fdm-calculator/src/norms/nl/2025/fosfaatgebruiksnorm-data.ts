@@ -1,4 +1,4 @@
-[
+export const fosfaatNormsData = [
     {
         "Arm": { "grasland": 120, "bouwland": 120 },
         "Laag": { "grasland": 105, "bouwland": 80 },
