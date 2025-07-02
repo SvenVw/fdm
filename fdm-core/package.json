@@ -51,11 +51,11 @@
         "@rollup/plugin-terser": "catalog:",
         "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-data": "workspace:^0.14.1",
-        "@types/node": "^22.15.32",
+        "@types/node": "^22.16.0",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.0",
-        "globals": "^16.2.0",
+        "globals": "^16.3.0",
         "rollup": "catalog:",
         "rollup-plugin-polyfill-node": "catalog:",
         "typedoc": "catalog:",
@@ -64,7 +64,7 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.3.3",
+        "@electric-sql/pglite": "^0.3.4",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
