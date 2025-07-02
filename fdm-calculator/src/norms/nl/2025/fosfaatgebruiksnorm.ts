@@ -148,7 +148,7 @@ export async function getNL2025FosfaatGebruiksNorm(
     const fosfaatKlasse = getFosfaatKlasse(a_p_cc, a_p_al, is_grasland)
 
     // Retrieve the base norms for the determined phosphate class.
-    const normsForKlasse = fosfaatNormsData[fosfaatKlasse]
+    const normsForKlasse = fosfaatNormsData[0][fosfaatKlasse]
 
     if (!normsForKlasse) {
         throw new Error(`No phosphate norms found for class ${fosfaatKlasse}.`)
