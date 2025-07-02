@@ -10,69 +10,7 @@ import type {
 } from "./types"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { getFdmPublicDataUrl } from "../../../balance/nitrogen"
-
-/**
- * `isPointInRing` is a helper function that determines if a given geographical point
- * (represented by `point`) lies inside a polygon defined by a `ring` (an array of coordinates).
- * This function is crucial for spatial queries, such as checking if a field's centroid
- * falls within a specific geographical area like an NV-gebied (nutriënten verontreinigd)
- * or a soil region.
- *
- * @param point - A tuple `[longitude, latitude]` representing the coordinates of the point to check.
- *   Note that in GIS contexts, coordinates are often expressed as `[longitude, latitude]` (X, Y).
- * @param ring - An array of coordinate pairs `[[lon1, lat1], [lon2, lat2], ...]` that define
- *   the vertices of a polygon. The last point should typically be the same as the first to close the ring.
- * @returns `true` if the point is inside the polygon, `false` otherwise.
- *
- * @remarks
- * This function implements the **Ray-Casting Algorithm** (also known as the "crossing number" algorithm).
- * The core idea is to draw an imaginary horizontal ray (a line extending infinitely to the right)
- * from the `point` and count how many times this ray intersects with the edges of the polygon `ring`.
- *
- * Here's how the algorithm works, step-by-step:
- * 1.  **Initialization**: A boolean variable `isInside` is set to `false`. This variable will
- *     be toggled each time the ray crosses an edge of the polygon.
- * 2.  **Iterating Through Edges**: The function loops through each edge of the polygon. An edge
- *     is defined by two consecutive vertices (e.g., `(xi, yi)` and `(xj, yj)`).
- * 3.  **Horizontal Ray**: Imagine a horizontal line extending from the `point` (specifically,
- *     from its Y-coordinate `point[1]`) towards positive infinity (to the right).
- * 4.  **Intersection Check**: For each edge `(xi, yi)` to `(xj, yj)`, the algorithm checks
- *     two conditions to determine if the horizontal ray from `point` intersects this edge:
- *     *   **Vertical Span Check**: `yi > point[1] !== yj > point[1]`
- *         This checks if the ray's Y-coordinate (`point[1]`) is strictly between the Y-coordinates
- *         of the two vertices of the edge (`yi` and `yj`). In simpler terms, it ensures that
- *         the edge actually crosses the horizontal line at the `point`'s Y-level. If both `yi`
- *         and `yj` are on the same side (both above or both below) the ray, there's no intersection.
- *     *   **Horizontal Position Check**: `point[0] < ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi`
- *         If the vertical span check passes, this part calculates the X-coordinate where the edge
- *         intersects the horizontal line at `point[1]`. It then checks if the `point`'s X-coordinate
- *         (`point[0]`) is to the left of this intersection point. If it is, the ray crosses the edge.
- *         This formula is derived from the equation of a line, solving for X at the given Y.
- * 5.  **Toggling `isInside`**: If both conditions are met (meaning the ray crosses the current edge),
- *     the `isInside` boolean is flipped (`isInside = !isInside`).
- * 6.  **Final Result**: After checking all edges, if `isInside` is `true`, it means the ray crossed
- *     an odd number of edges, indicating the point is inside the polygon. If `isInside` is `false`,
- *     it means an even number of crossings, indicating the point is outside.
- *
- * This algorithm is robust for most simple polygons and is a common method in computational geometry
- * for point-in-polygon tests.
- */
-const isPointInRing = (point: [number, number], ring: number[][]) => {
-    let isInside = false
-    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-        const xi = ring[i][0]
-        const yi = ring[i][1]
-        const xj = ring[j][0]
-        const yj = ring[j][1]
-        const intersect =
-            yi > point[1] !== yj > point[1] &&
-            point[0] < ((xj - xi) * (point[1] - yi)) / (yj - yi) + xi
-        if (intersect) {
-            isInside = !isInside
-        }
-    }
-    return isInside
-}
+import * as turf from "@turf/turf"
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.
@@ -112,7 +50,6 @@ const isPointInRing = (point: [number, number], ring: number[][]) => {
 export async function isFieldInNVGebied(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<boolean> {
-    console.log("Check isFieldInNVGebied 1")
     const fdmPublicDataUrl = getFdmPublicDataUrl()
     const url = `${fdmPublicDataUrl}norms/nl/2025/nv-gebied.fgb`
 
@@ -125,14 +62,11 @@ export async function isFieldInNVGebied(
         maxX: longitude + 0.00001,
         maxY: latitude + 0.00001,
     }
-    console.log("Check isFieldInNVGebied 2")
     try {
         const response = await fetch(url)
-        console.log("Check isFieldInNVGebied 3")
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
-        console.log("Check isFieldInNVGebied 4")
         const stream = response.body
         if (!stream) {
             throw new Error("Response body is null")
@@ -145,31 +79,19 @@ export async function isFieldInNVGebied(
                 continue
             }
 
+            const pt = turf.point([longitude, latitude])
             if (geometry.type === "Polygon") {
-                let inPolygon = false
-                for (const ring of geometry.coordinates) {
-                    if (isPointInRing([longitude, latitude], ring)) {
-                        inPolygon = !inPolygon
-                    }
-                }
-                if (inPolygon) {
+                const poly = turf.polygon(geometry.coordinates)
+                if (turf.booleanPointInPolygon(pt, poly)) {
                     return true
                 }
             } else if (geometry.type === "MultiPolygon") {
-                for (const polygon of geometry.coordinates) {
-                    let inMultiPolygon = false
-                    for (const ring of polygon) {
-                        if (isPointInRing([longitude, latitude], ring)) {
-                            inMultiPolygon = !inMultiPolygon
-                        }
-                    }
-                    if (inMultiPolygon) {
-                        return true
-                    }
+                const multiPoly = turf.multiPolygon(geometry.coordinates)
+                if (turf.booleanPointInPolygon(pt, multiPoly)) {
+                    return true
                 }
             }
         }
-        console.log("Check isFieldInNVGebied 5")
     } catch (err) {
         throw new Error(
             `Error querying NV-Gebied flatgeobuffer: ${String(err)}`,
@@ -244,32 +166,22 @@ export async function getRegion(
                 continue
             }
 
-            let inPolygon = false
+            const pt = turf.point([longitude, latitude])
             if (geometry.type === "Polygon") {
-                for (const ring of geometry.coordinates) {
-                    if (isPointInRing([longitude, latitude], ring)) {
-                        inPolygon = !inPolygon
+                const poly = turf.polygon(geometry.coordinates)
+                if (turf.booleanPointInPolygon(pt, poly)) {
+                    const region = feature.properties?.region as RegionKey
+                    if (region) {
+                        return region
                     }
                 }
             } else if (geometry.type === "MultiPolygon") {
-                for (const polygon of geometry.coordinates) {
-                    let inMultiPolygon = false
-                    for (const ring of polygon) {
-                        if (isPointInRing([longitude, latitude], ring)) {
-                            inMultiPolygon = !inMultiPolygon
-                        }
+                const multiPoly = turf.multiPolygon(geometry.coordinates)
+                if (turf.booleanPointInPolygon(pt, multiPoly)) {
+                    const region = feature.properties?.region as RegionKey
+                    if (region) {
+                        return region
                     }
-                    if (inMultiPolygon) {
-                        inPolygon = true
-                        break
-                    }
-                }
-            }
-
-            if (inPolygon) {
-                const region = feature.properties?.region as RegionKey
-                if (region) {
-                    return region
                 }
             }
         }
@@ -467,7 +379,7 @@ function getNormsForCultivation(
  * geographical factors.
  *
  * @see {@link https://www.rvo.nl/sites/default/files/2024-12/Tabel-2-Stikstof-landbouwgrond-2025_0.pdf | RVO Tabel 2 Stikstof landbouwgrond 2025} - Official document for nitrogen norms.
- * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiksnormen/stikstof-en-fosfaat/gebruiksnormen-stikstof | RVO Gebruiksnormen stikstof (official page)} - General information on nitrogen and phosphate norms.
+ * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/stikstof-en-fosfaat/gebruiksnormen-stikstof | RVO Gebruiksnormen stikstof (official page)} - General information on nitrogen and phosphate norms.
  */
 export async function getNL2025StikstofGebruiksNorm(
     input: NL2025NormsInput,
