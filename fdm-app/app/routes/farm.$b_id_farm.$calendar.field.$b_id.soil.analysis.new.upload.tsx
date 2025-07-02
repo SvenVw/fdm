@@ -8,8 +8,8 @@ import {
 import { fileTypeFromBuffer } from "file-type"
 import {
     type ActionFunctionArgs,
-    type LoaderFunctionArgs,
     data,
+    type LoaderFunctionArgs,
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { calculateNitrogenRemoval } from "."
 import type { FieldInput, NitrogenRemoval } from "../types"
+import { calculateNitrogenRemoval } from "."
 
 describe("calculateNitrogenRemoval", () => {
     it("should calculate total nitrogen removal from harvests and residues", () => {

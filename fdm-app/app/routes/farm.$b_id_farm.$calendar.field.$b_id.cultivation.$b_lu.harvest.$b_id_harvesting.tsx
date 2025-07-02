@@ -1,10 +1,10 @@
 import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    data,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"

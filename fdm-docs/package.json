@@ -35,11 +35,15 @@
         "@docusaurus/types": "3.8.1",
         "docusaurus-plugin-typedoc": "^1.4.0",
         "typedoc": "catalog:",
-        "typedoc-plugin-markdown": "^4.6.4",
+        "typedoc-plugin-markdown": "^4.7.0",
         "typescript": "catalog:"
     },
     "browserslist": {
-        "production": [">0.5%", "not dead", "not op_mini all"],
+        "production": [
+            ">0.5%",
+            "not dead",
+            "not op_mini all"
+        ],
         "development": [
             "last 3 chrome version",
             "last 3 firefox version",
@@ -49,5 +53,5 @@
     "engines": {
         "node": ">=18.0"
     },
-    "packageManager": "pnpm@10.11.0"
+    "packageManager": "pnpm@10.12.4"
 }

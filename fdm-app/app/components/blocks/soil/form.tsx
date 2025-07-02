@@ -1,17 +1,13 @@
-import { FormSchema } from "@/app/components/blocks/soil/formschema"
-import type { SoilAnalysis } from "@/app/components/blocks/soil/types"
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { SoilParameterDescription } from "@svenvw/fdm-core"
-import { format } from "date-fns"
-import { nl } from "date-fns/locale/nl"
-import { CalendarIcon } from "lucide-react"
 import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { FormSchema } from "@/app/components/blocks/soil/formschema"
+import type { SoilAnalysis } from "@/app/components/blocks/soil/types"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
 import {
     FormControl,
     FormDescription,
@@ -22,18 +18,12 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "~/components/ui/popover"
-import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { cn } from "~/lib/utils"
 import { DatePicker } from "../../custom/date-picker"
 
 export function SoilAnalysisForm(props: {

@@ -1,5 +1,3 @@
-import { useCalendarStore } from "@/app/store/calendar"
-import { useFarmStore } from "@/app/store/farm"
 import {
     ArrowRightLeft,
     BookOpenText,
@@ -8,6 +6,8 @@ import {
     Scale,
 } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
+import { useCalendarStore } from "@/app/store/calendar"
+import { useFarmStore } from "@/app/store/farm"
 import { Badge } from "~/components/ui/badge"
 import {
     SidebarGroup,

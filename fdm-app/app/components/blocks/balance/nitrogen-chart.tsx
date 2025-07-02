@@ -23,7 +23,9 @@ export function NitrogenBalanceChart({
         {
             supply: supply,
             removal: removal ? Math.abs(removal) : undefined,
-            volatilization: volatilization ? Math.abs(volatilization) : undefined,
+            volatilization: volatilization
+                ? Math.abs(volatilization)
+                : undefined,
         },
     ]
 

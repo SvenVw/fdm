@@ -1,9 +1,9 @@
 import { getFields } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    data,
     useLoaderData,
 } from "react-router"
 import { Button } from "~/components/ui/button"
@@ -95,24 +95,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * This component displays a message informing the user that the elevation map is not yet available and provides a button that navigates to the field map.
  */
 export default function FarmAtlasElevationBlock() {
-    const loaderData = useLoaderData<typeof loader>()
+    const _loaderData = useLoaderData<typeof loader>()
 
     return (
-        <>
-            <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
-                <div className="flex flex-col space-y-2 text-center">
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        Helaas, de hoogtekaart is nog niet beschikbaar :(
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        We proberen de hoogtekaart binnenkort toe te voegen. Hou
-                        de website in de gaten.
-                    </p>
-                </div>
-                <Button asChild>
-                    <NavLink to="../fields">Naar perceelkaart</NavLink>
-                </Button>
+        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+            <div className="flex flex-col space-y-2 text-center">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                    Helaas, de hoogtekaart is nog niet beschikbaar :(
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                    We proberen de hoogtekaart binnenkort toe te voegen. Hou de
+                    website in de gaten.
+                </p>
             </div>
-        </>
+            <Button asChild>
+                <NavLink to="../fields">Naar perceelkaart</NavLink>
+            </Button>
+        </div>
     )
 }

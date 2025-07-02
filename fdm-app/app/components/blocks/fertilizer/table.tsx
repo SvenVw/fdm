@@ -1,11 +1,11 @@
 import {
     type ColumnDef,
     type ColumnFiltersState,
-    type SortingState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getSortedRowModel,
+    type SortingState,
     useReactTable,
 } from "@tanstack/react-table"
 import { Plus } from "lucide-react"

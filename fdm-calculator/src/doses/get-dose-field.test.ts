@@ -1,4 +1,3 @@
-import { createFdmServer } from "@svenvw/fdm-core"
 import type { FdmServerType } from "@svenvw/fdm-core"
 import {
     addFarm,
@@ -6,6 +5,7 @@ import {
     addFertilizerApplication,
     addFertilizerToCatalogue,
     addField,
+    createFdmServer,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, inject, it } from "vitest"
 import { getDoseForField } from "./get-dose-field"

@@ -15,11 +15,12 @@ import {
     removeHarvest,
 } from "./harvest"
 import { createId } from "./id"
-import { type FdmServerType, addFarm, addField, createFdmServer } from "./index"
+import { addFarm, addField, createFdmServer, type FdmServerType } from "./index"
+
 describe("harvest", () => {
     let fdm: FdmServerType
     let b_lu_once: schema.cultivationsTypeSelect["b_lu"]
-    let b_lu_once_nonexistent: schema.cultivationsTypeSelect["b_lu"]
+    let _b_lu_once_nonexistent: schema.cultivationsTypeSelect["b_lu"]
     let b_lu_multiple: schema.cultivationsTypeSelect["b_lu"]
     let b_id_farm: string
     let b_id: string
@@ -114,7 +115,7 @@ describe("harvest", () => {
             b_n_fixation: 0,
         })
 
-        b_lu_once_nonexistent = await addCultivation(
+        _b_lu_once_nonexistent = await addCultivation(
             // Assign new b_lu
             fdm,
             principal_id,

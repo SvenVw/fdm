@@ -4,9 +4,9 @@ import { useEffect } from "react"
 import { Form } from "react-hook-form"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
     useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -30,7 +30,9 @@ import { getSession } from "~/lib/auth.server"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+
 const { isPostalCode } = validator
+
 import { clientConfig } from "~/lib/config"
 
 // Meta
@@ -126,7 +128,7 @@ export default function FarmSettingsPropertiesBlock() {
                 ? loaderData.farm.b_postalcode_farm
                 : "",
         })
-    }, [loaderData])
+    }, [loaderData, form.reset])
 
     return (
         <div className="space-y-6">

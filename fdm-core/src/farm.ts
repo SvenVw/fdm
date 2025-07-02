@@ -537,7 +537,7 @@ export async function isAllowedToShareFarm(
             "isAllowedToShareFarm",
         )
         return true
-    } catch (err) {
+    } catch (_err) {
         return false
     }
 }

@@ -1,6 +1,11 @@
 import { getCultivationPlan, getFarm } from "@svenvw/fdm-core"
-import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
-import { Outlet, useLoaderData } from "react-router"
+import {
+    data,
+    type LoaderFunctionArgs,
+    type MetaFunction,
+    Outlet,
+    useLoaderData,
+} from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -111,17 +116,15 @@ export default function Index() {
                 <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
             </Header>
             <main>
-                <>
-                    <FarmTitle
-                        title={"Bouwplan"}
-                        description={
-                            "Werk de eigenschappen per gewas in je bouwplan bij."
-                        }
-                    />
-                    <FarmContent sidebarItems={loaderData.sidebarPageItems}>
-                        <Outlet />
-                    </FarmContent>
-                </>
+                <FarmTitle
+                    title={"Bouwplan"}
+                    description={
+                        "Werk de eigenschappen per gewas in je bouwplan bij."
+                    }
+                />
+                <FarmContent sidebarItems={loaderData.sidebarPageItems}>
+                    <Outlet />
+                </FarmContent>
             </main>
         </SidebarInset>
     )

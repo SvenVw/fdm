@@ -2,12 +2,8 @@ import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
 import { useEffect, useState } from "react"
+import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
-import type {
-    MapBoxZoomEvent,
-    MapEvent,
-    MapMouseEvent,
-} from "react-map-gl/mapbox"
 import { data, useFetcher } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
@@ -26,7 +22,11 @@ export function FieldsPanelHover({
     zoomLevelFields,
     layer,
     layerExclude,
-}: { zoomLevelFields: number; layer: string; layerExclude?: string }) {
+}: {
+    zoomLevelFields: number
+    layer: string
+    layerExclude?: string
+}) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
     useEffect(() => {
@@ -103,7 +103,9 @@ export function FieldsPanelHover({
 
 export function FieldsPanelZoom({
     zoomLevelFields,
-}: { zoomLevelFields: number }) {
+}: {
+    zoomLevelFields: number
+}) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
 
@@ -148,7 +150,9 @@ export function FieldsPanelZoom({
 
 export function FieldsPanelSelection({
     fields,
-}: { fields: FeatureCollection }) {
+}: {
+    fields: FeatureCollection
+}) {
     const fetcher = useFetcher()
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
@@ -220,7 +224,7 @@ export function FieldsPanelSelection({
                             </CardHeader>
                             <CardContent className="grid gap-4">
                                 <div>
-                                    {cultivations.map((cultivation, index) => (
+                                    {cultivations.map((cultivation, _index) => (
                                         // let cultivationCountText = `${cultivation.count + 1} percelen`
 
                                         <div
@@ -286,7 +290,7 @@ export function FieldsPanelSelection({
             }
         }
         updatePanel()
-    }, [fields, isSubmitting, map])
+    }, [fields, isSubmitting, map, submitSelectedFields])
 
     return panel
 }

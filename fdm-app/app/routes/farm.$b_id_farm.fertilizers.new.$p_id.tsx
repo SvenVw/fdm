@@ -1,4 +1,3 @@
-import { FertilizerForm } from "@/app/components/blocks/fertilizer/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addFertilizer,
@@ -9,24 +8,18 @@ import {
     getFertilizerParametersDescription,
     getFertilizers,
 } from "@svenvw/fdm-core"
-import { updateFertilizerFromCatalogue } from "@svenvw/fdm-core"
-import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
     useLoaderData,
 } from "react-router"
 import { useRemixForm } from "remix-hook-form"
-import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess } from "remix-toast"
 import type { z } from "zod"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { FertilizerForm } from "@/app/components/blocks/fertilizer/form"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
-import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"

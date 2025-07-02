@@ -1,8 +1,8 @@
 import { getField } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
     useLoaderData,
 } from "react-router"
 import { Separator } from "~/components/ui/separator"
@@ -81,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * This component retrieves loader data via `useLoaderData` and displays a heading with descriptive text alongside a visual separator. It also sets up an empty grid layout intended for future content.
  */
 export default function FarmFieldsOverviewBlock() {
-    const loaderData = useLoaderData<typeof loader>()
+    const _loaderData = useLoaderData<typeof loader>()
 
     return (
         <div className="space-y-6">

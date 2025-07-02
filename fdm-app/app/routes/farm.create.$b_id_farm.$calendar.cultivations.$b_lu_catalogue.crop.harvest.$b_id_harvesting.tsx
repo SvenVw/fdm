@@ -3,10 +3,10 @@ import {
     getCultivationsFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    data,
     useLoaderData,
 } from "react-router"
 import { HarvestForm } from "~/components/blocks/harvest/form"
@@ -78,14 +78,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const timeframe = getTimeframe(params)
 
         // Get the available cultivations
-        let cultivationOptions = []
+        let _cultivationOptions = []
 
         const cultivationsCatalogue = await getCultivationsFromCatalogue(
             fdm,
             session.principal_id,
             b_id_farm,
         )
-        cultivationOptions = cultivationsCatalogue
+        _cultivationOptions = cultivationsCatalogue
             .filter(
                 (cultivation) =>
                     cultivation?.b_lu_catalogue && cultivation?.b_lu_name,

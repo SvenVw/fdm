@@ -1,4 +1,3 @@
-import { useCalendarStore } from "@/app/store/calendar"
 import type {
     FieldInput,
     NitrogenBalanceNumeric,
@@ -15,6 +14,7 @@ import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
 import type React from "react"
 import { NavLink } from "react-router"
+import { useCalendarStore } from "@/app/store/calendar"
 import {
     Accordion,
     AccordionContent,

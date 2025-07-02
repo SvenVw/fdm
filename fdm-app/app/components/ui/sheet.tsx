@@ -1,7 +1,7 @@
 "use client"
 
 import { Cross2Icon } from "@radix-ui/react-icons"
-import { type VariantProps, cva } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority"
 import { Dialog as SheetPrimitive } from "radix-ui"
 import * as React from "react"
 

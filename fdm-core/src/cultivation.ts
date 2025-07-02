@@ -1,5 +1,4 @@
 import {
-    type SQL,
     and,
     asc,
     desc,
@@ -9,6 +8,7 @@ import {
     isNotNull,
     lte,
     or,
+    type SQL,
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"

@@ -8,9 +8,9 @@ import {
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
     useFetcher,
     useLoaderData,
     useLocation,

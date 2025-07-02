@@ -14,9 +14,9 @@ import {
 } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"

@@ -1,4 +1,3 @@
-import type { Harvest, HarvestableAnalysis } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
     CultivationDetail,
