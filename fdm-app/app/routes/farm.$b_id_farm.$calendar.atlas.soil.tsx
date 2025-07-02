@@ -1,9 +1,9 @@
 import { getFields } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    data,
     useLoaderData,
 } from "react-router"
 import { Button } from "~/components/ui/button"
@@ -98,24 +98,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * linking to the field map.
  */
 export default function FarmAtlasSoilBlock() {
-    const loaderData = useLoaderData<typeof loader>()
+    const _loaderData = useLoaderData<typeof loader>()
 
     return (
-        <>
-            <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
-                <div className="flex flex-col space-y-2 text-center">
-                    <h1 className="text-2xl font-semibold tracking-tight">
-                        Helaas, de bodemkaart is nog niet beschikbaar :(
-                    </h1>
-                    <p className="text-sm text-muted-foreground">
-                        We proberen de bodemkaart binnenkort toe te voegen. Hou
-                        de website in de gaten.
-                    </p>
-                </div>
-                <Button asChild aria-label="Naar perceelkaart">
-                    <NavLink to="../fields">Naar perceelkaart</NavLink>
-                </Button>
+        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
+            <div className="flex flex-col space-y-2 text-center">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                    Helaas, de bodemkaart is nog niet beschikbaar :(
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                    We proberen de bodemkaart binnenkort toe te voegen. Hou de
+                    website in de gaten.
+                </p>
             </div>
-        </>
+            <Button asChild aria-label="Naar perceelkaart">
+                <NavLink to="../fields">Naar perceelkaart</NavLink>
+            </Button>
+        </div>
     )
 }

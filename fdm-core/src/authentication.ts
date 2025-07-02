@@ -33,7 +33,7 @@ export function createFdmAuth(
     emailAndPassword?: boolean,
 ): FdmAuth {
     // Setup social auth providers
-    let googleAuth = undefined
+    let googleAuth
     if (google) {
         googleAuth = {
             clientId: google?.clientId,
@@ -61,7 +61,7 @@ export function createFdmAuth(
         }
     }
 
-    let microsoftAuth = undefined
+    let microsoftAuth
     if (microsoft) {
         microsoftAuth = {
             clientId: microsoft.clientId,
@@ -153,7 +153,7 @@ export function createFdmAuth(
             magicLink({
                 sendMagicLink: async (
                     { email, url },
-                    request,
+                    _request,
                 ): Promise<void> => {
                     if (sendMagicLinkEmail) {
                         await sendMagicLinkEmail(email, url)

@@ -2,19 +2,19 @@ import * as Sentry from "@sentry/react"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import posthog from "posthog-js"
 import { useEffect } from "react"
+import type { LinksFunction, LoaderFunctionArgs } from "react-router"
 import {
+    data,
+    isRouteErrorResponse,
     Links,
     Meta,
     Outlet,
+    redirect,
     Scripts,
     ScrollRestoration,
-    data,
-    isRouteErrorResponse,
-    redirect,
     useLoaderData,
     useLocation,
 } from "react-router"
-import type { LinksFunction, LoaderFunctionArgs } from "react-router"
 import { getToast } from "remix-toast"
 import { toast as notify } from "sonner"
 import { Banner } from "~/components/custom/banner"

@@ -1,4 +1,3 @@
-import { cn } from "@/app/lib/utils"
 import type { Dose } from "@svenvw/fdm-calculator"
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import { format } from "date-fns"
@@ -6,6 +5,7 @@ import { nl } from "date-fns/locale"
 import { ChevronDown, ChevronUp, TriangleAlert } from "lucide-react"
 import { useState } from "react"
 import { NavLink } from "react-router"
+import { cn } from "@/app/lib/utils"
 import { Button } from "~/components/ui/button"
 import {
     Card,

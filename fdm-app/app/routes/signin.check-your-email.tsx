@@ -1,7 +1,6 @@
 import { Cookie } from "lucide-react"
-import type { LoaderFunctionArgs } from "react-router"
+import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { NavLink, redirect } from "react-router"
-import type { MetaFunction } from "react-router"
 import { Button } from "~/components/ui/button"
 import {
     Card,

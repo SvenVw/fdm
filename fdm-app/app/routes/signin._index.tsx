@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, Cookie, Info } from "lucide-react"
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
-import { Form, redirect } from "react-router"
-import type { MetaFunction } from "react-router"
-import { useSearchParams } from "react-router"
+import type {
+    ActionFunctionArgs,
+    LoaderFunctionArgs,
+    MetaFunction,
+} from "react-router"
+import { Form, redirect, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { toast } from "sonner"
@@ -27,8 +29,8 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { signIn } from "~/lib/auth-client"
 import { auth } from "~/lib/auth.server"
+import { signIn } from "~/lib/auth-client"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { cn } from "~/lib/utils"

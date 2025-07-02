@@ -107,11 +107,11 @@ export const parseHexToGeometry = (hex: string): GeoJSON.Geometry => {
 
         const hasSRID = (geometryType & 0x20000000) > 0 // Check if the SRID flag is set
 
-        let srid: number | undefined
+        let _srid: number | undefined
 
         if (hasSRID) {
             // If SRID is included, read the SRID
-            srid = dataView.getUint32(byteOffset, littleEndian)
+            _srid = dataView.getUint32(byteOffset, littleEndian)
             // Set geometry type to the actual type, stripping the SRID flag
             geometryType &= ~0x20000000
             byteOffset += 4 // Move the byte offset past the SRID field

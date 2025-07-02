@@ -10,7 +10,11 @@ export function HarvestsList({
     harvests,
     b_lu_harvestable,
     state,
-}: { harvests: Harvest[]; b_lu_harvestable: HarvestableType; state: string }) {
+}: {
+    harvests: Harvest[]
+    b_lu_harvestable: HarvestableType
+    state: string
+}) {
     const fetcher = useFetcher()
 
     const handleDelete = (b_id_harvesting: string | string[]) => {

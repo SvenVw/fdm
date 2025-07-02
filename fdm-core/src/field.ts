@@ -1,5 +1,4 @@
 import {
-    type SQL,
     and,
     asc,
     eq,
@@ -8,16 +7,16 @@ import {
     isNull,
     lte,
     or,
+    type SQL,
     sql,
 } from "drizzle-orm"
-import { createId } from "./id"
-
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
 import type { Field } from "./field.d"
+import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
 /**
@@ -211,7 +210,7 @@ export async function getFields(
             "getFields",
         )
 
-        let whereClause: SQL | undefined = undefined
+        let whereClause: SQL | undefined
 
         if (timeframe?.start && timeframe.end) {
             whereClause = and(

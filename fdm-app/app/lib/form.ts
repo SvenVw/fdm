@@ -39,7 +39,7 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
                 ) {
                     try {
                         formObject[key] = JSON.parse(value)
-                    } catch (e) {
+                    } catch (_e) {
                         // Not a valid JSON, so leave it as a string
                     }
                 } else if (key !== "b_geometry") {

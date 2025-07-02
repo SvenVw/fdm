@@ -1,4 +1,4 @@
-import { type LoaderFunctionArgs, type MetaFunction, data } from "react-router"
+import { data, type LoaderFunctionArgs, type MetaFunction } from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"

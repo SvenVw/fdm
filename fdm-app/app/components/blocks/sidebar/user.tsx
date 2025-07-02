@@ -1,5 +1,3 @@
-import { useIsMobile } from "@/app/hooks/use-mobile"
-import { clientConfig } from "@/app/lib/config"
 import {
     BadgeCheck,
     ChevronsUpDown,
@@ -11,6 +9,8 @@ import {
 } from "lucide-react"
 import posthog from "posthog-js"
 import { Form, NavLink } from "react-router"
+import { useIsMobile } from "@/app/hooks/use-mobile"
+import { clientConfig } from "@/app/lib/config"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import {

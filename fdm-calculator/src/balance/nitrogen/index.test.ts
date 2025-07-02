@@ -82,7 +82,7 @@ describe("calculateNitrogenBalance", () => {
                     p_no3_rt: 2,
                     p_nh4_rt: 8,
                     p_s_rt: 20,
-                    p_ef_nh3: null             
+                    p_ef_nh3: null,
                 },
             ],
             cultivationDetails: [

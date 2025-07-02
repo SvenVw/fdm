@@ -222,7 +222,7 @@ function constructSoilDataCards(
                 return null
             }
 
-            let label = undefined
+            let label
             if (description.type === "enum") {
                 label = description.options?.find(
                     (option: { value: string }) => option.value === item.value,

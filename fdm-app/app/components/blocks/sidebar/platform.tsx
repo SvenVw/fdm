@@ -1,9 +1,6 @@
-import { clientConfig } from "@/app/lib/config"
 import {
     ArrowLeft,
-    ArrowRight,
     Cookie,
-    House,
     Languages,
     Mail,
     Sparkles,
@@ -11,6 +8,7 @@ import {
     Users,
 } from "lucide-react"
 import { NavLink } from "react-router"
+import { clientConfig } from "@/app/lib/config"
 import { Button } from "~/components/ui/button"
 import {
     SidebarGroup,

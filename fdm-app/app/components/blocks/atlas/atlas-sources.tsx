@@ -3,14 +3,18 @@ import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
-import { generateFeatureClass } from "./atlas-functions"
 import type { FieldsAvailableUrlType } from "./atlas.d"
+import { generateFeatureClass } from "./atlas-functions"
 
 export function FieldsSourceNotClickable({
     id,
     fieldsData,
     children,
-}: { id: string; fieldsData: FeatureCollection; children: JSX.Element }) {
+}: {
+    id: string
+    fieldsData: FeatureCollection
+    children: JSX.Element
+}) {
     return (
         <Source id={id} type="geojson" data={fieldsData}>
             {children}
@@ -55,7 +59,7 @@ export function FieldsSourceSelected({
                 map.off("click", clickOnMap)
             }
         }
-    }, [map, fieldsData, availableLayerId, setFieldsData])
+    }, [map, availableLayerId, setFieldsData])
 
     return (
         <Source id={id} type="geojson" data={fieldsData}>

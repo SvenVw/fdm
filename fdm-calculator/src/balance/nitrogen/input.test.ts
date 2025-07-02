@@ -3,11 +3,11 @@ import type {
     FdmType,
     FertilizerApplication,
     Field,
+    fdmSchema,
     Harvest,
     PrincipalId,
     SoilAnalysis,
     Timeframe,
-    fdmSchema,
 } from "@svenvw/fdm-core"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { collectInputForNitrogenBalance } from "./input"

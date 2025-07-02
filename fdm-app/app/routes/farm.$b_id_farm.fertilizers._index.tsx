@@ -1,14 +1,14 @@
 import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import {
-    type Fertilizer,
     columns,
+    type Fertilizer,
 } from "~/components/blocks/fertilizer/columns"
 import { DataTable } from "~/components/blocks/fertilizer/table"
 import { Header } from "~/components/blocks/header/base"

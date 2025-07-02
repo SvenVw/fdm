@@ -1,7 +1,7 @@
 import {
-    type NitrogenBalanceNumeric,
     calculateNitrogenBalance,
     collectInputForNitrogenBalance,
+    type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import {
@@ -13,10 +13,10 @@ import {
     CircleCheck,
 } from "lucide-react"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    data,
     useLoaderData,
     useLocation,
     useNavigation,

@@ -1,10 +1,9 @@
 import {
-    type FdmAuth,
     createDisplayUsername,
     createFdmAuth,
+    type FdmAuth,
 } from "@svenvw/fdm-core"
-import type { Session } from "better-auth"
-import type { GenericEndpointContext } from "better-auth"
+import type { GenericEndpointContext, Session } from "better-auth"
 import { redirect } from "react-router"
 import { fdm } from "~/lib/fdm.server"
 import type { ExtendedUser } from "~/types/extended-user"

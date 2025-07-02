@@ -1,9 +1,9 @@
-import { clientConfig } from "@/app/lib/config"
 import * as Sentry from "@sentry/react"
 import { LifeBuoy, Send } from "lucide-react"
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
 import { toast } from "sonner"
+import { clientConfig } from "@/app/lib/config"
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -15,7 +15,10 @@ import {
 export function SidebarSupport({
     name,
     email,
-}: { name: string | undefined; email: string | undefined }) {
+}: {
+    name: string | undefined
+    email: string | undefined
+}) {
     useEffect(() => {
         if (clientConfig.analytics.sentry) {
             try {
