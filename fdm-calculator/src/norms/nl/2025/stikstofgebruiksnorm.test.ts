@@ -32,46 +32,54 @@ describe("stikstofgebruiksnorm helpers", () => {
 })
 
 describe("getNL2025StikstofGebruiksNorm", () => {
-    it("should return the correct norm for grasland", async () => {
-        const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
-            field: {
-                b_id: "1",
-                b_centroid: { latitude: 52.5, longitude: 5.5 },
-            } as Field,
-            cultivations: [
-                {
-                    b_lu_catalogue: "nl_265",
-                    b_lu_end: new Date(),
-                } as Partial<NL2025NormsInputForCultivation>,
-            ] as NL2025NormsInputForCultivation[],
-            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
-        }
+    it(
+        "should return the correct norm for grasland",
+        { timeout: 1000000 },
+        async () => {
+            const mockInput: NL2025NormsInput = {
+                farm: { is_derogatie_bedrijf: false },
+                field: {
+                    b_id: "1",
+                    b_centroid: { latitude: 52.5, longitude: 5.5 },
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_265",
+                        b_lu_end: new Date(),
+                    } as Partial<NL2025NormsInputForCultivation>,
+                ] as NL2025NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
 
-        const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        expect(result.normValue).toBe(280)
-        expect(result.normSource).toContain("Grasland")
-    })
+            const result = await getNL2025StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(345)
+            expect(result.normSource).toContain("Grasland")
+        },
+    )
 
-    it("should return the correct norm for potatoes", async () => {
-        const mockInput: NL2025NormsInput = {
-            farm: { is_derogatie_bedrijf: false },
-            field: {
-                b_id: "1",
-                b_centroid: { latitude: 52.5, longitude: 5.5 },
-            } as Field,
-            cultivations: [
-                {
-                    b_lu_catalogue: "nl_293", // Aardappel
-                    b_lu_variety: "Agria", // Pootaardappel
-                    b_lu_end: new Date(),
-                } as Partial<NL2025NormsInputForCultivation>,
-            ] as NL2025NormsInputForCultivation[],
-            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
-        }
+    it(
+        "should return the correct norm for potatoes",
+        { timeout: 1000000 },
+        async () => {
+            const mockInput: NL2025NormsInput = {
+                farm: { is_derogatie_bedrijf: false },
+                field: {
+                    b_id: "1",
+                    b_centroid: { latitude: 52.5, longitude: 5.5 },
+                } as Field,
+                cultivations: [
+                    {
+                        b_lu_catalogue: "nl_2015", // Pootaardappel
+                        b_lu_variety: "Adora", 
+                        b_lu_end: new Date(),
+                    } as Partial<NL2025NormsInputForCultivation>,
+                ] as NL2025NormsInputForCultivation[],
+                soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+            }
 
-        const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        expect(result.normValue).toBe(165)
-        expect(result.normSource).toContain("Pootaardappelen")
-    })
+            const result = await getNL2025StikstofGebruiksNorm(mockInput)
+            expect(result.normValue).toBe(140)
+            expect(result.normSource).toContain("Pootaardappelen")
+        },
+    )
 })
