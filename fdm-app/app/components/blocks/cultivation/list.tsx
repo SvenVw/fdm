@@ -15,7 +15,10 @@ interface Harvest {
 export function CultivationList({
     cultivations,
     harvests,
-}: { cultivations: Cultivation[]; harvests: Harvest[] }) {
+}: {
+    cultivations: Cultivation[]
+    harvests: Harvest[]
+}) {
     const fetcher = useFetcher()
 
     const handleDelete = (b_lu: string | string[]) => {

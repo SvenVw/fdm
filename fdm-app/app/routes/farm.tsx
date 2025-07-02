@@ -1,8 +1,7 @@
 import posthog from "posthog-js"
 import { useEffect } from "react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
-import { redirect } from "react-router"
-import { useLoaderData, useMatches } from "react-router"
+import { redirect, useLoaderData, useMatches } from "react-router"
 import { Outlet } from "react-router-dom"
 import { SidebarApps } from "~/components/blocks/sidebar/apps"
 import { SidebarFarm } from "~/components/blocks/sidebar/farm"
@@ -12,9 +11,9 @@ import { SidebarUser } from "~/components/blocks/sidebar/user"
 import {
     Sidebar,
     SidebarContent,
+    SidebarInset,
     SidebarProvider,
 } from "~/components/ui/sidebar"
-import { SidebarInset } from "~/components/ui/sidebar"
 import { checkSession, getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"

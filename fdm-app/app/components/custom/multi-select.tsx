@@ -1,6 +1,6 @@
 // https://github.com/sersavan/shadcn-multi-select-component
 
-import { type VariantProps, cva } from "class-variance-authority"
+import { cva, type VariantProps } from "class-variance-authority"
 import {
     CheckIcon,
     ChevronDown,

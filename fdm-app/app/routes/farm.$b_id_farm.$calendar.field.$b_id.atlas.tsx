@@ -2,13 +2,13 @@ import { Layer, Map as MapGL } from "react-map-gl/mapbox"
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
+import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
-    type LoaderFunctionArgs,
     data,
+    type LoaderFunctionArgs,
     useLoaderData,
 } from "react-router"
-import type { MetaFunction } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"

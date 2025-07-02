@@ -1,4 +1,4 @@
-import { type SQL, and, eq, gte, isNull, lte, or, sql } from "drizzle-orm"
+import { and, eq, gte, isNull, lte, or, type SQL, sql } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -300,7 +300,7 @@ export async function getSoilAnalyses(
             "getSoilAnalyses",
         )
 
-        let whereClause: SQL | undefined = undefined
+        let whereClause: SQL | undefined
         if (timeframe?.start && timeframe.end) {
             whereClause = and(
                 eq(schema.soilSampling.b_id, b_id),
@@ -432,7 +432,7 @@ export async function getCurrentSoilData(
         )
 
         // Filter out "future" analyes
-        let whereClause: SQL | undefined = undefined
+        let whereClause: SQL | undefined
         if (timeframe?.end) {
             whereClause = and(
                 eq(schema.soilSampling.b_id, b_id),

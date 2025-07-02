@@ -3,7 +3,7 @@
 // The database schema supports combined harvests, but the functions here do not yet implement this feature.
 // The current join structure is: cultivations (1) => cultivation_harvesting (M) => harvestables (1) => harvestable_sampling (1) => harvestable_analyses (1)
 
-import { type SQL, and, desc, eq, gte, lte } from "drizzle-orm"
+import { and, desc, eq, gte, lte, type SQL } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
 import * as schema from "./db/schema"
@@ -205,7 +205,7 @@ export async function getHarvests(
             "getHarvests",
         )
 
-        let whereClause: SQL | undefined = undefined
+        let whereClause: SQL | undefined
         if (timeframe?.start && timeframe?.end) {
             whereClause = and(
                 eq(schema.cultivationHarvesting.b_lu, b_lu),

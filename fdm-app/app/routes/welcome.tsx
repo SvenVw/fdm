@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { updateUserProfile } from "@svenvw/fdm-core"
 import { Cookie } from "lucide-react"
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router"
+import type {
+    ActionFunctionArgs,
+    LoaderFunctionArgs,
+    MetaFunction,
+} from "react-router"
 import { Form, useLoaderData } from "react-router"
-import type { MetaFunction } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"

@@ -1,9 +1,9 @@
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    data,
     redirect,
     useLoaderData,
     useLocation,

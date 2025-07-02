@@ -1,8 +1,8 @@
 import { Decimal } from "decimal.js"
 // c:\Users\sven.verweij\Applications\fdm\fdm-calculator\src\balance\nitrogen\supply\fertilizers\index.test.ts
-import { describe, expect, it, vi } from "vitest"
-import { calculateNitrogenSupplyByFertilizers } from "."
+import { describe, expect, it } from "vitest"
 import type { FertilizerDetail, FieldInput } from "../../types"
+import { calculateNitrogenSupplyByFertilizers } from "."
 
 describe("calculateNitrogenSupplyByFertilizers", () => {
     it("should return 0 if no fertilizer applications are provided", () => {

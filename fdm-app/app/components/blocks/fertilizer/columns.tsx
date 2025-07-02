@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight, Pencil, SquareArrowOutUpRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import {

@@ -1,9 +1,9 @@
 import { getFarms, getFields } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
-    data,
     redirect,
     useLoaderData,
 } from "react-router"

@@ -1,6 +1,5 @@
 import { calculateDose } from "@svenvw/fdm-calculator"
 import {
-    getCultivation,
     getCultivations,
     getCurrentSoilData,
     getFertilizerApplications,

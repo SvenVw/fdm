@@ -8,8 +8,8 @@ import {
 import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
-import { type LoaderFunctionArgs, data, useLoaderData } from "react-router"
 import type { MetaFunction } from "react-router"
+import { data, type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
@@ -131,38 +131,36 @@ export default function FarmAtlasFieldsBlock() {
     }, [])
 
     return (
-        <>
-            <MapGL
-                {...viewState}
-                style={{ height: "calc(100vh - 64px - 147px)", width: "100%" }}
-                interactive={true}
-                mapStyle={loaderData.mapboxStyle}
-                mapboxAccessToken={loaderData.mapboxToken}
-                interactiveLayerIds={[id]}
-                onMove={onViewportChange}
-            >
-                <Controls
-                    onViewportChange={({ longitude, latitude, zoom }) =>
-                        setViewState((currentViewState) => ({
-                            ...currentViewState,
-                            longitude,
-                            latitude,
-                            zoom,
-                            pitch: currentViewState.pitch, // Ensure pitch is carried over
-                            bearing: currentViewState.bearing, // Ensure bearing is carried over
-                        }))
-                    }
+        <MapGL
+            {...viewState}
+            style={{ height: "calc(100vh - 64px - 147px)", width: "100%" }}
+            interactive={true}
+            mapStyle={loaderData.mapboxStyle}
+            mapboxAccessToken={loaderData.mapboxToken}
+            interactiveLayerIds={[id]}
+            onMove={onViewportChange}
+        >
+            <Controls
+                onViewportChange={({ longitude, latitude, zoom }) =>
+                    setViewState((currentViewState) => ({
+                        ...currentViewState,
+                        longitude,
+                        latitude,
+                        zoom,
+                        pitch: currentViewState.pitch, // Ensure pitch is carried over
+                        bearing: currentViewState.bearing, // Ensure bearing is carried over
+                    }))
+                }
+            />
+            <FieldsSourceNotClickable id={id} fieldsData={fields}>
+                <Layer {...fieldsSavedStyle} />
+            </FieldsSourceNotClickable>
+            <div className="fields-panel grid gap-4 w-[350px]">
+                <FieldsPanelHover
+                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                    layer={id}
                 />
-                <FieldsSourceNotClickable id={id} fieldsData={fields}>
-                    <Layer {...fieldsSavedStyle} />
-                </FieldsSourceNotClickable>
-                <div className="fields-panel grid gap-4 w-[350px]">
-                    <FieldsPanelHover
-                        zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                        layer={id}
-                    />
-                </div>
-            </MapGL>
-        </>
+            </div>
+        </MapGL>
     )
 }

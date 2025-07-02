@@ -571,7 +571,7 @@ describe("Cultivation Data Model", () => {
         let b_lu_catalogue: string
         let p_id: string
         let b_lu_source: string
-        let p_source: string
+        let _p_source: string
         let principal_id: string
 
         beforeEach(async () => {

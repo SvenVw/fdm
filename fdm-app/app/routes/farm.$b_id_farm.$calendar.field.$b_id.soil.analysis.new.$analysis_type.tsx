@@ -2,9 +2,9 @@ import { addSoilAnalysis, getField } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     NavLink,
-    data,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
