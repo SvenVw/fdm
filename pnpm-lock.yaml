@@ -71,7 +71,7 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@changesets/cli':
-        specifier: ^2.29.4
+        specifier: ^2.29.5
         version: 2.29.5
       turbo:
         specifier: ^2.5.4

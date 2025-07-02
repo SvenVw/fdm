@@ -26,10 +26,10 @@
     },
     "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@changesets/cli": "^2.29.4",
+        "@changesets/cli": "^2.29.5",
         "turbo": "^2.5.4"
     },
-    "packageManager": "pnpm@10.12.1",
+    "packageManager": "pnpm@10.12.4",
     "pnpm": {
         "packageExtensions": {
             "vite-plugin-dts": {
