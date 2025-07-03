@@ -87,7 +87,7 @@ export function FieldsPanelHover({
         })
 
         if (map) {
-            map.on("mousemove", (evt) => throttledUpdatePanel(evt))
+            map.on("mousemove", throttledUpdatePanel)
             map.on("click", updatePanel)
             map.on("zoom", throttledUpdatePanel)
             map.on("load", updatePanel)
@@ -202,6 +202,7 @@ export function FieldsPanelSelection({
                             acc: { b_lu_name: string; count: number }[],
                             feature,
                         ) => {
+                            if (!feature.properties) return acc
                             const existingCultivation = acc.find(
                                 (c) =>
                                     c.b_lu_name ===
@@ -296,7 +297,7 @@ export function FieldsPanelSelection({
             }
         }
         updatePanel()
-    }, [fields, isSubmitting, map])
+    }, [fields, isSubmitting, map, submitSelectedFields])
 
     return panel
 }
