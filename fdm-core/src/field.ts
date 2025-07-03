@@ -500,13 +500,13 @@ export async function removeField(
                     await tx.delete(schema.harvestables).where(inArray(schema.harvestables.b_id_harvestable, harvestableIds));
                 }
 
-                // Step 8: Delete from cultivation_starting, then cultivation_ending and cultivations
+                // Step 8: Delete from cultivation_starting, cultivation_ending and cultivations
                 await tx.delete(schema.cultivationStarting).where(inArray(schema.cultivationStarting.b_lu, cultivationIds));
                 await tx.delete(schema.cultivationEnding).where(inArray(schema.cultivationEnding.b_lu, cultivationIds));
                 await tx.delete(schema.cultivations).where(inArray(schema.cultivations.b_lu, cultivationIds));
             }
 
-            // Step 8: Get all soil analysis IDs for the field
+            // Step 9: Get all soil analysis IDs for the field
             const soilSamplings = await tx
                 .select({ a_id: schema.soilSampling.a_id })
                 .from(schema.soilSampling)
@@ -515,23 +515,20 @@ export async function removeField(
             if (soilSamplings.length > 0) {
                 const soilAnalysisIds = soilSamplings.map(ss => ss.a_id);
 
-                // Step 9: Delete from soil_sampling first
+                // Step 10: Delete from soil_sampling first
                 await tx.delete(schema.soilSampling).where(inArray(schema.soilSampling.a_id, soilAnalysisIds));
 
-                // Step 10: Delete from soil_analysis
+                // Step 11: Delete from soil_analysis
                 await tx.delete(schema.soilAnalysis).where(inArray(schema.soilAnalysis.a_id, soilAnalysisIds));
             }
 
-            // Step 10: Delete from soil_sampling, fertilizer_applying, cultivation_starting, field_discarding, and field_acquiring
-            await tx.delete(schema.soilSampling).where(eq(schema.soilSampling.b_id, b_id));
+            // Step 12: Delete from fertilizer_applying, field_discarding, and field_acquiring
             await tx.delete(schema.fertilizerApplication).where(eq(schema.fertilizerApplication.b_id, b_id));
-            await tx.delete(schema.cultivationStarting).where(eq(schema.cultivationStarting.b_id, b_id));
             await tx.delete(schema.fieldDiscarding).where(eq(schema.fieldDiscarding.b_id, b_id));
             await tx.delete(schema.fieldAcquiring).where(eq(schema.fieldAcquiring.b_id, b_id));
 
-            // Step 11: Finally, delete the field itself
+            // Step 13: Finally, delete the field itself
             await tx.delete(schema.fields).where(eq(schema.fields.b_id, b_id));
-        })
     } catch (err) {
         throw handleError(err, "Exception for removeField", { b_id });
     }
