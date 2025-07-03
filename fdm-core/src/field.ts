@@ -3,6 +3,7 @@ import {
     asc,
     eq,
     gte,
+    inArray,
     isNotNull,
     isNull,
     lte,
@@ -425,3 +426,109 @@ export async function updateField(
         }
     })
 }
+
+/**
+ * Removes a field and all its associated data.
+ *
+ * This function checks if the principal has permission to delete the field, then proceeds to delete
+ * the field and all cascading data, including acquiring and discarding information, cultivations, 
+ * fertilizer applications, soil analyses, and harvests.
+ * 
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The unique identifier of the principal performing the operation.
+ * @param b_id - The unique identifier of the field to be removed.
+ * @returns A promise that resolves when the field has been successfully removed.
+ *
+ * @throws {Error} If the principal does not have permission to delete the field.
+ *
+ * @alpha
+ */
+export async function removeField(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id: schema.fieldsTypeSelect["b_id"],
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "field",
+            "write",
+            b_id,
+            principal_id,
+            "removeField",
+        )
+
+        await fdm.transaction(async (tx: FdmType) => {
+            // Step 1: Get all cultivation IDs for the given field
+            const cultivations = await tx
+                .select({ b_lu: schema.cultivationStarting.b_lu })
+                .from(schema.cultivationStarting)
+                .where(eq(schema.cultivationStarting.b_id, b_id));
+
+            if (cultivations.length > 0) {
+                const cultivationIds = cultivations.map(c => c.b_lu);
+
+                // Step 2: Get all harvestable IDs from these cultivations
+                const harvestings = await tx
+                    .select({ b_id_harvestable: schema.cultivationHarvesting.b_id_harvestable })
+                    .from(schema.cultivationHarvesting)
+                    .where(inArray(schema.cultivationHarvesting.b_lu, cultivationIds));
+
+                if (harvestings.length > 0) {
+                    const harvestableIds = harvestings.map(h => h.b_id_harvestable);
+
+                    // Step 3: Get all harvestable analysis IDs from these harvestables
+                    const harvestableSamplings = await tx
+                        .select({ b_id_harvestable_analysis: schema.harvestableSampling.b_id_harvestable_analysis })
+                        .from(schema.harvestableSampling)
+                        .where(inArray(schema.harvestableSampling.b_id_harvestable, harvestableIds));
+
+                    if (harvestableSamplings.length > 0) {
+                        const harvestableAnalysisIds = harvestableSamplings.map(hs => hs.b_id_harvestable_analysis);
+
+                        // Step 4: Delete from harvestable_analyses
+                        await tx.delete(schema.harvestableAnalyses).where(inArray(schema.harvestableAnalyses.b_id_harvestable_analysis, harvestableAnalysisIds));
+                    }
+
+                    // Step 5: Delete from harvestable_sampling and cultivation_harvesting
+                    await tx.delete(schema.harvestableSampling).where(inArray(schema.harvestableSampling.b_id_harvestable, harvestableIds));
+                    await tx.delete(schema.cultivationHarvesting).where(inArray(schema.cultivationHarvesting.b_lu, cultivationIds));
+
+                    // Step 6: Delete from harvestables
+                    await tx.delete(schema.harvestables).where(inArray(schema.harvestables.b_id_harvestable, harvestableIds));
+                }
+
+                // Step 7: Delete from cultivation_ending and cultivations
+                await tx.delete(schema.cultivationEnding).where(inArray(schema.cultivationEnding.b_lu, cultivationIds));
+                await tx.delete(schema.cultivations).where(inArray(schema.cultivations.b_lu, cultivationIds));
+            }
+
+            // Step 8: Get all soil analysis IDs for the field
+            const soilSamplings = await tx
+                .select({ a_id: schema.soilSampling.a_id })
+                .from(schema.soilSampling)
+                .where(eq(schema.soilSampling.b_id, b_id));
+
+            if (soilSamplings.length > 0) {
+                const soilAnalysisIds = soilSamplings.map(ss => ss.a_id);
+
+                // Step 9: Delete from soil_analysis
+                await tx.delete(schema.soilAnalysis).where(inArray(schema.soilAnalysis.a_id, soilAnalysisIds));
+            }
+
+            // Step 10: Delete from soil_sampling, fertilizer_applying, cultivation_starting, field_discarding, and field_acquiring
+            await tx.delete(schema.soilSampling).where(eq(schema.soilSampling.b_id, b_id));
+            await tx.delete(schema.fertilizerApplication).where(eq(schema.fertilizerApplication.b_id, b_id));
+            await tx.delete(schema.cultivationStarting).where(eq(schema.cultivationStarting.b_id, b_id));
+            await tx.delete(schema.fieldDiscarding).where(eq(schema.fieldDiscarding.b_id, b_id));
+            await tx.delete(schema.fieldAcquiring).where(eq(schema.fieldAcquiring.b_id, b_id));
+
+            // Step 11: Finally, delete the field itself
+            await tx.delete(schema.fields).where(eq(schema.fields.b_id, b_id));
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for removeField", { b_id });
+    }
+}
+
+
