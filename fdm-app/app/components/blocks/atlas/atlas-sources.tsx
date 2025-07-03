@@ -54,7 +54,7 @@ export function FieldsSourceSelected({
         }
 
         if (map) {
-            map.once("click", clickOnMap)
+            map.on("click", clickOnMap)
             return () => {
                 map.off("click", clickOnMap)
             }
