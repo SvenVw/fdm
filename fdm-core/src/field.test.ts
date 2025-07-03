@@ -656,7 +656,7 @@ describe("Farm Data Model", () => {
                 principal_id,
                 b_lu_catalogue,
                 fieldId,
-                new Date("202-03-01"),
+                new Date("2025-03-01"),
             )
             const soilAnalysisId = await addSoilAnalysis(
                 fdm,
