@@ -14,11 +14,14 @@ import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 
 interface FieldDeleteDialogProps {
-    fieldName: string;
-    isSubmitting: boolean;
+    fieldName: string
+    isSubmitting: boolean
 }
 
-export function FieldDeleteDialog({ fieldName, isSubmitting }: FieldDeleteDialogProps) {
+export function FieldDeleteDialog({
+    fieldName,
+    isSubmitting,
+}: FieldDeleteDialogProps) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -30,27 +33,33 @@ export function FieldDeleteDialog({ fieldName, isSubmitting }: FieldDeleteDialog
                 <AlertDialogHeader>
                     <AlertDialogTitle>Weet je het zeker?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Deze actie kan niet ongedaan worden gemaakt. Dit verwijdert het perceel
-                        "{fieldName}" en alle bijbehorende gegevens, inclusief gewassen,
-                        bemestingen, bodemanalyses en oogsten.
+                        Deze actie kan niet ongedaan worden gemaakt. Dit
+                        verwijdert het perceel "{fieldName}" en alle
+                        bijbehorende gegevens, inclusief gewassen, bemestingen,
+                        bodemanalyses en oogsten.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isSubmitting}>Annuleren</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                        <Form method="delete">
-                            <Button type="submit" variant="destructive" disabled={isSubmitting}>
-                                {isSubmitting ? (
-                                    <div className="flex items-center space-x-2">
-                                        <LoadingSpinner />
-                                        <span>Verwijderen</span>
-                                    </div>
-                                ) : (
-                                    "Verwijderen"
-                                )}
-                            </Button>
-                        </Form>
-                    </AlertDialogAction>
+                    <AlertDialogCancel disabled={isSubmitting}>
+                        Annuleren
+                    </AlertDialogCancel>
+                    <Form method="delete">
+                        <Button
+                            type="submit"
+                            variant="destructive"
+                            disabled={isSubmitting}
+                            className="w-full"
+                        >
+                            {isSubmitting ? (
+                                <div className="flex items-center space-x-2">
+                                    <LoadingSpinner />
+                                    <span>Verwijderen</span>
+                                </div>
+                            ) : (
+                                "Verwijderen"
+                            )}
+                        </Button>
+                    </Form>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
