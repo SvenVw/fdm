@@ -1,5 +1,6 @@
 export { calculateNitrogenBalance } from "./balance/nitrogen/index"
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
+export {createFunctionsForNorms, createFunctionsForFertilizerApplicationFilling} from "./norms"
 export type {
     FieldInput,
     NitrogenBalanceInput,
