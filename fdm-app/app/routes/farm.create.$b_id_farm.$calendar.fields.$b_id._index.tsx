@@ -467,7 +467,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
 
-        console.log(request.method)
         if (request.method === "POST") {
             const formValues = await extractFormValuesFromRequest(
                 request,
