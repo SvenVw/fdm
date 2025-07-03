@@ -486,19 +486,22 @@ export async function removeField(
                     if (harvestableSamplings.length > 0) {
                         const harvestableAnalysisIds = harvestableSamplings.map(hs => hs.b_id_harvestable_analysis);
 
-                        // Step 4: Delete from harvestable_analyses
+                        // Step 4: Delete from harvestable_sampling first
+                        await tx.delete(schema.harvestableSampling).where(inArray(schema.harvestableSampling.b_id_harvestable_analysis, harvestableAnalysisIds));
+
+                        // Step 5: Delete from harvestable_analyses
                         await tx.delete(schema.harvestableAnalyses).where(inArray(schema.harvestableAnalyses.b_id_harvestable_analysis, harvestableAnalysisIds));
                     }
 
-                    // Step 5: Delete from harvestable_sampling and cultivation_harvesting
-                    await tx.delete(schema.harvestableSampling).where(inArray(schema.harvestableSampling.b_id_harvestable, harvestableIds));
+                    // Step 6: Delete from cultivation_harvesting
                     await tx.delete(schema.cultivationHarvesting).where(inArray(schema.cultivationHarvesting.b_lu, cultivationIds));
 
-                    // Step 6: Delete from harvestables
+                    // Step 7: Delete from harvestables
                     await tx.delete(schema.harvestables).where(inArray(schema.harvestables.b_id_harvestable, harvestableIds));
                 }
 
-                // Step 7: Delete from cultivation_ending and cultivations
+                // Step 8: Delete from cultivation_starting, then cultivation_ending and cultivations
+                await tx.delete(schema.cultivationStarting).where(inArray(schema.cultivationStarting.b_lu, cultivationIds));
                 await tx.delete(schema.cultivationEnding).where(inArray(schema.cultivationEnding.b_lu, cultivationIds));
                 await tx.delete(schema.cultivations).where(inArray(schema.cultivations.b_lu, cultivationIds));
             }
@@ -512,7 +515,10 @@ export async function removeField(
             if (soilSamplings.length > 0) {
                 const soilAnalysisIds = soilSamplings.map(ss => ss.a_id);
 
-                // Step 9: Delete from soil_analysis
+                // Step 9: Delete from soil_sampling first
+                await tx.delete(schema.soilSampling).where(inArray(schema.soilSampling.a_id, soilAnalysisIds));
+
+                // Step 10: Delete from soil_analysis
                 await tx.delete(schema.soilAnalysis).where(inArray(schema.soilAnalysis.a_id, soilAnalysisIds));
             }
 
