@@ -153,6 +153,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
                 title: "Kaart",
             },
+            {
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/delete`,
+                title: "Verwijderen",
+            },
         ]
 
         // Return user information from loader

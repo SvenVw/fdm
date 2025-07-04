@@ -51,12 +51,16 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { useCalendarStore } from "~/store/calendar"
+import { clientConfig } from "../lib/config"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: "FDM App" },
-        { name: "description", content: "Welcome to FDM!" },
+        { title: `Nieuw perceel | ${clientConfig.name}` },
+        {
+            name: "description",
+            content: "Voeg een nieuw perceel toe",
+        },
     ]
 }
 
