@@ -85,7 +85,7 @@ export type {
     FertilizerParameterDescriptionItem,
     FertilizerParameters,
 } from "./fertilizer.d"
-export { addField, getField, getFields, updateField } from "./field"
+export { addField, getField, getFields, updateField, removeField } from "./field"
 export type { Field } from "./field.d"
 export {
     addHarvest,

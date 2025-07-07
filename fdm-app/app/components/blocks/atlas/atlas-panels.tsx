@@ -1,7 +1,7 @@
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
 import { Check, Info } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
 import { data, useFetcher } from "react-router"
@@ -87,7 +87,7 @@ export function FieldsPanelHover({
         })
 
         if (map) {
-            map.on("mousemove", (evt) => throttledUpdatePanel(evt))
+            map.on("mousemove", throttledUpdatePanel)
             map.on("click", updatePanel)
             map.on("zoom", throttledUpdatePanel)
             map.on("load", updatePanel)
@@ -159,23 +159,29 @@ export function FieldsPanelSelection({
 
     const isSubmitting = fetcher.state === "submitting"
 
-    async function submitSelectedFields(fields: FeatureCollection) {
-        try {
-            const formSelectedFields = new FormData()
-            formSelectedFields.append("selected_fields", JSON.stringify(fields))
+    const submitSelectedFields = useCallback(
+        async (fields: FeatureCollection) => {
+            try {
+                const formSelectedFields = new FormData()
+                formSelectedFields.append(
+                    "selected_fields",
+                    JSON.stringify(fields),
+                )
 
-            await fetcher.submit(formSelectedFields, {
-                method: "POST",
-            })
-        } catch (error: unknown) {
-            console.error("Failed to submit fields: ", error)
-            throw data({
-                status: 500,
-                statusText: `Failed to submit fields: ${error}`,
-            })
-            // TODO: adding a toast notification with error
-        }
-    }
+                await fetcher.submit(formSelectedFields, {
+                    method: "POST",
+                })
+            } catch (error: unknown) {
+                console.error("Failed to submit fields: ", error)
+                throw data({
+                    status: 500,
+                    statusText: `Failed to submit fields: ${error}`,
+                })
+                // TODO: adding a toast notification with error
+            }
+        },
+        [fetcher],
+    )
 
     useEffect(() => {
         function updatePanel() {
@@ -183,7 +189,7 @@ export function FieldsPanelSelection({
                 // Set information about fields
                 const features = fields?.features || []
                 if (features.length > 0) {
-                    console.log(fields.features)
+                    // console.log(fields.features)
 
                     const fieldCount = features.length
                     let fieldCountText = `Je hebt ${fieldCount} percelen geselecteerd`
@@ -196,6 +202,7 @@ export function FieldsPanelSelection({
                             acc: { b_lu_name: string; count: number }[],
                             feature,
                         ) => {
+                            if (!feature.properties) return acc
                             const existingCultivation = acc.find(
                                 (c) =>
                                     c.b_lu_name ===

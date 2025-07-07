@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.20.2
+
+### Patch Changes
+
+- e8aceb2: Fix missing "continue" button on Bouwplan page in Farm Create Wizard
+
 ## 0.20.1
 
 ### Patch Changes
