@@ -5,6 +5,7 @@ import {
     getCurrentSoilData,
     getField,
     getSoilParametersDescription,
+    removeField,
     updateCultivation,
     updateField,
 } from "@svenvw/fdm-core"
@@ -22,7 +23,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { dataWithSuccess } from "remix-toast"
+import { dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
@@ -52,11 +53,12 @@ import { Separator } from "~/components/ui/separator"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { FieldDeleteDialog } from "../components/blocks/field/delete"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -256,7 +258,7 @@ export default function Index() {
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid lg:grid-cols-4 gap-6">
                 <div className="col-span-2">
                     <RemixFormProvider {...form}>
                         <Form
@@ -362,8 +364,8 @@ export default function Index() {
                         </Form>
                     </RemixFormProvider>
                 </div>
-                <div className="col-span-2">
-                    <div ref={mapContainerRef} className="h-[300px] w-full">
+                <div className="col-span-2 space-y-5">
+                    <div ref={mapContainerRef} className="h-[250px] w-full">
                         {mapIsLoaded ? (
                             <MapGL
                                 {...viewState}
@@ -387,6 +389,12 @@ export default function Index() {
                         ) : (
                             <Skeleton className="h-full w-full rounded-xl" />
                         )}
+                    </div>
+                    <div className="flex justify-end">
+                        <FieldDeleteDialog
+                            fieldName={loaderData.b_name}
+                            isSubmitting={form.formState.isSubmitting}
+                        />
                     </div>
                 </div>
             </div>
@@ -457,43 +465,58 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
 
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
+        if (request.method === "POST") {
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
 
-        await updateField(
-            fdm,
-            session.principal_id,
-            b_id,
-            formValues.b_name,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-        )
-
-        const cultivations = await getCultivations(
-            fdm,
-            session.principal_id,
-            b_id,
-            timeframe,
-        )
-        if (cultivations && cultivations.length > 0) {
-            await updateCultivation(
+            await updateField(
                 fdm,
                 session.principal_id,
-                cultivations[0].b_lu,
-                formValues.b_lu_catalogue,
+                b_id,
+                formValues.b_name,
+                undefined,
+                undefined,
+                undefined,
                 undefined,
                 undefined,
             )
 
-            return dataWithSuccess("fields have been updated", {
-                message: `${formValues.b_name} is bijgewerkt! 🎉`,
-            })
+            const cultivations = await getCultivations(
+                fdm,
+                session.principal_id,
+                b_id,
+                timeframe,
+            )
+            if (cultivations && cultivations.length > 0) {
+                await updateCultivation(
+                    fdm,
+                    session.principal_id,
+                    cultivations[0].b_lu,
+                    formValues.b_lu_catalogue,
+                    undefined,
+                    undefined,
+                )
+
+                return dataWithSuccess("fields have been updated", {
+                    message: `${formValues.b_name} is bijgewerkt! 🎉`,
+                })
+            }
+        } else if (request.method === "DELETE") {
+            // Delete field
+            const field = await getField(fdm, session.principal_id, b_id)
+            await removeField(fdm, session.principal_id, b_id)
+            return redirectWithSuccess(
+                `/farm/create/${b_id_farm}/${calendar}/fields}`,
+                {
+                    message: `${field.b_name} is verwijderd! 🎉`,
+                },
+            )
+        } else {
+            throw new Error("invalid method")
         }
     } catch (error) {
         throw handleActionError(error)
