@@ -1,6 +1,5 @@
 import type { Field } from "@svenvw/fdm-core"
-import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
-import {nitrogenStandardsData} from "./stikstofgebruiksnorm-data"
+import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
     GebruiksnormResult,
     NitrogenStandard,
@@ -9,184 +8,81 @@ import type {
     RegionKey,
 } from "./types"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
-import { getFdmPublicDataUrl } from "../../../balance/nitrogen"
-import * as turf from "@turf/turf"
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.
- * This is achieved by performing a spatial query against a `flatgeobuf` file containing
+ * This is achieved by performing a spatial query against a vector file containing
  * the boundaries of all NV-gebieden.
  *
  * @param b_centroid - An object containing the `latitude` and `longitude` of the field's centroid.
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to `true` if the field's centroid is found within an NV-gebied,
  *   `false` otherwise.
- * @throws {Error} If there are issues fetching the `flatgeobuf` file or processing its stream.
- *
- * @remarks
- * The function leverages the `flatgeobuf` format for efficient spatial querying. Instead of
- * downloading and processing the entire large dataset of NV-gebieds, it performs a targeted
- * query:
- * 1.  **Data Source**: It constructs a URL to the `nv.fgb` file, which is a `flatgeobuf`
- *     file hosted publicly.
- * 2.  **Bounding Box Query**: A small bounding box (approximately 1x1 meter) is created around
- *     the `b_centroid`'s longitude and latitude. This bounding box is sent as part of the
- *     request to the `flatgeobuf` server. This is a key optimization: the server only sends
- *     back geographical features that intersect with this small box, significantly reducing
- *     data transfer and processing load.
- * 3.  **Stream Processing**: The response is received as a stream. The `deserialize` function
- *     from `flatgeobuf` processes this stream, yielding only the GeoJSON features (polygons)
- *     that intersect with the defined bounding box.
- * 4.  **Point-in-Polygon Test**: For each returned polygon (or multi-polygon), the `isPointInRing`
- *     helper function is used to accurately determine if the field's centroid is truly inside
- *     any of its rings. This handles complex polygon geometries, including those with holes.
- * 5.  **Early Exit**: As soon as the centroid is found to be within any NV-gebied polygon,
- *     the function returns `true`. If no intersecting polygons are found after checking
- *     all features, it returns `false`.
- *
- * This approach ensures that the check is both accurate and performant, especially for large
- * geographical datasets.
+ * @throws {Error} If there are issues fetching the file or processing its stream.
  */
 export async function isFieldInNVGebied(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<boolean> {
-    const fdmPublicDataUrl = getFdmPublicDataUrl()
-    const url = `${fdmPublicDataUrl}norms/nl/2025/nv-gebied.fgb`
+    const url =
+        "https://api.ellipsis-drive.com/v3/path/992a7db3-01ea-4c8f-a172-268333e22706/vector/timestamp/1bc2cc57-e0dd-4f49-a290-f600780dd3fe/location"
 
     const { latitude, longitude } = b_centroid
-
-    // Create a small bounding box (1x1 meter) around the point for the spatial query
-    const rect = {
-        minX: longitude - 0.00001,
-        minY: latitude - 0.00001,
-        maxX: longitude + 0.00001,
-        maxY: latitude + 0.00001,
-    }
     try {
-        const response = await fetch(url)
+        const params = new URLSearchParams()
+        params.append("locations", `[[${longitude}, ${latitude}]]`)
+        const response = await fetch(`${url}?${params.toString()}`)
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
-        const stream = response.body
-        if (!stream) {
-            throw new Error("Response body is null")
+        const json = await response.json()
+        const feature = json[0][0]
+        if (feature) {
+            return true
         }
-
-        // Deserialize the flatgeobuffer stream into GeoJSON features within the specified bounding box
-        for await (const feature of deserialize(stream, rect)) {
-            const geometry = feature.geometry
-            if (!geometry) {
-                continue
-            }
-
-            const pt = turf.point([longitude, latitude])
-            if (geometry.type === "Polygon") {
-                const poly = turf.polygon(geometry.coordinates)
-                if (turf.booleanPointInPolygon(pt, poly)) {
-                    return true
-                }
-            } else if (geometry.type === "MultiPolygon") {
-                const multiPoly = turf.multiPolygon(geometry.coordinates)
-                if (turf.booleanPointInPolygon(pt, multiPoly)) {
-                    return true
-                }
-            }
-        }
+        return false
     } catch (err) {
-        throw new Error(
-            `Error querying NV-Gebied flatgeobuffer: ${String(err)}`,
-        )
+        throw new Error(`Error querying NV-Gebied : ${String(err)}`)
     }
-
-    // If no intersecting polygons were found
-    return false
 }
 
 /**
  * Determines the specific soil region (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") for a given field
  * based on its geographical coordinates. This is achieved by performing a spatial query
- * against a `flatgeobuf` file containing the boundaries of grondsoortenkaart in de Meststoffenwet in the Netherlands.
+ * against a vector file containing the boundaries of grondsoortenkaart in de Meststoffenwet in the Netherlands.
  *
  * @param b_centroid - An object containing the `latitude` and `longitude` of the field's centroid.
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to a `RegionKey` (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") if the
  *   field's centroid is found within a defined soil region.
- * @throws {Error} If there are issues fetching the `flatgeobuf` file, processing its stream,
+ * @throws {Error} If there are issues fetching the file, processing its stream,
  *   or if the field's coordinates do not fall within any known region.
  *
  * @remarks
- * Similar to `isFieldInNVGebied`, this function uses the `flatgeobuf` format for efficient
- * spatial querying of soil region data:
- * 1.  **Data Source**: It constructs a URL to the `gs.fgb` file, which contains the
- *     geographical boundaries of different soil regions.
- * 2.  **Bounding Box Query**: A small bounding box (approximately 1x1 meter) is created around
- *     the `b_centroid`'s longitude and latitude. This box is used to request only the relevant
- *     geographical features from the `flatgeobuf` server, minimizing data transfer.
- * 3.  **Stream Processing**: The `deserialize` function processes the incoming stream,
- *     providing GeoJSON features that intersect with the bounding box.
- * 4.  **Point-in-Polygon Test**: For each returned polygon (or multi-polygon), the `isPointInRing`
- *     helper function is used to precisely check if the field's centroid is inside.
- * 5.  **Region Extraction**: If the centroid is found within a polygon, the function attempts
- *     to extract the `region` property from the GeoJSON feature's properties. This `region`
- *     value (e.g., "zand" for sandy soil) is then returned.
- * 6.  **Error Handling**: If no region can be determined after checking all intersecting features,
- *     an error is thrown, indicating that the coordinates do not fall into a defined region.
- *
  * This function is critical for applying region-specific nitrogen norms, as these norms
  * vary based on soil type.
  */
 export async function getRegion(
     b_centroid: Pick<Field, "latitude" | "longitude">,
 ): Promise<RegionKey> {
-    const fdmPublicDataUrl = getFdmPublicDataUrl()
-    const url = `${fdmPublicDataUrl}norms/nl/2024/gs.fgb`
+    const url =
+        "https://api.ellipsis-drive.com/v3/path/9d3c44e3-d737-492b-9358-4b26f6c2aeb3/vector/timestamp/89db219b-9d9d-42a6-b4a1-50728ab1d7cf/location"
 
     const { latitude, longitude } = b_centroid
-
-    const rect = {
-        minX: longitude - 0.00001,
-        minY: latitude - 0.00001,
-        maxX: longitude + 0.00001,
-        maxY: latitude + 0.00001,
-    }
-
     try {
-        const response = await fetch(url)
+        const params = new URLSearchParams()
+        params.append("locations", `[[${longitude}, ${latitude}]]`)
+        const response = await fetch(`${url}?${params.toString()}`)
         if (!response.ok) {
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
-        const stream = response.body
-        if (!stream) {
-            throw new Error("Response body is null")
-        }
-
-        for await (const feature of deserialize(stream, rect)) {
-            const geometry = feature.geometry
-            if (!geometry) {
-                continue
-            }
-
-            const pt = turf.point([longitude, latitude])
-            if (geometry.type === "Polygon") {
-                const poly = turf.polygon(geometry.coordinates)
-                if (turf.booleanPointInPolygon(pt, poly)) {
-                    const region = feature.properties?.region as RegionKey
-                    if (region) {
-                        return region
-                    }
-                }
-            } else if (geometry.type === "MultiPolygon") {
-                const multiPoly = turf.multiPolygon(geometry.coordinates)
-                if (turf.booleanPointInPolygon(pt, multiPoly)) {
-                    const region = feature.properties?.region as RegionKey
-                    if (region) {
-                        return region
-                    }
-                }
-            }
+        const json = await response.json()
+        console.log(json)
+        const feature = json[0][0]
+        if (feature) {
+            return feature.region as RegionKey
         }
     } catch (err) {
-        throw new Error(`Error querying region flatgeobuffer: ${String(err)}`)
+        throw new Error(`Error querying region: ${String(err)}`)
     }
 
     throw new Error(
@@ -344,7 +240,7 @@ function getNormsForCultivation(
  *     -   `getRegion`: This asynchronous helper function determines the specific soil region
  *         (e.g., "zand" for sandy soil, "klei" for clay soil) based on the field's coordinates.
  *         Nitrogen norms can vary significantly by soil type.
- *     Both functions use efficient `flatgeobuf` spatial queries to retrieve this information.
+ *     Both functions use efficient spatial queries to retrieve this information.
  *
  * 3.  **Match Nitrogen Standard Data**:
  *     The `nitrogenStandardsData` (loaded from a JSON file) is filtered to find all entries
