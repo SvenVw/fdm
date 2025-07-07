@@ -4,7 +4,7 @@ import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/fosfaatgebruiksnorm"
 import { collectNL2025InputForNorms } from "./nl/2025/input"
 import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
 
-export function createFunctionsForNorms(b_region: string, year: number) {
+export function createFunctionsForNorms(b_region: "NL", year: number) {
     if (b_region === "NL") {
         if (year === 2025) {
             return {
@@ -12,7 +12,7 @@ export function createFunctionsForNorms(b_region: string, year: number) {
                 calculateNormForNitrogen: getNL2025StikstofGebruiksNorm,
                 calculateNormForManure: getNL2025DierlijkeMestGebruiksNorm,
                 calculateNormForPhosphate: getNL2025FosfaatGebruiksNorm,
-                aggregateNormsToFarmLevel: aggregateNormsToFarmLevel
+                aggregateNormsToFarmLevel: aggregateNormsToFarmLevel,
             }
         }
         throw new Error("Year not supported")
