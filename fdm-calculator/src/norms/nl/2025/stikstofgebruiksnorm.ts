@@ -289,7 +289,7 @@ export async function getNL2025StikstofGebruiksNorm(
     const cultivation = cultivations.find(
         (c) => c.b_lu_catalogue === b_lu_catalogue,
     )
-    if (!cultivation) {
+    if (b_lu_catalogue !== "nl_6794" && !cultivation) {
         throw new Error(
             `Cultivation with b_lu_catalogue ${b_lu_catalogue} not found`,
         )
