@@ -8,7 +8,7 @@ import { aggregateNormsToFarmLevel } from "./farm"
 
 describe("createFunctionsForNorms", () => {
     it("should return the correct functions for NL region and year 2025", () => {
-        const functions = createFunctionsForNorms("NL", 2025)
+        const functions = createFunctionsForNorms("NL", "2025")
         expect(functions.collectInputForNorms).toBe(collectNL2025InputForNorms)
         expect(functions.calculateNormForNitrogen).toBe(getNL2025StikstofGebruiksNorm)
         expect(functions.calculateNormForManure).toBe(getNL2025DierlijkeMestGebruiksNorm)
@@ -17,17 +17,17 @@ describe("createFunctionsForNorms", () => {
     })
 
     it("should throw an error for an unsupported year", () => {
-        expect(() => createFunctionsForNorms("NL", 2024)).toThrow("Year not supported")
+        expect(() => createFunctionsForNorms("NL"," 2024")).toThrow("Year not supported")
     })
 
     it("should throw an error for an unsupported region", () => {
-        expect(() => createFunctionsForNorms("BE", 2025)).toThrow("Region not supported")
+        expect(() => createFunctionsForNorms("BE", "2025")).toThrow("Region not supported")
     })
 })
 
 describe("createFunctionsForFertilizerApplicationFilling", () => {
     it("should return the correct functions for NL region and year 2025", () => {
-        const functions = createFunctionsForFertilizerApplicationFilling("NL", 2025)
+        const functions = createFunctionsForFertilizerApplicationFilling("NL", "2025")
         expect(functions.collectInputForFertilizerApplicationFilling).toBeUndefined()
         expect(functions.calculateFertilizerApplicationFillingForNitrogen).toBeUndefined()
         expect(functions.calculateFertilizerApplicationFillingForManure).toBeUndefined()
@@ -35,10 +35,10 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
     })
 
     it("should throw an error for an unsupported year", () => {
-        expect(() => createFunctionsForFertilizerApplicationFilling("NL", 2024)).toThrow("Year not supported")
+        expect(() => createFunctionsForFertilizerApplicationFilling("NL", "2024")).toThrow("Year not supported")
     })
 
     it("should throw an error for an unsupported region", () => {
-        expect(() => createFunctionsForFertilizerApplicationFilling("BE", 2025)).toThrow("Region not supported")
+        expect(() => createFunctionsForFertilizerApplicationFilling("BE", "2025")).toThrow("Region not supported")
     })
 })
