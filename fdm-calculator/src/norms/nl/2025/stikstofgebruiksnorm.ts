@@ -14,19 +14,20 @@ import { determineNL2025Hoofdteelt } from "./hoofdteelt"
  * This is achieved by performing a spatial query against a vector file containing
  * the boundaries of all NV-gebieden.
  *
- * @param b_centroid - An object containing the `latitude` and `longitude` of the field's centroid.
+ * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to `true` if the field's centroid is found within an NV-gebied,
  *   `false` otherwise.
  * @throws {Error} If there are issues fetching the file or processing its stream.
  */
 export async function isFieldInNVGebied(
-    b_centroid: Pick<Field, "latitude" | "longitude">,
+    b_centroid: Field["b_centroid"],
 ): Promise<boolean> {
     const url =
         "https://api.ellipsis-drive.com/v3/path/992a7db3-01ea-4c8f-a172-268333e22706/vector/timestamp/1bc2cc57-e0dd-4f49-a290-f600780dd3fe/location"
 
-    const { latitude, longitude } = b_centroid
+    const longitude = b_centroid[0]
+    const latitude = b_centroid[1]
     try {
         const params = new URLSearchParams()
         params.append("locations", `[[${longitude}, ${latitude}]]`)
@@ -50,7 +51,7 @@ export async function isFieldInNVGebied(
  * based on its geographical coordinates. This is achieved by performing a spatial query
  * against a vector file containing the boundaries of grondsoortenkaart in de Meststoffenwet in the Netherlands.
  *
- * @param b_centroid - An object containing the `latitude` and `longitude` of the field's centroid.
+ * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to a `RegionKey` (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") if the
  *   field's centroid is found within a defined soil region.
@@ -62,12 +63,13 @@ export async function isFieldInNVGebied(
  * vary based on soil type.
  */
 export async function getRegion(
-    b_centroid: Pick<Field, "latitude" | "longitude">,
+    b_centroid: Field["b_centroid"],
 ): Promise<RegionKey> {
     const url =
         "https://api.ellipsis-drive.com/v3/path/9d3c44e3-d737-492b-9358-4b26f6c2aeb3/vector/timestamp/89db219b-9d9d-42a6-b4a1-50728ab1d7cf/location"
 
-    const { latitude, longitude } = b_centroid
+    const longitude = b_centroid[0]
+    const latitude = b_centroid[1]
     try {
         const params = new URLSearchParams()
         params.append("locations", `[[${longitude}, ${latitude}]]`)
@@ -76,7 +78,6 @@ export async function getRegion(
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
         const json = await response.json()
-        console.log(json)
         const feature = json[0][0]
         if (feature) {
             return feature.region as RegionKey
