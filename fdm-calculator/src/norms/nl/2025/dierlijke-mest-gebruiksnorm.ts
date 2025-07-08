@@ -3,6 +3,44 @@ import type {
     NL2025NormsInput,
 } from "./types.d"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
+import type { Field } from "@svenvw/fdm-core"
+
+/**
+ * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
+ * This is achieved by performing a spatial query against a vector file containing
+ * the boundaries of all GWBG-gebieden.
+ *
+ * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
+ *   This point is used to query the geographical data.
+ * @returns A promise that resolves to `true` if the field's centroid is found within an GWBG-gebied,
+ *   `false` otherwise.
+ * @throws {Error} If there are issues fetching the file or processing its stream.
+ */
+export async function isFieldInGWGBGebied(
+    b_centroid: Field["b_centroid"],
+): Promise<boolean> {
+    const url =
+        "https://api.ellipsis-drive.com/v3/path/6e87a86a-4548-4bed-b47e-06a47e4b59fa/vector/timestamp/8780e629-668c-40fd-bbc0-4fa15e5557f7/location"
+
+    const longitude = b_centroid[0]
+    const latitude = b_centroid[1]
+    try {
+        const params = new URLSearchParams()
+        params.append("locations", `[[${longitude}, ${latitude}]]`)
+        const response = await fetch(`${url}?${params.toString()}`)
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+        }
+        const json = await response.json()
+        const feature = json[0][0]
+        if (feature) {
+            return true
+        }
+        return false
+    } catch (err) {
+        throw new Error(`Error querying GWGB-Gebied : ${String(err)}`)
+    }
+}
 
 /**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen from animal manure
@@ -37,6 +75,7 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
     const field = input.field
 
     const is_nv_gebied = await isFieldInNVGebied(field.b_centroid)
+    const is_gwbg_gebied = await isFieldInGWGBGebied(field.b_centroid)
 
     let normValue: number
     let normSource: string
@@ -45,9 +84,12 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
         if (is_nv_gebied) {
             normValue = 190
             normSource = "Derogatie - NV Gebied"
+        } else if (is_gwbg_gebied) {
+            normValue = 190
+            normSource = "Derogatie - Grondwaterbeschermingsgebied"
         } else {
             normValue = 200
-            normSource = "Derogatie - Buiten NV Gebied"
+            normSource = "Derogatie"
         }
     } else {
         normValue = 170
