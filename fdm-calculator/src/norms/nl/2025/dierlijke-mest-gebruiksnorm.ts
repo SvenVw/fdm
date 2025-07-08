@@ -1,22 +1,8 @@
-import type { Field } from "@svenvw/fdm-core"
 import type {
     DierlijkeMestGebruiksnormResult,
     NL2025NormsInput,
 } from "./types.d"
-
-/**
- * Placeholder function to determine if a field is in an NV-area.
- * In a real implementation, this would perform a spatial query.
- * @param _field - The field object, containing geometry or centroid.
- * @returns A promise that resolves to a boolean.
- */
-async function isFieldInNVGebied(
-    _field: Pick<Field, "b_id" | "b_centroid">,
-): Promise<boolean> {
-    // This function would typically use a service to check if the field's coordinates
-    // fall within a designated NV-area. For now, it returns a default value.
-    return Promise.resolve(false)
-}
+import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 
 /**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen from animal manure
@@ -50,7 +36,7 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
     const field = input.field
 
-    const is_nv_gebied = await isFieldInNVGebied(field)
+    const is_nv_gebied = await isFieldInNVGebied(field.b_centroid)
 
     let normValue: number
     let normSource: string
