@@ -287,10 +287,21 @@ export async function getNL2025StikstofGebruiksNorm(
 
     // Determine hoofdteelt
     const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
-    const cultivation = cultivations.find(
+    let cultivation = cultivations.find(
         (c) => c.b_lu_catalogue === b_lu_catalogue,
     )
-    if (b_lu_catalogue !== "nl_6794" && !cultivation) {
+
+    //Create cultivation in case of braak
+    if (b_lu_catalogue === "nl_6794") {
+        cultivation = {
+            b_lu: "Groene braak, spontane opkomst",
+            b_lu_catalogue: "nl_6794",
+            b_lu_start: new Date("2025-01-01"),
+            b_lu_end: new Date("2025-12-3"),
+            b_lu_variety: null,
+        }
+    }
+    if (!cultivation) {
         throw new Error(
             `Cultivation with b_lu_catalogue ${b_lu_catalogue} not found`,
         )
