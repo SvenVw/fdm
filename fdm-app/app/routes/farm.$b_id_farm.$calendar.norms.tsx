@@ -98,6 +98,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        // Currently only 2025 is supported
         if (calendar !== "2025") {
             return {
                 farm: farm,
@@ -112,7 +113,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Calculate norms per field
-        const functionsForms = createFunctionsForNorms("NL", 2025)
+        const functionsForms = createFunctionsForNorms("NL", calendar)
 
         const fieldNorms = await Promise.all(
             fields.map(async (field) => {
