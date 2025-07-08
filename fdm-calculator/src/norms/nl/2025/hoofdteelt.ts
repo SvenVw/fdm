@@ -32,7 +32,9 @@ export function determineNL2025Hoofdteelt(
 
     for (const cultivation of cultivations) {
         const cultivationStart = new Date(cultivation.b_lu_start)
-        const cultivationEnd = new Date(cultivation.b_lu_end)
+        const cultivationEnd = cultivation.b_lu_end
+            ? new Date(cultivation.b_lu_end)
+            : HOOFDTEELT_END
 
         const effectiveStart =
             cultivationStart > HOOFDTEELT_START

@@ -85,4 +85,18 @@ describe("determineNL2025Hoofdteelt", () => {
         const result = await determineNL2025Hoofdteelt(cultivations)
         expect(result).toBe("nl_6794")
     })
+
+    it("should handle cultivation with null end date", async () => {
+        const cultivations: NL2025NormsInputForCultivation[] = [
+            {
+                b_lu: "Gewas H",
+                b_lu_catalogue: "cat_H",
+                b_lu_start: "2025-01-01",
+                b_lu_end: null,
+                b_lu_variety: null,
+            },
+        ]
+        const result = await determineNL2025Hoofdteelt(cultivations)
+        expect(result).toBe("cat_H")
+    })
 })
