@@ -1,7 +1,5 @@
 import type {
     Cultivation,
-    CultivationCatalogue,
-    FdmType,
     Field,
     SoilAnalysis,
 } from "@svenvw/fdm-core"

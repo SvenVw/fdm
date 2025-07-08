@@ -28,19 +28,19 @@ type InputAggregateNormsToFarmLevel = {
  * Represents the aggregated output of the `aggregateNormsToFarmLevel` function.
  * The results are expressed as total amounts for the farm, not per hectare.
  */
-type OutputAggregateNormsToFarmLevel = {
-   /**
-    * Total manure norm in kg N for the entire farm.
-    */
-   manure: number // kg N
-   /**
-    * Total nitrogen norm in kg N for the entire farm.
-    */
-   nitrogen: number // kg N
-   /**
-    * Total phosphate norm in kg P2O5 for the entire farm.
-    */
-   phosphate: number // kg P2O5
+export type AggregatedNormsToFarmLevel = {
+    /**
+     * Total manure norm in kg N for the entire farm.
+     */
+    manure: number // kg N
+    /**
+     * Total nitrogen norm in kg N for the entire farm.
+     */
+    nitrogen: number // kg N
+    /**
+     * Total phosphate norm in kg P2O5 for the entire farm.
+     */
+    phosphate: number // kg P2O5
 }
 
 /**
@@ -84,16 +84,24 @@ type OutputAggregateNormsToFarmLevel = {
  * //   phosphate: (50 * 10) + (45 * 5) = 500 + 225 = 725,
  * // }
  */
-export function aggregateNormsToFarmLevel(input: InputAggregateNormsToFarmLevel): OutputAggregateNormsToFarmLevel {
+export function aggregateNormsToFarmLevel(
+    input: InputAggregateNormsToFarmLevel,
+): AggregatedNormsToFarmLevel {
     let totalManure = new Decimal(0)
     let totalNitrogen = new Decimal(0)
     let totalPhosphate = new Decimal(0)
 
     for (const field of input) {
         const area = new Decimal(field.b_area)
-        totalManure = totalManure.plus(new Decimal(field.norms.manure.normValue).times(area))
-        totalNitrogen = totalNitrogen.plus(new Decimal(field.norms.nitrogen.normValue).times(area))
-        totalPhosphate = totalPhosphate.plus(new Decimal(field.norms.phosphate.normValue).times(area))
+        totalManure = totalManure.plus(
+            new Decimal(field.norms.manure.normValue).times(area),
+        )
+        totalNitrogen = totalNitrogen.plus(
+            new Decimal(field.norms.nitrogen.normValue).times(area),
+        )
+        totalPhosphate = totalPhosphate.plus(
+            new Decimal(field.norms.phosphate.normValue).times(area),
+        )
     }
 
     return {

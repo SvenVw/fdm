@@ -49,7 +49,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                                     {getFieldName(field.b_id)}
                                 </CardTitle>
                                 <CardDescription className="text-base font-medium text-gray-600">
-                                    {field.b_area}
+                                    {`${field.b_area} ha`}
                                 </CardDescription>
                             </div>
                         </CardHeader>

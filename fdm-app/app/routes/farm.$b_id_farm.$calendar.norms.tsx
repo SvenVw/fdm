@@ -1,4 +1,8 @@
-import { createFunctionsForNorms } from "@svenvw/fdm-calculator"
+import {
+    AggregatedNormsToFarmLevel,
+    createFunctionsForNorms,
+    GebruiksnormResult,
+} from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     data,
@@ -6,6 +10,7 @@ import {
     type MetaFunction,
     NavLink,
     useLoaderData,
+    useLocation,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -22,6 +27,7 @@ import { Separator } from "../components/ui/separator"
 import { Alert, AlertDescription } from "../components/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "../components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -112,42 +118,60 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         }
 
-        // Calculate norms per field
-        const functionsForms = createFunctionsForNorms("NL", calendar)
+        let fieldNorms = undefined as
+            | {
+                  b_id: string
+                  b_area: number
+                  norms: {
+                      manure: GebruiksnormResult
+                      phosphate: GebruiksnormResult
+                      nitrogen: GebruiksnormResult
+                  }
+              }[]
+            | undefined
+        let farmNorms = undefined as AggregatedNormsToFarmLevel | undefined
+        let errorMessage = null as string | null
+        try {
+            // Calculate norms per field
+            const functionsForms = createFunctionsForNorms("NL", calendar)
 
-        const fieldNorms = await Promise.all(
-            fields.map(async (field) => {
-                // Collect the input
-                const input = await functionsForms.collectInputForNorms(
-                    fdm,
-                    session.principal_id,
-                    field.b_id,
-                    timeframe,
-                )
+            fieldNorms = await Promise.all(
+                fields.map(async (field) => {
+                    // Collect the input
+                    const input = await functionsForms.collectInputForNorms(
+                        fdm,
+                        session.principal_id,
+                        field.b_id,
+                        timeframe,
+                    )
 
-                // Calculate the norms
-                const normManure =
-                    await functionsForms.calculateNormForManure(input)
-                const normPhosphate =
-                    await functionsForms.calculateNormForPhosphate(input)
-                const normNitrogen = { normValue: 230, normSource: "test" }
-                // await functionsForms.calculateNormForNitrogen(input)
+                    // Calculate the norms
+                    const normManure =
+                        await functionsForms.calculateNormForManure(input)
+                    const normPhosphate =
+                        await functionsForms.calculateNormForPhosphate(input)
+                    // const normNitrogen = { normValue: 230, normSource: "test" }
+                    const normNitrogen =
+                        await functionsForms.calculateNormForNitrogen(input)
 
-                return {
-                    b_id: field.b_id,
-                    b_area: field.b_area,
-                    norms: {
-                        manure: normManure,
-                        phosphate: normPhosphate,
-                        nitrogen: normNitrogen,
-                    },
-                }
-            }),
-        )
+                    return {
+                        b_id: field.b_id,
+                        b_area: field.b_area,
+                        norms: {
+                            manure: normManure,
+                            phosphate: normPhosphate,
+                            nitrogen: normNitrogen,
+                        },
+                    }
+                }),
+            )
 
-        // Aggregate the norms to farm level
-        const farmNorms =
-            await functionsForms.aggregateNormsToFarmLevel(fieldNorms)
+            // Aggregate the norms to farm level
+            farmNorms =
+                await functionsForms.aggregateNormsToFarmLevel(fieldNorms)
+        } catch (error) {
+            errorMessage = String(error).replace("Error: ", "")
+        }
 
         // Return user information from loader
         return {
@@ -159,6 +183,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             fieldOptions: fieldOptions,
             fieldNorms: fieldNorms,
             farmNorms: farmNorms,
+            errorMessage: errorMessage,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -167,6 +192,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmNormsBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const location = useLocation()
+    const page = location.pathname
 
     return (
         <SidebarInset>
@@ -202,7 +229,42 @@ export default function FarmNormsBlock() {
                 ) : null}
 
                 <div className="space-y-6 px-10 pb-16">
-                    {loaderData.farmNorms && loaderData.fieldNorms ? (
+                    {loaderData.errorMessage ? (
+                        <div className="flex items-center justify-center">
+                            <Card className="w-[350px]">
+                                <CardHeader>
+                                    <CardTitle>
+                                        Helaas is het niet mogelijk om je
+                                        gebruiksnormen uit te rekenen
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-muted-foreground">
+                                        <p>
+                                            Er is onverwacht wat misgegaan.
+                                            Probeer opnieuw of neem contact op
+                                            met Ondersteuning en deel de
+                                            volgende foutmelding:
+                                        </p>
+                                        <div className="mt-8 w-full max-w-2xl">
+                                            <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
+                                                {JSON.stringify(
+                                                    {
+                                                        message:
+                                                            loaderData.errorMessage,
+                                                        page: page,
+                                                        timestamp: new Date(),
+                                                    },
+                                                    null,
+                                                    2,
+                                                )}
+                                            </pre>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    ) : loaderData.farmNorms && loaderData.fieldNorms ? (
                         <>
                             <FarmNorms farmNorms={loaderData.farmNorms} />
                             <Separator className="my-8" />
@@ -225,7 +287,6 @@ export default function FarmNormsBlock() {
                                 </p>
                                 <NavLink
                                     to={`/farm/${loaderData.b_id_farm}/2025/norms`}
-                                    asChild
                                 >
                                     <Button>Ga naar 2025</Button>
                                 </NavLink>
