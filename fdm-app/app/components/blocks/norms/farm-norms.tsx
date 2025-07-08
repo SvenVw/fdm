@@ -15,16 +15,16 @@ export function FarmNorms({ farmNorms }: FarmNormsProps) {
                 {/* <Info className="h-5 w-5 text-blue-600" /> */}
                 Bedrijfsniveau
             </h2>
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 xl:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Stikstofgebruiksnorm
+                            Stikstof
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {farmNorms.nitrogen} kg Nw
+                            {farmNorms.nitrogen} kg N
                         </div>
                         {/* <p className="text-xs text-muted-foreground"></p> */}
                     </CardContent>
@@ -32,7 +32,7 @@ export function FarmNorms({ farmNorms }: FarmNormsProps) {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Fosfaatgebruiksnorm
+                            Fosfaat
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -45,7 +45,7 @@ export function FarmNorms({ farmNorms }: FarmNormsProps) {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">
-                            Dierlijke mest gebruiksnorm
+                            Stiksof uit dierlijke mest
                         </CardTitle>
                     </CardHeader>
                     <CardContent>

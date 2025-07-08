@@ -37,7 +37,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
     return (
         <div>
             <h2 className="text-2xl font-semibold mb-6">Perceelniveau</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {fieldNorms.map((field) => (
                     <Card
                         key={field.b_id}
@@ -58,7 +58,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        Stikstofgebruiksnorm
+                                        Stikstof
                                     </p>
                                     <p className="text-sm text-gray-600">
                                         {field.norms.nitrogen.normSource}
@@ -78,7 +78,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        Fosfaatgebruiksnorm
+                                        Fosfaat
                                     </p>
                                     <p className="text-sm text-gray-600">
                                         {field.norms.phosphate.normSource}
@@ -98,7 +98,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border border-gray-100">
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        Dierlijke mest gebruiksnorm
+                                        Stikstof uit dierlijke mest
                                     </p>
                                     <p className="text-sm text-gray-600">
                                         {field.norms.manure.normSource}
