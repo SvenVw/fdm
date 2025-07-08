@@ -159,7 +159,7 @@ export async function getNL2025FosfaatGebruiksNorm(
         ? normsForKlasse.grasland
         : normsForKlasse.bouwland
     const normSource = is_grasland
-        ? `Grasland: ${fosfaatKlasse}}`
+        ? `Grasland: ${fosfaatKlasse}`
         : `Bouwland: ${fosfaatKlasse}`
 
     return { normValue, normSource }
