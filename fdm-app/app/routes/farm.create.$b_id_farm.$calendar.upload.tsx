@@ -1,32 +1,13 @@
-import { Info } from "lucide-react"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
     MetaFunction,
 } from "react-router"
-import {
-    data,
-    Form,
-    Link,
-    useLoaderData,
-    useNavigation,
-} from "react-router-dom"
+import { data, useLoaderData } from "react-router-dom"
+import { ShapefileUploadForm } from "~/components/blocks/field/form-upload"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
-import { Button } from "~/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
 import { SidebarInset } from "~/components/ui/sidebar"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { LocalFileStorage } from "@mjackson/file-storage/local"
@@ -81,9 +62,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function UploadShapefilePage() {
-    const { b_id_farm, b_name_farm, calendar } = useLoaderData<typeof loader>()
-    const navigation = useNavigation()
-    const isSubmitting = navigation.state === "submitting"
+    const { b_name_farm } = useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
@@ -92,71 +71,7 @@ export default function UploadShapefilePage() {
             </Header>
             <main>
                 <div className="flex h-screen items-center justify-center">
-                    <div className="w-[450px] space-y-4">
-                        <Card>
-                            <Form method="post" encType="multipart/form-data">
-                                <fieldset disabled={isSubmitting}>
-                                    <CardHeader className="space-y-6">
-                                        <CardTitle>
-                                            Shapefile uploaden
-                                        </CardTitle>
-                                        <Alert>
-                                            <Info className="h-4 w-4" />
-                                            <AlertTitle>
-                                                Experimentele functie
-                                            </AlertTitle>
-                                            <AlertDescription className="text-muted-foreground">
-                                                Deze functie is nog in
-                                                ontwikkeling. Laat ons het weten
-                                                als je feedback hebt!
-                                            </AlertDescription>
-                                        </Alert>
-                                        <CardDescription>
-                                            Selecteer de bestanden van uw RVO
-                                            Mijn Percelen export. Zorg ervoor
-                                            dat u alle bijbehorende bestanden
-                                            selecteert (.shp, .shx, .dbf, .prj).
-                                        </CardDescription>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid w-full max-w-sm items-center gap-1.5">
-                                            <Label htmlFor="shapefile">
-                                                Shapefile
-                                            </Label>
-                                            <Input
-                                                id="shapefile"
-                                                name="shapefile"
-                                                type="file"
-                                                multiple
-                                            />
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="flex justify-between">
-                                        <Link
-                                            to={`/farm/create/${b_id_farm}/${calendar}/fields`}
-                                        >
-                                            <Button
-                                                variant="outline"
-                                                type="button"
-                                            >
-                                                Terug
-                                            </Button>
-                                        </Link>
-                                        <Button type="submit">
-                                            {isSubmitting ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <LoadingSpinner />
-                                                    <span>Uploaden...</span>
-                                                </div>
-                                            ) : (
-                                                "Uploaden"
-                                            )}
-                                        </Button>
-                                    </CardFooter>
-                                </fieldset>
-                            </Form>
-                        </Card>
-                    </div>
+                    <ShapefileUploadForm />
                 </div>
             </main>
         </SidebarInset>
