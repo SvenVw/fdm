@@ -15,6 +15,7 @@ import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
 import { addCultivation, addField, getFarm } from "@svenvw/fdm-core"
 import type { FeatureCollection, Polygon } from "@turf/helpers"
 import * as turf from "@turf/turf"
+import proj4 from "proj4"
 import { redirectWithSuccess } from "remix-toast"
 import { combine, parseDbf, parseShp } from "shpjs"
 import { getSession } from "~/lib/auth.server"
@@ -80,7 +81,7 @@ export default function UploadShapefilePage() {
 interface RvoProperties {
     SECTORID: number
     SECTORVER: number
-    NEN3601D: string
+    NEN3610ID: string
     VOLGNR: number
     NAAM: string
     BEGINDAT: number
@@ -93,12 +94,17 @@ interface RvoProperties {
 
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
-        const { b_id_farm, calendar } = params
-        if (!b_id_farm || !calendar) {
-            throw new Error("b_id_farm and calendar are required")
+        // Get the Id and name of the farm
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", {
+                status: 400,
+                statusText: "Farm ID is required",
+            })
         }
 
         const session = await getSession(request)
+        const calendar = await getCalendar(params)
         const fileStorage = new LocalFileStorage("./uploads/shapefiles")
 
         const uploadHandler = async (fileUpload: FileUpload) => {
@@ -124,18 +130,35 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const shpBuffer = await shp_file.arrayBuffer()
         const shxBuffer = await shx_file.arrayBuffer()
         const dbfBuffer = await dbf_file.arrayBuffer()
+        const prj_text = await prj_file.text()
 
         const shapefile = (await combine([
             parseShp(shpBuffer, shxBuffer),
             parseDbf(dbfBuffer),
         ])) as FeatureCollection<Polygon, RvoProperties>
 
-        for (const feature of shapefile.features) {
+        const source_proj = prj_text
+        const dest_proj = "EPSG:4326"
+
+        const converter = proj4(source_proj, dest_proj)
+
+        const features = shapefile.features.map((feature) => {
+            const new_coords = feature.geometry.coordinates.map((ring) => {
+                return ring.map((coord) => {
+                    return converter.forward(coord)
+                })
+            })
+            feature.geometry.coordinates = new_coords
+            return feature
+        })
+
+        for (const feature of features) {
             const { properties, geometry } = feature
+            console.log(properties)
             const {
                 SECTORID,
                 SECTORVER,
-                NEN3601D,
+                NEN3610ID,
                 VOLGNR,
                 NAAM,
                 BEGINDAT,
@@ -149,7 +172,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (
                 !SECTORID ||
                 !SECTORVER ||
-                !NEN3601D ||
+                !NEN3610ID ||
                 !VOLGNR ||
                 !NAAM ||
                 !BEGINDAT ||
@@ -166,11 +189,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
             const b_geometry = turf.polygon(geometry.coordinates)
             const b_name = NAAM
-            const b_start = new Date(BEGINDAT * 1000)
-            const b_end =
-                EINDDAT === 253402297199 ? null : new Date(EINDDAT * 1000)
+            const b_start = new Date(BEGINDAT)
+            const b_end = EINDDAT === 253402297199 ? null : new Date(EINDDAT)
             const b_lu_catalogue = `nl_${GEWASCODE}`
-            const b_acquiring_method = TITEL as any
+            const b_acquiring_method = `nl_${TITEL}`
 
             const fieldId = await addField(
                 fdm,
@@ -178,7 +200,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_id_farm,
                 b_name,
                 null,
-                b_geometry,
+                b_geometry.geometry,
                 b_start,
                 b_acquiring_method,
                 b_end,
@@ -187,14 +209,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
             await addCultivation(
                 fdm,
                 session.principal_id,
-                fieldId,
                 b_lu_catalogue,
-                b_start,
-                b_end,
+                fieldId,
+                new Date(`${calendar}-01-01`),
+                undefined,
             )
         }
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/${calendar}/fields`, {
+        return redirectWithSuccess(`/farm/create/${b_id_farm}/${calendar}/fields`, {
             message: "Percelen zijn succesvol geïmporteerd! 🎉",
         })
     } catch (error) {
