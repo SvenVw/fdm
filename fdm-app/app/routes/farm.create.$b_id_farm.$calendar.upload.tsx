@@ -12,12 +12,11 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { LocalFileStorage } from "@mjackson/file-storage/local"
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
-import { parse } from "@loaders.gl/core"
-import { ShapefileLoader } from "@loaders.gl/shapefile"
 import { addCultivation, addField, getFarm } from "@svenvw/fdm-core"
 import type { FeatureCollection, Polygon } from "@turf/helpers"
 import * as turf from "@turf/turf"
 import { redirectWithSuccess } from "remix-toast"
+import { combine, parseDbf, parseShp } from "shpjs"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
 import { getCalendar } from "../lib/calendar"
@@ -112,30 +111,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const files = formData.getAll("shapefile") as File[]
 
         const shp_file = files.find((f) => f.name.endsWith(".shp"))
+        const shx_file = files.find((f) => f.name.endsWith(".shx"))
         const dbf_file = files.find((f) => f.name.endsWith(".dbf"))
         const prj_file = files.find((f) => f.name.endsWith(".prj"))
 
-        if (!shp_file || !dbf_file || !prj_file) {
-            throw new Error("Een .shp, .dbf, en .prj bestand zijn verplicht.")
+        if (!shp_file || !shx_file || !dbf_file || !prj_file) {
+            throw new Error(
+                "Een .shp, .shx, .dbf en .prj bestand zijn verplicht.",
+            )
         }
 
-        const shapefile = (await parse(
-            await shp_file.arrayBuffer(),
-            ShapefileLoader,
-            {
-                shp: {
-                    _isSidecar: true,
-                },
-                dbf: {
-                    _isSidecar: true,
-                    buffer: await dbf_file.arrayBuffer(),
-                },
-                prj: {
-                    _isSidecar: true,
-                    buffer: await prj_file.arrayBuffer(),
-                },
-            },
-        )) as FeatureCollection<Polygon, RvoProperties>
+        const shpBuffer = await shp_file.arrayBuffer()
+        const shxBuffer = await shx_file.arrayBuffer()
+        const dbfBuffer = await dbf_file.arrayBuffer()
+
+        const shapefile = (await combine([
+            parseShp(shpBuffer, shxBuffer),
+            parseDbf(dbfBuffer),
+        ])) as FeatureCollection<Polygon, RvoProperties>
 
         for (const feature of shapefile.features) {
             const { properties, geometry } = feature

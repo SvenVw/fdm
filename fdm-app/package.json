@@ -15,8 +15,6 @@
     },
     "dependencies": {
         "@hookform/resolvers": "^5.1.1",
-        "@loaders.gl/core": "^4.3.4",
-        "@loaders.gl/shapefile": "^4.3.4",
         "@mapbox/geojson-extent": "^1.0.1",
         "@mapbox/mapbox-gl-geocoder": "^5.0.3",
         "@mjackson/file-storage": "^0.7.0",
@@ -69,6 +67,7 @@
         "remix-hook-form": "7.1.0",
         "remix-toast": "^3.1.0",
         "remix-utils": "^8.7.0",
+        "shpjs": "^6.1.0",
         "sonner": "^2.0.5",
         "tailwind-merge": "^3.3.1",
         "tailwindcss-animate": "^1.0.7",
