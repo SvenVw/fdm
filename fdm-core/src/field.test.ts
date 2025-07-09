@@ -65,7 +65,7 @@ describe("Farm Data Model", () => {
             }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
+            const AcquiringMethod = "nl_01"
             const b_id = await addField(
                 fdm,
                 principal_id,
@@ -138,7 +138,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field1Start = new Date("2023-01-01")
-                const field1AcquiringMethod = "owner"
+                const field1AcquiringMethod = "nl_01"
                 await addField(
                     fdm,
                     principal_id,
@@ -165,7 +165,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field2Start = new Date("2023-02-01")
-                const field2AcquiringMethod = "lease"
+                const field2AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -210,7 +210,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field1Start = new Date("2023-01-01")
-                const field1AcquiringMethod = "owner"
+                const field1AcquiringMethod = "nl_01"
                 await addField(
                     fdm,
                     principal_id,
@@ -237,7 +237,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field2Start = new Date("2023-04-01")
-                const field2AcquiringMethod = "lease"
+                const field2AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -264,7 +264,7 @@ describe("Farm Data Model", () => {
                 }
                 const field3Start = new Date("2023-06-01")
                 const field3End = new Date("2023-08-01")
-                const field3AcquiringMethod = "lease"
+                const field3AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -292,7 +292,7 @@ describe("Farm Data Model", () => {
                 }
                 const field4Start = new Date("2023-07-01")
                 const field4End = new Date("2023-09-01")
-                const field4AcquiringMethod = "lease"
+                const field4AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -406,7 +406,7 @@ describe("Farm Data Model", () => {
             }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
+            const AcquiringMethod = "nl_01"
             const b_id = await addField(
                 fdm,
                 principal_id,
@@ -435,7 +435,7 @@ describe("Farm Data Model", () => {
             }
             const updatedAcquireDate = new Date("2024-01-01")
             const updatedDiscardingDate = new Date("2024-12-31")
-            const updatedAcquiringMethod = "lease"
+            const updatedAcquiringMethod = "nl_02"
             const updatedField = await updateField(
                 fdm,
                 principal_id,
@@ -485,7 +485,7 @@ describe("Farm Data Model", () => {
             }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
+            const AcquiringMethod = "nl_01"
             const b_id = await addField(
                 fdm,
                 principal_id,
@@ -520,7 +520,7 @@ describe("Farm Data Model", () => {
             expect(updatedField.b_acquiring_method).toBe(AcquiringMethod) // Should remain the same
 
             // Update only the manage type
-            const updatedAcquiringMethod = "lease"
+            const updatedAcquiringMethod = "nl_02"
             const updatedField2 = await updateField(
                 fdm,
                 principal_id,
@@ -648,7 +648,7 @@ describe("Farm Data Model", () => {
                     ],
                 },
                 new Date(),
-                "owner",
+                "nl_01",
             )
 
             const cultivationId = await addCultivation(
@@ -710,7 +710,7 @@ describe("Farm Data Model", () => {
                     ],
                 },
                 new Date(),
-                "owner",
+                "nl_01",
             )
 
             // 2. Action and Assertion: Attempt to remove the field with an unauthorized principal
@@ -753,7 +753,7 @@ describe("Farm Data Model", () => {
                     ],
                 },
                 new Date(),
-                "owner",
+                "nl_01",
             )
 
             await removeField(fdm, principal_id, fieldId)
@@ -781,7 +781,7 @@ describe("Farm Data Model", () => {
                     ],
                 },
                 new Date(),
-                "owner",
+                "nl_01",
             )
 
             const cultivationId = await addCultivation(
