@@ -12,7 +12,12 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { LocalFileStorage } from "@mjackson/file-storage/local"
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
-import { addCultivation, addField, getFarm } from "@svenvw/fdm-core"
+import {
+    addCultivation,
+    addField,
+    addSoilAnalysis,
+    getFarm,
+} from "@svenvw/fdm-core"
 import type { FeatureCollection, Polygon } from "@turf/helpers"
 import * as turf from "@turf/turf"
 import proj4 from "proj4"
@@ -21,6 +26,7 @@ import { combine, parseDbf, parseShp } from "shpjs"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
 import { getCalendar } from "../lib/calendar"
+import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -105,6 +111,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         const session = await getSession(request)
         const calendar = await getCalendar(params)
+        const nmiApiKey = getNmiApiKey()
         const fileStorage = new LocalFileStorage("./uploads/shapefiles")
 
         const uploadHandler = async (fileUpload: FileUpload) => {
@@ -154,7 +161,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         for (const feature of features) {
             const { properties, geometry } = feature
-            console.log(properties)
             const {
                 SECTORID,
                 SECTORVER,
@@ -214,11 +220,32 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 new Date(`${calendar}-01-01`),
                 undefined,
             )
+
+            if (nmiApiKey) {
+                const estimates = await getSoilParameterEstimates(
+                    b_geometry,
+                    nmiApiKey,
+                )
+
+                await addSoilAnalysis(
+                    fdm,
+                    session.principal_id,
+                    undefined,
+                    estimates.a_source,
+                    fieldId,
+                    estimates.a_depth_lower,
+                    undefined,
+                    estimates,
+                )
+            }
         }
 
-        return redirectWithSuccess(`/farm/create/${b_id_farm}/${calendar}/fields`, {
-            message: "Percelen zijn succesvol geïmporteerd! 🎉",
-        })
+        return redirectWithSuccess(
+            `/farm/create/${b_id_farm}/${calendar}/fields`,
+            {
+                message: "Percelen zijn succesvol geïmporteerd! 🎉",
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }
