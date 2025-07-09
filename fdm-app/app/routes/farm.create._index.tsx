@@ -239,8 +239,8 @@ export async function action({ request }: ActionFunctionArgs) {
         // Get current year
         const year = new Date().getFullYear()
 
-        return redirectWithSuccess(`./${b_id_farm}/${year}/atlas`, {
-            message: "Bedrijf is toegevoegd! 🎉",
+        return redirectWithSuccess(`./${b_id_farm}/${year}`, {
+            message: "Bedrijf is toegevoegd! 🎉 Selecteer nu de importmethode.",
         })
     } catch (error) {
         throw handleActionError(error)

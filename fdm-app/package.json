@@ -15,6 +15,8 @@
     },
     "dependencies": {
         "@hookform/resolvers": "^5.1.1",
+        "@loaders.gl/core": "^4.3.4",
+        "@loaders.gl/shapefile": "^4.3.4",
         "@mapbox/geojson-extent": "^1.0.1",
         "@mapbox/mapbox-gl-geocoder": "^5.0.3",
         "@mjackson/file-storage": "^0.7.0",
@@ -35,6 +37,7 @@
         "@tailwindcss/vite": "^4.1.11",
         "@tanstack/react-table": "^8.21.3",
         "@turf/centroid": "^7.2.0",
+        "@turf/turf": "^7.2.0",
         "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
