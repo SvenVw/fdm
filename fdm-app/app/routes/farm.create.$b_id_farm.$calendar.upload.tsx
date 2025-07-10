@@ -207,7 +207,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             ) {
                 return dataWithWarning(
                     {},
-                    "Het shapefile bevat niet de vereiste RVO attributen.",
+                    "De shapefile bevat niet de vereiste RVO attributen.",
                 )
             }
 
