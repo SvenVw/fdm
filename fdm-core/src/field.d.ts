@@ -10,5 +10,5 @@ export interface Field {
     b_area: number | null
     b_start: schema.fieldAcquiringTypeSelect["b_start"]
     b_end: schema.fieldDiscardingTypeSelect["b_end"]
-    b_acquiring_method: schema.field
+    b_acquiring_method: schema.fieldAcquiringTypeSelect["b_acquiring_method"]
 }
