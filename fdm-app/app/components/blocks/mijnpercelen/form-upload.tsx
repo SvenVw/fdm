@@ -27,6 +27,8 @@ import { parseDbf } from "shpjs"
 
 type UploadState = "idle" | "animating" | "success" | "error"
 
+const ANIMATION_ENABLED = true // Switch for the animation
+
 export function MijnPercelenUploadForm() {
     const [fileNames, setFileNames] = useState<string[]>([])
     const [fieldNames, setFieldNames] = useState<string[]>([])
@@ -125,11 +127,11 @@ export function MijnPercelenUploadForm() {
         }
     }
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault()
     }
 
-    const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault()
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const files = Array.from(e.dataTransfer.files)
@@ -196,10 +198,12 @@ export function MijnPercelenUploadForm() {
 
     return (
         <div className="flex justify-center">
-            {uploadState === "animating" ? (
+            {uploadState === "animating" && ANIMATION_ENABLED ? (
                 <MijnPercelenUploadAnimation fieldNames={fieldNames}>
                     {disabledForm}
                 </MijnPercelenUploadAnimation>
+            ) : uploadState === "animating" && !ANIMATION_ENABLED ? (
+                disabledForm
             ) : (
                 <Card className="w-full max-w-lg mx-auto">
                     <CardHeader className="space-y-6">
@@ -255,12 +259,6 @@ export function MijnPercelenUploadForm() {
                                                                         "success" &&
                                                                         "border-green-500 bg-green-50",
                                                                 )}
-                                                                onDragOver={
-                                                                    handleDragOver
-                                                                }
-                                                                onDrop={
-                                                                    handleDrop
-                                                                }
                                                             >
                                                                 <Input
                                                                     name={name}
@@ -293,6 +291,12 @@ export function MijnPercelenUploadForm() {
                                                                 <label
                                                                     htmlFor="file-upload"
                                                                     className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
+                                                                    onDragOver={
+                                                                        handleDragOver
+                                                                    }
+                                                                    onDrop={
+                                                                        handleDrop
+                                                                    }
                                                                 >
                                                                     {uploadState ===
                                                                         "idle" && (
