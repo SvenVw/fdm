@@ -4,6 +4,7 @@ import {
     type Timeframe,
     type FdmType,
     getField,
+    isDerogationGrantedForYear,
 } from "@svenvw/fdm-core"
 import type { NL2025NormsInput } from "./types.d"
 
@@ -30,8 +31,12 @@ export async function collectNL2025InputForNorms(
     const field = await getField(fdm, principal_id, b_id)
 
     // 2. Get the details for the farm
-    // const farm = await getFarm(fdm, principal_id, field.b_id_farm)
-    const is_derogatie_bedrijf = false // TODO: Store details if farm has derogation
+    const is_derogatie_bedrijf = await isDerogationGrantedForYear(
+        fdm,
+        principal_id,
+        field.b_id_farm,
+        2025,
+    )
 
     // 3. Get the details of the cultivations
     const cultivations = await getCultivations(
