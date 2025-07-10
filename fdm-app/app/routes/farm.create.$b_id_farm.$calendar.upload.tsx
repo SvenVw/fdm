@@ -4,7 +4,7 @@ import type {
     MetaFunction,
 } from "react-router"
 import { data, useLoaderData } from "react-router-dom"
-import { ShapefileUploadForm } from "~/components/blocks/field/form-upload"
+import { MijnPercelenUploadForm } from "@/app/components/blocks/mijnpercelen/form-upload"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -67,7 +67,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return { b_id_farm, b_name_farm: farm.b_name_farm, calendar }
 }
 
-export default function UploadShapefilePage() {
+export default function UploadMijnPercelenPage() {
     const { b_name_farm } = useLoaderData<typeof loader>()
 
     return (
@@ -77,7 +77,7 @@ export default function UploadShapefilePage() {
             </Header>
             <main>
                 <div className="flex h-screen items-center justify-center">
-                    <ShapefileUploadForm />
+                    <MijnPercelenUploadForm />
                 </div>
             </main>
         </SidebarInset>

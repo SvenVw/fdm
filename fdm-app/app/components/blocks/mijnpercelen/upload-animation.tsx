@@ -1,33 +1,33 @@
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { Card } from "~/components/ui/card";
+import { AnimatePresence, motion } from "framer-motion"
+import { useEffect, useState } from "react"
+import { Card } from "~/components/ui/card"
 
-export function ShapefileUploadAnimation({
+export function MijnPercelenUploadAnimation({
     children,
     fieldNames,
 }: {
-    children: React.ReactNode;
-    fieldNames: string[];
+    children: React.ReactNode
+    fieldNames: string[]
 }) {
-    const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
+    const [currentFieldIndex, setCurrentFieldIndex] = useState(0)
 
     useEffect(() => {
         if (fieldNames.length > 0) {
             const interval = setInterval(() => {
                 setCurrentFieldIndex((prevIndex) => {
                     if (prevIndex < fieldNames.length - 1) {
-                        return prevIndex + 1;
+                        return prevIndex + 1
                     }
-                    clearInterval(interval);
-                    return prevIndex;
-                });
-            }, 150); // Time per field
+                    clearInterval(interval)
+                    return prevIndex
+                })
+            }, 150) // Time per field
 
-            return () => clearInterval(interval);
+            return () => clearInterval(interval)
         }
-    }, [fieldNames]);
+    }, [fieldNames])
 
-    const currentFieldName = fieldNames[currentFieldIndex] || "";
+    const currentFieldName = fieldNames[currentFieldIndex] || ""
 
     return (
         <div className="relative w-full max-w-lg mx-auto">
@@ -65,12 +65,12 @@ export function ShapefileUploadAnimation({
                                     ? `Perceel ${currentFieldIndex + 1} van ${
                                           fieldNames.length
                                       }`
-                                    : `Voltooid!`}
+                                    : "Voltooid!"}
                             </p>
                         </div>
                     </Card>
                 </motion.div>
             </div>
         </div>
-    );
+    )
 }
