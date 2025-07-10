@@ -24,10 +24,6 @@ describe("collectNL2025InputForNorms", () => {
         const mockFdm = {} as FdmType
         const mockPrincipalId = "principal-1"
         const mockFieldId = "field-1"
-        const mockTimeframe = {
-            start: new Date(),
-            end: new Date(),
-        } as Timeframe
 
         const mockField = {
             b_id: mockFieldId,
@@ -50,7 +46,6 @@ describe("collectNL2025InputForNorms", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
-            mockTimeframe,
         )
 
         expect(result.farm.is_derogatie_bedrijf).toBe(false)
@@ -66,13 +61,11 @@ describe("collectNL2025InputForNorms", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
-            mockTimeframe,
         )
         expect(fdmCore.getCurrentSoilData).toHaveBeenCalledWith(
             mockFdm,
             mockPrincipalId,
             mockFieldId,
-            mockTimeframe,
         )
     })
 })

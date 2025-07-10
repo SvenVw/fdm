@@ -17,7 +17,6 @@ import type { NL2025NormsInput } from "./types.d"
  * @param fdm - An initialized FdmType instance for data access.
  * @param principal_id - The ID of the principal initiating the data collection.
  * @param b_id - The unique identifier of the field for which to collect data.
- * @param timeframe - The timeframe for which to collect the data.
  * @returns A promise that resolves to an `NL2025NormsInput` object, containing all the
  *   structured data required for the norm calculations.
  */
@@ -25,8 +24,13 @@ export async function collectNL2025InputForNorms(
     fdm: FdmType,
     principal_id: string,
     b_id: string,
-    timeframe: Timeframe,
 ): Promise<NL2025NormsInput> {
+    // Create timeframe for 2025
+    const year = 2025
+    const startOfYear = new Date(year, 0, 1)
+    const endOfYear = new Date(year, 11, 31)
+    const timeframe2025: Timeframe = { start: startOfYear, end: endOfYear }
+
     // 1. Get the details for the field.
     const field = await getField(fdm, principal_id, b_id)
 
@@ -43,7 +47,7 @@ export async function collectNL2025InputForNorms(
         fdm,
         principal_id,
         b_id,
-        timeframe,
+        timeframe2025,
     )
 
     // 4. Get the details of the soil analyses
@@ -51,7 +55,7 @@ export async function collectNL2025InputForNorms(
         fdm,
         principal_id,
         field.b_id,
-        timeframe,
+        timeframe2025,
     )
     const soilAnalysisPicked = {
         a_p_cc: soilAnalysis.find(
