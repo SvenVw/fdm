@@ -9,6 +9,7 @@ import {
     addField,
     getField,
     getFields,
+    listAvailableAcquiringMethods,
     removeField,
     updateField,
 } from "./field"
@@ -807,6 +808,18 @@ describe("Farm Data Model", () => {
                 .from(schema.harvestables)
                 .where(eq(schema.harvestables.b_id_harvestable, harvestId))
             expect(remainingHarvests.length).toBe(0)
+        })
+    })
+
+    describe("listAvailableAcquiringMethods", () => {
+        it("should list available acquiring methods", () => {
+            const methods = listAvailableAcquiringMethods()
+            expect(methods).toBeInstanceOf(Array)
+            expect(methods.length).toBeGreaterThan(0)
+            expect(methods[0]).toHaveProperty("value")
+            expect(methods[0]).toHaveProperty("label")
+            expect(methods.some((m) => m.value === "nl_01")).toBe(true)
+            expect(methods.some((m) => m.value === "nl_02")).toBe(true)
         })
     })
 })
