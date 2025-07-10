@@ -41,7 +41,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { acquiringMethodOptions } from "../../../fdm-core/dist/db/schema"
 
 export const meta: MetaFunction = () => {
     return [
