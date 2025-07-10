@@ -611,8 +611,8 @@ export async function removeField(
 }
 
 export function listAvailableAcquiringMethods(): {
-    value: fdmSchema.fieldAcquiringTypeSelect["b_acquiring_method"]
+    value: schema.fieldAcquiringTypeSelect["b_acquiring_method"]
     label: string
 }[] {
-    return fdmSchema.acquiringMethodOptions
+    return schema.acquiringMethodOptions
 }
