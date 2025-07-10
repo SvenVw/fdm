@@ -25,6 +25,9 @@ export async function addDerogation(
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
     b_derogation_year: schema.derogationsTypeInsert["b_derogation_year"],
 ): Promise<schema.derogationsTypeInsert["b_id_derogation"]> {
+    if (b_derogation_year < 2006 || b_derogation_year > 2025) {
+        throw new Error("Derogation year must be between 2006 and 2025.")
+    }
     try {
         return await fdm.transaction(async (tx) => {
             await checkPermission(
