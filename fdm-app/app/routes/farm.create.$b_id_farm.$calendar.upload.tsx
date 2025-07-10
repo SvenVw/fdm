@@ -25,8 +25,8 @@ import { redirectWithSuccess, dataWithWarning } from "remix-toast"
 import { combine, parseDbf, parseShp } from "shpjs"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
-import { getCalendar } from "../lib/calendar"
-import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
+import { getCalendar } from "~/lib/calendar"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 
 // Meta
 export const meta: MetaFunction = () => {
