@@ -18,10 +18,10 @@ import {
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
-import type { FeatureCollection, Polygon } from "@turf/helpers"
+import type { Feature, FeatureCollection, Polygon } from "geojson"
 import * as turf from "@turf/turf"
 import proj4 from "proj4"
-import { redirectWithSuccess } from "remix-toast"
+import { redirectWithSuccess, dataWithWarning } from "remix-toast"
 import { combine, parseDbf, parseShp } from "shpjs"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
@@ -132,7 +132,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const prj_file = files.find((f) => f.name.endsWith(".prj"))
 
         if (!shp_file || !shx_file || !dbf_file || !prj_file) {
-            throw new Error(
+            return dataWithWarning(
+                {},
                 "Een .shp, .shx, .dbf en .prj bestand zijn verplicht.",
             )
         }
@@ -142,25 +143,38 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const dbfBuffer = await dbf_file.arrayBuffer()
         const prj_text = await prj_file.text()
 
-        const shapefile = (await combine([
-            parseShp(shpBuffer, shxBuffer),
-            parseDbf(dbfBuffer),
-        ])) as FeatureCollection<Polygon, RvoProperties>
+        let shapefile: FeatureCollection<Polygon, RvoProperties>
+        try {
+            shapefile = (await combine([
+                parseShp(shpBuffer, shxBuffer),
+                parseDbf(dbfBuffer),
+            ])) as FeatureCollection<Polygon, RvoProperties>
+        } catch (error) {
+            return dataWithWarning({}, "Shapefile is ongeldig.")
+        }
+
+        if (shapefile.features.length === 0) {
+            return dataWithWarning({}, "Shapefile bevat geen percelen.")
+        }
 
         const source_proj = prj_text
         const dest_proj = "EPSG:4326"
 
         const converter = proj4(source_proj, dest_proj)
 
-        const features = shapefile.features.map((feature) => {
-            const new_coords = feature.geometry.coordinates.map((ring) => {
-                return ring.map((coord) => {
-                    return converter.forward(coord)
-                })
-            })
-            feature.geometry.coordinates = new_coords
-            return feature
-        })
+        const features = shapefile.features.map(
+            (feature: Feature<Polygon, RvoProperties>) => {
+                const new_coords = feature.geometry.coordinates.map(
+                    (ring: number[][]) => {
+                        return ring.map((coord: number[]) => {
+                            return converter.forward(coord)
+                        })
+                    },
+                )
+                feature.geometry.coordinates = new_coords
+                return feature
+            },
+        )
 
         for (const feature of features) {
             const { properties, geometry } = feature
@@ -191,7 +205,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 !TITEL ||
                 !TITELOMSCH
             ) {
-                throw new Error(
+                return dataWithWarning(
+                    {},
                     "Het shapefile bevat niet de vereiste RVO attributen.",
                 )
             }
