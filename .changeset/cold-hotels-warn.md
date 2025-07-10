@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add option to upload shapefile from Mijn Percelen at RVO instead of selecting fields at atlas page
+Enable uploading a Mijn Percelen shapefile instead of selecting fields on the atlas page.

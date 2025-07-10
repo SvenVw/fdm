@@ -415,30 +415,24 @@ export function MijnPercelenUploadForm({
                                                     "Uploaden"
                                                 )}
                                             </Button>
-                                            <Button
+                                            <NavLink
+                                                to={`/farm/create/${b_id_farm}/${calendar}`}
                                                 className="w-full"
-                                                variant={"outline"}
-                                                disabled={isSubmitting}
                                             >
-                                                {isSubmitting ? (
-                                                    <div className="flex items-center space-x-2">
-                                                        <span>Terug</span>
-                                                    </div>
-                                                ) : (
-                                                    <NavLink
-                                                        to={`/farm/create/${b_id_farm}/${calendar}`}
-                                                    >
-                                                        Terug
-                                                    </NavLink>
-                                                )}
-                                            </Button>
+                                                <Button
+                                                    className="w-full"
+                                                    variant={"outline"}
+                                                    disabled={isSubmitting}
+                                                >
+                                                    Terug
+                                                </Button>
+                                            </NavLink>
                                         </div>
                                     </div>
                                 </fieldset>
                             </Form>
                         </RemixFormProvider>
                     </CardContent>
-                    
                 </Card>
             )}
         </div>
