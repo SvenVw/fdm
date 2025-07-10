@@ -51,7 +51,7 @@ export const acquiringMethodOptions = [
     // },
     { value: "unknown", label: "Onbekend" },
 ]
-export const acquiringMethodEnum = fdmSchema.enum(
+const acquiringMethodEnum = fdmSchema.enum(
     "b_acquiring_method",
     acquiringMethodOptions.map((x) => x.value) as [string, ...string[]],
 )
