@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AlertCircle, CheckCircle, FileUp, Info } from "lucide-react"
+import { AlertCircle, CheckCircle, FileUp, FlaskConical } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Form, NavLink, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -17,7 +17,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -169,7 +168,7 @@ export function MijnPercelenUploadForm({
             <CardHeader className="space-y-6">
                 <CardTitle>Shapefile uploaden</CardTitle>
                 <Alert>
-                    <Info className="h-4 w-4" />
+                    <FlaskConical className="h-4 w-4" />
                     <AlertTitle>Experimentele functie</AlertTitle>
                     <AlertDescription className="text-muted-foreground">
                         Deze functie is nog in ontwikkeling. Laat ons het weten
@@ -258,7 +257,7 @@ export function MijnPercelenUploadForm({
                     <CardHeader className="space-y-6">
                         <CardTitle>Shapefile uploaden</CardTitle>
                         <Alert>
-                            <Info className="h-4 w-4" />
+                            <FlaskConical className="h-4 w-4" />
                             <AlertTitle>Experimentele functie</AlertTitle>
                             <AlertDescription className="text-muted-foreground">
                                 Deze functie is nog in ontwikkeling. Laat ons
