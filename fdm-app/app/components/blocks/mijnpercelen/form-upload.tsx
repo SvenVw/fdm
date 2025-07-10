@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertCircle, CheckCircle, FileUp, Info } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { Form, useActionData, useNavigation } from "react-router"
+import { Form, NavLink, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
@@ -29,7 +29,13 @@ type UploadState = "idle" | "animating" | "success" | "error"
 
 const ANIMATION_ENABLED = true // Switch for the animation
 
-export function MijnPercelenUploadForm() {
+export function MijnPercelenUploadForm({
+    b_id_farm,
+    calendar,
+}: {
+    b_id_farm: string
+    calendar: string
+}) {
     const [fileNames, setFileNames] = useState<string[]>([])
     const [fieldNames, setFieldNames] = useState<string[]>([])
     const [hasAllRequiredFiles, setHasAllRequiredFiles] = useState(false)
@@ -364,6 +370,23 @@ export function MijnPercelenUploadForm() {
                                                     </div>
                                                 ) : (
                                                     "Uploaden"
+                                                )}
+                                            </Button>
+                                            <Button
+                                                className="w-full"
+                                                variant={"outline"}
+                                                disabled={isSubmitting}
+                                            >
+                                                {isSubmitting ? (
+                                                    <div className="flex items-center space-x-2">
+                                                        <span>Terug</span>
+                                                    </div>
+                                                ) : (
+                                                    <NavLink
+                                                        to={`/farm/create/${b_id_farm}/${calendar}`}
+                                                    >
+                                                        Terug
+                                                    </NavLink>
                                                 )}
                                             </Button>
                                         </div>

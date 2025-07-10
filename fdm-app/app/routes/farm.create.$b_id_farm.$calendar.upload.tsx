@@ -68,7 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function UploadMijnPercelenPage() {
-    const { b_name_farm } = useLoaderData<typeof loader>()
+    const { b_id_farm, calendar, b_name_farm } = useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
@@ -77,7 +77,10 @@ export default function UploadMijnPercelenPage() {
             </Header>
             <main>
                 <div className="flex h-screen items-center justify-center">
-                    <MijnPercelenUploadForm />
+                    <MijnPercelenUploadForm
+                        b_id_farm={b_id_farm}
+                        calendar={calendar}
+                    />
                 </div>
             </main>
         </SidebarInset>
