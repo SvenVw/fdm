@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addFarm,
+    addDerogation,
     addFertilizer,
     enableCultivationCatalogue,
     enableFertilizerCatalogue,
     getFertilizersFromCatalogue,
-} from "@svenvw/fdm-core"
+} from "@svenvw/fdm-core";
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -35,7 +36,8 @@ import {
     FormLabel,
     FormMessage,
 } from "~/components/ui/form"
-import { Input } from "~/components/ui/input"
+import { Checkbox } from "~/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -62,7 +64,9 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
         }),
-})
+    has_derogation: z.boolean().default(false),
+    derogation_start_year: z.number().optional(),
+});
 
 // Loader
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -135,6 +139,52 @@ export default function AddFarmPage() {
                                                         </FormItem>
                                                     )}
                                                 />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="has_derogation"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel className="text-base">
+                                                                    Derogatie
+                                                                </FormLabel>
+                                                                <FormDescription>
+                                                                    Heeft dit bedrijf derogatie?
+                                                                </FormDescription>
+                                                            </div>
+                                                            <FormControl>
+                                                                <Checkbox
+                                                                    checked={field.value}
+                                                                    onCheckedChange={field.onChange}
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                {form.watch("has_derogation") && (
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="derogation_start_year"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>Startjaar derogatie</FormLabel>
+                                                                <Select onValueChange={field.onChange} defaultValue={String(new Date().getFullYear())}>
+                                                                    <FormControl>
+                                                                        <SelectTrigger>
+                                                                            <SelectValue placeholder="Selecteer een jaar" />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {Array.from({ length: 2025 - 2006 + 1 }, (_, i) => 2006 + i).map(year => (
+                                                                            <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     </CardContent>
@@ -189,7 +239,7 @@ export async function action({ request }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_name_farm } = formValues
+        const { b_name_farm, has_derogation, derogation_start_year } = formValues;
 
         const b_id_farm = await addFarm(
             fdm,
@@ -198,7 +248,13 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
             null,
-        )
+        );
+
+        if (has_derogation && derogation_start_year) {
+            for (let year = derogation_start_year; year <= 2025; year++) {
+                await addDerogation(fdm, session.principal_id, b_id_farm, year);
+            }
+        }
         await enableFertilizerCatalogue(
             fdm,
             session.principal_id,
