@@ -38,6 +38,11 @@ export function HeaderFarmCreate({
                     <BreadcrumbLink>Selecteer percelen</BreadcrumbLink>
                 </BreadcrumbItem>
             ) : null}
+            {currentPath.match(/upload/) ? (
+                <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink>Shapefile uploaden</BreadcrumbLink>
+                </BreadcrumbItem>
+            ) : null}
             {currentPath.match(/fields/) ? (
                 <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink>Percelen</BreadcrumbLink>

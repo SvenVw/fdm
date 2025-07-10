@@ -438,48 +438,7 @@ export function MijnPercelenUploadForm({
                             </Form>
                         </RemixFormProvider>
                     </CardContent>
-                    <CardFooter>
-                        <Accordion type="single" collapsible>
-                            <AccordionItem value="item-1">
-                                <AccordionTrigger>
-                                    Hoe download ik een shapefile van
-                                    mijn.rvo.nl?
-                                </AccordionTrigger>
-                                <AccordionContent>
-                                    <ol className="list-decimal list-inside space-y-2">
-                                        <li>Log in op mijn.rvo.nl.</li>
-                                        <li>
-                                            Ga via ‘’Registratie en meldingen
-                                            doorgeven’’ naar ‘’Percelen
-                                            registreren’’.
-                                        </li>
-                                        <li>
-                                            Klik op ‘’Registreren en wijzigen’’
-                                            onder ‘’Mijn percelen’’.
-                                        </li>
-                                        <li>
-                                            Ga bij ‘’Mijn percelen’’ naar
-                                            ‘’Wijzigen’’.
-                                        </li>
-                                        <li>
-                                            Klik op de datum om het juiste jaar
-                                            en de juiste peildatum in te stellen
-                                            waarvoor u de gecombineerde opgave
-                                            wilt downloaden.
-                                        </li>
-                                        <li>
-                                            Klik op het zwarte/blauwe pijltje
-                                            dat naar beneden wijst. Vervolgens
-                                            verschijnt er een klein uitklapmenu
-                                            waar ‘”Shape’’ tussen staat. Klik
-                                            hierop om de gecombineerde opgave in
-                                            ‘’shapefile’’ formaat te downloaden.
-                                        </li>
-                                    </ol>
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </CardFooter>
+                    
                 </Card>
             )}
         </div>
