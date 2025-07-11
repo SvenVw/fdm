@@ -6,7 +6,7 @@ import {
     enableCultivationCatalogue,
     enableFertilizerCatalogue,
     getFertilizersFromCatalogue,
-} from "@svenvw/fdm-core";
+} from "@svenvw/fdm-core"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -37,7 +37,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { Checkbox } from "~/components/ui/checkbox";
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     Select,
     SelectContent,
@@ -77,6 +77,7 @@ const FormSchema = z.object({
     }),
     has_derogation: z.boolean().default(false),
     derogation_start_year: z.number().optional(),
+})
 
 // Loader
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -100,6 +101,8 @@ export default function AddFarmPage() {
         defaultValues: {
             b_name_farm: loaderData.b_name_farm ?? "",
             year: loaderData.year,
+            has_derogation: false,
+            derogation_start_year: loaderData.year,
         },
     })
 
@@ -141,7 +144,7 @@ export default function AddFarmPage() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>
-                                                                Bedrijfsnaam                                                             
+                                                                Bedrijfsnaam
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
@@ -165,35 +168,81 @@ export default function AddFarmPage() {
                                                                     Derogatie
                                                                 </FormLabel>
                                                                 <FormDescription>
-                                                                    Heeft dit bedrijf derogatie?
+                                                                    Heeft dit
+                                                                    bedrijf
+                                                                    derogatie?
                                                                 </FormDescription>
                                                             </div>
                                                             <FormControl>
                                                                 <Checkbox
-                                                                    checked={field.value}
-                                                                    onCheckedChange={field.onChange}
+                                                                    checked={
+                                                                        field.value
+                                                                    }
+                                                                    onCheckedChange={
+                                                                        field.onChange
+                                                                    }
                                                                 />
                                                             </FormControl>
                                                         </FormItem>
                                                     )}
                                                 />
-                                                {form.watch("has_derogation") && (
+                                                {form.watch(
+                                                    "has_derogation",
+                                                ) && (
                                                     <FormField
                                                         control={form.control}
                                                         name="derogation_start_year"
                                                         render={({ field }) => (
                                                             <FormItem>
-                                                                <FormLabel>Startjaar derogatie</FormLabel>
-                                                                <Select onValueChange={field.onChange} defaultValue={String(new Date().getFullYear())}>
+                                                                <FormLabel>
+                                                                    Startjaar
+                                                                    derogatie
+                                                                </FormLabel>
+                                                                <Select
+                                                                    onValueChange={
+                                                                        field.onChange
+                                                                    }
+                                                                    defaultValue={String(
+                                                                        new Date().getFullYear(),
+                                                                    )}
+                                                                >
                                                                     <FormControl>
                                                                         <SelectTrigger>
                                                                             <SelectValue placeholder="Selecteer een jaar" />
                                                                         </SelectTrigger>
                                                                     </FormControl>
                                                                     <SelectContent>
-                                                                        {Array.from({ length: 2025 - 2006 + 1 }, (_, i) => 2006 + i).map(year => (
-                                                                            <SelectItem key={year} value={String(year)}>{year}</SelectItem>
-                                                                        ))}
+                                                                        {Array.from(
+                                                                            {
+                                                                                length:
+                                                                                    2025 -
+                                                                                    2006 +
+                                                                                    1,
+                                                                            },
+                                                                            (
+                                                                                _,
+                                                                                i,
+                                                                            ) =>
+                                                                                2006 +
+                                                                                i,
+                                                                        ).map(
+                                                                            (
+                                                                                year,
+                                                                            ) => (
+                                                                                <SelectItem
+                                                                                    key={
+                                                                                        year
+                                                                                    }
+                                                                                    value={String(
+                                                                                        year,
+                                                                                    )}
+                                                                                >
+                                                                                    {
+                                                                                        year
+                                                                                    }
+                                                                                </SelectItem>
+                                                                            ),
+                                                                        )}
                                                                     </SelectContent>
                                                                 </Select>
                                                                 <FormMessage />
@@ -301,8 +350,8 @@ export async function action({ request }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_name_farm, has_derogation, derogation_start_year } = formValues;
-        const { b_name_farm, year } = formValues
+        const { b_name_farm, year, has_derogation, derogation_start_year } =
+            formValues
 
         const b_id_farm = await addFarm(
             fdm,
@@ -311,11 +360,11 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
             null,
-        );
+        )
 
         if (has_derogation && derogation_start_year) {
             for (let year = derogation_start_year; year <= 2025; year++) {
-                await addDerogation(fdm, session.principal_id, b_id_farm, year);
+                await addDerogation(fdm, session.principal_id, b_id_farm, year)
             }
         }
         await enableFertilizerCatalogue(
