@@ -327,7 +327,7 @@ export function MijnPercelenUploadForm({
                                                     },
                                                 }) => (
                                                     <FormItem>
-                                                        <div>Shapefiles</div>
+                                                        <div>Shapefile</div>
                                                         <div>
                                                             <div
                                                                 className={cn(
