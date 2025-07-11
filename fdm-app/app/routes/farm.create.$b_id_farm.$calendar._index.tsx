@@ -142,8 +142,7 @@ export default function ChooseFieldImportMethod() {
                                 <MapIcon className="w-12 h-12 mb-4" />
                                 <CardTitle>Selecteer op de kaart</CardTitle>
                                 <CardDescription>
-                                    Teken of selecteer je percelen direct op de
-                                    kaart.
+                                    Selecteer je percelen direct op de kaart.
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="flex-grow flex items-end justify-center">
