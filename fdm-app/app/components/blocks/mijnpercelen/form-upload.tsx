@@ -1,5 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AlertCircle, CheckCircle, Circle, FileUp, FlaskConical } from "lucide-react"
+import {
+    AlertCircle,
+    CheckCircle,
+    Circle,
+    FileUp,
+    FlaskConical,
+} from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Form, NavLink, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -30,6 +36,7 @@ import { Input } from "~/components/ui/input"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { MijnPercelenUploadAnimation } from "./upload-animation"
 import { parseDbf } from "shpjs"
+import { toast as notify } from "sonner"
 
 type UploadState = "idle" | "animating" | "success" | "error"
 
@@ -125,11 +132,22 @@ export function MijnPercelenUploadForm({
     }, [form.reset])
 
     const handleFilesSet = async (files: File[]) => {
-        setFileNames(files.map((file) => file.name))
-        checkRequiredFiles(files)
+        const validFiles = files.filter((file) => {
+            const extension = `.${file.name.split(".").pop()}`
+            const isValid = requiredExtensions.includes(extension)
+            if (!isValid) {
+                notify.warning(`Bestandstype niet ondersteund: ${extension}`, {
+                    id: `invalid-file-type-${file.name}`,
+                })
+            }
+            return isValid
+        })
+
+        setFileNames(validFiles.map((file) => file.name))
+        checkRequiredFiles(validFiles)
         setUploadState("idle")
 
-        const dbfFile = files.find((file) => file.name.endsWith(".dbf"))
+        const dbfFile = validFiles.find((file) => file.name.endsWith(".dbf"))
         if (dbfFile) {
             const dbfBuffer = await dbfFile.arrayBuffer()
             const dbfData = parseDbf(dbfBuffer) as any[]
@@ -148,8 +166,24 @@ export function MijnPercelenUploadForm({
         e.preventDefault()
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const newFiles = Array.from(e.dataTransfer.files)
+            const validNewFiles = newFiles.filter((file) => {
+                const extension = `.${file.name.split(".").pop()}`
+                const isValid = requiredExtensions.includes(extension)
+                if (!isValid) {
+                    notify.warning(
+                        `Bestandstype niet ondersteund: ${extension}`,
+                        {
+                            id: `invalid-file-type-${file.name}`,
+                        },
+                    )
+                }
+                return isValid
+            })
+
+            if (validNewFiles.length === 0) return
+
             const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = [...currentFiles, ...newFiles]
+            const updatedFiles = [...currentFiles, ...validNewFiles]
             const uniqueFiles = updatedFiles.reduce((acc, current) => {
                 if (!acc.find((item) => item.name === current.name)) {
                     acc.push(current)
@@ -313,20 +347,90 @@ export function MijnPercelenUploadForm({
                                                                     onBlur={
                                                                         onBlur
                                                                     }
-                                                                    onChange={(event) => {
-                                                                        if (event.target.files) {
-                                                                            const newFiles = Array.from(event.target.files);
-                                                                            const currentFiles = form.getValues("shapefile") || [];
-                                                                            const updatedFiles = [...currentFiles, ...newFiles];
-                                                                            const uniqueFiles = updatedFiles.reduce((acc, current) => {
-                                                                                if (!acc.find((item) => item.name === current.name)) {
-                                                                                    acc.push(current);
-                                                                                }
-                                                                                return acc;
-                                                                            }, [] as File[]);
+                                                                    onChange={(
+                                                                        event,
+                                                                    ) => {
+                                                                        if (
+                                                                            event
+                                                                                .target
+                                                                                .files
+                                                                        ) {
+                                                                            const newFiles =
+                                                                                Array.from(
+                                                                                    event
+                                                                                        .target
+                                                                                        .files,
+                                                                                )
+                                                                            const validNewFiles =
+                                                                                newFiles.filter(
+                                                                                    (
+                                                                                        file,
+                                                                                    ) => {
+                                                                                        const extension = `.${file.name.split(".").pop()}`
+                                                                                        const isValid =
+                                                                                            requiredExtensions.includes(
+                                                                                                extension,
+                                                                                            )
+                                                                                        if (
+                                                                                            !isValid
+                                                                                        ) {
+                                                                                            notify.warning(
+                                                                                                `Bestandstype niet ondersteund: ${extension}`,
+                                                                                                {
+                                                                                                    id: `invalid-file-type-${file.name}`,
+                                                                                                },
+                                                                                            )
+                                                                                        }
+                                                                                        return isValid
+                                                                                    },
+                                                                                )
 
-                                                                            onChange(uniqueFiles);
-                                                                            handleFilesSet(uniqueFiles);
+                                                                            if (
+                                                                                validNewFiles.length ===
+                                                                                0
+                                                                            )
+                                                                                return
+
+                                                                            const currentFiles =
+                                                                                form.getValues(
+                                                                                    "shapefile",
+                                                                                ) ||
+                                                                                []
+                                                                            const updatedFiles =
+                                                                                [
+                                                                                    ...currentFiles,
+                                                                                    ...validNewFiles,
+                                                                                ]
+                                                                            const uniqueFiles =
+                                                                                updatedFiles.reduce(
+                                                                                    (
+                                                                                        acc,
+                                                                                        current,
+                                                                                    ) => {
+                                                                                        if (
+                                                                                            !acc.find(
+                                                                                                (
+                                                                                                    item,
+                                                                                                ) =>
+                                                                                                    item.name ===
+                                                                                                    current.name,
+                                                                                            )
+                                                                                        ) {
+                                                                                            acc.push(
+                                                                                                current,
+                                                                                            )
+                                                                                        }
+                                                                                        return acc
+                                                                                    },
+                                                                                    [] as File[],
+                                                                                )
+
+                                                                            onChange(
+                                                                                uniqueFiles,
+                                                                            )
+                                                                            handleFilesSet(
+                                                                                uniqueFiles,
+                                                                            )
                                                                         }
                                                                     }}
                                                                     ref={ref}
@@ -368,7 +472,17 @@ export function MijnPercelenUploadForm({
                                                                                 .dbf,
                                                                                 .prj */}
                                                                             </div>
-                                                                            <RequiredFilesStatus files={form.getValues("shapefile") || []} requiredExtensions={requiredExtensions} />
+                                                                            <RequiredFilesStatus
+                                                                                files={
+                                                                                    form.getValues(
+                                                                                        "shapefile",
+                                                                                    ) ||
+                                                                                    []
+                                                                                }
+                                                                                requiredExtensions={
+                                                                                    requiredExtensions
+                                                                                }
+                                                                            />
                                                                         </>
                                                                     )}
                                                                     {uploadState ===
@@ -443,22 +557,37 @@ export function MijnPercelenUploadForm({
     )
 }
 
-function RequiredFilesStatus({ files, requiredExtensions }: { files: File[], requiredExtensions: string[] }) {
-    const uploadedExtensions = new Set(files.map(file => `.${file.name.split('.').pop()}`));
+function RequiredFilesStatus({
+    files,
+    requiredExtensions,
+}: {
+    files: File[]
+    requiredExtensions: string[]
+}) {
+    const uploadedExtensions = new Set(
+        files.map((file) => `.${file.name.split(".").pop()}`),
+    )
 
     return (
         <div className="grid grid-cols-4 gap-x-4 mt-2 text-xs text-muted-foreground">
-            {requiredExtensions.map(ext => {
-                const isUploaded = uploadedExtensions.has(ext);
+            {requiredExtensions.map((ext) => {
+                const isUploaded = uploadedExtensions.has(ext)
                 return (
-                    <div key={ext} className={`flex items-center ${isUploaded ? 'text-green-500' : 'text-grey-500'}`}>
-                        {isUploaded ? <CheckCircle className="w-4 h-4 mr-1" /> : <Circle className="w-4 h-4 mr-1" />}
+                    <div
+                        key={ext}
+                        className={`flex items-center ${isUploaded ? "text-green-500" : "text-grey-500"}`}
+                    >
+                        {isUploaded ? (
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                        ) : (
+                            <Circle className="w-4 h-4 mr-1" />
+                        )}
                         <span>{ext}</span>
                     </div>
-                );
+                )
             })}
         </div>
-    );
+    )
 }
 
 const fileSizeLimit = 5 * 1024 * 1024 // 5MB
