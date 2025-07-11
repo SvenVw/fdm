@@ -148,10 +148,16 @@ export function MijnPercelenUploadForm({
 
         const dbfFile = validFiles.find((file) => file.name.endsWith(".dbf"))
         if (dbfFile) {
-            const dbfBuffer = await dbfFile.arrayBuffer()
-            const dbfData = parseDbf(dbfBuffer) as any[]
-            const names = dbfData.map((row) => row.NAAM)
-            setFieldNames(names)
+            try {
+                const dbfBuffer = await dbfFile.arrayBuffer()
+                const dbfData = parseDbf(dbfBuffer) as any[]
+                const names = dbfData.map((row) => row?.NAAM).filter(Boolean) // Remove null/undefined values
+                setFieldNames(names)
+            } catch (error) {
+                console.error("Failed to parse DBF file:", error)
+                notify.error("Kon het DBF bestand niet verwerken")
+                setFieldNames([])
+            }
         } else {
             setFieldNames([])
         }
