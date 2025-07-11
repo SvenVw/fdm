@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { AlertCircle, CheckCircle, FileUp, FlaskConical } from "lucide-react"
+import { AlertCircle, CheckCircle, Circle, FileUp, FlaskConical } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Form, NavLink, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
@@ -118,24 +118,25 @@ export function MijnPercelenUploadForm({
         setHasAllRequiredFiles(hasAll)
     }
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            const files = Array.from(e.target.files)
-            setFileNames(files.map((file) => file.name))
-            checkRequiredFiles(files)
-            setUploadState("idle")
+    useEffect(() => {
+        return () => {
+            form.reset()
+        }
+    }, [form.reset])
 
-            const dbfFile = files.find((file) => file.name.endsWith(".dbf"))
-            if (dbfFile) {
-                const dbfBuffer = await dbfFile.arrayBuffer()
-                const dbfData = parseDbf(dbfBuffer) as any[]
-                const names = dbfData.map((row) => row.NAAM)
-                setFieldNames(names)
-            }
+    const handleFilesSet = async (files: File[]) => {
+        setFileNames(files.map((file) => file.name))
+        checkRequiredFiles(files)
+        setUploadState("idle")
+
+        const dbfFile = files.find((file) => file.name.endsWith(".dbf"))
+        if (dbfFile) {
+            const dbfBuffer = await dbfFile.arrayBuffer()
+            const dbfData = parseDbf(dbfBuffer) as any[]
+            const names = dbfData.map((row) => row.NAAM)
+            setFieldNames(names)
         } else {
-            setFileNames([])
             setFieldNames([])
-            setHasAllRequiredFiles(false)
         }
     }
 
@@ -146,20 +147,19 @@ export function MijnPercelenUploadForm({
     const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault()
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const files = Array.from(e.dataTransfer.files)
-            form.setValue("shapefile", files, { shouldValidate: true })
-            setFileNames(files.map((file) => file.name))
-            checkRequiredFiles(files)
-            setUploadState("idle")
-            e.dataTransfer.clearData()
+            const newFiles = Array.from(e.dataTransfer.files)
+            const currentFiles = form.getValues("shapefile") || []
+            const updatedFiles = [...currentFiles, ...newFiles]
+            const uniqueFiles = updatedFiles.reduce((acc, current) => {
+                if (!acc.find((item) => item.name === current.name)) {
+                    acc.push(current)
+                }
+                return acc
+            }, [] as File[])
 
-            const dbfFile = files.find((file) => file.name.endsWith(".dbf"))
-            if (dbfFile) {
-                const dbfBuffer = await dbfFile.arrayBuffer()
-                const dbfData = parseDbf(dbfBuffer) as any[]
-                const names = dbfData.map((row) => row.NAAM)
-                setFieldNames(names)
-            }
+            form.setValue("shapefile", uniqueFiles, { shouldValidate: true })
+            handleFilesSet(uniqueFiles)
+            e.dataTransfer.clearData()
         }
     }
 
@@ -313,17 +313,21 @@ export function MijnPercelenUploadForm({
                                                                     onBlur={
                                                                         onBlur
                                                                     }
-                                                                    onChange={(
-                                                                        event,
-                                                                    ) => {
-                                                                        onChange(
-                                                                            event
-                                                                                .target
-                                                                                .files,
-                                                                        )
-                                                                        handleFileChange(
-                                                                            event,
-                                                                        )
+                                                                    onChange={(event) => {
+                                                                        if (event.target.files) {
+                                                                            const newFiles = Array.from(event.target.files);
+                                                                            const currentFiles = form.getValues("shapefile") || [];
+                                                                            const updatedFiles = [...currentFiles, ...newFiles];
+                                                                            const uniqueFiles = updatedFiles.reduce((acc, current) => {
+                                                                                if (!acc.find((item) => item.name === current.name)) {
+                                                                                    acc.push(current);
+                                                                                }
+                                                                                return acc;
+                                                                            }, [] as File[]);
+
+                                                                            onChange(uniqueFiles);
+                                                                            handleFilesSet(uniqueFiles);
+                                                                        }
                                                                     }}
                                                                     ref={ref}
                                                                     type="file"
@@ -359,11 +363,12 @@ export function MijnPercelenUploadForm({
                                                                                     : "Klik om te uploaden of sleep de bestanden hierheen"}
                                                                             </div>
                                                                             <div className="text-xs text-muted-foreground mt-1">
-                                                                                .shp,
+                                                                                {/* .shp,
                                                                                 .shx,
                                                                                 .dbf,
-                                                                                .prj
+                                                                                .prj */}
                                                                             </div>
+                                                                            <RequiredFilesStatus files={form.getValues("shapefile") || []} requiredExtensions={requiredExtensions} />
                                                                         </>
                                                                     )}
                                                                     {uploadState ===
@@ -436,6 +441,24 @@ export function MijnPercelenUploadForm({
             )}
         </div>
     )
+}
+
+function RequiredFilesStatus({ files, requiredExtensions }: { files: File[], requiredExtensions: string[] }) {
+    const uploadedExtensions = new Set(files.map(file => `.${file.name.split('.').pop()}`));
+
+    return (
+        <div className="grid grid-cols-4 gap-x-4 mt-2 text-xs text-muted-foreground">
+            {requiredExtensions.map(ext => {
+                const isUploaded = uploadedExtensions.has(ext);
+                return (
+                    <div key={ext} className={`flex items-center ${isUploaded ? 'text-green-500' : 'text-grey-500'}`}>
+                        {isUploaded ? <CheckCircle className="w-4 h-4 mr-1" /> : <Circle className="w-4 h-4 mr-1" />}
+                        <span>{ext}</span>
+                    </div>
+                );
+            })}
+        </div>
+    );
 }
 
 const fileSizeLimit = 5 * 1024 * 1024 // 5MB
