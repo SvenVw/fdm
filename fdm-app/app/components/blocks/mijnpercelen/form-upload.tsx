@@ -117,9 +117,7 @@ export function MijnPercelenUploadForm({
     }, [uploadState, form.reset])
 
     const checkRequiredFiles = (files: File[]) => {
-        const extensions = files.map((file) =>
-            file.name.slice(file.name.lastIndexOf(".")),
-        )
+        const extensions = files.map((file) => getFileExtension(file.name))
         const hasAll = requiredExtensions.every((ext) =>
             extensions.includes(ext),
         )
@@ -134,7 +132,7 @@ export function MijnPercelenUploadForm({
 
     const handleFilesSet = async (files: File[]) => {
         const validFiles = files.filter((file) => {
-            const extension = `.${file.name.split(".").pop()}`
+            const extension = getFileExtension(file.name)
             const isValid = requiredExtensions.includes(extension)
             if (!isValid) {
                 notify.warning(`Bestandstype niet ondersteund: ${extension}`, {
@@ -168,7 +166,7 @@ export function MijnPercelenUploadForm({
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const newFiles = Array.from(e.dataTransfer.files)
             const validNewFiles = newFiles.filter((file) => {
-                const extension = `.${file.name.split(".").pop()}`
+                const extension = getFileExtension(file.name)
                 const isValid = requiredExtensions.includes(extension)
                 if (!isValid) {
                     notify.warning(
@@ -389,7 +387,10 @@ export function MijnPercelenUploadForm({
                                                                                     (
                                                                                         file,
                                                                                     ) => {
-                                                                                        const extension = `.${file.name.split(".").pop()}`
+                                                                                        const extension =
+                                                                                            getFileExtension(
+                                                                                                file.name,
+                                                                                            )
                                                                                         const isValid =
                                                                                             requiredExtensions.includes(
                                                                                                 extension,
@@ -606,7 +607,7 @@ function RequiredFilesStatus({
     requiredExtensions: string[]
 }) {
     const uploadedExtensions = new Set(
-        files.map((file) => `.${file.name.split(".").pop()}`),
+        files.map((file) => getFileExtension(file.name)),
     )
 
     return (
@@ -647,7 +648,7 @@ export const FormSchema = z.object({
         .refine(
             (files) => {
                 const extensions = files.map((file) =>
-                    file.name.slice(file.name.lastIndexOf(".")),
+                    getFileExtension(file.name),
                 )
                 return [".shp", ".shx", ".dbf", ".prj"].every((ext) =>
                     extensions.includes(ext),
@@ -659,3 +660,7 @@ export const FormSchema = z.object({
             },
         ),
 })
+
+const getFileExtension = (filename: string): string => {
+    return filename.slice(filename.lastIndexOf(".")).toLowerCase()
+}
