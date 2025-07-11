@@ -510,7 +510,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const field = await getField(fdm, session.principal_id, b_id)
             await removeField(fdm, session.principal_id, b_id)
             return redirectWithSuccess(
-                `/farm/create/${b_id_farm}/${calendar}/fields}`,
+                `/farm/create/${b_id_farm}/${calendar}/fields`,
                 {
                     message: `${field.b_name} is verwijderd! 🎉`,
                 },

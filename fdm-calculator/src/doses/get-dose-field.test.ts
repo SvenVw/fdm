@@ -54,7 +54,7 @@ describe("getDoseForField", () => {
                 ],
             },
             new Date(),
-            "lease",
+            "nl_02",
         )
         p_id_catalogue = await addFertilizerToCatalogue(
             fdm,
@@ -197,7 +197,7 @@ describe("getDoseForField", () => {
                 ],
             },
             new Date(),
-            "lease",
+            "nl_02",
         )
 
         const expectedResult = {
