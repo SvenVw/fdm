@@ -1,4 +1,4 @@
-// rollup.config.js
+import commonjs from "@rollup/plugin-commonjs"
 import resolve from "@rollup/plugin-node-resolve"
 import terser from "@rollup/plugin-terser"
 import typescript from "@rollup/plugin-typescript"
@@ -15,6 +15,7 @@ export default defineConfig({
     ],
     plugins: [
         resolve(),
+        commonjs(),
         typescript({
             sourceMap: process.env.NODE_ENV === "development",
             inlineSources: process.env.NODE_ENV === "development",

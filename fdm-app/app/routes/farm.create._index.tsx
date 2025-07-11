@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     addFarm,
+    addDerogation,
     addFertilizer,
     enableCultivationCatalogue,
     enableFertilizerCatalogue,
@@ -36,6 +37,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     Select,
     SelectContent,
@@ -73,6 +75,8 @@ const FormSchema = z.object({
         required_error: "Jaar is verplicht",
         invalid_type_error: "Jaar moet een getal zijn",
     }),
+    has_derogation: z.boolean().default(false),
+    derogation_start_year: z.number().optional(),
 })
 
 // Loader
@@ -97,6 +101,8 @@ export default function AddFarmPage() {
         defaultValues: {
             b_name_farm: loaderData.b_name_farm ?? "",
             year: loaderData.year,
+            has_derogation: false,
+            derogation_start_year: loaderData.year,
         },
     })
 
@@ -138,7 +144,7 @@ export default function AddFarmPage() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>
-                                                                Bedrijfsnaam                                                             
+                                                                Bedrijfsnaam
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
@@ -152,6 +158,98 @@ export default function AddFarmPage() {
                                                         </FormItem>
                                                     )}
                                                 />
+                                                <FormField
+                                                    control={form.control}
+                                                    name="has_derogation"
+                                                    render={({ field }) => (
+                                                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                                            <div className="space-y-0.5">
+                                                                <FormLabel className="text-base">
+                                                                    Derogatie
+                                                                </FormLabel>
+                                                                <FormDescription>
+                                                                    Heeft dit
+                                                                    bedrijf
+                                                                    derogatie?
+                                                                </FormDescription>
+                                                            </div>
+                                                            <FormControl>
+                                                                <Checkbox
+                                                                    checked={
+                                                                        field.value
+                                                                    }
+                                                                    onCheckedChange={
+                                                                        field.onChange
+                                                                    }
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                {form.watch(
+                                                    "has_derogation",
+                                                ) && (
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="derogation_start_year"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormLabel>
+                                                                    Startjaar
+                                                                    derogatie
+                                                                </FormLabel>
+                                                                <Select
+                                                                    onValueChange={
+                                                                        field.onChange
+                                                                    }
+                                                                    defaultValue={String(
+                                                                        new Date().getFullYear(),
+                                                                    )}
+                                                                >
+                                                                    <FormControl>
+                                                                        <SelectTrigger>
+                                                                            <SelectValue placeholder="Selecteer een jaar" />
+                                                                        </SelectTrigger>
+                                                                    </FormControl>
+                                                                    <SelectContent>
+                                                                        {Array.from(
+                                                                            {
+                                                                                length:
+                                                                                    2025 -
+                                                                                    2006 +
+                                                                                    1,
+                                                                            },
+                                                                            (
+                                                                                _,
+                                                                                i,
+                                                                            ) =>
+                                                                                2006 +
+                                                                                i,
+                                                                        ).map(
+                                                                            (
+                                                                                year,
+                                                                            ) => (
+                                                                                <SelectItem
+                                                                                    key={
+                                                                                        year
+                                                                                    }
+                                                                                    value={String(
+                                                                                        year,
+                                                                                    )}
+                                                                                >
+                                                                                    {
+                                                                                        year
+                                                                                    }
+                                                                                </SelectItem>
+                                                                            ),
+                                                                        )}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                )}
                                             </div>
                                             <div className="flex flex-col space-y-1.5">
                                                 <FormField
@@ -252,7 +350,8 @@ export async function action({ request }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_name_farm, year } = formValues
+        const { b_name_farm, year, has_derogation, derogation_start_year } =
+            formValues
 
         const b_id_farm = await addFarm(
             fdm,
@@ -262,6 +361,12 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
         )
+
+        if (has_derogation && derogation_start_year) {
+            for (let year = derogation_start_year; year <= 2025; year++) {
+                await addDerogation(fdm, session.principal_id, b_id_farm, year)
+            }
+        }
         await enableFertilizerCatalogue(
             fdm,
             session.principal_id,
