@@ -608,6 +608,23 @@ export const FormSchema = z.object({
         )
         .refine(
             (files) => {
+                const validMimeTypes = [
+                    "application/octet-stream", // Common for .shp, .shx, .dbf
+                    "application/x-dbf", // .dbf files
+                    "text/plain", // .prj files
+                ]
+                return files.every(
+                    (file) =>
+                        validMimeTypes.includes(file.type) || file.type === "",
+                )
+            },
+            {
+                message:
+                    "Een of meerdere bestanden hebben een ongeldig bestandstype.",
+            },
+        )
+        .refine(
+            (files) => {
                 const extensions = files.map((file) =>
                     getFileExtension(file.name),
                 )
