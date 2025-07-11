@@ -36,8 +36,15 @@ import {
     FormLabel,
     FormMessage,
 } from "~/components/ui/form"
+import { Input } from "~/components/ui/input"
 import { Checkbox } from "~/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -64,14 +71,18 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
         }),
+    year: z.coerce.number({
+        required_error: "Jaar is verplicht",
+        invalid_type_error: "Jaar moet een getal zijn",
+    }),
     has_derogation: z.boolean().default(false),
     derogation_start_year: z.number().optional(),
-});
 
 // Loader
 export async function loader({ request }: LoaderFunctionArgs) {
     return {
         b_name_farm: null,
+        year: new Date().getFullYear(),
     }
 }
 
@@ -88,8 +99,16 @@ export default function AddFarmPage() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name_farm: loaderData.b_name_farm ?? "",
+            year: loaderData.year,
         },
     })
+
+    const currentYear = new Date().getFullYear()
+    const years = Array.from(
+        { length: currentYear - 2020 + 1 },
+        (_, i) => currentYear - i,
+    )
+
     return (
         <SidebarInset>
             <Header action={undefined}>
@@ -122,10 +141,7 @@ export default function AddFarmPage() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>
-                                                                Bedrijfsnaam{" "}
-                                                                <span className="text-red-500">
-                                                                    *
-                                                                </span>
+                                                                Bedrijfsnaam                                                             
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
@@ -186,6 +202,52 @@ export default function AddFarmPage() {
                                                     />
                                                 )}
                                             </div>
+                                            <div className="flex flex-col space-y-1.5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="year"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                Voor welk jaar
+                                                                wil je percelen
+                                                                invullen
+                                                            </FormLabel>
+                                                            <Select
+                                                                onValueChange={
+                                                                    field.onChange
+                                                                }
+                                                                defaultValue={field.value.toString()}
+                                                            >
+                                                                <FormControl>
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Selecteer een jaar" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {years.map(
+                                                                        (
+                                                                            year,
+                                                                        ) => (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    year
+                                                                                }
+                                                                                value={year.toString()}
+                                                                            >
+                                                                                {
+                                                                                    year
+                                                                                }
+                                                                            </SelectItem>
+                                                                        ),
+                                                                    )}
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            </div>
                                         </div>
                                     </CardContent>
                                     <CardFooter className="flex justify-between">
@@ -240,6 +302,7 @@ export async function action({ request }: ActionFunctionArgs) {
             FormSchema,
         )
         const { b_name_farm, has_derogation, derogation_start_year } = formValues;
+        const { b_name_farm, year } = formValues
 
         const b_id_farm = await addFarm(
             fdm,
@@ -292,11 +355,8 @@ export async function action({ request }: ActionFunctionArgs) {
             ),
         )
 
-        // Get current year
-        const year = new Date().getFullYear()
-
-        return redirectWithSuccess(`./${b_id_farm}/${year}/atlas`, {
-            message: "Bedrijf is toegevoegd! 🎉",
+        return redirectWithSuccess(`./${b_id_farm}/${year}`, {
+            message: "Bedrijf is toegevoegd! 🎉 Selecteer nu de importmethode.",
         })
     } catch (error) {
         throw handleActionError(error)
