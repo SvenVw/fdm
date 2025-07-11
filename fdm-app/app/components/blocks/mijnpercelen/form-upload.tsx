@@ -161,6 +161,42 @@ export function MijnPercelenUploadForm({
         e.preventDefault()
     }
 
+    const handleFileChange = async (
+        event: React.ChangeEvent<HTMLInputElement>,
+        onChange: (files: File[]) => void,
+    ) => {
+        if (event.target.files) {
+            const newFiles = Array.from(event.target.files)
+            const validNewFiles = newFiles.filter((file) => {
+                const extension = getFileExtension(file.name)
+                const isValid = requiredExtensions.includes(extension)
+                if (!isValid) {
+                    notify.warning(
+                        `Bestandstype niet ondersteund: ${extension}`,
+                        {
+                            id: `invalid-file-type-${file.name}`,
+                        },
+                    )
+                }
+                return isValid
+            })
+
+            if (validNewFiles.length === 0) return
+
+            const currentFiles = form.getValues("shapefile") || []
+            const updatedFiles = [...currentFiles, ...validNewFiles]
+            const uniqueFiles = updatedFiles.reduce((acc, current) => {
+                if (!acc.find((item) => item.name === current.name)) {
+                    acc.push(current)
+                }
+                return acc
+            }, [] as File[])
+
+            onChange(uniqueFiles)
+            await handleFilesSet(uniqueFiles)
+        }
+    }
+
     const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault()
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
@@ -368,94 +404,13 @@ export function MijnPercelenUploadForm({
                                                                     onBlur={
                                                                         onBlur
                                                                     }
-                                                                    onChange={(
+                                                                    onChange={async (
                                                                         event,
                                                                     ) => {
-                                                                        if (
-                                                                            event
-                                                                                .target
-                                                                                .files
-                                                                        ) {
-                                                                            const newFiles =
-                                                                                Array.from(
-                                                                                    event
-                                                                                        .target
-                                                                                        .files,
-                                                                                )
-                                                                            const validNewFiles =
-                                                                                newFiles.filter(
-                                                                                    (
-                                                                                        file,
-                                                                                    ) => {
-                                                                                        const extension =
-                                                                                            getFileExtension(
-                                                                                                file.name,
-                                                                                            )
-                                                                                        const isValid =
-                                                                                            requiredExtensions.includes(
-                                                                                                extension,
-                                                                                            )
-                                                                                        if (
-                                                                                            !isValid
-                                                                                        ) {
-                                                                                            notify.warning(
-                                                                                                `Bestandstype niet ondersteund: ${extension}`,
-                                                                                                {
-                                                                                                    id: `invalid-file-type-${file.name}`,
-                                                                                                },
-                                                                                            )
-                                                                                        }
-                                                                                        return isValid
-                                                                                    },
-                                                                                )
-
-                                                                            if (
-                                                                                validNewFiles.length ===
-                                                                                0
-                                                                            )
-                                                                                return
-
-                                                                            const currentFiles =
-                                                                                form.getValues(
-                                                                                    "shapefile",
-                                                                                ) ||
-                                                                                []
-                                                                            const updatedFiles =
-                                                                                [
-                                                                                    ...currentFiles,
-                                                                                    ...validNewFiles,
-                                                                                ]
-                                                                            const uniqueFiles =
-                                                                                updatedFiles.reduce(
-                                                                                    (
-                                                                                        acc,
-                                                                                        current,
-                                                                                    ) => {
-                                                                                        if (
-                                                                                            !acc.find(
-                                                                                                (
-                                                                                                    item,
-                                                                                                ) =>
-                                                                                                    item.name ===
-                                                                                                    current.name,
-                                                                                            )
-                                                                                        ) {
-                                                                                            acc.push(
-                                                                                                current,
-                                                                                            )
-                                                                                        }
-                                                                                        return acc
-                                                                                    },
-                                                                                    [] as File[],
-                                                                                )
-
-                                                                            onChange(
-                                                                                uniqueFiles,
-                                                                            )
-                                                                            handleFilesSet(
-                                                                                uniqueFiles,
-                                                                            )
-                                                                        }
+                                                                        await handleFileChange(
+                                                                            event,
+                                                                            onChange,
+                                                                        )
                                                                     }}
                                                                     ref={ref}
                                                                     type="file"
