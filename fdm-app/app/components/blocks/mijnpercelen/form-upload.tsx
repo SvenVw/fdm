@@ -333,8 +333,8 @@ export function MijnPercelenUploadForm({
                                                             {fileNames.length >
                                                                 0 && (
                                                                 <Button
-                                                                    variant= "ghost"
-                                                                    size= "icon"
+                                                                    variant="ghost"
+                                                                    size="icon"
                                                                     className="absolute top-2 right-2 h-6 w-6"
                                                                     onClick={() => {
                                                                         form.reset()
@@ -470,6 +470,24 @@ export function MijnPercelenUploadForm({
                                                                 <label
                                                                     htmlFor="file-upload"
                                                                     className="flex flex-col items-center justify-center w-full h-full cursor-pointer"
+                                                                    aria-label="Upload shapefile files by clicking or dragging and dropping"
+                                                                    onKeyDown={(
+                                                                        e,
+                                                                    ) => {
+                                                                        if (
+                                                                            e.key ===
+                                                                                "Enter" ||
+                                                                            e.key ===
+                                                                                " "
+                                                                        ) {
+                                                                            e.preventDefault()
+                                                                            document
+                                                                                .getElementById(
+                                                                                    "file-upload",
+                                                                                )
+                                                                                ?.click()
+                                                                        }
+                                                                    }}
                                                                     onDragOver={
                                                                         handleDragOver
                                                                     }
