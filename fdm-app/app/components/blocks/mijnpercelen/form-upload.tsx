@@ -5,6 +5,7 @@ import {
     Circle,
     FileUp,
     FlaskConical,
+    X,
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { Form, NavLink, useActionData, useNavigation } from "react-router"
@@ -328,7 +329,29 @@ export function MijnPercelenUploadForm({
                                                 }) => (
                                                     <FormItem>
                                                         <div>Shapefile</div>
-                                                        <div>
+                                                        <div className="relative">
+                                                            {fileNames.length >
+                                                                0 && (
+                                                                <Button
+                                                                    variant= "ghost"
+                                                                    size= "icon"
+                                                                    className="absolute top-2 right-2 h-6 w-6"
+                                                                    onClick={() => {
+                                                                        form.reset()
+                                                                        setFileNames(
+                                                                            [],
+                                                                        )
+                                                                        setFieldNames(
+                                                                            [],
+                                                                        )
+                                                                        setHasAllRequiredFiles(
+                                                                            false,
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </Button>
+                                                            )}
                                                             <div
                                                                 className={cn(
                                                                     "flex flex-col items-center justify-center w-full h-32 rounded-md border border-dashed border-muted-foreground/25 px-6 py-4 text-center transition-colors hover:bg-muted/25",
