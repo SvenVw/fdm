@@ -578,7 +578,7 @@ function RequiredFilesStatus({
                 return (
                     <div
                         key={ext}
-                        className={`flex items-center ${isUploaded ? "text-green-500" : "text-grey-500"}`}
+                        className={`flex items-center ${isUploaded ? "text-green-500" : "text-gray-500"}`}
                     >
                         {isUploaded ? (
                             <CheckCircle className="w-4 h-4 mr-1" />
