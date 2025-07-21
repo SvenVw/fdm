@@ -28,6 +28,7 @@ import { Alert, AlertDescription } from "../components/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { HeaderNorms } from "../components/blocks/header/norms"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -201,6 +202,7 @@ export default function FarmNormsBlock() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
+                <HeaderNorms b_id_farm={loaderData.b_id_farm} />
             </Header>
             <main>
                 <FarmTitle
