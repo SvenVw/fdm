@@ -78,9 +78,7 @@ export default function DerogationSettings() {
                                 <TableRow key={year}>
                                     <TableCell>{year}</TableCell>
                                     <TableCell>
-                                        <fetcher.Form method="post">
-                                            <input type="hidden" name="year" value={year} />
-                                            <input type="hidden" name="hasDerogation" value={String(hasDerogation)} />
+                                        <fetcher.Form method="post">                                   
                                             <Switch
                                                 checked={hasDerogation}
                                                 onCheckedChange={() => {
