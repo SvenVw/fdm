@@ -62,7 +62,7 @@ This schema holds the primary data related to farm operations.
 | **b_id**              | `text`                      | Not Null, Foreign Key (references `fields.b_id`) | Identifier of the field being acquired.                                  |
 | **b_id_farm**         | `text`                      | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm acquiring the field.                              |
 | **b_start**           | `timestamp with time zone`  |                                              | Timestamp indicating the start of the farm's management/acquisition.     |
-| **b_acquiring_method**| `acquiringMethodEnum`       | Not Null (default: 'unknown')                | Method by which the farm acquired the field (e.g., 'owner', 'lease'). |
+| **b_acquiring_method**| `acquiringMethodEnum`       | Not Null (default: 'unknown')                | Method by which the farm acquired the field (e.g., 'nl_01', 'nl_02'). |
 | **created**           | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**           | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
 
@@ -71,7 +71,7 @@ This schema holds the primary data related to farm operations.
 
 ##### `acquiringMethodEnum`
 *   **Name**: `b_acquiring_method`
-*   **Possible values**: `owner`, `lease`, `unknown`
+*   **Possible values**: `nl_01`, `nl_02`, `nl_07`, `nl_09`, `nl_12`, `nl_13`, `nl_61`, `nl_63`, `unknown`
 
 #### **`fieldDiscarding`**
 **Purpose**: Marks when a field is no longer actively managed or used within the system.
