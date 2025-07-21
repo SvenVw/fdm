@@ -10,7 +10,7 @@ describe("getNL2025FosfaatGebruiksNorm", () => {
             cultivations: [{ b_lu_catalogue: "nl_265" } as Partial<NL2025NormsInputForCultivation>] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
         };
-        const result = await getNL2025FosfaatGebruiksNorm(mockInput);;
+        const result = await getNL2025FosfaatGebruiksNorm(mockInput);
         expect(result.normValue).toBe(120);
         expect(result.normSource).toContain("Grasland");
     });
