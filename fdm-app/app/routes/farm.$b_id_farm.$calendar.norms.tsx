@@ -141,8 +141,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     const input = await functionsForms.collectInputForNorms(
                         fdm,
                         session.principal_id,
-                        field.b_id,
-                        timeframe,
+                        field.b_id,                     
                     )
 
                     // Calculate the norms
@@ -211,7 +210,7 @@ export default function FarmNormsBlock() {
                     }
                 />
                 {/* Disclaimer */}
-                {!loaderData.farmNorms && loaderData.fieldNorms ? (
+                {loaderData.farmNorms && loaderData.fieldNorms ? (
                     <div className="px-10">
                         <Alert className="mb-8  border-amber-200 bg-amber-50">
                             <AlertTriangle className="h-4 w-4 text-amber-600" />
