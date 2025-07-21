@@ -368,11 +368,16 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
         )
-
         if (has_derogation && derogation_start_year) {
-            for (let year = derogation_start_year; year <= 2025; year++) {
-                await addDerogation(fdm, session.principal_id, b_id_farm, year)
-            }
+            const years = Array.from(
+                { length: 2025 - derogation_start_year + 1 },
+                (_, i) => derogation_start_year + i
+            )
+            await Promise.all(
+                years.map(year =>
+                    addDerogation(fdm, session.principal_id, b_id_farm, year)
+                )
+            )
         }
         await enableFertilizerCatalogue(
             fdm,
