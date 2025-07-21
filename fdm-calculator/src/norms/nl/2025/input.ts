@@ -60,10 +60,10 @@ export async function collectNL2025InputForNorms(
     const soilAnalysisPicked = {
         a_p_cc: soilAnalysis.find(
             (x: { parameter: string }) => x.parameter === "a_p_cc",
-        ).value,
+        )?.value ?? null,
         a_p_al: soilAnalysis.find(
             (x: { parameter: string }) => x.parameter === "a_p_al",
-        ).value,
+        )?.value ?? null,
     }
 
     return {
