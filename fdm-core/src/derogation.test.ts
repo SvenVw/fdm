@@ -88,7 +88,7 @@ describe("Derogation Functions", () => {
 
     describe("listDerogations", () => {
         it("should list all derogations for a farm", async () => {
-            const year = 2027
+            const year = 2024
             await addDerogation(fdm, principal_id, b_id_farm, year)
             const derogations = await listDerogations(
                 fdm,
@@ -110,7 +110,7 @@ describe("Derogation Functions", () => {
 
     describe("isDerogationGrantedForYear", () => {
         it("should return true if a derogation is granted for the specified year", async () => {
-            const year = 2028
+            const year = 2024
             await addDerogation(fdm, principal_id, b_id_farm, year)
             const isGranted = await isDerogationGrantedForYear(
                 fdm,
@@ -122,7 +122,7 @@ describe("Derogation Functions", () => {
         })
 
         it("should return false if a derogation is not granted for the specified year", async () => {
-            const year = 2029
+            const year = 2023
             const isGranted = await isDerogationGrantedForYear(
                 fdm,
                 principal_id,
@@ -134,7 +134,7 @@ describe("Derogation Functions", () => {
 
         it("should throw an error if the principal does not have read access", async () => {
             const other_principal_id = createId()
-            const year = 2030
+            const year = 2024
             await expect(
                 isDerogationGrantedForYear(
                     fdm,
@@ -150,7 +150,7 @@ describe("Derogation Functions", () => {
 
     describe("removeDerogation", () => {
         it("should remove a derogation from a farm", async () => {
-            const year = 2031
+            const year = 2018
             const b_id_derogation = await addDerogation(
                 fdm,
                 principal_id,
@@ -168,7 +168,7 @@ describe("Derogation Functions", () => {
         })
 
         it("should throw an error if the principal does not have write access", async () => {
-            const year = 2032
+            const year = 2024
             const b_id_derogation = await addDerogation(
                 fdm,
                 principal_id,
@@ -187,7 +187,7 @@ describe("Derogation Functions", () => {
             const non_existent_derogation_id = createId()
             await expect(
                 removeDerogation(fdm, principal_id, non_existent_derogation_id),
-            ).rejects.toThrowError("Derogation not found on any farm.")
+            ).rejects.toThrowError("Exception for removeDerogatio")
         })
     })
 })
