@@ -75,8 +75,8 @@ const FormSchema = z.object({
         required_error: "Jaar is verplicht",
         invalid_type_error: "Jaar moet een getal zijn",
     }),
-    has_derogation: z.boolean().default(false),
-    derogation_start_year: z.number().optional(),
+    has_derogation: z.coerce.boolean().default(false),
+    derogation_start_year: z.coerce.number().optional(),
 })
 
 // Loader
