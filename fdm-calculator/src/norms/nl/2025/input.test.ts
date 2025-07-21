@@ -6,7 +6,6 @@ import type {
     Cultivation,
     SoilAnalysis,
     FdmType,
-    Timeframe,
 } from "@svenvw/fdm-core"
 
 vi.mock("@svenvw/fdm-core", async () => {
@@ -16,6 +15,7 @@ vi.mock("@svenvw/fdm-core", async () => {
         getField: vi.fn(),
         getCultivations: vi.fn(),
         getCurrentSoilData: vi.fn(),
+        isDerogationGrantedForYear: vi.fn(),
     }
 })
 
@@ -36,11 +36,17 @@ describe("collectNL2025InputForNorms", () => {
             { parameter: "a_p_al", value: 20 },
         ]
 
+        const timeframe = {
+            start: new Date(2025, 0, 1),
+            end: new Date(2025, 11, 31),
+        }
+
         vi.mocked(fdmCore.getField).mockResolvedValue(mockField)
         vi.mocked(fdmCore.getCultivations).mockResolvedValue(mockCultivations)
         vi.mocked(fdmCore.getCurrentSoilData).mockResolvedValue(
             mockSoilAnalysis as unknown as SoilAnalysis[],
         )
+        vi.mocked(fdmCore.isDerogationGrantedForYear).mockResolvedValue(false)
 
         const result = await collectNL2025InputForNorms(
             mockFdm,
@@ -61,11 +67,19 @@ describe("collectNL2025InputForNorms", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
+            timeframe,
         )
         expect(fdmCore.getCurrentSoilData).toHaveBeenCalledWith(
             mockFdm,
             mockPrincipalId,
             mockFieldId,
+            timeframe,
+        )
+        expect(fdmCore.isDerogationGrantedForYear).toHaveBeenCalledWith(
+            mockFdm,
+            mockPrincipalId,
+            "farm-1",
+            2025,
         )
     })
 })
