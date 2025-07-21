@@ -39,6 +39,33 @@ export async function addDerogation(
                 "addDerogation",
             )
 
+            const existingDerogation = await tx
+                .select({ id: schema.derogations.b_id_derogation })
+                .from(schema.derogations)
+                .leftJoin(
+                    schema.derogationApplying,
+                    eq(
+                        schema.derogations.b_id_derogation,
+                        schema.derogationApplying.b_id_derogation,
+                    ),
+                )
+                .where(
+                    and(
+                        eq(schema.derogationApplying.b_id_farm, b_id_farm),
+                        eq(
+                            schema.derogations.b_derogation_year,
+                            b_derogation_year,
+                        ),
+                    ),
+                )
+                .limit(1)
+
+            if (existingDerogation.length > 0) {
+                throw new Error(
+                    "Derogation already granted for this farm and year.",
+                )
+            }
+
             const b_id_derogation = createId()
             await tx.insert(schema.derogations).values({
                 b_id_derogation,

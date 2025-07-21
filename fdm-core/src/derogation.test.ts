@@ -84,6 +84,14 @@ describe("Derogation Functions", () => {
                 "Principal does not have permission to perform this action",
             )
         })
+
+        it("should throw an error if derogation is already granted for that year", async () => {
+            const year = 2021
+            await addDerogation(fdm, principal_id, b_id_farm, year)
+            await expect(
+                addDerogation(fdm, principal_id, b_id_farm, year),
+            ).rejects.toThrowError("Exception for addDerogation")
+        })
     })
 
     describe("listDerogations", () => {
@@ -110,7 +118,7 @@ describe("Derogation Functions", () => {
 
     describe("isDerogationGrantedForYear", () => {
         it("should return true if a derogation is granted for the specified year", async () => {
-            const year = 2024
+            const year = 2017
             await addDerogation(fdm, principal_id, b_id_farm, year)
             const isGranted = await isDerogationGrantedForYear(
                 fdm,
@@ -168,7 +176,7 @@ describe("Derogation Functions", () => {
         })
 
         it("should throw an error if the principal does not have write access", async () => {
-            const year = 2024
+            const year = 2012
             const b_id_derogation = await addDerogation(
                 fdm,
                 principal_id,
