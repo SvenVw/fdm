@@ -26,9 +26,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request);
         const formData = await request.formData();
         const year = Number(formData.get("year"));
-        const hasDerogation = formData.get("hasDerogation") === "true";
-
-        if (hasDerogation) {
+        const currentlyHasDerogation = formData.get("hasDerogation") === "true";
+        if (currentlyHasDerogation) {
+            // User is turning OFF the switch, so remove derogation
             const derogations = await listDerogations(fdm, session.principal_id, b_id_farm);
             const derogation = derogations.find(d => d.b_derogation_year === year);
             if (derogation) {
@@ -36,11 +36,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 return dataWithSuccess({}, `Derogatie voor ${year} verwijderd.`);
             }
         } else {
+            // User is turning ON the switch, so add derogation
             await addDerogation(fdm, session.principal_id, b_id_farm, year);
             return dataWithSuccess({}, `Derogatie voor ${year} toegevoegd.`);
         }
-
-        return dataWithError({}, "Actie mislukt.");
+        return dataWithError({}, `Het is niet gelukt derogatie voor ${year} aan te passen.`);
     } catch (error) {
         throw handleActionError(error);
     }
