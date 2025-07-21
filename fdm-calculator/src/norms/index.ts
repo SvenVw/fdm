@@ -21,7 +21,7 @@ export function createFunctionsForNorms(b_region: "NL", year: "2025") {
 }
 
 export function createFunctionsForFertilizerApplicationFilling(
-    b_region: string,
+    b_region: "NL",
     year: "2025",
 ) {
     if (b_region === "NL") {
