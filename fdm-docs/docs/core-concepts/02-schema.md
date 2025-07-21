@@ -448,6 +448,36 @@ This schema holds the primary data related to farm operations.
 
 ---
 
+### Derogations
+
+#### **`derogations`**
+**Purpose**: Stores information about derogations, which is special permissions by year related to legal norms for fertilizer application.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_derogation** | `text` | Primary Key | Unique identifier for the derogation. |
+| **b_derogation_year** | `integer` | Not Null | The year the derogation applies to. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+**Indexes:**
+*   Unique index on `b_id_derogation`.
+
+#### **`derogationApplying`**
+**Purpose**: Links a farm to a specific derogation, indicating that the farm is applying or making use of that derogation.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_farm** | `text` | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm applying the derogation. |
+| **b_id_derogation** | `text` | Not Null, Foreign Key (references `derogations.b_id_derogation`) | Identifier of the derogation being applied. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+**Constraints:**
+*   Primary Key on (`b_id_farm`, `b_id_derogation`).
+
+---
+
 ## `fdm-authn` Schema (Authentication)
 
 This schema handles user authentication, sessions, accounts, organizations, and related functionalities.
