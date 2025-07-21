@@ -14,4 +14,3 @@ CREATE TABLE "fdm"."derogations" (
 --> statement-breakpoint
 ALTER TABLE "fdm"."derogation_applying" ADD CONSTRAINT "derogation_applying_b_id_farm_farms_b_id_farm_fk" FOREIGN KEY ("b_id_farm") REFERENCES "fdm"."farms"("b_id_farm") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "fdm"."derogation_applying" ADD CONSTRAINT "derogation_applying_b_id_derogation_derogations_b_id_derogation_fk" FOREIGN KEY ("b_id_derogation") REFERENCES "fdm"."derogations"("b_id_derogation") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE UNIQUE INDEX "b_id_derogation_idx" ON "fdm"."derogations" USING btree ("b_id_derogation");--> statement-breakpoint

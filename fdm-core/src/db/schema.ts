@@ -668,10 +668,7 @@ export const derogations = fdmSchema.table(
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
-    (table) => [
-        uniqueIndex("b_id_derogation_idx").on(table.b_id_derogation)
-    ],
-);
+)
 
 export type derogationsTypeSelect = typeof derogations.$inferSelect
 export type derogationsTypeInsert = typeof derogations.$inferInsert
@@ -696,7 +693,7 @@ export const derogationApplying = fdmSchema.table(
             },
         ]
     },
-);
+)
 
 export type derogationApplyingTypeSelect = typeof derogationApplying.$inferSelect
 export type derogationApplyingTypeInsert = typeof derogationApplying.$inferInsert

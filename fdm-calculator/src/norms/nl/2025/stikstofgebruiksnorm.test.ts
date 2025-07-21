@@ -4,7 +4,6 @@ import {
     getRegion,
     isFieldInNVGebied,
 } from "./stikstofgebruiksnorm"
-import {} from "./stikstofgebruiksnorm"
 import type { Field } from "@svenvw/fdm-core"
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 

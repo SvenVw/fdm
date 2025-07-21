@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add at the farm create wizard the option to specify since when the farm has derogation
+Add an option in the farm-creation wizard to specify the start year of a farm’s derogation

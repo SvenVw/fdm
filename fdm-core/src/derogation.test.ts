@@ -195,7 +195,7 @@ describe("Derogation Functions", () => {
             const non_existent_derogation_id = createId()
             await expect(
                 removeDerogation(fdm, principal_id, non_existent_derogation_id),
-            ).rejects.toThrowError("Exception for removeDerogatio")
+            ).rejects.toThrowError("Exception for removeDerogation")
         })
     })
 })
