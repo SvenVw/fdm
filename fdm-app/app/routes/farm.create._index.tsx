@@ -76,7 +76,11 @@ const FormSchema = z.object({
         invalid_type_error: "Jaar moet een getal zijn",
     }),
     has_derogation: z.coerce.boolean().default(false),
-    derogation_start_year: z.coerce.number().optional(),
+    derogation_start_year: z.coerce.number().min(2006, {
+            message: "Startjaar moet minimaal 2006 zijn"
+        }).max(2025, {
+            message: "Startjaar mag maximaal 2025 zijn"
+        }).optional(),
 })
 
 // Loader
