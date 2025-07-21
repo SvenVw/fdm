@@ -55,7 +55,6 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
     it(
         "should return the correct norm for potatoes",
-        { timeout: 1000000 },
         async () => {
             const mockInput: NL2025NormsInput = {
                 farm: { is_derogatie_bedrijf: false },
