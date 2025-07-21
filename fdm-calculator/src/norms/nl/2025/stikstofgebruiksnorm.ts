@@ -297,7 +297,7 @@ export async function getNL2025StikstofGebruiksNorm(
             b_lu: "Groene braak, spontane opkomst",
             b_lu_catalogue: "nl_6794",
             b_lu_start: new Date("2025-01-01"),
-            b_lu_end: new Date("2025-12-3"),
+            b_lu_end: new Date("2025-12-31"),
             b_lu_variety: null,
         }
     }
