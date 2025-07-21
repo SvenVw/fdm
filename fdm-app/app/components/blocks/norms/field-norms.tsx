@@ -31,7 +31,7 @@ interface FieldNormsProps {
 
 export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
     const getFieldName = (b_id: string) => {
-        return fieldOptions.find((field) => field.b_id === b_id)?.b_name
+        return fieldOptions.find((field) => field.b_id === b_id)?.b_name || `Perceel ${b_id}`
     }
 
     return (
