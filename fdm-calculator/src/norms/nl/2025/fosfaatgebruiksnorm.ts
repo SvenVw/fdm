@@ -11,7 +11,7 @@ import type {
  * @param b_lu_catalogue - The cultivation catalogue code.
  * @returns A promise that resolves to a boolean.
  */
-async function isCultivationGrasland(b_lu_catalogue: string): Promise<boolean> {
+function isCultivationGrasland(b_lu_catalogue: string): boolean {
     const graslandCodes = ["nl_265", "nl_266", "nl_331", "nl_332", "nl_335"]
 
     if (graslandCodes.includes(b_lu_catalogue)) {
@@ -142,7 +142,7 @@ export async function getNL2025FosfaatGebruiksNorm(
     }
 
     const b_lu_catalogue = determineNL2025Hoofdteelt(cultivations)
-    const is_grasland = await isCultivationGrasland(b_lu_catalogue)
+    const is_grasland = isCultivationGrasland(b_lu_catalogue)
 
     // Determine the phosphate class based on soil analysis values and land type.
     const fosfaatKlasse = getFosfaatKlasse(a_p_cc, a_p_al, is_grasland)
