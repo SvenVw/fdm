@@ -111,23 +111,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         )
 
         // Get the harvests of the cultivations
-        const harvests = await Promise.all(
-            cultivations.map(async (cultivation) => {
-                return await getHarvests(
-                    fdm,
-                    session.principal_id,
-                    cultivation.b_lu,
-                    timeframe,
-                )
-            }),
-        )
+        const harvests = (
+            await Promise.all(
+                cultivations.map(async (cultivation) => {
+                    return await getHarvests(
+                        fdm,
+                        session.principal_id,
+                        cultivation.b_lu,
+                        timeframe,
+                    )
+                }),
+            )
+        ).flat()
 
         // Return user information from loader
         return {
             field: field,
             cultivationsCatalogueOptions: cultivationsCatalogueOptions,
             cultivations: cultivations,
-            harvests: harvests?.[0] ?? [],
+            harvests: harvests
         }
     } catch (error) {
         return handleLoaderError(error)
