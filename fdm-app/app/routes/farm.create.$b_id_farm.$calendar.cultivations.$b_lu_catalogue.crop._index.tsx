@@ -1,6 +1,7 @@
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
+    Harvest,
     removeHarvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -120,36 +121,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Combine similar harvests across all fields of the target cultivation.
-        interface HarvestInfo {
-            b_lu_harvest_date: Date
-            harvestables: {
-                harvestable_analyses: {
-                    b_lu_yield?: number
-                    b_lu_n_harvestable?: number
-                }[]
-            }[]
-        }
         const harvests = targetCultivation.fields.reduce(
-            (accumulator, field) => {
+            (accumulator: Harvest[], field: { harvests: Harvest[] }) => {
                 for (const harvest of field.harvests) {
                     // Create a key based on harvest properties to identify similar harvests
                     const isSimilarHarvest = (
-                        h1: HarvestInfo,
-                        h2: HarvestInfo,
+                        h1: Harvest,
+                        h2: Harvest,
                     ) =>
                         h1.b_lu_harvest_date.getTime() ===
                             h2.b_lu_harvest_date.getTime() &&
-                        h1.harvestables[0].harvestable_analyses[0]
+                        h1.harvestable.harvestable_analyses[0]
                             .b_lu_yield ===
-                            h2.harvestables[0].harvestable_analyses[0]
+                            h2.harvestable.harvestable_analyses[0]
                                 .b_lu_yield &&
-                        h1.harvestables[0].harvestable_analyses[0]
+                        h1.harvestable.harvestable_analyses[0]
                             .b_lu_n_harvestable ===
-                            h2.harvestables[0].harvestable_analyses[0]
+                            h2.harvestable.harvestable_analyses[0]
                                 .b_lu_n_harvestable
-
+            
                     const existingHarvestIndex = accumulator.findIndex(
-                        (existingHarvest: HarvestInfo) =>
+                        (existingHarvest: Harvest) =>
                             isSimilarHarvest(existingHarvest, harvest),
                     )
 
@@ -169,7 +161,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
                 return accumulator
             },
-            [] as HarvestInfo[],
+            [],
         )
 
         return {
