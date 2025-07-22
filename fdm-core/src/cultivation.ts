@@ -845,6 +845,11 @@ export async function removeCultivation(
                 throw new Error("Cultivation does not exist")
             }
 
+            // Delete associated harvest records first
+            await tx
+                .delete(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+
             await tx
                 .delete(schema.cultivationEnding)
                 .where(eq(schema.cultivationEnding.b_lu, b_lu))
