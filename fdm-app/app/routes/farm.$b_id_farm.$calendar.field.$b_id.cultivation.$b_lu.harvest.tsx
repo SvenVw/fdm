@@ -1,7 +1,6 @@
 import {
     addHarvest,
     getCultivation,
-    getHarvestablesFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -9,11 +8,9 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    useLoaderData,
     useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
-import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
 import {
     Dialog,

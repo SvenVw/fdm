@@ -22,17 +22,11 @@ export const FormSchema = z.object({
         .number({
             invalid_type_error: "Hoeveelheid moet een getal zijn",
         })
-        .positive({
+        .min(0, {
             message: "Hoeveelheid moet positief zijn",
-        })
-        .finite({
-            message: "Hoeveelheid moet een geheel getal zijn",
         })
         .max(1000, {
             message: "Hoeveelheid mag niet groter zijn dan 1000",
-        })
-        .safe({
-            message: "Hoeveelheid moet een safe getal zijn",
         })
         .optional(),
     // b_lu_start: z.coerce.date().optional(),

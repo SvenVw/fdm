@@ -78,7 +78,6 @@ export function HarvestForm({
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
-                                                disabled={isHarvestUpdate}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -100,7 +99,6 @@ export function HarvestForm({
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
-                                                disabled={isHarvestUpdate}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -170,21 +168,17 @@ export function HarvestForm({
                                 name={"b_lu_harvest_date"}
                                 label={"Oogstdatum"}
                                 description={"Kan ook inwerkdatum zijn"}
-                                disabled={isHarvestUpdate}
                             />
                         </div>
                         <div className="flex items-center space-x-2">
-                            <Button
-                                type="submit"
-                                name="_action"
-                                value="add"
-                                disabled={isHarvestUpdate}
-                            >
+                            <Button type="submit">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">
                                         <LoadingSpinner />
-                                        <span>Toevoegen...</span>
+                                        <span>Opslaan...</span>
                                     </div>
+                                ) : isHarvestUpdate ? (
+                                    "Bijwerken"
                                 ) : (
                                     "Toevoegen"
                                 )}

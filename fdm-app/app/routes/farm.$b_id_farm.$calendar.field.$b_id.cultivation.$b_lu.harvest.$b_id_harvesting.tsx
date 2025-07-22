@@ -1,8 +1,8 @@
 import {
-    addHarvest,
     getCultivation,
     getHarvest,
     removeHarvest,
+    updateHarvest,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -177,6 +177,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the action from the form
         if (request.method === "POST") {
+            const b_id_harvesting = params.b_id_harvesting
+            if (!b_id_harvesting) {
+                throw new Error("missing: b_id_harvesting")
+            }
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
                 request,
@@ -185,10 +189,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } =
                 formValues
 
-            await addHarvest(
+            await updateHarvest(
                 fdm,
                 session.principal_id,
-                b_lu,
+                b_id_harvesting,
                 b_lu_harvest_date,
                 b_lu_yield,
                 b_lu_n_harvestable,
@@ -197,7 +201,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return redirectWithSuccess(
                 `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
                 {
-                    message: "Oogst is toegevoegd! 🎉",
+                    message: "Oogst is gewijzigd! 🎉",
                 },
             )
         }

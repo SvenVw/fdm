@@ -15,7 +15,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { CultivationAddFormSchema, FormSchema } from "~/components/blocks/cultivation/schema"
+import { CultivationAddFormSchema} from "~/components/blocks/cultivation/schema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
