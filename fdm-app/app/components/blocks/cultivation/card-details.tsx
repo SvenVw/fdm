@@ -53,7 +53,9 @@ export function CultivationDetailsCard({
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{cultivation.b_lu_name}</CardTitle>
+                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
+                    {cultivation.b_lu_name}
+                </CardTitle>
                 <div className="flex justify-between">
                     <Button
                         variant="destructive"
@@ -83,66 +85,68 @@ export function CultivationDetailsCard({
                             }
                             className="space-y-4"
                         >
-                            <DatePicker
-                                form={form}
-                                name="b_lu_start"
-                                label="Zaaidatum"
-                                description=""
-                            />
-                            <DatePicker
-                                form={form}
-                                name="b_lu_end"
-                                label="Einddatum"
-                                description=""
-                            />
-                            <FormField
-                                control={form.control}
-                                name="m_cropresidue"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={Boolean(field.value)}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>
-                                                Gewasresten achterlaten
-                                            </FormLabel>
-                                            <FormMessage />
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
-                            <div className="flex justify-end">
-                                <Button
-                                    type="submit"
-                                    disabled={
-                                        form.formState.isSubmitting ||
-                                        fetcher.state === "submitting"
-                                    }
-                                >
-                                    {form.formState.isSubmitting ||
-                                    fetcher.state === "submitting" ? (
-                                        <div className="flex items-center space-x-2">
-                                            <LoadingSpinner />{" "}
-                                            <p>Bijwerken...</p>
-                                        </div>
-                                    ) : (
-                                        "Bijwerken"
+                            <div className="grid grid-cols-2 gap-4">
+                                <DatePicker
+                                    form={form}
+                                    name="b_lu_start"
+                                    label="Zaaidatum"
+                                    description=""
+                                />
+                                <DatePicker
+                                    form={form}
+                                    name="b_lu_end"
+                                    label="Einddatum"
+                                    description=""
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 items-end">
+                                <FormField
+                                    control={form.control}
+                                    name="m_cropresidue"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                            <FormControl>
+                                                <Checkbox
+                                                    checked={Boolean(
+                                                        field.value,
+                                                    )}
+                                                    onCheckedChange={
+                                                        field.onChange
+                                                    }
+                                                />
+                                            </FormControl>
+                                            <div className="space-y-1 leading-none">
+                                                <FormLabel>
+                                                    Gewasresten achterlaten
+                                                </FormLabel>
+                                                <FormMessage />
+                                            </div>
+                                        </FormItem>
                                     )}
-                                </Button>
+                                />
+                                {/* <div className="flex justify-end"> */}
+                                    <Button
+                                        type="submit"
+                                        disabled={
+                                            form.formState.isSubmitting ||
+                                            fetcher.state === "submitting"
+                                        }
+                                    >
+                                        {form.formState.isSubmitting ||
+                                        fetcher.state === "submitting" ? (
+                                            <div className="flex items-center space-x-2">
+                                                <LoadingSpinner />{" "}
+                                                <p>Bijwerken...</p>
+                                            </div>
+                                        ) : (
+                                            "Bijwerken"
+                                        )}
+                                    </Button>
+                                {/* </div> */}
                             </div>
                         </fieldset>
                     </Form>
                 </RemixFormProvider>
-                <Separator />
-                {/* <HarvestsList
-                    harvests={harvests}
-                    b_lu_harvestable={b_lu_harvestable}
-                    state={form.formState.isSubmitting}
-                /> */}
             </CardContent>
         </Card>
     )
