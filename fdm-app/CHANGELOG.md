@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.20.3
+
+### Patch Changes
+
+- 4f25214: Fixes exception when adding a harvest in farm create wizard
+
 ## 0.20.2
 
 ### Patch Changes
