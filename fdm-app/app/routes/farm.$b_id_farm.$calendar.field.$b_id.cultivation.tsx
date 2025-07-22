@@ -11,20 +11,18 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
+    Outlet,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { CultivationForm } from "~/components/blocks/cultivation/form"
-import { CultivationList } from "~/components/blocks/cultivation/list"
 import { FormSchema } from "~/components/blocks/cultivation/schema"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { CultivationCard, CultivationListCard } from "../components/blocks/cultivation/card-list"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -145,30 +143,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const location = useLocation()
 
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">Gewassen</h3>
-                <p className="text-sm text-muted-foreground">
-                    Vul de gewassen in voor dit perceel.
-                </p>
-            </div>
-            <Separator />
-            <div className="grid xl2:grid-cols-2 gap-8">
-                <CultivationForm
-                    b_lu_catalogue={undefined}
-                    b_lu_start={undefined}
-                    b_lu_end={undefined}
-                    action={location.pathname}
-                    options={loaderData.cultivationsCatalogueOptions}
-                />
-                <Separator />
-                <CultivationList
+            <div className="grid xl:grid-cols-2 gap-4">
+                <CultivationListCard
+                    cultivationsCatalogueOptions={
+                        loaderData.cultivationsCatalogueOptions
+                    }
                     cultivations={loaderData.cultivations}
                     harvests={loaderData.harvests}
                 />
+                <Outlet />
             </div>
         </div>
     )

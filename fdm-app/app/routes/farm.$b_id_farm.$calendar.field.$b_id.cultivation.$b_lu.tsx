@@ -11,17 +11,13 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     useFetcher,
     useLoaderData,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { CultivationForm } from "~/components/blocks/cultivation/form"
 import { FormSchema } from "~/components/blocks/cultivation/schema"
 import { HarvestsList } from "~/components/blocks/harvest/list"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
-import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -172,31 +168,7 @@ export default function FarmFieldsOverviewBlock() {
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <h3 className="text-lg font-medium">
-                        {loaderData.cultivation.b_lu_name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                        Vul de oogsten in voor dit gewas.
-                    </p>
-                </div>
-                <div className="flex justify-end">
-                    <NavLink to={"../cultivation"} className={"ml-auto"}>
-                        <Button>{"Terug"}</Button>
-                    </NavLink>
-                </div>
-            </div>
-            <Separator />
             <div className="space-y-6">
-                <CultivationForm
-                    b_lu_catalogue={loaderData.cultivation.b_lu_catalogue}
-                    b_lu_start={loaderData.cultivation.b_lu_start}
-                    b_lu_end={loaderData.cultivation.b_lu_end}
-                    options={loaderData.cultivationsCatalogueOptions}
-                    action={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
-                />
-                <Separator />
                 <HarvestsList
                     harvests={loaderData.harvests}
                     b_lu_harvestable={loaderData.b_lu_harvestable}

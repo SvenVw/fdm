@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -9,35 +8,45 @@ import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { FormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "~/components/ui/dialog"
 
-export function CultivationForm({
-    b_lu_catalogue,
-    b_lu_start,
-    b_lu_end,
-    options,
-    action,
-}: CultivationsFormProps) {
+export function CultivationAddFormDialog({options}: CultivationsFormProps) {
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button>Gewas toevoegen</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Gewas toevoegen</DialogTitle>
+                </DialogHeader>
+                <CultivationAddForm options={options} />
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+function CultivationAddForm({options}: CultivationsFormProps) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            b_lu_catalogue: b_lu_catalogue ?? "",
-            b_lu_start: b_lu_start ?? new Date(),
-            b_lu_end: b_lu_end,
+            b_lu_catalogue: "",
+            b_lu_start: new Date(),
+            b_lu_end: undefined,
         },
     })
-
-    useEffect(() => {
-        form.setValue("b_lu_catalogue", b_lu_catalogue ?? "")
-        form.setValue("b_lu_start", b_lu_start ?? new Date())
-        form.setValue("b_lu_end", b_lu_end)
-    }, [b_lu_catalogue, b_lu_start, b_lu_end, form.setValue])
 
     return (
         <RemixFormProvider {...form}>
             <Form
                 id="formCultivation"
-                action={action}
                 onSubmit={form.handleSubmit}
                 method="POST"
             >
@@ -54,7 +63,7 @@ export function CultivationForm({
                                         <span className="text-red-500">*</span>
                                     </span>
                                 }
-                                disabled={!!b_lu_catalogue}
+                                disabled={false}
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -78,8 +87,6 @@ export function CultivationForm({
                                         <LoadingSpinner />
                                         <span>Opslaan...</span>
                                     </div>
-                                ) : b_lu_catalogue ? (
-                                    "Bijwerken"
                                 ) : (
                                     "Voeg toe"
                                 )}

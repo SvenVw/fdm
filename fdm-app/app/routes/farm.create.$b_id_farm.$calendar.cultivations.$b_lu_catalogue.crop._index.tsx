@@ -14,7 +14,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { CultivationForm } from "~/components/blocks/cultivation/form"
+import { CultivationForm } from "@/app/components/blocks/cultivation/form-add"
 import { FormSchema } from "~/components/blocks/cultivation/schema"
 import { HarvestsList } from "~/components/blocks/harvest/list"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
@@ -125,21 +125,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             (accumulator: Harvest[], field: { harvests: Harvest[] }) => {
                 for (const harvest of field.harvests) {
                     // Create a key based on harvest properties to identify similar harvests
-                    const isSimilarHarvest = (
-                        h1: Harvest,
-                        h2: Harvest,
-                    ) =>
+                    const isSimilarHarvest = (h1: Harvest, h2: Harvest) =>
                         h1.b_lu_harvest_date.getTime() ===
                             h2.b_lu_harvest_date.getTime() &&
-                        h1.harvestable.harvestable_analyses[0]
-                            .b_lu_yield ===
-                            h2.harvestable.harvestable_analyses[0]
-                                .b_lu_yield &&
+                        h1.harvestable.harvestable_analyses[0].b_lu_yield ===
+                            h2.harvestable.harvestable_analyses[0].b_lu_yield &&
                         h1.harvestable.harvestable_analyses[0]
                             .b_lu_n_harvestable ===
                             h2.harvestable.harvestable_analyses[0]
                                 .b_lu_n_harvestable
-            
+
                     const existingHarvestIndex = accumulator.findIndex(
                         (existingHarvest: Harvest) =>
                             isSimilarHarvest(existingHarvest, harvest),
