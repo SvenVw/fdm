@@ -19,10 +19,10 @@ import { FormSchema } from "~/components/blocks/cultivation/schema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { handleActionError } from "~/lib/error"
+import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { CultivationCard, CultivationListCard } from "../components/blocks/cultivation/card-list"
+import { CultivationListCard } from "~/components/blocks/cultivation/card-list"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -130,7 +130,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             harvests: harvests?.[0] ?? [],
         }
     } catch (error) {
-        return handleActionError(error)
+        return handleLoaderError(error)
     }
 }
 
