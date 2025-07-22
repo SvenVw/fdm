@@ -4,6 +4,7 @@ import {
     getField,
     getHarvests,
     removeHarvest,
+    removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
 import {
@@ -11,12 +12,14 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useFetcher,
     useLoaderData,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { FormSchema } from "~/components/blocks/cultivation/schema"
-import { HarvestsList } from "~/components/blocks/harvest/list"
+import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-details"
+import {
+    CultivationDetailsFormSchema,
+    CultivationFormSchema,
+} from "~/components/blocks/cultivation/schema"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -164,17 +167,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
-            <div className="space-y-6">
-                <HarvestsList
-                    harvests={loaderData.harvests}
-                    b_lu_harvestable={loaderData.b_lu_harvestable}
-                    state={fetcher.state}
-                />
-            </div>
+            <CultivationDetailsCard
+                cultivation={loaderData.cultivation}
+                harvests={loaderData.harvests}
+                b_lu_harvestable={loaderData.b_lu_harvestable}
+                // b_id_farm={loaderData.b_id_farm}
+                // calendar={loaderData.calendar}
+            />
         </div>
     )
 }
@@ -206,45 +208,36 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        console.log(request.method)
 
         if (request.method === "POST") {
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
                 request,
-                FormSchema,
+                CultivationDetailsFormSchema,
             )
-            const { b_lu_catalogue, b_lu_start, b_lu_end } = formValues
+            const { b_lu_start, b_lu_end, m_cropresidue } = formValues
 
             await updateCultivation(
                 fdm,
                 session.principal_id,
                 b_lu,
-                b_lu_catalogue,
+                undefined,
                 b_lu_start,
                 b_lu_end,
+                m_cropresidue,
             )
 
             return dataWithSuccess(
-                { result: "Data saved successfully" },
-                { message: "Oogst is toegevoegd! 🎉" },
+                { result: "Cultivation updated successfully" },
+                { message: "Gewas is bijgewerkt! 🎉" },
             )
         }
 
         if (request.method === "DELETE") {
-            const formData = await request.formData()
-            const b_id_harvesting = formData.get("b_id_harvesting")
-
-            if (!b_id_harvesting || typeof b_id_harvesting !== "string") {
-                return dataWithError(
-                    "Invalid or missing b_id_harvesting value",
-                    "Oops! Something went wrong. Please try again later.",
-                )
-            }
-
-            await removeHarvest(fdm, session.principal_id, b_id_harvesting)
-
-            return dataWithSuccess("Harvest deleted successfully", {
-                message: "Oogst is verwijderd",
+            await removeCultivation(fdm, session.principal_id, b_lu)
+            return dataWithSuccess("Cultivation deleted successfully", {
+                message: "Gewas is verwijderd",
             })
         }
     } catch (error) {

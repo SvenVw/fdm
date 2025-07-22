@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form } from "react-router"
+import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
+import { z } from "zod"
+import { format } from "date-fns/format"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
-import { FormSchema } from "./schema"
+import { CultivationAddFormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
 import {
     Dialog,
@@ -33,24 +34,36 @@ export function CultivationAddFormDialog({options}: CultivationsFormProps) {
 }
 
 function CultivationAddForm({options}: CultivationsFormProps) {
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    const fetcher = useFetcher()
+    const form = useRemixForm<z.infer<typeof CultivationAddFormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(CultivationAddFormSchema),
         defaultValues: {
             b_lu_catalogue: "",
-            b_lu_start: new Date(),
+            b_lu_start: undefined,
             b_lu_end: undefined,
         },
     })
 
+    const onSubmit = (values: z.infer<typeof CultivationAddFormSchema>) => {
+        fetcher.submit(
+            {
+                ...values,
+                b_lu_start: values.b_lu_start ? format(values.b_lu_start, "yyyy-MM-dd") : "",
+                b_lu_end: values.b_lu_end ? format(values.b_lu_end, "yyyy-MM-dd") : "",
+            },
+            { method: "POST", encType: "application/json" },
+        )
+    }
+
     return (
         <RemixFormProvider {...form}>
-            <Form
+            <fetcher.Form
                 id="formCultivation"
-                onSubmit={form.handleSubmit}
+                // onSubmit={form.handleSubmit(onSubmit)}
                 method="POST"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
+                <fieldset disabled={fetcher.state === "submitting"}>
                     <div className="grid gap-4">
                         <div className="col-span-1">
                             <Combobox
@@ -82,7 +95,7 @@ function CultivationAddForm({options}: CultivationsFormProps) {
                         </div>
                         <div className="">
                             <Button type="submit" className="w-full">
-                                {form.formState.isSubmitting ? (
+                                {fetcher.state === "submitting" ? (
                                     <div className="flex items-center space-x-2">
                                         <LoadingSpinner />
                                         <span>Opslaan...</span>
@@ -94,7 +107,7 @@ function CultivationAddForm({options}: CultivationsFormProps) {
                         </div>
                     </div>
                 </fieldset>
-            </Form>
+            </fetcher.Form>
         </RemixFormProvider>
     )
 }
