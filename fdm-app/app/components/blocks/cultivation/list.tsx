@@ -59,9 +59,9 @@ export function CultivationList({
                                 }`
                             }
                         >
-                            <div className="grid grid-cols-3 items-center">
+                            <div className="grid grid-cols-3 items-center gap-1">
                                 <div className="col-span-1">
-                                    <p className="text-sm font-medium leading-none">
+                                    <p className="text-sm font-medium leading-none break-all">
                                         {cultivation.b_lu_name}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
