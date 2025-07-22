@@ -11,7 +11,6 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { HarvestsList } from "../harvest/list"
 import type { HarvestableType } from "../harvest/types"
 import {
     CultivationDetailsFormSchema,
@@ -19,8 +18,8 @@ import {
 } from "./schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DatePicker } from "~/components/custom/date-picker"
-import { Separator } from "../../ui/separator"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { useEffect } from "react"
 
 export function CultivationDetailsCard({
     cultivation,
@@ -45,6 +44,18 @@ export function CultivationDetailsCard({
             m_cropresidue: cultivation.m_cropresidue ?? false,
         },
     })
+
+    useEffect(() => {
+        form.reset({
+            b_lu_start: cultivation.b_lu_start
+                ? new Date(cultivation.b_lu_start)
+                : undefined,
+            b_lu_end: cultivation.b_lu_end
+                ? new Date(cultivation.b_lu_end)
+                : undefined,
+            m_cropresidue: cultivation.m_cropresidue ?? false,
+        })
+    }, [cultivation, form.reset])
 
     const handleDeleteCultivation = () => {
         return fetcher.submit(null, { method: "delete" })
@@ -124,25 +135,23 @@ export function CultivationDetailsCard({
                                         </FormItem>
                                     )}
                                 />
-                                {/* <div className="flex justify-end"> */}
-                                    <Button
-                                        type="submit"
-                                        disabled={
-                                            form.formState.isSubmitting ||
-                                            fetcher.state === "submitting"
-                                        }
-                                    >
-                                        {form.formState.isSubmitting ||
-                                        fetcher.state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />{" "}
-                                                <p>Bijwerken...</p>
-                                            </div>
-                                        ) : (
-                                            "Bijwerken"
-                                        )}
-                                    </Button>
-                                {/* </div> */}
+                                <Button
+                                    type="submit"
+                                    disabled={
+                                        form.formState.isSubmitting ||
+                                        fetcher.state === "submitting"
+                                    }
+                                >
+                                    {form.formState.isSubmitting ||
+                                    fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />{" "}
+                                            <p>Bijwerken...</p>
+                                        </div>
+                                    ) : (
+                                        "Bijwerken"
+                                    )}
+                                </Button>
                             </div>
                         </fieldset>
                     </Form>
