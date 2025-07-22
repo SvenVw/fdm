@@ -82,10 +82,7 @@ export function HarvestsList({
                             Voeg een oogst toe om gegevens zoals, opbrengst,
                             datum en gehaltes bij te houden.
                         </p>
-                    </div>
-                    <Button asChild>
-                        <NavLink to="./harvest">Oogst toevoegen</NavLink>
-                    </Button>
+                    </div>                   
                 </div>
             ) : (
                 <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">

@@ -1,4 +1,9 @@
-import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
+import {
+    addHarvest,
+    getCultivation,
+    getHarvest,
+    removeHarvest,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
@@ -170,28 +175,45 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
         const calendar = await getCalendar(params)
 
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } = formValues
+        // Get the action from the form
+        if (request.method === "POST") {
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } =
+                formValues
 
-        await addHarvest(
-            fdm,
-            session.principal_id,
-            b_lu,
-            b_lu_harvest_date,
-            b_lu_yield,
-            b_lu_n_harvestable,
-        )
+            await addHarvest(
+                fdm,
+                session.principal_id,
+                b_lu,
+                b_lu_harvest_date,
+                b_lu_yield,
+                b_lu_n_harvestable,
+            )
 
-        return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
-            {
-                message: "Oogst is toegevoegd! 🎉",
-            },
-        )
+            return redirectWithSuccess(
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
+                {
+                    message: "Oogst is toegevoegd! 🎉",
+                },
+            )
+        }
+        if (request.method === "DELETE") {
+            const b_id_harvesting = params.b_id_harvesting
+            if (!b_id_harvesting) {
+                throw new Error("missing: b_id_harvesting")
+            }
+            await removeHarvest(fdm, session.principal_id, b_id_harvesting)
+            return redirectWithSuccess(
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
+                {
+                    message: "Oogst is verwijderd! 🎉",
+                },
+            )
+        }
     } catch (error) {
         throw handleActionError(error)
     }

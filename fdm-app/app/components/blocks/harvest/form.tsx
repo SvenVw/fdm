@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form } from "react-router"
+import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -25,6 +25,8 @@ export function HarvestForm({
     b_lu_n_harvestable: number | undefined
     b_lu_harvest_date: Date | undefined
 }) {
+    const fetcher = useFetcher()
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -34,6 +36,10 @@ export function HarvestForm({
             b_lu_harvest_date: b_lu_harvest_date,
         },
     })
+
+    const handleDeleteHarvest = () => {
+        return fetcher.submit(null, { method: "delete" })
+    }
 
     // Currently updateHarvest function is not available, therefore check if this is a new harvest or is has already values
     const isHarvestUpdate =
@@ -56,9 +62,7 @@ export function HarvestForm({
                     method="post"
                 >
                     <fieldset
-                        disabled={
-                            form.formState.isSubmitting || isHarvestUpdate
-                        }
+                        disabled={form.formState.isSubmitting}
                         className="space-y-8"
                     >
                         <div className="grid w-4/5 lg:grid-cols-2 items-center gap-y-6 gap-x-8">
@@ -74,6 +78,7 @@ export function HarvestForm({
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
+                                                disabled={isHarvestUpdate}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -95,6 +100,7 @@ export function HarvestForm({
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
+                                                disabled={isHarvestUpdate}
                                             />
                                         </FormControl>
                                         <FormDescription>
@@ -164,10 +170,16 @@ export function HarvestForm({
                                 name={"b_lu_harvest_date"}
                                 label={"Oogstdatum"}
                                 description={"Kan ook inwerkdatum zijn"}
+                                disabled={isHarvestUpdate}
                             />
                         </div>
-                        <div>
-                            <Button type="submit">
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                type="submit"
+                                name="_action"
+                                value="add"
+                                disabled={isHarvestUpdate}
+                            >
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">
                                         <LoadingSpinner />
@@ -177,6 +189,25 @@ export function HarvestForm({
                                     "Toevoegen"
                                 )}
                             </Button>
+                            {isHarvestUpdate && (
+                                <Button
+                                    variant="destructive"
+                                    onClick={handleDeleteHarvest}
+                                    disabled={
+                                        form.formState.isSubmitting ||
+                                        fetcher.state === "submitting"
+                                    }
+                                    className="ml-auto"
+                                >
+                                    {form.formState.isSubmitting ||
+                                    fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />
+                                        </div>
+                                    ) : null}
+                                    Verwijderen
+                                </Button>
+                            )}
                         </div>
                     </fieldset>
                 </Form>
