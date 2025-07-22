@@ -14,10 +14,10 @@ export type CultivationDetailsFormSchemaType = z.infer<
 
 export const CultivationAddFormSchema = z.object({
     b_lu_catalogue: z.string().min(1, "Gewas is verplicht."),
-    b_lu_start: z.date({
+    b_lu_start: z.coerce.date({
         required_error: "Zaaidatum is verplicht.",
     }),
-    b_lu_end: z.date().optional().nullable(),
+    b_lu_end: z.coerce.date().optional().nullable(),
 })
 
 export type CultivationAddFormSchemaType = z.infer<

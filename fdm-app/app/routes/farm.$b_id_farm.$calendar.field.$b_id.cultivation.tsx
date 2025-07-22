@@ -15,7 +15,7 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { FormSchema } from "~/components/blocks/cultivation/schema"
+import { CultivationAddFormSchema, FormSchema } from "~/components/blocks/cultivation/schema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -190,7 +190,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
                 request,
-                FormSchema,
+                CultivationAddFormSchema
             )
             const { b_lu_catalogue, b_lu_start, b_lu_end } = formValues
 
