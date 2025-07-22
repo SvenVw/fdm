@@ -10,6 +10,7 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
+    Outlet,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
@@ -136,11 +137,27 @@ export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <HarvestForm
-            b_lu_yield={undefined}
-            b_lu_n_harvestable={undefined}
-            b_lu_harvest_date={undefined}
-        />
+        <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <h3 className="text-lg font-medium">
+                        {loaderData.cultivation.b_lu_name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                        Vul de oogsten in voor dit gewas.
+                    </p>
+                </div>
+                <div className="flex justify-end">
+                    <NavLink to={"../cultivation"} className={"ml-auto"}>
+                        <Button>{"Terug"}</Button>
+                    </NavLink>
+                </div>
+            </div>
+            <Separator />
+            <div className="space-y-6">
+                <Outlet />
+            </div>
+        </div>
     )
 }
 

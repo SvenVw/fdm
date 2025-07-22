@@ -22,7 +22,7 @@ export function CultivationListCard({
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Gewassen</CardTitle>
+                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Gewassen</CardTitle>
                 {cultivations.length !== 0 ? (
                     <CultivationAddFormDialog
                         options={cultivationsCatalogueOptions}

@@ -15,14 +15,6 @@ export function HarvestsList({
     b_lu_harvestable: HarvestableType
     state: string
 }) {
-    const fetcher = useFetcher()
-
-    const handleDelete = (b_id_harvesting: string | string[]) => {
-        if (fetcher.state === "submitting") return
-
-        fetcher.submit({ b_id_harvesting }, { method: "delete" })
-    }
-
     let canAddHarvest = false
     if (b_lu_harvestable === "once" && harvests.length === 0) {
         canAddHarvest = true
@@ -38,58 +30,23 @@ export function HarvestsList({
                     <div className="space-y-3">
                         {harvests.map((harvest) => (
                             <div
-                                className="grid grid-cols-4 items-center"
+                                className="flex flex-cols items-center"
                                 key={harvest.b_id_harvesting}
                             >
-                                <p className="text-sm font-medium leading-none">
-                                    {format(
-                                        harvest.b_lu_harvest_date,
-                                        "yyyy-MM-dd",
-                                    )}
-                                </p>
+                                <NavLink to={`./harvest/${harvest.b_id_harvesting}`}>
+                                    <p className="text-sm font-medium leading-none hover:underline">
+                                        {format(
+                                            harvest.b_lu_harvest_date,
+                                            "yyyy-MM-dd",
+                                        )}
+                                    </p>
+                                </NavLink>
 
-                                <div className="col-span-2">
+                                <div className="ml-auto">
                                     <p className="text-sm text-muted-foreground leading-none">
                                         {`${harvest.harvestable?.harvestable_analyses?.[0]?.b_lu_yield ?? "–"} kg DS/ha`}
                                     </p>
                                     {/* <p className="text-sm text-muted-foreground">m@example.com</p> */}
-                                </div>
-                                <div className="grid grid-cols-2 gap-x-2">
-                                    <Button
-                                        variant="default"
-                                        aria-label="Beijken"
-                                        asChild
-                                    >
-                                        <NavLink
-                                            to={`./harvest/${harvest.b_id_harvesting}`}
-                                        >
-                                            <Eye />
-                                        </NavLink>
-                                    </Button>
-                                    <Button
-                                        variant="destructive"
-                                        disabled={state === "submitting"}
-                                        onClick={() => {
-                                            if (harvest.b_ids_harvesting) {
-                                                handleDelete(
-                                                    harvest.b_ids_harvesting,
-                                                )
-                                            } else {
-                                                handleDelete([
-                                                    harvest.b_id_harvesting,
-                                                ])
-                                            }
-                                        }}
-                                        aria-label="Verwijderen"
-                                    >
-                                        {state === "submitting" ? (
-                                            <div className="flex items-center space-x-2">
-                                                <LoadingSpinner />
-                                            </div>
-                                        ) : (
-                                            <Trash2 />
-                                        )}
-                                    </Button>
                                 </div>
                             </div>
                         ))}

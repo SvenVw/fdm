@@ -14,11 +14,13 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { dataWithError, dataWithSuccess, redirectWithSuccess } from "remix-toast"
-import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-details"
 import {
-    CultivationDetailsFormSchema,
-} from "~/components/blocks/cultivation/schema"
+    dataWithError,
+    dataWithSuccess,
+    redirectWithSuccess,
+} from "remix-toast"
+import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-details"
+import { CultivationDetailsFormSchema } from "~/components/blocks/cultivation/schema"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -26,6 +28,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { CultivationHarvestsCard } from "../components/blocks/cultivation/card-harvests"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -175,6 +178,11 @@ export default function FarmFieldsOverviewBlock() {
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 // b_id_farm={loaderData.b_id_farm}
                 // calendar={loaderData.calendar}
+            />
+            <CultivationHarvestsCard
+                harvests={loaderData.harvests}
+                b_lu_harvestable={loaderData.b_lu_harvestable}
+                cultivation={loaderData.cultivation}
             />
         </div>
     )
