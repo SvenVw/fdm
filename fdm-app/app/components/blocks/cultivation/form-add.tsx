@@ -1,13 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form} from "react-router"
+import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { z } from "zod"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
-import { CultivationAddFormSchema } from "./schema"
-import type { CultivationsFormProps } from "./types"
 import {
     Dialog,
     DialogContent,
@@ -15,10 +13,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
+import { CultivationAddFormSchema } from "./schema"
+import type { CultivationsFormProps } from "./types"
+import { useEffect, useRef, useState } from "react"
 
 export function CultivationAddFormDialog({ options }: CultivationsFormProps) {
+    const [isOpen, setIsOpen] = useState(false)
+
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button>Gewas toevoegen</Button>
             </DialogTrigger>
@@ -26,13 +29,19 @@ export function CultivationAddFormDialog({ options }: CultivationsFormProps) {
                 <DialogHeader>
                     <DialogTitle>Gewas toevoegen</DialogTitle>
                 </DialogHeader>
-                <CultivationAddForm options={options} />
+                <CultivationAddForm
+                    options={options}
+                    onSuccess={() => setIsOpen(false)}
+                />
             </DialogContent>
         </Dialog>
     )
 }
 
-function CultivationAddForm({ options }: CultivationsFormProps) {
+function CultivationAddForm({
+    options,
+    onSuccess,
+}: CultivationsFormProps & { onSuccess?: () => void }) {
     const form = useRemixForm<z.infer<typeof CultivationAddFormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(CultivationAddFormSchema),
@@ -42,6 +51,17 @@ function CultivationAddForm({ options }: CultivationsFormProps) {
             b_lu_end: undefined,
         },
     })
+
+    const { isSubmitting, isSubmitSuccessful } = form.formState
+    const isSubmittingRef = useRef(isSubmitting)
+
+    useEffect(() => {
+        const wasSubmitting = isSubmittingRef.current
+        isSubmittingRef.current = isSubmitting
+        if (wasSubmitting && !isSubmitting && isSubmitSuccessful) {
+            onSuccess?.()
+        }
+    }, [isSubmitting, isSubmitSuccessful, onSuccess])
 
     return (
         <RemixFormProvider {...form}>
@@ -77,7 +97,9 @@ function CultivationAddForm({ options }: CultivationsFormProps) {
                                 form={form as any}
                                 name={"b_lu_end"}
                                 label={"Einddatum"}
-                                description={"Datum waarop het gewas wordt beëindigd"}
+                                description={
+                                    "Datum waarop het gewas wordt beëindigd"
+                                }
                             />
                         </div>
                         <div className="">
