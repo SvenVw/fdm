@@ -14,11 +14,10 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { dataWithError, dataWithSuccess } from "remix-toast"
+import { dataWithError, dataWithSuccess, redirectWithSuccess } from "remix-toast"
 import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-details"
 import {
     CultivationDetailsFormSchema,
-    CultivationFormSchema,
 } from "~/components/blocks/cultivation/schema"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
 import { getSession } from "~/lib/auth.server"
@@ -236,9 +235,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         if (request.method === "DELETE") {
             await removeCultivation(fdm, session.principal_id, b_lu)
-            return dataWithSuccess("Cultivation deleted successfully", {
-                message: "Gewas is verwijderd",
-            })
+            return redirectWithSuccess(
+                `/farm/${params.b_id_farm}/${params.calendar}/field/${b_id}/cultivation`,
+                { message: "Gewas is verwijderd" },
+            )
         }
     } catch (error) {
         throw handleActionError(error)
