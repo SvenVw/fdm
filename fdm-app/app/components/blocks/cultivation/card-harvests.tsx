@@ -28,7 +28,15 @@ export function CultivationHarvestsCard({
                     Oogsten
                 </CardTitle>
                 <div className="flex justify-between">
-                    <NavLink to="./harvest">
+                    <NavLink
+                        to="./harvest/new"
+                        onClick={(e) => {
+                            if (!canAddHarvest) {
+                                e.preventDefault()
+                            }
+                        }}
+                        className={!canAddHarvest ? "cursor-not-allowed" : ""}
+                    >
                         <Button variant="default" disabled={!canAddHarvest}>
                             Oogst toevoegen
                         </Button>

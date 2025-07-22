@@ -12,6 +12,7 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
+    Outlet,
     useLoaderData,
 } from "react-router"
 import {
@@ -28,7 +29,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { CultivationHarvestsCard } from "../components/blocks/cultivation/card-harvests"
+import { CultivationHarvestsCard } from "~/components/blocks/cultivation/card-harvests"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -184,6 +185,7 @@ export default function FarmFieldsOverviewBlock() {
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 cultivation={loaderData.cultivation}
             />
+        <Outlet />
         </div>
     )
 }

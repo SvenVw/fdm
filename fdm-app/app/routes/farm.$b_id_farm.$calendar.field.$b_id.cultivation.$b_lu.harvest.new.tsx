@@ -8,7 +8,6 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    Outlet,
     useLoaderData,
     useNavigate,
 } from "react-router"
@@ -70,17 +69,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function AddHarvestRoute() {
-    const navigate = useNavigate()
-
     return (
-        <Dialog open={true} onOpenChange={() => navigate("..")}>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Oogst</DialogTitle>
-                </DialogHeader>
-                <Outlet />
-            </DialogContent>
-        </Dialog>
+        <HarvestForm
+            b_lu_yield={undefined}
+            b_lu_n_harvestable={undefined}
+            b_lu_harvest_date={undefined}
+        />
     )
 }
 

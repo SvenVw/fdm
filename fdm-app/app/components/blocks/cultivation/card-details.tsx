@@ -1,4 +1,4 @@
-import { Harvest, Cultivation } from "@svenvw/fdm-core"
+import type { Harvest, Cultivation } from "@svenvw/fdm-core"
 import { useFetcher, Form } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -14,7 +14,7 @@ import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import type { HarvestableType } from "../harvest/types"
 import {
     CultivationDetailsFormSchema,
-    CultivationDetailsFormSchemaType,
+    type CultivationDetailsFormSchemaType,
 } from "./schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -23,8 +23,6 @@ import { useEffect } from "react"
 
 export function CultivationDetailsCard({
     cultivation,
-    harvests,
-    b_lu_harvestable,
 }: {
     cultivation: Cultivation
     harvests: Harvest[]

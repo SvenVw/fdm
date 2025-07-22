@@ -4,14 +4,11 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
-import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
@@ -128,40 +125,17 @@ export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <h3 className="text-lg font-medium">
-                        {loaderData.cultivation.b_lu_name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                        Vul de oogsten in voor dit gewas.
-                    </p>
-                </div>
-                <div className="flex justify-end">
-                    <NavLink
-                        to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
-                        className={"ml-auto"}
-                    >
-                        <Button>{"Terug"}</Button>
-                    </NavLink>
-                </div>
-            </div>
-            <Separator />
-            <div className="space-y-6">
-                <HarvestForm
-                    b_lu_yield={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_yield
-                    }
-                    b_lu_n_harvestable={
-                        loaderData.harvest?.harvestable
-                            ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
-                    }
-                    b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
-                />
-            </div>
-        </div>
+        <HarvestForm
+            b_lu_yield={
+                loaderData.harvest?.harvestable?.harvestable_analyses?.[0]
+                    ?.b_lu_yield
+            }
+            b_lu_n_harvestable={
+                loaderData.harvest?.harvestable?.harvestable_analyses?.[0]
+                    ?.b_lu_n_harvestable
+            }
+            b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
+        />
     )
 }
 
