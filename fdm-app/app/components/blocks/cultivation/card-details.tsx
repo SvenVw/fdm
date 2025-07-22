@@ -1,7 +1,5 @@
 import { Harvest, Cultivation } from "@svenvw/fdm-core"
-import { format } from "date-fns/format"
-import { Trash2 } from "lucide-react"
-import { NavLink, useFetcher, Form } from "react-router"
+import { useFetcher, Form } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -12,14 +10,12 @@ import {
     FormLabel,
     FormMessage,
 } from "~/components/ui/form"
-import { LoadingSpinner } from "../../custom/loadingspinner"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { HarvestsList } from "../harvest/list"
 import type { HarvestableType } from "../harvest/types"
 import {
     CultivationDetailsFormSchema,
     CultivationDetailsFormSchemaType,
-    CultivationFormSchema,
-    type CultivationFormSchemaType,
 } from "./schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -51,7 +47,7 @@ export function CultivationDetailsCard({
     })
 
     const handleDeleteCultivation = () => {
-        return fetcher.submit({ method: "delete" })
+        return fetcher.submit(null, { method: "delete" })
     }
 
     return (
@@ -62,9 +58,13 @@ export function CultivationDetailsCard({
                     <Button
                         variant="destructive"
                         onClick={handleDeleteCultivation}
-                        disabled={form.formState.isSubmitting}
+                        disabled={
+                            form.formState.isSubmitting ||
+                            fetcher.state === "submitting"
+                        }
                     >
-                        {form.formState.isSubmitting ? (
+                        {form.formState.isSubmitting ||
+                        fetcher.state === "submitting" ? (
                             <div className="flex items-center space-x-2">
                                 <LoadingSpinner />
                             </div>
@@ -75,57 +75,66 @@ export function CultivationDetailsCard({
             </CardHeader>
             <CardContent className="space-y-6">
                 <RemixFormProvider {...form}>
-                    <Form
-                        onSubmit={form.handleSubmit}
-                        method="post"
-                        className="space-y-4"
-                    >
-                        <DatePicker
-                            form={form}
-                            name="b_lu_start"
-                            label="Zaaidatum"
-                            description=""
-                        />
-                        <DatePicker
-                            form={form}
-                            name="b_lu_end"
-                            label="Einddatum"
-                            description=""
-                        />
-                        <FormField
-                            control={form.control}
-                            name="m_cropresidue"
-                            render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                    <FormControl>
-                                        <Checkbox
-                                            checked={Boolean(field.value)}
-                                            onCheckedChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                    <div className="space-y-1 leading-none">
-                                        <FormLabel>
-                                            Gewasresten achtergelaten
-                                        </FormLabel>
-                                        <FormMessage />
-                                    </div>
-                                </FormItem>
-                            )}
-                        />
-                        <div className="flex justify-end">
-                            <Button
-                                type="submit"
-                                disabled={form.formState.isSubmitting}
-                            >
-                                {form.formState.isSubmitting ? (
-                                    <div className="flex items-center space-x-2">
-                                        <LoadingSpinner /> <p>Bijwerken...</p>
-                                    </div>
-                                ) : (
-                                    "Bijwerken"
+                    <Form onSubmit={form.handleSubmit} method="post">
+                        <fieldset
+                            disabled={
+                                form.formState.isSubmitting ||
+                                fetcher.state === "submitting"
+                            }
+                            className="space-y-4"
+                        >
+                            <DatePicker
+                                form={form}
+                                name="b_lu_start"
+                                label="Zaaidatum"
+                                description=""
+                            />
+                            <DatePicker
+                                form={form}
+                                name="b_lu_end"
+                                label="Einddatum"
+                                description=""
+                            />
+                            <FormField
+                                control={form.control}
+                                name="m_cropresidue"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={Boolean(field.value)}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                Gewasresten achterlaten
+                                            </FormLabel>
+                                            <FormMessage />
+                                        </div>
+                                    </FormItem>
                                 )}
-                            </Button>
-                        </div>
+                            />
+                            <div className="flex justify-end">
+                                <Button
+                                    type="submit"
+                                    disabled={
+                                        form.formState.isSubmitting ||
+                                        fetcher.state === "submitting"
+                                    }
+                                >
+                                    {form.formState.isSubmitting ||
+                                    fetcher.state === "submitting" ? (
+                                        <div className="flex items-center space-x-2">
+                                            <LoadingSpinner />{" "}
+                                            <p>Bijwerken...</p>
+                                        </div>
+                                    ) : (
+                                        "Bijwerken"
+                                    )}
+                                </Button>
+                            </div>
+                        </fieldset>
                     </Form>
                 </RemixFormProvider>
                 <Separator />
