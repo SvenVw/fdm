@@ -13,7 +13,7 @@ export default defineConfig({
         noExternal: ["posthog-js", "posthog-js/react"],
     },
     build: {
-        sourcemap: process.env.NODE_ENV === "development",
+        sourcemap: process.env.NODE_ENV === "development" ? true : "hidden",
         target: "ES2022",
         rollupOptions: {
             output: {
