@@ -260,8 +260,12 @@ function calculateKorting(
         const matchingStandard = nitrogenStandardsData.find((ns) =>
             ns.b_lu_catalogue_match.includes(prevCultivation.b_lu_catalogue),
         )
-        const matchingYear = prevCultivation.b_lu_start.getTime() < new Date(currentYear, 1, 1).getTime() // Month 1 is February
-        return matchingStandard?.is_vanggewas === true && matchingYear === true 
+        const matchingYear =
+            prevCultivation.b_lu_start.getTime() <
+                new Date(currentYear, 1, 1).getTime() &&
+            prevCultivation.b_lu_start.getTime() >
+                new Date(previousYear, 6, 15).getTime() // Vanggewas should be sown between July 15th, 2024 and January 31th 2025
+        return matchingStandard?.is_vanggewas === true && matchingYear === true
     })
     if (vanggewassen2024.length === 0) {
         return {
@@ -274,8 +278,7 @@ function calculateKorting(
     const vanggewassenCompleted2024 = vanggewassen2024.filter(
         (prevCultivation) => {
             return (
-                prevCultivation.b_lu_end.getTime() >=
-                new Date(currentYear, 1, ) // Month 1 is February
+                prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
             )
         },
     )
