@@ -221,7 +221,7 @@ function calculateKorting(
     cultivations: NL2025NormsInputForCultivation[],
     region: RegionKey,
 ): { amount: Decimal; description: string } {
-    const currentYear = new Date().getFullYear()
+    const currentYear = 2025
     const previousYear = currentYear - 1
 
     const sandyOrLoessRegions: RegionKey[] = ["zand_nwc", "zand_zuid", "loess"]
@@ -256,40 +256,67 @@ function calculateKorting(
     )
 
     // Check for vanggewas exception in 2024
+    const vanggewassen2024 = cultivations2024.filter((prevCultivation) => {
+        const matchingStandard = nitrogenStandardsData.find((ns) =>
+            ns.b_lu_catalogue_match.includes(prevCultivation.b_lu_catalogue),
+        )
+        const matchingYear = prevCultivation.b_lu_start.getTime() < new Date(currentYear, 1, 1).getTime() // Month 1 is February
+        return matchingStandard?.is_vanggewas === true && matchingYear === true 
+    })
+    if (vanggewassen2024.length === 0) {
+        return {
+            amount: new Decimal(20),
+            description: ". Korting: 20kg N/ha: geen vanggewas of winterteelt",
+        }
+    }
+
+    // Check if a vanggewas is present to February 1st
+    const vanggewassenCompleted2024 = vanggewassen2024.filter(
+        (prevCultivation) => {
+            return (
+                prevCultivation.b_lu_end.getTime() >=
+                new Date(currentYear, 1, ) // Month 1 is February
+            )
+        },
+    )
+    if (!vanggewassenCompleted2024) {
+        return {
+            amount: new Decimal(20),
+            description:
+                ". Korting: 20kg N/ha: vanggewas staat niet tot 1 februari",
+        }
+    }
+    // If multiple vanggewassen are completed to February 1st select the vangewas that was first sown
+    const sortedVanggewassen = vanggewassenCompleted2024.sort((a, b) => {
+        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+    })
+    const vanggewas2024 = sortedVanggewassen[0]
+
+    const sowDate = vanggewas2024.b_lu_start
+    const october1 = new Date(previousYear, 9, 1) // October 1st
+    const october15 = new Date(previousYear, 9, 15) // October 15th
+    const november1 = new Date(previousYear, 10, 1) // November 1st
+
     let kortingAmount = new Decimal(20) // Default korting
     let kortingDescription =
         ". Korting: 20kg N/ha, geen vanggewas of te laat gezaaid"
 
-    const vanggewas2024 = cultivations2024.find((prevCultivation) => {
-        const matchingStandard = nitrogenStandardsData.find((ns) =>
-            ns.b_lu_catalogue_match.includes(prevCultivation.b_lu_catalogue),
-        )
-        return matchingStandard?.is_vanggewas === true
-    })
-
-    if (vanggewas2024) {
-        const sowDate = vanggewas2024.b_lu_start
-        const october1 = new Date(previousYear, 9, 1) // October 1st
-        const october15 = new Date(previousYear, 9, 15) // October 15th
-        const november1 = new Date(previousYear, 10, 1) // November 1st
-
-        if (sowDate <= october1) {
-            kortingAmount = new Decimal(0)
-            kortingDescription =
-                ". Geen korting: vanggewas gezaaid uiterlijk 1 oktober"
-        } else if (sowDate > october1 && sowDate <= october15) {
-            kortingAmount = new Decimal(5)
-            kortingDescription =
-                ". Korting: 5kg N/ha, vanggewas gezaaid 2 t/m 14 oktober"
-        } else if (sowDate > october15 && sowDate < november1) {
-            kortingAmount = new Decimal(10)
-            kortingDescription =
-                ". Korting: 10kg N/ha, vanggewas gezaaid 15 t/m 31 oktober"
-        } else {
-            kortingAmount = new Decimal(20)
-            kortingDescription =
-                ". Korting: 20kg N/ha, vanggewas gezaaid op of na 1 november"
-        }
+    if (sowDate <= october1) {
+        kortingAmount = new Decimal(0)
+        kortingDescription =
+            ". Geen korting: vanggewas gezaaid uiterlijk 1 oktober"
+    } else if (sowDate > october1 && sowDate <= october15) {
+        kortingAmount = new Decimal(5)
+        kortingDescription =
+            ". Korting: 5kg N/ha, vanggewas gezaaid tussen 2 t/m 14 oktober"
+    } else if (sowDate > october15 && sowDate < november1) {
+        kortingAmount = new Decimal(10)
+        kortingDescription =
+            ". Korting: 10kg N/ha, vanggewas gezaaid tussen 15 t/m 31 oktober"
+    } else {
+        kortingAmount = new Decimal(20)
+        kortingDescription =
+            ". Korting: 20kg N/ha, vanggewas gezaaid op of na 1 november"
     }
 
     return { amount: kortingAmount, description: kortingDescription }
