@@ -1,3 +1,4 @@
+import Decimal from "decimal.js"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import type {
@@ -39,6 +40,13 @@ function getFosfaatKlasse(
     a_p_al: number,
     is_grasland: boolean,
 ): FosfaatKlasse {
+
+    // Round P-AL to whole number
+    a_p_al = new Decimal(a_p_al).toDecimalPlaces(0).toNumber()
+
+    // Rounnd P-CaCl2 to 1 digit
+    a_p_cc = new Decimal(a_p_cc).toDecimalPlaces(1).toNumber()
+
     if (is_grasland) {
         // Logic for Grasland (Table 1)
         if (a_p_cc < 0.8) {
