@@ -30,6 +30,10 @@ export async function collectNL2025InputForNorms(
     const startOfYear = new Date(year, 0, 1)
     const endOfYear = new Date(year, 11, 31)
     const timeframe2025: Timeframe = { start: startOfYear, end: endOfYear }
+    const timeframe2025Cultivation: Timeframe = {
+        start: new Date(year - 1, 0, 1),
+        end: new Date(year - 1, 11, 31),
+    }
 
     // 1. Get the details for the field.
     const field = await getField(fdm, principal_id, b_id)
@@ -47,7 +51,7 @@ export async function collectNL2025InputForNorms(
         fdm,
         principal_id,
         b_id,
-        timeframe2025,
+        timeframe2025Cultivation,
     )
 
     // 4. Get the details of the soil analyses
@@ -58,12 +62,14 @@ export async function collectNL2025InputForNorms(
         timeframe2025,
     )
     const soilAnalysisPicked = {
-        a_p_cc: soilAnalysis.find(
-            (x: { parameter: string }) => x.parameter === "a_p_cc",
-        )?.value ?? null,
-        a_p_al: soilAnalysis.find(
-            (x: { parameter: string }) => x.parameter === "a_p_al",
-        )?.value ?? null,
+        a_p_cc:
+            soilAnalysis.find(
+                (x: { parameter: string }) => x.parameter === "a_p_cc",
+            )?.value ?? null,
+        a_p_al:
+            soilAnalysis.find(
+                (x: { parameter: string }) => x.parameter === "a_p_al",
+            )?.value ?? null,
     }
 
     return {
