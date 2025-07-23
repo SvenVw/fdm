@@ -48,7 +48,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(345)
-        expect(result.normSource).toContain("Grasland")
+        expect(result.normSource).toEqual("Grasland.")
     })
 
     it("should return the correct norm for potatoes", async () => {
@@ -71,7 +71,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(140)
-        expect(result.normSource).toContain("Akkerbouwgewas, pootaardappelen")
+        expect(result.normSource).toEqual("Akkerbouwgewas, pootaardappelen.")
     })
 
     it("should apply 0 korting if winterteelt is present in zand_nwc region (hoofdteelt 2025)", async () => {
@@ -95,7 +95,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
         // The base norm for Grasland in zand_nwc is 200 in nv-gebied. With winterteelt, korting should be 0.
         expect(result.normValue).toBe(200)
-        expect(result.normSource).toContain(
+        expect(result.normSource).toEqual(
             "Grasland. Geen korting: winterteelt aanwezig",
         )
     })
@@ -116,7 +116,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
                     b_lu_start: new Date(2024, 9, 1), // Oct 1st, 2024
-                    b_lu_end: new Date(2024, 11, 31),
+                    b_lu_end: new Date(2025, 1, 31),
                 } as Partial<NL2025NormsInputForCultivation>,
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
@@ -125,8 +125,8 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         // The base norm for Vruchtgewassen in zand_nwc is 108. With vanggewas sown <= Oct 1st, korting should be 0.
         expect(result.normValue).toBe(108)
-        expect(result.normSource).toContain(
-            "Geen korting: vanggewas gezaaid uiterlijk 1 oktober",
+        expect(result.normSource).toEqual(
+            "Vruchtgewassen, Landbouwstambonen, rijp zaad. Geen korting: vanggewas gezaaid uiterlijk 1 oktober",
         )
     })
 
@@ -146,7 +146,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
                     b_lu_start: new Date(2024, 9, 5), // Oct 5th, 2024
-                    b_lu_end: new Date(2024, 11, 31),
+                    b_lu_end: new Date(2025, 1, 31),
                 } as Partial<NL2025NormsInputForCultivation>,
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
@@ -155,8 +155,8 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With vanggewas sown Oct 2-14, korting should be 5.
         expect(result.normValue).toBe(103) // 108 - 5
-        expect(result.normSource).toContain(
-            "Korting: 5kg N/ha, vanggewas gezaaid 2 t/m 14 oktober",
+        expect(result.normSource).toEqual(
+            "Vruchtgewassen, Landbouwstambonen, rijp zaad. Korting: 5kg N/ha, vanggewas gezaaid tussen 2 t/m 14 oktober",
         )
     })
 
@@ -176,7 +176,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
                     b_lu_start: new Date(2024, 9, 20), // Oct 20th, 2024
-                    b_lu_end: new Date(2024, 11, 31),
+                    b_lu_end: new Date(2025, 1, 31),
                 } as Partial<NL2025NormsInputForCultivation>,
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
@@ -185,8 +185,8 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With vanggewas sown Oct 15-31, korting should be 10.
         expect(result.normValue).toBe(98) // 108 - 10
-        expect(result.normSource).toContain(
-            "Korting: 10kg N/ha, vanggewas gezaaid 15 t/m 31 oktober",
+        expect(result.normSource).toEqual(
+            "Vruchtgewassen, Landbouwstambonen, rijp zaad. Korting: 10kg N/ha, vanggewas gezaaid tussen 15 t/m 31 oktober",
         )
     })
 
@@ -206,7 +206,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
                 {
                     b_lu_catalogue: "nl_428", // Gele mosterd (is_vanggewas: true)
                     b_lu_start: new Date(2024, 10, 1), // Nov 1st, 2024
-                    b_lu_end: new Date(2024, 11, 31),
+                    b_lu_end: new Date(2025, 1, 31),
                 } as Partial<NL2025NormsInputForCultivation>,
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
@@ -215,8 +215,8 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With vanggewas sown Nov 1st+, korting should be 20.
         expect(result.normValue).toBe(88) // 108 - 20
-        expect(result.normSource).toContain(
-            "Korting: 20kg N/ha, vanggewas gezaaid op of na 1 november",
+        expect(result.normSource).toEqual(
+            "Vruchtgewassen, Landbouwstambonen, rijp zaad. Korting: 20kg N/ha, vanggewas gezaaid op of na 1 november",
         )
     })
 
@@ -245,8 +245,8 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With no exception, korting should be 20.
         expect(result.normValue).toBe(88) // 108 - 20
-        expect(result.normSource).toContain(
-            "Korting: 20kg N/ha, geen vanggewas of te laat gezaaid",
+        expect(result.normSource).toEqual(
+            "Vruchtgewassen, Landbouwstambonen, rijp zaad. Korting: 20kg N/ha: geen vanggewas of winterteelt",
         )
     })
 
@@ -266,7 +266,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
                 {
                     b_lu_catalogue: "nl_234", // Zomertarwe (not winterteelt or vanggewas)
                     b_lu_start: new Date(2024, 5, 1),
-                    b_lu_end: new Date(2024, 8, 1),
+                    b_lu_end: new Date(2025, 1, 31),
                 } as Partial<NL2025NormsInputForCultivation>,
             ] as NL2025NormsInputForCultivation[],
             soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
@@ -275,7 +275,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         // The base norm for Vruchtgewassen in klei is 135. Korting should not apply in non-sandy/loess regions.
         expect(result.normValue).toBe(135)
-        expect(result.normSource).toContain(
+        expect(result.normSource).toEqual(
             "Vruchtgewassen, Landbouwstambonen, rijp zaad.",
         )
     })
