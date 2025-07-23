@@ -614,6 +614,8 @@ export const nitrogenStandardsData = [
         type: "gras",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "inzaai in september en eerste jaar",
                 norms: {
                     klei: { standard: 30, nv_area: 24 },
@@ -648,6 +650,8 @@ export const nitrogenStandardsData = [
         type: "graszaad",
         is_winterteelt: true,
         is_vanggewas: true,
+        sub_types: [
+            {
                 omschrijving: "1e jaars",
                 norms: {
                     klei: { standard: 165, nv_area: 132 },
@@ -960,6 +964,8 @@ export const nitrogenStandardsData = [
         type: "akkerbouw",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "winter",
                 norms: {
                     klei: { standard: 205, nv_area: 164 },
@@ -1023,6 +1029,8 @@ export const nitrogenStandardsData = [
         type: "bladgewas",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "1e teelt",
                 norms: {
                     klei: { standard: 260, nv_area: 208 },
@@ -1072,6 +1080,8 @@ export const nitrogenStandardsData = [
         type: "bladgewas",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "1e teelt",
                 norms: {
                     klei: { standard: 180, nv_area: 144 },
@@ -1113,6 +1123,8 @@ export const nitrogenStandardsData = [
         type: "bladgewas",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "1e teelt",
                 norms: {
                     klei: { standard: 180, nv_area: 144 },
@@ -1175,6 +1187,8 @@ export const nitrogenStandardsData = [
         type: "bladgewas",
         is_winterteelt: false,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "eenmalige oogst",
                 norms: {
                     klei: { standard: 150, nv_area: 120 },
@@ -1363,6 +1377,8 @@ export const nitrogenStandardsData = [
         type: "kruiden",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "bladgewas, eenmalige oogst",
                 norms: {
                     klei: { standard: 150, nv_area: 120 },
@@ -1961,6 +1977,8 @@ export const nitrogenStandardsData = [
         type: "bloembol",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "grofbollig",
                 norms: {
                     klei: { standard: 170, nv_area: 136 },
@@ -1988,6 +2006,8 @@ export const nitrogenStandardsData = [
         type: "bloembol",
         is_winterteelt: true,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "grote gele",
                 norms: {
                     klei: { standard: 175, nv_area: 140 },
@@ -2057,6 +2077,8 @@ export const nitrogenStandardsData = [
         type: "bloembol",
         is_winterteelt: false,
         is_vanggewas: false,
+        sub_types: [
+            {
                 omschrijving: "pitten",
                 norms: {
                     klei: { standard: 260, nv_area: 208 },
