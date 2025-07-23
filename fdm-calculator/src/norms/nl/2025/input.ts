@@ -32,7 +32,7 @@ export async function collectNL2025InputForNorms(
     const timeframe2025: Timeframe = { start: startOfYear, end: endOfYear }
     const timeframe2025Cultivation: Timeframe = {
         start: new Date(year - 1, 0, 1),
-        end: new Date(year - 1, 11, 31),
+        end: endOfYear,
     }
 
     // 1. Get the details for the field.

@@ -79,7 +79,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.6279889, 51.975571], // This centroid is in 'zand_nwc'
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
             } as Field,
             cultivations: [
                 {
@@ -92,10 +92,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in zand_nwc is 250. With winterteelt, korting should be 0.
-        expect(result.normValue).toBe(250)
-        expect(result.kortingDescription).toContain(
-            "Geen korting: winterteelt aanwezig",
+
+        // The base norm for Grasland in zand_nwc is 200 in nv-gebied. With winterteelt, korting should be 0.
+        expect(result.normValue).toBe(200)
+        expect(result.normSource).toContain(
+            "Grasland. Geen korting: winterteelt aanwezig",
         )
     })
 
@@ -104,11 +105,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.6279889, 51.975571], // This centroid is in 'zand_nwc'
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
             } as Field,
             cultivations: [
                 {
-                    b_lu_catalogue: "nl_265", // Grasland (2025 hoofdteelt)
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen (2025 hoofdteelt)
                     b_lu_start: new Date(2025, 0, 1),
                     b_lu_end: new Date(2025, 5, 1),
                 } as Partial<NL2025NormsInputForCultivation>,
@@ -122,9 +123,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in zand_nwc is 250. With vanggewas sown <= Oct 1st, korting should be 0.
-        expect(result.normValue).toBe(250)
-        expect(result.kortingDescription).toContain(
+        // The base norm for Vruchtgewassen in zand_nwc is 108. With vanggewas sown <= Oct 1st, korting should be 0.
+        expect(result.normValue).toBe(108)
+        expect(result.normSource).toContain(
             "Geen korting: vanggewas gezaaid uiterlijk 1 oktober",
         )
     })
@@ -134,11 +135,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.6279889, 51.975571], // This centroid is in 'zand_nwc'
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
             } as Field,
             cultivations: [
                 {
-                    b_lu_catalogue: "nl_265", // Grasland (2025 hoofdteelt)
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen (2025 hoofdteelt)
                     b_lu_start: new Date(2025, 0, 1),
                     b_lu_end: new Date(2025, 5, 1),
                 } as Partial<NL2025NormsInputForCultivation>,
@@ -152,9 +153,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in zand_nwc is 250. With vanggewas sown Oct 2-14, korting should be 5.
-        expect(result.normValue).toBe(245) // 250 - 5
-        expect(result.kortingDescription).toContain(
+        // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With vanggewas sown Oct 2-14, korting should be 5.
+        expect(result.normValue).toBe(103) // 108 - 5
+        expect(result.normSource).toContain(
             "Korting: 5kg N/ha, vanggewas gezaaid 2 t/m 14 oktober",
         )
     })
@@ -164,11 +165,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.6279889, 51.975571], // This centroid is in 'zand_nwc'
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
             } as Field,
             cultivations: [
                 {
-                    b_lu_catalogue: "nl_265", // Grasland (2025 hoofdteelt)
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen (2025 hoofdteelt)
                     b_lu_start: new Date(2025, 0, 1),
                     b_lu_end: new Date(2025, 5, 1),
                 } as Partial<NL2025NormsInputForCultivation>,
@@ -182,9 +183,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in zand_nwc is 250. With vanggewas sown Oct 15-31, korting should be 10.
-        expect(result.normValue).toBe(240) // 250 - 10
-        expect(result.kortingDescription).toContain(
+        // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With vanggewas sown Oct 15-31, korting should be 10.
+        expect(result.normValue).toBe(98) // 108 - 10
+        expect(result.normSource).toContain(
             "Korting: 10kg N/ha, vanggewas gezaaid 15 t/m 31 oktober",
         )
     })
@@ -194,11 +195,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.6279889, 51.975571], // This centroid is in 'zand_nwc'
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
             } as Field,
             cultivations: [
                 {
-                    b_lu_catalogue: "nl_265", // Grasland (2025 hoofdteelt)
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen (2025 hoofdteelt)
                     b_lu_start: new Date(2025, 0, 1),
                     b_lu_end: new Date(2025, 5, 1),
                 } as Partial<NL2025NormsInputForCultivation>,
@@ -212,9 +213,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in zand_nwc is 250. With vanggewas sown Nov 1st+, korting should be 20.
-        expect(result.normValue).toBe(230) // 250 - 20
-        expect(result.kortingDescription).toContain(
+        // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With vanggewas sown Nov 1st+, korting should be 20.
+        expect(result.normValue).toBe(88) // 108 - 20
+        expect(result.normSource).toContain(
             "Korting: 20kg N/ha, vanggewas gezaaid op of na 1 november",
         )
     })
@@ -224,11 +225,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.6279889, 51.975571], // This centroid is in 'zand_nwc'
+                b_centroid: [5.656346970245633, 51.987872886419524], // This centroid is in 'zand_nwc'
             } as Field,
             cultivations: [
                 {
-                    b_lu_catalogue: "nl_265", // Grasland (2025 hoofdteelt)
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen (2025 hoofdteelt)
                     b_lu_start: new Date(2025, 0, 1),
                     b_lu_end: new Date(2025, 5, 1),
                 } as Partial<NL2025NormsInputForCultivation>,
@@ -242,9 +243,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in zand_nwc is 250. With no exception, korting should be 20.
-        expect(result.normValue).toBe(230) // 250 - 20
-        expect(result.kortingDescription).toContain(
+        // The base norm for Vruchtgewassen in zand_nwc in nv-gebied is 108. With no exception, korting should be 20.
+        expect(result.normValue).toBe(88) // 108 - 20
+        expect(result.normSource).toContain(
             "Korting: 20kg N/ha, geen vanggewas of te laat gezaaid",
         )
     })
@@ -254,11 +255,11 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             farm: { is_derogatie_bedrijf: false },
             field: {
                 b_id: "1",
-                b_centroid: [5.64188724, 51.977587], // This centroid is in 'klei'
+                b_centroid: [5.648307588666836, 51.96484772224782], // This centroid is in 'klei'
             } as Field,
             cultivations: [
                 {
-                    b_lu_catalogue: "nl_265", // Grasland (2025 hoofdteelt)
+                    b_lu_catalogue: "nl_2751", // Vruchtgewassen (2025 hoofdteelt)
                     b_lu_start: new Date(2025, 0, 1),
                     b_lu_end: new Date(2025, 5, 1),
                 } as Partial<NL2025NormsInputForCultivation>,
@@ -272,10 +273,10 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         }
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
-        // The base norm for Grasland in klei is 345. Korting should not apply in non-sandy/loess regions.
-        expect(result.normValue).toBe(345)
-        expect(result.kortingDescription).toContain(
-            "Korting: 20kg N/ha, geen vanggewas of te laat gezaaid",
+        // The base norm for Vruchtgewassen in klei is 135. Korting should not apply in non-sandy/loess regions.
+        expect(result.normValue).toBe(135)
+        expect(result.normSource).toContain(
+            "Vruchtgewassen, Landbouwstambonen, rijp zaad.",
         )
     })
 })
