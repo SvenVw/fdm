@@ -29,6 +29,9 @@ import { AlertTriangle } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { HeaderNorms } from "../components/blocks/header/norms"
+import { NormsFallback } from "~/components/blocks/norms/skeletons"
+import { Suspense } from "react"
+import { Await } from "react-router"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -211,90 +214,96 @@ export default function FarmNormsBlock() {
                         "Bekijk de gebruiksnormen voor je bedrijf en percelen."
                     }
                 />
-                {/* Disclaimer */}
-                {loaderData.farmNorms && loaderData.fieldNorms ? (
-                    <div className="px-10">
-                        <Alert className="mb-8  border-amber-200 bg-amber-50">
-                            <AlertTriangle className="h-4 w-4 text-amber-600" />
-                            <AlertDescription className="text-amber-800">
-                                <strong>Disclaimer:</strong> Deze getallen zijn
-                                uitsluitend bedoeld voor informatieve
-                                doeleinden. De getoonde gebruiksnormen zijn
-                                indicatief en dienen te worden geverifieerd voor
-                                juridische naleving. Raadpleeg altijd de
-                                officiële RVO-publicaties en uw adviseur voor
-                                definitieve normen.
-                            </AlertDescription>
-                        </Alert>
-                    </div>
-                ) : null}
-
-                <div className="space-y-6 px-10 pb-16">
-                    {loaderData.errorMessage ? (
-                        <div className="flex items-center justify-center">
-                            <Card className="w-[350px]">
-                                <CardHeader>
-                                    <CardTitle>
-                                        Helaas is het niet mogelijk om je
-                                        gebruiksnormen uit te rekenen
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-muted-foreground">
-                                        <p>
-                                            Er is onverwacht wat misgegaan.
-                                            Probeer opnieuw of neem contact op
-                                            met Ondersteuning en deel de
-                                            volgende foutmelding:
-                                        </p>
-                                        <div className="mt-8 w-full max-w-2xl">
-                                            <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
-                                                {JSON.stringify(
-                                                    {
-                                                        message:
-                                                            loaderData.errorMessage,
-                                                        page: page,
-                                                        timestamp: new Date(),
-                                                    },
-                                                    null,
-                                                    2,
-                                                )}
-                                            </pre>
-                                        </div>
+                <Suspense fallback={<NormsFallback />}>
+                    <Await resolve={Promise.all([loaderData.farmNorms, loaderData.fieldNorms])}>
+                        {([farmNorms, fieldNorms]) => {
+                            if (loaderData.errorMessage) {
+                                return (
+                                    <div className="flex items-center justify-center">
+                                        <Card className="w-[350px]">
+                                            <CardHeader>
+                                                <CardTitle>
+                                                    Helaas is het niet mogelijk om je
+                                                    gebruiksnormen uit te rekenen
+                                                </CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="text-muted-foreground">
+                                                    <p>
+                                                        Er is onverwacht wat misgegaan.
+                                                        Probeer opnieuw of neem contact op
+                                                        met Ondersteuning en deel de
+                                                        volgende foutmelding:
+                                                    </p>
+                                                    <div className="mt-8 w-full max-w-2xl">
+                                                        <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
+                                                            {JSON.stringify(
+                                                                {
+                                                                    message:
+                                                                        loaderData.errorMessage,
+                                                                    page: page,
+                                                                    timestamp: new Date(),
+                                                                },
+                                                                null,
+                                                                2,
+                                                            )}
+                                                        </pre>
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
                                     </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    ) : loaderData.farmNorms && loaderData.fieldNorms ? (
-                        <>
-                            <FarmNorms farmNorms={loaderData.farmNorms} />
-                            <Separator className="my-8" />
-                            <FieldNorms
-                                fieldNorms={loaderData.fieldNorms}
-                                fieldOptions={loaderData.fieldOptions}
-                            />
-                        </>
-                    ) : (
-                        <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
-                            <div className="flex flex-col space-y-2 text-center">
-                                <h1 className="text-2xl font-semibold tracking-tight">
-                                    Helaas, nog geen gebruiksnormen beschikbaar
-                                    voor {loaderData.calendar}
-                                </h1>
-                                <p className="text-sm text-muted-foreground">
-                                    Op dit moment kunnen we alleen nog de
-                                    gebruiksnormen voor 2025 berekenen en
-                                    weergeven.
-                                </p>
-                                <NavLink
-                                    to={`/farm/${loaderData.b_id_farm}/2025/norms`}
-                                >
-                                    <Button>Ga naar 2025</Button>
-                                </NavLink>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                                )
+                            }
+
+                            if (farmNorms && fieldNorms) {
+                                return (
+                                    <div className="space-y-6 px-10 pb-16">
+                                        <Alert className="mb-8  border-amber-200 bg-amber-50">
+                                            <AlertTriangle className="h-4 w-4 text-amber-600" />
+                                            <AlertDescription className="text-amber-800">
+                                                <strong>Disclaimer:</strong> Deze getallen zijn
+                                                uitsluitend bedoeld voor informatieve
+                                                doeleinden. De getoonde gebruiksnormen zijn
+                                                indicatief en dienen te worden geverifieerd voor
+                                                juridische naleving. Raadpleeg altijd de
+                                                officiële RVO-publicaties en uw adviseur voor
+                                                definitieve normen.
+                                            </AlertDescription>
+                                        </Alert>
+                                        <FarmNorms farmNorms={farmNorms} />
+                                        <Separator className="my-8" />
+                                        <FieldNorms
+                                            fieldNorms={fieldNorms}
+                                            fieldOptions={loaderData.fieldOptions}
+                                        />
+                                    </div>
+                                )
+                            }
+
+                            return (
+                                <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
+                                    <div className="flex flex-col space-y-2 text-center">
+                                        <h1 className="text-2xl font-semibold tracking-tight">
+                                            Helaas, nog geen gebruiksnormen beschikbaar
+                                            voor {loaderData.calendar}
+                                        </h1>
+                                        <p className="text-sm text-muted-foreground">
+                                            Op dit moment kunnen we alleen nog de
+                                            gebruiksnormen voor 2025 berekenen en
+                                            weergeven.
+                                        </p>
+                                        <NavLink
+                                            to={`/farm/${loaderData.b_id_farm}/2025/norms`}
+                                        >
+                                            <Button>Ga naar 2025</Button>
+                                        </NavLink>
+                                    </div>
+                                </div>
+                            )
+                        }}
+                    </Await>
+                </Suspense>
             </main>
         </SidebarInset>
     )
