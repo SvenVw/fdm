@@ -3,6 +3,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Grasland",
         b_lu_catalogue_match: ["nl_265", "nl_331"],
         type: "grasland",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 345, nv_area: 276 },
             zand_nwc: { standard: 250, nv_area: 200 },
@@ -15,6 +17,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Grasland met volledig maaien",
         b_lu_catalogue_match: ["nl_265", "nl_331"],
         type: "grasland",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 385, nv_area: 308 },
             zand_nwc: { standard: 320, nv_area: 256 },
@@ -27,6 +31,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Tijdelijk grasland",
         b_lu_catalogue_match: ["nl_266"],
         type: "grasland_tijdelijk",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 period_description: "van 1 januari tot minstens 15 april",
@@ -175,6 +181,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewas, consumptie aardappelen",
         b_lu_catalogue_match: ["nl_2014"],
         type: "aardappel",
+        is_winterteelt: false,
+        is_vanggewas: false,
         variety_type: "consumptie_overig",
         varieties_hoge_norm: [
             "Adora",
@@ -265,6 +273,8 @@ export const nitrogenStandardsData = [
             "Consumptieaardappel, vroeg (loofvernietiging voor 15 juli)",
         b_lu_catalogue_match: ["nl_1911", "nl_1912"],
         type: "aardappel",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 120, nv_area: 96 },
             zand_nwc: { standard: 120, nv_area: 96 },
@@ -277,6 +287,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewas, pootaardappelen",
         b_lu_catalogue_match: ["nl_2015", "nl_2016"],
         type: "aardappel",
+        is_winterteelt: false,
+        is_vanggewas: false,
         variety_type: "poot_overig",
         varieties_hoge_norm: [
             "Adora",
@@ -375,6 +387,8 @@ export const nitrogenStandardsData = [
             "nl_3731",
         ],
         type: "aardappel",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 180, nv_area: 144 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -387,6 +401,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewas, zetmeelaardappelen",
         b_lu_catalogue_match: ["nl_2017"],
         type: "aardappel",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 240, nv_area: 192 },
             zand_nwc: { standard: 230, nv_area: 184 },
@@ -399,6 +415,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, suikerbieten",
         b_lu_catalogue_match: ["nl_256"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 145, nv_area: 116 },
@@ -411,6 +429,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Cichorei",
         b_lu_catalogue_match: ["nl_511", "nl_1023", "nl_1024", "nl_1036"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 70, nv_area: 56 },
             zand_nwc: { standard: 70, nv_area: 56 },
@@ -423,6 +443,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, voederbieten",
         b_lu_catalogue_match: ["nl_257"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 165, nv_area: 132 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -435,6 +457,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, wintertarwe",
         b_lu_catalogue_match: ["nl_233", "nl_382"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 245, nv_area: 196 },
             zand_nwc: { standard: 160, nv_area: 128 },
@@ -447,6 +471,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, zomertarwe",
         b_lu_catalogue_match: ["nl_234"],
         type: "akkerbouw",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -459,6 +485,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, wintergerst",
         b_lu_catalogue_match: ["nl_235"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 140, nv_area: 112 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -471,6 +499,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, zomergerst",
         b_lu_catalogue_match: ["nl_236", "nl_381"],
         type: "akkerbouw",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 80, nv_area: 64 },
             zand_nwc: { standard: 80, nv_area: 64 },
@@ -483,6 +513,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen Triticale",
         b_lu_catalogue_match: ["nl_314"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 160, nv_area: 128 },
             zand_nwc: { standard: 150, nv_area: 120 },
@@ -495,6 +527,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, winterrogge",
         b_lu_catalogue_match: ["nl_237", "nl_6806"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 140, nv_area: 112 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -507,6 +541,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Haver",
         b_lu_catalogue_match: ["nl_238", "nl_670", "nl_6636"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 100, nv_area: 80 },
             zand_nwc: { standard: 100, nv_area: 80 },
@@ -525,6 +561,8 @@ export const nitrogenStandardsData = [
             "nl_2032",
         ],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         derogatie_norms: {
             klei: { standard: 160, nv_area: 128 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -544,6 +582,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Luzerne",
         b_lu_catalogue_match: ["nl_258", "nl_663", "nl_1926", "nl_1949"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         sub_types: [
             {
                 omschrijving: "eerste jaar",
@@ -572,6 +612,8 @@ export const nitrogenStandardsData = [
             "Akkerbouwgewassen, Gras voor industriële verwerking",
         b_lu_catalogue_match: ["nl_3805"],
         type: "gras",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "inzaai in september en eerste jaar",
@@ -606,6 +648,8 @@ export const nitrogenStandardsData = [
             "nl_6751",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         sub_types: [
             {
                 omschrijving: "1e jaars",
@@ -639,6 +683,8 @@ export const nitrogenStandardsData = [
             "nl_6783",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 140, nv_area: 112 },
             zand_nwc: { standard: 130, nv_area: 104 },
@@ -657,6 +703,8 @@ export const nitrogenStandardsData = [
             "nl_6783",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 60, nv_area: 48 },
             zand_nwc: { standard: 50, nv_area: 40 },
@@ -675,6 +723,8 @@ export const nitrogenStandardsData = [
             "nl_6789",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 130, nv_area: 104 },
             zand_nwc: { standard: 110, nv_area: 80 },
@@ -693,6 +743,8 @@ export const nitrogenStandardsData = [
             "nl_6789",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 60, nv_area: 48 },
             zand_nwc: { standard: 50, nv_area: 40 },
@@ -711,6 +763,8 @@ export const nitrogenStandardsData = [
             "nl_6785",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         sub_types: [
             {
                 omschrijving: "1e jaars",
@@ -744,6 +798,8 @@ export const nitrogenStandardsData = [
             "nl_6785",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         sub_types: [
             {
                 omschrijving: "1e jaars",
@@ -771,6 +827,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Graszaad,Westerwolds",
         b_lu_catalogue_match: ["nl_1919", "nl_3513", "nl_6790", "nl_6791"],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 110, nv_area: 88 },
             zand_nwc: { standard: 100, nv_area: 80 },
@@ -783,6 +841,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Graszaad, Italiaans",
         b_lu_catalogue_match: ["nl_1920", "nl_3512", "nl_6754", "nl_6755"],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 130, nv_area: 104 },
             zand_nwc: { standard: 120, nv_area: 96 },
@@ -802,6 +862,8 @@ export const nitrogenStandardsData = [
             "nl_6752",
         ],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 90, nv_area: 72 },
             zand_nwc: { standard: 80, nv_area: 64 },
@@ -815,6 +877,8 @@ export const nitrogenStandardsData = [
             "Akkerbouwgewassen, graszaad, overig, vanggewas",
         b_lu_catalogue_match: ["nl_6753"],
         type: "graszaad",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 45, nv_area: 36 },
             zand_nwc: { standard: 45, nv_area: 36 },
@@ -827,6 +891,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, graszoden",
         b_lu_catalogue_match: ["nl_1921"],
         type: "gras",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 340, nv_area: 272 },
             zand_nwc: { standard: 340, nv_area: 272 },
@@ -840,6 +906,8 @@ export const nitrogenStandardsData = [
             "Akkerbouwgewassen, Ui overig, zaaiui of winterui.",
         b_lu_catalogue_match: ["nl_6660", "nl_6664", "nl_1932", "nl_1933"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 170, nv_area: 136 },
             zand_nwc: { standard: 120, nv_area: 96 },
@@ -852,6 +920,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Ui overig",
         b_lu_catalogue_match: ["nl_263", "nl_1934", "nl_1021"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 120, nv_area: 96 },
             zand_nwc: { standard: 120, nv_area: 96 },
@@ -864,6 +934,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Blauwmaanzaad",
         b_lu_catalogue_match: ["nl_247"],
         type: "akkerbouw",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 110, nv_area: 88 },
             zand_nwc: { standard: 100, nv_area: 80 },
@@ -876,6 +948,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Karwij",
         b_lu_catalogue_match: ["nl_246"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -888,6 +962,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, koolzaad",
         b_lu_catalogue_match: ["nl_1922", "nl_1923"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "winter",
@@ -915,6 +991,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Akkerbouwgewassen, Vlas",
         b_lu_catalogue_match: ["nl_249", "nl_666", "nl_3736"],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 70, nv_area: 56 },
             zand_nwc: { standard: 70, nv_area: 56 },
@@ -935,6 +1013,8 @@ export const nitrogenStandardsData = [
             "nl_6802",
         ],
         type: "akkerbouw",
+        is_winterteelt: true,
+        is_vanggewas: true,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 185, nv_area: 148 },
@@ -947,6 +1027,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bladgewassen, Spinazie",
         b_lu_catalogue_match: ["nl_2773", "nl_2774"],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "1e teelt",
@@ -974,6 +1056,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Baldgewassen, Spinazie volgteelt",
         b_lu_catalogue_match: ["nl_1022"],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 185, nv_area: 148 },
             zand_nwc: { standard: 145, nv_area: 116 },
@@ -994,6 +1078,8 @@ export const nitrogenStandardsData = [
             "nl_2766",
         ],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "1e teelt",
@@ -1021,6 +1107,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bladgewassen, Andijvie eerste teelt",
         b_lu_catalogue_match: ["nl_2709"],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 180, nv_area: 144 },
             zand_nwc: { standard: 170, nv_area: 136 },
@@ -1033,6 +1121,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bladgewassen, Andijvie eerste teelt volgteelt",
         b_lu_catalogue_match: ["nl_2708"],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "1e teelt",
@@ -1060,6 +1150,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bladgewassen, Selderij, bleek/groen",
         b_lu_catalogue_match: ["nl_2765"],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 185, nv_area: 148 },
@@ -1079,6 +1171,8 @@ export const nitrogenStandardsData = [
             "nl_2802",
         ],
         type: "bladgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 245, nv_area: 196 },
             zand_nwc: { standard: 225, nv_area: 180 },
@@ -1091,6 +1185,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bladgewassen, Bladgewassen overig",
         b_lu_catalogue_match: ["nl_2791", "nl_2792"],
         type: "bladgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "eenmalige oogst",
@@ -1118,6 +1214,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Spruitkool",
         b_lu_catalogue_match: ["nl_2777", "nl_2778"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 290, nv_area: 232 },
             zand_nwc: { standard: 265, nv_area: 212 },
@@ -1130,6 +1228,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Witte Kool",
         b_lu_catalogue_match: ["nl_2789", "nl_2790"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 320, nv_area: 256 },
             zand_nwc: { standard: 290, nv_area: 232 },
@@ -1142,6 +1242,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Rode kool",
         b_lu_catalogue_match: ["nl_2759", "nl_2760"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 285, nv_area: 228 },
             zand_nwc: { standard: 260, nv_area: 208 },
@@ -1154,6 +1256,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Savooiekool",
         b_lu_catalogue_match: ["nl_2761", "nl_2762"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 285, nv_area: 228 },
             zand_nwc: { standard: 260, nv_area: 208 },
@@ -1166,6 +1270,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Spitskool",
         b_lu_catalogue_match: ["nl_2775", "nl_2776"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 285, nv_area: 228 },
             zand_nwc: { standard: 260, nv_area: 208 },
@@ -1185,6 +1291,8 @@ export const nitrogenStandardsData = [
             "nl_2798",
         ],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 230, nv_area: 184 },
             zand_nwc: { standard: 210, nv_area: 168 },
@@ -1197,6 +1305,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Broccoli",
         b_lu_catalogue_match: ["nl_2719", "nl_2720"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 270, nv_area: 216 },
             zand_nwc: { standard: 235, nv_area: 188 },
@@ -1209,6 +1319,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Chinese kool",
         b_lu_catalogue_match: ["nl_2721", "nl_2722"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 180, nv_area: 144 },
             zand_nwc: { standard: 155, nv_area: 124 },
@@ -1221,6 +1333,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, boerenkool",
         b_lu_catalogue_match: ["nl_2715", "nl_2716"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 170, nv_area: 136 },
             zand_nwc: { standard: 155, nv_area: 124 },
@@ -1233,6 +1347,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Paksoi",
         b_lu_catalogue_match: ["nl_2745", "nl_2746"],
         type: "koolgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 180, nv_area: 144 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -1245,6 +1361,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Koolgewassen, Raapstelen",
         b_lu_catalogue_match: ["nl_2753", "nl_2754", "nl_664"],
         type: "koolgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 140, nv_area: 112 },
             zand_nwc: { standard: 130, nv_area: 104 },
@@ -1257,6 +1375,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Kruiden",
         b_lu_catalogue_match: ["nl_2743", "nl_2744"],
         type: "kruiden",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "bladgewas, eenmalige oogst",
@@ -1316,6 +1436,8 @@ export const nitrogenStandardsData = [
             "nl_6749",
         ],
         type: "kruiden",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -1328,6 +1450,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Kruiden, wortelgewassen",
         b_lu_catalogue_match: ["nl_652"],
         type: "kruiden",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 185, nv_area: 148 },
@@ -1340,6 +1464,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Kruiden, zaadgewassen",
         b_lu_catalogue_match: ["nl_655"],
         type: "kruiden",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 100, nv_area: 80 },
             zand_nwc: { standard: 90, nv_area: 72 },
@@ -1353,6 +1479,8 @@ export const nitrogenStandardsData = [
             "Vruchtgewassen, Aardbei (wachtbed, vermeerdering)",
         b_lu_catalogue_match: ["nl_2700", "nl_2701"],
         type: "vruchtgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 120, nv_area: 96 },
             zand_nwc: { standard: 110, nv_area: 88 },
@@ -1365,6 +1493,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, Aardbei (productie)",
         b_lu_catalogue_match: ["nl_2702"],
         type: "vruchtgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 170, nv_area: 136 },
             zand_nwc: { standard: 155, nv_area: 124 },
@@ -1389,6 +1519,8 @@ export const nitrogenStandardsData = [
             "nl_2736",
         ],
         type: "vruchtgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 190, nv_area: 152 },
             zand_nwc: { standard: 175, nv_area: 140 },
@@ -1401,6 +1533,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, suikermais",
         b_lu_catalogue_match: ["nl_814"],
         type: "vruchtgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 185, nv_area: 148 },
@@ -1413,6 +1547,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, stam/stokboon",
         b_lu_catalogue_match: ["nl_2779", "nl_2780", "nl_2781", "nl_2782"],
         type: "vruchtgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 120, nv_area: 96 },
             zand_nwc: { standard: 110, nv_area: 88 },
@@ -1425,6 +1561,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, Landbouwstambonen, rijp zaad",
         b_lu_catalogue_match: ["nl_2751", "nl_2752"],
         type: "vruchtgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 135, nv_area: 108 },
             zand_nwc: { standard: 135, nv_area: 108 },
@@ -1444,6 +1582,8 @@ export const nitrogenStandardsData = [
             "nl_6767",
         ],
         type: "vruchtgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 50, nv_area: 40 },
             zand_nwc: { standard: 50, nv_area: 40 },
@@ -1456,6 +1596,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, Tuinbonen, vers/peulen",
         b_lu_catalogue_match: ["nl_242"],
         type: "vruchtgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 75, nv_area: 60 },
             zand_nwc: { standard: 75, nv_area: 60 },
@@ -1468,6 +1610,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, Erwt, vers + rijp zaad",
         b_lu_catalogue_match: ["nl_241", "nl_244", "nl_308"],
         type: "vruchtgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 30, nv_area: 24 },
             zand_nwc: { standard: 30, nv_area: 24 },
@@ -1480,6 +1624,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Vruchtgewassen, Peul",
         b_lu_catalogue_match: ["nl_2747", "nl_2748"],
         type: "vruchtgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 90, nv_area: 72 },
             zand_nwc: { standard: 85, nv_area: 68 },
@@ -1493,6 +1639,8 @@ export const nitrogenStandardsData = [
             "Stengel/knol/wortelgewassen, Asperges (excl. Opkweek)",
         b_lu_catalogue_match: ["nl_2710"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 85, nv_area: 68 },
             zand_nwc: { standard: 75, nv_area: 60 },
@@ -1505,6 +1653,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Knolselderij",
         b_lu_catalogue_match: ["nl_2725", "nl_2726"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 185, nv_area: 148 },
@@ -1518,6 +1668,8 @@ export const nitrogenStandardsData = [
             "Stengel/knol/wortelgewassen, Knolvenkel/venkel",
         b_lu_catalogue_match: ["nl_2727", "nl_2728"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 180, nv_area: 144 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -1530,6 +1682,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Koolraap",
         b_lu_catalogue_match: ["nl_2737", "nl_2738"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 170, nv_area: 136 },
             zand_nwc: { standard: 155, nv_area: 124 },
@@ -1542,6 +1696,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Koolrabi",
         b_lu_catalogue_match: ["nl_2739", "nl_2740"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 180, nv_area: 144 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -1555,6 +1711,8 @@ export const nitrogenStandardsData = [
             "Stengel/knol/wortelgewassen, Kroten/rode bieten",
         b_lu_catalogue_match: ["nl_2741", "nl_2742"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 185, nv_area: 148 },
             zand_nwc: { standard: 170, nv_area: 136 },
@@ -1568,6 +1726,8 @@ export const nitrogenStandardsData = [
             "Stengel/knol/wortelgewassen, winterpeen/waspeen",
         b_lu_catalogue_match: ["nl_2783", "nl_2784", "nl_2785", "nl_2786"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 110, nv_area: 88 },
             zand_nwc: { standard: 110, nv_area: 88 },
@@ -1580,6 +1740,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, bospeen",
         b_lu_catalogue_match: ["nl_2717", "nl_2718"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 50, nv_area: 40 },
             zand_nwc: { standard: 50, nv_area: 40 },
@@ -1592,6 +1754,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Rabarber",
         b_lu_catalogue_match: ["nl_2755", "nl_2756"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 250, nv_area: 200 },
             zand_nwc: { standard: 230, nv_area: 184 },
@@ -1604,6 +1768,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Radijs",
         b_lu_catalogue_match: ["nl_2757", "nl_2758"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 80, nv_area: 64 },
             zand_nwc: { standard: 80, nv_area: 64 },
@@ -1616,6 +1782,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Schorseneren",
         b_lu_catalogue_match: ["nl_2763", "nl_2764"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 170, nv_area: 136 },
             zand_nwc: { standard: 170, nv_area: 136 },
@@ -1628,6 +1796,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Stengel/knol/wortelgewassen, Witlof",
         b_lu_catalogue_match: ["nl_2787", "nl_2788"],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 100, nv_area: 80 },
             zand_nwc: { standard: 100, nv_area: 80 },
@@ -1648,6 +1818,8 @@ export const nitrogenStandardsData = [
             "nl_6632",
         ],
         type: "stengel_knol_wortelgewas",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 185, nv_area: 148 },
@@ -1673,6 +1845,8 @@ export const nitrogenStandardsData = [
             "nl_3520",
         ],
         type: "groenbemester",
+        is_vanggewas: true,
+        is_winterteelt: false,
         norms: {
             klei: { standard: 60, nv_area: 48 },
             zand_nwc: { standard: 50, nv_area: 40 },
@@ -1703,6 +1877,8 @@ export const nitrogenStandardsData = [
             "nl_6769",
         ],
         type: "groenbemester",
+        is_vanggewas: true,
+        is_winterteelt: false,
         norms: {
             klei: { standard: 0, nv_area: 0 },
             zand_nwc: { standard: 0, nv_area: 0 },
@@ -1716,6 +1892,8 @@ export const nitrogenStandardsData = [
             "Graszaadstoppel ter vernietiging in najaar of vroege voorjaar",
         b_lu_catalogue_match: [],
         type: "groenbemester",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 60, nv_area: 48 },
             zand_nwc: { standard: 50, nv_area: 40 },
@@ -1728,6 +1906,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Acidanthera",
         b_lu_catalogue_match: [],
         type: "bloembol",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 255, nv_area: 204 },
             zand_nwc: { standard: 240, nv_area: 192 },
@@ -1740,6 +1920,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Anemone coronaria",
         b_lu_catalogue_match: [],
         type: "bloembol",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 130, nv_area: 104 },
             zand_nwc: { standard: 125, nv_area: 100 },
@@ -1752,6 +1934,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Fritillaria imperialis",
         b_lu_catalogue_match: [],
         type: "bloembol",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 135, nv_area: 108 },
             zand_nwc: { standard: 130, nv_area: 104 },
@@ -1771,6 +1955,8 @@ export const nitrogenStandardsData = [
             "nl_1018",
         ],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 220, nv_area: 176 },
             zand_nwc: { standard: 210, nv_area: 168 },
@@ -1789,6 +1975,8 @@ export const nitrogenStandardsData = [
             "nl_1052",
         ],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "grofbollig",
@@ -1816,6 +2004,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Krokus",
         b_lu_catalogue_match: ["nl_976", "nl_977", "nl_1001"],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "grote gele",
@@ -1843,6 +2033,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Narcis",
         b_lu_catalogue_match: ["nl_982", "nl_983", "nl_1003"],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 145, nv_area: 116 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -1855,6 +2047,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Tulp",
         b_lu_catalogue_match: ["nl_985", "nl_986", "nl_1004"],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 200, nv_area: 160 },
             zand_nwc: { standard: 190, nv_area: 152 },
@@ -1867,6 +2061,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Dahlia",
         b_lu_catalogue_match: ["nl_964", "nl_965", "nl_997"],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 110, nv_area: 88 },
             zand_nwc: { standard: 105, nv_area: 84 },
@@ -1879,6 +2075,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Gladiool",
         b_lu_catalogue_match: ["nl_967", "nl_968", "nl_998"],
         type: "bloembol",
+        is_winterteelt: false,
+        is_vanggewas: false,
         sub_types: [
             {
                 omschrijving: "pitten",
@@ -1906,6 +2104,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Knolbegonia",
         b_lu_catalogue_match: [],
         type: "bloembol",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 145, nv_area: 116 },
@@ -1918,6 +2118,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen,Lelie",
         b_lu_catalogue_match: ["nl_979", "nl_980", "nl_1002"],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 155, nv_area: 124 },
             zand_nwc: { standard: 145, nv_area: 116 },
@@ -1930,6 +2132,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Bloembollengewassen, Zantedeschia",
         b_lu_catalogue_match: ["nl_988", "nl_989", "nl_1005"],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 120, nv_area: 96 },
             zand_nwc: { standard: 120, nv_area: 96 },
@@ -1963,6 +2167,8 @@ export const nitrogenStandardsData = [
             "nl_6805",
         ],
         type: "bloembol",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 165, nv_area: 132 },
             zand_nwc: { standard: 155, nv_area: 124 },
@@ -1975,6 +2181,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, Appel",
         b_lu_catalogue_match: ["nl_1095", "nl_1096"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 175, nv_area: 140 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -1987,6 +2195,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, blauwe bes",
         b_lu_catalogue_match: ["nl_1869", "nl_1874", "nl_1047"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 100, nv_area: 80 },
             zand_nwc: { standard: 95, nv_area: 76 },
@@ -1999,6 +2209,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, braam",
         b_lu_catalogue_match: ["nl_2327"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -2011,6 +2223,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, framboos",
         b_lu_catalogue_match: ["nl_2326"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -2023,6 +2237,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, kers",
         b_lu_catalogue_match: ["nl_1872", "nl_2328", "nl_1100", "nl_2645"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 175, nv_area: 140 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -2035,6 +2251,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, Peer",
         b_lu_catalogue_match: ["nl_1097", "nl_1098"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 175, nv_area: 140 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -2047,6 +2265,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, Pruimen",
         b_lu_catalogue_match: ["nl_1870"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 175, nv_area: 140 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -2059,6 +2279,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, rode bes",
         b_lu_catalogue_match: ["nl_2325"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 150, nv_area: 120 },
             zand_nwc: { standard: 140, nv_area: 112 },
@@ -2071,6 +2293,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, wijnbouw",
         b_lu_catalogue_match: ["nl_1099"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 100, nv_area: 80 },
             zand_nwc: { standard: 95, nv_area: 76 },
@@ -2083,6 +2307,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Fruitteeltgewassen, zwarte bes",
         b_lu_catalogue_match: ["nl_1873"],
         type: "fruitteelt",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 175, nv_area: 140 },
             zand_nwc: { standard: 165, nv_area: 132 },
@@ -2095,6 +2321,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Buitenbloemen, hoog",
         b_lu_catalogue_match: ["nl_1025", "nl_1026", "nl_1054"],
         type: "buitenbloem",
+        is_winterteelt: true,
+        is_vanggewas: false,
         varieties: [
             "Alchemilla mollis",
             "Carthamus",
@@ -2138,6 +2366,8 @@ export const nitrogenStandardsData = [
             "nl_1055",
         ],
         type: "buitenbloem",
+        is_winterteelt: true,
+        is_vanggewas: true,
         varieties: [],
         norms: {
             klei: { standard: 150, nv_area: 120 },
@@ -2151,6 +2381,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Buitenbloemen, Tagetes",
         b_lu_catalogue_match: ["nl_346", "nl_347", "nl_669", "nl_671"],
         type: "buitenbloem",
+        is_vanggewas: true,
+        is_winterteelt: false,
         norms: {
             klei: { standard: 90, nv_area: 72 },
             zand_nwc: { standard: 80, nv_area: 64 },
@@ -2163,6 +2395,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Laanbomen onderstammen",
         b_lu_catalogue_match: ["nl_1070"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 40, nv_area: 32 },
             zand_nwc: { standard: 40, nv_area: 32 },
@@ -2176,6 +2410,8 @@ export const nitrogenStandardsData = [
             "Boomkwekerijgewassen, Laanbomen/parkbomen, opzetters",
         b_lu_catalogue_match: ["nl_1071", "nl_1072"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 115, nv_area: 92 },
             zand_nwc: { standard: 115, nv_area: 92 },
@@ -2188,6 +2424,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen,Sierheesters",
         b_lu_catalogue_match: ["nl_1075"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 75, nv_area: 60 },
             zand_nwc: { standard: 75, nv_area: 60 },
@@ -2201,6 +2439,8 @@ export const nitrogenStandardsData = [
             "Boomkwekerijgewassen, coniferen incl kerstsparren en dennen",
         b_lu_catalogue_match: ["nl_796", "nl_1074"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 80, nv_area: 64 },
             zand_nwc: { standard: 80, nv_area: 64 },
@@ -2213,6 +2453,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Rozen",
         b_lu_catalogue_match: ["nl_1073"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 70, nv_area: 56 },
             zand_nwc: { standard: 70, nv_area: 56 },
@@ -2225,6 +2467,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Bos- en haagplantsoen",
         b_lu_catalogue_match: ["nl_1067", "nl_863"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 95, nv_area: 76 },
             zand_nwc: { standard: 95, nv_area: 76 },
@@ -2237,6 +2481,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Vaste planten",
         b_lu_catalogue_match: ["nl_1080"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 175, nv_area: 140 },
             zand_nwc: { standard: 175, nv_area: 140 },
@@ -2250,6 +2496,8 @@ export const nitrogenStandardsData = [
             "Boomkwekerijgewassen, Vruchtbomen, onderstammen",
         b_lu_catalogue_match: ["nl_1078"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 30, nv_area: 24 },
             zand_nwc: { standard: 30, nv_area: 24 },
@@ -2262,6 +2510,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, moerbomen",
         b_lu_catalogue_match: ["nl_1077"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 110, nv_area: 88 },
             zand_nwc: { standard: 110, nv_area: 88 },
@@ -2274,6 +2524,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Vruchtbomen, overig,",
         b_lu_catalogue_match: ["nl_1079"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 135, nv_area: 108 },
             zand_nwc: { standard: 105, nv_area: 84 },
@@ -2286,6 +2538,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Trek- en besheesters",
         b_lu_catalogue_match: ["nl_1076"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 80, nv_area: 64 },
             zand_nwc: { standard: 80, nv_area: 64 },
@@ -2298,6 +2552,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Snijgroen",
         b_lu_catalogue_match: ["nl_1876"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 95, nv_area: 76 },
             zand_nwc: { standard: 95, nv_area: 76 },
@@ -2310,6 +2566,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Ericaceae",
         b_lu_catalogue_match: ["nl_1069"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 70, nv_area: 56 },
             zand_nwc: { standard: 70, nv_area: 56 },
@@ -2322,6 +2580,8 @@ export const nitrogenStandardsData = [
         cultivation_rvo_table2: "Boomkwekerijgewassen, Buxus",
         b_lu_catalogue_match: ["nl_1068"],
         type: "boomkwekerij",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 95, nv_area: 76 },
             zand_nwc: { standard: 95, nv_area: 76 },
@@ -2335,6 +2595,8 @@ export const nitrogenStandardsData = [
             "Boomkwekerijgewassen, Snelgroeiende houtsoorten voor biomassaproductie",
         b_lu_catalogue_match: ["nl_864"],
         type: "bosbouw",
+        is_winterteelt: true,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 90, nv_area: 72 },
             zand_nwc: { standard: 90, nv_area: 72 },
@@ -2348,6 +2610,8 @@ export const nitrogenStandardsData = [
             "Akkerbouwgewas, Aardappel, bestrijdingsmaatregel",
         b_lu_catalogue_match: ["nl_2025"],
         type: "aardappel",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 0, nv_area: 0 },
             zand_nwc: { standard: 0, nv_area: 0 },
@@ -2371,6 +2635,8 @@ export const nitrogenStandardsData = [
             "nl_6807",
         ],
         type: "Geen gewas",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 0, nv_area: 0 },
             zand_nwc: { standard: 0, nv_area: 0 },
@@ -2410,6 +2676,8 @@ export const nitrogenStandardsData = [
             "nl_6793",
         ],
         type: "Landschapselement",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 0, nv_area: 0 },
             zand_nwc: { standard: 0, nv_area: 0 },
@@ -2429,6 +2697,8 @@ export const nitrogenStandardsData = [
             "nl_6799",
         ],
         type: "Natte teelt",
+        is_winterteelt: false,
+        is_vanggewas: false,
         norms: {
             klei: { standard: 0, nv_area: 0 },
             zand_nwc: { standard: 0, nv_area: 0 },

@@ -1,4 +1,5 @@
 import type { Field } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
     GebruiksnormResult,
@@ -6,6 +7,7 @@ import type {
     NL2025NormsInput,
     NormsByRegion,
     RegionKey,
+    NL2025NormsInputForCultivation,
 } from "./types"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 
@@ -208,6 +210,122 @@ function getNormsForCultivation(
 }
 
 /**
+ * Calculates the "korting" (reduction) on the nitrogen usage norm based on the presence
+ * of winter crops or catch crops in the previous year.
+ *
+ * @param cultivations - An array of cultivation objects for the current and previous year.
+ * @param region - The soil region of the field (e.g., "zand_nwc", "zand_zuid", "loess").
+ * @returns An object containing the reduction amount in kilograms of nitrogen per hectare (kg N/ha) and a description.
+ */
+function calculateKorting(
+    cultivations: NL2025NormsInputForCultivation[],
+    region: RegionKey,
+): { amount: Decimal; description: string } {
+    const currentYear = 2025
+    const previousYear = currentYear - 1
+
+    const sandyOrLoessRegions: RegionKey[] = ["zand_nwc", "zand_zuid", "loess"]
+
+    // Check if field is outside regions with korting
+    if (!sandyOrLoessRegions.includes(region)) {
+        return {
+            amount: new Decimal(0),
+            description: ".",
+        }
+    }
+
+    // Determine hoofdteelt for the current year (2025)
+    const hoofdteelt2025 = determineNL2025Hoofdteelt(
+        cultivations.filter((c) => c.b_lu_start.getFullYear() === currentYear),
+    )
+    const hoofdteelt2025Standard = nitrogenStandardsData.find((ns) =>
+        ns.b_lu_catalogue_match.includes(hoofdteelt2025),
+    )
+
+    // Check for winterteelt exception (hoofdteelt of 2025 is winterteelt, sown in late 2024)
+    if (hoofdteelt2025Standard?.is_winterteelt) {
+        return {
+            amount: new Decimal(0),
+            description: ". Geen korting: winterteelt aanwezig",
+        }
+    }
+
+    // Filter cultivations for the previous year (2024)
+    const cultivations2024 = cultivations.filter(
+        (c) => c.b_lu_start.getFullYear() === previousYear,
+    )
+
+    // Check for vanggewas exception in 2024
+    const vanggewassen2024 = cultivations2024.filter((prevCultivation) => {
+        const matchingStandard = nitrogenStandardsData.find((ns) =>
+            ns.b_lu_catalogue_match.includes(prevCultivation.b_lu_catalogue),
+        )
+        const matchingYear =
+            prevCultivation.b_lu_start.getTime() <
+                new Date(currentYear, 1, 1).getTime() &&
+            prevCultivation.b_lu_start.getTime() >
+                new Date(previousYear, 6, 15).getTime() // Vanggewas should be sown between July 15th, 2024 and January 31th 2025
+        return matchingStandard?.is_vanggewas === true && matchingYear === true
+    })
+    if (vanggewassen2024.length === 0) {
+        return {
+            amount: new Decimal(20),
+            description: ". Korting: 20kg N/ha: geen vanggewas of winterteelt",
+        }
+    }
+
+    // Check if a vanggewas is present to February 1st
+    const vanggewassenCompleted2024 = vanggewassen2024.filter(
+        (prevCultivation) => {
+            return (
+                prevCultivation.b_lu_end.getTime() >= new Date(currentYear, 1) // Month 1 is February
+            )
+        },
+    )
+    if (!vanggewassenCompleted2024) {
+        return {
+            amount: new Decimal(20),
+            description:
+                ". Korting: 20kg N/ha: vanggewas staat niet tot 1 februari",
+        }
+    }
+    // If multiple vanggewassen are completed to February 1st select the vangewas that was first sown
+    const sortedVanggewassen = vanggewassenCompleted2024.sort((a, b) => {
+        return a.b_lu_start.getTime() - b.b_lu_start.getTime()
+    })
+    const vanggewas2024 = sortedVanggewassen[0]
+
+    const sowDate = vanggewas2024.b_lu_start
+    const october1 = new Date(previousYear, 9, 1) // October 1st
+    const october15 = new Date(previousYear, 9, 15) // October 15th
+    const november1 = new Date(previousYear, 10, 1) // November 1st
+
+    let kortingAmount = new Decimal(20) // Default korting
+    let kortingDescription =
+        ". Korting: 20kg N/ha, geen vanggewas of te laat gezaaid"
+
+    if (sowDate <= october1) {
+        kortingAmount = new Decimal(0)
+        kortingDescription =
+            ". Geen korting: vanggewas gezaaid uiterlijk 1 oktober"
+    } else if (sowDate > october1 && sowDate <= october15) {
+        kortingAmount = new Decimal(5)
+        kortingDescription =
+            ". Korting: 5kg N/ha, vanggewas gezaaid tussen 2 t/m 14 oktober"
+    } else if (sowDate > october15 && sowDate < november1) {
+        kortingAmount = new Decimal(10)
+        kortingDescription =
+            ". Korting: 10kg N/ha, vanggewas gezaaid tussen 15 t/m 31 oktober"
+    } else {
+        kortingAmount = new Decimal(20)
+        kortingDescription =
+            ". Korting: 20kg N/ha, vanggewas gezaaid op of na 1 november"
+    }
+
+    return { amount: kortingAmount, description: kortingDescription }
+}
+
+/**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen for a given cultivation
  * based on its BRP code, geographical location, and other specific characteristics.
  * This function is the primary entry point for calculating the nitrogen usage norm
@@ -221,7 +339,8 @@ function getNormsForCultivation(
  * @returns A promise that resolves to an object of type `GebruiksnormResult` containing:
  *   - `normValue`: The determined nitrogen usage standard in kilograms per hectare (kg/ha).
  *   - `normSource`: The descriptive name from RVO Table 2 used for the calculation.
- *   Returns `null` if no matching standard or applicable norm can be found for the given input.
+ *   - `kortingDescription`: A description of any korting (reduction) applied to the norm.
+ * Returns `null` if no matching standard or applicable norm can be found for the given input.
  * @throws {Error} If the `hoofdteelt` cultivation cannot be found or if geographical data
  *   queries fail.
  *
@@ -270,6 +389,11 @@ function getNormsForCultivation(
  *     From the `applicableNorms` object, the function retrieves the specific norms for the
  *     determined `region`. The final `normValue` is then selected: if the field is in an
  *     `is_nv_area`, the `nv_area` norm is used; otherwise, the `standard` norm is applied.
+ *
+ * 8.  **Apply "Korting" (Reduction)**:
+ *     The `calculateKorting` function is called to determine if a reduction should be applied
+ *     based on the previous year's cultivations and the field's region. The calculated
+ *     `kortingAmount` is then subtracted from the `normValue`.
  *
  * This detailed process ensures that the calculated nitrogen usage norm is accurate and
  * compliant with RVO regulations, taking into account all relevant agricultural and
@@ -419,12 +543,17 @@ export async function getNL2025StikstofGebruiksNorm(
         )
     }
 
-    const normValue = is_nv_area
+    let normValue = is_nv_area
         ? normsForRegion.nv_area
         : normsForRegion.standard
 
+    // Apply korting
+    const { amount: kortingAmount, description: kortingDescription } =
+        calculateKorting(cultivations, region)
+    normValue = new Decimal(normValue).minus(kortingAmount).toNumber()
+
     return {
         normValue: normValue,
-        normSource: selectedStandard.cultivation_rvo_table2,
+        normSource: `${selectedStandard.cultivation_rvo_table2}${kortingDescription}`,
     }
 }

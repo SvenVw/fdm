@@ -41,6 +41,11 @@ describe("collectNL2025InputForNorms", () => {
             end: new Date(2025, 11, 31),
         }
 
+        const timeframeCultivation = {
+            start: new Date(2024, 0, 1),
+            end: new Date(2025, 11, 31),
+        }
+
         vi.mocked(fdmCore.getField).mockResolvedValue(mockField)
         vi.mocked(fdmCore.getCultivations).mockResolvedValue(mockCultivations)
         vi.mocked(fdmCore.getCurrentSoilData).mockResolvedValue(
@@ -67,7 +72,7 @@ describe("collectNL2025InputForNorms", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
-            timeframe,
+            timeframeCultivation,
         )
         expect(fdmCore.getCurrentSoilData).toHaveBeenCalledWith(
             mockFdm,

@@ -110,6 +110,14 @@ export interface NitrogenStandard {
      */
     varieties?: string[]
     /**
+     * Indicates if the cultivation is considered a "winterteelt" (winter crop).
+     */
+    is_winterteelt: boolean
+    /**
+     * Indicates if the cultivation is considered a "vanggewas" (catch crop).
+     */
+    is_vanggewas: boolean
+    /**
      * Optional. The default nitrogen norms (standard and NV-area) per region.
      * This is the most common structure for norms.
      */
