@@ -40,71 +40,70 @@ function getFosfaatKlasse(
     a_p_al: number,
     is_grasland: boolean,
 ): FosfaatKlasse {
+    // Round P-AL to whole number and convert to Decimal for precise comparisons
+    const pAl = new Decimal(a_p_al).toDecimalPlaces(0)
 
-    // Round P-AL to whole number
-    a_p_al = new Decimal(a_p_al).toDecimalPlaces(0).toNumber()
-
-    // Rounnd P-CaCl2 to 1 digit
-    a_p_cc = new Decimal(a_p_cc).toDecimalPlaces(1).toNumber()
+    // Round P-CaCl2 to 1 digit and convert to Decimal for precise comparisons
+    const pCc = new Decimal(a_p_cc).toDecimalPlaces(1)
 
     if (is_grasland) {
         // Logic for Grasland (Table 1)
-        if (a_p_cc < 0.8) {
-            if (a_p_al < 21) return "Arm"
-            if (a_p_al <= 45) return "Laag"
-            if (a_p_al <= 55) return "Neutraal"
-            return "Ruim" // a_p_al > 55
+        if (pCc.lessThan(0.8)) {
+            if (pAl.lessThan(21)) return "Arm"
+            if (pAl.lessThanOrEqualTo(45)) return "Laag"
+            if (pAl.lessThanOrEqualTo(55)) return "Neutraal"
+            return "Ruim" // pAl.greaterThan(new Decimal(55))
         }
-        if (a_p_cc <= 1.4) {
-            if (a_p_al < 21) return "Arm"
-            if (a_p_al <= 30) return "Laag"
-            if (a_p_al <= 45) return "Neutraal"
-            return "Ruim" // a_p_al > 45
+        if (pCc.lessThanOrEqualTo(1.4)) {
+            if (pAl.lessThan(21)) return "Arm"
+            if (pAl.lessThanOrEqualTo(30)) return "Laag"
+            if (pAl.lessThanOrEqualTo(45)) return "Neutraal"
+            return "Ruim" // pAl.greaterThan(new Decimal(45))
         }
-        if (a_p_cc <= 2.4) {
-            if (a_p_al < 21) return "Laag"
-            if (a_p_al <= 30) return "Neutraal"
-            if (a_p_al <= 55) return "Ruim"
-            return "Hoog" // a_p_al > 55
+        if (pCc.lessThanOrEqualTo(2.4)) {
+            if (pAl.lessThan(21)) return "Laag"
+            if (pAl.lessThanOrEqualTo(30)) return "Neutraal"
+            if (pAl.lessThanOrEqualTo(55)) return "Ruim"
+            return "Hoog" // pAl.greaterThan(new Decimal(55))
         }
-        if (a_p_cc <= 3.4) {
-            if (a_p_al < 21) return "Neutraal"
-            if (a_p_al <= 45) return "Ruim"
-            return "Hoog" // a_p_al > 45
+        if (pCc.lessThanOrEqualTo(3.4)) {
+            if (pAl.lessThan(21)) return "Neutraal"
+            if (pAl.lessThanOrEqualTo(45)) return "Ruim"
+            return "Hoog" // pAl.greaterThan(new Decimal(45))
         }
-        // a_p_cc > 3.4
-        if (a_p_al < 31) return "Ruim"
-        return "Hoog" // a_p_al >= 31
+        // pCc.greaterThan(new Decimal(3.4))
+        if (pAl.lessThan(31)) return "Ruim"
+        return "Hoog" // pAl.greaterThanOrEqualTo(new Decimal(31))
     }
 
     // Logic for Bouwland (Table 2)
-    if (a_p_cc < 0.8) {
-        if (a_p_al < 46) return "Arm"
-        return "Laag" // a_p_al >= 46
+    if (pCc.lessThan(0.8)) {
+        if (pAl.lessThan(46)) return "Arm"
+        return "Laag" // pAl.greaterThanOrEqualTo(new Decimal(46))
     }
-    if (a_p_cc <= 1.4) {
-        if (a_p_al < 46) return "Arm"
-        if (a_p_al <= 55) return "Laag"
-        return "Neutraal" // a_p_al > 55
+    if (pCc.lessThanOrEqualTo(1.4)) {
+        if (pAl.lessThan(46)) return "Arm"
+        if (pAl.lessThanOrEqualTo(55)) return "Laag"
+        return "Neutraal" // pAl.greaterThan(new Decimal(55))
     }
-    if (a_p_cc <= 2.4) {
-        if (a_p_al < 31) return "Arm"
-        if (a_p_al <= 45) return "Laag"
-        if (a_p_al <= 55) return "Neutraal"
-        return "Ruim" // a_p_al > 55
+    if (pCc.lessThanOrEqualTo(2.4)) {
+        if (pAl.lessThan(31)) return "Arm"
+        if (pAl.lessThanOrEqualTo(45)) return "Laag"
+        if (pAl.lessThanOrEqualTo(55)) return "Neutraal"
+        return "Ruim" // pAl.greaterThan(new Decimal(55))
     }
-    if (a_p_cc <= 3.4) {
-        if (a_p_al < 21) return "Arm"
-        if (a_p_al <= 30) return "Laag"
-        if (a_p_al <= 45) return "Neutraal"
-        if (a_p_al <= 55) return "Ruim"
-        return "Hoog" // a_p_al > 55
+    if (pCc.lessThanOrEqualTo(3.4)) {
+        if (pAl.lessThan(21)) return "Arm"
+        if (pAl.lessThanOrEqualTo(30)) return "Laag"
+        if (pAl.lessThanOrEqualTo(45)) return "Neutraal"
+        if (pAl.lessThanOrEqualTo(55)) return "Ruim"
+        return "Hoog" // pAl.greaterThan(new Decimal(55))
     }
-    // a_p_cc > 3.4
-    if (a_p_al < 31) return "Laag"
-    if (a_p_al <= 45) return "Neutraal"
-    if (a_p_al <= 55) return "Ruim"
-    return "Hoog" // a_p_al > 55
+    // pCc.greaterThan(new Decimal(3.4))
+    if (pAl.lessThan(31)) return "Laag"
+    if (pAl.lessThanOrEqualTo(45)) return "Neutraal"
+    if (pAl.lessThanOrEqualTo(55)) return "Ruim"
+    return "Hoog" // pAl.greaterThan(new Decimal(55))
 }
 
 /**
