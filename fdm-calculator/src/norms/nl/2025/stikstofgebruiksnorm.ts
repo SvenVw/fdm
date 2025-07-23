@@ -282,7 +282,7 @@ function calculateKorting(
             )
         },
     )
-    if (!vanggewassenCompleted2024) {
+    if (vanggewassenCompleted2024.length === 0) {
         return {
             amount: new Decimal(20),
             description:
