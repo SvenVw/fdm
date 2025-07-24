@@ -135,3 +135,4 @@ export type {
     SoilParameters,
 } from "./soil.d"
 export type { Timeframe } from "./timeframe.d"
+export { isDerogationGrantedForYear, addDerogation, removeDerogation, listDerogations} from "./derogation"

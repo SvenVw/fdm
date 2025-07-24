@@ -62,7 +62,7 @@ This schema holds the primary data related to farm operations.
 | **b_id**              | `text`                      | Not Null, Foreign Key (references `fields.b_id`) | Identifier of the field being acquired.                                  |
 | **b_id_farm**         | `text`                      | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm acquiring the field.                              |
 | **b_start**           | `timestamp with time zone`  |                                              | Timestamp indicating the start of the farm's management/acquisition.     |
-| **b_acquiring_method**| `acquiringMethodEnum`       | Not Null (default: 'unknown')                | Method by which the farm acquired the field (e.g., 'owner', 'lease'). |
+| **b_acquiring_method**| `acquiringMethodEnum`       | Not Null (default: 'unknown')                | Method by which the farm acquired the field (e.g., 'nl_01', 'nl_02'). |
 | **created**           | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**           | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
 
@@ -71,7 +71,7 @@ This schema holds the primary data related to farm operations.
 
 ##### `acquiringMethodEnum`
 *   **Name**: `b_acquiring_method`
-*   **Possible values**: `owner`, `lease`, `unknown`
+*   **Possible values**: `nl_01`, `nl_02`, `nl_07`, `nl_09`, `nl_12`, `nl_13`, `nl_61`, `nl_63`, `unknown`
 
 #### **`fieldDiscarding`**
 **Purpose**: Marks when a field is no longer actively managed or used within the system.
@@ -445,6 +445,36 @@ This schema holds the primary data related to farm operations.
 | **b_sampling_geometry**| `geometry` (MultiPoint, SRID 4326) |      | MultiPoint geometry representing the location(s) where the sample(s) were taken. See Custom Types section. |
 | **created**           | `timestamp with time zone`  | Not Null                                     | Timestamp when this record was created (default: now()).                 |
 | **updated**           | `timestamp with time zone`  |                                              | Timestamp when this record was last updated.                             |
+
+---
+
+### Derogations
+
+#### **`derogations`**
+**Purpose**: Stores information about derogations, which is special permissions by year related to legal norms for fertilizer application.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_derogation** | `text` | Primary Key | Unique identifier for the derogation. |
+| **b_derogation_year** | `integer` | Not Null | The year the derogation applies to. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+**Indexes:**
+*   Unique index on `b_id_derogation`.
+
+#### **`derogationApplying`**
+**Purpose**: Links a farm to a specific derogation, indicating that the farm is applying or making use of that derogation.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| **b_id_farm** | `text` | Not Null, Foreign Key (references `farms.b_id_farm`) | Identifier of the farm applying the derogation. |
+| **b_id_derogation** | `text` | Not Null, Foreign Key (references `derogations.b_id_derogation`) | Identifier of the derogation being applied. |
+| **created** | `timestamp with time zone` | Not Null | Timestamp when this record was created (default: now()). |
+| **updated** | `timestamp with time zone` | | Timestamp when this record was last updated. |
+
+**Constraints:**
+*   Primary Key on (`b_id_farm`, `b_id_derogation`).
 
 ---
 

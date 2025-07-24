@@ -146,10 +146,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Bodem",
             },
             {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/norm`,
-                title: "Gebruiksnormen",
-            },
-            {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
                 title: "Kaart",
             },
