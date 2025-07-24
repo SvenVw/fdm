@@ -51,6 +51,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error";
 import { fdm } from "~/lib/fdm.server";
 import { extractFormValuesFromRequest } from "~/lib/form";
 import { useCalendarStore } from "~/store/calendar";
+import { clientConfig } from "~/lib/config";
 
 // Meta
 export const meta: MetaFunction = () => {
