@@ -91,25 +91,32 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get details of field
     const field = await getField(fdm, session.principal_id, b_id)
 
-    // Collect input data for nutrient balance calculation
- const nitrogenBalancePromise = collectInputForNitrogenBalance(
+    // Return promise directly for React Router v7 Suspense pattern
+    const nitrogenBalancePromise = collectInputForNitrogenBalance(
         fdm,
         session.principal_id,
         b_id_farm,
         timeframe,
         String(process.env.FDM_PUBLIC_DATA_URL),
-    ).then(async (input) => {
-        const result = await calculateNitrogenBalance(input);
-        return {
-            input: input.fields.find((field: { field: { b_id: string } }) => field.field.b_id === b_id),
-            result: result.fields.find((field: { b_id: string }) => field.b_id === b_id),
-            errorMessage: null
-        };
-    }).catch(error => ({
-        input: null,
-        result: null,
-        errorMessage: String(error).replace("Error: ", "")
-    }));
+    )
+        .then(async (input) => {
+            const result = await calculateNitrogenBalance(input)
+            return {
+                input: input.fields.find(
+                    (field: { field: { b_id: string } }) =>
+                        field.field.b_id === b_id,
+                ),
+                result: result.fields.find(
+                    (field: { b_id: string }) => field.b_id === b_id,
+                ),
+                errorMessage: null,
+            }
+        })
+        .catch((error) => ({
+            input: null,
+            result: null,
+            errorMessage: String(error).replace("Error: ", ""),
+        }))
 
     return {
         nitrogenBalanceResult: nitrogenBalancePromise,
@@ -124,18 +131,15 @@ export default function FarmBalanceNitrogenFieldBlock() {
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
 
-    const {
-        nitrogenBalanceResult,
-        field,
-        farm,
-    } = loaderData
+    const { nitrogenBalanceResult, field, farm } = loaderData
 
     return (
         <div className="space-y-4">
             <Suspense fallback={<NitrogenBalanceFallback />}>
                 <Await resolve={nitrogenBalanceResult}>
                     {(resolvedNitrogenBalanceResult) => {
-                        const { input, result, errorMessage } = resolvedNitrogenBalanceResult
+                        const { input, result, errorMessage } =
+                            resolvedNitrogenBalanceResult
                         if (!input) {
                             return (
                                 <div className="flex items-center justify-center">
@@ -146,9 +150,11 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         <CardContent>
                                             <div className="text-muted-foreground">
                                                 <p>
-                                                    Dit perceel was niet in gebruik voor dit
-                                                    jaar. Als dit perceel wel in gebruik was,
-                                                    werk dan de startdatum bij in de
+                                                    Dit perceel was niet in
+                                                    gebruik voor dit jaar. Als
+                                                    dit perceel wel in gebruik
+                                                    was, werk dan de startdatum
+                                                    bij in de
                                                     perceelsinstelling.
                                                 </p>
                                             </div>
@@ -157,7 +163,9 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                             <NavLink
                                                 to={`../../${calendar}/field/${field.b_id}/`}
                                             >
-                                                <Button>Naar perceelsinstelling</Button>
+                                                <Button>
+                                                    Naar perceelsinstelling
+                                                </Button>
                                             </NavLink>
                                         </CardFooter>
                                     </Card>
@@ -171,59 +179,76 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                     <Card className="w-[350px]">
                                         <CardHeader>
                                             <CardTitle>
-                                                Helaas is het niet mogelijk om je balans uit te
-                                                rekenen
+                                                Helaas is het niet mogelijk om
+                                                je balans uit te rekenen
                                             </CardTitle>
                                         </CardHeader>
                                         <CardContent>
                                             {!errorMessage ? (
                                                 <div className="text-muted-foreground">
                                                     <p>
-                                                        Er is een onbekende fout opgetreden.
-                                                        Probeer opnieuw of neem contact op met
-                                                        Ondersteuning.
+                                                        Er is een onbekende fout
+                                                        opgetreden. Probeer
+                                                        opnieuw of neem contact
+                                                        op met Ondersteuning.
                                                     </p>
                                                 </div>
                                             ) : errorMessage.match(
-                                                /Missing required soil parameters/,
-                                            ) ? (
+                                                  /Missing required soil parameters/,
+                                              ) ? (
                                                 <div className="text-muted-foreground">
                                                     <p>
-                                                        Voor niet alle percelen zijn de
-                                                        benodigde bodemparameters bekend:
+                                                        Voor niet alle percelen
+                                                        zijn de benodigde
+                                                        bodemparameters bekend:
                                                     </p>
                                                     <br />
                                                     <ul className="list-disc list-inside">
-                                                        {errorMessage.match(/a_n_rt/) ? (
-                                                            <li>Totaal stikstofgehalte</li>
+                                                        {errorMessage.match(
+                                                            /a_n_rt/,
+                                                        ) ? (
+                                                            <li>
+                                                                Totaal
+                                                                stikstofgehalte
+                                                            </li>
                                                         ) : null}
                                                         {errorMessage.match(
                                                             /b_soiltype_agr/,
                                                         ) ? (
-                                                            <li>Agrarisch bodemtype</li>
+                                                            <li>
+                                                                Agrarisch
+                                                                bodemtype
+                                                            </li>
                                                         ) : null}
                                                         {errorMessage.match(
                                                             /a_c_of|a_som_loi/,
                                                         ) ? (
-                                                            <li>Organische stofgehalte</li>
+                                                            <li>
+                                                                Organische
+                                                                stofgehalte
+                                                            </li>
                                                         ) : null}
                                                     </ul>
                                                 </div>
                                             ) : (
                                                 <div className="text-muted-foreground">
                                                     <p>
-                                                        Er is helaas wat misgegaan. Probeer
-                                                        opnieuw of neem contact op met
-                                                        Ondersteuning en deel de volgende
+                                                        Er is helaas wat
+                                                        misgegaan. Probeer
+                                                        opnieuw of neem contact
+                                                        op met Ondersteuning en
+                                                        deel de volgende
                                                         foutmelding:
                                                     </p>
                                                     <div className="mt-8 w-full max-w-2xl">
                                                         <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
                                                             {JSON.stringify(
                                                                 {
-                                                                    message: errorMessage,
+                                                                    message:
+                                                                        errorMessage,
                                                                     page: page,
-                                                                    timestamp: new Date(),
+                                                                    timestamp:
+                                                                        new Date(),
                                                                 },
                                                                 null,
                                                                 2,
@@ -321,26 +346,24 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         <CardHeader>
                                             <CardTitle>Balans</CardTitle>
                                             <CardDescription>
-                                                De stikstofbalans voor {field.b_name} van{" "}
-                                                {farm.b_name_farm}. De balans is het
-                                                verschil tussen de totale aanvoer, afvoer en
-                                                emissie van stikstof. Een positieve balans
-                                                betekent een overschot aan stikstof, een
-                                                negatieve balans een tekort.
+                                                De stikstofbalans voor{" "}
+                                                {field.b_name} van{" "}
+                                                {farm.b_name_farm}. De balans is
+                                                het verschil tussen de totale
+                                                aanvoer, afvoer en emissie van
+                                                stikstof. Een positieve balans
+                                                betekent een overschot aan
+                                                stikstof, een negatieve balans
+                                                een tekort.
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="pl-2">
                                             <NitrogenBalanceChart
                                                 balance={result.balance}
-                                                supply={
-                                                    result.supply.total
-                                                }
-                                                removal={
-                                                    result.removal.total
-                                                }
+                                                supply={result.supply.total}
+                                                removal={result.removal.total}
                                                 volatilization={
-                                                    result.volatilization
-                                                        .total
+                                                    result.volatilization.total
                                                 }
                                             />
                                         </CardContent>
