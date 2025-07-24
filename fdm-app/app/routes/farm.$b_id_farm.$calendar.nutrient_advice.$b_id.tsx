@@ -180,21 +180,21 @@ export default function FieldNutrientAdviceBlock() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {primaryNutrients.map(
-                            (nutrient: NutrientDescription) => (
-                                <Suspense
-                                    key={nutrient.symbol}
-                                    fallback={<NutrientCardSkeleton />}
-                                >
-                                    <Await resolve={nutrientAdvice}>
-                                        {(nutrientAdvice) => (
+                        <Suspense
+                            fallback={primaryNutrients.map((nutrient) => (
+                                <NutrientCardSkeleton key={nutrient.symbol} />
+                            ))}
+                        >
+                            <Await resolve={nutrientAdvice}>
+                                {(nutrientAdvice) =>
+                                    primaryNutrients.map(
+                                        (nutrient: NutrientDescription) => (
                                             <NutrientCard
                                                 key={nutrient.symbol}
                                                 description={nutrient}
                                                 advice={
                                                     nutrientAdvice[
-                                                        nutrient
-                                                            .adviceParameter
+                                                        nutrient.adviceParameter
                                                     ]
                                                 }
                                                 doses={doses}
@@ -204,11 +204,11 @@ export default function FieldNutrientAdviceBlock() {
                                                 fertilizers={fertilizers}
                                                 to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                                             />
-                                        )}
-                                    </Await>
-                                </Suspense>
-                            ),
-                        )}
+                                        ),
+                                    )
+                                }
+                            </Await>
+                        </Suspense>
                     </div>
                 </CardContent>
             </Card>
@@ -244,21 +244,21 @@ export default function FieldNutrientAdviceBlock() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {secondaryNutrients.map(
-                            (nutrient: NutrientDescription) => (
-                                <Suspense
-                                    key={nutrient.symbol}
-                                    fallback={<NutrientCardSkeleton />}
-                                >
-                                    <Await resolve={nutrientAdvice}>
-                                        {(nutrientAdvice) => (
+                        <Suspense
+                            fallback={secondaryNutrients.map((nutrient) => (
+                                <NutrientCardSkeleton key={nutrient.symbol} />
+                            ))}
+                        >
+                            <Await resolve={nutrientAdvice}>
+                                {(nutrientAdvice) =>
+                                    secondaryNutrients.map(
+                                        (nutrient: NutrientDescription) => (
                                             <NutrientCard
                                                 key={nutrient.symbol}
                                                 description={nutrient}
                                                 advice={
                                                     nutrientAdvice[
-                                                        nutrient
-                                                            .adviceParameter
+                                                        nutrient.adviceParameter
                                                     ]
                                                 }
                                                 doses={doses}
@@ -268,11 +268,11 @@ export default function FieldNutrientAdviceBlock() {
                                                 fertilizers={fertilizers}
                                                 to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                                             />
-                                        )}
-                                    </Await>
-                                </Suspense>
-                            ),
-                        )}
+                                        ),
+                                    )
+                                }
+                            </Await>
+                        </Suspense>
                     </div>
                 </CardContent>
             </Card>
@@ -289,21 +289,21 @@ export default function FieldNutrientAdviceBlock() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {traceNutrients.map(
-                            (nutrient: NutrientDescription) => (
-                                <Suspense
-                                    key={nutrient.symbol}
-                                    fallback={<NutrientCardSkeleton />}
-                                >
-                                    <Await resolve={nutrientAdvice}>
-                                        {(nutrientAdvice) => (
+                        <Suspense
+                            fallback={traceNutrients.map((nutrient) => (
+                                <NutrientCardSkeleton key={nutrient.symbol} />
+                            ))}
+                        >
+                            <Await resolve={nutrientAdvice}>
+                                {(nutrientAdvice) =>
+                                    traceNutrients.map(
+                                        (nutrient: NutrientDescription) => (
                                             <NutrientCard
                                                 key={nutrient.symbol}
                                                 description={nutrient}
                                                 advice={
                                                     nutrientAdvice[
-                                                        nutrient
-                                                            .adviceParameter
+                                                        nutrient.adviceParameter
                                                     ]
                                                 }
                                                 doses={doses}
@@ -313,11 +313,11 @@ export default function FieldNutrientAdviceBlock() {
                                                 fertilizers={fertilizers}
                                                 to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                                             />
-                                        )}
-                                    </Await>
-                                </Suspense>
-                            ),
-                        )}
+                                        ),
+                                    )
+                                }
+                            </Await>
+                        </Suspense>
                     </div>
                 </CardContent>
             </Card>
