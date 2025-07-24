@@ -406,7 +406,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 		);
 
 		if (nmiApiKey) {
-			const estimates = await getSoilParameterEstimates(field, nmiApiKey);
+			const estimates = await getSoilParameterEstimates(b_geometry, nmiApiKey);
 
 			await addSoilAnalysis(
 				fdm,
