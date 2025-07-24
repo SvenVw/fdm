@@ -92,53 +92,42 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const field = await getField(fdm, session.principal_id, b_id)
 
     // Collect input data for nutrient balance calculation
-    let nitrogenBalanceInput = await collectInputForNitrogenBalance(
+ const nitrogenBalancePromise = collectInputForNitrogenBalance(
         fdm,
         session.principal_id,
         b_id_farm,
         timeframe,
         String(process.env.FDM_PUBLIC_DATA_URL),
-    )
-
-    let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null
-    let errorMessage = null as string | null
-    try {
-        nitrogenBalanceResult =
-            await calculateNitrogenBalance(nitrogenBalanceInput)
-
-        nitrogenBalanceResult = nitrogenBalanceResult.fields.find(
-            (field: NitrogenBalanceNumeric['fields'][number]) => field.b_id === b_id,
-        )
-
-        nitrogenBalanceInput = nitrogenBalanceInput.fields.find(
-            (field: typeof nitrogenBalanceInput.fields[number]) => field.field.b_id === b_id,
-        )
-    } catch (error) {
-        errorMessage = String(error).replace("Error: ", "")
-    }
+    ).then(async (input) => {
+        const result = await calculateNitrogenBalance(input);
+        return {
+            input: input.fields.find((field: { field: { b_id: string } }) => field.field.b_id === b_id),
+            result: result.fields.find((field: { b_id: string }) => field.b_id === b_id),
+            errorMessage: null
+        };
+    }).catch(error => ({
+        input: null,
+        result: null,
+        errorMessage: String(error).replace("Error: ", "")
+    }));
 
     return {
-        nitrogenBalanceInput: nitrogenBalanceInput,
-        nitrogenBalanceResult: nitrogenBalanceResult,
+        nitrogenBalanceResult: nitrogenBalancePromise,
         field: field,
         farm: farm,
-        errorMessage: errorMessage,
     }
 }
 
 export default function FarmBalanceNitrogenFieldBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
-    const navigation = useNavigation()
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
 
     const {
-        nitrogenBalanceInput,
         nitrogenBalanceResult,
         field,
         farm,
-        errorMessage,
     } = loaderData
 
     return (
@@ -146,7 +135,8 @@ export default function FarmBalanceNitrogenFieldBlock() {
             <Suspense fallback={<NitrogenBalanceFallback />}>
                 <Await resolve={nitrogenBalanceResult}>
                     {(resolvedNitrogenBalanceResult) => {
-                        if (!nitrogenBalanceInput) {
+                        const { input, result, errorMessage } = resolvedNitrogenBalanceResult
+                        if (!input) {
                             return (
                                 <div className="flex items-center justify-center">
                                     <Card className="w-[350px]">
@@ -262,10 +252,10 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                             <div className="text-2xl font-bold">
                                                 <div className="flex items-center gap-4">
                                                     <p>
-                                                        {`${resolvedNitrogenBalanceResult.balance} / ${resolvedNitrogenBalanceResult.target}`}
+                                                        {`${result.balance} / ${result.target}`}
                                                     </p>
-                                                    {resolvedNitrogenBalanceResult.balance <=
-                                                    resolvedNitrogenBalanceResult.target ? (
+                                                    {result.balance <=
+                                                    result.target ? (
                                                         <CircleCheck className="text-green-500 bg-green-100 p-0 rounded-full " />
                                                     ) : (
                                                         <CircleAlert className="text-red-500 bg-red-100 rounded-full " />
@@ -286,7 +276,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {resolvedNitrogenBalanceResult.supply.total}
+                                                {result.supply.total}
                                             </div>
                                             <p className="text-xs text-muted-foreground">
                                                 kg N / ha
@@ -302,7 +292,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {resolvedNitrogenBalanceResult.removal.total}
+                                                {result.removal.total}
                                             </div>
                                             <p className="text-xs text-muted-foreground">
                                                 kg N / ha
@@ -318,7 +308,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {resolvedNitrogenBalanceResult.volatilization.total}
+                                                {result.volatilization.total}
                                             </div>
                                             <p className="text-xs text-muted-foreground">
                                                 kg N / ha
@@ -341,15 +331,15 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         </CardHeader>
                                         <CardContent className="pl-2">
                                             <NitrogenBalanceChart
-                                                balance={resolvedNitrogenBalanceResult.balance}
+                                                balance={result.balance}
                                                 supply={
-                                                    resolvedNitrogenBalanceResult.supply.total
+                                                    result.supply.total
                                                 }
                                                 removal={
-                                                    resolvedNitrogenBalanceResult.removal.total
+                                                    result.removal.total
                                                 }
                                                 volatilization={
-                                                    resolvedNitrogenBalanceResult.volatilization
+                                                    result.volatilization
                                                         .total
                                                 }
                                             />
@@ -363,8 +353,8 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         <CardContent>
                                             <div className="space-y-8">
                                                 <NitrogenBalanceDetails
-                                                    balanceData={resolvedNitrogenBalanceResult}
-                                                    fieldInput={nitrogenBalanceInput}
+                                                    balanceData={result}
+                                                    fieldInput={input}
                                                 />
                                             </div>
                                         </CardContent>
