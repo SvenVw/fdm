@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.20.4
+
+### Patch Changes
+
+- f589317: Fix storing additional soil parameters when adding a new field (not in the farm create wizard)
+
 ## 0.20.3
 
 ### Patch Changes
