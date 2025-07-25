@@ -25,7 +25,7 @@ export function CultivationHarvestsCard({
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
-                    Oogsten
+                    {b_lu_harvestable === 'multiple' ? 'Oogsten' : 'Oogst'}                
                 </CardTitle>
                 <div className="flex justify-between">
                     <NavLink
