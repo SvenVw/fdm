@@ -57,6 +57,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_id_farm,
             b_lu,
+            cultivation,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -76,6 +77,8 @@ export default function AddHarvestRoute() {
                     b_lu_yield={undefined}
                     b_lu_n_harvestable={undefined}
                     b_lu_harvest_date={undefined}
+                    b_lu_start={loaderData.cultivation.b_lu_start_date}
+                    b_lu_end={loaderData.cultivation.b_lu_end_date}
                 />
             </DialogContent>
         </Dialog>

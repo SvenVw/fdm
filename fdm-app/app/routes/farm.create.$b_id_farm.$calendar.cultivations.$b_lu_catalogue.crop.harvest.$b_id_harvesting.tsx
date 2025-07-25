@@ -117,6 +117,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 harvest?.harvestable.harvestable_analyses?.[0]
                     .b_lu_n_harvestable,
             b_lu_harvest_date: harvest?.b_lu_harvest_date,
+            cultivation: cultivation,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -152,6 +153,8 @@ export default function CultivationPlanGetHarvestBlock() {
                 b_lu_yield={loaderData.b_lu_yield}
                 b_lu_n_harvestable={loaderData.b_lu_n_harvestable}
                 b_lu_harvest_date={loaderData.b_lu_harvest_date}
+                b_lu_start={loaderData.cultivation?.b_lu_start_date}
+                b_lu_end={loaderData.cultivation?.b_lu_end_date}
             />
         </div>
     )

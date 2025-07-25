@@ -21,10 +21,14 @@ export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
     b_lu_harvest_date,
+    b_lu_start,
+    b_lu_end,
 }: {
     b_lu_yield: number | undefined
     b_lu_n_harvestable: number | undefined
     b_lu_harvest_date: Date | undefined
+    b_lu_start: Date | undefined
+    b_lu_end: Date | undefined
 }) {
     const fetcher = useFetcher()
 
@@ -35,6 +39,8 @@ export function HarvestForm({
             b_lu_yield: b_lu_yield,
             b_lu_n_harvestable: b_lu_n_harvestable,
             b_lu_harvest_date: b_lu_harvest_date,
+            b_lu_start: b_lu_start,
+            b_lu_end: b_lu_end,
         },
     })
 
