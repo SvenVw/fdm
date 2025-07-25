@@ -1,4 +1,4 @@
-import { addHarvest, getCultivation } from "@svenvw/fdm-core"
+import { addHarvest, getCultivationPlan } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
@@ -15,12 +15,13 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from "../components/ui/dialog"
+} from "~/components/ui/dialog"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -40,16 +41,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("Farm ID is required", { status: 400 })
         }
 
-        const b_lu = params.b_lu
-        if (!b_lu) {
-            throw data("Cultivation ID is required", { status: 400 })
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("Cultivation Catalogue ID is required", { status: 400 })
         }
 
         const session = await getSession(request)
-        const cultivation = await getCultivation(
+        const timeframe = getTimeframe(params)
+
+        const cultivationPlan = await getCultivationPlan(
             fdm,
             session.principal_id,
-            b_lu,
+            b_id_farm,
+            timeframe,
+        )
+        const cultivation = cultivationPlan.find(
+            (c) => c.b_lu_catalogue === b_lu_catalogue,
         )
         if (!cultivation) {
             throw data("Cultivation not found", { status: 404 })
@@ -57,7 +64,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return {
             b_id_farm,
-            b_lu,
+            b_lu_catalogue,
             cultivation,
         }
     } catch (error) {
@@ -89,24 +96,50 @@ export default function AddHarvestRoute() {
 
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
-        const b_lu = params.b_lu
-        if (!b_lu) {
-            throw data("Cultivation ID is required", { status: 400 })
+        const b_lu_catalogue = params.b_lu_catalogue
+        if (!b_lu_catalogue) {
+            throw data("Cultivation Catalogue ID is required", { status: 400 })
+        }
+
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("Farm ID is required", { status: 400 })
         }
 
         const session = await getSession(request)
+        const timeframe = getTimeframe(params)
+
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+        const cultivation = cultivationPlan.find(
+            (c) => c.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!cultivation) {
+            throw data("Cultivation not found", { status: 404 })
+        }
+
+        const b_lu_ids = cultivation.fields.map((field: { b_lu: string }) => field.b_lu)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
         )
 
-        await addHarvest(
-            fdm,
-            session.principal_id,
-            b_lu,
-            formValues.b_lu_harvest_date,
-            formValues.b_lu_yield,
-            formValues.b_lu_n_harvestable,
+        await Promise.all(
+            b_lu_ids.map(async (b_lu: string) => {
+                await addHarvest(
+                    fdm,
+                    session.principal_id,
+                    b_lu,
+                    formValues.b_lu_harvest_date,
+                    formValues.b_lu_yield,
+                    formValues.b_lu_n_harvestable,
+                )
+            }),
         )
 
         return redirectWithSuccess("..", {

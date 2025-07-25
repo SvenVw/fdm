@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form, useFetcher } from "react-router"
+import { useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -16,7 +16,6 @@ import {
 import { Input } from "~/components/ui/input"
 import { FormSchema } from "./schema"
 import { cn } from "@/app/lib/utils"
-
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
@@ -32,6 +31,7 @@ export function HarvestForm({
 }) {
     const fetcher = useFetcher()
 
+    // @ts-ignore
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -57,9 +57,25 @@ export function HarvestForm({
     return (
         <div className="space-y-6">
             <RemixFormProvider {...form}>
-                <Form
+                <fetcher.Form
                     id="formHarvest"
-                    onSubmit={form.handleSubmit}
+                    onSubmit={form.handleSubmit(
+                        (data: z.infer<typeof FormSchema>) => {
+                            const formData = new FormData()
+                            for (const key in data) {
+                                const value = data[key as keyof typeof data]
+                                if (value instanceof Date) {
+                                    formData.append(key, value.toISOString())
+                                } else if (
+                                    value !== undefined &&
+                                    value !== null
+                                ) {
+                                    formData.append(key, String(value))
+                                }
+                            }
+                            fetcher.submit(formData, { method: "post" })
+                        },
+                    )}
                     method="post"
                 >
                     <fieldset
@@ -71,6 +87,7 @@ export function HarvestForm({
                                 form={form}
                                 name={"b_lu_harvest_date"}
                                 label={"Oogstdatum"}
+                                description={""}
                             />
                             <FormField
                                 control={form.control}
@@ -148,7 +165,7 @@ export function HarvestForm({
                             </Button>
                         </div>
                     </fieldset>
-                </Form>
+                </fetcher.Form>
             </RemixFormProvider>
         </div>
     )

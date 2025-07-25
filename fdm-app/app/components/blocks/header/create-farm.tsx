@@ -49,9 +49,26 @@ export function HeaderFarmCreate({
                 </BreadcrumbItem>
             ) : null}
             {currentPath.match(/cultivations/) ? (
-                <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink>Bouwplan</BreadcrumbLink>
-                </BreadcrumbItem>
+                <>
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Bouwplan</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Gewassen</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </>
+            ) : null}
+            {currentPath.match(/fertilizers/) ? (
+                <>
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Bouwplan</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Bemesting</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </>
             ) : null}
             {currentPath.match(/access/) ? (
                 <BreadcrumbItem className="hidden md:block">
