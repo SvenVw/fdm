@@ -80,9 +80,7 @@ export function HarvestForm({
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormDescription>
-                                            In kg droge stof per hectare
-                                        </FormDescription>
+                                        <FormDescription />
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -95,14 +93,14 @@ export function HarvestForm({
                                         <FormLabel>Stikstofgehalte</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="Bv. 4 g N/kg"
+                                                placeholder="Bv. 4 g N/kg DS"
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            In geoogst product (g N/kg DS)
+                                            In geoogst product
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

@@ -185,7 +185,7 @@ export default function FarmFieldsOverviewBlock() {
                 b_lu_harvestable={loaderData.b_lu_harvestable}
                 cultivation={loaderData.cultivation}
             />
-        <Outlet />
+            <Outlet />
         </div>
     )
 }
@@ -217,7 +217,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
-        console.log(request.method)
 
         if (request.method === "POST") {
             // Collect form entry
