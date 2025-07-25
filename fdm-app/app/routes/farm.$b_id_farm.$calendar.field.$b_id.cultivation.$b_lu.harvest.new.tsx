@@ -1,12 +1,10 @@
-import {
-    addHarvest,
-    getCultivation,
-} from "@svenvw/fdm-core"
+import { addHarvest, getCultivation } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
+    useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { HarvestForm } from "~/components/blocks/harvest/form"
@@ -16,6 +14,12 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "../components/ui/dialog"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -60,12 +64,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function AddHarvestRoute() {
+    const navigate = useNavigate()
+
     return (
-        <HarvestForm
-            b_lu_yield={undefined}
-            b_lu_n_harvestable={undefined}
-            b_lu_harvest_date={undefined}
-        />
+        <Dialog open={true} onOpenChange={() => navigate("..")}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Oogst toevoegen</DialogTitle>
+                </DialogHeader>
+                <HarvestForm
+                    b_lu_yield={undefined}
+                    b_lu_n_harvestable={undefined}
+                    b_lu_harvest_date={undefined}
+                />
+            </DialogContent>
+        </Dialog>
     )
 }
 

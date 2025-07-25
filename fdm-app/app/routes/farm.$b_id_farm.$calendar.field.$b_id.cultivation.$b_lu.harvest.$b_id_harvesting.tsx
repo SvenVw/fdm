@@ -10,6 +10,7 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { HarvestForm } from "~/components/blocks/harvest/form"
@@ -20,6 +21,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { getCalendar } from "../lib/calendar"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -128,19 +130,27 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const navigate = useNavigate()
 
     return (
-        <HarvestForm
-            b_lu_yield={
-                loaderData.harvest?.harvestable?.harvestable_analyses?.[0]
-                    ?.b_lu_yield
-            }
-            b_lu_n_harvestable={
-                loaderData.harvest?.harvestable?.harvestable_analyses?.[0]
-                    ?.b_lu_n_harvestable
-            }
-            b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
-        />
+        <Dialog open={true} onOpenChange={() => navigate("..")}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Oogst bijwerken</DialogTitle>
+                </DialogHeader>
+                <HarvestForm
+                    b_lu_yield={
+                        loaderData.harvest?.harvestable
+                            ?.harvestable_analyses?.[0]?.b_lu_yield
+                    }
+                    b_lu_n_harvestable={
+                        loaderData.harvest?.harvestable
+                            ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
+                    }
+                    b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
+                />
+            </DialogContent>
+        </Dialog>
     )
 }
 
