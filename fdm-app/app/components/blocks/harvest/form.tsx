@@ -95,14 +95,14 @@ export function HarvestForm({
                                         <FormLabel>Stikstofgehalte</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="Bv. 4 kg N / ha"
+                                                placeholder="Bv. 4 g N/kg"
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            In geoogst product (kg N / ha)
+                                            In geoogst product (g N/kg DS)
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
