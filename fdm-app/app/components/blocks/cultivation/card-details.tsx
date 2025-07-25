@@ -35,10 +35,10 @@ export function CultivationDetailsCard({
         defaultValues: {
             b_lu_start: cultivation.b_lu_start
                 ? new Date(cultivation.b_lu_start)
-                : undefined,
+                : null,
             b_lu_end: cultivation.b_lu_end
                 ? new Date(cultivation.b_lu_end)
-                : undefined,
+                : null,
             m_cropresidue: cultivation.m_cropresidue ?? false,
         },
     })
@@ -47,10 +47,10 @@ export function CultivationDetailsCard({
         form.reset({
             b_lu_start: cultivation.b_lu_start
                 ? new Date(cultivation.b_lu_start)
-                : undefined,
+                : null,
             b_lu_end: cultivation.b_lu_end
                 ? new Date(cultivation.b_lu_end)
-                : undefined,
+                : null,
             m_cropresidue: cultivation.m_cropresidue ?? false,
         })
     }, [cultivation, form.reset])
