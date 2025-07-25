@@ -13,9 +13,5 @@ export interface CultivationOption {
 }
 
 export interface CultivationsFormProps {
-    b_lu_catalogue: string | undefined
-    b_lu_start: Date | undefined
-    b_lu_end: Date | undefined
     options: CultivationOption[]
-    action: string
 }

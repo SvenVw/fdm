@@ -149,6 +149,8 @@ export default function CultivationPlanAddHarvestBlock() {
                 b_lu_yield={undefined}
                 b_lu_n_harvestable={undefined}
                 b_lu_harvest_date={undefined}
+                b_lu_start={loaderData.b_lu_start}
+                b_lu_end={loaderData.b_lu_end}
             />
         </div>
     )

@@ -486,6 +486,164 @@ export async function checkHarvestDateCompability(
 }
 
 /**
+ * Updates an existing harvest record.
+ *
+ * This function allows for the modification of harvest details. It first verifies that the principal has the necessary
+ * permissions to update the harvest. Within a database transaction, it updates the harvest date and the associated
+ * analysis data, such as yield and nutrient content. If the cultivation is designated as a single-harvest type,
+ * the function also adjusts the cultivation's termination date to match the new harvest date.
+ *
+ * @param fdm The FDM instance providing the connection to the database.
+ * @param principal_id The ID of the principal performing the update, for permission checking.
+ * @param b_id_harvesting The unique identifier of the harvest to be updated.
+ * @param b_lu_harvest_date The new date of the harvest.
+ * @param b_lu_yield The new dry-matter yield for the harvest, in kg/ha.
+ * @param b_lu_n_harvestable The new total nitrogen content in the harvestable yield (g N/kg).
+ * @param b_lu_n_residue The new total nitrogen content in the crop residue (g N/kg).
+ * @param b_lu_p_harvestable The new total phosphorus content in the harvestable yield (g P2O5/kg).
+ * @param b_lu_p_residue The new total phosphorus content in the crop residue (g P2O5/kg).
+ * @param b_lu_k_harvestable The new total potassium content in the harvestable yield (g K2O/kg).
+ * @param b_lu_k_residue The new total potassium content in the crop residue (g K2O/kg).
+ *
+ * @returns A Promise that resolves when the update is complete.
+ *
+ * @throws Error if the harvest does not exist, permission checks fail, or any database update fails.
+ */
+export async function updateHarvest(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"],
+    b_lu_harvest_date: schema.cultivationHarvestingTypeInsert["b_lu_harvest_date"],
+    b_lu_yield: schema.harvestableAnalysesTypeInsert["b_lu_yield"],
+    b_lu_n_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_n_harvestable"],
+    b_lu_n_residue?: schema.harvestableAnalysesTypeInsert["b_lu_n_residue"],
+    b_lu_p_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_p_harvestable"],
+    b_lu_p_residue?: schema.harvestableAnalysesTypeInsert["b_lu_p_residue"],
+    b_lu_k_harvestable?: schema.harvestableAnalysesTypeInsert["b_lu_k_harvestable"],
+    b_lu_k_residue?: schema.harvestableAnalysesTypeInsert["b_lu_k_residue"],
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "harvesting",
+            "write",
+            b_id_harvesting,
+            principal_id,
+            "updateHarvest",
+        )
+
+        return await fdm.transaction(async (tx: FdmType) => {
+            const harvest = await getHarvestSimplified(tx, b_id_harvesting)
+            if (!harvest) {
+                throw new Error("Harvest does not exist")
+            }
+
+            const b_lu = harvest.b_lu
+
+            // --- Validation logic ---
+            if (!b_lu_harvest_date) {
+                throw new Error("Argument b_lu_harvest_date is missing")
+            }
+
+            const sowingDate = await tx
+                .select({
+                    b_lu_start: schema.cultivationStarting.b_lu_start,
+                })
+                .from(schema.cultivationStarting)
+                .where(eq(schema.cultivationStarting.b_lu, b_lu))
+                .limit(1)
+
+            if (sowingDate.length === 0 || !sowingDate[0].b_lu_start) {
+                throw new Error("Sowing date does not exist")
+            }
+
+            if (b_lu_harvest_date.getTime() <= sowingDate[0].b_lu_start.getTime()) {
+                throw new Error("Harvest date must be after sowing date")
+            }
+
+            const b_lu_harvestable = await getHarvestableTypeOfCultivation(
+                tx,
+                b_lu,
+            )
+
+            if (b_lu_harvestable === "multiple") {
+                const terminatingDate = await tx
+                    .select({
+                        b_lu_end: schema.cultivationEnding.b_lu_end,
+                    })
+                    .from(schema.cultivationEnding)
+                    .where(eq(schema.cultivationEnding.b_lu, b_lu))
+                    .limit(1)
+
+                if (
+                    terminatingDate.length > 0 &&
+                    terminatingDate[0].b_lu_end &&
+                    b_lu_harvest_date.getTime() >
+                        terminatingDate[0].b_lu_end.getTime()
+                ) {
+                    throw new Error(
+                        "Harvest date must be before terminating date for this cultivation",
+                    )
+                }
+            }
+            // --- End of validation logic ---
+
+            const b_id_harvestable_analysis =
+                harvest.harvestable.harvestable_analyses[0]
+                    .b_id_harvestable_analysis
+
+            await tx
+                .update(schema.cultivationHarvesting)
+                .set({ b_lu_harvest_date: b_lu_harvest_date, updated: new Date() })
+                .where(
+                    eq(
+                        schema.cultivationHarvesting.b_id_harvesting,
+                        b_id_harvesting,
+                    ),
+                )
+
+            await tx
+                .update(schema.harvestableAnalyses)
+                .set({
+                    b_lu_yield: b_lu_yield,
+                    b_lu_n_harvestable: b_lu_n_harvestable,
+                    b_lu_n_residue: b_lu_n_residue,
+                    b_lu_p_harvestable: b_lu_p_harvestable,
+                    b_lu_p_residue: b_lu_p_residue,
+                    b_lu_k_harvestable: b_lu_k_harvestable,
+                    b_lu_k_residue: b_lu_k_residue,
+                    updated: new Date(),
+                })
+                .where(
+                    eq(
+                        schema.harvestableAnalyses.b_id_harvestable_analysis,
+                        b_id_harvestable_analysis,
+                    ),
+                )
+
+            if (b_lu_harvestable === "once") {
+                await tx
+                    .update(schema.cultivationEnding)
+                    .set({ b_lu_end: b_lu_harvest_date, updated: new Date() })
+                    .where(eq(schema.cultivationEnding.b_lu, b_lu))
+            }
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for updateHarvest", {
+            b_id_harvesting,
+            b_lu_harvest_date,
+            b_lu_yield,
+            b_lu_n_harvestable,
+            b_lu_n_residue,
+            b_lu_p_harvestable,
+            b_lu_p_residue,
+            b_lu_k_harvestable,
+            b_lu_k_residue,
+        })
+    }
+}
+
+/**
  * Retrieves simplified details of a harvest, including its associated harvestable and analysis.
  *
  * This asynchronous function queries the database for a harvest record matching the provided identifier.

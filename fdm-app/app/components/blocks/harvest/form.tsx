@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Form } from "react-router"
+import { useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -15,16 +15,23 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { FormSchema } from "./schema"
-
+import { cn } from "@/app/lib/utils"
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
     b_lu_harvest_date,
+    b_lu_start,
+    b_lu_end,
 }: {
     b_lu_yield: number | undefined
     b_lu_n_harvestable: number | undefined
     b_lu_harvest_date: Date | undefined
+    b_lu_start: Date | undefined
+    b_lu_end: Date | undefined
 }) {
+    const fetcher = useFetcher()
+
+    // @ts-ignore
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -32,10 +39,16 @@ export function HarvestForm({
             b_lu_yield: b_lu_yield,
             b_lu_n_harvestable: b_lu_n_harvestable,
             b_lu_harvest_date: b_lu_harvest_date,
+            b_lu_start: b_lu_start,
+            b_lu_end: b_lu_end,
         },
     })
 
-    // Currently updateHarvest function is not available, therefore check if this is a new harvest or is has already values
+    const handleDeleteHarvest = () => {
+        return fetcher.submit(null, { method: "delete" })
+    }
+
+    // Check if this is a new harvest or is has already values
     const isHarvestUpdate =
         b_lu_yield !== undefined ||
         b_lu_n_harvestable !== undefined ||
@@ -43,25 +56,39 @@ export function HarvestForm({
 
     return (
         <div className="space-y-6">
-            {/* <div>
-                <p className="text-sm text-muted-foreground">
-                    Werk de opbrengst, stikstofgehalte en zaai- en oogstdatum
-                    bij voor dit gewas.
-                </p>
-            </div> */}
             <RemixFormProvider {...form}>
-                <Form
-                    id="formCultivation"
-                    onSubmit={form.handleSubmit}
+                <fetcher.Form
+                    id="formHarvest"
+                    onSubmit={form.handleSubmit(
+                        (data: z.infer<typeof FormSchema>) => {
+                            const formData = new FormData()
+                            for (const key in data) {
+                                const value = data[key as keyof typeof data]
+                                if (value instanceof Date) {
+                                    formData.append(key, value.toISOString())
+                                } else if (
+                                    value !== undefined &&
+                                    value !== null
+                                ) {
+                                    formData.append(key, String(value))
+                                }
+                            }
+                            fetcher.submit(formData, { method: "post" })
+                        },
+                    )}
                     method="post"
                 >
                     <fieldset
-                        disabled={
-                            form.formState.isSubmitting || isHarvestUpdate
-                        }
+                        disabled={form.formState.isSubmitting}
                         className="space-y-8"
                     >
-                        <div className="grid w-4/5 lg:grid-cols-2 items-center gap-y-6 gap-x-8">
+                        <div className="grid lg:grid-cols-2 items-center gap-y-6 gap-x-8">
+                            <DatePicker
+                                form={form}
+                                name={"b_lu_harvest_date"}
+                                label={"Oogstdatum"}
+                                description={""}
+                            />
                             <FormField
                                 control={form.control}
                                 name="b_lu_yield"
@@ -76,9 +103,7 @@ export function HarvestForm({
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormDescription>
-                                            In kg droge stof per hectare
-                                        </FormDescription>
+                                        <FormDescription />
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -91,95 +116,56 @@ export function HarvestForm({
                                         <FormLabel>Stikstofgehalte</FormLabel>
                                         <FormControl>
                                             <Input
-                                                placeholder="Bv. 4 kg N / ha"
+                                                placeholder="Bv. 4 g N/kg DS"
                                                 aria-required="true"
                                                 type="number"
                                                 {...field}
                                             />
                                         </FormControl>
                                         <FormDescription>
-                                            In geoogst product (kg N / ha)
+                                            In geoogst product
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
-                            {/* <FormField
-                                control={form.control}
-                                name="b_lu_start"                    
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-col">
-                                        <FormLabel>Zaaidatum</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value &&
-                                                                "text-muted-foreground",
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                field.value,
-                                                                "yyyy-MM-dd",
-                                                            )
-                                                        ) : (
-                                                            <span>
-                                                                Kies een datum
-                                                            </span>
-                                                        )}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent
-                                                className="w-auto p-0"
-                                                align="start"
-                                            >
-                                                <Calendar
-                                                    locale={nl}
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) =>
-                                                        date <
-                                                        new Date("1970-01-01")
-                                                    }
-                                                    initialFocus
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
-                                        <FormDescription>
-                                            Kan ook poot- of aanplantdatum zijn
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            /> */}
-                            <DatePicker
-                                form={form}
-                                name={"b_lu_harvest_date"}
-                                label={"Oogstdatum"}
-                                description={"Kan ook inwerkdatum zijn"}
                             />
                         </div>
-                        <div>
-                            <Button type="submit">
+                        <div className="grid grid-cols-2 items">
+                            <Button
+                                variant="destructive"
+                                onClick={handleDeleteHarvest}
+                                disabled={
+                                    form.formState.isSubmitting ||
+                                    fetcher.state === "submitting"
+                                }
+                                className={cn(
+                                    "mr-auto",
+                                    !isHarvestUpdate ? "invisible" : "",
+                                )}
+                            >
+                                {form.formState.isSubmitting ||
+                                fetcher.state === "submitting" ? (
+                                    <div className="flex items-center space-x-2">
+                                        <LoadingSpinner />
+                                    </div>
+                                ) : null}
+                                Verwijderen
+                            </Button>
+                            <Button type="submit" className="ml-auto">
                                 {form.formState.isSubmitting ? (
                                     <div className="flex items-center space-x-2">
                                         <LoadingSpinner />
-                                        <span>Toevoegen...</span>
+                                        <span>Opslaan...</span>
                                     </div>
+                                ) : isHarvestUpdate ? (
+                                    "Bijwerken"
                                 ) : (
                                     "Toevoegen"
                                 )}
                             </Button>
                         </div>
                     </fieldset>
-                </Form>
+                </fetcher.Form>
             </RemixFormProvider>
         </div>
     )

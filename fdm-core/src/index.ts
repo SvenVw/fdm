@@ -91,6 +91,7 @@ export {
     addHarvest,
     getHarvest,
     getHarvests,
+    updateHarvest,
     removeHarvest,
 } from "./harvest"
 export type {
