@@ -21,6 +21,12 @@ describe("stikstofgebruiksnorm helpers", () => {
         expect(result).toBe(false)
     })
 
+    it("should correctly identify a field not in an NV Gebied, but with single array response (see #205)", async () => {
+        const centroidOutsideNV = [5.5527872994244785, 52.92595151470198] // Known point outside NV Gebied
+        const result = await isFieldInNVGebied(centroidOutsideNV)
+        expect(result).toBe(false)
+    })
+
     it("should correctly identify the region for a field", async () => {
         const centroidInKlei = [5.64188724, 51.977587] // Known point in Klei
         const region = await getRegion(centroidInKlei)
