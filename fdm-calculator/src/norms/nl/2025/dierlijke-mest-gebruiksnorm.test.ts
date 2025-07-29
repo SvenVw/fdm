@@ -79,4 +79,19 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             "Derogatie - Grondwaterbeschermingsgebied",
         )
     })
+
+    it("should return the default norm value for derogation outside Grondwaterbeschermingsgebied and inside NV-gebied, but with single array response (see #205)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: true },
+            field: {
+                b_id: "1",
+                b_centroid: [5.058131582583726, 52.50733333508596],
+            },
+            cultivations: [],
+            soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
+        }
+        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(190)
+        expect(result.normSource).toBe("Derogatie - NV Gebied")
+    })
 })
