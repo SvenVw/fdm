@@ -11,7 +11,14 @@ export const CultivationDetailsFormSchema = z
             }
             return value
         }, z.coerce.date().optional().nullable()),
-        m_cropresidue: z.coerce.boolean().optional().nullable(),
+        m_cropresidue: z.preprocess((value) => {
+            if (typeof value === "string") {
+                if (value.toLowerCase() === "false") return false
+                if (value.toLowerCase() === "true") return true
+                if (value.toLowerCase() === "null") return null
+            }
+            return value
+        }, z.coerce.boolean().optional().nullable()),
     })
     .refine(
         (data) => {
