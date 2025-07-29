@@ -80,7 +80,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
         )
     })
 
-    it("should return the default norm value for derogation outside Grondwaterbeschermingsgebied and inside NV-gebied, but with single array responce (see #205)", async () => {
+    it("should return the default norm value for derogation outside Grondwaterbeschermingsgebied and inside NV-gebied, but with single array response (see #205)", async () => {
         const mockInput: NL2025NormsInput = {
             farm: { is_derogatie_bedrijf: true },
             field: {
