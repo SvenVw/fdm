@@ -5,7 +5,12 @@ export const CultivationDetailsFormSchema = z
         b_lu_start: z.coerce.date({
             required_error: "Zaaidatum is verplicht.",
         }),
-        b_lu_end: z.coerce.date().optional().nullable(),
+        b_lu_end: z.preprocess((value) => {
+            if (typeof value === "string") {
+                if (value.toLowerCase() === "null") return null
+            }
+            return value
+        }, z.coerce.date().optional().nullable()),
         m_cropresidue: z.coerce.boolean().optional().nullable(),
     })
     .refine(
@@ -30,7 +35,12 @@ export const CultivationAddFormSchema = z.object({
     b_lu_start: z.coerce.date({
         required_error: "Zaaidatum is verplicht.",
     }),
-    b_lu_end: z.coerce.date().optional().nullable(),
+    b_lu_end: z.preprocess((value) => {
+        if (typeof value === "string") {
+            if (value.toLowerCase() === "null") return null
+        }
+        return value
+    }, z.coerce.date().optional().nullable()),
 })
 
 export type CultivationAddFormSchemaType = z.infer<

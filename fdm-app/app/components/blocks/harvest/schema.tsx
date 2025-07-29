@@ -30,15 +30,24 @@ export const FormSchema = z
                 message: "Hoeveelheid mag niet groter zijn dan 1000",
             })
             .optional(),
-        b_lu_start: z.coerce.date().optional(),
-        b_lu_end: z.coerce.date().optional(),
+        b_lu_start: z.preprocess((value) => {
+            if (typeof value === "string") {
+                if (value.toLowerCase() === "null") return null
+            }
+            return value
+        }, z.coerce.date().optional().nullable()),
+        b_lu_end: z.preprocess((value) => {
+            if (typeof value === "string") {
+                if (value.toLowerCase() === "null") return null
+            }
+            return value
+        }, z.coerce.date().optional().nullable()),
         b_lu_harvest_date: z.coerce.date({
             required_error: "Oogstdatum is verplicht",
             invalid_type_error: "Oogstdatum moet een datum zijn",
         }),
     })
-    .superRefine(
-        (data, ctx) => {
+    .superRefine((data, ctx) => {
         if (
             data.b_lu_start &&
             data.b_lu_harvest_date &&
