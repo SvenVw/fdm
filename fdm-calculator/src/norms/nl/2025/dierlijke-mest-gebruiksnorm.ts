@@ -32,9 +32,11 @@ export async function isFieldInGWGBGebied(
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
         const json = await response.json()
-        const feature = json[0][0]
-        if (feature) {
-            return true
+        if (json.length > 0) { // Check if not single array response
+            const feature = json[0][0]
+            if (feature) {
+                return true
+            }
         }
         return false
     } catch (err) {
