@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useFetcher } from "react-router"
+import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { DatePicker } from "~/components/custom/date-picker"
@@ -57,25 +57,9 @@ export function HarvestForm({
     return (
         <div className="space-y-6">
             <RemixFormProvider {...form}>
-                <fetcher.Form
+                <Form
                     id="formHarvest"
-                    onSubmit={form.handleSubmit(
-                        (data: z.infer<typeof FormSchema>) => {
-                            const formData = new FormData()
-                            for (const key in data) {
-                                const value = data[key as keyof typeof data]
-                                if (value instanceof Date) {
-                                    formData.append(key, value.toISOString())
-                                } else if (
-                                    value !== undefined &&
-                                    value !== null
-                                ) {
-                                    formData.append(key, String(value))
-                                }
-                            }
-                            fetcher.submit(formData, { method: "post" })
-                        },
-                    )}
+                    onSubmit={form.handleSubmit}
                     method="post"
                 >
                     <fieldset
@@ -165,7 +149,7 @@ export function HarvestForm({
                             </Button>
                         </div>
                     </fieldset>
-                </fetcher.Form>
+                </Form>
             </RemixFormProvider>
         </div>
     )
