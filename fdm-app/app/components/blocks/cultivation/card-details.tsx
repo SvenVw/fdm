@@ -33,9 +33,7 @@ export function CultivationDetailsCard({
         resolver: zodResolver(CultivationDetailsFormSchema),
         mode: "onTouched",
         defaultValues: {
-            b_lu_start: cultivation.b_lu_start
-                ? new Date(cultivation.b_lu_start)
-                : null,
+            b_lu_start: new Date(cultivation.b_lu_start),
             b_lu_end: cultivation.b_lu_end
                 ? new Date(cultivation.b_lu_end)
                 : null,
@@ -45,9 +43,7 @@ export function CultivationDetailsCard({
 
     useEffect(() => {
         form.reset({
-            b_lu_start: cultivation.b_lu_start
-                ? new Date(cultivation.b_lu_start)
-                : null,
+            b_lu_start: new Date(cultivation.b_lu_start),
             b_lu_end: cultivation.b_lu_end
                 ? new Date(cultivation.b_lu_end)
                 : null,
