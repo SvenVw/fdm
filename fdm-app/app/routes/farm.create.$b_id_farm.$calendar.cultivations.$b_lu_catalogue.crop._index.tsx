@@ -10,7 +10,6 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useFetcher,
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
@@ -18,8 +17,6 @@ import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-det
 import { CultivationHarvestsCard } from "~/components/blocks/cultivation/card-harvests"
 import { CultivationDetailsFormSchema } from "~/components/blocks/cultivation/schema"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
-import { Separator } from "~/components/ui/separator"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -30,7 +27,9 @@ import { extractFormValuesFromRequest } from "~/lib/form"
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gewas- Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
+        {
+            title: `Gewas - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}`,
+        },
         {
             name: "description",
             content:
