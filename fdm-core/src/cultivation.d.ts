@@ -18,12 +18,14 @@ export interface Cultivation {
 export interface CultivationPlan {
     b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"]
     b_lu_name: schema.cultivationsCatalogueTypeSelect["b_lu_name"]
+    b_area: number
     b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
     b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
     m_cropresidue: schema.cultivationEndingTypeSelect["m_cropresidue"]
     fields: Array<{
         b_lu: schema.cultivationsTypeSelect["b_lu"]
         b_id: schema.fieldsTypeSelect["b_id"]
+        b_area: number
         b_name: schema.fieldsTypeSelect["b_name"]
         fertilizer_applications: Array<{
             p_id_catalogue: schema.fertilizersCatalogueTypeSelect["p_id_catalogue"]

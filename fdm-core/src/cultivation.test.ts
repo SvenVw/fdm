@@ -1,4 +1,4 @@
-import { and, gte, isNotNull, lte, or, eq } from "drizzle-orm"
+import { and, gte, isNotNull, lte, or, eq, sql } from "drizzle-orm"
 import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     enableCultivationCatalogue,
@@ -1092,6 +1092,67 @@ describe("Cultivation Data Model", () => {
                 (c) => c.b_lu_catalogue === b_lu_catalogue2,
             )
             expect(cornCultivation).toBeDefined() // Corn cultivation should also be found
+        })
+
+        it("should correctly calculate the total area of a cultivation across multiple fields", async () => {
+            const b_id2 = await addField(
+                fdm,
+                principal_id,
+                b_id_farm,
+                "test field 2",
+                "test source",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                },
+                new Date("2023-01-01"),
+                "nl_01",
+                new Date("2024-01-01"),
+            )
+
+            await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue, // Wheat
+                b_id2,
+                new Date("2024-03-01"),
+            )
+
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+
+            const wheatCultivation = cultivationPlan.find(
+                (c) => c.b_lu_catalogue === b_lu_catalogue,
+            )
+
+            const field1 = await fdm
+                .select({
+                    b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                })
+                .from(schema.fields)
+                .where(eq(schema.fields.b_id, b_id))
+
+            const field2 = await fdm
+                .select({
+                    b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                })
+                .from(schema.fields)
+                .where(eq(schema.fields.b_id, b_id2))
+
+            const totalArea = field1[0].b_area + field2[0].b_area
+
+            expect(wheatCultivation?.b_area).toBeCloseTo(totalArea, 2)
         })
 
         it("should get an empty cultivation plan for a farm when timeframe excludes all cultivations", async () => {
