@@ -38,10 +38,11 @@ export function CultivationListPlan({
                 <div className="flex flex-col gap-2">
                     {cultivationPlan.map((cultivation) => {
                         const numberOfFields = cultivation.fields.length
-                        const totalArea = cultivation.b_area                           
-                        const nameOfFields = cultivation.fields.map(
-                            (field) => field.b_name,
-                        ).concat(', ')
+                        const totalArea = cultivation.b_area
+                        const nameOfFields = cultivation.fields
+                            .map((field) => field.b_name)
+                            .join(', ')
+                        
 
                         return (
                             <NavLink
