@@ -10,6 +10,7 @@
         "dotenvx": "dotenvx",
         "start": "pnpm db:migrate && react-router-serve ./build/server/index.js",
         "start-dev": "dotenvx run -- pnpm db:migrate && dotenvx run -- react-router-serve ./build/server/index.js",
+        "test": "dotenvx run playwright test",
         "db:migrate": "node ./app/lib/fdm-migrate.server.js",
         "typecheck": "react-router typegen && tsc"
     },
@@ -81,6 +82,7 @@
     },
     "devDependencies": {
         "@dotenvx/dotenvx": "catalog:",
+        "@playwright/test": "^1.54.1",
         "@react-router/dev": "^7.7.0",
         "@react-router/fs-routes": "^7.7.0",
         "@svenvw/fdm-calculator": "workspace:*",
@@ -96,6 +98,8 @@
         "@types/react-dom": "^19.1.6",
         "@types/react-map-gl": "^6.1.7",
         "@types/validator": "^13.15.2",
+        "c8": "^10.1.3",
+        "playwright": "^1.54.1",
         "postcss": "^8.5.6",
         "tailwindcss": "^4.1.11",
         "typescript": "catalog:",
