@@ -336,7 +336,7 @@ jobs:
         working-directory: ./fdm-app
 
       - name: Run tests with coverage
-        run: pnpm run test-ci
+        run: pnpm db:migrate & pnpm test-ci
         working-directory: ./fdm-app
         env:
           # The hostname used to communicate with the PostgreSQL service container
