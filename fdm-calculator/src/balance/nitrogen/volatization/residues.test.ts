@@ -24,6 +24,8 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -50,7 +52,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(-2.688, 2)
+        expect(result.total.toNumber()).toBeCloseTo(-6.72, 2)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
@@ -61,6 +63,8 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -102,7 +106,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(-2.688, 2)
+        expect(result.total.toNumber()).toBeCloseTo(-6.72, 2)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
@@ -113,6 +117,8 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -135,6 +141,8 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: false,
             },
         ]
@@ -170,6 +178,8 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: undefined, // Undefined residue handling
             },
         ]
@@ -206,6 +216,8 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -241,7 +253,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-2.688, 1)
+        expect(result.total.toNumber()).toBeCloseTo(-6.72, 1)
         expect(result.cultivations).toEqual([
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
