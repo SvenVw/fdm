@@ -316,7 +316,8 @@ jobs:
         run: pnpm i
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps\
+        run: pnpm exec playwright install --with-deps
+        working-directory: ./fdm-app
 
       - name: Build fdm-data
         run: pnpm build
