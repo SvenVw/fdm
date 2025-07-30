@@ -11,7 +11,6 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useFetcher,
     useLoaderData,
     useLocation,
 } from "react-router"
@@ -29,7 +28,6 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
