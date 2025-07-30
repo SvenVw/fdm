@@ -17,14 +17,14 @@ test("Sign-in via magic link", async ({ browser }) => {
     await expect(loginSubmitButton, "Login submit button exists.").toBeVisible()
 
     const loginEmailBox = page.getByPlaceholder("e-mail")
-    await expect(loginSubmitButton, "Email input box exists.").toBeVisible()
+    await expect(loginEmailBox, "Email input box exists.").toBeVisible()
 
     await loginEmailBox.fill("xyz@gmail.com")
 
     await loginSubmitButton.click()
 
     const message = page.getByText("aanmelden...")
-    expect(message).toBeDefined()
+    expect(message).toBeVisible()
 
     await page.waitForURL("**/check-your-email")
 
