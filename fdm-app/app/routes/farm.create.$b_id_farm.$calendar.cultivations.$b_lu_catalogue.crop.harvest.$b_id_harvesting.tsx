@@ -147,6 +147,7 @@ export default function FarmFieldsOverviewBlock() {
                     b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
                     b_lu_start={loaderData.cultivation.b_lu_start}
                     b_lu_end={loaderData.cultivation.b_lu_end}
+                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
                 />
             </DialogContent>
         </Dialog>

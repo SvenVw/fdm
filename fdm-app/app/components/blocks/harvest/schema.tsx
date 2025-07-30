@@ -46,6 +46,7 @@ export const FormSchema = z
             required_error: "Oogstdatum is verplicht",
             invalid_type_error: "Oogstdatum moet een datum zijn",
         }),
+        b_lu_harvestable: z.enum(["once", "multiple", "none"]).optional(),
     })
     .superRefine((data, ctx) => {
         if (
@@ -62,7 +63,8 @@ export const FormSchema = z
         if (
             data.b_lu_end &&
             data.b_lu_harvest_date &&
-            data.b_lu_harvest_date > data.b_lu_end
+            data.b_lu_harvest_date > data.b_lu_end &&
+            data.b_lu_harvestable === "multiple"
         ) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
