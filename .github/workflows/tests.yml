@@ -323,6 +323,10 @@ jobs:
         run: pnpm build
         working-directory: ./fdm-core
 
+      - name: Build fdm-app
+        run: pnpm build
+        working-directory: ./fdm-app
+
       - name: Run tests with coverage
         run: pnpm run test-ci
         working-directory: ./fdm-app
