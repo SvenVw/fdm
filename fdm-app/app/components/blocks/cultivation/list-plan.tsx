@@ -12,6 +12,7 @@ interface CultivationField {
 interface CultivationPlanItem {
     b_lu_catalogue: string
     b_lu_name: string
+    b_area: number
     fields: CultivationField[]
 }
 
@@ -37,10 +38,7 @@ export function CultivationListPlan({
                 <div className="flex flex-col gap-2">
                     {cultivationPlan.map((cultivation) => {
                         const numberOfFields = cultivation.fields.length
-                        const totalArea = cultivation.fields.reduce(
-                            (sum, field) => sum + field.b_area,
-                            0,
-                        )
+                        const totalArea = cultivation.b_area                           
                         const nameOfFields = cultivation.fields.map(
                             (field) => field.b_name,
                         ).concat(', ')
@@ -72,7 +70,7 @@ export function CultivationListPlan({
                                             : `${numberOfFields} percelen`}
                                     </Badge>
                                     <Badge variant="outline">
-                                        {Math.round(totalArea / 10) * 10} ha
+                                        {Math.round(totalArea * 10) / 10} ha
                                     </Badge>
                                 </div>
                             </NavLink>
