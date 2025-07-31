@@ -6,30 +6,16 @@ import {
     getFertilizers,
     removeFertilizerApplication,
 } from "@svenvw/fdm-core"
-import { useState } from "react"
 import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    useLocation,
-    useNavigation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
+import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
-import { FertilizerApplicationsList } from "~/components/blocks/fertilizer-applications/list"
-import { Button } from "~/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "~/components/ui/dialog"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -168,47 +154,15 @@ export default function Index() {
     const loaderData = useLoaderData<typeof loader>() as Awaited<
         ReturnType<typeof loader>
     >
-    const location = useLocation()
-    const navigation = useNavigation()
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end">
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button>Bemesting toevoegen</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[800px]">
-                        <DialogHeader>
-                            <DialogTitle>Bemesting toevoegen</DialogTitle>
-                            <DialogDescription>
-                                Voeg een nieuwe bemestingstoepassing toe aan het
-                                perceel.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <FertilizerApplicationForm
-                            options={loaderData.fertilizerOptions}
-                            action={location.pathname}
-                            onSuccess={() => setIsDialogOpen(false)}
-                            navigation={navigation}
-                        />
-                    </DialogContent>
-                </Dialog>
-            </div>
-            <div className="grid 2xl:grid-cols-3 gap-8">
-                <div className="2xl:col-span-2">
-                    <FertilizerApplicationsList
-                        fertilizerApplications={
-                            loaderData.fertilizerApplications
-                        }
-                        applicationMethodOptions={
-                            loaderData.applicationMethodOptions
-                        }
-                    />
-                </div>
-                <FertilizerApplicationsCards dose={loaderData.dose} />
-            </div>
+            <FertilizerApplicationCard
+                fertilizerApplications={loaderData.fertilizerApplications}
+                applicationMethodOptions={loaderData.applicationMethodOptions}
+                fertilizerOptions={loaderData.fertilizerOptions}
+                dose={loaderData.dose}
+            />
         </div>
     )
 }
