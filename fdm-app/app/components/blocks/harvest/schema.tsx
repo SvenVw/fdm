@@ -19,17 +19,23 @@ export const FormSchema = z
                 message: "Hoeveelheid moet een safe getal zijn",
             })
             .optional(),
-        b_lu_n_harvestable: z.coerce
-            .number({
-                invalid_type_error: "Hoeveelheid moet een getal zijn",
-            })
-            .min(0, {
-                message: "Hoeveelheid moet positief zijn",
-            })
-            .max(1000, {
-                message: "Hoeveelheid mag niet groter zijn dan 1000",
-            })
-            .optional(),
+        b_lu_n_harvestable: z.preprocess(
+            (val) => {
+                if (val === "" || val === null) return undefined
+                return val as number | undefined
+            },
+            z.coerce
+                .number({
+                    invalid_type_error: "Hoeveelheid moet een getal zijn",
+                })
+                .min(0, {
+                    message: "Hoeveelheid moet positief zijn",
+                })
+                .max(1000, {
+                    message: "Hoeveelheid mag niet groter zijn dan 1000",
+                })
+                .optional(),
+        ),
         b_lu_start: z.preprocess((value) => {
             if (typeof value === "string") {
                 if (value.toLowerCase() === "null") return null
