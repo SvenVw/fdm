@@ -115,10 +115,6 @@ describe("Harvest Data Model", () => {
         )
     })
 
-    afterAll(async () => {
-        // Cleanup created data
-    })
-
     it("should update an existing harvest", async () => {
         const newHarvestDate = new Date("2024-07-15")
         const newYield = 5500
