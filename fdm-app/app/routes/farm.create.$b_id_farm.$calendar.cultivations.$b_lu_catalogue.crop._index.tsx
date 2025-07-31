@@ -112,12 +112,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     const isSimilarHarvest = (h1: Harvest, h2: Harvest) =>
                         h1.b_lu_harvest_date.getTime() ===
                             h2.b_lu_harvest_date.getTime() &&
-                        h1.harvestable.harvestable_analyses[0].b_lu_yield ===
-                            h2.harvestable.harvestable_analyses[0].b_lu_yield &&
-                        h1.harvestable.harvestable_analyses[0]
-                            .b_lu_n_harvestable ===
+                        h1.harvestable.harvestable_analyses[0]?.b_lu_yield ===
                             h2.harvestable.harvestable_analyses[0]
-                                .b_lu_n_harvestable
+                                ?.b_lu_yield &&
+                        h1.harvestable.harvestable_analyses[0]
+                            ?.b_lu_n_harvestable ===
+                            h2.harvestable.harvestable_analyses[0]
+                                ?.b_lu_n_harvestable
 
                     const existingHarvestIndex = accumulator.findIndex(
                         (existingHarvest: Harvest) =>
@@ -254,7 +255,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 "Gewas is bijgewerkt! 🎉",
             )
         }
-       
     } catch (error) {
         throw handleActionError(error)
     }
