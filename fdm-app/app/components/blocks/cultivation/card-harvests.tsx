@@ -1,8 +1,8 @@
 import { Harvest, Cultivation } from "@svenvw/fdm-core"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { HarvestsList } from "../harvest/list"
-import type { HarvestableType } from "../harvest/types"
-import { Button } from "../../ui/button"
+import { HarvestsList } from "~/components/blocks/harvest/list"
+import type { HarvestableType } from "~/components/blocks/harvest/types"
+import { Button } from "~/components/ui/button"
 import { NavLink } from "react-router"
 
 export function CultivationHarvestsCard({

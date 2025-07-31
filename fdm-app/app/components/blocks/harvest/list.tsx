@@ -1,15 +1,12 @@
 import type { Harvest } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
-import { Eye, Trash2 } from "lucide-react"
-import { NavLink, useFetcher } from "react-router"
+import { NavLink } from "react-router"
 import { Button } from "~/components/ui/button"
-import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { HarvestableType } from "./types"
 
 export function HarvestsList({
     harvests,
     b_lu_harvestable,
-    state,
 }: {
     harvests: Harvest[]
     b_lu_harvestable: HarvestableType
