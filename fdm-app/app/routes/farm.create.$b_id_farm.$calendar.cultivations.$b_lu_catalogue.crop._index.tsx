@@ -254,31 +254,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 "Gewas is bijgewerkt! 🎉",
             )
         }
-        if (request.method === "DELETE") {
-            const formData = await request.formData()
-            const rawHarvestIds = formData.get("b_id_harvesting")
-
-            if (!rawHarvestIds || typeof rawHarvestIds !== "string") {
-                throw new Error("invalid: rawHarvestIds")
-            }
-            const b_ids_harvesting = rawHarvestIds.split(",")
-
-            // Remove harvests for all cultivations
-            await Promise.all(
-                b_ids_harvesting.map(async (b_id_harvesting: string) => {
-                    await removeHarvest(
-                        fdm,
-                        session.principal_id,
-                        b_id_harvesting,
-                    )
-                }),
-            )
-
-            return dataWithSuccess(
-                { result: "Data removed successfully" },
-                "Oogst is verwijderd",
-            )
-        }
+       
     } catch (error) {
         throw handleActionError(error)
     }

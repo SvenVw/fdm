@@ -1,5 +1,5 @@
 import type { Harvest, Cultivation } from "@svenvw/fdm-core"
-import { useFetcher, Form } from "react-router"
+import { useFetcher, Form, useLocation } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -41,6 +41,9 @@ export function CultivationDetailsCard({
         },
     })
 
+    const { pathname } = useLocation()
+    const isCreateWizard = pathname.includes("/farm/create/")
+
     useEffect(() => {
         form.reset({
             b_lu_start: new Date(cultivation.b_lu_start),
@@ -61,24 +64,26 @@ export function CultivationDetailsCard({
                 <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
                     {cultivation.b_lu_name}
                 </CardTitle>
-                <div className="flex justify-between">
-                    <Button
-                        variant="destructive"
-                        onClick={handleDeleteCultivation}
-                        disabled={
-                            form.formState.isSubmitting ||
-                            fetcher.state === "submitting"
-                        }
-                    >
-                        {form.formState.isSubmitting ||
-                        fetcher.state === "submitting" ? (
-                            <div className="flex items-center space-x-2">
-                                <LoadingSpinner />
-                            </div>
-                        ) : null}
-                        Verwijderen
-                    </Button>
-                </div>
+                {!isCreateWizard ? (
+                    <div className="flex justify-between">
+                        <Button
+                            variant="destructive"
+                            onClick={handleDeleteCultivation}
+                            disabled={
+                                form.formState.isSubmitting ||
+                                fetcher.state === "submitting"
+                            }
+                        >
+                            {form.formState.isSubmitting ||
+                            fetcher.state === "submitting" ? (
+                                <div className="flex items-center space-x-2">
+                                    <LoadingSpinner />
+                                </div>
+                            ) : null}
+                            Verwijderen
+                        </Button>
+                    </div>
+                ) : null}
             </CardHeader>
             <CardContent className="space-y-6">
                 <RemixFormProvider {...form}>
