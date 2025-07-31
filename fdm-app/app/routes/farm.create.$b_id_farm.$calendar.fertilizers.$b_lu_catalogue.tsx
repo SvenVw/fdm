@@ -6,6 +6,7 @@ import {
     getFertilizers,
     removeFertilizerApplication,
 } from "@svenvw/fdm-core"
+import { useState } from "react"
 import {
     type ActionFunctionArgs,
     data,
@@ -13,6 +14,7 @@ import {
     type MetaFunction,
     useLoaderData,
     useLocation,
+    useNavigation,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-applications/cards"
@@ -49,131 +51,131 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    try {
-        // Extract farm ID from URL parameters
-        const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
-
-        // Extract cultivation catalogue ID from URL parameters
-        const b_lu_catalogue = params.b_lu_catalogue
-        if (!b_lu_catalogue) {
-            throw data("Cultivation catalogue ID is required", {
-                status: 400,
-                statusText: "Cultivation catalogue ID is required",
-            })
-        }
-
-        // Get the session
-        const session = await getSession(request)
-
-        // Get timeframe from calendar store
-        const timeframe = getTimeframe(params)
-
-        // Fetch available fertilizers for the farm
-        const fertilizers = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        const fertilizerParameterDescription =
-            getFertilizerParametersDescription()
-        const applicationMethods = fertilizerParameterDescription.find(
-            (x: { parameter: string }) => x.parameter === "p_app_method_options",
-        )
-        if (!applicationMethods) throw new Error("Parameter metadata missing")
-        // Map fertilizers to options for the combobox
-        const fertilizerOptions = fertilizers.map((fertilizer) => {
-            const applicationMethodOptions = fertilizer.p_app_method_options
-                .map((opt: string) => {
-                    const meta = applicationMethods.options.find(
-                        (x: { value: string }) => x.value === opt,
-                    )
-                    return meta ? { value: opt, label: meta.label } : undefined
-                })
-                .filter(Boolean)
-            return {
-                value: fertilizer.p_id,
-                label: fertilizer.p_name_nl,
-                applicationMethodOptions: applicationMethodOptions,
-            }
+    // Extract farm ID from URL parameters
+    const b_id_farm = params.b_id_farm
+    if (!b_id_farm) {
+        throw data("Farm ID is required", {
+            status: 400,
+            statusText: "Farm ID is required",
         })
+    }
 
-        // Fetch the cultivation plan for the farm
-        const cultivationPlan = await getCultivationPlan(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-
-        // Find the target cultivation within the cultivation plan
-        const targetCultivation = cultivationPlan.find(
-            (c) => c.b_lu_catalogue === b_lu_catalogue,
-        )
-        if (!targetCultivation) {
-            throw data("Cultivation not found", { status: 404 })
-        }
-
-        // Combine similar fertilizer applications across all fields of the target cultivation.
-        const fertilizerApplications = targetCultivation.fields.reduce(
-            (accumulator: any[], field: { fertilizer_applications: any[] }) => {
-                field.fertilizer_applications.forEach((app: any) => {
-                    // Create a key based on application properties to identify similar applications.
-                    const isSimilarApplication = (app1: any, app2: any) =>
-                        app1.p_id_catalogue === app2.p_id_catalogue &&
-                        app1.p_app_amount === app2.p_app_amount &&
-                        app1.p_app_method === app2.p_app_method &&
-                        app1.p_app_date.getTime() === app2.p_app_date.getTime()
-
-                    const existingApplication = accumulator.find(
-                        (existingApp: any) => isSimilarApplication(existingApp, app),
-                    )
-
-                    if (existingApplication) {
-                        // If similar application exists, add the current p_app_id to its p_app_ids array.
-                        existingApplication.p_app_ids.push(app.p_app_id)
-                    } else {
-                        // If it's a new application, add it to the accumulator with a new p_app_ids array.
-                        accumulator.push({ ...app, p_app_ids: [app.p_app_id] })
-                    }
-                })
-
-                return accumulator
-            },
-            [],
-        )
-
-        const dose = calculateDose({
-            applications: fertilizerApplications,
-            fertilizers,
+    // Extract cultivation catalogue ID from URL parameters
+    const b_lu_catalogue = params.b_lu_catalogue
+    if (!b_lu_catalogue) {
+        throw data("Cultivation catalogue ID is required", {
+            status: 400,
+            statusText: "Cultivation catalogue ID is required",
         })
+    }
 
+    // Get the session
+    const session = await getSession(request)
+
+    // Get timeframe from calendar store
+    const timeframe = getTimeframe(params)
+
+    // Fetch available fertilizers for the farm
+    const fertilizers = await getFertilizers(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+    )
+    const fertilizerParameterDescription = getFertilizerParametersDescription()
+    const applicationMethods = fertilizerParameterDescription.find(
+        (x: { parameter: string }) => x.parameter === "p_app_method_options",
+    )
+    if (!applicationMethods) throw new Error("Parameter metadata missing")
+    // Map fertilizers to options for the combobox
+    const fertilizerOptions = fertilizers.map((fertilizer) => {
+        const applicationMethodOptions = fertilizer.p_app_method_options
+            .map((opt: string) => {
+                const meta = applicationMethods.options.find(
+                    (x: { value: string }) => x.value === opt,
+                )
+                return meta ? { value: opt, label: meta.label } : undefined
+            })
+            .filter(Boolean)
         return {
-            b_lu_catalogue: b_lu_catalogue,
-            b_id_farm: b_id_farm,
-            fertilizerOptions: fertilizerOptions,
-            fertilizerApplications: fertilizerApplications,
-            dose: dose.dose,
-            applicationMethodOptions: applicationMethods.options,
+            value: fertilizer.p_id,
+            label: fertilizer.p_name_nl,
+            applicationMethodOptions: applicationMethodOptions,
         }
-    } catch (error) {
-        return handleLoaderError(error)
+    })
+
+    // Fetch the cultivation plan for the farm
+    const cultivationPlan = await getCultivationPlan(
+        fdm,
+        session.principal_id,
+        b_id_farm,
+        timeframe,
+    )
+
+    // Find the target cultivation within the cultivation plan
+    const targetCultivation = cultivationPlan.find(
+        (c) => c.b_lu_catalogue === b_lu_catalogue,
+    )
+    if (!targetCultivation) {
+        throw data("Cultivation not found", { status: 404 })
+    }
+
+    // Combine similar fertilizer applications across all fields of the target cultivation.
+    const fertilizerApplications = targetCultivation.fields.reduce(
+        (accumulator: any[], field: { fertilizer_applications: any[] }) => {
+            field.fertilizer_applications.forEach((app: any) => {
+                // Create a key based on application properties to identify similar applications.
+                const isSimilarApplication = (app1: any, app2: any) =>
+                    app1.p_id_catalogue === app2.p_id_catalogue &&
+                    app1.p_app_amount === app2.p_app_amount &&
+                    app1.p_app_method === app2.p_app_method &&
+                    app1.p_app_date.getTime() === app2.p_app_date.getTime()
+
+                const existingApplication = accumulator.find(
+                    (existingApp: any) =>
+                        isSimilarApplication(existingApp, app),
+                )
+
+                if (existingApplication) {
+                    // If similar application exists, add the current p_app_id to its p_app_ids array.
+                    existingApplication.p_app_ids.push(app.p_app_id)
+                } else {
+                    // If it's a new application, add it to the accumulator with a new p_app_ids array.
+                    accumulator.push({ ...app, p_app_ids: [app.p_app_id] })
+                }
+            })
+
+            return accumulator
+        },
+        [],
+    )
+
+    const dose = calculateDose({
+        applications: fertilizerApplications,
+        fertilizers,
+    })
+
+    return {
+        b_lu_catalogue: b_lu_catalogue,
+        b_id_farm: b_id_farm,
+        fertilizerOptions: fertilizerOptions,
+        fertilizerApplications: fertilizerApplications,
+        dose: dose.dose,
+        applicationMethodOptions: applicationMethods.options,
     }
 }
 
 export default function Index() {
-    const loaderData = useLoaderData<typeof loader>() as Awaited<ReturnType<typeof loader>>
+    const loaderData = useLoaderData<typeof loader>() as Awaited<
+        ReturnType<typeof loader>
+    >
     const location = useLocation()
+    const navigation = useNavigation()
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     return (
-        <div className="space-y-6">      
+        <div className="space-y-6">
             <div className="flex justify-end">
-                <Dialog>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>Bemesting toevoegen</Button>
                     </DialogTrigger>
@@ -188,6 +190,8 @@ export default function Index() {
                         <FertilizerApplicationForm
                             options={loaderData.fertilizerOptions}
                             action={location.pathname}
+                            onSuccess={() => setIsDialogOpen(false)}
+                            navigation={navigation}
                         />
                     </DialogContent>
                 </Dialog>

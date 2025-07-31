@@ -7,14 +7,15 @@ import {
     getField,
     removeFertilizerApplication,
 } from "@svenvw/fdm-core"
+import { useState } from "react"
 import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useFetcher,
     useLoaderData,
     useLocation,
+    useNavigation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
 import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-applications/cards"
@@ -164,7 +165,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
     const location = useLocation()
-    const fetcher = useFetcher()
+    const navigation = useNavigation()
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
 
     return (
         <div className="space-y-6">
@@ -176,7 +178,7 @@ export default function FarmFieldsOverviewBlock() {
             </div>
             <Separator />
             <div className="flex justify-end">
-                <Dialog>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>Bemesting toevoegen</Button>
                     </DialogTrigger>
@@ -191,6 +193,8 @@ export default function FarmFieldsOverviewBlock() {
                         <FertilizerApplicationForm
                             options={loaderData.fertilizerOptions}
                             action={location.pathname}
+                            onSuccess={() => setIsDialogOpen(false)}
+                            navigation={navigation}
                         />
                     </DialogContent>
                 </Dialog>
@@ -204,7 +208,6 @@ export default function FarmFieldsOverviewBlock() {
                         applicationMethodOptions={
                             loaderData.applicationMethodOptions
                         }
-                        fetcher={fetcher}
                     />
                 </div>
                 <FertilizerApplicationsCards dose={loaderData.dose} />
