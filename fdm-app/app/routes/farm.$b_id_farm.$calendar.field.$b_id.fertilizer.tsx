@@ -12,24 +12,11 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useFetcher,
     useLoaderData,
-    useLocation,
 } from "react-router"
 import { dataWithError, dataWithSuccess } from "remix-toast"
-import { FertilizerApplicationsCards } from "~/components/blocks/fertilizer-applications/cards"
-import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
+import { FertilizerApplicationCard } from "~/components/blocks/fertilizer-applications/card"
 import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
-import { FertilizerApplicationsList } from "~/components/blocks/fertilizer-applications/list"
-import { Button } from "~/components/ui/button"
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "~/components/ui/dialog"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
@@ -163,52 +150,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const location = useLocation()
-    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">Bemesting</h3>
-                <p className="text-sm text-muted-foreground">
-                    Hier kunt u de bemestingsgegevens van het perceel bijwerken.
-                </p>
-            </div>
-            <Separator />
-            <div className="flex justify-end">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button>Bemesting toevoegen</Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[800px]">
-                        <DialogHeader>
-                            <DialogTitle>Bemesting toevoegen</DialogTitle>
-                            <DialogDescription>
-                                Voeg een nieuwe bemestingstoepassing toe aan het
-                                perceel.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <FertilizerApplicationForm
-                            options={loaderData.fertilizerOptions}
-                            action={location.pathname}
-                        />
-                    </DialogContent>
-                </Dialog>
-            </div>
-            <div className="grid 2xl:grid-cols-3 gap-8">
-                <div className="2xl:col-span-2">
-                    <FertilizerApplicationsList
-                        fertilizerApplications={
-                            loaderData.fertilizerApplications
-                        }
-                        applicationMethodOptions={
-                            loaderData.applicationMethodOptions
-                        }
-                        fetcher={fetcher}
-                    />
-                </div>
-                <FertilizerApplicationsCards dose={loaderData.dose} />
-            </div>
+            <FertilizerApplicationCard
+                fertilizerApplications={loaderData.fertilizerApplications}
+                applicationMethodOptions={loaderData.applicationMethodOptions}
+                fertilizerOptions={loaderData.fertilizerOptions}
+                dose={loaderData.dose}
+            />
         </div>
     )
 }

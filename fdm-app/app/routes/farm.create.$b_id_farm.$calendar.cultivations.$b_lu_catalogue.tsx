@@ -5,14 +5,7 @@ import {
     type MetaFunction,
     Outlet,
     useLoaderData,
-    useLocation,
 } from "react-router"
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-} from "~/components/ui/pagination"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -99,50 +92,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const { pathname } = useLocation()
-
-    // Get field names
-    let fieldNames = loaderData.cultivation.fields.map((field) => field.b_name)
-    if (fieldNames.length > 1) {
-        fieldNames = fieldNames.join(", ")
-        fieldNames = fieldNames.replace(/,(?=[^,]+$)/, ", en") //Replace last comma with and
-    }
-
-    const items = [
-        {
-            title: "Gewas",
-            href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`,
-        },
-        {
-            title: "Bemesting",
-            href: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/fertilizers`,
-        },
-    ]
 
     return (
         <div className="space-y-6">
-            <div>
-                <h3 className="text-lg font-medium">
-                    {loaderData.cultivation.b_lu_name}
-                </h3>
-                <p className="text-sm text-muted-foreground">{fieldNames}</p>
-            </div>
-
-            <Pagination>
-                <PaginationContent className="">
-                    {items.map((item) => (
-                        <PaginationItem key={item.href}>
-                            <PaginationLink
-                                href={item.href}
-                                size="default"
-                                isActive={pathname === item.href}
-                            >
-                                {item.title}
-                            </PaginationLink>
-                        </PaginationItem>
-                    ))}
-                </PaginationContent>
-            </Pagination>
             <Outlet />
         </div>
     )

@@ -25,13 +25,18 @@ import {
 } from "~/components/ui/select"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
+import type { Navigation } from "react-router"
 
 export function FertilizerApplicationForm({
     options,
     action,
+    onSuccess,
+    navigation,
 }: {
     options: FertilizerOption[]
     action: string
+    onSuccess?: () => void
+    navigation: Navigation
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -53,10 +58,11 @@ export function FertilizerApplicationForm({
     }, [p_id, form.setValue])
 
     useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
+        if (form.formState.isSubmitSuccessful && navigation.state === "idle") {
             form.reset()
+            onSuccess?.()
         }
-    }, [form.formState, form.reset])
+    }, [form.formState, form.reset, onSuccess, navigation.state])
 
     return (
         <RemixFormProvider {...form}>

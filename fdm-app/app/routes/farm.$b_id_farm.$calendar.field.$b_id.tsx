@@ -135,7 +135,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             },
             {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation`,
-                title: "Gewas",
+                title: "Gewassen",
             },
             {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,

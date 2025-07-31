@@ -3,25 +3,19 @@ import { format } from "date-fns"
 import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { FertilizerApplication } from "./types.d"
+import { useFetcher } from "react-router"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,
     applicationMethodOptions,
-    fetcher,
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
         value: ApplicationMethods
         label: string
     }[]
-    fetcher: {
-        state: string
-        submit: (
-            data: { p_app_id: string | string[] },
-            options: { method: string },
-        ) => void
-    }
 }) {
+    const fetcher = useFetcher()
     const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
 

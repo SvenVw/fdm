@@ -1,52 +1,81 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import type { z } from "zod"
+import { z } from "zod"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
-import { FormSchema } from "./schema"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "~/components/ui/dialog"
+import { CultivationAddFormSchema } from "./schema"
 import type { CultivationsFormProps } from "./types"
+import { useEffect, useRef, useState } from "react"
 
-export function CultivationForm({
-    b_lu_catalogue,
-    b_lu_start,
-    b_lu_end,
+export function CultivationAddFormDialog({ options }: CultivationsFormProps) {
+    const [isOpen, setIsOpen] = useState(false)
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button>Gewas toevoegen</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Gewas toevoegen</DialogTitle>
+                </DialogHeader>
+                <CultivationAddForm
+                    options={options}
+                    onSuccess={() => setIsOpen(false)}
+                />
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+function CultivationAddForm({
     options,
-    action,
-}: CultivationsFormProps) {
-    const form = useRemixForm<z.infer<typeof FormSchema>>({
+    onSuccess,
+}: CultivationsFormProps & { onSuccess?: () => void }) {
+    const form = useRemixForm<z.infer<typeof CultivationAddFormSchema>>({
         mode: "onTouched",
-        resolver: zodResolver(FormSchema),
+        resolver: zodResolver(CultivationAddFormSchema),
         defaultValues: {
-            b_lu_catalogue: b_lu_catalogue ?? "",
-            b_lu_start: b_lu_start ?? new Date(),
-            b_lu_end: b_lu_end,
+            b_lu_catalogue: "",
+            b_lu_start: new Date(), // Initialize with a Date object
+            b_lu_end: undefined,
         },
     })
 
+    const { isSubmitting, isSubmitSuccessful } = form.formState
+    const isSubmittingRef = useRef(isSubmitting)
+
     useEffect(() => {
-        form.setValue("b_lu_catalogue", b_lu_catalogue ?? "")
-        form.setValue("b_lu_start", b_lu_start ?? new Date())
-        form.setValue("b_lu_end", b_lu_end)
-    }, [b_lu_catalogue, b_lu_start, b_lu_end, form.setValue])
+        const wasSubmitting = isSubmittingRef.current
+        isSubmittingRef.current = isSubmitting
+        if (wasSubmitting && !isSubmitting && isSubmitSuccessful) {
+            onSuccess?.()
+        }
+    }, [isSubmitting, isSubmitSuccessful, onSuccess])
 
     return (
         <RemixFormProvider {...form}>
             <Form
                 id="formCultivation"
-                action={action}
                 onSubmit={form.handleSubmit}
-                method="POST"
+                method="post"
             >
                 <fieldset disabled={form.formState.isSubmitting}>
                     <div className="grid gap-4">
                         <div className="col-span-1">
                             <Combobox
                                 options={options}
-                                form={form}
+                                form={form as any}
                                 name="b_lu_catalogue"
                                 label={
                                     <span>
@@ -54,21 +83,23 @@ export function CultivationForm({
                                         <span className="text-red-500">*</span>
                                     </span>
                                 }
-                                disabled={!!b_lu_catalogue}
+                                disabled={false}
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <DatePicker
-                                form={form}
+                                form={form as any}
                                 name={"b_lu_start"}
                                 label={"Zaaidatum"}
                                 description={""}
                             />
                             <DatePicker
-                                form={form}
+                                form={form as any}
                                 name={"b_lu_end"}
                                 label={"Einddatum"}
-                                description={""}
+                                description={
+                                    "Datum waarop het gewas wordt beëindigd"
+                                }
                             />
                         </div>
                         <div className="">
@@ -78,8 +109,6 @@ export function CultivationForm({
                                         <LoadingSpinner />
                                         <span>Opslaan...</span>
                                     </div>
-                                ) : b_lu_catalogue ? (
-                                    "Bijwerken"
                                 ) : (
                                     "Voeg toe"
                                 )}

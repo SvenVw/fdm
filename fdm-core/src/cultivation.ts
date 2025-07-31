@@ -8,6 +8,7 @@ import {
     isNotNull,
     lte,
     or,
+    sql,
     type SQL,
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
@@ -586,6 +587,7 @@ export async function getCultivationPlan(
                 b_lu: schema.cultivations.b_lu,
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
+                b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -719,6 +721,7 @@ export async function getCultivationPlan(
                     existingCultivation = {
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
+                        b_area: 0,
                         b_lu_start: curr.b_lu_start,
                         b_lu_end: curr.b_lu_end,
                         m_cropresidue: curr.m_cropresidue,
@@ -735,11 +738,15 @@ export async function getCultivationPlan(
                     existingField = {
                         b_lu: curr.b_lu,
                         b_id: curr.b_id,
+                        b_area: curr.b_area,
                         b_name: curr.b_name,
                         fertilizer_applications: [],
                         harvests: [],
                     }
                     existingCultivation.fields.push(existingField)
+                    if (curr.b_area) {
+                        existingCultivation.b_area += curr.b_area
+                    }
                 }
 
                 if (curr.p_app_id) {
@@ -844,6 +851,11 @@ export async function removeCultivation(
             if (existing.length === 0) {
                 throw new Error("Cultivation does not exist")
             }
+
+            // Delete associated harvest records first
+            await tx
+                .delete(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
 
             await tx
                 .delete(schema.cultivationEnding)

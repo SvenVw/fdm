@@ -1,4 +1,4 @@
-import { and, gte, isNotNull, lte, or } from "drizzle-orm"
+import { and, gte, isNotNull, lte, or, eq, sql } from "drizzle-orm"
 import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     enableCultivationCatalogue,
@@ -29,6 +29,7 @@ import {
 import { addField } from "./field"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
+import { addHarvest } from "./harvest"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -345,6 +346,33 @@ describe("Cultivation Data Model", () => {
             const cultivations = await getCultivations(fdm, principal_id, b_id)
             expect(cultivations.length).toEqual(0)
         })
+
+        it("should remove a cultivation and its associated harvests", async () => {
+            // Add a harvest to the cultivation using the addHarvest function
+            const harvestDate = new Date("2024-01-15");
+            await addHarvest(fdm, principal_id, b_lu, harvestDate, 1000); // Add a dummy yield value
+
+            // Verify the harvest exists
+            const harvestsBeforeDelete = await fdm.select().from(schema.cultivationHarvesting).where(eq(schema.cultivationHarvesting.b_lu, b_lu));
+            expect(harvestsBeforeDelete.length).toBe(1);
+
+            // Remove the cultivation
+            await removeCultivation(fdm, principal_id, b_lu);
+
+            // Verify the cultivation is removed
+            await expect(
+                getCultivation(fdm, principal_id, b_lu),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            );
+
+            // Verify the associated harvest is also removed
+            const harvestsAfterDelete = await fdm.select().from(schema.cultivationHarvesting).where(eq(schema.cultivationHarvesting.b_lu, b_lu));
+            expect(harvestsAfterDelete.length).toBe(0);
+
+            const cultivations = await getCultivations(fdm, principal_id, b_id);
+            expect(cultivations.length).toEqual(0);
+        });
 
         it("should update an existing cultivation", async () => {
             const newSowingDate = new Date("2024-03-01")
@@ -1066,6 +1094,67 @@ describe("Cultivation Data Model", () => {
             expect(cornCultivation).toBeDefined() // Corn cultivation should also be found
         })
 
+        it("should correctly calculate the total area of a cultivation across multiple fields", async () => {
+            const b_id2 = await addField(
+                fdm,
+                principal_id,
+                b_id_farm,
+                "test field 2",
+                "test source",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [30, 10],
+                            [40, 40],
+                            [20, 40],
+                            [10, 20],
+                            [30, 10],
+                        ],
+                    ],
+                },
+                new Date("2023-01-01"),
+                "nl_01",
+                new Date("2024-01-01"),
+            )
+
+            await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue, // Wheat
+                b_id2,
+                new Date("2024-03-01"),
+            )
+
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+
+            const wheatCultivation = cultivationPlan.find(
+                (c) => c.b_lu_catalogue === b_lu_catalogue,
+            )
+
+            const field1 = await fdm
+                .select({
+                    b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                })
+                .from(schema.fields)
+                .where(eq(schema.fields.b_id, b_id))
+
+            const field2 = await fdm
+                .select({
+                    b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                })
+                .from(schema.fields)
+                .where(eq(schema.fields.b_id, b_id2))
+
+            const totalArea = field1[0].b_area + field2[0].b_area
+
+            expect(wheatCultivation?.b_area).toBeCloseTo(totalArea, 2)
+        })
+
         it("should get an empty cultivation plan for a farm when timeframe excludes all cultivations", async () => {
             // Add a second cultivation to the catalogue - 'Corn'
             const b_lu_catalogue2 = createId()
@@ -1131,12 +1220,12 @@ describe("getCultivationsFromCatalogue error handling", () => {
             select: () => {
                 throw new Error("Database error")
             },
-        }
+        } as any; // Cast to any to satisfy the FdmServerType interface for mocking purposes
 
         // Act & Assert
         try {
             await getCultivationsFromCatalogue(
-                mockFdm as FdmServerType,
+                mockFdm,
                 principal_id,
                 b_id_farm,
             )

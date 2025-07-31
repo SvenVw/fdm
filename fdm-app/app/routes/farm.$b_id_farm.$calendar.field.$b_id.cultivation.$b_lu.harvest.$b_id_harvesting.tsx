@@ -1,23 +1,27 @@
-import { addHarvest, getCultivation, getHarvest } from "@svenvw/fdm-core"
+import {
+    getCultivation,
+    getHarvest,
+    removeHarvest,
+    updateHarvest,
+} from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    NavLink,
     useLoaderData,
+    useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
-import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { getCalendar } from "../lib/calendar"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -126,29 +130,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldsOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const navigate = useNavigate()
 
     return (
-        <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <h3 className="text-lg font-medium">
-                        {loaderData.cultivation.b_lu_name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                        Vul de oogsten in voor dit gewas.
-                    </p>
-                </div>
-                <div className="flex justify-end">
-                    <NavLink
-                        to={`/farm/${loaderData.b_id_farm}/${loaderData.calendar}/field/${loaderData.cultivation.b_id}/cultivation/${loaderData.cultivation.b_lu}`}
-                        className={"ml-auto"}
-                    >
-                        <Button>{"Terug"}</Button>
-                    </NavLink>
-                </div>
-            </div>
-            <Separator />
-            <div className="space-y-6">
+        <Dialog open={true} onOpenChange={() => navigate("..")}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Oogst bijwerken</DialogTitle>
+                </DialogHeader>
                 <HarvestForm
                     b_lu_yield={
                         loaderData.harvest?.harvestable
@@ -159,9 +148,12 @@ export default function FarmFieldsOverviewBlock() {
                             ?.harvestable_analyses?.[0]?.b_lu_n_harvestable
                     }
                     b_lu_harvest_date={loaderData.harvest?.b_lu_harvest_date}
+                    b_lu_start={loaderData.cultivation.b_lu_start}
+                    b_lu_end={loaderData.cultivation.b_lu_end}
+                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
                 />
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     )
 }
 
@@ -196,28 +188,49 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
         const calendar = await getCalendar(params)
 
-        // Collect form entry
-        const formValues = await extractFormValuesFromRequest(
-            request,
-            FormSchema,
-        )
-        const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } = formValues
+        // Get the action from the form
+        if (request.method === "POST") {
+            const b_id_harvesting = params.b_id_harvesting
+            if (!b_id_harvesting) {
+                throw new Error("missing: b_id_harvesting")
+            }
+            // Collect form entry
+            const formValues = await extractFormValuesFromRequest(
+                request,
+                FormSchema,
+            )
+            const { b_lu_yield, b_lu_n_harvestable, b_lu_harvest_date } =
+                formValues
 
-        await addHarvest(
-            fdm,
-            session.principal_id,
-            b_lu,
-            b_lu_harvest_date,
-            b_lu_yield,
-            b_lu_n_harvestable,
-        )
+            await updateHarvest(
+                fdm,
+                session.principal_id,
+                b_id_harvesting,
+                b_lu_harvest_date,
+                b_lu_yield,
+                b_lu_n_harvestable,
+            )
 
-        return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
-            {
-                message: "Oogst is toegevoegd! 🎉",
-            },
-        )
+            return redirectWithSuccess(
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
+                {
+                    message: "Oogst is gewijzigd! 🎉",
+                },
+            )
+        }
+        if (request.method === "DELETE") {
+            const b_id_harvesting = params.b_id_harvesting
+            if (!b_id_harvesting) {
+                throw new Error("missing: b_id_harvesting")
+            }
+            await removeHarvest(fdm, session.principal_id, b_id_harvesting)
+            return redirectWithSuccess(
+                `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation/${b_lu}`,
+                {
+                    message: "Oogst is verwijderd! 🎉",
+                },
+            )
+        }
     } catch (error) {
         throw handleActionError(error)
     }
