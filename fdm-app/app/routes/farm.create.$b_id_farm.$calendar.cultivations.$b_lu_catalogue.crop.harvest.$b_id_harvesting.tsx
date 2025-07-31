@@ -214,18 +214,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
             }
 
             // Update harvests for all cultivations that share the same harvest date for this cultivation
-            const targetHarvests = cultivation.fields.reduce(
-                (acc: { b_id_harvesting: string }[], field: any) => {
-                    const harvest = field.harvests.find(
-                        (h: { b_id_harvesting: string }) =>
-                            h.b_id_harvesting === b_id_harvesting,
+            const targetHarvests = cultivation.fields.flatMap(
+                (field: { harvests: { b_id_harvesting: string }[] }) => {
+                    return field.harvests.filter(
+                        (harvest: { b_lu_harvest_date: Date }) => {
+                            return (
+                                harvest.b_lu_harvest_date.getTime() ===
+                                b_lu_harvest_date.getTime()
+                            )
+                        },
                     )
-                    if (harvest) {
-                        acc.push(harvest)
-                    }
-                    return acc
                 },
-                [],
+            )
             )
 
             await Promise.all(

@@ -88,6 +88,7 @@ export default function AddHarvestRoute() {
                     b_lu_harvest_date={undefined}
                     b_lu_start={loaderData.cultivation.b_lu_start}
                     b_lu_end={loaderData.cultivation.b_lu_end}
+                    b_lu_harvestable={loaderData.cultivation.b_lu_harvestable}
                 />
             </DialogContent>
         </Dialog>
