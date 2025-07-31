@@ -1,5 +1,11 @@
 # fdm-docs
 
+## 0.6.1
+
+### Patch Changes
+
+- 07392e0: Fix broken link to documentation website at July 2025 Release Notes blog post
+
 ## 0.6.0
 
 ### Minor Changes
