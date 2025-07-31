@@ -91,6 +91,22 @@ describe("Harvest Data Model", () => {
             b_n_fixation: 0,
         })
 
+        await addCultivationToCatalogue(fdm, {
+            b_lu_catalogue: `${b_lu_catalogue}-multiple`,
+            b_lu_source: b_lu_source,
+            b_lu_name: "test-name-multiple",
+            b_lu_name_en: "test-name-en-multiple",
+            b_lu_harvestable: "multiple",
+            b_lu_hcat3: "test-hcat3-multiple",
+            b_lu_hcat3_name: "test-hcat3-name-multiple",
+            b_lu_croprotation: "grass",
+            b_lu_yield: 2000,
+            b_lu_hi: 0.4,
+            b_lu_n_harvestable: 12,
+            b_lu_n_residue: 2,
+            b_n_fixation: 0,
+        })
+
         b_lu_start = new Date("2024-01-01")
         b_lu = await addCultivation(
             fdm,
@@ -216,5 +232,88 @@ describe("Harvest Data Model", () => {
             .limit(1)
 
         expect(cultivation[0].b_lu_end).toEqual(newHarvestDate)
+    })
+
+    it("should not update cultivation end date for 'multiple' harvestable cultivations", async () => {
+        const newHarvestDate = new Date("2024-08-01")
+        const b_lu_multiple = await addCultivation(
+            fdm,
+            principal_id,
+            `${b_lu_catalogue}-multiple`,
+            b_id,
+            b_lu_start,
+        )
+
+        const b_id_harvesting_multiple = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            new Date("2024-07-01"),
+            5000,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+        )
+
+        await updateHarvest(
+            fdm,
+            principal_id,
+            b_id_harvesting_multiple,
+            newHarvestDate,
+            5000,
+        )
+
+        const cultivation = await fdm
+            .select()
+            .from(schema.cultivationEnding)
+            .where(eq(schema.cultivationEnding.b_lu, b_lu_multiple))
+            .limit(1)
+
+        expect(cultivation[0].b_lu_end).not.toEqual(newHarvestDate)
+    })
+
+    it("should throw an error when updating harvest date after terminating date for 'multiple' harvestable cultivations", async () => {
+        const b_lu_multiple = await addCultivation(
+            fdm,
+            principal_id,
+            `${b_lu_catalogue}-multiple`,
+            b_id,
+            b_lu_start,
+        )
+
+        const b_id_harvesting_multiple = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu_multiple,
+            new Date("2024-07-01"),
+            5000,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+        )
+
+        // Set a terminating date for the cultivation
+        await fdm
+            .update(schema.cultivationEnding)
+            .set({ b_lu_end: new Date("2024-07-30") })
+            .where(eq(schema.cultivationEnding.b_lu, b_lu_multiple))
+
+        const newHarvestDate = new Date("2024-08-01") // After terminating date
+
+        await expect(
+            updateHarvest(
+                fdm,
+                principal_id,
+                b_id_harvesting_multiple,
+                newHarvestDate,
+                5000,
+            ),
+        ).rejects.toThrowError("Exception for updateHarvest")
     })
 })
