@@ -1,7 +1,6 @@
 import type { Harvest } from "@svenvw/fdm-core"
 import { format } from "date-fns/format"
 import { NavLink } from "react-router"
-import { Button } from "~/components/ui/button"
 import type { HarvestableType } from "./types"
 
 export function HarvestsList({
@@ -47,27 +46,7 @@ export function HarvestsList({
                                 </div>
                             </div>
                         ))}
-                    </div>
-                    {canAddHarvest ? (
-                        <div>
-                            <Button
-                                aria-label="Voeg oogst toe"
-                                disabled={!canAddHarvest}
-                                asChild
-                            >
-                                <NavLink
-                                    to="./harvest"
-                                    className={
-                                        !canAddHarvest
-                                            ? "pointer-events-none opacity-50"
-                                            : ""
-                                    }
-                                >
-                                    Oogst toevoegen
-                                </NavLink>
-                            </Button>
-                        </div>
-                    ) : null}
+                    </div>                 
                 </div>
             ) : canAddHarvest ? (
                 <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
