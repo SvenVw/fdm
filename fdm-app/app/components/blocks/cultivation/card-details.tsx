@@ -25,8 +25,6 @@ export function CultivationDetailsCard({
     cultivation,
 }: {
     cultivation: Cultivation
-    harvests: Harvest[]
-    b_lu_harvestable: HarvestableType
 }) {
     const fetcher = useFetcher()
     const form = useRemixForm<CultivationDetailsFormSchemaType>({

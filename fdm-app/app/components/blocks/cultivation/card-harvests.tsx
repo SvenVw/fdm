@@ -9,7 +9,6 @@ export function CultivationHarvestsCard({
     harvests,
     b_lu_harvestable,
 }: {
-    cultivation: Cultivation
     harvests: Harvest[]
     b_lu_harvestable: HarvestableType
 }) {
