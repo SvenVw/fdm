@@ -211,7 +211,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 await Promise.all(
                     fields.map(async (field: { b_id: string }) => {
                         const b_id = field.b_id
-                        addFertilizerApplication(
+                        await addFertilizerApplication(
                             fdm,
                             session.principal_id,
                             b_id,
