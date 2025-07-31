@@ -29,7 +29,9 @@ export function HarvestsList({
                                 className="flex flex-cols items-center"
                                 key={harvest.b_id_harvesting}
                             >
-                                <NavLink to={`./harvest/${harvest.b_id_harvesting}`}>
+                                <NavLink
+                                    to={`./harvest/${harvest.b_id_harvesting}`}
+                                >
                                     <p className="text-sm font-medium leading-none hover:underline">
                                         {format(
                                             harvest.b_lu_harvest_date,
@@ -46,7 +48,7 @@ export function HarvestsList({
                                 </div>
                             </div>
                         ))}
-                    </div>                 
+                    </div>
                 </div>
             ) : canAddHarvest ? (
                 <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
@@ -58,7 +60,7 @@ export function HarvestsList({
                             Voeg een oogst toe om gegevens zoals, opbrengst,
                             datum en gehaltes bij te houden.
                         </p>
-                    </div>                   
+                    </div>
                 </div>
             ) : (
                 <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">

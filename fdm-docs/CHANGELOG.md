@@ -1,5 +1,15 @@
 # fdm-docs
 
+## 0.6.0
+
+### Minor Changes
+
+- f78d85e: Add explanation of how Dutch legal norms are calculated with fdm-calculator
+
+### Patch Changes
+
+- db5e7fe: Update dependencies
+
 ## 0.5.0
 
 ### Minor Changes

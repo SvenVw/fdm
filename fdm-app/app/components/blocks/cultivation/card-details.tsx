@@ -1,5 +1,10 @@
-import type { Harvest, Cultivation } from "@svenvw/fdm-core"
-import { useFetcher, Form, useLocation } from "react-router"
+import { zodResolver } from "@hookform/resolvers/zod"
+import type { Cultivation } from "@svenvw/fdm-core"
+import { useEffect } from "react"
+import { Form, useFetcher, useLocation } from "react-router"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { DatePicker } from "~/components/custom/date-picker"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Checkbox } from "~/components/ui/checkbox"
@@ -10,16 +15,10 @@ import {
     FormLabel,
     FormMessage,
 } from "~/components/ui/form"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import type { HarvestableType } from "../harvest/types"
 import {
     CultivationDetailsFormSchema,
     type CultivationDetailsFormSchemaType,
 } from "./schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { DatePicker } from "~/components/custom/date-picker"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { useEffect } from "react"
 
 export function CultivationDetailsCard({
     cultivation,

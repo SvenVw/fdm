@@ -21,11 +21,8 @@ import {
     NutrientKPICardForTotalApplications,
 } from "~/components/blocks/nutrient-advice/kpi"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
+import { NutrientCardSkeleton } from "~/components/blocks/nutrient-advice/skeletons"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
-import {
-    NutrientAdviceFallback,
-    NutrientCardSkeleton,
-} from "~/components/blocks/nutrient-advice/skeletons"
 import {
     Card,
     CardContent,

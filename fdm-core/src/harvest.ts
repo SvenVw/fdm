@@ -557,7 +557,10 @@ export async function updateHarvest(
                 throw new Error("Sowing date does not exist")
             }
 
-            if (b_lu_harvest_date.getTime() <= sowingDate[0].b_lu_start.getTime()) {
+            if (
+                b_lu_harvest_date.getTime() <=
+                sowingDate[0].b_lu_start.getTime()
+            ) {
                 throw new Error("Harvest date must be after sowing date")
             }
 
@@ -594,7 +597,10 @@ export async function updateHarvest(
 
             await tx
                 .update(schema.cultivationHarvesting)
-                .set({ b_lu_harvest_date: b_lu_harvest_date, updated: new Date() })
+                .set({
+                    b_lu_harvest_date: b_lu_harvest_date,
+                    updated: new Date(),
+                })
                 .where(
                     eq(
                         schema.cultivationHarvesting.b_id_harvesting,

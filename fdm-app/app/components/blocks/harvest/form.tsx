@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Form, useFetcher } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { cn } from "@/app/lib/utils"
 import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
@@ -15,7 +16,6 @@ import {
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import { FormSchema } from "./schema"
-import { cn } from "@/app/lib/utils"
 export function HarvestForm({
     b_lu_yield,
     b_lu_n_harvestable,
@@ -29,7 +29,7 @@ export function HarvestForm({
     b_lu_harvest_date: Date | undefined
     b_lu_start: Date | undefined
     b_lu_end: Date | undefined
-    b_lu_harvestable: "once" | "multiple" | "none" | undefined,
+    b_lu_harvestable: "once" | "multiple" | "none" | undefined
 }) {
     const fetcher = useFetcher()
 

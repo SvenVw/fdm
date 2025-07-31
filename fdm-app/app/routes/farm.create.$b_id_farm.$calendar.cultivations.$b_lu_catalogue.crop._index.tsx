@@ -1,8 +1,7 @@
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
-    Harvest,
-    removeHarvest,
+    type Harvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
 import {

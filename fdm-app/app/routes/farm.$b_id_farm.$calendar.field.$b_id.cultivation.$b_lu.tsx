@@ -3,7 +3,6 @@ import {
     getCultivationsFromCatalogue,
     getField,
     getHarvests,
-    removeHarvest,
     removeCultivation,
     updateCultivation,
 } from "@svenvw/fdm-core"
@@ -21,6 +20,7 @@ import {
     redirectWithSuccess,
 } from "remix-toast"
 import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-details"
+import { CultivationHarvestsCard } from "~/components/blocks/cultivation/card-harvests"
 import { CultivationDetailsFormSchema } from "~/components/blocks/cultivation/schema"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
 import { getSession } from "~/lib/auth.server"
@@ -29,7 +29,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { CultivationHarvestsCard } from "~/components/blocks/cultivation/card-harvests"
 
 // Meta
 export const meta: MetaFunction = () => {

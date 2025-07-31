@@ -4,24 +4,24 @@ import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    useNavigate,
     useLoaderData,
+    useNavigate,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { HarvestForm } from "~/components/blocks/harvest/form"
 import { FormSchema } from "~/components/blocks/harvest/schema"
-import { getSession } from "~/lib/auth.server"
-import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { extractFormValuesFromRequest } from "~/lib/form"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from "~/components/ui/dialog"
+import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -123,7 +123,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw data("Cultivation not found", { status: 404 })
         }
 
-        const b_lu_ids = cultivation.fields.map((field: { b_lu: string }) => field.b_lu)
+        const b_lu_ids = cultivation.fields.map(
+            (field: { b_lu: string }) => field.b_lu,
+        )
 
         const formValues = await extractFormValuesFromRequest(
             request,

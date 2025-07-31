@@ -91,7 +91,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 // Main
 export default function Index() {
-    const loaderData = useLoaderData<typeof loader>()
+    const _loaderData = useLoaderData<typeof loader>()
 
     return (
         <div className="space-y-6">

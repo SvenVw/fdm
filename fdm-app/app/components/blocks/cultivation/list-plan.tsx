@@ -1,6 +1,6 @@
 import { NavLink } from "react-router"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
 
 interface CultivationField {
@@ -41,8 +41,7 @@ export function CultivationListPlan({
                         const totalArea = cultivation.b_area
                         const nameOfFields = cultivation.fields
                             .map((field) => field.b_name)
-                            .join(', ')
-                        
+                            .join(", ")
 
                         return (
                             <NavLink

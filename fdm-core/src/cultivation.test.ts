@@ -1,4 +1,4 @@
-import { and, gte, isNotNull, lte, or, eq, sql } from "drizzle-orm"
+import { and, eq, gte, isNotNull, lte, or, sql } from "drizzle-orm"
 import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     enableCultivationCatalogue,
@@ -27,9 +27,9 @@ import {
     addFertilizerToCatalogue,
 } from "./fertilizer"
 import { addField } from "./field"
+import { addHarvest } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
-import { addHarvest } from "./harvest"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -349,30 +349,36 @@ describe("Cultivation Data Model", () => {
 
         it("should remove a cultivation and its associated harvests", async () => {
             // Add a harvest to the cultivation using the addHarvest function
-            const harvestDate = new Date("2024-01-15");
-            await addHarvest(fdm, principal_id, b_lu, harvestDate, 1000); // Add a dummy yield value
+            const harvestDate = new Date("2024-01-15")
+            await addHarvest(fdm, principal_id, b_lu, harvestDate, 1000) // Add a dummy yield value
 
             // Verify the harvest exists
-            const harvestsBeforeDelete = await fdm.select().from(schema.cultivationHarvesting).where(eq(schema.cultivationHarvesting.b_lu, b_lu));
-            expect(harvestsBeforeDelete.length).toBe(1);
+            const harvestsBeforeDelete = await fdm
+                .select()
+                .from(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            expect(harvestsBeforeDelete.length).toBe(1)
 
             // Remove the cultivation
-            await removeCultivation(fdm, principal_id, b_lu);
+            await removeCultivation(fdm, principal_id, b_lu)
 
             // Verify the cultivation is removed
             await expect(
                 getCultivation(fdm, principal_id, b_lu),
             ).rejects.toThrowError(
                 "Principal does not have permission to perform this action",
-            );
+            )
 
             // Verify the associated harvest is also removed
-            const harvestsAfterDelete = await fdm.select().from(schema.cultivationHarvesting).where(eq(schema.cultivationHarvesting.b_lu, b_lu));
-            expect(harvestsAfterDelete.length).toBe(0);
+            const harvestsAfterDelete = await fdm
+                .select()
+                .from(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+            expect(harvestsAfterDelete.length).toBe(0)
 
-            const cultivations = await getCultivations(fdm, principal_id, b_id);
-            expect(cultivations.length).toEqual(0);
-        });
+            const cultivations = await getCultivations(fdm, principal_id, b_id)
+            expect(cultivations.length).toEqual(0)
+        })
 
         it("should update an existing cultivation", async () => {
             const newSowingDate = new Date("2024-03-01")
@@ -1220,15 +1226,11 @@ describe("getCultivationsFromCatalogue error handling", () => {
             select: () => {
                 throw new Error("Database error")
             },
-        } as any; // Cast to any to satisfy the FdmServerType interface for mocking purposes
+        } as any // Cast to any to satisfy the FdmServerType interface for mocking purposes
 
         // Act & Assert
         try {
-            await getCultivationsFromCatalogue(
-                mockFdm,
-                principal_id,
-                b_id_farm,
-            )
+            await getCultivationsFromCatalogue(mockFdm, principal_id, b_id_farm)
             // Should not reach here
             expect.fail("Expected an error to be thrown")
         } catch (err) {

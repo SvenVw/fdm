@@ -1,15 +1,3 @@
-import type {
-    ActionFunctionArgs,
-    LoaderFunctionArgs,
-    MetaFunction,
-} from "react-router"
-import { data, useLoaderData } from "react-router"
-import { MijnPercelenUploadForm } from "@/app/components/blocks/mijnpercelen/form-upload"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
-import { SidebarInset } from "~/components/ui/sidebar"
-import { clientConfig } from "~/lib/config"
-import { handleActionError } from "~/lib/error"
 import { LocalFileStorage } from "@mjackson/file-storage/local"
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
 import {
@@ -18,15 +6,27 @@ import {
     addSoilAnalysis,
     getFarm,
 } from "@svenvw/fdm-core"
-import type { Feature, FeatureCollection, Polygon } from "geojson"
 import * as turf from "@turf/turf"
+import type { Feature, FeatureCollection, Polygon } from "geojson"
 import proj4 from "proj4"
-import { redirectWithSuccess, dataWithWarning } from "remix-toast"
+import type {
+    ActionFunctionArgs,
+    LoaderFunctionArgs,
+    MetaFunction,
+} from "react-router"
+import { data, useLoaderData } from "react-router"
+import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { combine, parseDbf, parseShp } from "shpjs"
-import { getSession } from "~/lib/auth.server"
-import { fdm } from "~/lib/fdm.server"
-import { getCalendar } from "~/lib/calendar"
+import { MijnPercelenUploadForm } from "@/app/components/blocks/mijnpercelen/form-upload"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -149,7 +149,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 parseShp(shpBuffer, shxBuffer),
                 parseDbf(dbfBuffer),
             ])) as FeatureCollection<Polygon, RvoProperties>
-        } catch (error) {
+        } catch (_error) {
             return dataWithWarning({}, "Shapefile is ongeldig.")
         }
 

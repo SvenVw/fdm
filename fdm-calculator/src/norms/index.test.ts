@@ -1,13 +1,13 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
+import { aggregateNormsToFarmLevel } from "./farm"
 import {
-    createFunctionsForNorms,
     createFunctionsForFertilizerApplicationFilling,
+    createFunctionsForNorms,
 } from "./index"
-import { collectNL2025InputForNorms } from "./nl/2025/input"
-import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
 import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/dierlijke-mest-gebruiksnorm"
 import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/fosfaatgebruiksnorm"
-import { aggregateNormsToFarmLevel } from "./farm"
+import { collectNL2025InputForNorms } from "./nl/2025/input"
+import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
 
 describe("createFunctionsForNorms", () => {
     it("should return the correct functions for NL region and year 2025", () => {

@@ -5,11 +5,7 @@ import {
     BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb"
 
-export function HeaderNorms({
-    b_id_farm,
-}: {
-    b_id_farm: string
-}) {
+export function HeaderNorms({ b_id_farm }: { b_id_farm: string }) {
     const calendar = useCalendarStore((state) => state.calendar)
 
     return (
@@ -23,4 +19,3 @@ export function HeaderNorms({
         </>
     )
 }
-

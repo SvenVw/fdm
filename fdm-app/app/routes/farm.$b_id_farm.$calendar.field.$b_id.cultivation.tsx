@@ -15,14 +15,14 @@ import {
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { CultivationAddFormSchema} from "~/components/blocks/cultivation/schema"
+import { CultivationListCard } from "~/components/blocks/cultivation/card-list"
+import { CultivationAddFormSchema } from "~/components/blocks/cultivation/schema"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { CultivationListCard } from "~/components/blocks/cultivation/card-list"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -129,7 +129,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             field: field,
             cultivationsCatalogueOptions: cultivationsCatalogueOptions,
             cultivations: cultivations,
-            harvests: harvests
+            harvests: harvests,
         }
     } catch (error) {
         return handleLoaderError(error)
@@ -192,7 +192,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             // Collect form entry
             const formValues = await extractFormValuesFromRequest(
                 request,
-                CultivationAddFormSchema
+                CultivationAddFormSchema,
             )
             const { b_lu_catalogue, b_lu_start, b_lu_end } = formValues
 

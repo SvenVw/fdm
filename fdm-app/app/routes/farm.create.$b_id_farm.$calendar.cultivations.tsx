@@ -6,6 +6,7 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
+import { CultivationListPlan } from "~/components/blocks/cultivation/list-plan"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
@@ -14,7 +15,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { CultivationListPlan } from "~/components/blocks/cultivation/list-plan"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -111,19 +111,19 @@ export default function Index() {
                     description={
                         "Werk de eigenschappen per gewas in je bouwplan bij."
                     }
-						action={{
-							to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
-							label: "Doorgaan",
-						}}
+                    action={{
+                        to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                        label: "Doorgaan",
+                    }}
                 />
                 <div className="space-y-6 px-8">
                     <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6">
-					<CultivationListPlan
-						cultivationPlan={loaderData.cultivationPlan}
-						b_id_farm={loaderData.b_id_farm}
-						calendar={loaderData.calendar}
-						basePath="cultivations"
-					/>
+                        <CultivationListPlan
+                            cultivationPlan={loaderData.cultivationPlan}
+                            b_id_farm={loaderData.b_id_farm}
+                            calendar={loaderData.calendar}
+                            basePath="cultivations"
+                        />
                         <div className="xl:col-span-2">
                             <Outlet />
                         </div>

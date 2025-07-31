@@ -1,7 +1,6 @@
 import {
     calculateNitrogenBalance,
     collectInputForNitrogenBalance,
-    type NitrogenBalanceNumeric,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getField } from "@svenvw/fdm-core"
 import {
@@ -12,14 +11,15 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
+import { Suspense } from "react"
 import {
+    Await,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
     useLoaderData,
     useLocation,
-    useNavigation,
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
@@ -34,8 +34,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { getSession } from "~/lib/auth.server"
-import { Suspense } from "react"
-import { Await } from "react-router"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"

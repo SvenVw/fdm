@@ -1,9 +1,9 @@
-import { Harvest, Cultivation } from "@svenvw/fdm-core"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import type { Harvest } from "@svenvw/fdm-core"
+import { NavLink } from "react-router"
 import { HarvestsList } from "~/components/blocks/harvest/list"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
 import { Button } from "~/components/ui/button"
-import { NavLink } from "react-router"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 
 export function CultivationHarvestsCard({
     harvests,
@@ -24,7 +24,7 @@ export function CultivationHarvestsCard({
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
-                    {b_lu_harvestable === 'multiple' ? 'Oogsten' : 'Oogst'}                
+                    {b_lu_harvestable === "multiple" ? "Oogsten" : "Oogst"}
                 </CardTitle>
                 <div className="flex justify-between">
                     <NavLink

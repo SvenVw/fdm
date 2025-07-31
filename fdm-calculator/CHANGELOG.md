@@ -1,5 +1,26 @@
 # fdm-calculator
 
+## 0.5.0
+
+### Minor Changes
+
+- Implement detailed calculations for `norms` in The Netherlands for 2025, including stikstofgebruiksnorm, fosfaatgebruiksnorm and dierlijke mest norm
+- Add setup for `norms` to provide functions for regions and years to calculate the amount of fertilizer that can be applied according to local legislation
+
+### Patch Changes
+
+- db5e7fe: Update dependencies
+- f19238b: Fix calculation of crop residue biomass at nitrogen balance calculation
+- Updated dependencies [52e0959]
+- Updated dependencies [0f8e4eb]
+- Updated dependencies [db5e7fe]
+- Updated dependencies [b502367]
+- Updated dependencies [b40cffa]
+- Updated dependencies [cbf5340]
+- Updated dependencies [51722cc]
+- Updated dependencies [2ac1471]
+  - @svenvw/fdm-core@0.23.0
+
 ## 0.4.1
 
 ### Patch Changes

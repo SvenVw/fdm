@@ -1,9 +1,9 @@
+import type { Field } from "@svenvw/fdm-core"
+import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
     NL2025NormsInput,
 } from "./types.d"
-import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
-import type { Field } from "@svenvw/fdm-core"
 
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
@@ -32,7 +32,8 @@ export async function isFieldInGWGBGebied(
             throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
         }
         const json = await response.json()
-        if (json.length > 0) { // Check if not single array response
+        if (json.length > 0) {
+            // Check if not single array response
             const feature = json[0][0]
             if (feature) {
                 return true

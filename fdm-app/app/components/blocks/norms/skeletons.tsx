@@ -1,10 +1,19 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 
 export function FarmNormsSkeleton() {
     return (
         <div className="mb-0 animate-pulse">
-            <h2 className="h-8 w-48 bg-muted rounded mb-4" aria-label="Loading farm norms" />
+            <h2
+                className="h-8 w-48 bg-muted rounded mb-4"
+                aria-label="Loading farm norms"
+            />
             <div className="grid gap-4 xl:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -38,10 +47,16 @@ export function FarmNormsSkeleton() {
 export function FieldNormsSkeleton() {
     return (
         <div className="animate-pulse">
-            <h2 className="h-8 w-48 bg-muted rounded mb-6" aria-label="Loading field norms" />
+            <h2
+                className="h-8 w-48 bg-muted rounded mb-6"
+                aria-label="Loading field norms"
+            />
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {[...Array(3)].map((_, i) => (
-                    <Card key={`field-norm-skeleton-${i}`} className="hover:shadow-md transition-shadow border-gray-200">
+                    <Card
+                        key={`field-norm-skeleton-${i}`}
+                        className="hover:shadow-md transition-shadow border-gray-200"
+                    >
                         <CardHeader>
                             <div>
                                 <CardTitle className="h-6 w-3/4 bg-muted rounded" />

@@ -39,6 +39,41 @@ export interface UpdatePost {
 // Data for update posts
 export const updatePosts: UpdatePost[] = [
     {
+        id: "update-2025-07-31",
+        title: "Juli 2025",
+        description: `
+### Nieuwe App: Gebruiksnormen
+
+*   **Berekening van Gebruiksnormen:** De nieuwe app 'Gebruiksnormen' berekent de wettelijke gebruiksruimte voor stikstof en fosfaat op uw percelen. Voor een zo nauwkeurig mogelijke berekening worden diverse gegevens gebruikt, zoals de hoofdteelt, grondsoort, de ligging van het perceel (bijvoorbeeld in een NV-gebied) en de meest recente bodemanalyse. Voor de transparantie toont de app niet alleen de berekende norm, maar ook de categorie en of er speciale restricties aanwezig zijn. Zo kunt u altijd herleiden hoe de berekening tot stand is gekomen.
+
+### Derogatiebeheer
+
+*   **Derogatie per Jaar: Vanaf nu kunt u de derogatiestatus van uw bedrijf per jaar beheren. Dit zorgt voor een correcte berekening van de bijbehorende normen.
+
+### Vereenvoudigde Percelen-selectie
+
+*   **Upload "Mijn Percelen":** In plaats van percelen handmatig op de kaart te selecteren, kunt u nu direct een shapefile van "Mijn Percelen" (RVO) uploaden. De applicatie leest dit bestand in en importeert automatisch de percelen.
+
+### Verbeteringen in de 'Bedrijf Aanmaken' Wizard
+
+De wizard voor het aanmaken van een nieuw bedrijf is op meerdere punten verbeterd voor een soepelere ervaring:
+
+*   **Opsplitsing Bouwplan:** De stappen "Gewassen" en "Bemesting" zijn nu opgesplitst in twee aparte pagina's voor meer duidelijkheid.
+*   **Duidelijker Gewassenoverzicht:** De lijst met teelten in het bouwplan is overzichtelijker gemaakt en toont nu ook het aantal percelen en de totale oppervlakte per gewas.
+*   **Flexibele Jaarkeuze:** U kunt nu een ander jaar dan het huidige selecteren bij het aanmaken van een bedrijf, wat handig is voor het invoeren van historische gegevens.
+*   **Startjaar Derogatie:** Er is een optie toegevoegd om het startjaar van de derogatie van een bedrijf op te geven.
+*   **Percelen Verwijderen:** Het is nu mogelijk om een perceel direct vanuit de wizard te verwijderen.
+
+### Overige Verbeteringen
+
+*   **Vernieuwde Teelt- en Oogstpagina's:** De pagina's voor het beheren van teelten en oogsten hebben een complete make-over gekregen. U kunt nu sneller een teelt selecteren, details bekijken en direct nieuwe teelten of oogsten toevoegen via een dialoogvenster.
+*   **Overzichtelijkere Bemestingspagina:** Het ontwerp van de bemestingspagina's is verbeterd door het ontwerp duidelijker te maken.
+*   **Visuele Feedback bij Berekeningen:** Pagina's die berekeningen uitvoeren (zoals nutriëntenadvies, normen en de balans) tonen nu direct een visuele placeholder. Zo weet u dat de pagina laadt en de resultaten binnenkort verschijnen.
+`,
+        date: new Date("2025-07-31"),
+        isNew: true,
+    },
+    {
         id: "update-2025-06-26",
         title: "Juni 2025",
         description: `
