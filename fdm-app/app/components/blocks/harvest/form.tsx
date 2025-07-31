@@ -33,7 +33,6 @@ export function HarvestForm({
 }) {
     const fetcher = useFetcher()
 
-    // @ts-ignore
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
