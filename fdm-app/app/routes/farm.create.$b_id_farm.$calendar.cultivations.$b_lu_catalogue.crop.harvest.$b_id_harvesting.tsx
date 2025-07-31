@@ -215,9 +215,17 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
             // Update harvests for all cultivations that share the same harvest date for this cultivation
             const targetHarvests = cultivation.fields.flatMap(
-                (field: { harvests: { b_id_harvesting: string }[] }) => {
+                (field: {
+                    harvests: {
+                        b_id_harvesting: string
+                        b_lu_harvest_date: Date
+                    }[]
+                }) => {
                     return field.harvests.filter(
-                        (harvest: { b_lu_harvest_date: Date }) => {
+                        (harvest: {
+                            b_id_harvesting: string
+                            b_lu_harvest_date: Date
+                        }) => {
                             return (
                                 harvest.b_lu_harvest_date.getTime() ===
                                 b_lu_harvest_date.getTime()
@@ -225,7 +233,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
                         },
                     )
                 },
-            )
             )
 
             await Promise.all(
@@ -269,31 +276,35 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!cultivation) {
                 throw new Error("Cultivation not found")
             }
-            const b_lu_ids = cultivation.fields.map(
-                (field: { b_lu: string }) => field.b_lu,
+
+            // Remove harvests for selected cultivations that share the same date
+            const harvestsForCultivation =
+                cultivation.fields.flatMap(
+                    (field: { harvests: { b_id_harvesting: string }[] }) =>
+                        field.harvests,
+                ) || []
+
+            const targetHarvestDate = harvestsForCultivation.find(
+                (h: { b_id_harvesting: string }) =>
+                    h.b_id_harvesting === b_id_harvesting,
+            ).b_lu_harvest_date
+
+            const targetHarvests = harvestsForCultivation.filter(
+                (harvest: { b_lu_harvest_date: Date }) =>
+                    harvest.b_lu_harvest_date.getTime() ===
+                    targetHarvestDate.getTime(),
             )
 
-            // Remove harvests for all cultivations that share the same harvest ID
             await Promise.all(
-                b_lu_ids.map(async (b_lu: string) => {
-                    const harvestsForCultivation =
-                        cultivation.fields.find(
-                            (field: { b_lu: string }) => field.b_lu === b_lu,
-                        )?.harvests || []
-
-                    const targetHarvest = harvestsForCultivation.find(
-                        (h: { b_id_harvesting: string }) =>
-                            h.b_id_harvesting === b_id_harvesting,
-                    )
-
-                    if (targetHarvest) {
+                targetHarvests.map(
+                    async (targetHarvest: { b_id_harvesting: string }) => {
                         await removeHarvest(
                             fdm,
                             session.principal_id,
                             targetHarvest.b_id_harvesting,
                         )
-                    }
-                }),
+                    },
+                ),
             )
 
             return redirectWithSuccess(
@@ -303,6 +314,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 },
             )
         }
+
+        throw new Error("Invalid request method")
     } catch (error) {
         throw handleActionError(error)
     }

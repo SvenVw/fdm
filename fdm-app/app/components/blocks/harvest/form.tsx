@@ -48,7 +48,7 @@ export function HarvestForm({
     })
 
     const handleDeleteHarvest = () => {
-        return fetcher.submit(null, { method: "delete" })
+        return fetcher.submit(null, { method: "DELETE" })
     }
 
     // Check if this is a new harvest or is has already values
@@ -121,6 +121,7 @@ export function HarvestForm({
                         </div>
                         <div className="grid grid-cols-2 items">
                             <Button
+                                type="button"
                                 variant="destructive"
                                 onClick={handleDeleteHarvest}
                                 disabled={
