@@ -47,7 +47,7 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
                 }
 
                 // Parse null values at formData
-                if (value === 'null') {
+                if (value === "null") {
                     formObject[key] = null
                 }
 

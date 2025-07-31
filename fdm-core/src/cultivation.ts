@@ -8,8 +8,8 @@ import {
     isNotNull,
     lte,
     or,
-    sql,
     type SQL,
+    sql,
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"

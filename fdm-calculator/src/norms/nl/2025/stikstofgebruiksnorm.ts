@@ -1,15 +1,15 @@
 import type { Field } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
     GebruiksnormResult,
     NitrogenStandard,
     NL2025NormsInput,
+    NL2025NormsInputForCultivation,
     NormsByRegion,
     RegionKey,
-    NL2025NormsInputForCultivation,
 } from "./types"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.

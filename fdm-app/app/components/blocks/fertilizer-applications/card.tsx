@@ -1,9 +1,9 @@
-import { calculateDose, type Dose } from "@svenvw/fdm-calculator"
+import type { Dose } from "@svenvw/fdm-calculator"
 import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
 import { Lightbulb, Scale } from "lucide-react"
+import { useEffect, useState } from "react"
 import { useFetcher, useLocation, useNavigation } from "react-router"
-import { useState, useEffect } from "react"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {

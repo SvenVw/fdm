@@ -1,4 +1,6 @@
+import { eq } from "drizzle-orm"
 import { beforeEach, describe, expect, inject, it } from "vitest"
+import { enableCultivationCatalogue } from "./catalogues"
 import { addCultivation, addCultivationToCatalogue } from "./cultivation"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
@@ -16,8 +18,6 @@ import {
 import { addHarvest } from "./harvest"
 import { createId } from "./id"
 import { addSoilAnalysis } from "./soil"
-import { eq } from "drizzle-orm"
-import { enableCultivationCatalogue } from "./catalogues"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 

@@ -1,4 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
 
 export function NitrogenBalanceCardSkeleton() {
@@ -42,7 +48,10 @@ export function NitrogenBalanceFieldsSkeleton() {
             <CardContent>
                 <div className="space-y-8">
                     {[...Array(4)].map((_, i) => (
-                        <div key={`field-balance-skeleton-${i}`} className="flex items-center">
+                        <div
+                            key={`field-balance-skeleton-${i}`}
+                            className="flex items-center"
+                        >
                             <Skeleton className="h-6 w-6 rounded-full" />
                             <div className="ml-4 space-y-1">
                                 <Skeleton className="h-4 w-[250px]" />

@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest"
+import type { Field } from "@svenvw/fdm-core"
+import { describe, expect, it } from "vitest"
 import {
     getNL2025StikstofGebruiksNorm,
     getRegion,
     isFieldInNVGebied,
 } from "./stikstofgebruiksnorm"
-import type { Field } from "@svenvw/fdm-core"
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 
 describe("stikstofgebruiksnorm helpers", () => {

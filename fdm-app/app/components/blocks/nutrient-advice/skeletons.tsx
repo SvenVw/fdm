@@ -29,7 +29,10 @@ export function NutrientCardSkeleton() {
                     <Separator />
                     <div className="space-y-3">
                         {[...Array(2)].map((_, i) => (
-                            <div key={`skeleton-detail-${i}`} className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                            <div
+                                key={`skeleton-detail-${i}`}
+                                className="flex justify-between items-center p-2 bg-muted/50 rounded"
+                            >
                                 <div className="space-y-1">
                                     <p className="h-4 w-32 bg-muted rounded" />
                                     <p className="h-3 w-24 bg-muted rounded" />

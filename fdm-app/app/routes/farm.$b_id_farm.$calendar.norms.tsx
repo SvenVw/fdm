@@ -1,10 +1,13 @@
 import {
-    AggregatedNormsToFarmLevel,
+    type AggregatedNormsToFarmLevel,
     createFunctionsForNorms,
-    GebruiksnormResult,
+    type GebruiksnormResult,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
+import { AlertTriangle } from "lucide-react"
+import { Suspense } from "react"
 import {
+    Await,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -17,21 +20,18 @@ import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { FarmNorms } from "~/components/blocks/norms/farm-norms"
 import { FieldNorms } from "~/components/blocks/norms/field-norms"
+import { NormsFallback } from "~/components/blocks/norms/skeletons"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { Separator } from "../components/ui/separator"
+import { HeaderNorms } from "../components/blocks/header/norms"
 import { Alert, AlertDescription } from "../components/ui/alert"
-import { AlertTriangle } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { HeaderNorms } from "../components/blocks/header/norms"
-import { NormsFallback } from "~/components/blocks/norms/skeletons"
-import { Suspense } from "react"
-import { Await } from "react-router"
+import { Separator } from "../components/ui/separator"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -145,7 +145,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     const input = await functionsForms.collectInputForNorms(
                         fdm,
                         session.principal_id,
-                        field.b_id,                     
+                        field.b_id,
                     )
 
                     // Calculate the norms
@@ -215,7 +215,12 @@ export default function FarmNormsBlock() {
                     }
                 />
                 <Suspense fallback={<NormsFallback />}>
-                    <Await resolve={Promise.all([loaderData.farmNorms, loaderData.fieldNorms])}>
+                    <Await
+                        resolve={Promise.all([
+                            loaderData.farmNorms,
+                            loaderData.fieldNorms,
+                        ])}
+                    >
                         {([farmNorms, fieldNorms]) => {
                             if (loaderData.errorMessage) {
                                 return (
@@ -223,17 +228,20 @@ export default function FarmNormsBlock() {
                                         <Card className="w-[350px]">
                                             <CardHeader>
                                                 <CardTitle>
-                                                    Helaas is het niet mogelijk om je
-                                                    gebruiksnormen uit te rekenen
+                                                    Helaas is het niet mogelijk
+                                                    om je gebruiksnormen uit te
+                                                    rekenen
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent>
                                                 <div className="text-muted-foreground">
                                                     <p>
-                                                        Er is onverwacht wat misgegaan.
-                                                        Probeer opnieuw of neem contact op
-                                                        met Ondersteuning en deel de
-                                                        volgende foutmelding:
+                                                        Er is onverwacht wat
+                                                        misgegaan. Probeer
+                                                        opnieuw of neem contact
+                                                        op met Ondersteuning en
+                                                        deel de volgende
+                                                        foutmelding:
                                                     </p>
                                                     <div className="mt-8 w-full max-w-2xl">
                                                         <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
@@ -242,7 +250,8 @@ export default function FarmNormsBlock() {
                                                                     message:
                                                                         loaderData.errorMessage,
                                                                     page: page,
-                                                                    timestamp: new Date(),
+                                                                    timestamp:
+                                                                        new Date(),
                                                                 },
                                                                 null,
                                                                 2,
@@ -262,20 +271,25 @@ export default function FarmNormsBlock() {
                                         <Alert className="mb-8  border-amber-200 bg-amber-50">
                                             <AlertTriangle className="h-4 w-4 text-amber-600" />
                                             <AlertDescription className="text-amber-800">
-                                                <strong>Disclaimer:</strong> Deze getallen zijn
-                                                uitsluitend bedoeld voor informatieve
-                                                doeleinden. De getoonde gebruiksnormen zijn
-                                                indicatief en dienen te worden geverifieerd voor
-                                                juridische naleving. Raadpleeg altijd de
-                                                officiële RVO-publicaties en uw adviseur voor
-                                                definitieve normen.
+                                                <strong>Disclaimer:</strong>{" "}
+                                                Deze getallen zijn uitsluitend
+                                                bedoeld voor informatieve
+                                                doeleinden. De getoonde
+                                                gebruiksnormen zijn indicatief
+                                                en dienen te worden geverifieerd
+                                                voor juridische naleving.
+                                                Raadpleeg altijd de officiële
+                                                RVO-publicaties en uw adviseur
+                                                voor definitieve normen.
                                             </AlertDescription>
                                         </Alert>
                                         <FarmNorms farmNorms={farmNorms} />
                                         <Separator className="my-8" />
                                         <FieldNorms
                                             fieldNorms={fieldNorms}
-                                            fieldOptions={loaderData.fieldOptions}
+                                            fieldOptions={
+                                                loaderData.fieldOptions
+                                            }
                                         />
                                     </div>
                                 )
@@ -285,13 +299,14 @@ export default function FarmNormsBlock() {
                                 <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
                                     <div className="flex flex-col space-y-2 text-center">
                                         <h1 className="text-2xl font-semibold tracking-tight">
-                                            Helaas, nog geen gebruiksnormen beschikbaar
-                                            voor {loaderData.calendar}
+                                            Helaas, nog geen gebruiksnormen
+                                            beschikbaar voor{" "}
+                                            {loaderData.calendar}
                                         </h1>
                                         <p className="text-sm text-muted-foreground">
-                                            Op dit moment kunnen we alleen nog de
-                                            gebruiksnormen voor 2025 berekenen en
-                                            weergeven.
+                                            Op dit moment kunnen we alleen nog
+                                            de gebruiksnormen voor 2025
+                                            berekenen en weergeven.
                                         </p>
                                         <NavLink
                                             to={`/farm/${loaderData.b_id_farm}/2025/norms`}

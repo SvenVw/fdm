@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import { getNL2025DierlijkeMestGebruiksNorm } from "./dierlijke-mest-gebruiksnorm"
 import type { NL2025NormsInput } from "./types"
 

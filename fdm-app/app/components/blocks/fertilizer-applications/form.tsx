@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
+import type { Navigation } from "react-router"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -25,7 +26,6 @@ import {
 } from "~/components/ui/select"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
-import type { Navigation } from "react-router"
 
 export function FertilizerApplicationForm({
     options,

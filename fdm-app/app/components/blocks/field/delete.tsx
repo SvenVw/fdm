@@ -1,7 +1,7 @@
 import { Form } from "react-router"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -11,7 +11,6 @@ import {
     AlertDialogTrigger,
 } from "~/components/ui/alert-dialog"
 import { Button } from "~/components/ui/button"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
 
 interface FieldDeleteDialogProps {
     fieldName: string

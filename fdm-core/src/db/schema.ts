@@ -660,15 +660,12 @@ export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
 export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
 
 // Define derogations table
-export const derogations = fdmSchema.table(
-    "derogations",
-    {
-        b_id_derogation: text().primaryKey(),
-        b_derogation_year: integer().notNull(),
-        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-        updated: timestamp({ withTimezone: true }),
-    },
-)
+export const derogations = fdmSchema.table("derogations", {
+    b_id_derogation: text().primaryKey(),
+    b_derogation_year: integer().notNull(),
+    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated: timestamp({ withTimezone: true }),
+})
 
 export type derogationsTypeSelect = typeof derogations.$inferSelect
 export type derogationsTypeInsert = typeof derogations.$inferInsert
@@ -689,14 +686,18 @@ export const derogationApplying = fdmSchema.table(
     (table) => {
         return [
             {
-                pk: primaryKey({ columns: [table.b_id_farm, table.b_id_derogation] }),
+                pk: primaryKey({
+                    columns: [table.b_id_farm, table.b_id_derogation],
+                }),
             },
         ]
     },
 )
 
-export type derogationApplyingTypeSelect = typeof derogationApplying.$inferSelect
-export type derogationApplyingTypeInsert = typeof derogationApplying.$inferInsert
+export type derogationApplyingTypeSelect =
+    typeof derogationApplying.$inferSelect
+export type derogationApplyingTypeInsert =
+    typeof derogationApplying.$inferInsert
 
 // Define fertilizer_catalogue_enabling table
 export const fertilizerCatalogueEnabling = fdmSchema.table(

@@ -1,9 +1,9 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
+import { useFetcher } from "react-router"
 import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { FertilizerApplication } from "./types.d"
-import { useFetcher } from "react-router"
 
 export function FertilizerApplicationsList({
     fertilizerApplications,

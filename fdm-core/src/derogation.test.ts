@@ -6,8 +6,8 @@ import {
     removeDerogation,
 } from "./derogation"
 import { addFarm } from "./farm"
-import type { FdmServerType } from "./fdm-server.d"
 import { createFdmServer } from "./fdm-server"
+import type { FdmServerType } from "./fdm-server.d"
 import { createId } from "./id"
 
 describe("Derogation Functions", () => {

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { CultivationAddFormDialog } from "./form-add"
-import type { Cultivation, CultivationOption } from "./types"
 import { CultivationList } from "./list"
+import type { Cultivation, CultivationOption } from "./types"
 
 interface Harvest {
     b_lu: string
@@ -22,7 +22,9 @@ export function CultivationListCard({
     return (
         <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">Gewassen</CardTitle>
+                <CardTitle className="text-xl font-semibold tracking-tight text-gray-900">
+                    Gewassen
+                </CardTitle>
                 {cultivations.length !== 0 ? (
                     <CultivationAddFormDialog
                         options={cultivationsCatalogueOptions}

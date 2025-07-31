@@ -19,7 +19,6 @@ import type { FdmType } from "./fdm"
 import type { Field } from "./field.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
-import { fdmSchema } from "./db/schema"
 
 /**
  * Adds a new field to a farm.
