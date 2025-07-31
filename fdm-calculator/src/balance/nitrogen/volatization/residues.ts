@@ -111,6 +111,7 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
 
         // Calculate the amount of Nitrogen volatilized by crop residues of this cultivation
         const removal = b_lu_yield
+            .dividedBy(b_lu_hi)
             .times(b_lu_hi_res)
             .times(b_lu_n_residue)
             .times(emissionFactor)
