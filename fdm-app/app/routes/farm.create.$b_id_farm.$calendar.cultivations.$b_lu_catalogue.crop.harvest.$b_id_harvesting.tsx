@@ -283,11 +283,14 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     (field: { harvests: { b_id_harvesting: string }[] }) =>
                         field.harvests,
                 ) || []
-
-            const targetHarvestDate = harvestsForCultivation.find(
+            const targetHarvest = harvestsForCultivation.find(
                 (h: { b_id_harvesting: string }) =>
                     h.b_id_harvesting === b_id_harvesting,
-            ).b_lu_harvest_date
+            )
+            if (!targetHarvest) {
+                throw new Error("Target harvest not found")
+            }
+            const targetHarvestDate = targetHarvest.b_lu_harvest_date
 
             const targetHarvests = harvestsForCultivation.filter(
                 (harvest: { b_lu_harvest_date: Date }) =>
