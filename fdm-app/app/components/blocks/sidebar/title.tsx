@@ -1,5 +1,5 @@
-import { clientConfig } from "@/app/lib/config"
 import { NavLink } from "react-router"
+import { clientConfig } from "@/app/lib/config"
 import {
     SidebarHeader,
     SidebarMenu,

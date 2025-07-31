@@ -1,13 +1,14 @@
-import { useCalendarStore } from "@/app/store/calendar"
-import { useFarmStore } from "@/app/store/farm"
 import {
     ArrowRightLeft,
     BookOpenText,
     GitPullRequestArrow,
+    Landmark,
     MapIcon,
     Scale,
 } from "lucide-react"
 import { NavLink, useLocation } from "react-router"
+import { useCalendarStore } from "@/app/store/calendar"
+import { useFarmStore } from "@/app/store/farm"
 import { Badge } from "~/components/ui/badge"
 import {
     SidebarGroup,
@@ -52,6 +53,15 @@ export function SidebarApps() {
         nutrientAdviceLink = `/farm/${farmId}/${selectedCalendar}/nutrient_advice`
     } else {
         nutrientAdviceLink = undefined
+    }
+
+    let normsLink: string | undefined
+    if (isCreateFarmWizard) {
+        normsLink = undefined
+    } else if (farmId) {
+        normsLink = `/farm/${farmId}/${selectedCalendar}/norms`
+    } else {
+        normsLink = undefined
     }
 
     const omBalanceLink = undefined
@@ -117,6 +127,26 @@ export function SidebarApps() {
                                 <span className="flex items-center gap-2 cursor-default text-muted-foreground">
                                     <BookOpenText />
                                     <span>Bemestingsadvies</span>
+                                </span>
+                            </SidebarMenuButton>
+                        )}
+                    </SidebarMenuItem>
+                    <SidebarMenuItem>
+                        {normsLink ? (
+                            <SidebarMenuButton asChild>
+                                <NavLink to={normsLink}>
+                                    <Landmark />
+                                    <span>Gebruiksruimte</span>
+                                </NavLink>
+                            </SidebarMenuButton>
+                        ) : (
+                            <SidebarMenuButton
+                                asChild
+                                className="hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                            >
+                                <span className="flex items-center gap-2 cursor-default text-muted-foreground">
+                                    <Landmark />
+                                    <span>Gebruiksruimte</span>
                                 </span>
                             </SidebarMenuButton>
                         )}

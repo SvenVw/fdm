@@ -1,4 +1,3 @@
-import { username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
 import { type BetterAuth, createFdmAuth } from "./authentication"

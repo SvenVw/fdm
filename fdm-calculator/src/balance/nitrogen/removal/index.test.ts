@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { calculateNitrogenRemoval } from "."
 import type { FieldInput, NitrogenRemoval } from "../types"
+import { calculateNitrogenRemoval } from "."
 
 describe("calculateNitrogenRemoval", () => {
     it("should calculate total nitrogen removal from harvests and residues", () => {
@@ -9,6 +9,8 @@ describe("calculateNitrogenRemoval", () => {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: true,
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
             },
         ]
         const harvests: FieldInput["harvests"] = [
@@ -45,9 +47,9 @@ describe("calculateNitrogenRemoval", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-21.2) // -20 from harvest + -1.2 from residue
+        expect(result.total.toNumber()).toBeCloseTo(-23) // -20 from harvest + -3 from residue
         expect(result.harvests.total.toNumber()).toBeCloseTo(-20)
-        expect(result.residues.total.toNumber()).toBeCloseTo(-1.2)
+        expect(result.residues.total.toNumber()).toBeCloseTo(-3)
     })
 
     it("should handle cases with no harvests or residues", () => {
@@ -56,6 +58,8 @@ describe("calculateNitrogenRemoval", () => {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
                 m_cropresidue: false,
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
             },
         ]
         const harvests: FieldInput["harvests"] = []

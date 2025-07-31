@@ -64,6 +64,20 @@
             "when": 1750751079210,
             "tag": "0008_v0-21-0-2",
             "breakpoints": true
+        },
+        {
+            "idx": 9,
+            "version": "7",
+            "when": 1752056714510,
+            "tag": "0009_sweet_smasher",
+            "breakpoints": true
+        },
+        {
+            "idx": 10,
+            "version": "7",
+            "when": 1753084974762,
+            "tag": "0010_zippy_ronan",
+            "breakpoints": true
         }
     ]
 }

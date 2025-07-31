@@ -44,7 +44,7 @@ function generateCacheControl({
  */
 export function getCacheControlHeaders(
     request: Request,
-    context: EntryContext,
+    _context: EntryContext,
 ): Headers {
     const url = new URL(request.url)
     const headers = new Headers()

@@ -6,7 +6,6 @@ import type {
     Field,
     Harvest,
     SoilAnalysis,
-    fdmSchema,
 } from "@svenvw/fdm-core"
 import type { Decimal } from "decimal.js"
 

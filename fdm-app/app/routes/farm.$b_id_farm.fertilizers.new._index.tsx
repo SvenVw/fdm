@@ -1,5 +1,5 @@
-import { getFertilizers } from "@svenvw/fdm-core"
 import type { Fertilizer } from "@svenvw/fdm-core"
+import { getFertilizers } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { Link, NavLink, useLoaderData } from "react-router"
 import { Card, CardContent } from "~/components/ui/card"

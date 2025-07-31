@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
+    addDerogation,
     addFarm,
     addFertilizer,
     enableCultivationCatalogue,
@@ -27,6 +28,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     FormControl,
     FormDescription,
@@ -36,6 +38,13 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -62,12 +71,27 @@ const FormSchema = z.object({
         .min(3, {
             message: "Naam van bedrijf moet minimaal 3 karakters bevatten",
         }),
+    year: z.coerce.number({
+        required_error: "Jaar is verplicht",
+        invalid_type_error: "Jaar moet een getal zijn",
+    }),
+    has_derogation: z.coerce.boolean().default(false),
+    derogation_start_year: z.coerce
+        .number()
+        .min(2006, {
+            message: "Startjaar moet minimaal 2006 zijn",
+        })
+        .max(2025, {
+            message: "Startjaar mag maximaal 2025 zijn",
+        })
+        .optional(),
 })
 
 // Loader
 export async function loader({ request }: LoaderFunctionArgs) {
     return {
         b_name_farm: null,
+        year: new Date().getFullYear(),
     }
 }
 
@@ -84,8 +108,18 @@ export default function AddFarmPage() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             b_name_farm: loaderData.b_name_farm ?? "",
+            year: loaderData.year,
+            has_derogation: false,
+            derogation_start_year: loaderData.year,
         },
     })
+
+    const currentYear = new Date().getFullYear()
+    const years = Array.from(
+        { length: currentYear - 2020 + 1 },
+        (_, i) => currentYear - i,
+    )
+
     return (
         <SidebarInset>
             <Header action={undefined}>
@@ -118,10 +152,7 @@ export default function AddFarmPage() {
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>
-                                                                Bedrijfsnaam{" "}
-                                                                <span className="text-red-500">
-                                                                    *
-                                                                </span>
+                                                                Bedrijfsnaam
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <Input
@@ -131,6 +162,151 @@ export default function AddFarmPage() {
                                                                 />
                                                             </FormControl>
                                                             <FormDescription />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <div className="rounded-lg border p-4 space-y-4">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name="has_derogation"
+                                                        render={({ field }) => (
+                                                            <FormItem className="flex flex-row items-center justify-between">
+                                                                <div className="space-y-0.5">
+                                                                    <FormLabel className="text-base">
+                                                                        Derogatie
+                                                                    </FormLabel>
+                                                                    <FormDescription>
+                                                                        Heeft
+                                                                        dit
+                                                                        bedrijf
+                                                                        derogatie?
+                                                                    </FormDescription>
+                                                                </div>
+                                                                <FormControl>
+                                                                    <Checkbox
+                                                                        checked={
+                                                                            field.value
+                                                                        }
+                                                                        onCheckedChange={
+                                                                            field.onChange
+                                                                        }
+                                                                    />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    {form.watch(
+                                                        "has_derogation",
+                                                    ) && (
+                                                        <FormField
+                                                            control={
+                                                                form.control
+                                                            }
+                                                            name="derogation_start_year"
+                                                            render={({
+                                                                field,
+                                                            }) => (
+                                                                <FormItem>
+                                                                    <FormLabel>
+                                                                        Startjaar
+                                                                        derogatie
+                                                                    </FormLabel>
+                                                                    <Select
+                                                                        onValueChange={
+                                                                            field.onChange
+                                                                        }
+                                                                        defaultValue={String(
+                                                                            new Date().getFullYear(),
+                                                                        )}
+                                                                    >
+                                                                        <FormControl>
+                                                                            <SelectTrigger>
+                                                                                <SelectValue placeholder="Selecteer een jaar" />
+                                                                            </SelectTrigger>
+                                                                        </FormControl>
+                                                                        <SelectContent>
+                                                                            {Array.from(
+                                                                                {
+                                                                                    length:
+                                                                                        2025 -
+                                                                                        2006 +
+                                                                                        1,
+                                                                                },
+                                                                                (
+                                                                                    _,
+                                                                                    i,
+                                                                                ) =>
+                                                                                    2006 +
+                                                                                    i,
+                                                                            ).map(
+                                                                                (
+                                                                                    year,
+                                                                                ) => (
+                                                                                    <SelectItem
+                                                                                        key={
+                                                                                            year
+                                                                                        }
+                                                                                        value={String(
+                                                                                            year,
+                                                                                        )}
+                                                                                    >
+                                                                                        {
+                                                                                            year
+                                                                                        }
+                                                                                    </SelectItem>
+                                                                                ),
+                                                                            )}
+                                                                        </SelectContent>
+                                                                    </Select>
+                                                                    <FormMessage />
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col space-y-1.5">
+                                                <FormField
+                                                    control={form.control}
+                                                    name="year"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel>
+                                                                Voor welk jaar
+                                                                wil je percelen
+                                                                invullen
+                                                            </FormLabel>
+                                                            <Select
+                                                                onValueChange={
+                                                                    field.onChange
+                                                                }
+                                                                defaultValue={field.value.toString()}
+                                                            >
+                                                                <FormControl>
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Selecteer een jaar" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {years.map(
+                                                                        (
+                                                                            year,
+                                                                        ) => (
+                                                                            <SelectItem
+                                                                                key={
+                                                                                    year
+                                                                                }
+                                                                                value={year.toString()}
+                                                                            >
+                                                                                {
+                                                                                    year
+                                                                                }
+                                                                            </SelectItem>
+                                                                        ),
+                                                                    )}
+                                                                </SelectContent>
+                                                            </Select>
                                                             <FormMessage />
                                                         </FormItem>
                                                     )}
@@ -189,7 +365,8 @@ export async function action({ request }: ActionFunctionArgs) {
             request,
             FormSchema,
         )
-        const { b_name_farm } = formValues
+        const { b_name_farm, year, has_derogation, derogation_start_year } =
+            formValues
 
         const b_id_farm = await addFarm(
             fdm,
@@ -199,6 +376,17 @@ export async function action({ request }: ActionFunctionArgs) {
             null,
             null,
         )
+        if (has_derogation && derogation_start_year) {
+            const years = Array.from(
+                { length: 2025 - derogation_start_year + 1 },
+                (_, i) => derogation_start_year + i,
+            )
+            await Promise.all(
+                years.map((year) =>
+                    addDerogation(fdm, session.principal_id, b_id_farm, year),
+                ),
+            )
+        }
         await enableFertilizerCatalogue(
             fdm,
             session.principal_id,
@@ -236,11 +424,8 @@ export async function action({ request }: ActionFunctionArgs) {
             ),
         )
 
-        // Get current year
-        const year = new Date().getFullYear()
-
-        return redirectWithSuccess(`./${b_id_farm}/${year}/atlas`, {
-            message: "Bedrijf is toegevoegd! 🎉",
+        return redirectWithSuccess(`./${b_id_farm}/${year}`, {
+            message: "Bedrijf is toegevoegd! 🎉 Selecteer nu de importmethode.",
         })
     } catch (error) {
         throw handleActionError(error)

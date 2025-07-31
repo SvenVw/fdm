@@ -1,36 +1,34 @@
 import {
     getCultivationPlan,
     getCultivationsFromCatalogue,
-    Harvest,
-    removeHarvest,
+    type Harvest,
     updateCultivation,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    data,
-    useFetcher,
     useLoaderData,
 } from "react-router"
 import { dataWithSuccess } from "remix-toast"
-import { CultivationForm } from "~/components/blocks/cultivation/form"
-import { FormSchema } from "~/components/blocks/cultivation/schema"
-import { HarvestsList } from "~/components/blocks/harvest/list"
+import { CultivationDetailsCard } from "~/components/blocks/cultivation/card-details"
+import { CultivationHarvestsCard } from "~/components/blocks/cultivation/card-harvests"
+import { CultivationDetailsFormSchema } from "~/components/blocks/cultivation/schema"
 import type { HarvestableType } from "~/components/blocks/harvest/types"
-import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 
 // Meta
 export const meta: MetaFunction = () => {
     return [
-        { title: `Gewas- Bouwplan - Bedrijf toevoegen | ${clientConfig.name}` },
+        {
+            title: `Gewas - Bouwplan - Bedrijf toevoegen | ${clientConfig.name}`,
+        },
         {
             name: "description",
             content:
@@ -72,24 +70,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const timeframe = getTimeframe(params)
         const calendar = getCalendar(params)
 
+        // Get the cultivationPlan
+        const cultivationPlan = await getCultivationPlan(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+
+        // Find the target cultivation within the cultivation plan
+        const targetCultivation = cultivationPlan.find(
+            (c) => c.b_lu_catalogue === b_lu_catalogue,
+        )
+        if (!targetCultivation) {
+            throw data("Cultivation not found", { status: 404 })
+        }
+
         // Get the available cultivations
-        let cultivationOptions = []
         let b_lu_harvestable: HarvestableType = "none"
         const cultivationsCatalogue = await getCultivationsFromCatalogue(
             fdm,
             session.principal_id,
             b_id_farm,
         )
-        cultivationOptions = cultivationsCatalogue
-            .filter(
-                (cultivation) =>
-                    cultivation?.b_lu_catalogue && cultivation?.b_lu_name,
-            )
-            .map((cultivation) => ({
-                value: cultivation.b_lu_catalogue,
-                label: `${cultivation.b_lu_name} (${cultivation.b_lu_catalogue.split("_")[1]})`,
-            }))
-
         const cultivationCatalogueItem = cultivationsCatalogue.find(
             (cultivation) => {
                 return cultivation.b_lu_catalogue === b_lu_catalogue
@@ -100,46 +103,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
         }
 
-        const cultivationPlan = await getCultivationPlan(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-        const cultivation = cultivationPlan.find(
-            (x) => x.b_lu_catalogue === b_lu_catalogue,
-        )
-        const b_lu_start = cultivation.b_lu_start
-        const b_lu_end = cultivation.b_lu_end
-
-        // Find the target cultivation within the cultivation plan
-        const targetCultivation = cultivationPlan.find(
-            (c) => c.b_lu_catalogue === b_lu_catalogue,
-        )
-        if (!targetCultivation) {
-            throw data("Cultivation not found", { status: 404 })
-        }
-
         // Combine similar harvests across all fields of the target cultivation.
         const harvests = targetCultivation.fields.reduce(
             (accumulator: Harvest[], field: { harvests: Harvest[] }) => {
                 for (const harvest of field.harvests) {
                     // Create a key based on harvest properties to identify similar harvests
-                    const isSimilarHarvest = (
-                        h1: Harvest,
-                        h2: Harvest,
-                    ) =>
+                    const isSimilarHarvest = (h1: Harvest, h2: Harvest) =>
                         h1.b_lu_harvest_date.getTime() ===
                             h2.b_lu_harvest_date.getTime() &&
-                        h1.harvestable.harvestable_analyses[0]
-                            .b_lu_yield ===
+                        h1.harvestable.harvestable_analyses[0]?.b_lu_yield ===
                             h2.harvestable.harvestable_analyses[0]
-                                .b_lu_yield &&
+                                ?.b_lu_yield &&
                         h1.harvestable.harvestable_analyses[0]
-                            .b_lu_n_harvestable ===
+                            ?.b_lu_n_harvestable ===
                             h2.harvestable.harvestable_analyses[0]
-                                .b_lu_n_harvestable
-            
+                                ?.b_lu_n_harvestable
+
                     const existingHarvestIndex = accumulator.findIndex(
                         (existingHarvest: Harvest) =>
                             isSimilarHarvest(existingHarvest, harvest),
@@ -167,11 +146,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_lu_catalogue: b_lu_catalogue,
             b_id_farm: b_id_farm,
-            b_lu_start: b_lu_start,
-            b_lu_end: b_lu_end,
+            cultivation: targetCultivation,
             b_lu_harvestable: b_lu_harvestable,
             harvests: harvests,
-            cultivationOptions: cultivationOptions,
             calendar: calendar,
         }
     } catch (error) {
@@ -190,54 +167,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmAFieldCultivationBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const fetcher = useFetcher()
 
     return (
         <div className="space-y-6">
-            {/* <div>
-                <p className="text-sm text-muted-foreground">
-                    Vul de oogsten in voor dit gewas.
-                </p>
-            </div> */}
-            <Separator />
-            <div className="grid grid-cols-2 gap-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>
-                            {loaderData.b_lu_harvestable === "multiple"
-                                ? "Oogsten"
-                                : "Oogst"}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {loaderData.b_lu_harvestable === "none" ? (
-                            <p className="text-muted-foreground">
-                                Dit gewas kan niet geoogst worden.
-                            </p>
-                        ) : (
-                            <HarvestsList
-                                harvests={loaderData.harvests}
-                                b_lu_harvestable={loaderData.b_lu_harvestable}
-                                state={fetcher.state}
-                            />
-                        )}
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Gewasdetails</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <CultivationForm
-                            b_lu_catalogue={loaderData.b_lu_catalogue}
-                            b_lu_start={loaderData.b_lu_start}
-                            b_lu_end={loaderData.b_lu_end}
-                            options={loaderData.cultivationOptions}
-                            action={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations/${loaderData.b_lu_catalogue}/crop`}
-                        />
-                    </CardContent>
-                </Card>
-            </div>
+            <CultivationDetailsCard
+                cultivation={loaderData.cultivation}
+                harvests={loaderData.harvests}
+                b_lu_harvestable={loaderData.b_lu_harvestable}
+            />
+            <CultivationHarvestsCard
+                harvests={loaderData.harvests}
+                b_lu_harvestable={loaderData.b_lu_harvestable}
+                cultivation={loaderData.cultivation}
+            />
         </div>
     )
 }
@@ -280,12 +222,15 @@ export async function action({ request, params }: ActionFunctionArgs) {
             const cultivation = cultivationPlan.find(
                 (cultivation) => cultivation.b_lu_catalogue === b_lu_catalogue,
             )
+            if (!cultivation) {
+                throw new Error("Cultivation not found")
+            }
             const b_lu = cultivation.fields.map(
                 (field: { b_lu: string }) => field.b_lu,
             )
             const formValues = await extractFormValuesFromRequest(
                 request,
-                FormSchema,
+                CultivationDetailsFormSchema,
             )
 
             // Add cultivation details for each cultivation
@@ -307,31 +252,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             return dataWithSuccess(
                 { result: "Data saved successfully" },
                 "Gewas is bijgewerkt! 🎉",
-            )
-        }
-        if (request.method === "DELETE") {
-            const formData = await request.formData()
-            const rawHarvestIds = formData.get("b_id_harvesting")
-
-            if (!rawHarvestIds || typeof rawHarvestIds !== "string") {
-                throw new Error("invalid: rawHarvestIds")
-            }
-            const b_ids_harvesting = rawHarvestIds.split(",")
-
-            // Remove harvests for all cultivations
-            await Promise.all(
-                b_ids_harvesting.map(async (b_id_harvesting: string) => {
-                    await removeHarvest(
-                        fdm,
-                        session.principal_id,
-                        b_id_harvesting,
-                    )
-                }),
-            )
-
-            return dataWithSuccess(
-                { result: "Data removed successfully" },
-                "Oogst is verwijderd",
             )
         }
     } catch (error) {

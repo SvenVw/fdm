@@ -1,16 +1,15 @@
 import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    data,
     useLoaderData,
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
@@ -92,6 +91,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             {
                 to: `/farm/${b_id_farm}/settings/access`,
                 title: "Toegang",
+            },
+            {
+                to: `/farm/${b_id_farm}/settings/derogation`,
+                title: "Derogatie",
             },
             {
                 to: `/farm/${b_id_farm}/settings/delete`,

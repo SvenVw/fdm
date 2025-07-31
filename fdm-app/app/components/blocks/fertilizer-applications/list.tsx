@@ -1,5 +1,6 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
+import { useFetcher } from "react-router"
 import { Button } from "~/components/ui/button"
 import { LoadingSpinner } from "../../custom/loadingspinner"
 import type { FertilizerApplication } from "./types.d"
@@ -7,21 +8,14 @@ import type { FertilizerApplication } from "./types.d"
 export function FertilizerApplicationsList({
     fertilizerApplications,
     applicationMethodOptions,
-    fetcher,
 }: {
     fertilizerApplications: FertilizerApplication[]
     applicationMethodOptions: {
         value: ApplicationMethods
         label: string
     }[]
-    fetcher: {
-        state: string
-        submit: (
-            data: { p_app_id: string | string[] },
-            options: { method: string },
-        ) => void
-    }
 }) {
+    const fetcher = useFetcher()
     const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
 

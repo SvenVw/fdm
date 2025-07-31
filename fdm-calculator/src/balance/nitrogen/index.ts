@@ -280,7 +280,7 @@ function convertDecimalToNumberRecursive(data: unknown): unknown {
     if (typeof data === "object" && data !== null && !(data instanceof Date)) {
         const newData: { [key: string]: unknown } = {}
         for (const key in data) {
-            if (Object.prototype.hasOwnProperty.call(data, key)) {
+            if (Object.hasOwn(data, key)) {
                 newData[key] = convertDecimalToNumberRecursive(
                     (data as Record<string, unknown>)[key],
                 )

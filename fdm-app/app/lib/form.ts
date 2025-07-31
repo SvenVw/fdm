@@ -22,7 +22,7 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
         const formData = await request.formData()
         const formObject = Object.fromEntries(formData) as Record<
             string,
-            FormDataEntryValue | unknown[]
+            FormDataEntryValue | unknown[] | null
         >
 
         // Trim all values and remove quotation marks
@@ -39,11 +39,16 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
                 ) {
                     try {
                         formObject[key] = JSON.parse(value)
-                    } catch (e) {
+                    } catch (_e) {
                         // Not a valid JSON, so leave it as a string
                     }
                 } else if (key !== "b_geometry") {
                     formObject[key] = value.replace(/['"]+/g, "").trim()
+                }
+
+                // Parse null values at formData
+                if (value === "null") {
+                    formObject[key] = null
                 }
 
                 // Daypicker returns 01 Jan 1970 if no date is selected. This workaround removes the date if it is 01 Jan 1970

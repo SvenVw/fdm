@@ -62,7 +62,7 @@ describe("Soil Analysis Functions", () => {
         }
         const AcquireDate = new Date("2023-01-01")
         const DiscardingDate = new Date("2023-12-31")
-        const acquiringMethod = "owner"
+        const acquiringMethod = "nl_01"
         b_id = await addField(
             fdm,
             principal_id,

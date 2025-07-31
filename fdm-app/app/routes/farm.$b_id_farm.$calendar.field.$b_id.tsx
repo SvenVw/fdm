@@ -1,9 +1,9 @@
 import { getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    data,
     redirect,
     useLoaderData,
 } from "react-router"
@@ -135,7 +135,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             },
             {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation`,
-                title: "Gewas",
+                title: "Gewassen",
             },
             {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
@@ -146,12 +146,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Bodem",
             },
             {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/norm`,
-                title: "Gebruiksnormen",
-            },
-            {
                 to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
                 title: "Kaart",
+            },
+            {
+                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/delete`,
+                title: "Verwijderen",
             },
         ]
 
@@ -184,39 +184,33 @@ export default function FarmFieldIndex() {
     const calendar = useCalendarStore((state) => state.calendar)
 
     return (
-        <>
-            <SidebarInset>
-                <Header
-                    action={{
-                        to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
-                        label: "Terug naar percelen",
-                        disabled: false,
-                    }}
-                >
-                    <HeaderFarm
-                        b_id_farm={loaderData.b_id_farm}
-                        farmOptions={loaderData.farmOptions}
-                    />
-                    <HeaderField
-                        b_id_farm={loaderData.b_id_farm}
-                        fieldOptions={loaderData.fieldOptions}
-                        b_id={loaderData.b_id}
-                    />
-                </Header>
-                <main>
-                    <>
-                        <FarmTitle
-                            title={loaderData.field?.b_name}
-                            description={
-                                "Beheer hier de gegevens van dit perceel"
-                            }
-                        />
-                        <FarmContent sidebarItems={loaderData.sidebarPageItems}>
-                            <Outlet />
-                        </FarmContent>
-                    </>
-                </main>
-            </SidebarInset>
-        </>
+        <SidebarInset>
+            <Header
+                action={{
+                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
+                    label: "Terug naar percelen",
+                    disabled: false,
+                }}
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderField
+                    b_id_farm={loaderData.b_id_farm}
+                    fieldOptions={loaderData.fieldOptions}
+                    b_id={loaderData.b_id}
+                />
+            </Header>
+            <main>
+                <FarmTitle
+                    title={loaderData.field?.b_name}
+                    description={"Beheer hier de gegevens van dit perceel"}
+                />
+                <FarmContent sidebarItems={loaderData.sidebarPageItems}>
+                    <Outlet />
+                </FarmContent>
+            </main>
+        </SidebarInset>
     )
 }

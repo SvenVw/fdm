@@ -39,7 +39,7 @@ export function calculateTargetForNitrogenBalance(
     })
 
     // Determine whether field is zand/loess or klei/veen
-    let soilType = undefined
+    let soilType
     if (
         ["moerige_klei", "rivierklei", "zeeklei", "maasklei", "veen"].includes(
             soilAnalysis.b_soiltype_agr,
@@ -57,7 +57,7 @@ export function calculateTargetForNitrogenBalance(
     }
 
     // Determine groundwaterclass
-    let groundwaterClass = undefined
+    let groundwaterClass
     if (["bVII", "sVII", "VIII", "VII"].includes(soilAnalysis.b_gwl_class)) {
         groundwaterClass = "dry"
     } else if (
@@ -77,7 +77,7 @@ export function calculateTargetForNitrogenBalance(
     }
 
     // Determine targetValue based on Ros et al. 2023
-    let targetValue = undefined
+    let targetValue
     if (
         cultivationType === "grassland" &&
         soilType === "sand" &&

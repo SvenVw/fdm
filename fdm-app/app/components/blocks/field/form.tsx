@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import type { Feature, Polygon } from "geojson"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"

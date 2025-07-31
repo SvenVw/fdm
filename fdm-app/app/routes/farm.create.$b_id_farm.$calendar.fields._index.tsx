@@ -5,7 +5,7 @@ import {
     redirect,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -48,7 +48,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
+        const calendar = getCalendar(params)
 
+        // Get fields
         const fields = await getFields(
             fdm,
             session.principal_id,
@@ -56,7 +58,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
         if (!fields.length) {
-            throw new Error("No fields found for this farm")
+            return redirect(`/farm/create/${b_id_farm}/${calendar}/atlas`)
         }
         return redirect(`./${fields[0].b_id}`)
     } catch (error) {

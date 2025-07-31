@@ -2,6 +2,7 @@ import type { ApplicationMethods } from "@svenvw/fdm-data"
 import {
     boolean,
     index,
+    integer,
     pgSchema,
     primaryKey,
     text,
@@ -33,11 +34,28 @@ export type farmsTypeSelect = typeof farms.$inferSelect
 export type farmsTypeInsert = typeof farms.$inferInsert
 
 // Define farm_managing table
-export const acquiringMethodEnum = fdmSchema.enum("b_acquiring_method", [
-    "owner",
-    "lease",
-    "unknown",
-])
+export const acquiringMethodOptions = [
+    { value: "nl_01", label: "Eigendom" },
+    { value: "nl_02", label: "Reguliere pacht" },
+    { value: "nl_07", label: "Overige exploitatievormen" },
+    { value: "nl_09", label: "Erfpacht" },
+    { value: "nl_12", label: "Geliberaliseerde pacht, langer dan 6 jaar" },
+    { value: "nl_13", label: "Geliberaliseerde pacht, 6 jaar of korter" },
+    { value: "nl_61", label: "Reguliere pacht kortlopend" },
+    { value: "nl_63", label: "Teeltpacht" },
+    // { value: "nl_xx", label: "Pacht van geringe oppervlakten" },
+    // { value: "nl_xx", label: "Natuurpacht" },
+    // { value: "nl_xx", label: "In gebuik van een terreinbeherende organisatie" },
+    // {
+    //     value: "nl_xx",
+    //     label: "Tijdelijk gebuik in het kader van landinrichting",
+    // },
+    { value: "unknown", label: "Onbekend" },
+]
+const acquiringMethodEnum = fdmSchema.enum(
+    "b_acquiring_method",
+    acquiringMethodOptions.map((x) => x.value) as [string, ...string[]],
+)
 
 export const fieldAcquiring = fdmSchema.table(
     "field_acquiring",
@@ -640,6 +658,46 @@ export const soilSampling = fdmSchema.table("soil_sampling", {
 
 export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
 export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
+
+// Define derogations table
+export const derogations = fdmSchema.table("derogations", {
+    b_id_derogation: text().primaryKey(),
+    b_derogation_year: integer().notNull(),
+    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated: timestamp({ withTimezone: true }),
+})
+
+export type derogationsTypeSelect = typeof derogations.$inferSelect
+export type derogationsTypeInsert = typeof derogations.$inferInsert
+
+// Define derogation_applying table
+export const derogationApplying = fdmSchema.table(
+    "derogation_applying",
+    {
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        b_id_derogation: text()
+            .notNull()
+            .references(() => derogations.b_id_derogation),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => {
+        return [
+            {
+                pk: primaryKey({
+                    columns: [table.b_id_farm, table.b_id_derogation],
+                }),
+            },
+        ]
+    },
+)
+
+export type derogationApplyingTypeSelect =
+    typeof derogationApplying.$inferSelect
+export type derogationApplyingTypeInsert =
+    typeof derogationApplying.$inferInsert
 
 // Define fertilizer_catalogue_enabling table
 export const fertilizerCatalogueEnabling = fdmSchema.table(

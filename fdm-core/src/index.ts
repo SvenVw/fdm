@@ -15,122 +15,136 @@
 /** {@inheritDoc fdmServer} */
 import * as fdmSchema from "./db/schema"
 export { fdmSchema }
-export type { FdmType } from "./fdm.d"
-export type { FdmServerType } from "./fdm-server.d"
-export { createFdmServer } from "./fdm-server"
 // export { createFdmLocal } from './fdm-local'
 export {
+    createDisplayUsername,
     createFdmAuth,
     updateUserProfile,
-    createDisplayUsername,
 } from "./authentication"
 export type { FdmAuth } from "./authentication.d"
 export type { PrincipalId } from "./authorization.d"
 export {
+    disableCultivationCatalogue,
+    disableFertilizerCatalogue,
+    enableCultivationCatalogue,
+    enableFertilizerCatalogue,
+    getEnabledCultivationCatalogues,
+    getEnabledFertilizerCatalogues,
+    isCultivationCatalogueEnabled,
+    isFertilizerCatalogueEnabled,
+    syncCatalogues,
+} from "./catalogues"
+export {
+    addCultivation,
+    addCultivationToCatalogue,
+    getCultivation,
+    getCultivationPlan,
+    getCultivations,
+    getCultivationsFromCatalogue,
+    removeCultivation,
+    updateCultivation,
+} from "./cultivation"
+export type {
+    Cultivation,
+    CultivationCatalogue,
+    CultivationPlan,
+} from "./cultivation.d"
+export {
+    addDerogation,
+    isDerogationGrantedForYear,
+    listDerogations,
+    removeDerogation,
+} from "./derogation"
+export {
     addFarm,
     getFarm,
     getFarms,
-    updateFarm,
     grantRoleToFarm,
     isAllowedToShareFarm,
     listPrincipalsForFarm,
     revokePrincipalFromFarm,
+    updateFarm,
     updateRoleOfPrincipalAtFarm,
 } from "./farm"
-export { addField, getField, getFields, updateField } from "./field"
-export type { Field } from "./field.d"
+export type { FdmType } from "./fdm.d"
+export { createFdmServer } from "./fdm-server"
+export type { FdmServerType } from "./fdm-server.d"
 export {
-    addFertilizerToCatalogue,
-    updateFertilizerFromCatalogue,
-    getFertilizersFromCatalogue,
     addFertilizer,
-    removeFertilizer,
-    getFertilizer,
-    getFertilizers,
     addFertilizerApplication,
-    updateFertilizerApplication,
-    removeFertilizerApplication,
+    addFertilizerToCatalogue,
+    getFertilizer,
     getFertilizerApplication,
     getFertilizerApplications,
     getFertilizerParametersDescription,
+    getFertilizers,
+    getFertilizersFromCatalogue,
+    removeFertilizer,
+    removeFertilizerApplication,
+    updateFertilizerApplication,
+    updateFertilizerFromCatalogue,
 } from "./fertilizer"
 export type {
     Fertilizer,
     FertilizerApplication,
-    FertilizerParameters,
     FertilizerParameterDescription,
     FertilizerParameterDescriptionItem,
+    FertilizerParameters,
 } from "./fertilizer.d"
 export {
-    addCultivationToCatalogue,
-    getCultivationsFromCatalogue,
-    addCultivation,
-    updateCultivation,
-    removeCultivation,
-    getCultivation,
-    getCultivations,
-    getCultivationPlan,
-} from "./cultivation"
-export type {
-    Cultivation,
-    CultivationPlan,
-    CultivationCatalogue,
-} from "./cultivation.d"
-export {
-    addSoilAnalysis,
-    updateSoilAnalysis,
-    removeSoilAnalysis,
-    getSoilAnalysis,
-    getSoilAnalyses,
-    getCurrentSoilData,
-    getSoilParametersDescription,
-} from "./soil"
-export type {
-    SoilAnalysis,
-    CurrentSoilData,
-    SoilParameters,
-    SoilParameterDescription,
-} from "./soil.d"
+    addField,
+    getField,
+    getFields,
+    listAvailableAcquiringMethods,
+    removeField,
+    updateField,
+} from "./field"
+export type { Field } from "./field.d"
 export {
     addHarvest,
     getHarvest,
     getHarvests,
     removeHarvest,
+    updateHarvest,
 } from "./harvest"
 export type {
     Harvest,
     Harvestable,
     HarvestableAnalysis,
 } from "./harvest.d"
-export {
-    getEnabledFertilizerCatalogues,
-    getEnabledCultivationCatalogues,
-    enableFertilizerCatalogue,
-    enableCultivationCatalogue,
-    disableFertilizerCatalogue,
-    disableCultivationCatalogue,
-    isFertilizerCatalogueEnabled,
-    isCultivationCatalogueEnabled,
-    syncCatalogues,
-} from "./catalogues"
-export type { Timeframe } from "./timeframe.d"
 export { runMigration } from "./migrate"
 export {
-    createOrganization,
-    getOrganizationsForUser,
-    getUsersInOrganization,
+    acceptInvitation,
+    cancelPendingInvitation,
     checkOrganizationSlugForAvailability,
+    createOrganization,
+    deleteOrganization,
+    getOrganization,
+    getOrganizationsForUser,
+    getPendingInvitation,
+    getPendingInvitationsForOrganization,
+    getPendingInvitationsForUser,
+    getUsersInOrganization,
     inviteUserToOrganization,
     rejectInvitation,
     removeUserFromOrganization,
-    updateRoleOfUserAtOrganization,
-    deleteOrganization,
-    getPendingInvitationsForUser,
-    getPendingInvitationsForOrganization,
-    getPendingInvitation,
-    acceptInvitation,
-    cancelPendingInvitation,
     updateOrganization,
-    getOrganization,
+    updateRoleOfUserAtOrganization,
 } from "./organization"
 export { lookupPrincipal } from "./principal"
+export {
+    addSoilAnalysis,
+    getCurrentSoilData,
+    getSoilAnalyses,
+    getSoilAnalysis,
+    getSoilParametersDescription,
+    removeSoilAnalysis,
+    updateSoilAnalysis,
+} from "./soil"
+export type {
+    CurrentSoilData,
+    SoilAnalysis,
+    SoilParameterDescription,
+    SoilParameters,
+} from "./soil.d"
+export type { Timeframe } from "./timeframe.d"

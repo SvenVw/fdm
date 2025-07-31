@@ -1,6 +1,6 @@
 {
     "name": "@svenvw/fdm-docs",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "private": true,
     "scripts": {
         "docusaurus": "docusaurus",
@@ -24,7 +24,7 @@
         "@docusaurus/preset-classic": "3.8.1",
         "@mdx-js/react": "^3.1.0",
         "clsx": "^2.1.1",
-        "lucide-react": "^0.511.0",
+        "lucide-react": "^0.525.0",
         "prism-react-renderer": "^2.4.1",
         "react": "^19.1.0",
         "react-dom": "^19.1.0"
@@ -35,11 +35,15 @@
         "@docusaurus/types": "3.8.1",
         "docusaurus-plugin-typedoc": "^1.4.0",
         "typedoc": "catalog:",
-        "typedoc-plugin-markdown": "^4.6.4",
+        "typedoc-plugin-markdown": "^4.7.1",
         "typescript": "catalog:"
     },
     "browserslist": {
-        "production": [">0.5%", "not dead", "not op_mini all"],
+        "production": [
+            ">0.5%",
+            "not dead",
+            "not op_mini all"
+        ],
         "development": [
             "last 3 chrome version",
             "last 3 firefox version",
@@ -49,5 +53,5 @@
     "engines": {
         "node": ">=18.0"
     },
-    "packageManager": "pnpm@10.11.0"
+    "packageManager": "pnpm@10.13.1"
 }

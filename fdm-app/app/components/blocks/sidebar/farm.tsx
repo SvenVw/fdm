@@ -1,6 +1,3 @@
-import { getCalendarSelection } from "@/app/lib/calendar"
-import { useCalendarStore } from "@/app/store/calendar"
-import { useFarmStore } from "@/app/store/farm"
 import {
     Calendar,
     Check,
@@ -11,6 +8,9 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 import { NavLink, useLocation } from "react-router"
+import { getCalendarSelection } from "@/app/lib/calendar"
+import { useCalendarStore } from "@/app/store/calendar"
+import { useFarmStore } from "@/app/store/farm"
 import { Badge } from "~/components/ui/badge"
 import {
     Collapsible,

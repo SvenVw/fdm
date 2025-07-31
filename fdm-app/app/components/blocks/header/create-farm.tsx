@@ -38,15 +38,37 @@ export function HeaderFarmCreate({
                     <BreadcrumbLink>Selecteer percelen</BreadcrumbLink>
                 </BreadcrumbItem>
             ) : null}
+            {currentPath.match(/upload/) ? (
+                <BreadcrumbItem className="hidden md:block">
+                    <BreadcrumbLink>Shapefile uploaden</BreadcrumbLink>
+                </BreadcrumbItem>
+            ) : null}
             {currentPath.match(/fields/) ? (
                 <BreadcrumbItem className="hidden md:block">
                     <BreadcrumbLink>Percelen</BreadcrumbLink>
                 </BreadcrumbItem>
             ) : null}
             {currentPath.match(/cultivations/) ? (
-                <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink>Bouwplan</BreadcrumbLink>
-                </BreadcrumbItem>
+                <>
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Bouwplan</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Gewassen</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </>
+            ) : null}
+            {currentPath.match(/fertilizers/) ? (
+                <>
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Bouwplan</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem className="hidden md:block">
+                        <BreadcrumbLink>Bemesting</BreadcrumbLink>
+                    </BreadcrumbItem>
+                </>
             ) : null}
             {currentPath.match(/access/) ? (
                 <BreadcrumbItem className="hidden md:block">

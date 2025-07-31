@@ -1,14 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { getField, updateField } from "@svenvw/fdm-core"
+import {
+    getField,
+    listAvailableAcquiringMethods,
+    updateField,
+} from "@svenvw/fdm-core"
 import { useEffect } from "react"
-import { Form } from "react-router"
+import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
-    type LoaderFunctionArgs,
     data,
+    Form,
+    type LoaderFunctionArgs,
     useLoaderData,
 } from "react-router"
-import type { MetaFunction } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { dataWithSuccess } from "remix-toast"
 import { z } from "zod"
@@ -85,6 +89,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             field: field,
+            acquiringMethodOptions: listAvailableAcquiringMethods(),
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -172,7 +177,7 @@ export default function FarmFieldsOverviewBlock() {
                                                     onValueChange={
                                                         field.onChange
                                                     }
-                                                    defaultValue={field.value}
+                                                    value={field.value}
                                                 >
                                                     <FormControl>
                                                         <SelectTrigger>
@@ -180,15 +185,22 @@ export default function FarmFieldsOverviewBlock() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="owner">
-                                                            Eigendom
-                                                        </SelectItem>
-                                                        <SelectItem value="lease">
-                                                            Pacht
-                                                        </SelectItem>
-                                                        <SelectItem value="unknown">
-                                                            Onbekend
-                                                        </SelectItem>
+                                                        {loaderData.acquiringMethodOptions.map(
+                                                            (option) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        option.value
+                                                                    }
+                                                                    value={
+                                                                        option.value
+                                                                    }
+                                                                >
+                                                                    {
+                                                                        option.label
+                                                                    }
+                                                                </SelectItem>
+                                                            ),
+                                                        )}
                                                     </SelectContent>
                                                 </Select>
                                             </FormControl>
@@ -282,7 +294,10 @@ const FormSchema = z
         b_name: z.string().min(3, {
             message: "Naam van perceel moet minimaal 3 karakters bevatten",
         }),
-        b_acquiring_method: z.enum(["owner", "lease", "unknown"]),
+        b_acquiring_method: z.string({
+            required_error:
+                "Selecteer of het perceel in eigendom is of gepacht",
+        }),
         b_start: z.coerce.date().optional(),
         b_end: z.coerce.date().optional(),
     })

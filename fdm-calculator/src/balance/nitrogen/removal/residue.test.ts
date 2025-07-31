@@ -24,7 +24,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: false, // No residue left
             },
         ]
@@ -47,7 +48,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -74,8 +76,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
-        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
+        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
     })
 
     it("should calculate nitrogen removal for multiple harvests, averaging yields", () => {
@@ -83,7 +85,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -108,8 +111,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
-        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
+        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
     })
 
     it("should handle missing harvest data using cultivation defaults", () => {
@@ -117,7 +120,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -129,8 +133,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
-        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
+        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
     })
 
     it("should handle missing cultivation details and throw an error", () => {
@@ -138,7 +142,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -161,7 +166,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: undefined, // Undefined residue handling
             },
         ]
@@ -184,7 +190,8 @@ describe("calculateNitrogenRemovalByResidue", () => {
             {
                 b_lu: "cultivation1",
                 b_lu_catalogue: "catalogue1",
-                // b_lu_start: new Date(),
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
                 m_cropresidue: true,
             },
         ]
@@ -206,7 +213,7 @@ describe("calculateNitrogenRemovalByResidue", () => {
             cultivationDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
-        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-1.2) //Approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
+        expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
     })
 })

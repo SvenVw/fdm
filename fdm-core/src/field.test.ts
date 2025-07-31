@@ -1,11 +1,23 @@
+import { eq } from "drizzle-orm"
 import { beforeEach, describe, expect, inject, it } from "vitest"
-import type * as schema from "./db/schema"
+import { enableCultivationCatalogue } from "./catalogues"
+import { addCultivation, addCultivationToCatalogue } from "./cultivation"
+import * as schema from "./db/schema"
 import { addFarm } from "./farm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
-import { addField, getField, getFields, updateField } from "./field"
+import {
+    addField,
+    getField,
+    getFields,
+    listAvailableAcquiringMethods,
+    removeField,
+    updateField,
+} from "./field"
+import { addHarvest } from "./harvest"
 import { createId } from "./id"
+import { addSoilAnalysis } from "./soil"
 
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
@@ -54,7 +66,7 @@ describe("Farm Data Model", () => {
             }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
+            const AcquiringMethod = "nl_01"
             const b_id = await addField(
                 fdm,
                 principal_id,
@@ -127,7 +139,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field1Start = new Date("2023-01-01")
-                const field1AcquiringMethod = "owner"
+                const field1AcquiringMethod = "nl_01"
                 await addField(
                     fdm,
                     principal_id,
@@ -154,7 +166,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field2Start = new Date("2023-02-01")
-                const field2AcquiringMethod = "lease"
+                const field2AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -199,7 +211,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field1Start = new Date("2023-01-01")
-                const field1AcquiringMethod = "owner"
+                const field1AcquiringMethod = "nl_01"
                 await addField(
                     fdm,
                     principal_id,
@@ -226,7 +238,7 @@ describe("Farm Data Model", () => {
                     ],
                 }
                 const field2Start = new Date("2023-04-01")
-                const field2AcquiringMethod = "lease"
+                const field2AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -253,7 +265,7 @@ describe("Farm Data Model", () => {
                 }
                 const field3Start = new Date("2023-06-01")
                 const field3End = new Date("2023-08-01")
-                const field3AcquiringMethod = "lease"
+                const field3AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -281,7 +293,7 @@ describe("Farm Data Model", () => {
                 }
                 const field4Start = new Date("2023-07-01")
                 const field4End = new Date("2023-09-01")
-                const field4AcquiringMethod = "lease"
+                const field4AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
                     principal_id,
@@ -395,7 +407,7 @@ describe("Farm Data Model", () => {
             }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
+            const AcquiringMethod = "nl_01"
             const b_id = await addField(
                 fdm,
                 principal_id,
@@ -424,7 +436,7 @@ describe("Farm Data Model", () => {
             }
             const updatedAcquireDate = new Date("2024-01-01")
             const updatedDiscardingDate = new Date("2024-12-31")
-            const updatedAcquiringMethod = "lease"
+            const updatedAcquiringMethod = "nl_02"
             const updatedField = await updateField(
                 fdm,
                 principal_id,
@@ -474,7 +486,7 @@ describe("Farm Data Model", () => {
             }
             const AcquireDate = new Date("2023-01-01")
             const discardingDate = new Date("2023-12-31")
-            const AcquiringMethod = "owner"
+            const AcquiringMethod = "nl_01"
             const b_id = await addField(
                 fdm,
                 principal_id,
@@ -509,7 +521,7 @@ describe("Farm Data Model", () => {
             expect(updatedField.b_acquiring_method).toBe(AcquiringMethod) // Should remain the same
 
             // Update only the manage type
-            const updatedAcquiringMethod = "lease"
+            const updatedAcquiringMethod = "nl_02"
             const updatedField2 = await updateField(
                 fdm,
                 principal_id,
@@ -573,6 +585,241 @@ describe("Farm Data Model", () => {
             expect(updatedField4.b_acquiring_method).toBe(
                 updatedAcquiringMethod,
             ) // Should remain the same
+        })
+    })
+
+    describe("removeField", () => {
+        const b_lu_source = "custom"
+        let b_lu_catalogue: string
+        let farmId: string
+
+        beforeEach(async () => {
+            // 1. Setup: Create a farm, enable catalogue and add cultivation to catalogue
+            farmId = await addFarm(
+                fdm,
+                principal_id,
+                "Test Farm",
+                "123",
+                "Address",
+                "12345",
+            )
+
+            await enableCultivationCatalogue(
+                fdm,
+                principal_id,
+                farmId,
+                b_lu_source,
+            )
+            // Ensure catalogue entry exists before each test
+            b_lu_catalogue = createId()
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue,
+                b_lu_source: b_lu_source,
+                b_lu_name: "test-name",
+                b_lu_name_en: "test-name-en",
+                b_lu_harvestable: "once",
+                b_lu_hcat3: "test-hcat3",
+                b_lu_hcat3_name: "test-hcat3-name",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
+            })
+        })
+
+        it("should remove a field and all its associated data", async () => {
+            const fieldId = await addField(
+                fdm,
+                principal_id,
+                farmId,
+                "Test Field",
+                "source1",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [-1, -1],
+                            [-1, 1],
+                            [1, 1],
+                            [1, -1],
+                            [-1, -1],
+                        ],
+                    ],
+                },
+                new Date(),
+                "nl_01",
+            )
+
+            const cultivationId = await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue,
+                fieldId,
+                new Date("2025-03-01"),
+            )
+            const soilAnalysisId = await addSoilAnalysis(
+                fdm,
+                principal_id,
+                null,
+                "other",
+                fieldId,
+                30,
+                new Date("2025-01-20"),
+                { a_som_loi: 4 },
+                0,
+            )
+
+            // 2. Action: Remove the field
+            await removeField(fdm, principal_id, fieldId)
+
+            // 3. Assertion: Verify that the field and all associated data are deleted
+            await expect(getField(fdm, principal_id, fieldId)).rejects.toThrow()
+
+            const remainingCultivations = await fdm
+                .select()
+                .from(schema.cultivations)
+                .where(eq(schema.cultivations.b_lu, cultivationId))
+            expect(remainingCultivations.length).toBe(0)
+
+            const remainingSoilAnalyses = await fdm
+                .select()
+                .from(schema.soilAnalysis)
+                .where(eq(schema.soilAnalysis.a_id, soilAnalysisId))
+            expect(remainingSoilAnalyses.length).toBe(0)
+        })
+
+        it("should not remove a field if the principal does not have write permission", async () => {
+            // 1. Setup: Create a field
+            const fieldId = await addField(
+                fdm,
+                principal_id,
+                farmId,
+                "Test Field",
+                "source1",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [-1, -1],
+                            [-1, 1],
+                            [1, 1],
+                            [1, -1],
+                            [-1, -1],
+                        ],
+                    ],
+                },
+                new Date(),
+                "nl_01",
+            )
+
+            // 2. Action and Assertion: Attempt to remove the field with an unauthorized principal
+            const unauthorized_principal_id = createId()
+            await expect(
+                removeField(fdm, unauthorized_principal_id, fieldId),
+            ).rejects.toThrow(
+                "Principal does not have permission to perform this action",
+            )
+
+            // Verify that the field still exists
+            const field = await getField(fdm, principal_id, fieldId)
+            expect(field).toBeDefined()
+        })
+
+        it("should throw an error when trying to remove a non-existent field", async () => {
+            const nonExistentFieldId = createId()
+            await expect(
+                removeField(fdm, principal_id, nonExistentFieldId),
+            ).rejects.toThrow()
+        })
+
+        it("should successfully remove a field with no associated data", async () => {
+            const fieldId = await addField(
+                fdm,
+                principal_id,
+                farmId,
+                "Test Field",
+                "source1",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [-1, -1],
+                            [-1, 1],
+                            [1, 1],
+                            [1, -1],
+                            [-1, -1],
+                        ],
+                    ],
+                },
+                new Date(),
+                "nl_01",
+            )
+
+            await removeField(fdm, principal_id, fieldId)
+
+            await expect(getField(fdm, principal_id, fieldId)).rejects.toThrow()
+        })
+
+        it("should test deeper cascading relationships", async () => {
+            const fieldId = await addField(
+                fdm,
+                principal_id,
+                farmId,
+                "Test Field",
+                "source1",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [-1, -1],
+                            [-1, 1],
+                            [1, 1],
+                            [1, -1],
+                            [-1, -1],
+                        ],
+                    ],
+                },
+                new Date(),
+                "nl_01",
+            )
+
+            const cultivationId = await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue,
+                fieldId,
+                new Date("2025-03-01"),
+            )
+            const harvestId = await addHarvest(
+                fdm,
+                principal_id,
+                cultivationId,
+                new Date("2025-08-10"),
+                5000,
+            )
+
+            await removeField(fdm, principal_id, fieldId)
+
+            await expect(getField(fdm, principal_id, fieldId)).rejects.toThrow()
+            const remainingHarvests = await fdm
+                .select()
+                .from(schema.harvestables)
+                .where(eq(schema.harvestables.b_id_harvestable, harvestId))
+            expect(remainingHarvests.length).toBe(0)
+        })
+    })
+
+    describe("listAvailableAcquiringMethods", () => {
+        it("should list available acquiring methods", () => {
+            const methods = listAvailableAcquiringMethods()
+            expect(methods).toBeInstanceOf(Array)
+            expect(methods.length).toBeGreaterThan(0)
+            expect(methods[0]).toHaveProperty("value")
+            expect(methods[0]).toHaveProperty("label")
+            expect(methods.some((m) => m.value === "nl_01")).toBe(true)
+            expect(methods.some((m) => m.value === "nl_02")).toBe(true)
         })
     })
 })

@@ -1,4 +1,3 @@
-import type { Harvest, HarvestableAnalysis } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
     CultivationDetail,
@@ -104,6 +103,7 @@ export function calculateNitrogenRemovalByResidue(
 
         // Calculate the amount of Nitrogen removed by crop residues of this cultivation
         const removal = b_lu_yield
+            .dividedBy(b_lu_hi)
             .times(b_lu_hi_res)
             .times(b_lu_n_residue)
             .dividedBy(new Decimal(1000)) // Convert from g N / ha to kg N / ha
