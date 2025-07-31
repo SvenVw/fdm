@@ -21,7 +21,12 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog"
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "~/components/ui/dialog"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -207,20 +212,25 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!cultivation) {
                 throw new Error("Cultivation not found")
             }
-            const b_lu_ids = cultivation.fields.map((field: { b_lu: string }) => field.b_lu)
 
-            // Update harvests for all cultivations that share the same harvest ID
-            await Promise.all(
-                b_lu_ids.map(async (b_lu: string) => {
-                    const harvestsForCultivation = cultivation.fields.find(
-                        (field: { b_lu: string }) => field.b_lu === b_lu,
-                    )?.harvests || []
-
-                    const targetHarvest = harvestsForCultivation.find(
-                        (h: { b_id_harvesting: string }) => h.b_id_harvesting === b_id_harvesting,
+            // Update harvests for all cultivations that share the same harvest date for this cultivation
+            const targetHarvests = cultivation.fields.reduce(
+                (acc: { b_id_harvesting: string }[], field: any) => {
+                    const harvest = field.harvests.find(
+                        (h: { b_id_harvesting: string }) =>
+                            h.b_id_harvesting === b_id_harvesting,
                     )
+                    if (harvest) {
+                        acc.push(harvest)
+                    }
+                    return acc
+                },
+                [],
+            )
 
-                    if (targetHarvest) {
+            await Promise.all(
+                targetHarvests.map(
+                    async (targetHarvest: { b_id_harvesting: string }) => {
                         await updateHarvest(
                             fdm,
                             session.principal_id,
@@ -229,8 +239,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             b_lu_yield,
                             b_lu_n_harvestable,
                         )
-                    }
-                }),
+                    },
+                ),
             )
 
             return redirectWithSuccess(
@@ -259,17 +269,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!cultivation) {
                 throw new Error("Cultivation not found")
             }
-            const b_lu_ids = cultivation.fields.map((field: { b_lu: string }) => field.b_lu)
+            const b_lu_ids = cultivation.fields.map(
+                (field: { b_lu: string }) => field.b_lu,
+            )
 
             // Remove harvests for all cultivations that share the same harvest ID
             await Promise.all(
                 b_lu_ids.map(async (b_lu: string) => {
-                    const harvestsForCultivation = cultivation.fields.find(
-                        (field: { b_lu: string }) => field.b_lu === b_lu,
-                    )?.harvests || []
+                    const harvestsForCultivation =
+                        cultivation.fields.find(
+                            (field: { b_lu: string }) => field.b_lu === b_lu,
+                        )?.harvests || []
 
                     const targetHarvest = harvestsForCultivation.find(
-                        (h: { b_id_harvesting: string }) => h.b_id_harvesting === b_id_harvesting,
+                        (h: { b_id_harvesting: string }) =>
+                            h.b_id_harvesting === b_id_harvesting,
                     )
 
                     if (targetHarvest) {
