@@ -1,5 +1,15 @@
 # fdm-data
 
+## 0.15.0
+
+### Minor Changes
+
+- 6821ee9: Correct the values for `b_lu_yield` at `brp` cultivation catalogue
+
+### Patch Changes
+
+- db5e7fe: Update dependencies
+
 ## 0.14.1
 
 ### Patch Changes

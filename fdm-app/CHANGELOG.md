@@ -1,5 +1,44 @@
 # Changelog fdm-app
 
+## 0.21.0
+
+### Minor Changes
+
+- db525fc: Enable uploading a Mijn Percelen shapefile instead of selecting fields on the atlas page.
+- 99aec54: At farm create wizard for Bouwplan improve list of cultivations and provide more information as number of fields and total area
+- c3f1454: Replace the options for `b_acquiring_method` with the new options following RVO specification
+- ce5fcdb: At field properties add a section to delete a field
+- fcfc84e: Improved design of fertilizer application pages by combining various components into a single card
+- b7d95e0: Add for pages with calculations (.e.g., nutrient advice, norms and balance) placeholders with skeletons so that user sees the page already and is notified that the content will arrive shortly
+- 99aec54: At farm create wizard for Bouwplan split Gewassen en Bemesting in 2 seperate pages instead of tabs
+- 5708973: Add new app `Gebruiksnormen` to show legal norms at farm and field level
+- d5fb186: Allow selecting a non-current year in the farm-creation wizard
+- 65fb0ed: Add an option in the farm-creation wizard to specify the start year of a farm’s derogation
+- e6a9d4e: Add page to manage derogation for a farm
+- 99aec54: Overhaul the pages with cultivation and harvests to enable users to quickly select a cultivation, get the details and list of harvest and enable to open dialogs to add new cultivations and harvests
+- 0c367ea: Add delete field button at fields page in Farm Create Wizard
+
+### Patch Changes
+
+- db5e7fe: Update dependencies
+- 94250d9: Fixes incorrect unit description of `b_lu_n_harvestable`
+- ec3c5c8: Fix metadata of "New field" page
+- Updated dependencies [52e0959]
+- Updated dependencies
+- Updated dependencies [0f8e4eb]
+- Updated dependencies [db5e7fe]
+- Updated dependencies [6821ee9]
+- Updated dependencies
+- Updated dependencies [b502367]
+- Updated dependencies [b40cffa]
+- Updated dependencies [cbf5340]
+- Updated dependencies [51722cc]
+- Updated dependencies [f19238b]
+- Updated dependencies [2ac1471]
+  - @svenvw/fdm-core@0.23.0
+  - @svenvw/fdm-calculator@0.5.0
+  - @svenvw/fdm-data@0.15.0
+
 ## 0.20.4
 
 ### Patch Changes
@@ -521,7 +560,6 @@
 - fe29385: Add a page `farm` to select from list of farms
 
   Changes include:
-
   - Restructured routing: renamed paths from `app/addfarm` to `farm/create`
   - Updated farms table schema:
     - Added: business ID, address, and postal code fields
@@ -529,7 +567,6 @@
   - Added new `getFarms` function for farm management
 
 - fe29385: Add farm settings page and restructure routes
-
   - Add new farm settings page for managing farm configurations
   - Restructure routes: rename 'app' to 'farm' and 'app/addfarm' to 'farm/create'
   - Add new farm fields: business ID, address, and postal code
