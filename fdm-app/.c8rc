@@ -1,0 +1,12 @@
+{
+    "reporter": ["text", "json", "html"],
+    "exclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/turbo**",
+        "**/setup-test.ts",
+        "**.d.ts",
+        "*.config.ts",
+        "*.config.js"
+    ]
+}
