@@ -16,7 +16,7 @@ export function ChangelogNotification() {
                 to="/about/whats-new"
                 className="flex flex-grow items-center gap-2"
             >
-                <Circle className="h-4 w-4 text-blue-400 fill-blue-400 text-sahdow-muted-foreground" />
+                <Circle className="h-4 w-4 text-blue-400 fill-blue-400" />
                 <span className="font-medium text-shadow-muted-foregroundforeground">
                     {latestUpdateTitle}
                 </span>
