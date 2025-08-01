@@ -10,6 +10,12 @@ import { serverConfig } from "~/lib/config.server"
 import type { ExtendedUser } from "~/types/extended-user"
 
 const client = new postmark.ServerClient(String(process.env.POSTMARK_API_KEY))
+const writeMagicLinkFile =
+    (process.env.CI && process.env.CI.length > 0) ||
+    (process.env.WRITE_MAGIC_LINK_FILE &&
+        process.env.WRITE_MAGIC_LINK_FILE.length > 0)
+const sendRealEmail =
+    process.env.POSTMARK_API_KEY && process.env.POSTMARK_API_KEY.length > 0
 
 interface Email {
     From: string
@@ -95,7 +101,9 @@ export async function renderMagicLinkEmail(
 }
 
 export async function sendEmail(email: Email): Promise<void> {
-    await client.sendEmail(email)
+    if (sendRealEmail) {
+        await client.sendEmail(email)
+    }
 }
 
 // Helper function to send magic link emails, to be passed to fdm-core
@@ -103,6 +111,17 @@ export async function sendMagicLinkEmailToUser(
     emailAddress: string,
     magicLinkUrl: string,
 ): Promise<void> {
+    if (writeMagicLinkFile) {
+        const testIo = await import("@/tests/test-io")
+        await testIo.writeTestFileLine(
+            testIo.magicLinkUrlFileName,
+            magicLinkUrl,
+            {
+                tmpUrl: testIo.runtimeTestTmpUrl(),
+            },
+        )
+    }
+
     const email = await renderMagicLinkEmail(emailAddress, magicLinkUrl)
     await sendEmail(email)
 }

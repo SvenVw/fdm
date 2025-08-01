@@ -282,7 +282,34 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+    env:
+      # The hostname used to communicate with the PostgreSQL service container
+      POSTGRES_HOST: postgres
+      # The default PostgreSQL port
+      POSTGRES_PORT: 5432
+      # the default usernam
+      POSTGRES_USER: postgres
+      # the default password
+      POSTGRES_PASSWORD: postgres
+      # the default database
+      POSTGRES_DB: postgres
 
+      # Public name of the application displayed in the UI.
+      PUBLIC_FDM_NAME: MINAS4
+      # Base URL of the application (used for API calls, etc.).
+      PUBLIC_FDM_URL: http://localhost:3000
+      # URL to the privacy policy document.
+      PUBLIC_FDM_PRIVACY_URL: http://localhost:3000/privacy
+      # Secret key used to sign session cookies. MUST be a strong, random string.
+      FDM_SESSION_SECRET: blablabla1
+      # Authentication (Better Auth & OAuth Providers)
+      BETTER_AUTH_SECRET: blablabla2
+      # Full base URL of this application (used for redirects by better-auth).
+      BETTER_AUTH_URL: http://localhost:3000
+      # Mapbox API token for displaying maps.
+      PUBLIC_MAPBOX_TOKEN: ${{ secrets.PUBLIC_MAPBOX_TOKEN }}
+      # URL to the FlatGeobuf (.fgb) file containing selectable field geometries.
+      AVAILABLE_FIELDS_URL: https://storage.googleapis.com/fdm-public-data/fields/nl/2024/draft.fgb
     steps:
       # Include dependencies for codecov
       - name: Install system dependencies
@@ -335,37 +362,17 @@ jobs:
         run: pnpm build
         working-directory: ./fdm-app
 
-      - name: Run tests with coverage
-        run: pnpm db:migrate & pnpm test-ci
+      - name: Migrate database
+        run: pnpm db:migrate
         working-directory: ./fdm-app
-        env:
-          # The hostname used to communicate with the PostgreSQL service container
-          POSTGRES_HOST: postgres
-          # The default PostgreSQL port
-          POSTGRES_PORT: 5432
-          # the default usernam
-          POSTGRES_USER: postgres
-          # the default password
-          POSTGRES_PASSWORD: postgres
-          # the default database
-          POSTGRES_DB: postgres
 
-          # Public name of the application displayed in the UI.
-          PUBLIC_FDM_NAME: MINAS4
-          # Base URL of the application (used for API calls, etc.).
-          PUBLIC_FDM_URL: http://localhost:3000
-          # URL to the privacy policy document.
-          PUBLIC_FDM_PRIVACY_URL: http://localhost:3000/privacy
-          # Secret key used to sign session cookies. MUST be a strong, random string.
-          FDM_SESSION_SECRET: blablabla1
-          # Authentication (Better Auth & OAuth Providers)
-          BETTER_AUTH_SECRET: blablabla2
-          # Full base URL of this application (used for redirects by better-auth).
-          BETTER_AUTH_URL: http://localhost:3000
-          # Mapbox API token for displaying maps.
-          PUBLIC_MAPBOX_TOKEN: ${{ secrets.PUBLIC_MAPBOX_TOKEN }}
-          # URL to the FlatGeobuf (.fgb) file containing selectable field geometries.
-          AVAILABLE_FIELDS_URL: https://storage.googleapis.com/fdm-public-data/fields/nl/2024/draft.fgb
+      - name: Run login tests with coverage
+        run: pnpm test-login-ci
+        working-directory: ./fdm-app
+
+      - name: Run app tests with coverage
+        run: pnpm test-ci
+        working-directory: ./fdm-app
 
       - name: fdm-app - Upload results to Codecov
         uses: codecov/codecov-action@v5

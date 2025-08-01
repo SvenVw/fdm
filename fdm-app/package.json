@@ -10,8 +10,9 @@
         "dotenvx": "dotenvx",
         "start": "pnpm db:migrate && react-router-serve ./build/server/index.js",
         "start-dev": "dotenvx run -- pnpm db:migrate && dotenvx run -- react-router-serve ./build/server/index.js",
-        "test": "dotenvx run playwright test",
-        "test-ci": "playwright test",
+        "test": "dotenvx run -- playwright test -c ./playwright-login.config.ts & dotenvx run playwright test -c ./playwright-app.config.ts",
+        "test-login-ci": "playwright test -c ./playwright-login.config.ts",
+        "test-ci": "playwright test -c ./playwright-app.config.ts",
         "db:migrate": "node ./app/lib/fdm-migrate.server.js",
         "typecheck": "react-router typegen && tsc"
     },
