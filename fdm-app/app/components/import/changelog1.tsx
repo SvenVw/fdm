@@ -42,9 +42,9 @@ const Changelog1 = ({
                     </p>
                 </div>
                 <div className="mx-auto mt-16 max-w-3xl space-y-16 md:mt-24 md:space-y-24">
-                    {entries.map((entry, index) => (
+                    {entries.map((entry) => (
                         <div
-                            key={index}
+                            key={`${entry.version}-${entry.date}`}
                             className="relative flex flex-col gap-4 md:flex-row md:gap-16"
                         >
                             <div className="top-8 flex h-min w-64 shrink-0 items-center gap-4 md:sticky">
@@ -66,7 +66,7 @@ const Changelog1 = ({
                                     <ul className="mt-4 ml-4 space-y-1.5 text-sm text-muted-foreground md:text-base">
                                         {entry.items.map((item, itemIndex) => (
                                             <li
-                                                key={itemIndex}
+                                                key={`${entry.version}-item-${itemIndex}`}
                                                 className="list-disc"
                                             >
                                                 {item}
