@@ -1,5 +1,6 @@
 // Imported from https://www.shadcnblocks.com/block/changelog1
 import { ArrowUpRight } from "lucide-react"
+import { NavLink } from "react-router"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 
@@ -87,13 +88,14 @@ const Changelog1 = ({
                                         className="mt-4 self-end"
                                         asChild
                                     >
-                                        <a
-                                            href={entry.button.url}
+                                        <NavLink
+                                            to={entry.button.url}
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                         >
                                             {entry.button.text}{" "}
                                             <ArrowUpRight className="h-4 w-4" />
-                                        </a>
+                                        </NavLink>
                                     </Button>
                                 )}
                             </div>
