@@ -192,10 +192,10 @@ export default function Index() {
     const fieldsSavedId = "fieldsSaved"
     const fieldsSaved = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
-    let viewState = getViewState(null)
-    if (fieldsSaved.features.length > 0) {
-        viewState = getViewState(fieldsSaved)
-    }
+    const mapProps =
+        fieldsSaved.features.length > 0
+            ? getViewState(fieldsSaved)
+            : { initialViewState: getViewState(null) }
 
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
@@ -266,7 +266,7 @@ export default function Index() {
                     >
                         {() => (
                             <MapGL
-                                {...viewState}
+                                {...mapProps}
                                 style={{
                                     height: "calc(100vh - 64px - 123px)",
                                     width: "100%",

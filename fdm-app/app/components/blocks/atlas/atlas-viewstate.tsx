@@ -31,7 +31,6 @@ export function getViewState(fields: FeatureCollection | null) {
     }
 
     const viewState = {
-        fitBoundsOptions: { padding: 100 },
         longitude: 4.9, // Default longitude for initial view
         latitude: 52.2, // Default latitude for initial view
         zoom: 6, // Default zoom level
