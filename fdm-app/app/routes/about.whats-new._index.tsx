@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -5,10 +6,14 @@ import {
 } from "react-router"
 import { HeaderAbout } from "~/components/blocks/header/about"
 import { Header } from "~/components/blocks/header/base"
-import { Changelog1, type ChangelogEntry } from "@/app/components/import/changelog1"
+import {
+    Changelog1,
+    type ChangelogEntry,
+} from "~/components/import/changelog1"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
+import { useChangelogStore } from "~/store/changelog"
 
 export const meta: MetaFunction = () => {
     return [
@@ -96,7 +101,6 @@ export const changelogEntries: ChangelogEntry[] = [
             "Vereenvoudigd Percelen Toevoegen: Het toevoegen van nieuwe percelen aan uw bedrijf is gestroomlijnd met een toegewijde nieuwe pagina, wat het proces sneller en intuïtiever maakt.",
             "Flexibel Filteren met de Kalender: In de zijbalk vindt u nu een 'Kalender' optie. Deze functie stelt u in staat om uw data (zoals percelen, bemestingen, oogsten) te filteren op een specifiek jaar. Dit is ideaal voor jaarlijkse overzichten of analyses. U kunt er ook voor kiezen om alle data ongefilterd te tonen.",
             "Welkomstmail: Om nieuwe gebruikers welkom te heten, wordt er nu automatisch een welkomstmail verstuurd na succesvolle registratie.",
-            "**Verbeteringen in de 'Bedrijf Aanmaken' Wizard:**",
             "Direct bodemanalyse Toevoegen: U hoeft de wizard niet meer te verlaten om een nieuwe bodemanalyse toe te voegen. Dit kan nu direct tijdens het configureren van een perceel binnen de wizard, wat tijd bespaart.",
             "Duidelijker Bodem Component: De manier waarop bodemgegevens worden gepresenteerd en hoe u ermee interacteert op de perceelpagina binnen de wizard, is volledig herzien. Dit zorgt voor een beter overzicht en minder kans op fouten bij het invoeren van bodemdata.",
             "Overzichtelijker Percelen Pagina: De layout van de pagina voor het beheren van percelen binnen de wizard is verbeterd voor een betere workflow en duidelijkheid.",
@@ -155,6 +159,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function WhatsNew() {
     const loaderData = useLoaderData<typeof loader>()
+    const markAllAsSeen = useChangelogStore((state) => state.markAllAsSeen)
+
+    useEffect(() => {
+        markAllAsSeen()
+    }, [markAllAsSeen])
 
     return (
         <>

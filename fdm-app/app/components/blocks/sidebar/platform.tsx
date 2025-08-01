@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { NavLink } from "react-router"
 import { clientConfig } from "@/app/lib/config"
+import { ChangelogNotification } from "@/app/components/custom/changelog-notification"
 import { Button } from "~/components/ui/button"
 import {
     SidebarGroup,

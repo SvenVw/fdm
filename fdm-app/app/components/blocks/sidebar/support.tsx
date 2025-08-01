@@ -11,6 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
+import { ChangelogNotification } from "../../custom/changelog-notification"
 
 export function SidebarSupport({
     name,
@@ -87,6 +88,7 @@ export function SidebarSupport({
         <SidebarGroup className="mt-auto">
             <SidebarGroupContent>
                 <SidebarMenu>
+                    <ChangelogNotification />
                     <SidebarMenuItem key="support">
                         <SidebarMenuButton
                             size="sm"
