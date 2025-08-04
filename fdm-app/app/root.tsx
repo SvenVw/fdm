@@ -21,6 +21,7 @@ import { Banner } from "~/components/custom/banner"
 import { ErrorBlock } from "~/components/custom/error"
 import { Toaster } from "~/components/ui/sonner"
 import { clientConfig } from "~/lib/config"
+import { useChangelogStore } from "~/store/changelog"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 
@@ -90,6 +91,11 @@ export function Layout() {
             posthog.capture("$pageview")
         }
     }, [location])
+
+    // Initialize changelog store
+    useEffect(() => {
+        useChangelogStore.getState().initializeChangelog()
+    }, [])
 
     // Hook to show the toasts
     useEffect(() => {
