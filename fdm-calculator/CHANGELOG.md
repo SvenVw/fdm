@@ -1,5 +1,13 @@
 # fdm-calculator
 
+## 0.5.2
+
+### Patch Changes
+
+- 11136b2: Fix issues with tests that used outdated gwl classes
+- Updated dependencies [828ad89]
+  - @svenvw/fdm-core@0.23.2
+
 ## 0.5.1
 
 ### Patch Changes
