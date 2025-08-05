@@ -1,5 +1,11 @@
 # Changelog fdm-core
 
+## 0.23.2
+
+### Patch Changes
+
+- 828ad89: Remove unnecessary line in DB migration
+
 ## 0.23.1
 
 ### Patch Changes
