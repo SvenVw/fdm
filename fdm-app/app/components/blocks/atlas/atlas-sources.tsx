@@ -74,7 +74,7 @@ export function FieldsSourceSelected({
                 map.off("click", clickOnMap)
             }
         }
-    }, [map, availableLayerId, setFieldsData])
+    }, [map, availableLayerId, excludedLayerId, setFieldsData])
 
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -165,7 +165,6 @@ export function FieldsSourceAvailable({
                             let i = 0
                             const featureClass = generateFeatureClass()
 
-                            let count = 0
                             for await (const feature of iter) {
                                 if (
                                     !unwantedIds.has(
@@ -176,8 +175,6 @@ export function FieldsSourceAvailable({
                                         ...feature,
                                         id: i,
                                     })
-                                } else {
-                                    count++
                                 }
                                 i += 1
                             }

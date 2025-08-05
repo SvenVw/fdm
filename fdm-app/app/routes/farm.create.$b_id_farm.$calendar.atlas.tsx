@@ -181,7 +181,7 @@ export default function Index() {
 
     const fieldsAvailableId = "fieldsAvailable"
     // const fields = loaderData.savedFields
-    const initialViewState = getViewState(null)
+    const initialViewState = getViewState(loaderData.previouslyCreatedFields)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [viewState, setViewState] = useState<ViewState>(
@@ -327,10 +327,6 @@ export default function Index() {
                                 <div className="fields-panel grid gap-4 w-[350px]">
                                     <FieldsPanelSelection
                                         fields={selectedFieldsData}
-                                        numPreviouslyCreatedFields={
-                                            loaderData.previouslyCreatedFields
-                                                .features.length
-                                        }
                                         continueTo={loaderData.continueTo}
                                     />
                                     <FieldsPanelZoom
@@ -397,8 +393,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         let firstFieldIndex: number
         try {
             firstFieldIndex =
-                (await getFields(fdm, session.principal_id, b_id_farm)).length +
-                1
+                (
+                    await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+                ).length + 1
         } catch (e) {
             console.warn(e)
             firstFieldIndex = 1

@@ -152,11 +152,9 @@ export function FieldsPanelZoom({
 
 export function FieldsPanelSelection({
     fields,
-    numPreviouslyCreatedFields,
     continueTo,
 }: {
     fields: FeatureCollection
-    numPreviouslyCreatedFields: number
     continueTo: string
 }) {
     const fetcher = useFetcher()
