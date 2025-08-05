@@ -39,7 +39,7 @@ export function calculateTargetForNitrogenBalance(
     })
 
     // Determine whether field is zand/loess or klei/veen
-    let soilType
+    let soilType: string
     if (
         ["moerige_klei", "rivierklei", "zeeklei", "maasklei", "veen"].includes(
             soilAnalysis.b_soiltype_agr,
@@ -57,19 +57,46 @@ export function calculateTargetForNitrogenBalance(
     }
 
     // Determine groundwaterclass
-    let groundwaterClass
-    if (["bVII", "sVII", "VIII", "VII"].includes(soilAnalysis.b_gwl_class)) {
-        groundwaterClass = "dry"
-    } else if (
-        ["V", "VI", "Vb", "sVI", "IVu", "sV", "sVb", "bVI"].includes(
+    let groundwaterClass: string
+    if (
+        ["VII", "VIIo", "VIId", "VIII", "VIIIo", "VIIId"].includes(
             soilAnalysis.b_gwl_class,
         )
     ) {
+        groundwaterClass = "dry"
+    } else if (
+        [
+            "V",
+            "Va",
+            "Vao",
+            "Vad",
+            "Vb",
+            "Vbo",
+            "Vbd",
+            "sV",
+            "sVb",
+            "VI",
+            "VIo",
+            "VId",
+        ].includes(soilAnalysis.b_gwl_class)
+    ) {
         groundwaterClass = "average"
     } else if (
-        ["II", "IV", "IIIb", "-", "Va", "III", "I", "IIb", "IIIa"].includes(
-            soilAnalysis.b_gwl_class,
-        )
+        [
+            "I",
+            "Ia",
+            "Ic",
+            "II",
+            "IIa",
+            "IIb",
+            "IIc",
+            "III",
+            "IIIa",
+            "IIIb",
+            "IV",
+            "IVu",
+            "IVc",
+        ].includes(soilAnalysis.b_gwl_class)
     ) {
         groundwaterClass = "wet"
     } else {
@@ -77,7 +104,7 @@ export function calculateTargetForNitrogenBalance(
     }
 
     // Determine targetValue based on Ros et al. 2023
-    let targetValue
+    let targetValue: Decimal
     if (
         cultivationType === "grassland" &&
         soilType === "sand" &&
