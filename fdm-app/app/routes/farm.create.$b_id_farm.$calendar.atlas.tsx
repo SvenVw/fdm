@@ -151,7 +151,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }),
         )
 
-        const previouslyCreatedFields: FeatureCollection = {
+        const fieldsSaved: FeatureCollection = {
             type: "FeatureCollection",
             features: features,
         }
@@ -163,7 +163,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_id_farm: farm.b_id_farm,
             b_name_farm: farm.b_name_farm,
-            previouslyCreatedFields: previouslyCreatedFields,
+            fieldsSaved: fieldsSaved,
             timeframe: timeframe,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
@@ -181,7 +181,7 @@ export default function Index() {
 
     const fieldsAvailableId = "fieldsAvailable"
     // const fields = loaderData.savedFields
-    const initialViewState = getViewState(loaderData.previouslyCreatedFields)
+    const initialViewState = getViewState(loaderData.fieldsSaved)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [viewState, setViewState] = useState<ViewState>(
@@ -198,9 +198,7 @@ export default function Index() {
         null,
     )
 
-    const handleClickPreviouslyCreatedField = async (
-        feature: Feature<Polygon>,
-    ) => {
+    const handleClickSavedField = async (feature: Feature<Polygon>) => {
         setSelectedField(feature)
         setOpen(true)
     }
@@ -208,11 +206,9 @@ export default function Index() {
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
 
-    const fieldsPreviouslyCreatedId = "fieldsPreviouslyCreated"
-    const fieldsPreviouslyCreated = loaderData.previouslyCreatedFields
-    const fieldsPreviouslyCreatedStyle = getFieldsStyle(
-        fieldsPreviouslyCreatedId,
-    )
+    const fieldsSavedId = "fieldsSaved"
+    const fieldsSaved = loaderData.fieldsSaved
+    const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
 
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(
@@ -263,19 +259,18 @@ export default function Index() {
                                 interactiveLayerIds={[
                                     fieldsAvailableId,
                                     fieldsSelectedId,
-                                    fieldsPreviouslyCreatedId,
+                                    fieldsSavedId,
                                 ]}
                                 onMove={onViewportChange}
                                 onClick={(evt) => {
                                     if (!evt.features) return
                                     const polygonFeature = evt.features.find(
                                         (f) =>
-                                            f.source ===
-                                                fieldsPreviouslyCreatedId &&
+                                            f.source === fieldsSavedId &&
                                             f.geometry?.type === "Polygon",
                                     )
                                     if (polygonFeature) {
-                                        handleClickPreviouslyCreatedField(
+                                        handleClickSavedField(
                                             polygonFeature as Feature<Polygon>,
                                         )
                                     }
@@ -300,7 +295,7 @@ export default function Index() {
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
-                                    exclude={fieldsPreviouslyCreated.features}
+                                    exclude={fieldsSaved.features}
                                     url={loaderData.fieldsAvailableUrl}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                 >
@@ -312,16 +307,16 @@ export default function Index() {
                                     availableLayerId={fieldsAvailableId}
                                     fieldsData={selectedFieldsData}
                                     setFieldsData={setSelectedFieldsData}
-                                    excludedLayerId={fieldsPreviouslyCreatedId}
+                                    excludedLayerId={fieldsSavedId}
                                 >
                                     <Layer {...fieldsSelectedStyle} />
                                 </FieldsSourceSelected>
 
                                 <FieldsSourceNotClickable
-                                    id={fieldsPreviouslyCreatedId}
-                                    fieldsData={fieldsPreviouslyCreated}
+                                    id={fieldsSavedId}
+                                    fieldsData={fieldsSaved}
                                 >
-                                    <Layer {...fieldsPreviouslyCreatedStyle} />
+                                    <Layer {...fieldsSavedStyle} />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
@@ -337,7 +332,7 @@ export default function Index() {
                                         layer={fieldsAvailableId}
                                         layerExclude={[
                                             fieldsSelectedId,
-                                            fieldsPreviouslyCreatedId,
+                                            fieldsSavedId,
                                         ]}
                                     />
                                     <FieldsPanelHover

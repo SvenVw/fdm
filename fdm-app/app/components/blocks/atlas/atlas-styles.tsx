@@ -40,10 +40,6 @@ export function getFieldsStyle(layerId: string): LayerProps &
         fieldsStyle.paint["fill-color"] = "#10b981"
         fieldsStyle.paint["fill-opacity"] = 0.9
     }
-    if (layerId === "fieldsPreviouslyCreated") {
-        fieldsStyle.paint["fill-color"] = "#10b981"
-        fieldsStyle.paint["fill-opacity"] = 0.9
-    }
 
     return fieldsStyle
 }
