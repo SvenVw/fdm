@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- 828ad89: Fix remove not needed line at db migration
+- 828ad89: Remove unnecessary line in DB migration
 
 ## 0.23.1
 
