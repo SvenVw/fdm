@@ -1,5 +1,21 @@
 # fdm-calculator
 
+## 0.5.2
+
+### Patch Changes
+
+- 11136b2: Fix issues with tests that used outdated gwl classes
+- Updated dependencies [828ad89]
+  - @svenvw/fdm-core@0.23.2
+
+## 0.5.1
+
+### Patch Changes
+
+- 48b94c3: Support the updated classed for `b_gwl_class` at `calculateTargetForNitrogenBalance`
+- Updated dependencies [d331cca]
+  - @svenvw/fdm-core@0.23.1
+
 ## 0.5.0
 
 ### Minor Changes
