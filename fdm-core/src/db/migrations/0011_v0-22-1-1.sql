@@ -1,6 +1,6 @@
 ALTER TABLE "fdm"."soil_analysis" ALTER COLUMN "b_gwl_class" SET DATA TYPE text;--> statement-breakpoint
 DROP TYPE "fdm"."b_gwl_class";--> statement-breakpoint
-UPDATE "fdm"."soil_analysis" SET "b_gwl_class" = '-' WHERE "b_gwl_class" = 'IIb';
+UPDATE "fdm"."soil_analysis" SET "b_gwl_class" = 'IIb' WHERE "b_gwl_class" = '-';
 UPDATE "fdm"."soil_analysis" SET "b_gwl_class" = 'VId' WHERE "b_gwl_class" = 'sVI';
 UPDATE "fdm"."soil_analysis" SET "b_gwl_class" = 'VIIo' WHERE "b_gwl_class" = 'sVII';
 UPDATE "fdm"."soil_analysis" SET "b_gwl_class" = 'VIIo' WHERE "b_gwl_class" = 'bVII';
