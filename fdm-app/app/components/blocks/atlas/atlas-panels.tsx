@@ -4,7 +4,7 @@ import { Check, Info } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
-import { data, useFetcher } from "react-router"
+import { data, NavLink, useFetcher } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
@@ -152,8 +152,12 @@ export function FieldsPanelZoom({
 
 export function FieldsPanelSelection({
     fields,
+    numPreviouslyCreatedFields,
+    continueTo,
 }: {
     fields: FeatureCollection
+    numPreviouslyCreatedFields: number
+    continueTo: string
 }) {
     const fetcher = useFetcher()
     const { current: map } = useMap()
@@ -163,6 +167,7 @@ export function FieldsPanelSelection({
 
     const submitSelectedFields = useCallback(
         async (fields: FeatureCollection) => {
+            if (fields.features.length === 0) return
             try {
                 const formSelectedFields = new FormData()
                 formSelectedFields.append(
@@ -280,7 +285,7 @@ export function FieldsPanelSelection({
                     )
                 } else {
                     setPanel(
-                        <Card className={cn("w-[380px]")}>
+                        <Card>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
                                 <CardDescription>
@@ -289,13 +294,12 @@ export function FieldsPanelSelection({
                             </CardHeader>
                             <CardContent className="grid gap-4" />
                             <CardFooter>
-                                <Button
-                                    className="w-full"
-                                    onClick={() => submitSelectedFields(fields)}
-                                >
-                                    <Check />
-                                    <span>Doorgaan</span>
-                                </Button>
+                                <NavLink to={continueTo} className="flex-1">
+                                    <Button className="w-full">
+                                        <Check />
+                                        <span>Doorgaan</span>
+                                    </Button>
+                                </NavLink>
                             </CardFooter>
                         </Card>,
                     )

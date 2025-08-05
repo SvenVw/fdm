@@ -148,7 +148,13 @@ export default function Index() {
                             <aside className="lg:w-1/5">
                                 <SidebarPage
                                     items={loaderData.sidebarPageItems}
-                                />
+                                >
+                                    <NavLink
+                                        to={`/farm/create/${loaderData.b_id_farm}/fields`}
+                                    >
+                                        <Button>Voeg meer percelen toe</Button>
+                                    </NavLink>
+                                </SidebarPage>
                             </aside>
                             <div className="flex-1">
                                 <Outlet />

@@ -101,7 +101,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get timeframe from calendar store
+        // Get calendar and timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
         // Get the fields of the farm in case the farmer came back after creating some fields
@@ -167,6 +168,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
             fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
+            continueTo: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -325,6 +327,11 @@ export default function Index() {
                                 <div className="fields-panel grid gap-4 w-[350px]">
                                     <FieldsPanelSelection
                                         fields={selectedFieldsData}
+                                        numPreviouslyCreatedFields={
+                                            loaderData.previouslyCreatedFields
+                                                .features.length
+                                        }
+                                        continueTo={loaderData.continueTo}
                                     />
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
