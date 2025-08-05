@@ -25,7 +25,7 @@ export function FieldsPanelHover({
 }: {
     zoomLevelFields: number
     layer: string
-    layerExclude?: string
+    layerExclude?: string[] | string
 }) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
@@ -43,7 +43,9 @@ export function FieldsPanelHover({
                         const featuresExclude = map.queryRenderedFeatures(
                             evt.point,
                             {
-                                layers: [layerExclude],
+                                layers: Array.isArray(layerExclude)
+                                    ? layerExclude
+                                    : [layerExclude],
                             },
                         )
                         if (featuresExclude && featuresExclude.length > 0) {
@@ -287,8 +289,12 @@ export function FieldsPanelSelection({
                             </CardHeader>
                             <CardContent className="grid gap-4" />
                             <CardFooter>
-                                <Button className="w-full" disabled>
-                                    <Check /> Sla geselecteerde percelen op
+                                <Button
+                                    className="w-full"
+                                    onClick={() => submitSelectedFields(fields)}
+                                >
+                                    <Check />
+                                    <span>Doorgaan</span>
                                 </Button>
                             </CardFooter>
                         </Card>,

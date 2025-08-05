@@ -33,12 +33,16 @@ export function getFieldsStyle(layerId: string): LayerProps &
     } as LayerProps & FillLayerSpecification // Cast to FillLayerSpecification to allow modification of paint
 
     if (layerId === "fieldsSelected") {
-        fieldsStyle.paint["fill-color"] = "#f43f5e"
-        fieldsStyle.paint["fill-opacity"] = 0.8
+        fieldsStyle.paint["fill-color"] = "#ffcf0d"
+        fieldsStyle.paint["fill-opacity"] = 0.6
     }
     if (layerId === "fieldsSaved") {
         fieldsStyle.paint["fill-color"] = "#10b981"
-        fieldsStyle.paint["fill-opacity"] = 0.8
+        fieldsStyle.paint["fill-opacity"] = 0.9
+    }
+    if (layerId === "fieldsPreviouslyCreated") {
+        fieldsStyle.paint["fill-color"] = "#10b981"
+        fieldsStyle.paint["fill-opacity"] = 0.9
     }
 
     return fieldsStyle

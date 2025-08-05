@@ -5,6 +5,7 @@ import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import type { FieldsAvailableUrlType } from "./atlas.d"
 import { generateFeatureClass } from "./atlas-functions"
+import { Field } from "@svenvw/fdm-core"
 
 export function FieldsSourceNotClickable({
     id,
@@ -28,9 +29,11 @@ export function FieldsSourceSelected({
     fieldsData,
     setFieldsData,
     children,
+    excludedLayerId,
 }: {
     id: string
     availableLayerId: string
+    excludedLayerId?: string
     fieldsData: FeatureCollection
     setFieldsData: React.Dispatch<
         React.SetStateAction<FeatureCollection>
@@ -43,12 +46,24 @@ export function FieldsSourceSelected({
         function clickOnMap(evt) {
             if (!map) return
 
+            if (
+                map.queryRenderedFeatures(evt.point, {
+                    layers: [excludedLayerId],
+                }).length
+            ) {
+                return
+            }
+
             const features = map.queryRenderedFeatures(evt.point, {
                 layers: [availableLayerId],
             })
             console.log(features)
 
-            if (features.length > 0) {
+            if (
+                features.length > 0 &&
+                features[0].layer &&
+                features[0].layer !== excludedLayerId
+            ) {
                 handleFieldClick(features[0], setFieldsData)
             }
         }
@@ -107,15 +122,23 @@ function handleFieldClick(
 export function FieldsSourceAvailable({
     id,
     url,
+    exclude,
     zoomLevelFields,
     children,
 }: {
     id: string
     url: FieldsAvailableUrlType
+    exclude?: Field[]
     zoomLevelFields: number
     children: JSX.Element
 }) {
     if (!url) return null
+
+    const unwantedIds = new Set(
+        exclude
+            ? exclude.map((f) => f.properties.b_id_source).filter((id) => id)
+            : [],
+    )
 
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
@@ -142,11 +165,20 @@ export function FieldsSourceAvailable({
                             let i = 0
                             const featureClass = generateFeatureClass()
 
+                            let count = 0
                             for await (const feature of iter) {
-                                featureClass.features.push({
-                                    ...feature,
-                                    id: i,
-                                })
+                                if (
+                                    !unwantedIds.has(
+                                        feature.properties!.b_id_source,
+                                    )
+                                ) {
+                                    featureClass.features.push({
+                                        ...feature,
+                                        id: i,
+                                    })
+                                } else {
+                                    count++
+                                }
                                 i += 1
                             }
                             setData(featureClass)
@@ -174,7 +206,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, url, zoomLevelFields])
+    }, [map, url, zoomLevelFields, unwantedIds])
 
     return (
         <Source id={id} type="geojson" data={data}>
