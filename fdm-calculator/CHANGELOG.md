@@ -1,5 +1,13 @@
 # fdm-calculator
 
+## 0.5.1
+
+### Patch Changes
+
+- 48b94c3: Support the updated classed for `b_gwl_class` at `calculateTargetForNitrogenBalance`
+- Updated dependencies [d331cca]
+  - @svenvw/fdm-core@0.23.1
+
 ## 0.5.0
 
 ### Minor Changes
