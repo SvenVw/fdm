@@ -36,6 +36,7 @@ import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
+import { serverConfig } from "~/lib/config.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -79,12 +80,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
     // Collect input data for nutrient balance calculation
+    const datasetsUrl = serverConfig.datasets_url
     const nitrogenBalanceInput = await collectInputForNitrogenBalance(
         fdm,
         session.principal_id,
         b_id_farm,
         timeframe,
-        String(process.env.FDM_PUBLIC_DATA_URL),
+        datasetsUrl,
     )
 
     let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null

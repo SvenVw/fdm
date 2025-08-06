@@ -1,10 +1,10 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
+import { type Dispatch, type JSX, type SetStateAction, useEffect, useState } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
-import type { FieldsAvailableUrlType } from "./atlas.d"
 import { generateFeatureClass } from "./atlas-functions"
+import { getAvailableFieldsUrl } from "./atlas-url"
 
 export function FieldsSourceNotClickable({
     id,
@@ -106,19 +106,18 @@ function handleFieldClick(
 
 export function FieldsSourceAvailable({
     id,
-    url,
+    calendar,
     zoomLevelFields,
     children,
 }: {
     id: string
-    url: FieldsAvailableUrlType
+    calendar: string
     zoomLevelFields: number
     children: JSX.Element
 }) {
-    if (!url) return null
-
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
+    const availableFieldsUrl = getAvailableFieldsUrl(calendar)
 
     useEffect(() => {
         async function loadData() {
@@ -137,7 +136,7 @@ export function FieldsSourceAvailable({
                             maxY: 1.0005 * maxY,
                         }
                         try {
-                            const iter = deserialize(url, bbox)
+                            const iter = deserialize(availableFieldsUrl, bbox)
 
                             let i = 0
                             const featureClass = generateFeatureClass()
@@ -174,7 +173,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, url, zoomLevelFields])
+    }, [map, availableFieldsUrl, zoomLevelFields])
 
     return (
         <Source id={id} type="geojson" data={data}>
