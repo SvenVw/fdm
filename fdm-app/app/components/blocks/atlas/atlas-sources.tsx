@@ -1,6 +1,7 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
+import centroid from "@turf/centroid"
 import {
     type Dispatch,
     type JSX,
@@ -11,8 +12,7 @@ import {
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import { getAvailableFieldsUrl } from "./atlas-url"
-import { redirect } from "react-router"
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router"
 
 export function FieldsSourceNotClickable({
     id,
@@ -134,10 +134,13 @@ export function FieldsSourceAvailable({
     useEffect(() => {
         if (map && redirectToDetailsPage) {
             map.on("click", id, (e) => {
-                // Get the coordinates of clicked field
+                // Get the coordinates of the centroid of the clicked field
                 if (e.features) {
-                    const coordinates = e.lngLat.toArray().join(",")
-                    navigate(`${coordinates}`)
+                    const clickedFeature = e.features[0]
+                    const featureCentroid = centroid(clickedFeature)
+                    const featureCentroidCoordinates =
+                        featureCentroid.geometry.coordinates.join(",")
+                    navigate(featureCentroidCoordinates)
                 }
             })
         }
