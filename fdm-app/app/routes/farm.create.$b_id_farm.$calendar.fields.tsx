@@ -150,7 +150,7 @@ export default function Index() {
                                     items={loaderData.sidebarPageItems}
                                 >
                                     <NavLink
-                                        to={`/farm/create/${loaderData.b_id_farm}/fields`}
+                                        to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/atlas`}
                                     >
                                         <Button>Voeg meer percelen toe</Button>
                                     </NavLink>
