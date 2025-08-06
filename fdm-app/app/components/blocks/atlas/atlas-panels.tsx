@@ -1,6 +1,6 @@
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
-import { Check, Info } from "lucide-react"
+import { ArrowRight, Check, Info } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
@@ -294,7 +294,7 @@ export function FieldsPanelSelection({
                             <CardFooter>
                                 <NavLink to={continueTo} className="flex-1">
                                     <Button className="w-full">
-                                        <Check />
+                                        <ArrowRight />
                                         <span>Doorgaan</span>
                                     </Button>
                                 </NavLink>
