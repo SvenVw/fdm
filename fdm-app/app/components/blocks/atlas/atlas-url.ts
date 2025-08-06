@@ -4,14 +4,12 @@ export function getAvailableFieldsUrl(calendar: string): string {
     // Get URL of FDM public datasets
     const datasetsUrl = clientConfig.datasets_url
 
-    // Set year accoriding to available at FDM public datasets
-    let year = Math.round(Number(calendar))
-    if (year < 2020) {
-        year = 2020
+    //  Set year according to available at FDM public datasets
+    const parsedYear = Number.parseInt(calendar, 10)
+    if (Number.isNaN(parsedYear)) {
+        throw new Error(`Invalid calendar year: ${calendar}`)
     }
-    if (year > 2025) {
-        year = 2025
-    }
+    const year = Math.max(2020, Math.min(2025, parsedYear))
 
     // Set version according to availability at FDM public datasets
     let version = "definitive"

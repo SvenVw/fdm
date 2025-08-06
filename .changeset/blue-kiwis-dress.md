@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Replace environmental FDM_PUBLIC_DATA with PUBLIC_FDM_DATASETS_URL
+Replace environment variable FDM_PUBLIC_DATA with PUBLIC_FDM_DATASETS_URL
