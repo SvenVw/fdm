@@ -1,5 +1,17 @@
 # Changelog fdm-core
 
+## 0.23.2
+
+### Patch Changes
+
+- 828ad89: Remove unnecessary line in DB migration
+
+## 0.23.1
+
+### Patch Changes
+
+- d331cca: Fix that the classes of `b_gwl_class` are aligned with the latest definition
+
 ## 0.23.0
 
 ### Minor Changes

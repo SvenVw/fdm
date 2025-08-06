@@ -55,7 +55,7 @@ describe("calculateTargetForNitrogenBalance", () => {
 
     it("should calculate target for grassland on dry sandy soil", () => {
         const cultivations = [createCultivation("grass1")]
-        const soilAnalysis = createSoilAnalysis("duinzand", "bVII")
+        const soilAnalysis = createSoilAnalysis("duinzand", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
             "grass1",
             "grass",
@@ -89,7 +89,7 @@ describe("calculateTargetForNitrogenBalance", () => {
         const cultivations: FieldInput["cultivations"] = [
             createCultivation("crop1"),
         ]
-        const soilAnalysis = createSoilAnalysis("dekzand", "sVII")
+        const soilAnalysis = createSoilAnalysis("dekzand", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
             "crop1",
             "cereal",
@@ -143,7 +143,7 @@ describe("calculateTargetForNitrogenBalance", () => {
         const cultivations: FieldInput["cultivations"] = [
             createCultivation("crop1"),
         ]
-        const soilAnalysis = createSoilAnalysis("rivierklei", "sVII")
+        const soilAnalysis = createSoilAnalysis("rivierklei", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
             "crop1",
             "cereal",
@@ -179,7 +179,7 @@ describe("calculateTargetForNitrogenBalance", () => {
         const cultivations: FieldInput["cultivations"] = [
             createCultivation("grass1"),
         ]
-        const soilAnalysis = createSoilAnalysis("duinzand", "bVII")
+        const soilAnalysis = createSoilAnalysis("duinzand", "VIIo")
         const cultivationDetailsMap = createCultivationDetailsMap(
             "grass1",
             "grass",
