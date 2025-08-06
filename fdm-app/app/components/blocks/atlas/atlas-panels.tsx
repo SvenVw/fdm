@@ -287,7 +287,7 @@ export function FieldsPanelSelection({
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
                                 <CardDescription>
-                                    Je hebt geen percelen geselecteerd
+                                    Je hebt geen nieuwe percelen geselecteerd
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4" />
