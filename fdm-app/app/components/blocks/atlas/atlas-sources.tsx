@@ -1,10 +1,18 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type JSX, type SetStateAction, useEffect, useState } from "react"
+import {
+    type Dispatch,
+    type JSX,
+    type SetStateAction,
+    useEffect,
+    useState,
+} from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import { getAvailableFieldsUrl } from "./atlas-url"
+import { redirect } from "react-router"
+import { useNavigate } from "react-router-dom"
 
 export function FieldsSourceNotClickable({
     id,
@@ -108,16 +116,32 @@ export function FieldsSourceAvailable({
     id,
     calendar,
     zoomLevelFields,
+    redirectToDetailsPage = false,
     children,
 }: {
     id: string
     calendar: string
     zoomLevelFields: number
+    redirectToDetailsPage: boolean
     children: JSX.Element
 }) {
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
     const availableFieldsUrl = getAvailableFieldsUrl(calendar)
+
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (map && redirectToDetailsPage) {
+            map.on("click", id, (e) => {
+                // Get the coordinates of clicked field
+                if (e.features) {
+                    const coordinates = e.lngLat.toArray().join(",")
+                    navigate(`${coordinates}`)
+                }
+            })
+        }
+    }, [map, id, redirectToDetailsPage, navigate])
 
     useEffect(() => {
         async function loadData() {

@@ -202,6 +202,7 @@ export default function Index() {
                                     id={fieldsAvailableId}
                                     calendar={loaderData.calendar}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                                    redirectToDetailsPage={false}
                                 >
                                     <Layer {...fieldsAvailableStyle} />
                                 </FieldsSourceAvailable>

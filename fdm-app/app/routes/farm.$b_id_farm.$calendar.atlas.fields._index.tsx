@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
     Layer,
     Map as MapGL,
+    useMap,
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
@@ -13,12 +14,15 @@ import { data, type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
-import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceNotClickable,
+} from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -64,6 +68,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
         // Get the fields of the farm
@@ -99,6 +104,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
+            calendar: calendar,
             savedFields: featureCollection,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
@@ -121,6 +127,8 @@ export default function FarmAtlasFieldsBlock() {
     const fields = loaderData.savedFields
     const initialViewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
+    const fieldsAvailableId = "fieldsAvailable"
+    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [viewState, setViewState] = useState<ViewState>(
         initialViewState as ViewState,
@@ -133,11 +141,11 @@ export default function FarmAtlasFieldsBlock() {
     return (
         <MapGL
             {...viewState}
-            style={{ height: "calc(100vh - 64px - 147px)", width: "100%" }}
+            style={{ height: "calc(100vh - 64px)", width: "100%" }}
             interactive={true}
             mapStyle={loaderData.mapboxStyle}
             mapboxAccessToken={loaderData.mapboxToken}
-            interactiveLayerIds={[id]}
+            interactiveLayerIds={[id, fieldsAvailableId]}
             onMove={onViewportChange}
         >
             <Controls
@@ -152,6 +160,16 @@ export default function FarmAtlasFieldsBlock() {
                     }))
                 }
             />
+
+            <FieldsSourceAvailable
+                id={fieldsAvailableId}
+                calendar={loaderData.calendar}
+                zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                redirectToDetailsPage={true}
+            >
+                <Layer {...fieldsAvailableStyle} />
+            </FieldsSourceAvailable>
+
             <FieldsSourceNotClickable id={id} fieldsData={fields}>
                 <Layer {...fieldsSavedStyle} />
             </FieldsSourceNotClickable>

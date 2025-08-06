@@ -139,12 +139,6 @@ export default function FarmContentBlock() {
                 />
             </Header>
             <main>
-                <FarmTitle
-                    title={"Kaarten"}
-                    description={
-                        "Bekijk verschillende kaartlagen van je bedrijf"
-                    }
-                />
                 <ClientOnly
                     fallback={<Skeleton className="h-full w-full rounded-xl" />}
                 >
