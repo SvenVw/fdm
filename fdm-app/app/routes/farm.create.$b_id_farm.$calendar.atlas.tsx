@@ -350,7 +350,7 @@ export default function Index() {
                     open={open}
                     setOpen={setOpen}
                     field={selectedField}
-                    hint="Dit perceel is al aangemaakt. U kunt percellen verwijderen op de volgende pagina."
+                    hint="Dit perceel is al opgeslagen. U kunt percelen verwijderen op de volgende pagina."
                 />
             )}
         </SidebarInset>
@@ -389,7 +389,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
         try {
             firstFieldIndex =
                 (
-                    await getFields(fdm, session.principal_id, b_id_farm, timeframe)
+                    await getFields(
+                        fdm,
+                        session.principal_id,
+                        b_id_farm,
+                        timeframe,
+                    )
                 ).length + 1
         } catch (e) {
             console.warn(e)
