@@ -17,6 +17,7 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
+import { getCultivationColor } from "../../custom/cultivation-colors"
 
 export function FieldsPanelHover({
     zoomLevelFields,
@@ -199,7 +200,7 @@ export function FieldsPanelSelection({
 
                     const cultivations = features.reduce(
                         (
-                            acc: { b_lu_name: string; count: number }[],
+                            acc: { b_lu_name: string; b_lu_croprotation: string; count: number }[],
                             feature,
                         ) => {
                             if (!feature.properties) return acc
@@ -213,6 +214,8 @@ export function FieldsPanelSelection({
                             } else {
                                 acc.push({
                                     b_lu_name: feature.properties.b_lu_name,
+                                    b_lu_croprotation:
+                                        feature.properties.b_lu_croprotation,
                                     count: 1,
                                 })
                             }
@@ -238,7 +241,15 @@ export function FieldsPanelSelection({
                                             key={cultivation.b_lu_name}
                                             className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
                                         >
-                                            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
+                                            <span
+                                                className="flex h-2 w-2 translate-y-1 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        getCultivationColor(
+                                                            cultivation.b_lu_croprotation,
+                                                        ),
+                                                }}
+                                            />
                                             <div className="space-y-1">
                                                 <p className="text-sm font-medium leading-none">
                                                     {cultivation.b_lu_name}
