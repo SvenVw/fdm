@@ -3,6 +3,7 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    Await,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -10,10 +11,11 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
 import { getCultivationCatalogue } from "@svenvw/fdm-data"
-import { FarmTitle } from "../components/blocks/farm/farm-title"
-import { CultivationHistoryCard } from "../components/blocks/atlas-fields/cultivation-history"
-import { SoilTextureCard } from "../components/blocks/atlas-fields/soil-texture"
-import { GroundWaterCard } from "../components/blocks/atlas-fields/groundwater"
+import { FarmTitle, FarmTitleSkeleton } from "../components/blocks/farm/farm-title"
+import { CultivationHistoryCard, CultivationHistorySkeleton } from "../components/blocks/atlas-fields/cultivation-history"
+import { SoilTextureCard, SoilTextureSkeleton } from "../components/blocks/atlas-fields/soil-texture"
+import { GroundWaterCard, GroundWaterSkeleton } from "../components/blocks/atlas-fields/groundwater"
+import { Suspense } from "react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -62,51 +64,50 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             },
         } as GeoJSON.Feature<GeoJSON.Point>
         const nmiApiKey = getNmiApiKey()
-        const estimates = await getSoilParameterEstimates(field, nmiApiKey)
 
-        // Get cultivation history details
-        const cultivationCatalogue = await getCultivationCatalogue("brp")
-        const cultivationHistory = estimates.cultivations.map((cultivation) => {
-            const b_lu_catalogue = `nl_${cultivation.b_lu_brp}`
-            const catalogueItem = cultivationCatalogue.find(
-                (catalogueItem) =>
-                    catalogueItem.b_lu_catalogue === b_lu_catalogue,
-            )
-            return {
-                year: cultivation.year,
-                b_lu_catalogue: b_lu_catalogue,
-                b_lu_name: catalogueItem?.b_lu_name,
-                b_lu_croprotation: catalogueItem?.b_lu_croprotation,
-            }
-        })
-
-        // Get groundwater details
-        const groundwaterEstimates = {
-            b_gwl_class: estimates.b_gwl_class,
-            b_gwl_ghg: estimates.b_gwl_ghg,
-            b_gwl_glg: estimates.b_gwl_glg,
-        }
-
-        // Get soil parameter estimates
-        const soilParameterEstimates = {
-            a_clay_mi: Math.round(estimates.a_clay_mi),
-            a_silt_mi: Math.round(estimates.a_silt_mi),
-            a_sand_mi: Math.round(estimates.a_sand_mi),
-        }
-
-        // Get field details
-        const fieldDetails = {
-            b_area: undefined,
-            isNvGebied: undefined,
-            isNatura2000Area: undefined,
-            regionTable2: undefined,
-        }
+        const estimatesPromise = getSoilParameterEstimates(field, nmiApiKey)
+        const cultivationCataloguePromise = getCultivationCatalogue("brp")
 
         return {
-            cultivationHistory: cultivationHistory,
-            groundwaterEstimates: groundwaterEstimates,
-            soilParameterEstimates: soilParameterEstimates,
-            fieldDetails: fieldDetails,
+            cultivationHistory: (async () => {
+                const estimates = await estimatesPromise
+                const cultivationCatalogue = await cultivationCataloguePromise
+                return estimates.cultivations.map((cultivation) => {
+                    const b_lu_catalogue = `nl_${cultivation.b_lu_brp}`
+                    const catalogueItem = cultivationCatalogue.find(
+                        (catalogueItem) =>
+                            catalogueItem.b_lu_catalogue === b_lu_catalogue,
+                    )
+                    return {
+                        year: cultivation.year,
+                        b_lu_catalogue: b_lu_catalogue,
+                        b_lu_name: catalogueItem?.b_lu_name,
+                        b_lu_croprotation: catalogueItem?.b_lu_croprotation,
+                    }
+                })
+            })(),
+            groundwaterEstimates: (async () => {
+                const estimates = await estimatesPromise
+                return {
+                    b_gwl_class: estimates.b_gwl_class,
+                    b_gwl_ghg: estimates.b_gwl_ghg,
+                    b_gwl_glg: estimates.b_gwl_glg,
+                }
+            })(),
+            soilParameterEstimates: (async () => {
+                const estimates = await estimatesPromise
+                return {
+                    a_clay_mi: Math.round(estimates.a_clay_mi),
+                    a_silt_mi: Math.round(estimates.a_silt_mi),
+                    a_sand_mi: Math.round(estimates.a_sand_mi),
+                }
+            })(),
+            fieldDetails: {
+                b_area: undefined,
+                isNvGebied: undefined,
+                isNatura2000Area: undefined,
+                regionTable2: undefined,
+            },
             calendar: calendar,
         }
     } catch (error) {
@@ -124,28 +125,60 @@ export default function FieldDetailsAtlasBlock() {
 
     return (
         <main>
-            <FarmTitle
-                title={
-                    cultivationHistory.find(
-                        (cultivation) => String(cultivation.year) === calendar,
-                    )?.b_lu_name
-                }
-                description={"Bekijk alle details over dit perceel"}
-                action={{to: "../fields", label: "Terug"}}
-            />
+            <Suspense fallback={<FarmTitleSkeleton />}>
+                <Await resolve={cultivationHistory}>
+                    {(resolvedCultivationHistory) => (
+                        <FarmTitle
+                            title={
+                                // @ts-ignore
+                                resolvedCultivationHistory.find(
+                                    (cultivation) =>
+                                        String(cultivation.year) === calendar,
+                                )?.b_lu_name
+                            }
+                            description={"Bekijk alle details over dit perceel"}
+                            action={{ to: "../fields", label: "Terug" }}
+                        />
+                    )}
+                </Await>
+            </Suspense>
             <div className="grid grid-flow-col grid-rows-3 gap-6 lg:grid-cols-3 px-10 items-start">
                 <div className="row-span-3">
-                    <CultivationHistoryCard
-                        cultivationHistory={cultivationHistory}
-                    />
+                    <Suspense fallback={<CultivationHistorySkeleton />}>
+                        <Await resolve={cultivationHistory}>
+                            {(resolvedCultivationHistory) => (
+                                <CultivationHistoryCard
+                                    cultivationHistory={
+                                        resolvedCultivationHistory
+                                    }
+                                />
+                            )}
+                        </Await>
+                    </Suspense>
                 </div>
                 <div className="col-span-2 space-y-4">
-                    <SoilTextureCard
-                        soilParameterEstimates={soilParameterEstimates}
-                    />
-                    <GroundWaterCard
-                        groundWaterEstimates={groundwaterEstimates}
-                    />
+                    <Suspense fallback={<SoilTextureSkeleton />}>
+                        <Await resolve={soilParameterEstimates}>
+                            {(resolvedSoilParameterEstimates) => (
+                                <SoilTextureCard
+                                    soilParameterEstimates={
+                                        resolvedSoilParameterEstimates
+                                    }
+                                />
+                            )}
+                        </Await>
+                    </Suspense>
+                    <Suspense fallback={<GroundWaterSkeleton />}>
+                        <Await resolve={groundwaterEstimates}>
+                            {(resolvedGroundwaterEstimates) => (
+                                <GroundWaterCard
+                                    groundWaterEstimates={
+                                        resolvedGroundwaterEstimates
+                                    }
+                                />
+                            )}
+                        </Await>
+                    </Suspense>
                 </div>
             </div>
         </main>

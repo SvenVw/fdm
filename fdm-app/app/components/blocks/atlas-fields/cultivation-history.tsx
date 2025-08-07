@@ -5,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Skeleton } from "~/components/ui/skeleton"
 
 type CultivationHistory = {
     year: number
@@ -81,6 +82,36 @@ export function CultivationHistoryCard({
                                 <p className="text-sm text-gray-500">
                                     {cultivation.year}
                                 </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
+export function CultivationHistorySkeleton() {
+    return (
+        <Card className="col-span-1 lg:row-span-2">
+            <CardHeader>
+                <CardTitle>Gewashistorie</CardTitle>
+                <CardDescription>
+                    De gewassen van de afgelopen jaren op dit perceel volgens
+                    Basisregistratie Gewapercelen.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 text-sm">
+                <div className="relative pl-1">
+                    {[...Array(3)].map((_, index) => (
+                        <div
+                            key={index}
+                            className="flex items-start space-x-4 pb-6"
+                        >
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <div className="min-w-0 flex-1 space-y-2">
+                                <Skeleton className="h-4 w-3/4" />
+                                <Skeleton className="h-3 w-1/2" />
                             </div>
                         </div>
                     ))}

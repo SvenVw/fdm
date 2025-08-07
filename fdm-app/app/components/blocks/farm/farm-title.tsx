@@ -1,6 +1,7 @@
 import { NavLink } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
+import { Skeleton } from "~/components/ui/skeleton"
 
 interface FarmTitleProps {
     title: string
@@ -28,6 +29,23 @@ export function FarmTitle({ title, description, action }: FarmTitleProps) {
                         </NavLink>
                     </div>
                 )}
+            </div>
+            <Separator className="my-6" />
+        </div>
+    )
+}
+
+export function FarmTitleSkeleton() {
+    return (
+        <div className="space-y-6 p-10 pb-0">
+            <div className="flex items-center gap-4">
+                <div className="space-y-0.5 ">
+                    <Skeleton className="h-8 w-64" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="ml-auto">
+                    <Skeleton className="h-10 w-24" />
+                </div>
             </div>
             <Separator className="my-6" />
         </div>
