@@ -35,7 +35,7 @@ export default defineConfig({
     /* Start the server in a CI environment such as GitHub Actions */
     webServer: {
         command:
-            "pnpm dotenvx run -- c8 react-router-serve ./build/server/index.js",
+            "pnpm dotenvx run -- c8 -c v8-reporter.config.json --reports-dir coverage/login react-router-serve ./build/server/index.js",
         env: {
             WRITE_MAGIC_LINK_FILE: "1",
         },

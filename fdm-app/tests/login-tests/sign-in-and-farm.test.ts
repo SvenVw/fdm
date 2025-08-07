@@ -7,7 +7,6 @@ import {
 } from "../test-io"
 import { submitCookieBanner } from "../util"
 import { magicLinkUrlFileName } from "../test-io"
-import fs from "node:fs/promises"
 
 test.describe.configure({ mode: "serial" })
 
