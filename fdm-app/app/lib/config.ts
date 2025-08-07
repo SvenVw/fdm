@@ -24,6 +24,7 @@ const initializeRuntimeEnvMap = (): RuntimeConfig => {
         "PUBLIC_FDM_URL",
         "PUBLIC_FDM_NAME",
         "PUBLIC_FDM_PRIVACY_URL",
+        "PUBLIC_FDM_DATASETS_URL",
         "PUBLIC_MAPBOX_TOKEN",
         "PUBLIC_SENTRY_DSN",
         "PUBLIC_SENTRY_ORG",
@@ -112,6 +113,7 @@ export const clientConfig: ClientConfig = {
     logomark: "/fdm-high-resolution-logo-transparent-no-text.png", // Assuming static
     url: String(getConfigValue("PUBLIC_FDM_URL")),
     privacy_url: String(getConfigValue("PUBLIC_FDM_PRIVACY_URL")),
+    datasets_url: String(getConfigValue("PUBLIC_FDM_DATASETS_URL")),
 
     analytics: {
         sentry: sentryConfig,

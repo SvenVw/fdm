@@ -82,9 +82,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
+        const calendar = getCalendar(params)
 
+        // Get the farm
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-
         if (!farm) {
             throw data("Farm not found", {
                 status: 404,
@@ -99,9 +100,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_id_farm: farm.b_id_farm,
             b_name_farm: farm.b_name_farm,
+            calendar: calendar,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
-            fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -199,7 +200,7 @@ export default function Index() {
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
-                                    url={loaderData.fieldsAvailableUrl}
+                                    calendar={loaderData.calendar}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                 >
                                     <Layer {...fieldsAvailableStyle} />
