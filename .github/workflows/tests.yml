@@ -377,6 +377,6 @@ jobs:
       - name: fdm-app - Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./fdm-app/coverage/tmp/*.json
+          files: ./fdm-app/coverage/**/*.json
           flags: fdm-app
           token: ${{ secrets.CODECOV_TOKEN }}
