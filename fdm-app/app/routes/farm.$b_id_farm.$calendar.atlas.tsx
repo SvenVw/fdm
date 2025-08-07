@@ -9,7 +9,6 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { HeaderAtlas } from "~/components/blocks/header/atlas"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"

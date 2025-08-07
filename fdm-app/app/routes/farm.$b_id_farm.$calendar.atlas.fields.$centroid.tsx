@@ -5,12 +5,15 @@ import {
     useLoaderData,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
 import { getCultivationCatalogue } from "@svenvw/fdm-data"
-import { fdm } from "../lib/fdm.server"
+import { FarmTitle } from "../components/blocks/farm/farm-title"
+import { CultivationHistoryCard } from "../components/blocks/atlas-fields/cultivation-history"
+import { SoilTextureCard } from "../components/blocks/atlas-fields/soil-texture"
+import { GroundWaterCard } from "../components/blocks/atlas-fields/groundwater"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -38,6 +41,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
         // Get the estimates for this field
@@ -103,18 +107,47 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             groundwaterEstimates: groundwaterEstimates,
             soilParameterEstimates: soilParameterEstimates,
             fieldDetails: fieldDetails,
+            calendar: calendar,
         }
-
-
-
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
 export default function FieldDetailsAtlasBlock() {
-    const loaderData = useLoaderData<typeof loader>()
-    console.log(loaderData)
+    const {
+        cultivationHistory,
+        calendar,
+        soilParameterEstimates,
+        groundwaterEstimates,
+    } = useLoaderData<typeof loader>()
 
-    return null
+    return (
+        <main>
+            <FarmTitle
+                title={
+                    cultivationHistory.find(
+                        (cultivation) => String(cultivation.year) === calendar,
+                    )?.b_lu_name
+                }
+                description={"Bekijk alle details over dit perceel"}
+                action={{to: "../fields", label: "Terug"}}
+            />
+            <div className="grid grid-flow-col grid-rows-3 gap-6 lg:grid-cols-3 px-10 items-start">
+                <div className="row-span-3">
+                    <CultivationHistoryCard
+                        cultivationHistory={cultivationHistory}
+                    />
+                </div>
+                <div className="col-span-2 space-y-4">
+                    <SoilTextureCard
+                        soilParameterEstimates={soilParameterEstimates}
+                    />
+                    <GroundWaterCard
+                        groundWaterEstimates={groundwaterEstimates}
+                    />
+                </div>
+            </div>
+        </main>
+    )
 }
