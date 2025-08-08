@@ -74,7 +74,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
         const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
-        expect(result.normValue).toBe(190)
+        expect(result.normValue).toBe(170)
         expect(result.normSource).toBe(
             "Derogatie - Grondwaterbeschermingsgebied",
         )

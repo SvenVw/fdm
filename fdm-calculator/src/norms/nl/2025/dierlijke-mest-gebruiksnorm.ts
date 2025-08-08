@@ -88,7 +88,7 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
             normValue = 190
             normSource = "Derogatie - NV Gebied"
         } else if (is_gwbg_gebied) {
-            normValue = 190
+            normValue = 170
             normSource = "Derogatie - Grondwaterbeschermingsgebied"
         } else {
             normValue = 200
