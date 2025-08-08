@@ -9,12 +9,24 @@ import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { getNmiApiKey, getSoilParameterEstimates } from "../integrations/nmi"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getCultivationCatalogue } from "@svenvw/fdm-data"
-import { FarmTitle, FarmTitleSkeleton } from "../components/blocks/farm/farm-title"
-import { CultivationHistoryCard, CultivationHistorySkeleton } from "../components/blocks/atlas-fields/cultivation-history"
-import { SoilTextureCard, SoilTextureSkeleton } from "../components/blocks/atlas-fields/soil-texture"
-import { GroundWaterCard, GroundWaterSkeleton } from "../components/blocks/atlas-fields/groundwater"
+import {
+    FarmTitle,
+    FarmTitleSkeleton,
+} from "~/components/blocks/farm/farm-title"
+import {
+    CultivationHistoryCard,
+    CultivationHistorySkeleton,
+} from "~/components/blocks/atlas-fields/cultivation-history"
+import {
+    SoilTextureCard,
+    SoilTextureSkeleton,
+} from "~/components/blocks/atlas-fields/soil-texture"
+import {
+    GroundWaterCard,
+    GroundWaterSkeleton,
+} from "~/components/blocks/atlas-fields/groundwater"
 import { Suspense } from "react"
 
 // Meta
@@ -130,14 +142,16 @@ export default function FieldDetailsAtlasBlock() {
                     {(resolvedCultivationHistory) => (
                         <FarmTitle
                             title={
-                                // @ts-ignore
                                 resolvedCultivationHistory.find(
                                     (cultivation) =>
                                         String(cultivation.year) === calendar,
-                                )?.b_lu_name
+                                )?.b_lu_name ?? ""
                             }
-                            description={"Bekijk alle details over dit perceel"}
-                            action={{ to: "../fields", label: "Terug" }}
+                            description="Bekijk alle details over dit perceel"
+                            action={{
+                                to: "../fields",
+                                label: "Terug",
+                            }}
                         />
                     )}
                 </Await>

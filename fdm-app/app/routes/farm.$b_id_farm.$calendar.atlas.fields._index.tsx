@@ -1,8 +1,7 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
     Layer,
     Map as MapGL,
-    useMap,
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
@@ -130,13 +129,31 @@ export default function FarmAtlasFieldsBlock() {
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
-    const [viewState, setViewState] = useState<ViewState>(
-        initialViewState as ViewState,
-    )
+    // Create a sessionStorage to store the latest viewstate
+    const [viewState, setViewState] = useState<ViewState>(() => {
+        if (typeof window !== "undefined") {
+            const savedViewState = sessionStorage.getItem("mapViewState")
+            if (savedViewState) {
+                return JSON.parse(savedViewState)
+            }
+        }
+        return initialViewState as ViewState
+    })
 
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
+
+    const isFirstRender = useRef(true)
+
+    // If latest viewstate is available use that one
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false
+            return
+        }
+        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+    }, [viewState])
 
     return (
         <MapGL
