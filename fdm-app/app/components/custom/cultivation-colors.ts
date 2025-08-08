@@ -17,6 +17,9 @@ export function getCultivationTypesHavingColors() {
     return Object.keys(CROP_ROTATION_COLORS)
 }
 
-export function getCultivationColor(cultivationType: string) {
-    return CROP_ROTATION_COLORS[cultivationType] ?? CROP_ROTATION_COLORS.other
+export function getCultivationColor(cultivationType: string | undefined) {
+    if (cultivationType) {
+        return CROP_ROTATION_COLORS[cultivationType?.toLowerCase()] ?? CROP_ROTATION_COLORS.other
+    }
+    return CROP_ROTATION_COLORS.other
 }

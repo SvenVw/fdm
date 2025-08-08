@@ -124,12 +124,17 @@ export function FieldsSourceAvailable({
     const availableFieldsUrl = getAvailableFieldsUrl(calendar)
 
     const cultivationCataloguePromise = useMemo(async () => {
-        const items = await getCultivationCatalogue("brp")
-        const result: Record<string, CatalogueCultivationItem> = {}
-        for (const item of items) {
-            result[item.b_lu_catalogue] = item
+        try {
+            const items = await getCultivationCatalogue("brp")
+            const result: Record<string, CatalogueCultivationItem> = {}
+            for (const item of items) {
+                result[item.b_lu_catalogue] = item
+            }
+            return result
+        } catch (err) {
+            console.error("Failed to load cultivation catalogue; defaulting to other color.", err)
+            return {}
         }
-        return result
     }, [])
 
     useEffect(() => {

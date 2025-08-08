@@ -17,7 +17,7 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
-import { getCultivationColor } from "../../custom/cultivation-colors"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
 
 export function FieldsPanelHover({
     zoomLevelFields,
@@ -200,7 +200,7 @@ export function FieldsPanelSelection({
 
                     const cultivations = features.reduce(
                         (
-                            acc: { b_lu_name: string; b_lu_croprotation: string; count: number }[],
+                            acc: { b_lu_name: string; b_lu_croprotation?: string; count: number }[],
                             feature,
                         ) => {
                             if (!feature.properties) return acc
