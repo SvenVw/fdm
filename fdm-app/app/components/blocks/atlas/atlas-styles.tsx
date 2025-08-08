@@ -45,7 +45,8 @@ function getFieldsStyleInner(layerId: string): LayerProps {
             type: "fill",
             paint: {
                 ...baseFillStyles,
-                "fill-color": "transparent",
+                "fill-color": "#000000",
+                "fill-opacity": 0,
             },
         }
     }
@@ -67,7 +68,6 @@ function getFieldsStyleInner(layerId: string): LayerProps {
             ...baseFillStyles,
             "fill-color": baseFieldsFillColorExpr,
             "fill-opacity": 0.8,
-            "fill-outline-color": "#1e3a8a",
         },
     }
 }

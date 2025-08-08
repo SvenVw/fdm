@@ -1,7 +1,7 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type JSX, type SetStateAction, useEffect, useMemo, useState } from "react"
+import { type Dispatch, type JSX, ReactNode, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import { getAvailableFieldsUrl } from "./atlas-url"
@@ -17,7 +17,7 @@ export function FieldsSourceNotClickable({
 }: {
     id: string
     fieldsData: FeatureCollection
-    children: JSX.Element
+    children: ReactNode
 }) {
     return (
         <Source id={id} type="geojson" data={fieldsData}>

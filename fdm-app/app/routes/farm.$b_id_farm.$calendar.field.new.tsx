@@ -194,8 +194,7 @@ export default function Index() {
     const fieldsSaved = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
 
-    const idOutline = "fieldsSavedOutline"
-    const fieldsSavedOutlineStyle = getFieldsStyle(idOutline)
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
     const mapProps =
         fieldsSaved.features.length > 0
@@ -318,11 +317,6 @@ export default function Index() {
                                     fieldsData={fieldsSaved}
                                 >
                                     <Layer {...fieldsSavedStyle} />
-                                </FieldsSourceNotClickable>
-                                <FieldsSourceNotClickable
-                                    id={idOutline}
-                                    fieldsData={fieldsSaved}
-                                >
                                     <Layer {...fieldsSavedOutlineStyle} />
                                 </FieldsSourceNotClickable>
 
