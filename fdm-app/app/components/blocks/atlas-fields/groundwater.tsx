@@ -80,7 +80,7 @@ export function GroundWaterSkeleton() {
             <CardHeader>
                 <CardTitle>Grondwater</CardTitle>
                 <CardDescription>
-                    De geschatte grondwaterstanden van dit perceel.
+                    De geschatte grondwaterstanden voor dit perceel.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-4">

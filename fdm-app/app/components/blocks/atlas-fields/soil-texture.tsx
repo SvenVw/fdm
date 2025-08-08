@@ -21,7 +21,7 @@ export function SoilTextureCard({
             <CardHeader>
                 <CardTitle>Bodemtextuur</CardTitle>
                 <CardDescription>
-                    De geschatte bodemtextuur van dit perceel.
+                    De geschatte bodemtextuur voor dit perceel.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid lg:grid-cols-3 gap-4">
