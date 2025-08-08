@@ -49,6 +49,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             PUBLIC_FDM_URL: process.env.PUBLIC_FDM_URL,
             PUBLIC_FDM_NAME: process.env.PUBLIC_FDM_NAME,
             PUBLIC_FDM_PRIVACY_URL: process.env.PUBLIC_FDM_PRIVACY_URL,
+            PUBLIC_FDM_DATASETS_URL: process.env.PUBLIC_FDM_DATASETS_URL,
             PUBLIC_MAPBOX_TOKEN: process.env.PUBLIC_MAPBOX_TOKEN,
             PUBLIC_SENTRY_DSN: process.env.PUBLIC_SENTRY_DSN,
             PUBLIC_SENTRY_ORG: process.env.PUBLIC_SENTRY_ORG,

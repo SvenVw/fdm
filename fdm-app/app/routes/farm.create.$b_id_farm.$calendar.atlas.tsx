@@ -92,8 +92,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get the farm
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-
         if (!farm) {
             throw data("Farm not found", {
                 status: 404,
@@ -165,6 +165,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_name_farm: farm.b_name_farm,
             fieldsSaved: fieldsSaved,
             timeframe: timeframe,
+            calendar: calendar,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
             fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
@@ -296,7 +297,7 @@ export default function Index() {
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
                                     exclude={fieldsSaved.features}
-                                    url={loaderData.fieldsAvailableUrl}
+                                    calendar={loaderData.calendar}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                 >
                                     <Layer {...fieldsAvailableStyle} />
@@ -423,7 +424,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     }
                     const b_name = `Perceel ${firstFieldIndex + index}`
                     const b_id_source = field.properties.b_id_source
-                    const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
+                    const b_lu_catalogue = field.properties.b_lu_catalogue
                     const b_geometry = field.geometry
                     const currentYear = new Date().getFullYear()
                     const defaultDate = timeframe.start

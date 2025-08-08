@@ -1,11 +1,15 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
+import { type Dispatch, type JSX, type ReactNode, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
-import type { FieldsAvailableUrlType } from "./atlas.d"
 import { generateFeatureClass } from "./atlas-functions"
-import { Field } from "@svenvw/fdm-core"
+import type { Field } from "@svenvw/fdm-core"
+import { getAvailableFieldsUrl } from "./atlas-url"
+import {
+    type CatalogueCultivationItem,
+    getCultivationCatalogue,
+} from "@svenvw/fdm-data"
 
 export function FieldsSourceNotClickable({
     id,
@@ -14,7 +18,7 @@ export function FieldsSourceNotClickable({
 }: {
     id: string
     fieldsData: FeatureCollection
-    children: JSX.Element
+    children: ReactNode
 }) {
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -121,27 +125,42 @@ function handleFieldClick(
 
 export function FieldsSourceAvailable({
     id,
-    url,
+    calendar,
     exclude,
     zoomLevelFields,
     children,
 }: {
     id: string
-    url: FieldsAvailableUrlType
-    exclude?: Field[]
+    calendar: string
+    exclude: Field[]
     zoomLevelFields: number
     children: JSX.Element
 }) {
-    if (!url) return null
-
     const unwantedIds = new Set(
         exclude
             ? exclude.map((f) => f.properties.b_id_source).filter((id) => id)
             : [],
     )
-
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
+    const availableFieldsUrl = getAvailableFieldsUrl(calendar)
+
+    const cultivationCataloguePromise = useMemo(async () => {
+        try {
+            const items = await getCultivationCatalogue("brp")
+            const result: Record<string, CatalogueCultivationItem> = {}
+            for (const item of items) {
+                result[item.b_lu_catalogue] = item
+            }
+            return result
+        } catch (err) {
+            console.error(
+                "Failed to load cultivation catalogue; defaulting to other color.",
+                err,
+            )
+            return {}
+        }
+    }, [])
 
     useEffect(() => {
         async function loadData() {
@@ -159,8 +178,10 @@ export function FieldsSourceAvailable({
                             minY: 0.9995 * minY,
                             maxY: 1.0005 * maxY,
                         }
+                        const cultivationCatalogue =
+                            await cultivationCataloguePromise
                         try {
-                            const iter = deserialize(url, bbox)
+                            const iter = deserialize(availableFieldsUrl, bbox)
 
                             let i = 0
                             const featureClass = generateFeatureClass()
@@ -171,9 +192,18 @@ export function FieldsSourceAvailable({
                                         feature.properties!.b_id_source,
                                     )
                                 ) {
+                                    const catalogueKey =
+                                        feature.properties?.b_lu_catalogue
                                     featureClass.features.push({
                                         ...feature,
                                         id: i,
+                                        properties: {
+                                            ...feature.properties,
+                                            b_lu_croprotation:
+                                                cultivationCatalogue[
+                                                    catalogueKey
+                                                ]?.b_lu_croprotation,
+                                        },
                                     })
                                 }
                                 i += 1
@@ -203,7 +233,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, url, zoomLevelFields, unwantedIds])
+    }, [map, availableFieldsUrl, zoomLevelFields, unwantedIds, cultivationCataloguePromise])
 
     return (
         <Source id={id} type="geojson" data={data}>

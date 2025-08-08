@@ -88,6 +88,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const session = await getSession(request)
 
         // Get timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
         // Get a list of possible farms of the user
@@ -172,12 +173,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmOptions: farmOptions,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
+            calendar: calendar,
             featureCollection: featureCollection,
             fieldNameDefault: fieldNameDefault,
             cultivationOptions: cultivationOptions,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
-            fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -192,6 +193,9 @@ export default function Index() {
     const fieldsSavedId = "fieldsSaved"
     const fieldsSaved = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+
     const mapProps =
         fieldsSaved.features.length > 0
             ? getViewState(fieldsSaved)
@@ -285,7 +289,12 @@ export default function Index() {
                                             f.source === fieldsAvailableId &&
                                             f.geometry?.type === "Polygon",
                                     )
-                                    if (polygonFeature) {
+                                    const savedPolygonFeature = evt.features.find(
+                                        (f) =>
+                                            f.source === fieldsSavedId &&
+                                            f.geometry?.type === "Polygon",
+                                    )
+                                    if (polygonFeature && !savedPolygonFeature) {
                                         handleSelectField(
                                             polygonFeature as Feature<Polygon>,
                                         )
@@ -297,7 +306,7 @@ export default function Index() {
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
-                                    url={loaderData.fieldsAvailableUrl}
+                                    calendar={loaderData.calendar}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                 >
                                     <Layer {...fieldsAvailableStyle} />
@@ -308,6 +317,7 @@ export default function Index() {
                                     fieldsData={fieldsSaved}
                                 >
                                     <Layer {...fieldsSavedStyle} />
+                                    <Layer {...fieldsSavedOutlineStyle} />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
