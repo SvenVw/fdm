@@ -6,12 +6,14 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
+import { Badge } from "~/components/ui/badge"
 
 type CultivationHistory = {
     year: number
     b_lu_catalogue: string
     b_lu_name?: string
     b_lu_croprotation?: string
+    b_lu_rest_oravib?: boolean
 }
 
 // Crop rotation color legend
@@ -82,6 +84,13 @@ export function CultivationHistoryCard({
                                 <p className="text-sm text-gray-500">
                                     {cultivation.year}
                                 </p>
+                            </div>
+                            <div>
+                                {cultivation.b_lu_rest_oravib === true ? (
+                                    <Badge variant={"secondary"}>
+                                        Rustgewas
+                                    </Badge>
+                                ) : null}
                             </div>
                         </div>
                     ))}

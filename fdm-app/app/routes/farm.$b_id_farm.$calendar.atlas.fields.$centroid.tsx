@@ -113,6 +113,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         b_lu_catalogue: b_lu_catalogue,
                         b_lu_name: catalogueItem?.b_lu_name,
                         b_lu_croprotation: catalogueItem?.b_lu_croprotation,
+                        b_lu_rest_oravib: catalogueItem?.b_lu_rest_oravib,
                     }
                 })
             })(),
