@@ -1,7 +1,9 @@
+import { Info } from "lucide-react"
 import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -93,6 +95,10 @@ export function FieldDetailsCard({ fieldDetails }: { fieldDetails: any }) {
                     </Card>
                 </div>
             </CardContent>
+            <CardFooter className="flex items-center justify-start space-x-2 text-sm text-muted-foreground">
+                <Info className="h-4" />
+                <p>De gebieden gelden voor 2025</p>
+            </CardFooter>
         </Card>
     )
 }
