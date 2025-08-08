@@ -41,10 +41,10 @@ function getFieldsStyleInner(layerId: string): LayerProps {
     }
 
     if (layerId === "fieldsSaved") {
+        // This layer should not be visible but still clickable
         return {
             type: "fill",
             paint: {
-                ...baseFillStyles,
                 "fill-color": "#000000",
                 "fill-opacity": 0,
             },
