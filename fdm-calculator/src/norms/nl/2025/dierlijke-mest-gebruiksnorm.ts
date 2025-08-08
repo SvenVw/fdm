@@ -102,6 +102,10 @@ export async function isFieldInNatura2000Gebied(
  * - **Standard Norm (No Derogation)**: If the farm does NOT have a derogation permit,
  *   the norm is 170 kg N/ha from animal manure.
  * - **Derogation Norm (With Derogation)**: If the farm HAS a derogation permit:
+ *   - **Inside Natura2000-Gebied**: If the parcel is located in a Natura200-Gebied or within 100m of it,
+ *     the norm is 170 kg N/ha from animal manure.
+ *   - **Inside GWBG-Gebied**: If the parcel is located in a GWBG Gebied or within 100m of it,
+ *     the norm is 170 kg N/ha from animal manure.
  *   - **Inside NV-Gebied**: If the parcel is located in a Nutriënt-Verontreinigd Gebied,
  *     the norm is 190 kg N/ha from animal manure.
  *   - **Outside NV-Gebied**: If the parcel is NOT located in a Nutriënt-Verontreinigd Gebied,

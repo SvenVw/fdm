@@ -63,7 +63,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
         expect(result.normSource).toBe("Standaard - geen derogatie")
     })
 
-    it("should return the default norm value for derogation in Grondwaterbeschermingsgebied", async () => {
+    it("should return the adjusted norm value for derogation in Grondwaterbeschermingsgebied", async () => {
         const mockInput: NL2025NormsInput = {
             farm: { is_derogatie_bedrijf: true },
             field: {

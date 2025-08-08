@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Fixes that norm for derogation in GWGB should be 170
+Fix derogation norm for GWBG-gebieden: 170 kg N/ha
