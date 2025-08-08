@@ -46,6 +46,46 @@ export async function isFieldInGWGBGebied(
 }
 
 /**
+ * Determines if a field is located within a Natura 2000 in the Netherlands.
+ * This is achieved by performing a spatial query against a vector file containing
+ * the boundaries of all natura200-gebieden, including the 100m buffer.
+ *
+ * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
+ *   This point is used to query the geographical data.
+ * @returns A promise that resolves to `true` if the field's centroid is found within an natura2000-gebied or within 100m buffer,
+ *   `false` otherwise.
+ * @throws {Error} If there are issues fetching the file or processing its stream.
+ */
+export async function isFieldInNatura2000Gebied(
+    b_centroid: Field["b_centroid"],
+): Promise<boolean> {
+    const url =
+        "https://api.ellipsis-drive.com/v3/path/153b4c2f-d250-4edd-ab19-9320245de431/vector/timestamp/ce0e4ac3-42aa-4e85-a321-9561ffa1183e/location"
+
+    const longitude = b_centroid[0]
+    const latitude = b_centroid[1]
+    try {
+        const params = new URLSearchParams()
+        params.append("locations", `[[${longitude}, ${latitude}]]`)
+        const response = await fetch(`${url}?${params.toString()}`)
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+        }
+        const json = await response.json()
+        if (json.length > 0) {
+            // Check if not single array response
+            const feature = json[0][0]
+            if (feature) {
+                return true
+            }
+        }
+        return false
+    } catch (err) {
+        throw new Error(`Error querying Natura2000-Gebied : ${String(err)}`)
+    }
+}
+
+/**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen from animal manure
  * for a given farm and parcel in the Netherlands for the year 2025.
  *
@@ -79,6 +119,9 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
 
     const is_nv_gebied = await isFieldInNVGebied(field.b_centroid)
     const is_gwbg_gebied = await isFieldInGWGBGebied(field.b_centroid)
+    const is_natura2000_gebied = await isFieldInNatura2000Gebied(
+        field.b_centroid,
+    )
 
     let normValue: number
     let normSource: string
@@ -87,6 +130,9 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
         if (is_nv_gebied) {
             normValue = 190
             normSource = "Derogatie - NV Gebied"
+        } else if (is_natura2000_gebied) {
+            normValue = 170
+            normSource = "Derogatie - Natura2000 Gebied"
         } else if (is_gwbg_gebied) {
             normValue = 170
             normSource = "Derogatie - Grondwaterbeschermingsgebied"
