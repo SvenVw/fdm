@@ -1,45 +1,71 @@
-import type {
-    FillLayerSpecification,
-    LayerProps,
-    SymbolLayerSpecification,
-} from "react-map-gl/mapbox"
+import type { ExpressionSpecification } from "mapbox-gl"
+import type { LayerProps } from "react-map-gl/mapbox"
+import {
+    getCultivationColor,
+    getCultivationTypesHavingColors,
+} from "~/components/custom/cultivation-colors"
 
-export function getFieldsStyle(layerId: string): LayerProps &
-    (
-        | {
-              id: string
-              type: "fill"
-              paint: FillLayerSpecification["paint"]
-          }
-        | {
-              id: string
-              type: "symbol"
-              layout: SymbolLayerSpecification["layout"]
-              paint: SymbolLayerSpecification["paint"]
-          }
-    ) {
-    const baseFieldsStyle: Omit<FillLayerSpecification, "id" | "source"> = {
-        type: "fill",
-        paint: {
-            "fill-color": "#60a5fa",
-            "fill-opacity": 0.5,
-            "fill-outline-color": "#1e3a8a",
-        },
-    } as FillLayerSpecification // Cast to FillLayerSpecification to allow modification of paint
+const baseFieldsFillColorExpr: ExpressionSpecification = [
+    "match",
+    ["get", "b_lu_croprotation"],
+    ...getCultivationTypesHavingColors().flatMap((k) => [
+        k,
+        getCultivationColor(k),
+    ]),
+    getCultivationColor("other"),
+]
 
-    const fieldsStyle = {
-        ...baseFieldsStyle,
-        id: layerId,
-    } as LayerProps & FillLayerSpecification // Cast to FillLayerSpecification to allow modification of paint
+export function getFieldsStyle(layerId: string): LayerProps {
+    const style = getFieldsStyleInner(layerId)
+    style.id = layerId
+    return style
+}
+
+function getFieldsStyleInner(layerId: string): LayerProps {
+    const baseFillStyles = {}
+
+    const baseLineStyles = {
+        "line-width": 4,
+    }
 
     if (layerId === "fieldsSelected") {
-        fieldsStyle.paint["fill-color"] = "#f43f5e"
-        fieldsStyle.paint["fill-opacity"] = 0.8
-    }
-    if (layerId === "fieldsSaved") {
-        fieldsStyle.paint["fill-color"] = "#10b981"
-        fieldsStyle.paint["fill-opacity"] = 0.8
+        return {
+            type: "line",
+            paint: {
+                ...baseLineStyles,
+                "line-color": "#ffcf0d",
+            },
+        }
     }
 
-    return fieldsStyle
+    if (layerId === "fieldsSaved") {
+        // This layer should not be visible but still clickable
+        return {
+            type: "fill",
+            paint: {
+                "fill-color": "#000000",
+                "fill-opacity": 0,
+            },
+        }
+    }
+
+    if (layerId === "fieldsSavedOutline") {
+        return {
+            type: "line",
+            paint: {
+                ...baseLineStyles,
+                "line-color": "#10b981",
+            },
+        }
+    }
+
+    // default styles
+    return {
+        type: "fill",
+        paint: {
+            ...baseFillStyles,
+            "fill-color": baseFieldsFillColorExpr,
+            "fill-opacity": 0.8,
+        },
+    }
 }

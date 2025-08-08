@@ -289,7 +289,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     }
                     const b_name = `Perceel ${index + 1}`
                     const b_id_source = field.properties.b_id_source
-                    const b_lu_catalogue = `nl_${field.properties.b_lu_catalogue}` //TEMPORARY
+                    const b_lu_catalogue = field.properties.b_lu_catalogue
                     const b_geometry = field.geometry
                     const currentYear = new Date().getFullYear()
                     const defaultDate = timeframe.start

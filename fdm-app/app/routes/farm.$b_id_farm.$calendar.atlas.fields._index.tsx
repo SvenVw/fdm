@@ -129,6 +129,7 @@ export default function FarmAtlasFieldsBlock() {
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
     // Create a sessionStorage to store the latest viewstate
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
@@ -189,6 +190,7 @@ export default function FarmAtlasFieldsBlock() {
 
             <FieldsSourceNotClickable id={id} fieldsData={fields}>
                 <Layer {...fieldsSavedStyle} />
+                <Layer {...fieldsSavedOutlineStyle} />
             </FieldsSourceNotClickable>
             <div className="fields-panel grid gap-4 w-[350px]">
                 <FieldsPanelHover

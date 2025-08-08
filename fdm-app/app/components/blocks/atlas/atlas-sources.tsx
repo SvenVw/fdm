@@ -7,12 +7,17 @@ import {
     type JSX,
     type SetStateAction,
     useEffect,
+    useMemo,
     useState,
 } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import { getAvailableFieldsUrl } from "./atlas-url"
 import { useNavigate } from "react-router"
+import {
+    type CatalogueCultivationItem,
+    getCultivationCatalogue,
+} from "@svenvw/fdm-data"
 
 export function FieldsSourceNotClickable({
     id,
@@ -21,7 +26,7 @@ export function FieldsSourceNotClickable({
 }: {
     id: string
     fieldsData: FeatureCollection
-    children: JSX.Element
+    children: ReactNode
 }) {
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -131,6 +136,20 @@ export function FieldsSourceAvailable({
 
     const navigate = useNavigate()
 
+    const cultivationCataloguePromise = useMemo(async () => {
+        try {
+            const items = await getCultivationCatalogue("brp")
+            const result: Record<string, CatalogueCultivationItem> = {}
+            for (const item of items) {
+                result[item.b_lu_catalogue] = item
+            }
+            return result
+        } catch (err) {
+            console.error("Failed to load cultivation catalogue; defaulting to other color.", err)
+            return {}
+        }
+    }, [])
+
     useEffect(() => {
         if (map && redirectToDetailsPage) {
             map.on("click", id, (e) => {
@@ -162,6 +181,8 @@ export function FieldsSourceAvailable({
                             minY: 0.9995 * minY,
                             maxY: 1.0005 * maxY,
                         }
+                        const cultivationCatalogue =
+                            await cultivationCataloguePromise
                         try {
                             const iter = deserialize(availableFieldsUrl, bbox)
 
@@ -169,9 +190,17 @@ export function FieldsSourceAvailable({
                             const featureClass = generateFeatureClass()
 
                             for await (const feature of iter) {
+                                const catalogueKey =
+                                    feature.properties?.b_lu_catalogue
                                 featureClass.features.push({
                                     ...feature,
                                     id: i,
+                                    properties: {
+                                        ...feature.properties,
+                                        b_lu_croprotation:
+                                            cultivationCatalogue[catalogueKey]
+                                                ?.b_lu_croprotation,
+                                    },
                                 })
                                 i += 1
                             }
@@ -200,7 +229,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, availableFieldsUrl, zoomLevelFields])
+    }, [map, availableFieldsUrl, zoomLevelFields, cultivationCataloguePromise])
 
     return (
         <Source id={id} type="geojson" data={data}>
