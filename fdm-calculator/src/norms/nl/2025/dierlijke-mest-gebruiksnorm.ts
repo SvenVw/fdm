@@ -5,6 +5,8 @@ import type {
     NL2025NormsInput,
 } from "./types.d"
 
+const FETCH_TIMEOUT_MS = 8000
+
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
  * This is achieved by performing a spatial query against a vector file containing
@@ -24,24 +26,35 @@ export async function isFieldInGWGBGebied(
 
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+
+    const params = new URLSearchParams()
+    params.append("locations", `[[${longitude}, ${latitude}]]`)
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     try {
-        const params = new URLSearchParams()
-        params.append("locations", `[[${longitude}, ${latitude}]]`)
-        const response = await fetch(`${url}?${params.toString()}`)
+        const response = await fetch(`${url}?${params.toString()}`, {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+        })
         if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+            throw new Error(
+                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+            )
         }
         const json = await response.json()
-        if (json.length > 0) {
-            // Check if not single array response
-            const feature = json[0][0]
-            if (feature) {
-                return true
-            }
-        }
-        return false
+        const feature = json?.[0]?.[0]
+        return Boolean(feature)
     } catch (err) {
+        if ((err as any)?.name === "AbortError") {
+            throw new Error(
+                `Timeout querying GWGB-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+            )
+        }
         throw new Error(`Error querying GWGB-Gebied : ${String(err)}`)
+    } finally {
+        clearTimeout(timeout)
     }
 }
 
@@ -64,24 +77,35 @@ export async function isFieldInNatura2000Gebied(
 
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+
+    const params = new URLSearchParams()
+    params.append("locations", `[[${longitude}, ${latitude}]]`)
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     try {
-        const params = new URLSearchParams()
-        params.append("locations", `[[${longitude}, ${latitude}]]`)
-        const response = await fetch(`${url}?${params.toString()}`)
+        const response = await fetch(`${url}?${params.toString()}`, {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+        })
         if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+            throw new Error(
+                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+            )
         }
         const json = await response.json()
-        if (json.length > 0) {
-            // Check if not single array response
-            const feature = json[0][0]
-            if (feature) {
-                return true
-            }
-        }
-        return false
+        const feature = json?.[0]?.[0]
+        return Boolean(feature)
     } catch (err) {
+        if ((err as any)?.name === "AbortError") {
+            throw new Error(
+                `Timeout querying Natura2000-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+            )
+        }
         throw new Error(`Error querying Natura2000-Gebied : ${String(err)}`)
+    } finally {
+        clearTimeout(timeout)
     }
 }
 
