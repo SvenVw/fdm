@@ -193,6 +193,9 @@ export default function Index() {
     const fieldsSavedId = "fieldsSaved"
     const fieldsSaved = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+
     const mapProps =
         fieldsSaved.features.length > 0
             ? getViewState(fieldsSaved)
@@ -286,7 +289,12 @@ export default function Index() {
                                             f.source === fieldsAvailableId &&
                                             f.geometry?.type === "Polygon",
                                     )
-                                    if (polygonFeature) {
+                                    const savedPolygonFeature = evt.features.find(
+                                        (f) =>
+                                            f.source === fieldsSavedId &&
+                                            f.geometry?.type === "Polygon",
+                                    )
+                                    if (polygonFeature && !savedPolygonFeature) {
                                         handleSelectField(
                                             polygonFeature as Feature<Polygon>,
                                         )
@@ -309,6 +317,7 @@ export default function Index() {
                                     fieldsData={fieldsSaved}
                                 >
                                     <Layer {...fieldsSavedStyle} />
+                                    <Layer {...fieldsSavedOutlineStyle} />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
