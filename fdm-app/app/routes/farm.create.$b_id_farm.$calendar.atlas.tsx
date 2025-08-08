@@ -211,6 +211,8 @@ export default function Index() {
     const fieldsSaved = loaderData.fieldsSaved
     const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
 
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(
         generateFeatureClass(),
@@ -318,6 +320,7 @@ export default function Index() {
                                     fieldsData={fieldsSaved}
                                 >
                                     <Layer {...fieldsSavedStyle} />
+                                    <Layer {...fieldsSavedOutlineStyle} />
                                 </FieldsSourceNotClickable>
 
                                 <div className="fields-panel grid gap-4 w-[350px]">
