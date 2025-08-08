@@ -1,12 +1,12 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type JSX, ReactNode, type SetStateAction, useEffect, useMemo, useState } from "react"
+import { type Dispatch, type JSX, type ReactNode, type SetStateAction, useEffect, useMemo, useState } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import { getAvailableFieldsUrl } from "./atlas-url"
 import {
-    CatalogueCultivationItem,
+    type CatalogueCultivationItem,
     getCultivationCatalogue,
 } from "@svenvw/fdm-data"
 
