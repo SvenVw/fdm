@@ -22,9 +22,7 @@ export function getFieldsStyle(layerId: string): LayerProps {
 }
 
 function getFieldsStyleInner(layerId: string): LayerProps {
-    const baseFillStyles = {
-        "fill-outline-color": "#1e3a8a",
-    }
+    const baseFillStyles = {}
 
     const baseLineStyles = {
         "line-width": 4,
