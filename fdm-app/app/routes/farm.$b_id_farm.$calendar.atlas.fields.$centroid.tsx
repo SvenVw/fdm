@@ -6,7 +6,7 @@ import {
     Await,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
@@ -27,6 +27,10 @@ import {
     GroundWaterCard,
     GroundWaterSkeleton,
 } from "~/components/blocks/atlas-fields/groundwater"
+import {
+    FieldDetailsCard,
+    FieldDetailsSkeleton,
+} from "~/components/blocks/atlas-fields/field-details"
 import { Suspense } from "react"
 
 // Meta
@@ -114,10 +118,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 }
             })(),
             fieldDetails: {
-                b_area: undefined,
-                isNvGebied: undefined,
-                isNatura2000Area: undefined,
-                regionTable2: undefined,
+                // Values are mocked for now
+                b_area: 10.5,
+                isNvGebied: true,
+                isGWBGGebied: false,
+                isNatura2000Area: false,
+                regionTable2: "zand_nwc",
             },
             calendar: calendar,
         }
@@ -132,6 +138,7 @@ export default function FieldDetailsAtlasBlock() {
         calendar,
         soilParameterEstimates,
         groundwaterEstimates,
+        fieldDetails,
     } = useLoaderData<typeof loader>()
 
     return (
@@ -146,7 +153,7 @@ export default function FieldDetailsAtlasBlock() {
                                         String(cultivation.year) === calendar,
                                 )?.b_lu_name ?? ""
                             }
-                            description="Bekijk alle details over dit perceel"                          
+                            description="Bekijk alle details over dit perceel"
                         />
                     )}
                 </Await>
@@ -166,6 +173,15 @@ export default function FieldDetailsAtlasBlock() {
                     </Suspense>
                 </div>
                 <div className="col-span-2 space-y-4">
+                    <Suspense fallback={<FieldDetailsSkeleton />}>
+                        <Await resolve={fieldDetails}>
+                            {(resolvedFieldDetails) => (
+                                <FieldDetailsCard
+                                    fieldDetails={resolvedFieldDetails}
+                                />
+                            )}
+                        </Await>
+                    </Suspense>
                     <Suspense fallback={<SoilTextureSkeleton />}>
                         <Await resolve={soilParameterEstimates}>
                             {(resolvedSoilParameterEstimates) => (
