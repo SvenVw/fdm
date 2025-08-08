@@ -1,4 +1,5 @@
 import { getFarm, getFields } from "@svenvw/fdm-core"
+import { ArrowLeft } from "lucide-react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -148,7 +149,16 @@ export default function Index() {
                             <aside className="lg:w-1/5">
                                 <SidebarPage
                                     items={loaderData.sidebarPageItems}
-                                />
+                                >
+                                    <Button variant={"link"} asChild>
+                                        <NavLink
+                                            to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/atlas`}
+                                        >
+                                            <ArrowLeft />
+                                            Terug naar kaart
+                                        </NavLink>
+                                    </Button>
+                                </SidebarPage>
                             </aside>
                             <div className="flex-1">
                                 <Outlet />
