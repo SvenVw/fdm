@@ -117,11 +117,12 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
     const field = input.field
 
-    const is_nv_gebied = await isFieldInNVGebied(field.b_centroid)
-    const is_gwbg_gebied = await isFieldInGWGBGebied(field.b_centroid)
-    const is_natura2000_gebied = await isFieldInNatura2000Gebied(
-        field.b_centroid,
-    )
+    const [is_nv_gebied, is_gwbg_gebied, is_natura2000_gebied] =
+        await Promise.all([
+            isFieldInNVGebied(field.b_centroid),
+            isFieldInGWGBGebied(field.b_centroid),
+            isFieldInNatura2000Gebied(field.b_centroid),
+        ])
 
     let normValue: number
     let normSource: string
