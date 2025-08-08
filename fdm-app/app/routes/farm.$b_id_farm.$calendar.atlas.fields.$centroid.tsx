@@ -56,7 +56,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get timeframe from calendar store
         const calendar = getCalendar(params)
-        const timeframe = getTimeframe(params)
 
         // Get the estimates for this field
         const centroid = params.centroid
@@ -147,11 +146,7 @@ export default function FieldDetailsAtlasBlock() {
                                         String(cultivation.year) === calendar,
                                 )?.b_lu_name ?? ""
                             }
-                            description="Bekijk alle details over dit perceel"
-                            action={{
-                                to: "../fields",
-                                label: "Terug",
-                            }}
+                            description="Bekijk alle details over dit perceel"                          
                         />
                     )}
                 </Await>

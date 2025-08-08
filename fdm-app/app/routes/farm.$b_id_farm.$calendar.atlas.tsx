@@ -18,6 +18,8 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { HeaderAction } from "../components/blocks/header/action"
+import { getCalendar } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -54,6 +56,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get the calendar
+        const calendar = getCalendar(params)
+
         // Get details of farm
         let farm = null
         try {
@@ -87,18 +92,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        const atlasLayerOptions = [
-            { atlasLayerId: "fields", atlasLayerName: "Percelen" },
-            { atlasLayerId: "soil", atlasLayerName: "Bodem" },
-            { atlasLayerId: "elevation", atlasLayerName: "Hoogtekaart" },
-        ]
-
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
+            calendar: calendar,
             farmOptions: farmOptions,
-            atlasLayerOptions: atlasLayerOptions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -122,20 +121,27 @@ export default function FarmContentBlock() {
     // Get the current layer
     const pathname = location.pathname
     const pathSegments = pathname.split("/")
-    const layerSelected = pathSegments[pathSegments.length - 1]
+
+    // Add back to map button when visiting the map layer details page
+    let headerAction:
+        | { to: string; label: string; disabled: boolean }
+        | undefined
+    if (pathSegments.length > 6) {
+        headerAction = {
+            to: `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/atlas/fields`,
+            label: "Terug",
+            disabled: false,
+        }
+    }
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
+            <Header action={headerAction}>
                 <HeaderFarm
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderAtlas
-                    b_id_farm={loaderData.b_id_farm}
-                    selectedAtlasLayerId={layerSelected}
-                    atlasLayerOptions={loaderData.atlasLayerOptions}
-                />
+                <HeaderAtlas b_id_farm={loaderData.b_id_farm} />
             </Header>
             <main>
                 <ClientOnly

@@ -1,29 +1,11 @@
-import { ChevronDown } from "lucide-react"
-import { NavLink, useLocation } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
     BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
 
-export function HeaderAtlas({
-    b_id_farm,
-    selectedAtlasLayerId,
-    atlasLayerOptions,
-}: {
-    b_id_farm: string
-    selectedAtlasLayerId: string
-    atlasLayerOptions: HeaderAtlasLayerOption[]
-}) {
-    const location = useLocation()
-    const currentPath = String(location.pathname)
+export function HeaderAtlas({ b_id_farm }: { b_id_farm: string }) {
     const calendar = useCalendarStore((state) => state.calendar)
 
     return (
@@ -35,41 +17,12 @@ export function HeaderAtlas({
                 </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="flex items-center gap-1">
-                        {selectedAtlasLayerId && atlasLayerOptions
-                            ? (atlasLayerOptions.find(
-                                  (option) =>
-                                      option.atlasLayerId ===
-                                      selectedAtlasLayerId,
-                              )?.atlasLayerName ?? "Unknown layer")
-                            : "Kies een kaartlaag"}
-                        <ChevronDown className="text-muted-foreground h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    {atlasLayerOptions && atlasLayerOptions.length > 0 ? (
-                        <DropdownMenuContent align="start">
-                            {atlasLayerOptions.map((option) => (
-                                <DropdownMenuCheckboxItem
-                                    checked={
-                                        selectedAtlasLayerId ===
-                                        option.atlasLayerId
-                                    }
-                                    key={option.atlasLayerId}
-                                >
-                                    <NavLink
-                                        to={currentPath.replace(
-                                            selectedAtlasLayerId,
-                                            option.atlasLayerId,
-                                        )}
-                                    >
-                                        {option.atlasLayerName}
-                                    </NavLink>
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                    ) : null}
-                </DropdownMenu>
+            <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink
+                    href={`/farm/${b_id_farm}/${calendar}/atlas/fields`}
+                >
+                    Percelen
+                </BreadcrumbLink>
             </BreadcrumbItem>
         </>
     )
