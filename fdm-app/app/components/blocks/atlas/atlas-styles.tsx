@@ -8,21 +8,20 @@ import {
 const baseFieldsFillColorExpr: ExpressionSpecification = [
     "match",
     ["get", "b_lu_croprotation"],
+    ...getCultivationTypesHavingColors().flatMap((k) => [
+        k,
+        getCultivationColor(k),
+    ]),
+    getCultivationColor("other"),
 ]
 
-for (const key of getCultivationTypesHavingColors()) {
-    baseFieldsFillColorExpr.push(key, getCultivationColor(key))
-}
-
-baseFieldsFillColorExpr.push("#60a5fa")
-
-export function getFieldsStyle(layerId: string) {
-    const style = getFieldsStyleInner(layerId) as LayerProps
+export function getFieldsStyle(layerId: string): LayerProps {
+    const style = getFieldsStyleInner(layerId)
     style.id = layerId
     return style
 }
 
-function getFieldsStyleInner(layerId: string): Omit<LayerProps, "id"> {
+function getFieldsStyleInner(layerId: string): LayerProps {
     const baseFillStyles = {
         "fill-outline-color": "#1e3a8a",
     }
@@ -46,8 +45,17 @@ function getFieldsStyleInner(layerId: string): Omit<LayerProps, "id"> {
             type: "fill",
             paint: {
                 ...baseFillStyles,
-                "fill-color": "#10b981",
-                "fill-opacity": 0.8,
+                "fill-color": "transparent",
+            },
+        }
+    }
+
+    if (layerId === "fieldsSavedOutline") {
+        return {
+            type: "line",
+            paint: {
+                ...baseLineStyles,
+                "line-color": "#10b981",
             },
         }
     }
