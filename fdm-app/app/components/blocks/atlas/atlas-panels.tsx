@@ -1,6 +1,6 @@
 import type { FeatureCollection } from "geojson"
 import throttle from "lodash.throttle"
-import { ArrowRight, Check, Info } from "lucide-react"
+import { Check, Info } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
@@ -308,12 +308,15 @@ export function FieldsPanelSelection({
                             <CardContent className="grid gap-4" />
                             <CardFooter>
                                 {numFieldsSaved > 0 ? (
-                                    <NavLink to={continueTo} className="flex-1">
-                                        <Button className="w-full">
+                                    <Button asChild className="w-full">
+                                        <NavLink
+                                            to={continueTo}
+                                            className="flex items-center gap-2"
+                                        >
                                             <Check />
                                             <span>Doorgaan</span>
-                                        </Button>
-                                    </NavLink>
+                                        </NavLink>
+                                    </Button>
                                 ) : (
                                     <Button className="w-full" disabled>
                                         <Check /> Sla geselecteerde percelen op
