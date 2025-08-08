@@ -3,7 +3,6 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
@@ -122,7 +121,10 @@ export function FieldDetailsSkeleton() {
         <Card>
             <CardHeader>
                 <CardTitle>Perceeldetails</CardTitle>
-                <CardDescription>De details van dit perceel.</CardDescription>
+                <CardDescription className="flex items-center justify-start space-x-2 text-sm text-muted-foreground">
+                    <Info className="h-4" />
+                    <p>De gebieden gelden voor 2025</p>
+                </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
                 <Card>

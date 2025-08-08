@@ -19,9 +19,9 @@ export function SoilTextureCard({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Bodemtextuur</CardTitle>
+                <CardTitle>Textuur</CardTitle>
                 <CardDescription>
-                    De geschatte bodemtextuur voor dit perceel.
+                    De geschatte textuur van de bodem voor dit perceel.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid lg:grid-cols-3 gap-4">
@@ -85,9 +85,9 @@ export function SoilTextureSkeleton() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Bodemtextuur</CardTitle>
+                <CardTitle>Textuur</CardTitle>
                 <CardDescription>
-                    De geschatte bodemtextuur van dit perceel.
+                    De geschatte textuur van de bodem voor dit perceel.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-4">

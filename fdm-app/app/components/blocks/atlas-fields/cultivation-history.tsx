@@ -107,7 +107,7 @@ export function CultivationHistorySkeleton() {
                 <CardTitle>Gewashistorie</CardTitle>
                 <CardDescription>
                     De gewassen van de afgelopen jaren op dit perceel volgens
-                    Basisregistratie Gewapercelen.
+                    Basisregistratie Gewaspercelen.
                 </CardDescription>
             </CardHeader>
             <CardContent className="pt-6 text-sm">

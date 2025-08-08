@@ -17,7 +17,7 @@ export function GroundWaterCard({
             <CardHeader>
                 <CardTitle>Grondwater</CardTitle>
                 <CardDescription>
-                    De geschatte grondwaterstanden van dit perceel.
+                    De geschatte grondwaterstanden voor dit perceel.
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid lg:grid-cols-3 gap-4">
