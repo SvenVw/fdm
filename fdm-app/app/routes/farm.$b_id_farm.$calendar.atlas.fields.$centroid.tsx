@@ -38,7 +38,7 @@ import {
     isFieldInNatura2000Gebied,
     isFieldInNVGebied,
 } from "@svenvw/fdm-calculator"
-import { is } from "drizzle-orm"
+import { getFieldByCentroid } from "@/app/components/blocks/atlas-fields/query"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -77,6 +77,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
         const [longitude, latitude] = centroid.split(",").map(Number)
+        const fieldPromise = getFieldByCentroid(longitude, latitude, calendar)
         const field = {
             type: "Feature",
             properties: {},
@@ -90,7 +91,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const estimatesPromise = getSoilParameterEstimates(field, nmiApiKey)
         const cultivationCataloguePromise = getCultivationCatalogue("brp")
 
-        const fieldDetails = Promise.all([
+        const fieldDetailsPromise = Promise.all([
             getRegion([longitude, latitude]),
             isFieldInNVGebied([longitude, latitude]),
             isFieldInGWGBGebied([longitude, latitude]),
@@ -137,9 +138,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     isNvGebied,
                     isGWBGGebied,
                     isNatura2000Area,
-                ] = await fieldDetails
+                ] = await fieldDetailsPromise
+                const queriedField = await fieldPromise
                 return {
-                    b_area: 10.5,
+                    b_area:
+                        Math.round(
+                            ((queriedField?.properties?.b_area ?? 0) / 10000) *
+                                100,
+                        ) / 100,
                     isNvGebied: isNvGebied,
                     isGWBGGebied: isGWBGGebied,
                     isNatura2000Area: isNatura2000Area,
