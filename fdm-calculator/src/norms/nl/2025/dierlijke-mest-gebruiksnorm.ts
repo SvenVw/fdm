@@ -127,15 +127,15 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
     let normSource: string
 
     if (is_derogatie_bedrijf) {
-        if (is_nv_gebied) {
-            normValue = 190
-            normSource = "Derogatie - NV Gebied"
-        } else if (is_natura2000_gebied) {
+        if (is_natura2000_gebied) {
             normValue = 170
             normSource = "Derogatie - Natura2000 Gebied"
         } else if (is_gwbg_gebied) {
             normValue = 170
             normSource = "Derogatie - Grondwaterbeschermingsgebied"
+        } else if (is_nv_gebied) {
+            normValue = 190
+            normSource = "Derogatie - NV Gebied"
         } else {
             normValue = 200
             normSource = "Derogatie"
