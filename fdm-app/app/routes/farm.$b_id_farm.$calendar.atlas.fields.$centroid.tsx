@@ -32,6 +32,13 @@ import {
     FieldDetailsSkeleton,
 } from "~/components/blocks/atlas-fields/field-details"
 import { Suspense } from "react"
+import {
+    getRegion,
+    isFieldInGWGBGebied,
+    isFieldInNatura2000Gebied,
+    isFieldInNVGebied,
+} from "@svenvw/fdm-calculator"
+import { is } from "drizzle-orm"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -83,6 +90,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const estimatesPromise = getSoilParameterEstimates(field, nmiApiKey)
         const cultivationCataloguePromise = getCultivationCatalogue("brp")
 
+        const fieldDetails = Promise.all([
+            getRegion([longitude, latitude]),
+            isFieldInNVGebied([longitude, latitude]),
+            isFieldInGWGBGebied([longitude, latitude]),
+            isFieldInNatura2000Gebied([longitude, latitude]),
+        ])
+
         return {
             cultivationHistory: (async () => {
                 const estimates = await estimatesPromise
@@ -117,14 +131,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     a_sand_mi: Math.round(estimates.a_sand_mi),
                 }
             })(),
-            fieldDetails: {
-                // Values are mocked for now
-                b_area: 10.5,
-                isNvGebied: true,
-                isGWBGGebied: false,
-                isNatura2000Area: false,
-                regionTable2: "zand_nwc",
-            },
+            fieldDetails: (async () => {
+                const [
+                    regionTable2,
+                    isNvGebied,
+                    isGWBGGebied,
+                    isNatura2000Area,
+                ] = await fieldDetails
+                return {
+                    b_area: 10.5,
+                    isNvGebied: isNvGebied,
+                    isGWBGGebied: isGWBGGebied,
+                    isNatura2000Area: isNatura2000Area,
+                    regionTable2: regionTable2,
+                }
+            })(),
             calendar: calendar,
         }
     } catch (error) {

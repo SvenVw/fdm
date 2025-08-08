@@ -43,7 +43,19 @@ export function FieldDetailsCard({ fieldDetails }: { fieldDetails: any }) {
                     <CardContent className="space-y-2">
                         <div className="flex items-baseline space-x-2">
                             <div className="text-2xl font-bold">
-                                {fieldDetails.regionTable2}
+                                {fieldDetails.regionTable2 === "klei"
+                                    ? "Klei"
+                                    : fieldDetails.regionTable2 === "veen"
+                                      ? "Veen"
+                                      : fieldDetails.regionTable2 === "loess"
+                                        ? "Löss"
+                                        : fieldDetails.regionTable2 ===
+                                            "zand_nwc"
+                                          ? "Noordelijk, westelijk, en centraal zand"
+                                          : fieldDetails.regionTable2 ===
+                                              "zand_zuid"
+                                            ? "Zuidelijk zand"
+                                            : "Onbekend"}
                             </div>
                         </div>
                     </CardContent>
