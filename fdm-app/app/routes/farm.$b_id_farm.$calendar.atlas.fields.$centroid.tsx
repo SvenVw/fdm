@@ -179,8 +179,21 @@ export default function FieldDetailsAtlasBlock() {
                     )}
                 </Await>
             </Suspense>
-            <div className="grid grid-flow-col grid-rows-3 gap-6 lg:grid-cols-3 px-10 items-start">
-                <div className="row-span-3">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-10 items-start">
+                {/* Field Details - Mobile first (order 1), Desktop (order 2) */}
+                <div className="lg:order-2 lg:col-span-2 space-y-4">
+                    <Suspense fallback={<FieldDetailsSkeleton />}>
+                        <Await resolve={fieldDetails}>
+                            {(resolvedFieldDetails) => (
+                                <FieldDetailsCard
+                                    fieldDetails={resolvedFieldDetails}
+                                />
+                            )}
+                        </Await>
+                    </Suspense>
+                </div>
+                {/* Cultivation History - Mobile (order 2), Desktop (order 1) */}
+                <div className="lg:order-1 lg:row-span-3">
                     <Suspense fallback={<CultivationHistorySkeleton />}>
                         <Await resolve={cultivationHistory}>
                             {(resolvedCultivationHistory) => (
@@ -193,16 +206,8 @@ export default function FieldDetailsAtlasBlock() {
                         </Await>
                     </Suspense>
                 </div>
-                <div className="col-span-2 space-y-4">
-                    <Suspense fallback={<FieldDetailsSkeleton />}>
-                        <Await resolve={fieldDetails}>
-                            {(resolvedFieldDetails) => (
-                                <FieldDetailsCard
-                                    fieldDetails={resolvedFieldDetails}
-                                />
-                            )}
-                        </Await>
-                    </Suspense>
+                {/* Soil Texture - Mobile (order 3), Desktop (order 3) */}
+                <div className="lg:order-3 lg:col-span-2 space-y-4">
                     <Suspense fallback={<SoilTextureSkeleton />}>
                         <Await resolve={soilParameterEstimates}>
                             {(resolvedSoilParameterEstimates) => (
@@ -214,6 +219,9 @@ export default function FieldDetailsAtlasBlock() {
                             )}
                         </Await>
                     </Suspense>
+                </div>
+                {/* Ground Water - Mobile (order 4), Desktop (order 4) */}
+                <div className="lg:order-4 lg:col-span-2 space-y-4">
                     <Suspense fallback={<GroundWaterSkeleton />}>
                         <Await resolve={groundwaterEstimates}>
                             {(resolvedGroundwaterEstimates) => (

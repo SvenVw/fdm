@@ -20,10 +20,10 @@ export function GroundWaterCard({
                     De geschatte grondwaterstanden van dit perceel.
                 </CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-3 gap-4">
+            <CardContent className="grid lg:grid-cols-3 gap-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <CardTitle className="text-sm font-medium">
+                        <CardTitle className="text-sm font-medium break-all">
                             Grondwaterklasse
                         </CardTitle>
                     </CardHeader>

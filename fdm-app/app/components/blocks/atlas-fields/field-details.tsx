@@ -16,51 +16,54 @@ export function FieldDetailsCard({ fieldDetails }: { fieldDetails: any }) {
                 <CardTitle>Perceeldetails</CardTitle>
                 <CardDescription>De details van dit perceel.</CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <CardTitle className="text-sm font-medium">
-                            Oppervlakte
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <div className="flex items-baseline space-x-2">
-                            <div className="text-2xl font-bold">
-                                {fieldDetails.b_area}
+            <CardContent className="grid lg:grid-cols-2 gap-4">
+                <div className="grid lg:grid-cols-2 col-span-2 gap-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                            <CardTitle className="text-sm font-medium">
+                                Oppervlakte
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            <div className="flex items-baseline space-x-2">
+                                <div className="text-2xl font-bold">
+                                    {fieldDetails.b_area}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                    ha
+                                </div>
                             </div>
-                            <div className="text-sm text-muted-foreground">
-                                ha
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <CardTitle className="text-sm font-medium">
-                            Regio (RVO Tabel 2)
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <div className="flex items-baseline space-x-2">
-                            <div className="text-2xl font-bold">
-                                {fieldDetails.regionTable2 === "klei"
-                                    ? "Klei"
-                                    : fieldDetails.regionTable2 === "veen"
-                                      ? "Veen"
-                                      : fieldDetails.regionTable2 === "loess"
-                                        ? "Löss"
-                                        : fieldDetails.regionTable2 ===
-                                            "zand_nwc"
-                                          ? "Noordelijk, westelijk, en centraal zand"
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                            <CardTitle className="text-sm font-medium">
+                                Regio (RVO Tabel 2)
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            <div className="flex items-baseline space-x-2">
+                                <div className="text-2xl font-bold">
+                                    {fieldDetails.regionTable2 === "klei"
+                                        ? "Klei"
+                                        : fieldDetails.regionTable2 === "veen"
+                                          ? "Veen"
                                           : fieldDetails.regionTable2 ===
-                                              "zand_zuid"
-                                            ? "Zuidelijk zand"
-                                            : "Onbekend"}
+                                              "loess"
+                                            ? "Löss"
+                                            : fieldDetails.regionTable2 ===
+                                                "zand_nwc"
+                                              ? "Noordelijk, westelijk, en centraal zand"
+                                              : fieldDetails.regionTable2 ===
+                                                  "zand_zuid"
+                                                ? "Zuidelijk zand"
+                                                : "Onbekend"}
+                                </div>
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
-                <div className="grid grid-cols-3 col-span-2 gap-4">
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="grid lg:grid-cols-3 col-span-2 gap-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
                             <CardTitle className="text-sm font-medium">
@@ -77,7 +80,7 @@ export function FieldDetailsCard({ fieldDetails }: { fieldDetails: any }) {
                     </Card>
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                            <CardTitle className="text-sm font-medium">
+                            <CardTitle className="text-sm font-medium word-break-all">
                                 Grondwaterbeschermingsgebied
                             </CardTitle>
                         </CardHeader>
