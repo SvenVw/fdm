@@ -152,9 +152,11 @@ export function FieldsPanelZoom({
 
 export function FieldsPanelSelection({
     fields,
+    numFieldsSaved,
     continueTo,
 }: {
     fields: FeatureCollection
+    numFieldsSaved: number
     continueTo: string
 }) {
     const fetcher = useFetcher()
@@ -287,17 +289,25 @@ export function FieldsPanelSelection({
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
                                 <CardDescription>
-                                    Je hebt geen nieuwe percelen geselecteerd
+                                    {numFieldsSaved > 0
+                                        ? "Je hebt geen nieuwe percelen geselecteerd"
+                                        : "Je hebt geen percelen geselecteerd"}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4" />
                             <CardFooter>
-                                <NavLink to={continueTo} className="flex-1">
-                                    <Button className="w-full">
-                                        <ArrowRight />
-                                        <span>Doorgaan</span>
+                                {numFieldsSaved > 0 ? (
+                                    <NavLink to={continueTo} className="flex-1">
+                                        <Button className="w-full">
+                                            <Check />
+                                            <span>Doorgaan</span>
+                                        </Button>
+                                    </NavLink>
+                                ) : (
+                                    <Button className="w-full" disabled>
+                                        <Check /> Sla geselecteerde percelen op
                                     </Button>
-                                </NavLink>
+                                )}
                             </CardFooter>
                         </Card>,
                     )

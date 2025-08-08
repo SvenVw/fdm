@@ -322,6 +322,10 @@ export default function Index() {
                                 <div className="fields-panel grid gap-4 w-[350px]">
                                     <FieldsPanelSelection
                                         fields={selectedFieldsData}
+                                        numFieldsSaved={
+                                            loaderData.fieldsSaved.features
+                                                .length
+                                        }
                                         continueTo={loaderData.continueTo}
                                     />
                                     <FieldsPanelZoom
