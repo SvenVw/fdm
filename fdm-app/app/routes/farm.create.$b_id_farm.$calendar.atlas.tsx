@@ -168,7 +168,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             calendar: calendar,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
-            fieldsAvailableUrl: process.env.AVAILABLE_FIELDS_URL,
             continueTo: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
