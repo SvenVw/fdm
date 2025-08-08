@@ -1,5 +1,13 @@
 # fdm-calculator
 
+## 0.5.3
+
+### Patch Changes
+
+- 9b71a8f: Give Natura 2000 and GWBG derogation norms priority over NV-gebied
+- 74dbb41: Add Natura 2000 proximity check to derogation norm calculation
+- 03f2d99: Fix derogation norm for GWBG-gebieden: 170 kg N/ha
+
 ## 0.5.2
 
 ### Patch Changes

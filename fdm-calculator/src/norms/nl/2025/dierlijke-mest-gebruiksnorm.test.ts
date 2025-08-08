@@ -63,18 +63,18 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
         expect(result.normSource).toBe("Standaard - geen derogatie")
     })
 
-    it("should return the default norm value for derogation in Grondwaterbeschermingsgebied", async () => {
+    it("should return the adjusted norm value for derogation in Grondwaterbeschermingsgebied", async () => {
         const mockInput: NL2025NormsInput = {
             farm: { is_derogatie_bedrijf: true },
             field: {
                 b_id: "1",
-                b_centroid: [6.423238, 52.3445902],
+                b_centroid: [6.397701151566514, 52.56657210653102],
             },
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
         const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
-        expect(result.normValue).toBe(190)
+        expect(result.normValue).toBe(170)
         expect(result.normSource).toBe(
             "Derogatie - Grondwaterbeschermingsgebied",
         )
@@ -93,5 +93,20 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
         const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(190)
         expect(result.normSource).toBe("Derogatie - NV Gebied")
+    })
+
+    it("should return the adjusted norm value for derogation in Natura 2000 gebied", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: true },
+            field: {
+                b_id: "1",
+                b_centroid: [5.804910408558418, 52.04532099948795], // Coordinates within a Natura 2000 area (Veluwe)
+            },
+            cultivations: [],
+            soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
+        }
+        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(170)
+        expect(result.normSource).toBe("Derogatie - Natura2000 Gebied")
     })
 })
