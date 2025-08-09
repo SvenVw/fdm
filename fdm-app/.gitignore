@@ -4,7 +4,16 @@ node_modules
 /build
 /uploads
 .env
+.env.test
 .env.production
+
+dist
+dist-ssr
+playwright-report
+test-results
+test-tmp
+coverage
+*.local
 
 .react-router/
 # Sentry Config File
