@@ -136,52 +136,56 @@ export function FieldDetailsSkeleton() {
                     <p>De gebieden gelden voor 2025</p>
                 </CardDescription>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <Skeleton className="h-4 w-1/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-6 w-1/2" />
-                        <Skeleton className="h-3 w-1/4" />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <Skeleton className="h-4 w-1/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-6 w-1/2" />
-                        <Skeleton className="h-3 w-1/4" />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <Skeleton className="h-4 w-1/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-6 w-1/2" />
-                        <Skeleton className="h-3 w-1/4" />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <Skeleton className="h-4 w-1/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-6 w-1/2" />
-                        <Skeleton className="h-3 w-1/4" />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
-                        <Skeleton className="h-4 w-1/4" />
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-6 w-1/2" />
-                        <Skeleton className="h-3 w-1/4" />
-                    </CardContent>
-                </Card>
+            <CardContent className="grid lg:grid-cols-2 gap-4">
+                <div className="grid lg:grid-cols-2 col-span-2 gap-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                            <Skeleton className="h-4 w-1/4" />
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            <Skeleton className="h-6 w-1/2" />
+                            <Skeleton className="h-3 w-1/4" />
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                            <Skeleton className="h-4 w-1/4" />
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                            <Skeleton className="h-6 w-1/2" />
+                            <Skeleton className="h-3 w-1/4" />
+                        </CardContent>
+                    </Card>
+                    <div className="grid lg:grid-cols-3 col-span-2 gap-4">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                                <Skeleton className="h-4 w-1/4" />
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <Skeleton className="h-6 w-1/2" />
+                                <Skeleton className="h-3 w-1/4" />
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                                <Skeleton className="h-4 w-1/4" />
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <Skeleton className="h-6 w-1/2" />
+                                <Skeleton className="h-3 w-1/4" />
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
+                                <Skeleton className="h-4 w-1/4" />
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <Skeleton className="h-6 w-1/2" />
+                                <Skeleton className="h-3 w-1/4" />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
             </CardContent>
         </Card>
     )
