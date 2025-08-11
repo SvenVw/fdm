@@ -38,7 +38,7 @@ import {
     isFieldInNatura2000Gebied,
     isFieldInNVGebied,
 } from "@svenvw/fdm-calculator"
-import { getFieldByCentroid } from "@/app/components/blocks/atlas-fields/query"
+import { getFieldByCentroid } from "~/components/blocks/atlas-fields/query"
 
 // Meta
 export const meta: MetaFunction = () => {
