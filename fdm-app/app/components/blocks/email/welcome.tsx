@@ -84,14 +84,24 @@ export function WelcomeEmail({
                                 Door een bedrijf aan te maken, krijg je toegang
                                 tot de volgende functies:
                             </Text>
-                            <Text className="text-black text-[14px] leading-[24px] ml-4">
-                                • Stikstofbaland, bemestingsadvies en
-                                gebruiksruimte apps. <br />• Beheer van meerdere
-                                jaren voor een compleet overzicht. <br />• Een
-                                uitgebreide lijst van meststoffen die je zelf
-                                kunt aanpassen. <br />• De mogelijkheid om je
-                                adviseur toegang te geven.
-                            </Text>
+                            <ul className="text-black text-[14px] leading-[24px] ml-4 list-disc pl-5">
+                                <li>
+                                    Stikstofbalans, bemestingsadvies en
+                                    gebruiksruimte-apps.
+                                </li>
+                                <li>
+                                    Beheer van meerdere jaren voor een compleet
+                                    overzicht.
+                                </li>
+                                <li>
+                                    Een uitgebreide lijst van meststoffen die je
+                                    zelf kunt aanpassen.
+                                </li>
+                                <li>
+                                    De mogelijkheid om je adviseur toegang te
+                                    geven.
+                                </li>
+                            </ul>
 
                             <Text className="text-black text-[16px] font-bold leading-[24px] mt-6">
                                 2. De Atlas verkennen
@@ -100,13 +110,20 @@ export function WelcomeEmail({
                                 Je kunt er ook voor kiezen om de Atlas te
                                 verkennen. Hier vind je onder andere:
                             </Text>
-                            <Text className="text-black text-[14px] leading-[24px] ml-4">
-                                • De volledige gewashistorie van percelen tot
-                                2009. <br />• Of een perceel in een gebied met
-                                beperkingen voor de gebruiksruimte valt. <br />•
-                                Een inschatting van de bodemtextuur en het
-                                grondwaterpeil.
-                            </Text>
+                            <ul className="text-black text-[14px] leading-[24px] ml-4 list-disc pl-5">
+                                <li>
+                                    De volledige gewashistorie van percelen
+                                    sinds 2009.
+                                </li>
+                                <li>
+                                    Of een perceel in een gebied met beperkingen
+                                    voor de gebruiksruimte valt.
+                                </li>
+                                <li>
+                                    Een inschatting van de bodemtextuur en het
+                                    grondwaterpeil.
+                                </li>
+                            </ul>
                         </Section>
 
                         <Section className="text-center mt-[32px] mb-[32px]">
@@ -115,7 +132,7 @@ export function WelcomeEmail({
                                 className="bg-primary rounded text-primary-foreground text-[14px] font-semibold no-underline px-5 py-3"
                                 href={url}
                             >
-                                Naar de website
+                                Start met {appName}
                             </Button>
                         </Section>
                         <Section className="my-[20px] mx-0 p-0">
