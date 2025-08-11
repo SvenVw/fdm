@@ -180,11 +180,18 @@ export function FieldsSourceAvailable({
             const handleClick = (e: any) => {
                 // Get the coordinates of the centroid of the clicked field
                 if (e.features) {
-                    const clickedFeature = e.features[0]
-                    const featureCentroid = centroid(clickedFeature)
-                    const featureCentroidCoordinates =
-                        featureCentroid.geometry.coordinates.join(",")
-                    navigate(featureCentroidCoordinates)
+                    try {
+                        const clickedFeature = e.features[0]
+                        const featureCentroid = centroid(clickedFeature)
+                        const featureCentroidCoordinates =
+                            featureCentroid.geometry.coordinates.join(",")
+                        navigate(featureCentroidCoordinates)
+                    } catch (error) {
+                        console.error(
+                            "Failed to calculate centroid or navigate:",
+                            error,
+                        )
+                    }
                 }
             }
             map.on("click", id, handleClick)
