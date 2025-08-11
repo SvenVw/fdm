@@ -105,7 +105,7 @@ export function FieldsPanelHover({
                 map.off("load", updatePanel)
             }
         }
-    }, [map, zoomLevelFields, layer, layerExclude])
+    }, [map, zoomLevelFields, layer, layerExclude, clickRedirectsToDetailsPage])
 
     return panel
 }
