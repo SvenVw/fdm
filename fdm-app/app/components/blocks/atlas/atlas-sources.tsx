@@ -177,7 +177,7 @@ export function FieldsSourceAvailable({
 
     useEffect(() => {
         if (map && redirectToDetailsPage) {
-            map.on("click", id, (e) => {
+            const handleClick = (e: any) => {
                 // Get the coordinates of the centroid of the clicked field
                 if (e.features) {
                     const clickedFeature = e.features[0]
@@ -186,7 +186,11 @@ export function FieldsSourceAvailable({
                         featureCentroid.geometry.coordinates.join(",")
                     navigate(featureCentroidCoordinates)
                 }
-            })
+            }
+            map.on("click", id, handleClick)
+            return () => {
+                map.off("click", id, handleClick)
+            }
         }
     }, [map, id, redirectToDetailsPage, navigate])
 
@@ -261,7 +265,13 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, availableFieldsUrl, zoomLevelFields, unwantedIds, cultivationCataloguePromise])
+    }, [
+        map,
+        availableFieldsUrl,
+        zoomLevelFields,
+        unwantedIds,
+        cultivationCataloguePromise,
+    ])
 
     return (
         <Source id={id} type="geojson" data={data}>
