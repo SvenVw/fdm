@@ -94,13 +94,15 @@ export default function FarmContentBlock() {
 
     // Get the current layer
     const pathname = location.pathname
-    const pathSegments = pathname.split("/")
 
-    // Add back to map button when visiting the map layer details page
+    // Add back to map button when visiting the field details page
+    const isFieldDetailsPage =
+        pathname.includes("/atlas/fields/") &&
+        pathname.split("/atlas/fields/")[1]?.includes(",")
     let headerAction:
         | { to: string; label: string; disabled: boolean }
         | undefined
-    if (pathSegments.length > 6) {
+    if (isFieldDetailsPage) {
         headerAction = {
             to: `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/atlas/fields`,
             label: "Terug",
