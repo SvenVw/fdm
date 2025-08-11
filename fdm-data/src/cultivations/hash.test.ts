@@ -18,6 +18,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -25,7 +26,7 @@ describe("hashCultivation", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("c514800f")
+        expect(hash).toBe("f6ceb42b")
     })
 
     it("should generate different hashes for different cultivation items", async () => {
@@ -43,6 +44,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -60,6 +62,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -84,6 +87,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -112,6 +116,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -140,6 +145,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -169,6 +175,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -198,6 +205,7 @@ describe("hashCultivation", () => {
             b_lu_n_harvestable: 11.3,
             b_lu_n_residue: 19.3,
             b_n_fixation: 0,
+            b_lu_rest_oravib: false,
             hash: null,
         }
 
@@ -217,5 +225,35 @@ describe("hashCultivation", () => {
 
         expect(hash1).not.toBe(hash2)
         expect(hash1).not.toBe(hash3)
+    })
+
+    it("should generate different hashes when a boolean value changes", async () => {
+        const cultivation1: CatalogueCultivationItem = {
+            b_lu_source: "brp",
+            b_lu_catalogue: "test-id-1",
+            b_lu_name: "Test Cultivation 1",
+            b_lu_name_en: "Test Cultivation (EN)",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "hcat3",
+            b_lu_hcat3_name: "hcat3 name",
+            b_lu_croprotation: "other",
+            b_lu_yield: 51298,
+            b_lu_hi: 0.85,
+            b_lu_n_harvestable: 11.3,
+            b_lu_n_residue: 19.3,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            hash: null,
+        }
+
+        const cultivation2: CatalogueCultivationItem = {
+            ...cultivation1,
+            b_lu_rest_oravib: true,
+        }
+
+        const hash1 = await hashCultivation(cultivation1)
+        const hash2 = await hashCultivation(cultivation2)
+
+        expect(hash1).not.toBe(hash2)
     })
 })

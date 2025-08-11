@@ -61,6 +61,7 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             b_lu_n_harvestable: cultivation.b_lu_n_harvestable,
             b_lu_n_residue: cultivation.b_lu_n_residue,
             b_n_fixation: cultivation.b_n_fixation,
+            b_lu_rest_oravib: cultivation.b_lu_rest_oravib,
             hash: null,
         }
 

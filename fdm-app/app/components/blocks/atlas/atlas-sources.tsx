@@ -1,11 +1,21 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type JSX, type ReactNode, type SetStateAction, useEffect, useMemo, useState } from "react"
+import centroid from "@turf/centroid"
+import {
+    type Dispatch,
+    type JSX,
+    type ReactNode,
+    type SetStateAction,
+    useEffect,
+    useMemo,
+    useState,
+} from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
 import type { Field } from "@svenvw/fdm-core"
 import { getAvailableFieldsUrl } from "./atlas-url"
+import { useNavigate } from "react-router"
 import {
     type CatalogueCultivationItem,
     getCultivationCatalogue,
@@ -128,12 +138,14 @@ export function FieldsSourceAvailable({
     calendar,
     exclude,
     zoomLevelFields,
+    redirectToDetailsPage = false,
     children,
 }: {
     id: string
     calendar: string
     exclude: Field[]
     zoomLevelFields: number
+    redirectToDetailsPage: boolean
     children: JSX.Element
 }) {
     const unwantedIds = new Set(
@@ -144,6 +156,8 @@ export function FieldsSourceAvailable({
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
     const availableFieldsUrl = getAvailableFieldsUrl(calendar)
+
+    const navigate = useNavigate()
 
     const cultivationCataloguePromise = useMemo(async () => {
         try {
@@ -161,6 +175,32 @@ export function FieldsSourceAvailable({
             return {}
         }
     }, [])
+
+    useEffect(() => {
+        if (map && redirectToDetailsPage) {
+            const handleClick = (e: any) => {
+                // Get the coordinates of the centroid of the clicked field
+                if (e.features) {
+                    try {
+                        const clickedFeature = e.features[0]
+                        const featureCentroid = centroid(clickedFeature)
+                        const featureCentroidCoordinates =
+                            featureCentroid.geometry.coordinates.join(",")
+                        navigate(featureCentroidCoordinates)
+                    } catch (error) {
+                        console.error(
+                            "Failed to calculate centroid or navigate:",
+                            error,
+                        )
+                    }
+                }
+            }
+            map.on("click", id, handleClick)
+            return () => {
+                map.off("click", id, handleClick)
+            }
+        }
+    }, [map, id, redirectToDetailsPage, navigate])
 
     useEffect(() => {
         async function loadData() {
@@ -233,7 +273,13 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, availableFieldsUrl, zoomLevelFields, unwantedIds, cultivationCataloguePromise])
+    }, [
+        map,
+        availableFieldsUrl,
+        zoomLevelFields,
+        unwantedIds,
+        cultivationCataloguePromise,
+    ])
 
     return (
         <Source id={id} type="geojson" data={data}>

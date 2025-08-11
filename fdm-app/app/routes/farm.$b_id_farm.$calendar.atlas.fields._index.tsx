@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import {
     Layer,
     Map as MapGL,
@@ -13,12 +13,15 @@ import { data, type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"
-import { FieldsSourceNotClickable } from "~/components/blocks/atlas/atlas-sources"
+import {
+    FieldsSourceAvailable,
+    FieldsSourceNotClickable,
+} from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import { getMapboxStyle, getMapboxToken } from "~/integrations/mapbox"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -53,44 +56,42 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
         const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
 
         // Get the session
         const session = await getSession(request)
 
         // Get timeframe from calendar store
+        const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
         // Get the fields of the farm
-        const fields = await getFields(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-        const features = fields.map((field) => {
-            const feature = {
-                type: "Feature" as const,
-                properties: {
-                    b_id: field.b_id,
-                    b_name: field.b_name,
-                    b_area: Math.round(field.b_area * 10) / 10,
-                    b_lu_name: field.b_lu_name,
-                    b_id_source: field.b_id_source,
-                },
-                geometry: field.b_geometry,
-            }
-            return feature
-        })
+        let featureCollection: FeatureCollection | undefined
+        if (b_id_farm && b_id_farm !== "undefined") {
+            const fields = await getFields(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+            const features = fields.map((field) => {
+                const feature = {
+                    type: "Feature" as const,
+                    properties: {
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: Math.round(field.b_area * 10) / 10,
+                        b_lu_name: field.b_lu_name,
+                        b_id_source: field.b_id_source,
+                    },
+                    geometry: field.b_geometry,
+                }
+                return feature
+            })
 
-        const featureCollection: FeatureCollection = {
-            type: "FeatureCollection",
-            features: features,
+            featureCollection = {
+                type: "FeatureCollection",
+                features: features,
+            }
         }
 
         // Get the Mapbox token and style
@@ -99,6 +100,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
+            calendar: calendar,
             savedFields: featureCollection,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
@@ -119,27 +121,50 @@ export default function FarmAtlasFieldsBlock() {
 
     const id = "fieldsSaved"
     const fields = loaderData.savedFields
-    const initialViewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
-
+    const fieldsAvailableId = "fieldsAvailable"
+    const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+    const initialViewState = getViewState(fields)
 
-    const [viewState, setViewState] = useState<ViewState>(
-        initialViewState as ViewState,
-    )
+    // Create a sessionStorage to store the latest viewstate
+    const [viewState, setViewState] = useState<ViewState>(() => {
+        if (typeof window !== "undefined") {
+            const savedViewState = sessionStorage.getItem("mapViewState")
+            if (savedViewState) {
+                try {
+                    return JSON.parse(savedViewState)
+                } catch {
+                    sessionStorage.removeItem("mapViewState")
+                }
+            }
+        }
+        return initialViewState as ViewState
+    })
 
     const onViewportChange = useCallback((event: ViewStateChangeEvent) => {
         setViewState(event.viewState)
     }, [])
 
+    const isFirstRender = useRef(true)
+
+    // If latest viewstate is available use that one
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false
+            return
+        }
+        sessionStorage.setItem("mapViewState", JSON.stringify(viewState))
+    }, [viewState])
+
     return (
         <MapGL
             {...viewState}
-            style={{ height: "calc(100vh - 64px - 147px)", width: "100%" }}
+            style={{ height: "calc(100vh - 64px)", width: "100%" }}
             interactive={true}
             mapStyle={loaderData.mapboxStyle}
             mapboxAccessToken={loaderData.mapboxToken}
-            interactiveLayerIds={[id]}
+            interactiveLayerIds={[id, fieldsAvailableId]}
             onMove={onViewportChange}
         >
             <Controls
@@ -154,11 +179,29 @@ export default function FarmAtlasFieldsBlock() {
                     }))
                 }
             />
-            <FieldsSourceNotClickable id={id} fieldsData={fields}>
-                <Layer {...fieldsSavedStyle} />
-                <Layer {...fieldsSavedOutlineStyle} />
-            </FieldsSourceNotClickable>
+
+            <FieldsSourceAvailable
+                id={fieldsAvailableId}
+                calendar={loaderData.calendar}
+                zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                redirectToDetailsPage={true}
+            >
+                <Layer {...fieldsAvailableStyle} />
+            </FieldsSourceAvailable>
+
+            {fields ? (
+                <FieldsSourceNotClickable id={id} fieldsData={fields}>
+                    <Layer {...fieldsSavedStyle} />
+                    <Layer {...fieldsSavedOutlineStyle} />
+                </FieldsSourceNotClickable>
+            ) : null}
             <div className="fields-panel grid gap-4 w-[350px]">
+                <FieldsPanelHover
+                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                    layer={fieldsAvailableId}
+                    layerExclude={id}
+                    clickRedirectsToDetailsPage={true}
+                />
                 <FieldsPanelHover
                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                     layer={id}
