@@ -7,8 +7,6 @@ export async function getFieldByCentroid(
     latitude: number,
     calendar: string,
 ): Promise<Feature<Geometry, GeoJsonProperties> | null> {
-    const availableFieldsUrl = getAvailableFieldsUrl(calendar)
-
     // Create a small bounding box around the centroid to query the FGB file
     const buffer = 0.000001 // A very small buffer to ensure the point is within the bbox
     const bbox = {
@@ -19,6 +17,8 @@ export async function getFieldByCentroid(
     }
 
     try {
+        const availableFieldsUrl = getAvailableFieldsUrl(calendar)
+
         const iter = deserialize(availableFieldsUrl, bbox)
         for await (const feature of iter) {
             // For simplicity, we'll assume the first feature found in the bbox is the one we want (as the buffer is very small).
