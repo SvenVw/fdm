@@ -11,7 +11,7 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import {
     Await,
     data,
@@ -129,7 +129,14 @@ export default function FarmBalanceNitrogenFieldBlock() {
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
 
-    const { nitrogenBalanceResult, field, farm } = loaderData
+    const { field, farm } = loaderData
+    const [nitrogenBalanceResult, setNitrogenBalanceResult] = useState(
+        loaderData.nitrogenBalanceResult,
+    )
+    useEffect(
+        () => setNitrogenBalanceResult(loaderData.nitrogenBalanceResult),
+        [loaderData.nitrogenBalanceResult],
+    )
 
     return (
         <div className="space-y-4">
