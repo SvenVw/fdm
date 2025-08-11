@@ -10,7 +10,11 @@ import { Skeleton } from "~/components/ui/skeleton"
 export function GroundwaterCard({
     groundwaterEstimates,
 }: {
-    groundwaterEstimates: any
+    groundwaterEstimates: {
+        b_gwl_class?: string | null
+        b_gwl_ghg?: number | null
+        b_gwl_glg?: number | null
+    }
 }) {
     return (
         <Card>
@@ -30,7 +34,7 @@ export function GroundwaterCard({
                     <CardContent className="space-y-2">
                         <div className="flex items-baseline space-x-2">
                             <div className="text-2xl font-bold">
-                                {groundWaterEstimates.b_gwl_class}
+                                {groundwaterEstimates.b_gwl_class ?? "Onbekend"}
                             </div>
                         </div>
                     </CardContent>
@@ -44,7 +48,7 @@ export function GroundwaterCard({
                     <CardContent className="space-y-2">
                         <div className="flex items-baseline space-x-2">
                             <div className="text-2xl font-bold">
-                                {groundWaterEstimates.b_gwl_ghg}
+                                {groundwaterEstimates.b_gwl_ghg ?? "Onbekend"}
                             </div>
                             <div className="text-sm text-muted-foreground">
                                 cm-mv
@@ -61,7 +65,7 @@ export function GroundwaterCard({
                     <CardContent className="space-y-2">
                         <div className="flex items-baseline space-x-2">
                             <div className="text-2xl font-bold">
-                                {groundWaterEstimates.b_gwl_glg}
+                                {groundwaterEstimates.b_gwl_glg ?? "Onbekend"}
                             </div>
                             <div className="text-sm text-muted-foreground">
                                 cm-mv
@@ -84,8 +88,8 @@ export function GroundwaterSkeleton() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-4">
-                {[...Array(3)].map((_, index) => (
-                    <Card key={index}>
+                {["class", "ghg", "glg"].map((key) => (
+                    <Card key={key}>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
                             <Skeleton className="h-4 w-1/4" />
                         </CardHeader>
