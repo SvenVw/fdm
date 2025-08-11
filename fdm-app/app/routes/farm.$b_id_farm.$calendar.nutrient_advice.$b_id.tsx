@@ -7,7 +7,7 @@ import {
     getField,
 } from "@svenvw/fdm-core"
 import { Tally1, Tally2, Tally3 } from "lucide-react"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import {
     Await,
     type LoaderFunctionArgs,
@@ -83,58 +83,65 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const field = await getField(fdm, session.principal_id, b_id)
 
-        const currentSoilData = await getCurrentSoilData(
+        const currentSoilData = getCurrentSoilData(
             fdm,
             session.principal_id,
             b_id,
         )
 
-        const fertilizerApplications = await getFertilizerApplications(
-            fdm,
-            session.principal_id,
-            b_id,
-            timeframe,
-        )
-        const fertilizers = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-
-        const doses = calculateDose({
-            applications: fertilizerApplications,
-            fertilizers,
-        })
-
-        const cultivations = await getCultivations(
+        const fertilizerApplications = getFertilizerApplications(
             fdm,
             session.principal_id,
             b_id,
             timeframe,
         )
-        if (!cultivations.length) {
-            throw handleLoaderError("missing: cultivations")
-        }
-        // For now take the first cultivation
-        const b_lu_catalogue = cultivations[0].b_lu_catalogue
+        const fertilizers = getFertilizers(fdm, session.principal_id, b_id_farm)
+
+        const doses = (async () =>
+            calculateDose({
+                applications: await fertilizerApplications,
+                fertilizers: await fertilizers,
+            }))()
+
+        const cultivations = (async () => {
+            const cultivations = await getCultivations(
+                fdm,
+                session.principal_id,
+                b_id,
+                timeframe,
+            )
+            if (!cultivations.length) {
+                throw handleLoaderError("missing: cultivations")
+            }
+            return cultivations
+        })()
 
         // Request nutrient advice
-        const nutrientAdvice = getNutrientAdvice(
-            b_lu_catalogue,
-            field.b_centroid,
-            currentSoilData,
-        )
+        const nutrientAdvice = (async () => {
+            const myCultivations = await cultivations
+            return getNutrientAdvice(
+                // For now take the first cultivation
+                myCultivations[0].b_lu_catalogue,
+                field.b_centroid,
+                await currentSoilData,
+            )
+        })()
 
         const nutrientsDescription = getNutrientsDescription()
 
+        const asyncData = (async () => ({
+            currentSoilData: await currentSoilData,
+            fertilizers: await fertilizers,
+            fertilizerApplications: await fertilizerApplications,
+            doses: await doses,
+            nutrientAdvice: await nutrientAdvice,
+        }))()
+
         return {
             field: field,
-            nutrientAdvice: nutrientAdvice,
             nutrientsDescription: nutrientsDescription,
-            doses: doses,
-            fertilizerApplications: fertilizerApplications,
-            fertilizers: fertilizers,
             calendar: calendar,
+            asyncData: asyncData,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -142,15 +149,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function FieldNutrientAdviceBlock() {
-    const {
-        field,
-        nutrientAdvice,
-        nutrientsDescription,
-        doses,
-        fertilizerApplications,
-        fertilizers,
-        calendar,
-    } = useLoaderData()
+    const loaderData = useLoaderData()
+    const { field, nutrientsDescription, calendar } = loaderData
+    const [asyncData, setAsyncData] = useState(loaderData.asyncData)
+    useEffect(() => {
+        setAsyncData(loaderData.asyncData)
+    }, [loaderData.asyncData])
 
     const primaryNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "primary",
@@ -182,8 +186,13 @@ export default function FieldNutrientAdviceBlock() {
                                 <NutrientCardSkeleton key={nutrient.symbol} />
                             ))}
                         >
-                            <Await resolve={nutrientAdvice}>
-                                {(nutrientAdvice) =>
+                            <Await resolve={asyncData}>
+                                {({
+                                    fertilizers,
+                                    fertilizerApplications,
+                                    nutrientAdvice,
+                                    doses,
+                                }) =>
                                     primaryNutrients.map(
                                         (nutrient: NutrientDescription) => (
                                             <NutrientCard
@@ -211,22 +220,40 @@ export default function FieldNutrientAdviceBlock() {
             </Card>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <NutrientKPICardForTotalApplications
-                    doses={doses}
-                    fertilizerApplications={fertilizerApplications}
-                />
+                <Suspense
+                    fallback={[1, 2, 3].map((id) => (
+                        <NutrientCardSkeleton key={id} />
+                    ))}
+                >
+                    <Await resolve={asyncData}>
+                        {({
+                            fertilizerApplications,
+                            nutrientAdvice,
+                            doses,
+                        }) => (
+                            <>
+                                <NutrientKPICardForTotalApplications
+                                    doses={doses}
+                                    fertilizerApplications={
+                                        fertilizerApplications
+                                    }
+                                />
 
-                <NutrientKPICardForNutrientDeficit
-                    descriptions={nutrientsDescription}
-                    advices={nutrientAdvice}
-                    doses={doses}
-                />
+                                <NutrientKPICardForNutrientDeficit
+                                    descriptions={nutrientsDescription}
+                                    advices={nutrientAdvice}
+                                    doses={doses}
+                                />
 
-                <NutrientKPICardForNutrientExcess
-                    descriptions={nutrientsDescription}
-                    advices={nutrientAdvice}
-                    doses={doses}
-                />
+                                <NutrientKPICardForNutrientExcess
+                                    descriptions={nutrientsDescription}
+                                    advices={nutrientAdvice}
+                                    doses={doses}
+                                />
+                            </>
+                        )}
+                    </Await>
+                </Suspense>
             </div>
             <Card>
                 <CardHeader>
@@ -246,8 +273,13 @@ export default function FieldNutrientAdviceBlock() {
                                 <NutrientCardSkeleton key={nutrient.symbol} />
                             ))}
                         >
-                            <Await resolve={nutrientAdvice}>
-                                {(nutrientAdvice) =>
+                            <Await resolve={asyncData}>
+                                {({
+                                    fertilizers,
+                                    fertilizerApplications,
+                                    nutrientAdvice,
+                                    doses,
+                                }) =>
                                     secondaryNutrients.map(
                                         (nutrient: NutrientDescription) => (
                                             <NutrientCard
@@ -291,8 +323,13 @@ export default function FieldNutrientAdviceBlock() {
                                 <NutrientCardSkeleton key={nutrient.symbol} />
                             ))}
                         >
-                            <Await resolve={nutrientAdvice}>
-                                {(nutrientAdvice) =>
+                            <Await resolve={asyncData}>
+                                {({
+                                    fertilizers,
+                                    fertilizerApplications,
+                                    nutrientAdvice,
+                                    doses,
+                                }) =>
                                     traceNutrients.map(
                                         (nutrient: NutrientDescription) => (
                                             <NutrientCard
