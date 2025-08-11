@@ -5,7 +5,7 @@ import {
     BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb"
 
-export function HeaderAtlas({ b_id_farm }: { b_id_farm: string }) {
+export function HeaderAtlas({ b_id_farm }: { b_id_farm: string | undefined }) {
     const calendar = useCalendarStore((state) => state.calendar)
 
     return (

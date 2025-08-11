@@ -16,7 +16,7 @@ function getBounds(fields: FeatureCollection | null) {
     return bounds
 }
 
-export function getViewState(fields: FeatureCollection | null) {
+export function getViewState(fields: FeatureCollection | null | undefined) {
     if (fields) {
         const bounds = getBounds(fields)
 

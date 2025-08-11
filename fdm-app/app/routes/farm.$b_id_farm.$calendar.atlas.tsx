@@ -18,8 +18,7 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { HeaderAction } from "../components/blocks/header/action"
-import { getCalendar } from "../lib/calendar"
+import { getCalendar } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -46,36 +45,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
         const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
 
         // Get the session
         const session = await getSession(request)
 
         // Get the calendar
         const calendar = getCalendar(params)
-
-        // Get details of farm
-        let farm = null
-        try {
-            farm = await getFarm(fdm, session.principal_id, b_id_farm)
-            if (!farm) {
-                throw data("Farm is not found", {
-                    status: 404,
-                    statusText: "Farm is not found",
-                })
-            }
-        } catch (error) {
-            console.error("Failed to fetch farm details:", error)
-            throw data("Failed to fetch farm details", {
-                status: 500,
-                statusText: "Internal Server Error",
-            })
-        }
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
@@ -94,7 +69,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
             b_id_farm: b_id_farm,
             calendar: calendar,
             farmOptions: farmOptions,

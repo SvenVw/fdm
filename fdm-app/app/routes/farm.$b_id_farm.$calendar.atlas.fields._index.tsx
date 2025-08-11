@@ -56,12 +56,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
         const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
 
         // Get the session
         const session = await getSession(request)
@@ -71,30 +65,33 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const timeframe = getTimeframe(params)
 
         // Get the fields of the farm
-        const fields = await getFields(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
-        const features = fields.map((field) => {
-            const feature = {
-                type: "Feature" as const,
-                properties: {
-                    b_id: field.b_id,
-                    b_name: field.b_name,
-                    b_area: Math.round(field.b_area * 10) / 10,
-                    b_lu_name: field.b_lu_name,
-                    b_id_source: field.b_id_source,
-                },
-                geometry: field.b_geometry,
-            }
-            return feature
-        })
+        let featureCollection: FeatureCollection | undefined
+        if (b_id_farm && b_id_farm !== "undefined") {
+            const fields = await getFields(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+            const features = fields.map((field) => {
+                const feature = {
+                    type: "Feature" as const,
+                    properties: {
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: Math.round(field.b_area * 10) / 10,
+                        b_lu_name: field.b_lu_name,
+                        b_id_source: field.b_id_source,
+                    },
+                    geometry: field.b_geometry,
+                }
+                return feature
+            })
 
-        const featureCollection: FeatureCollection = {
-            type: "FeatureCollection",
-            features: features,
+            featureCollection = {
+                type: "FeatureCollection",
+                features: features,
+            }
         }
 
         // Get the Mapbox token and style
@@ -124,12 +121,12 @@ export default function FarmAtlasFieldsBlock() {
 
     const id = "fieldsSaved"
     const fields = loaderData.savedFields
-    const initialViewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
     const fieldsAvailableId = "fieldsAvailable"
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
-
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
+    const initialViewState = getViewState(fields)
+
     // Create a sessionStorage to store the latest viewstate
     const [viewState, setViewState] = useState<ViewState>(() => {
         if (typeof window !== "undefined") {
@@ -188,10 +185,12 @@ export default function FarmAtlasFieldsBlock() {
                 <Layer {...fieldsAvailableStyle} />
             </FieldsSourceAvailable>
 
-            <FieldsSourceNotClickable id={id} fieldsData={fields}>
-                <Layer {...fieldsSavedStyle} />
-                <Layer {...fieldsSavedOutlineStyle} />
-            </FieldsSourceNotClickable>
+            {fields ? (
+                <FieldsSourceNotClickable id={id} fieldsData={fields}>
+                    <Layer {...fieldsSavedStyle} />
+                    <Layer {...fieldsSavedOutlineStyle} />
+                </FieldsSourceNotClickable>
+            ) : null}
             <div className="fields-panel grid gap-4 w-[350px]">
                 <FieldsPanelHover
                     zoomLevelFields={ZOOM_LEVEL_FIELDS}

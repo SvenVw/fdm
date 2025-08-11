@@ -1,5 +1,5 @@
 import { getFarms } from "@svenvw/fdm-core"
-import { House } from "lucide-react"
+import { House, MapIcon } from "lucide-react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -26,6 +26,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
+import { getCalendar, getCalendarSelection } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -50,14 +51,16 @@ export const meta: MetaFunction = () => {
  *
  * @throws {Error} If retrieving the session or fetching the farm data fails.
  */
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
 
+        // Get latest available year
+        const calendar = getCalendarSelection()[0] ?? "all"
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
-
         const farmOptions = farms.map((farm) => {
             return {
                 b_id_farm: farm.b_id_farm,
@@ -69,6 +72,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         return {
             farms: farms,
             farmOptions: farmOptions,
+            calendar: calendar,
             username: session.userName,
         }
     } catch (error) {
@@ -230,8 +234,37 @@ export default function AppIndex() {
                                             </CardFooter>
                                         </Card>
                                     ))}
+                                    <Card
+                                        key="atlas"
+                                        className="transition-all hover:shadow-md"
+                                    >
+                                        <NavLink
+                                            to={`/farm/undefined/${loaderData.calendar}/atlas/fields`}
+                                            className="flex h-full flex-col"
+                                        >
+                                            <CardHeader>
+                                                <CardTitle className="flex items-center gap-2">
+                                                    <MapIcon className="text-muted-foreground" />
+                                                    <span>Atlas</span>
+                                                </CardTitle>
+                                                <CardDescription />
+                                            </CardHeader>
+                                            <CardContent className="flex-grow">
+                                                <p className="text-sm text-muted-foreground">
+                                                    Bekijk alle percelen op de
+                                                    kaart en selecteer een
+                                                    perceel voor meer details,
+                                                    zoals gewashistorie.
+                                                </p>
+                                            </CardContent>
+                                            <CardFooter>
+                                                <span className="text-sm font-semibold text-primary">
+                                                    Naar Atlas →
+                                                </span>
+                                            </CardFooter>
+                                        </NavLink>
+                                    </Card>
                                 </div>
-
                                 <div className="flex flex-col items-center space-y-2 mt-8">
                                     <Separator />
                                     <p className="text-muted-foreground text-sm">
