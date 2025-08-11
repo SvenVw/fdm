@@ -12,7 +12,7 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import {
     Await,
     data,
@@ -79,31 +79,36 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get details of fields
     const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
-    // Collect input data for nutrient balance calculation
-    const datasetsUrl = serverConfig.datasets_url
-    const nitrogenBalanceInput = await collectInputForNitrogenBalance(
-        fdm,
-        session.principal_id,
-        b_id_farm,
-        timeframe,
-        datasetsUrl,
-    )
+    const asyncData = (async () => {
+        // Collect input data for nutrient balance calculation
+        const datasetsUrl = serverConfig.datasets_url
+        const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+            datasetsUrl,
+        )
 
-    let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null
-    let errorMessage = null as string | null
-    try {
-        nitrogenBalanceResult =
-            await calculateNitrogenBalance(nitrogenBalanceInput)
-    } catch (error) {
-        errorMessage = String(error).replace("Error: ", "")
-    }
+        let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null
+        let errorMessage = null as string | null
+        try {
+            nitrogenBalanceResult =
+                await calculateNitrogenBalance(nitrogenBalanceInput)
+        } catch (error) {
+            errorMessage = String(error).replace("Error: ", "")
+        }
+
+        return {
+            nitrogenBalanceResult: nitrogenBalanceResult,
+            errorMessage: errorMessage,
+        }
+    })()
 
     return {
-        nitrogenBalanceInput: nitrogenBalanceInput,
-        nitrogenBalanceResult: nitrogenBalanceResult,
         farm: farm,
         fields: fields,
-        errorMessage: errorMessage,
+        asyncData: asyncData,
     }
 }
 
@@ -112,13 +117,18 @@ export default function FarmBalanceNitrogenOverviewBlock() {
     const location = useLocation()
     const _navigation = useNavigation()
     const page = location.pathname
-    const { nitrogenBalanceResult, farm, fields, errorMessage } = loaderData
+    const { farm, fields } = loaderData
+    const [asyncData, setAsyncData] = useState(loaderData.asyncData)
+    useEffect(() => setAsyncData(loaderData.asyncData), [loaderData.asyncData])
+
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     return (
         <div className="space-y-4">
             <Suspense fallback={<NitrogenBalanceFallback />}>
-                <Await resolve={nitrogenBalanceResult}>
-                    {(resolvedNitrogenBalanceResult) => {
+                <Await resolve={asyncData}>
+                    {({ nitrogenBalanceResult, errorMessage }) => {
+                        const resolvedNitrogenBalanceResult =
+                            nitrogenBalanceResult
                         if (errorMessage) {
                             return (
                                 <div className="flex items-center justify-center">
