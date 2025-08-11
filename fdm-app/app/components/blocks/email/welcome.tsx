@@ -33,6 +33,8 @@ export function WelcomeEmail({
 
     const fontFamily = `"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif`
 
+    const absoluteUrl = url.startsWith("http") ? url : `https://${url}`
+
     return (
         <Html lang="nl">
             <Head>
@@ -128,9 +130,12 @@ export function WelcomeEmail({
 
                         <Section className="text-center mt-[32px] mb-[32px]">
                             <Button
-                                // Use Tailwind padding classes instead of pX/pY props
                                 className="bg-primary rounded text-primary-foreground text-[14px] font-semibold no-underline px-5 py-3"
-                                href={url}
+                                style={{
+                                    backgroundColor: "#1a73e8",
+                                    color: "#ffffff",
+                                }}
+                                href={absoluteUrl}
                             >
                                 Start met {appName}
                             </Button>
