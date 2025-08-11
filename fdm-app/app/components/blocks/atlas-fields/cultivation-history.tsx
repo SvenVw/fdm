@@ -101,6 +101,8 @@ export function CultivationHistoryCard({
 }
 
 export function CultivationHistorySkeleton() {
+    const SKELETON_KEYS = ["sk-1", "sk-2", "sk-3"] as const
+
     return (
         <Card className="col-span-1 lg:row-span-2">
             <CardHeader>
@@ -112,9 +114,9 @@ export function CultivationHistorySkeleton() {
             </CardHeader>
             <CardContent className="pt-6 text-sm">
                 <div className="relative pl-1">
-                    {[...Array(3)].map((_, index) => (
+                    {SKELETON_KEYS.map((key) => (
                         <div
-                            key={index}
+                            key={key}
                             className="flex items-start space-x-4 pb-6"
                         >
                             <Skeleton className="h-10 w-10 rounded-full" />
