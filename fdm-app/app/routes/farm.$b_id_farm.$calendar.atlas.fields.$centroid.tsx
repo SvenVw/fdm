@@ -105,62 +105,63 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             isFieldInNatura2000Gebied([longitude, latitude]),
         ])
 
+        const [
+            estimates,
+            cultivationCatalogue,
+            fieldDetailsData,
+            queriedField,
+        ] = await Promise.all([
+            estimatesPromise,
+            cultivationCataloguePromise,
+            fieldDetailsPromise,
+            fieldPromise,
+        ])
+
+        const [regionTable2, isNvGebied, isGWBGGebied, isNatura2000Area] =
+            fieldDetailsData
+
+        const cultivationHistory = estimates.cultivations.map(
+            (cultivation: { year: number; b_lu_brp: string }) => {
+                const b_lu_catalogue = `nl_${cultivation.b_lu_brp}`
+                const catalogueItem = cultivationCatalogue.find(
+                    (item: { b_lu_catalogue: string }) =>
+                        item.b_lu_catalogue === b_lu_catalogue,
+                )
+                return {
+                    year: cultivation.year,
+                    b_lu_catalogue,
+                    b_lu_name: catalogueItem?.b_lu_name ?? "Onbekend gewas",
+                    b_lu_croprotation:
+                        catalogueItem?.b_lu_croprotation ?? "other",
+                    b_lu_rest_oravib: catalogueItem?.b_lu_rest_oravib ?? false,
+                }
+            },
+        )
+
         return {
-            cultivationHistory: (async () => {
-                const estimates = await estimatesPromise
-                const cultivationCatalogue = await cultivationCataloguePromise
-                return estimates.cultivations.map((cultivation) => {
-                    const b_lu_catalogue = `nl_${cultivation.b_lu_brp}`
-                    const catalogueItem = cultivationCatalogue.find(
-                        (catalogueItem) =>
-                            catalogueItem.b_lu_catalogue === b_lu_catalogue,
-                    )
-                    return {
-                        year: cultivation.year,
-                        b_lu_catalogue: b_lu_catalogue,
-                        b_lu_name: catalogueItem?.b_lu_name,
-                        b_lu_croprotation: catalogueItem?.b_lu_croprotation,
-                        b_lu_rest_oravib: catalogueItem?.b_lu_rest_oravib,
-                    }
-                })
-            })(),
-            groundwaterEstimates: (async () => {
-                const estimates = await estimatesPromise
-                return {
-                    b_gwl_class: estimates.b_gwl_class,
-                    b_gwl_ghg: estimates.b_gwl_ghg,
-                    b_gwl_glg: estimates.b_gwl_glg,
-                }
-            })(),
-            soilParameterEstimates: (async () => {
-                const estimates = await estimatesPromise
-                return {
-                    a_clay_mi: Math.round(estimates.a_clay_mi),
-                    a_silt_mi: Math.round(estimates.a_silt_mi),
-                    a_sand_mi: Math.round(estimates.a_sand_mi),
-                }
-            })(),
-            fieldDetails: (async () => {
-                const [
-                    regionTable2,
-                    isNvGebied,
-                    isGWBGGebied,
-                    isNatura2000Area,
-                ] = await fieldDetailsPromise
-                const queriedField = await fieldPromise
-                return {
-                    b_area:
-                        Math.round(
-                            ((queriedField?.properties?.b_area ?? 0) / 10000) *
-                                100,
-                        ) / 100,
-                    isNvGebied: isNvGebied,
-                    isGWBGGebied: isGWBGGebied,
-                    isNatura2000Area: isNatura2000Area,
-                    regionTable2: regionTable2,
-                }
-            })(),
-            calendar: calendar,
+            cultivationHistory,
+            groundwaterEstimates: {
+                b_gwl_class: estimates.b_gwl_class,
+                b_gwl_ghg: estimates.b_gwl_ghg,
+                b_gwl_glg: estimates.b_gwl_glg,
+            },
+            soilParameterEstimates: {
+                a_clay_mi: Math.round(estimates.a_clay_mi),
+                a_silt_mi: Math.round(estimates.a_silt_mi),
+                a_sand_mi: Math.round(estimates.a_sand_mi),
+            },
+            fieldDetails: {
+                b_area: queriedField?.properties?.b_area
+                    ? Math.round(
+                          (queriedField.properties.b_area / 10000) * 100,
+                      ) / 100
+                    : 0,
+                isNvGebied,
+                isGWBGGebied,
+                isNatura2000Area,
+                regionTable2,
+            },
+            calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
