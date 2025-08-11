@@ -91,8 +91,8 @@ export function SoilTextureSkeleton() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-3 gap-4">
-                {[...Array(3)].map((_, index) => (
-                    <Card key={index}>
+                {["clay", "silt", "sand"].map((key) => (
+                    <Card key={key}>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 space-x-2">
                             <Skeleton className="h-4 w-1/4" />
                         </CardHeader>
