@@ -5,7 +5,7 @@ import {
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import { AlertTriangle } from "lucide-react"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import {
     Await,
     data,
@@ -108,75 +108,76 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        // Currently only 2025 is supported
-        if (calendar !== "2025") {
-            return {
-                farm: farm,
-                b_id_farm: b_id_farm,
-                b_id: b_id,
-                calendar: calendar,
-                farmOptions: farmOptions,
-                fieldOptions: fieldOptions,
-                fieldNorms: undefined,
-                farmNorms: undefined,
+        const asyncData = (async () => {
+            // Currently only 2025 is supported
+            if (calendar !== "2025") {
+                return {}
             }
-        }
 
-        let fieldNorms = undefined as
-            | {
-                  b_id: string
-                  b_area: number
-                  norms: {
-                      manure: GebruiksnormResult
-                      phosphate: GebruiksnormResult
-                      nitrogen: GebruiksnormResult
-                  }
-              }[]
-            | undefined
-        let farmNorms = undefined as AggregatedNormsToFarmLevel | undefined
-        let errorMessage = null as string | null
-        try {
-            // Calculate norms per field
-            const functionsForms = createFunctionsForNorms("NL", calendar)
+            let fieldNorms = undefined as
+                | {
+                      b_id: string
+                      b_area: number
+                      norms: {
+                          manure: GebruiksnormResult
+                          phosphate: GebruiksnormResult
+                          nitrogen: GebruiksnormResult
+                      }
+                  }[]
+                | undefined
+            let farmNorms = undefined as AggregatedNormsToFarmLevel | undefined
+            let errorMessage = null as string | null
+            try {
+                // Calculate norms per field
+                const functionsForms = createFunctionsForNorms("NL", calendar)
 
-            fieldNorms = await Promise.all(
-                fields.map(async (field) => {
-                    // Collect the input
-                    const input = await functionsForms.collectInputForNorms(
-                        fdm,
-                        session.principal_id,
-                        field.b_id,
-                    )
+                fieldNorms = await Promise.all(
+                    fields.map(async (field) => {
+                        // Collect the input
+                        const input = await functionsForms.collectInputForNorms(
+                            fdm,
+                            session.principal_id,
+                            field.b_id,
+                        )
 
-                    // Calculate the norms
-                    const normManure =
-                        await functionsForms.calculateNormForManure(input)
-                    const normPhosphate =
-                        await functionsForms.calculateNormForPhosphate(input)
-                    // const normNitrogen = { normValue: 230, normSource: "test" }
-                    const normNitrogen =
-                        await functionsForms.calculateNormForNitrogen(input)
+                        // Calculate the norms
+                        const normManure =
+                            await functionsForms.calculateNormForManure(input)
+                        const normPhosphate =
+                            await functionsForms.calculateNormForPhosphate(
+                                input,
+                            )
+                        // const normNitrogen = { normValue: 230, normSource: "test" }
+                        const normNitrogen =
+                            await functionsForms.calculateNormForNitrogen(input)
 
-                    return {
-                        b_id: field.b_id,
-                        b_area: field.b_area,
-                        norms: {
-                            manure: normManure,
-                            phosphate: normPhosphate,
-                            nitrogen: normNitrogen,
-                        },
-                    }
-                }),
-            )
+                        return {
+                            b_id: field.b_id,
+                            b_area: field.b_area,
+                            norms: {
+                                manure: normManure,
+                                phosphate: normPhosphate,
+                                nitrogen: normNitrogen,
+                            },
+                        }
+                    }),
+                )
 
-            // Aggregate the norms to farm level
-            farmNorms =
-                await functionsForms.aggregateNormsToFarmLevel(fieldNorms)
-        } catch (error) {
-            errorMessage = String(error).replace("Error: ", "")
-        }
+                // Aggregate the norms to farm level
+                farmNorms =
+                    await functionsForms.aggregateNormsToFarmLevel(fieldNorms)
+            } catch (error) {
+                errorMessage = String(error).replace("Error: ", "")
+            }
 
-        // Return user information from loader
+            // Return user information from loader
+            return {
+                errorMessage: errorMessage,
+                fieldNorms: fieldNorms,
+                farmNorms: farmNorms,
+            }
+        })()
+
         return {
             farm: farm,
             b_id_farm: b_id_farm,
@@ -184,9 +185,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             calendar: calendar,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
-            fieldNorms: fieldNorms,
-            farmNorms: farmNorms,
-            errorMessage: errorMessage,
+            asyncData,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -195,6 +194,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmNormsBlock() {
     const loaderData = useLoaderData<typeof loader>()
+    const [asyncData, setAsyncData] = useState(loaderData.asyncData)
+    useEffect(() => setAsyncData(loaderData.asyncData), [loaderData.asyncData])
+
     const location = useLocation()
     const page = location.pathname
 
@@ -215,14 +217,9 @@ export default function FarmNormsBlock() {
                     }
                 />
                 <Suspense fallback={<NormsFallback />}>
-                    <Await
-                        resolve={Promise.all([
-                            loaderData.farmNorms,
-                            loaderData.fieldNorms,
-                        ])}
-                    >
-                        {([farmNorms, fieldNorms]) => {
-                            if (loaderData.errorMessage) {
+                    <Await resolve={asyncData}>
+                        {({ farmNorms, fieldNorms, errorMessage }) => {
+                            if (errorMessage) {
                                 return (
                                     <div className="flex items-center justify-center">
                                         <Card className="w-[350px]">
@@ -248,7 +245,7 @@ export default function FarmNormsBlock() {
                                                             {JSON.stringify(
                                                                 {
                                                                     message:
-                                                                        loaderData.errorMessage,
+                                                                        errorMessage,
                                                                     page: page,
                                                                     timestamp:
                                                                         new Date(),
