@@ -83,27 +83,30 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const field = await getField(fdm, session.principal_id, b_id)
 
-        const currentSoilData = getCurrentSoilData(
-            fdm,
-            session.principal_id,
-            b_id,
-        )
+        const asyncData = (async () => {
+            const currentSoilData = await getCurrentSoilData(
+                fdm,
+                session.principal_id,
+                b_id,
+            )
 
-        const fertilizerApplications = getFertilizerApplications(
-            fdm,
-            session.principal_id,
-            b_id,
-            timeframe,
-        )
-        const fertilizers = getFertilizers(fdm, session.principal_id, b_id_farm)
+            const fertilizerApplications = await getFertilizerApplications(
+                fdm,
+                session.principal_id,
+                b_id,
+                timeframe,
+            )
+            const fertilizers = await getFertilizers(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
 
-        const doses = (async () =>
-            calculateDose({
-                applications: await fertilizerApplications,
-                fertilizers: await fertilizers,
-            }))()
+            const doses = calculateDose({
+                applications: fertilizerApplications,
+                fertilizers,
+            })
 
-        const cultivations = (async () => {
             const cultivations = await getCultivations(
                 fdm,
                 session.principal_id,
@@ -113,29 +116,25 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             if (!cultivations.length) {
                 throw handleLoaderError("missing: cultivations")
             }
-            return cultivations
-        })()
+            // For now take the first cultivation
+            const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
-        // Request nutrient advice
-        const nutrientAdvice = (async () => {
-            const myCultivations = await cultivations
-            return getNutrientAdvice(
-                // For now take the first cultivation
-                myCultivations[0].b_lu_catalogue,
+            // Request nutrient advice
+            const nutrientAdvice = await getNutrientAdvice(
+                b_lu_catalogue,
                 field.b_centroid,
-                await currentSoilData,
+                currentSoilData,
             )
+
+            return {
+                nutrientAdvice: nutrientAdvice,
+                doses: doses,
+                fertilizerApplications: fertilizerApplications,
+                fertilizers: fertilizers,
+            }
         })()
 
         const nutrientsDescription = getNutrientsDescription()
-
-        const asyncData = (async () => ({
-            currentSoilData: await currentSoilData,
-            fertilizers: await fertilizers,
-            fertilizerApplications: await fertilizerApplications,
-            doses: await doses,
-            nutrientAdvice: await nutrientAdvice,
-        }))()
 
         return {
             field: field,
