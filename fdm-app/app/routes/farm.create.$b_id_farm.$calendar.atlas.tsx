@@ -2,9 +2,16 @@ import {
     addCultivation,
     addField,
     addSoilAnalysis,
+    getCultivations,
     getFarm,
+    getFields,
 } from "@svenvw/fdm-core"
-import type { Feature, GeoJsonProperties, Polygon } from "geojson"
+import type {
+    Feature,
+    FeatureCollection,
+    GeoJsonProperties,
+    Polygon,
+} from "geojson"
 import { useCallback, useState } from "react"
 import {
     Layer,
@@ -31,6 +38,7 @@ import {
 } from "~/components/blocks/atlas/atlas-panels"
 import {
     FieldsSourceAvailable,
+    FieldsSourceNotClickable,
     FieldsSourceSelected,
 } from "~/components/blocks/atlas/atlas-sources"
 import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
@@ -47,6 +55,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import FieldDetailsInfoPopup from "../components/blocks/field/popup"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -82,7 +91,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the session
         const session = await getSession(request)
-        const calendar = getCalendar(params)
 
         // Get the farm
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
@@ -93,6 +101,61 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        // Get calendar and timeframe from calendar store
+        const calendar = getCalendar(params)
+        const timeframe = getTimeframe(params)
+
+        // Get the fields of the farm in case the farmer came back after creating some fields
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+        const features = await Promise.all(
+            fields.map(async (field) => {
+                // Get field cultivation if available or get the first cultivation created by the farmer
+                let cultivation = field.b_lu_name
+                if (!cultivation) {
+                    try {
+                        const cultivations = await getCultivations(
+                            fdm,
+                            session.principal_id,
+                            field.b_id,
+                            timeframe,
+                        )
+
+                        if (cultivations.length > 0) {
+                            cultivation = cultivations[0].b_lu_name
+                        } else {
+                            cultivation = "geen gewassen"
+                        }
+                    } catch (e) {
+                        console.warn(e)
+                        cultivation = "gewassen onbekend"
+                    }
+                }
+
+                const feature: Feature = {
+                    type: "Feature" as const,
+                    properties: {
+                        b_id: field.b_id,
+                        b_name: field.b_name,
+                        b_area: Math.round(field.b_area * 10) / 10,
+                        b_lu_name: cultivation,
+                        b_id_source: field.b_id_source,
+                    },
+                    geometry: field.b_geometry,
+                }
+                return feature
+            }),
+        )
+
+        const fieldsSaved: FeatureCollection = {
+            type: "FeatureCollection",
+            features: features,
+        }
+
         // Get the Mapbox token and style
         const mapboxToken = getMapboxToken()
         const mapboxStyle = getMapboxStyle()
@@ -100,9 +163,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             b_id_farm: farm.b_id_farm,
             b_name_farm: farm.b_name_farm,
+            fieldsSaved: fieldsSaved,
+            timeframe: timeframe,
             calendar: calendar,
             mapboxToken: mapboxToken,
             mapboxStyle: mapboxStyle,
+            continueTo: `/farm/create/${b_id_farm}/${calendar}/fields`,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -115,7 +181,7 @@ export default function Index() {
 
     const fieldsAvailableId = "fieldsAvailable"
     // const fields = loaderData.savedFields
-    const initialViewState = getViewState(null)
+    const initialViewState = getViewState(loaderData.fieldsSaved)
     const fieldsAvailableStyle = getFieldsStyle(fieldsAvailableId)
 
     const [viewState, setViewState] = useState<ViewState>(
@@ -126,8 +192,25 @@ export default function Index() {
         setViewState(event.viewState)
     }, [])
 
+    const [open, setOpen] = useState(false)
+
+    const [selectedField, setSelectedField] = useState<Feature<Polygon> | null>(
+        null,
+    )
+
+    const handleClickSavedField = async (feature: Feature<Polygon>) => {
+        setSelectedField(feature)
+        setOpen(true)
+    }
+
     const fieldsSelectedId = "fieldsSelected"
     const fieldsSelectedStyle = getFieldsStyle(fieldsSelectedId)
+
+    const fieldsSavedId = "fieldsSaved"
+    const fieldsSaved = loaderData.fieldsSaved
+    const fieldsSavedStyle = getFieldsStyle(fieldsSavedId)
+
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
     // Set selected fields
     const [selectedFieldsData, setSelectedFieldsData] = useState(
@@ -178,8 +261,22 @@ export default function Index() {
                                 interactiveLayerIds={[
                                     fieldsAvailableId,
                                     fieldsSelectedId,
+                                    fieldsSavedId,
                                 ]}
                                 onMove={onViewportChange}
+                                onClick={(evt) => {
+                                    if (!evt.features) return
+                                    const polygonFeature = evt.features.find(
+                                        (f) =>
+                                            f.source === fieldsSavedId &&
+                                            f.geometry?.type === "Polygon",
+                                    )
+                                    if (polygonFeature) {
+                                        handleClickSavedField(
+                                            polygonFeature as Feature<Polygon>,
+                                        )
+                                    }
+                                }}
                             >
                                 <Controls
                                     onViewportChange={({
@@ -200,6 +297,7 @@ export default function Index() {
 
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
+                                    exclude={fieldsSaved.features}
                                     calendar={loaderData.calendar}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                 >
@@ -211,13 +309,27 @@ export default function Index() {
                                     availableLayerId={fieldsAvailableId}
                                     fieldsData={selectedFieldsData}
                                     setFieldsData={setSelectedFieldsData}
+                                    excludedLayerId={fieldsSavedId}
                                 >
                                     <Layer {...fieldsSelectedStyle} />
                                 </FieldsSourceSelected>
 
+                                <FieldsSourceNotClickable
+                                    id={fieldsSavedId}
+                                    fieldsData={fieldsSaved}
+                                >
+                                    <Layer {...fieldsSavedStyle} />
+                                    <Layer {...fieldsSavedOutlineStyle} />
+                                </FieldsSourceNotClickable>
+
                                 <div className="fields-panel grid gap-4 w-[350px]">
                                     <FieldsPanelSelection
                                         fields={selectedFieldsData}
+                                        numFieldsSaved={
+                                            loaderData.fieldsSaved.features
+                                                .length
+                                        }
+                                        continueTo={loaderData.continueTo}
                                     />
                                     <FieldsPanelZoom
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
@@ -225,7 +337,10 @@ export default function Index() {
                                     <FieldsPanelHover
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                         layer={fieldsAvailableId}
-                                        layerExclude={fieldsSelectedId}
+                                        layerExclude={[
+                                            fieldsSelectedId,
+                                            fieldsSavedId,
+                                        ]}
                                     />
                                     <FieldsPanelHover
                                         zoomLevelFields={ZOOM_LEVEL_FIELDS}
@@ -237,6 +352,14 @@ export default function Index() {
                     </ClientOnly>
                 </div>
             </main>
+            {selectedField && (
+                <FieldDetailsInfoPopup
+                    open={open}
+                    setOpen={setOpen}
+                    field={selectedField}
+                    hint="Dit perceel is al opgeslagen. U kunt percelen verwijderen op de volgende pagina."
+                />
+            )}
         </SidebarInset>
     )
 }
@@ -269,6 +392,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get timeframe from calendar store
         const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
+        let firstFieldIndex: number
+        try {
+            firstFieldIndex =
+                (
+                    await getFields(
+                        fdm,
+                        session.principal_id,
+                        b_id_farm,
+                        timeframe,
+                    )
+                ).length + 1
+        } catch (e) {
+            console.warn(e)
+            firstFieldIndex = 1
+        }
 
         const nmiApiKey = getNmiApiKey()
 
@@ -286,7 +424,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     if (!field.properties) {
                         throw new Error("missing: field.properties")
                     }
-                    const b_name = `Perceel ${index + 1}`
+                    const b_name = `Perceel ${firstFieldIndex + index}`
                     const b_id_source = field.properties.b_id_source
                     const b_lu_catalogue = field.properties.b_lu_catalogue
                     const b_geometry = field.geometry

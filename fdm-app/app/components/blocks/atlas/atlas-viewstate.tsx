@@ -5,7 +5,7 @@ function getBounds(fields: FeatureCollection | null) {
     const initialBounds = [3.1, 50.7, 7.2, 53.6]
 
     let bounds = initialBounds
-    if (fields) {
+    if (fields && fields.features.length > 0) {
         try {
             bounds = geojsonExtent(fields)
         } catch (error) {
