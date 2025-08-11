@@ -7,6 +7,7 @@ import {
 } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Badge } from "~/components/ui/badge"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
 
 type CultivationHistory = {
     year: number
@@ -14,22 +15,6 @@ type CultivationHistory = {
     b_lu_name?: string
     b_lu_croprotation?: string
     b_lu_rest_oravib?: boolean
-}
-
-// Crop rotation color legend
-const cropRotationColorLegend = {
-    grass: "#558B2F",
-    maize: "#FBC02D",
-    cereal: "#C2B280",
-    potato: "#8D6E63",
-    sugarbeet: "#9B2D30",
-    rapeseed: "#D4AC0D",
-    clover: "#8BC34A",
-    alfalfa: "#7E57C2",
-    catchcrop: "#4DD0E1",
-    nature: "#00796B",
-    starch: "#F57C00",
-    other: "#9E9E9E",
 }
 
 export function CultivationHistoryCard({
@@ -57,20 +42,18 @@ export function CultivationHistoryCard({
                                 <span
                                     className="absolute h-full w-full rounded-full"
                                     style={{
-                                        backgroundColor:
-                                            cropRotationColorLegend[
-                                                cultivation.b_lu_croprotation as keyof typeof cropRotationColorLegend
-                                            ] || cropRotationColorLegend.other,
+                                        backgroundColor: getCultivationColor(
+                                            cultivation.b_lu_croprotation,
+                                        ),
                                         opacity: 0.2,
                                     }}
                                 />
                                 <span
                                     className="relative h-5 w-5 rounded-full"
                                     style={{
-                                        backgroundColor:
-                                            cropRotationColorLegend[
-                                                cultivation.b_lu_croprotation as keyof typeof cropRotationColorLegend
-                                            ] || cropRotationColorLegend.other,
+                                        backgroundColor: getCultivationColor(
+                                            cultivation.b_lu_croprotation,
+                                        ),
                                     }}
                                 />
                                 {index !== cultivationHistory.length - 1 && (
