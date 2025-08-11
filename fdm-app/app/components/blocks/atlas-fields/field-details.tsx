@@ -8,7 +8,17 @@ import {
 } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
 
-export function FieldDetailsCard({ fieldDetails }: { fieldDetails: any }) {
+export function FieldDetailsCard({
+    fieldDetails,
+}: {
+    fieldDetails: {
+        b_area: number
+        regionTable2?: "klei" | "veen" | "loess" | "zand_nwc" | "zand_zuid"
+        isNvGebied?: boolean
+        isGWBGGebied?: boolean
+        isNatura2000Area?: boolean
+    }
+}) {
     return (
         <Card>
             <CardHeader>
