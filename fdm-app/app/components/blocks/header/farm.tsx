@@ -57,13 +57,13 @@ export function HeaderFarm({
                                         to={
                                             b_id_farm
                                                 ? currentPath.replace(
-                                                      b_id_farm,
-                                                      option.b_id_farm,
+                                                      /^\/farm\/[^/]+/,
+                                                      `/farm/${option.b_id_farm}`,
                                                   )
                                                 : `/farm/${option.b_id_farm}`
                                         }
                                     >
-                                        {option.b_name_farm}
+                                        {option.b_name_farm ?? "Naam onbekend"}
                                     </NavLink>
                                 </DropdownMenuCheckboxItem>
                             ))}
