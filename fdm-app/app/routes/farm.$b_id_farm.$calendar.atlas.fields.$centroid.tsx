@@ -185,9 +185,9 @@ export default function FieldDetailsAtlasBlock() {
                         <FarmTitle
                             title={
                                 resolvedCultivationHistory.find(
-                                    (cultivation) =>
-                                        String(cultivation.year) === calendar,
-                                )?.b_lu_name ?? ""
+                                    (cultivation: { year: number }) =>
+                                        cultivation.year === Number(calendar),
+                                )?.b_lu_name ?? "Onbekend gewas"
                             }
                             description="Bekijk alle details over dit perceel"
                         />
