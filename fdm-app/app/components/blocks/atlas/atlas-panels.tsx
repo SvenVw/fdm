@@ -4,7 +4,7 @@ import { Check, Info } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
-import { data, useFetcher } from "react-router"
+import { data, NavLink, useFetcher } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
@@ -27,7 +27,7 @@ export function FieldsPanelHover({
 }: {
     zoomLevelFields: number
     layer: string
-    layerExclude?: string
+    layerExclude?: string[] | string
     clickRedirectsToDetailsPage?: boolean
 }) {
     const { current: map } = useMap()
@@ -46,7 +46,9 @@ export function FieldsPanelHover({
                         const featuresExclude = map.queryRenderedFeatures(
                             evt.point,
                             {
-                                layers: [layerExclude],
+                                layers: Array.isArray(layerExclude)
+                                    ? layerExclude
+                                    : [layerExclude],
                             },
                         )
                         if (featuresExclude && featuresExclude.length > 0) {
@@ -98,7 +100,9 @@ export function FieldsPanelHover({
             map.on("load", updatePanel)
             return () => {
                 map.off("mousemove", throttledUpdatePanel)
+                map.off("click", updatePanel)
                 map.off("zoom", throttledUpdatePanel)
+                map.off("load", updatePanel)
             }
         }
     }, [map, zoomLevelFields, layer, layerExclude])
@@ -155,8 +159,12 @@ export function FieldsPanelZoom({
 
 export function FieldsPanelSelection({
     fields,
+    numFieldsSaved,
+    continueTo,
 }: {
     fields: FeatureCollection
+    numFieldsSaved: number
+    continueTo: string
 }) {
     const fetcher = useFetcher()
     const { current: map } = useMap()
@@ -166,6 +174,7 @@ export function FieldsPanelSelection({
 
     const submitSelectedFields = useCallback(
         async (fields: FeatureCollection) => {
+            if (fields.features.length === 0) return
             try {
                 const formSelectedFields = new FormData()
                 formSelectedFields.append(
@@ -297,18 +306,32 @@ export function FieldsPanelSelection({
                     )
                 } else {
                     setPanel(
-                        <Card className={cn("w-[380px]")}>
+                        <Card>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
                                 <CardDescription>
-                                    Je hebt geen percelen geselecteerd
+                                    {numFieldsSaved > 0
+                                        ? "Je hebt geen nieuwe percelen geselecteerd"
+                                        : "Je hebt geen percelen geselecteerd"}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4" />
                             <CardFooter>
-                                <Button className="w-full" disabled>
-                                    <Check /> Sla geselecteerde percelen op
-                                </Button>
+                                {numFieldsSaved > 0 ? (
+                                    <Button asChild className="w-full">
+                                        <NavLink
+                                            to={continueTo}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Check />
+                                            <span>Doorgaan</span>
+                                        </NavLink>
+                                    </Button>
+                                ) : (
+                                    <Button className="w-full" disabled>
+                                        <Check /> Sla geselecteerde percelen op
+                                    </Button>
+                                )}
                             </CardFooter>
                         </Card>,
                     )

@@ -12,6 +12,7 @@ import {
 } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
 import { generateFeatureClass } from "./atlas-functions"
+import type { Field } from "@svenvw/fdm-core"
 import { getAvailableFieldsUrl } from "./atlas-url"
 import { useNavigate } from "react-router"
 import {
@@ -41,9 +42,11 @@ export function FieldsSourceSelected({
     fieldsData,
     setFieldsData,
     children,
+    excludedLayerId,
 }: {
     id: string
     availableLayerId: string
+    excludedLayerId?: string
     fieldsData: FeatureCollection
     setFieldsData: React.Dispatch<
         React.SetStateAction<FeatureCollection>
@@ -56,12 +59,24 @@ export function FieldsSourceSelected({
         function clickOnMap(evt) {
             if (!map) return
 
+            if (
+                map.queryRenderedFeatures(evt.point, {
+                    layers: [excludedLayerId],
+                }).length
+            ) {
+                return
+            }
+
             const features = map.queryRenderedFeatures(evt.point, {
                 layers: [availableLayerId],
             })
             console.log(features)
 
-            if (features.length > 0) {
+            if (
+                features.length > 0 &&
+                features[0].layer &&
+                features[0].layer !== excludedLayerId
+            ) {
                 handleFieldClick(features[0], setFieldsData)
             }
         }
@@ -72,7 +87,7 @@ export function FieldsSourceSelected({
                 map.off("click", clickOnMap)
             }
         }
-    }, [map, availableLayerId, setFieldsData])
+    }, [map, availableLayerId, excludedLayerId, setFieldsData])
 
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -120,16 +135,23 @@ function handleFieldClick(
 export function FieldsSourceAvailable({
     id,
     calendar,
+    exclude,
     zoomLevelFields,
     redirectToDetailsPage = false,
     children,
 }: {
     id: string
     calendar: string
+    exclude: Field[]
     zoomLevelFields: number
     redirectToDetailsPage: boolean
     children: JSX.Element
 }) {
+    const unwantedIds = new Set(
+        exclude
+            ? exclude.map((f) => f.properties.b_id_source).filter((id) => id)
+            : [],
+    )
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
     const availableFieldsUrl = getAvailableFieldsUrl(calendar)
@@ -145,7 +167,10 @@ export function FieldsSourceAvailable({
             }
             return result
         } catch (err) {
-            console.error("Failed to load cultivation catalogue; defaulting to other color.", err)
+            console.error(
+                "Failed to load cultivation catalogue; defaulting to other color.",
+                err,
+            )
             return {}
         }
     }, [])
@@ -190,18 +215,25 @@ export function FieldsSourceAvailable({
                             const featureClass = generateFeatureClass()
 
                             for await (const feature of iter) {
-                                const catalogueKey =
-                                    feature.properties?.b_lu_catalogue
-                                featureClass.features.push({
-                                    ...feature,
-                                    id: i,
-                                    properties: {
-                                        ...feature.properties,
-                                        b_lu_croprotation:
-                                            cultivationCatalogue[catalogueKey]
-                                                ?.b_lu_croprotation,
-                                    },
-                                })
+                                if (
+                                    !unwantedIds.has(
+                                        feature.properties!.b_id_source,
+                                    )
+                                ) {
+                                    const catalogueKey =
+                                        feature.properties?.b_lu_catalogue
+                                    featureClass.features.push({
+                                        ...feature,
+                                        id: i,
+                                        properties: {
+                                            ...feature.properties,
+                                            b_lu_croprotation:
+                                                cultivationCatalogue[
+                                                    catalogueKey
+                                                ]?.b_lu_croprotation,
+                                        },
+                                    })
+                                }
                                 i += 1
                             }
                             setData(featureClass)
@@ -229,7 +261,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, availableFieldsUrl, zoomLevelFields, cultivationCataloguePromise])
+    }, [map, availableFieldsUrl, zoomLevelFields, unwantedIds, cultivationCataloguePromise])
 
     return (
         <Source id={id} type="geojson" data={data}>
