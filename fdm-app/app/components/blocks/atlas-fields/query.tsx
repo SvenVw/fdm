@@ -1,6 +1,7 @@
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { Feature, GeoJsonProperties, Geometry } from "geojson"
-import { getAvailableFieldsUrl } from "../atlas/atlas-url"
+import { getAvailableFieldsUrl } from "~/components/blocks/atlas/atlas-url"
+import { booleanPointInPolygon, point } from "@turf/turf"
 
 export async function getFieldByCentroid(
     longitude: number,
@@ -8,7 +9,7 @@ export async function getFieldByCentroid(
     calendar: string,
 ): Promise<Feature<Geometry, GeoJsonProperties> | null> {
     // Create a small bounding box around the centroid to query the FGB file
-    const buffer = 0.000001 // A very small buffer to ensure the point is within the bbox
+    const buffer = 0.00001 // A very small buffer to ensure the point is within the bbox
     const bbox = {
         minX: longitude - buffer,
         maxX: longitude + buffer,
@@ -19,10 +20,13 @@ export async function getFieldByCentroid(
     try {
         const availableFieldsUrl = getAvailableFieldsUrl(calendar)
 
+        const pt = point([longitude, latitude])
         const iter = deserialize(availableFieldsUrl, bbox)
         for await (const feature of iter) {
-            // For simplicity, we'll assume the first feature found in the bbox is the one we want (as the buffer is very small).
-            return feature
+            // Verify the centroid is actually inside the polygon
+            if (feature.geometry && booleanPointInPolygon(pt, feature as any)) {
+                return feature
+            }
         }
     } catch (error) {
         console.error("Failed to query FGB data by centroid: ", error)
