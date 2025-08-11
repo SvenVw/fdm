@@ -7,10 +7,10 @@ import {
 } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
 
-export function GroundWaterCard({
-    groundWaterEstimates,
+export function GroundwaterCard({
+    groundwaterEstimates,
 }: {
-    groundWaterEstimates: any
+    groundwaterEstimates: any
 }) {
     return (
         <Card>
@@ -74,7 +74,7 @@ export function GroundWaterCard({
     )
 }
 
-export function GroundWaterSkeleton() {
+export function GroundwaterSkeleton() {
     return (
         <Card>
             <CardHeader>

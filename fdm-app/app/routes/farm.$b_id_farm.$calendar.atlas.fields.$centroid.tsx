@@ -24,8 +24,8 @@ import {
     SoilTextureSkeleton,
 } from "~/components/blocks/atlas-fields/soil-texture"
 import {
-    GroundWaterCard,
-    GroundWaterSkeleton,
+    GroundwaterCard,
+    GroundwaterSkeleton,
 } from "~/components/blocks/atlas-fields/groundwater"
 import {
     FieldDetailsCard,
@@ -239,11 +239,11 @@ export default function FieldDetailsAtlasBlock() {
                     </div>
                     {/* Ground Water - Mobile (order 4) */}
                     <div className="order-4">
-                        <Suspense fallback={<GroundWaterSkeleton />}>
+                        <Suspense fallback={<GroundwaterSkeleton />}>
                             <Await resolve={groundwaterEstimates}>
                                 {(resolvedGroundwaterEstimates) => (
-                                    <GroundWaterCard
-                                        groundWaterEstimates={
+                                    <GroundwaterCard
+                                        groundwaterEstimates={
                                             resolvedGroundwaterEstimates
                                         }
                                     />
