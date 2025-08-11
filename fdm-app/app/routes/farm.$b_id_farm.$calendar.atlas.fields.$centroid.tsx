@@ -39,6 +39,7 @@ import {
     isFieldInNVGebied,
 } from "@svenvw/fdm-calculator"
 import { getFieldByCentroid } from "~/components/blocks/atlas-fields/query"
+import type { Feature, Point } from "geojson"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -91,7 +92,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 type: "Point",
                 coordinates: [longitude, latitude],
             },
-        } as GeoJSON.Feature<GeoJSON.Point>
+        } as Feature<Point>
         const nmiApiKey = getNmiApiKey()
 
         const estimatesPromise = getSoilParameterEstimates(field, nmiApiKey)
