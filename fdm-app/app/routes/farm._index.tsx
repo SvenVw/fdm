@@ -162,7 +162,7 @@ export default function AppIndex() {
                                 </CardContent>
                                 <CardFooter>
                                     <Button asChild className="w-full">
-                                        <NavLink to="./create">
+                                        <NavLink to="/farm/create">
                                             Start wizard
                                         </NavLink>
                                     </Button>
@@ -338,7 +338,7 @@ export default function AppIndex() {
                                     className="transition-all hover:shadow-md"
                                 >
                                     <NavLink
-                                        to={`/farm/undefined/${loaderData.calendar}/atlas/fields`}
+                                        to={"/farm/create"}
                                         className="flex h-full flex-col"
                                     >
                                         <CardHeader>
