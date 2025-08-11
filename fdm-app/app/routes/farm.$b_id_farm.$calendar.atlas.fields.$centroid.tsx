@@ -77,6 +77,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
         const [longitude, latitude] = centroid.split(",").map(Number)
+        if (Number.isNaN(longitude) || Number.isNaN(latitude)) {
+            throw data("Invalid centroid format", {
+                status: 400,
+                statusText: "Centroid must be in format: longitude,latitude",
+            })
+        }
         const fieldPromise = getFieldByCentroid(longitude, latitude, calendar)
         const field = {
             type: "Feature",
