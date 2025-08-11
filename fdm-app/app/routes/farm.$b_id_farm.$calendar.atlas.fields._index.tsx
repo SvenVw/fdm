@@ -132,7 +132,11 @@ export default function FarmAtlasFieldsBlock() {
         if (typeof window !== "undefined") {
             const savedViewState = sessionStorage.getItem("mapViewState")
             if (savedViewState) {
-                return JSON.parse(savedViewState)
+                try {
+                    return JSON.parse(savedViewState)
+                } catch {
+                    sessionStorage.removeItem("mapViewState")
+                }
             }
         }
         return initialViewState as ViewState
