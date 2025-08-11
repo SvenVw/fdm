@@ -1,7 +1,7 @@
 import geojsonExtent from "@mapbox/geojson-extent"
 import type { FeatureCollection } from "geojson"
 
-function getBounds(fields: FeatureCollection | null) {
+function getBounds(fields: FeatureCollection | null | undefined) {
     const initialBounds = [3.1, 50.7, 7.2, 53.6]
 
     let bounds = initialBounds
