@@ -194,6 +194,12 @@ export default function FarmAtlasFieldsBlock() {
             <div className="fields-panel grid gap-4 w-[350px]">
                 <FieldsPanelHover
                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
+                    layer={fieldsAvailableId}
+                    layerExclude={id}
+                    clickRedirectsToDetailsPage={true}
+                />
+                <FieldsPanelHover
+                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
                     layer={id}
                 />
             </div>
