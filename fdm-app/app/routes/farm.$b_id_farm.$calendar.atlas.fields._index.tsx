@@ -5,11 +5,10 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
-import "mapbox-gl/dist/mapbox-gl.css"
 import { getFields } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import type { MetaFunction } from "react-router"
-import { data, type LoaderFunctionArgs, useLoaderData } from "react-router"
+import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"
 import { Controls } from "~/components/blocks/atlas/atlas-controls"
 import { FieldsPanelHover } from "~/components/blocks/atlas/atlas-panels"

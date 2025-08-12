@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react-router"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import posthog from "posthog-js"
 import { useEffect } from "react"
