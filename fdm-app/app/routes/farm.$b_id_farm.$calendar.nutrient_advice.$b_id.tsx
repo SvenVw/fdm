@@ -9,7 +9,6 @@ import {
 import { Tally1, Tally2, Tally3 } from "lucide-react"
 import { Suspense, useEffect, useState } from "react"
 import {
-    Await,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
@@ -249,8 +248,8 @@ export default function FieldNutrientAdviceBlock() {
                                 <NutrientCardSkeleton key={nutrient.symbol} />
                             ))}
                         >
-                            <Await resolve={asyncData}>
-                                {({
+                            {asyncData.then(
+                                ({
                                     fertilizers,
                                     fertilizerApplications,
                                     nutrientAdvice,
@@ -274,9 +273,8 @@ export default function FieldNutrientAdviceBlock() {
                                                 to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                                             />
                                         ),
-                                    )
-                                }
-                            </Await>
+                                    ),
+                            )}
                         </Suspense>
                     </div>
                 </CardContent>
@@ -288,12 +286,8 @@ export default function FieldNutrientAdviceBlock() {
                         <NutrientCardSkeleton key={id} />
                     ))}
                 >
-                    <Await resolve={asyncData}>
-                        {({
-                            fertilizerApplications,
-                            nutrientAdvice,
-                            doses,
-                        }) => (
+                    {asyncData.then(
+                        ({ fertilizerApplications, nutrientAdvice, doses }) => (
                             <>
                                 <NutrientKPICardForTotalApplications
                                     doses={doses}
@@ -314,8 +308,8 @@ export default function FieldNutrientAdviceBlock() {
                                     doses={doses}
                                 />
                             </>
-                        )}
-                    </Await>
+                        ),
+                    )}
                 </Suspense>
             </div>
             <Card>
@@ -336,8 +330,8 @@ export default function FieldNutrientAdviceBlock() {
                                 <NutrientCardSkeleton key={nutrient.symbol} />
                             ))}
                         >
-                            <Await resolve={asyncData}>
-                                {({
+                            {asyncData.then(
+                                ({
                                     fertilizers,
                                     fertilizerApplications,
                                     nutrientAdvice,
@@ -361,9 +355,8 @@ export default function FieldNutrientAdviceBlock() {
                                                 to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                                             />
                                         ),
-                                    )
-                                }
-                            </Await>
+                                    ),
+                            )}
                         </Suspense>
                     </div>
                 </CardContent>
@@ -386,8 +379,8 @@ export default function FieldNutrientAdviceBlock() {
                                 <NutrientCardSkeleton key={nutrient.symbol} />
                             ))}
                         >
-                            <Await resolve={asyncData}>
-                                {({
+                            {asyncData.then(
+                                ({
                                     fertilizers,
                                     fertilizerApplications,
                                     nutrientAdvice,
@@ -411,9 +404,8 @@ export default function FieldNutrientAdviceBlock() {
                                                 to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
                                             />
                                         ),
-                                    )
-                                }
-                            </Await>
+                                    ),
+                            )}
                         </Suspense>
                     </div>
                 </CardContent>
