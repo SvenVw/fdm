@@ -14,7 +14,8 @@ export default defineConfig((config) => {
             tsconfigPaths(),
             tailwindcss(),
             // Conditionally add Sentry plugin only for production builds
-            ...(process.env.SENTRY_AUTH_TOKEN !== undefined
+            ...(process.env.SENTRY_AUTH_TOKEN !== undefined &&
+            process.env.NODE_ENV === "production"
                 ? [
                       sentryReactRouter(
                           {
@@ -23,11 +24,7 @@ export default defineConfig((config) => {
                               authToken: process.env.SENTRY_AUTH_TOKEN,
                               release: {
                                   name: process.env.npm_package_version,
-                              },
-                              sourceMapsUploadOptions: {
-                                  enabled:
-                                      process.env.SENTRY_AUTH_TOKEN !==
-                                      undefined,
+                                  setCommits: true,
                               },
                           } as SentryReactRouterBuildOptions,
                           config,
