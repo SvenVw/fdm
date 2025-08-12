@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/node"
+import * as Sentry from "@sentry/react-router"
 import { nodeProfilingIntegration } from "@sentry/profiling-node"
 
 const requiredEnvVars = [

@@ -5,7 +5,11 @@ import { createReadableStreamFromReadable } from "@react-router/node"
  * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
  * For more information, see https://remix.run/file-conventions/entry.server
  */
-import * as Sentry from "@sentry/node"
+import * as Sentry from "@sentry/react-router"
+import {
+    getMetaTagTransformer,
+    wrapSentryHandleRequest,
+} from "@sentry/react-router"
 import { isbot } from "isbot"
 import { renderToPipeableStream } from "react-dom/server"
 import type {
@@ -18,7 +22,7 @@ import { addSecurityHeaders, getCacheControlHeaders } from "./lib/cache.server"
 
 export const streamTimeout = 5000
 
-export default function handleRequest(
+const handleRequest = function handleRequest(
     request: Request,
     responseStatusCode: number,
     responseHeaders: Headers,
@@ -27,7 +31,7 @@ export default function handleRequest(
     // free to delete this parameter in your app if you're not using it!
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _loadContext: AppLoadContext,
-) {
+): Promise<Response> {
     const url = new URL(request.url)
     const { hostname } = url
 
@@ -78,7 +82,7 @@ function handleBotRequest(
     responseStatusCode: number,
     responseHeaders: Headers,
     reactRouterContext: EntryContext,
-) {
+): Promise<Response> {
     return new Promise((resolve, reject) => {
         let shellRendered = false
         let currentStatus = responseStatusCode
@@ -126,7 +130,7 @@ function handleBrowserRequest(
     responseStatusCode: number,
     responseHeaders: Headers,
     reactRouterContext: EntryContext,
-) {
+): Promise<Response> {
     return new Promise((resolve, reject) => {
         let shellRendered = false
         let currentStatus = responseStatusCode
@@ -148,7 +152,8 @@ function handleBrowserRequest(
                         }),
                     )
 
-                    pipe(body)
+                    // this enables distributed tracing between client and server
+                    pipe(getMetaTagTransformer(body))
                 },
                 onShellError(error: unknown) {
                     reject(error)
@@ -168,6 +173,9 @@ function handleBrowserRequest(
         setTimeout(abort, streamTimeout + 1000)
     })
 }
+
+// wrap the default export
+export default wrapSentryHandleRequest(handleRequest)
 
 export const handleError: HandleErrorFunction = (error, { request }) => {
     // React Router may abort some interrupted requests, report those
