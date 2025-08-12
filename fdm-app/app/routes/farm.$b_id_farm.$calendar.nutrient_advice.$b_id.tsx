@@ -13,6 +13,7 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    useLocation,
 } from "react-router"
 import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
 import {
@@ -84,53 +85,63 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const field = await getField(fdm, session.principal_id, b_id)
 
         const asyncData = (async () => {
-            const currentSoilData = await getCurrentSoilData(
-                fdm,
-                session.principal_id,
-                b_id,
-            )
+            try {
+                const currentSoilData = getCurrentSoilData(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                )
 
-            const fertilizerApplications = await getFertilizerApplications(
-                fdm,
-                session.principal_id,
-                b_id,
-                timeframe,
-            )
-            const fertilizers = await getFertilizers(
-                fdm,
-                session.principal_id,
-                b_id_farm,
-            )
+                const fertilizerApplications = getFertilizerApplications(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                    timeframe,
+                )
+                const fertilizers = getFertilizers(
+                    fdm,
+                    session.principal_id,
+                    b_id_farm,
+                )
 
-            const doses = calculateDose({
-                applications: fertilizerApplications,
-                fertilizers,
-            })
+                const cultivations = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                    timeframe,
+                )
 
-            const cultivations = await getCultivations(
-                fdm,
-                session.principal_id,
-                b_id,
-                timeframe,
-            )
-            if (!cultivations.length) {
-                throw handleLoaderError("missing: cultivations")
-            }
-            // For now take the first cultivation
-            const b_lu_catalogue = cultivations[0].b_lu_catalogue
+                if (!cultivations.length) {
+                    throw handleLoaderError("missing: cultivations")
+                }
 
-            // Request nutrient advice
-            const nutrientAdvice = await getNutrientAdvice(
-                b_lu_catalogue,
-                field.b_centroid,
-                currentSoilData,
-            )
+                // For now take the first cultivation
+                const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
-            return {
-                nutrientAdvice: nutrientAdvice,
-                doses: doses,
-                fertilizerApplications: fertilizerApplications,
-                fertilizers: fertilizers,
+                const doses = (async () =>
+                    calculateDose({
+                        applications: await fertilizerApplications,
+                        fertilizers: await fertilizers,
+                    }))()
+
+                // Request nutrient advice
+                const nutrientAdvice = (async () =>
+                    getNutrientAdvice(
+                        b_lu_catalogue,
+                        field.b_centroid,
+                        await currentSoilData,
+                    ))()
+
+                const obj = {
+                    nutrientAdvice: await nutrientAdvice,
+                    doses: await doses,
+                    fertilizerApplications: await fertilizerApplications,
+                    fertilizers: await fertilizers,
+                }
+
+                return obj
+            } catch (error) {
+                return { errorMessage: String(error).replace("Error: ", "") }
             }
         })()
 
@@ -150,10 +161,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FieldNutrientAdviceBlock() {
     const loaderData = useLoaderData()
     const { field, nutrientsDescription, calendar } = loaderData
+
+    const [errorMessage, setErrorMessage] = useState(undefined)
     const [asyncData, setAsyncData] = useState(loaderData.asyncData)
     useEffect(() => {
+        let cancelled = false
+        setErrorMessage(undefined)
         setAsyncData(loaderData.asyncData)
+        loaderData.asyncData.then((data) => {
+            if (cancelled) return
+
+            if (data.errorMessage) {
+                setErrorMessage(data.errorMessage)
+            }
+        })
+        return () => {
+            cancelled = true
+        }
     }, [loaderData.asyncData])
+    const location = useLocation()
+    const page = location.pathname
 
     const primaryNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "primary",
@@ -164,6 +191,43 @@ export default function FieldNutrientAdviceBlock() {
     const traceNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "trace",
     )
+
+    if (errorMessage) {
+        return (
+            <div className="flex items-center justify-center">
+                <Card className="w-[350px]">
+                    <CardHeader>
+                        <CardTitle>
+                            Helaas is het niet mogelijk om je bemestingsadvies
+                            uit te rekenen
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-muted-foreground">
+                            <p>
+                                Er is onverwacht wat misgegaan. Probeer opnieuw
+                                of neem contact op met Ondersteuning en deel de
+                                volgende foutmelding:
+                            </p>
+                            <div className="mt-8 w-full max-w-2xl">
+                                <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
+                                    {JSON.stringify(
+                                        {
+                                            message: errorMessage,
+                                            page: page,
+                                            timestamp: new Date(),
+                                        },
+                                        null,
+                                        2,
+                                    )}
+                                </pre>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
 
     return (
         <div className="grid grid-cols-1 gap-y-6">
