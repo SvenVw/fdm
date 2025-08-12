@@ -115,6 +115,7 @@ export async function addCultivationToCatalogue(
         b_lu_n_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_n_harvestable"]
         b_lu_n_residue: schema.cultivationsCatalogueTypeInsert["b_lu_n_residue"]
         b_n_fixation: schema.cultivationsCatalogueTypeInsert["b_n_fixation"]
+        b_lu_rest_oravib: schema.cultivationsCatalogueTypeInsert["b_lu_rest_oravib"]
     },
 ): Promise<void> {
     try {

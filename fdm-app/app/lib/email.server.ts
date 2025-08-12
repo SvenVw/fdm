@@ -86,7 +86,7 @@ export async function renderMagicLinkEmail(
     const email: Email = {
         From: `"${serverConfig.mail?.postmark.sender_name}" <${serverConfig.mail?.postmark.sender_address}>`,
         To: emailAddress,
-        Subject: `Aanmeldlink voor ${serverConfig.name} | ${emailTimestamp}}`,
+        Subject: `Aanmeldlink voor ${serverConfig.name} | ${emailTimestamp}`,
         HtmlBody: emailHtml,
         Tag: "magic-link",
     }

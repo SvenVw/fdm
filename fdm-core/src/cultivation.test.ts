@@ -117,6 +117,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             b_lu_start = new Date("2024-01-01")
@@ -161,6 +162,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             const cultivations = await getCultivationsFromCatalogue(
@@ -399,6 +401,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             await updateCultivation(
@@ -469,6 +472,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             const newSowingDate = new Date("2024-02-01")
@@ -511,6 +515,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 8,
                 b_lu_n_residue: 5,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
@@ -683,6 +688,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             await addCultivation(
@@ -850,6 +856,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             // Add a second field
@@ -993,6 +1000,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             // Add a cultivation 'Wheat' within the timeframe
@@ -1055,6 +1063,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             // Add a cultivation 'Wheat'
@@ -1178,6 +1187,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false,
             })
 
             // Add a cultivation 'Wheat' - outside timeframe

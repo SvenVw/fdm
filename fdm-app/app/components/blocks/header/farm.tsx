@@ -40,7 +40,7 @@ export function HeaderFarm({
                         {b_id_farm && farmOptions
                             ? (farmOptions.find(
                                   (option) => option.b_id_farm === b_id_farm,
-                              )?.b_name_farm ?? "Unknown farm")
+                              )?.b_name_farm ?? "Geen bedrijf geselecteerd")
                             : "Kies een bedrijf"}
                         {farmOptions && farmOptions.length > 0 ? (
                             <ChevronDown className="text-muted-foreground h-4 w-4" />
@@ -57,13 +57,13 @@ export function HeaderFarm({
                                         to={
                                             b_id_farm
                                                 ? currentPath.replace(
-                                                      b_id_farm,
-                                                      option.b_id_farm,
+                                                      /^\/farm\/[^/]+/,
+                                                      `/farm/${option.b_id_farm}`,
                                                   )
                                                 : `/farm/${option.b_id_farm}`
                                         }
                                     >
-                                        {option.b_name_farm}
+                                        {option.b_name_farm ?? "Naam onbekend"}
                                     </NavLink>
                                 </DropdownMenuCheckboxItem>
                             ))}
