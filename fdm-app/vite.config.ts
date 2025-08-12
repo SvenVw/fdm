@@ -7,9 +7,6 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
-console.log(process.env.SENTRY_AUTH_TOKEN)
-
-
 export default defineConfig((config) => {
     return {
         plugins: [
