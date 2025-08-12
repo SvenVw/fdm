@@ -106,66 +106,22 @@ Atmospheric deposition refers to the input of nitrogen compounds from the atmosp
 
 #### 3.1.4. Soil Mineralization
 
-Soil mineralization is a crucial biological process where organic nitrogen (N) compounds in soil organic matter (SOM) are converted by microorganisms into inorganic, plant-available forms, primarily ammonium (NH4+). This process is a significant natural source of nitrogen for crops, and its rate is influenced by factors such as SOM content, C / N ratio of organic matter, soil temperature, and moisture. The Minip model is an empirical model used to estimate this complex biological process.
-*  **Method (Minip Model):**
-  1.  The calculation uses soil parameters:
-        *  `a_c_of`: Organic carbon content (g C / kg soil).
-        *  `a_cn_fr`: C / N ratio (unitless).
-        *  `a_density_sa`: Soil bulk density (g / cm³).
-  2.  Fixed parameters for the model:
-        *  `w_temp_mean`: Average annual temperature = 10.6 °C.
-        *  `bouwvoor`: Topsoil depth = 20 cm.
-  3.  **Temperature Correction Factor (`temp_corr`):** This factor adjusts the mineralization rate based on the average temperature, reflecting that microbial activity (and thus mineralization) is highly temperature-dependent.
-        *  If `-1 < w_temp_mean <= 9` °C:
-            `temp_corr = w_temp_mean * 0.1`
-        *  If `9 < w_temp_mean <= 27` °C:
-            `temp_corr = 2 ^ ((w_temp_mean - 9) / 9)`
-        *  If `w_temp_mean > 27` °C, an error is thrown, as the model's applicability range is exceeded.
-  4.  **Decomposable Carbon Fraction (`cDec`, g C / kg soil):** This represents the portion of soil organic carbon that is readily available for microbial decomposition and subsequent nitrogen release.
-   Let `Tc` be `temp_corr`.
-   Let `C_org` be `a_c_of`.
-        ```
-        b = (Tc * 10 + 17)^(-0.6)
-        c = 17^(-0.6)
-        d = exp(4.7 * (b - c))
-        e = 1 - d
-        cDec = (C_org * e)  /  10
-        ```
-  5.  **Annual N Mineralization Rate (`N_min_annual`, kg N / ha / year):** This is the estimated amount of nitrogen released annually from the soil organic matter.
-   Let `CN` be `a_cn_fr`.
-   Let `D_bv` be `bouwvoor` (cm).
-   Let `rho_b` be `a_density_sa` (g / cm³).
-        ```
-        f = (1.5 * cDec) / CN
-        g = cDec / D_bv
-        N_min_annual = (f - g) * 10000 * (D_bv / 100) * rho_b
-        ```
-   *(Note: The formulas are presented in a simplified text format due to rendering issues with complex mathematical notation in this documentation environment.)*
-  6.  This annual rate is then capped (min: 5 kg N / ha / year, max: 250 kg N / ha / year) to ensure realistic agronomic values, preventing extreme estimations.
-  7.  The capped annual rate is pro-rated for the balance `Time Frame`:
-   `Mineralization_period (kg N / ha) = Capped_Annual_N_Min (kg N / ha / year) * (Days_in_TimeFrame + 1) / 365`
+Soil mineralization is a crucial biological process where organic nitrogen (N) compounds in soil organic matter (SOM) are converted by microorganisms into inorganic, plant-available forms, primarily ammonium (NH4+). This process can be a source of nitrogen for crops. The calculation of nitrogen mineralization is based on default values that depend on the soil type and land use (grassland or arable land).
 
-##### 3.1.4.1. Estimation of Missing Soil Parameters
+*   **Method:**
+    1.  The calculation is performed for each year within the specified `TimeFrame`.
+    2.  For each year, the system determines if the field is considered "grassland" or "arable land". A field is considered "grassland" for a given year if it has a cultivation with a crop rotation code corresponding to grassland (e.g., BRP code 265) that is active between May 15th and July 15th of that year. Otherwise, it is considered "arable land".
+    3.  Based on the soil type (`b_soiltype_agr`) and whether the field is grassland, a default annual N mineralization rate (kg N / ha / year) is assigned:
 
-Soil analysis data can sometimes be incomplete. To ensure the Minip model has all necessary inputs, missing parameters are estimated based on established agronomic relationships:
-*  **Organic Carbon (`a_c_of`) from SOM (`a_som_loi`):** Soil organic matter (SOM) is largely composed of carbon. This conversion estimates organic carbon content from the loss on ignition (LOI) method for SOM, using a common conversion factor.
-  `a_c_of (g C / kg) = a_som_loi (%) * 0.5 * 10`
-  (Clamped: 0.1-600 g C / kg).
-*  **SOM (`a_som_loi`) from Organic Carbon (`a_c_of`):** The inverse relationship is used to estimate SOM from organic carbon content.
-  `a_som_loi (%) = (a_c_of (g C / kg)  /  10) / 0.5`
-  (Clamped: 0.5-75%).
-*  **C / N Ratio (`a_cn_fr`):** The carbon-to-nitrogen ratio is a key indicator of organic matter quality and decomposition rates. It's calculated from the organic carbon and total nitrogen content.
-  `a_cn_fr = a_c_of (g C / kg) / (a_n_rt (mg N / kg) / 1000)`
-  (Clamped: 5-40).
-*  **Bulk Density (`a_density_sa`, g / cm³):** Bulk density reflects soil compaction and porosity, which influences water and air movement, and root growth. It is estimated based on organic matter content and soil texture (type), as organic matter generally lowers bulk density, and different soil textures have inherent density ranges.
-    *  For sandy / loess soils (e.g., "dekzand", "dalgrond", "duinzand", "loess"):
-     `a_density_sa = 1 / (a_som_loi (%) * 0.02525 + 0.6541)`
-    *  For other soil types:
-    Let `L` be `a_som_loi (%)`.
-        ```
-        a_density_sa = (0.00000067 * L^4) - (0.00007792 * L^3) + (0.00314712 * L^2) - (0.06039523 * L) + 1.33932206
-        ```
-        (Clamped: 0.5-3.0 g / cm³).
+| Soil Type (`b_soiltype_agr`) | Land Use | Annual N Mineralization (kg N / ha / year) |
+| :--- | :--- | :--- |
+| `dalgrond` | Arable or Grassland | 20 |
+| `veen` | Grassland | 160 |
+| `veen` | Arable Land | 20 |
+| Other | Arable or Grassland | 0 |
+
+    4.  The annual mineralization rate is then pro-rated for the number of days the field is active within the `TimeFrame` for that year:
+        `Mineralization_period (kg N / ha) = Annual_N_Min (kg N / ha / year) * Days_in_TimeFrame_for_the_year / 365`
 
 ### 3.2. Nitrogen Removal (kg N / ha)
 
