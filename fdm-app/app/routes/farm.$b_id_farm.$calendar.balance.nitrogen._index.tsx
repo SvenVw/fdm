@@ -14,7 +14,6 @@ import {
 } from "lucide-react"
 import { Suspense, useEffect, useState } from "react"
 import {
-    Await,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -125,10 +124,9 @@ export default function FarmBalanceNitrogenOverviewBlock() {
     return (
         <div className="space-y-4">
             <Suspense fallback={<NitrogenBalanceFallback />}>
-                <Await resolve={asyncData}>
-                    {({ nitrogenBalanceResult, errorMessage }) => {
-                        const resolvedNitrogenBalanceResult =
-                            nitrogenBalanceResult
+                {asyncData.then(
+                    ({ nitrogenBalanceResult, errorMessage }) => {
+                        const resolvedNitrogenBalanceResult = nitrogenBalanceResult
                         if (errorMessage) {
                             return (
                                 <div className="flex items-center justify-center">
@@ -398,8 +396,8 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                 </div>
                             </>
                         )
-                    }}
-                </Await>
+                    }
+                )}
             </Suspense>
         </div>
     )

@@ -7,7 +7,6 @@ import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import { AlertTriangle } from "lucide-react"
 import { Suspense, useEffect, useState } from "react"
 import {
-    Await,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -217,8 +216,8 @@ export default function FarmNormsBlock() {
                     }
                 />
                 <Suspense fallback={<NormsFallback />}>
-                    <Await resolve={asyncData}>
-                        {({ farmNorms, fieldNorms, errorMessage }) => {
+                    {asyncData.then(
+                        ({ farmNorms, fieldNorms, errorMessage }) => {
                             if (errorMessage) {
                                 return (
                                     <div className="flex items-center justify-center">
@@ -313,8 +312,8 @@ export default function FarmNormsBlock() {
                                     </div>
                                 </div>
                             )
-                        }}
-                    </Await>
+                        },
+                    )}
                 </Suspense>
             </main>
         </SidebarInset>

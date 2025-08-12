@@ -13,7 +13,6 @@ import {
 } from "lucide-react"
 import { Suspense, useEffect, useState } from "react"
 import {
-    Await,
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -141,8 +140,8 @@ export default function FarmBalanceNitrogenFieldBlock() {
     return (
         <div className="space-y-4">
             <Suspense fallback={<NitrogenBalanceFallback />}>
-                <Await resolve={nitrogenBalanceResult}>
-                    {(resolvedNitrogenBalanceResult) => {
+                {nitrogenBalanceResult.then(
+                    (resolvedNitrogenBalanceResult) => {
                         const { input, result, errorMessage } =
                             resolvedNitrogenBalanceResult
                         if (!input) {
@@ -390,8 +389,8 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                 </div>
                             </>
                         )
-                    }}
-                </Await>
+                    }
+                )}
             </Suspense>
         </div>
     )
