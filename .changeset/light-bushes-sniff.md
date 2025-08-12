@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Switch to `@sentry/react-router` from `@sentry/react` for better error monitoring
+Migrate Sentry to `@sentry/react-router` (RRv7 integration with improved routing-aware tracing and profiling)

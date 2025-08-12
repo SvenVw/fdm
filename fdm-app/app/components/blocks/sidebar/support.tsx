@@ -101,14 +101,11 @@ export function SidebarSupport({
                     {clientConfig.analytics.sentry ? (
                         <SidebarMenuItem key="feedback">
                             <SidebarMenuButton
-                                asChild
                                 size="sm"
                                 onClick={openFeedbackForm}
                             >
-                                <NavLink to="#">
-                                    <Send />
-                                    <span>Feedback</span>
-                                </NavLink>
+                                <Send />
+                                <span>Feedback</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ) : null}
