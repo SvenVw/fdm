@@ -101,6 +101,10 @@ export type NitrogenSupplyMineralization = {
      * The total amount of nitrogen supply derived from soil mineralization on the field.
      */
     total: Decimal
+    /**
+     * The total amount of nitrogen supply derived from soil mineralization on the field per year.
+     */
+    years: { year: number; value: Decimal }[]
 }
 
 /**
