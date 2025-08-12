@@ -22,7 +22,7 @@ import { addSecurityHeaders, getCacheControlHeaders } from "./lib/cache.server"
 
 export const streamTimeout = 5000
 
-const handleRequest = function handleRequest(
+const handleRequest = async function handleRequest(
     request: Request,
     responseStatusCode: number,
     responseHeaders: Headers,
