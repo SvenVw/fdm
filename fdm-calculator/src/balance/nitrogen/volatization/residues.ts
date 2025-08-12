@@ -73,7 +73,6 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
             }
 
             // Fallback to default yield from cultivation_catalogue
-            // Fallback to default yield from cultivation catalogue
             if (yieldForThisHarvest === null) {
                 yieldForThisHarvest = new Decimal(
                     cultivationDetail.b_lu_yield ?? 0,
