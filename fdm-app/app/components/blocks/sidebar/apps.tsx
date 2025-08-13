@@ -34,7 +34,7 @@ export function SidebarApps() {
     } else if (farmId) {
         atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
     } else {
-        atlasLink = undefined
+        atlasLink = `/farm/undefined/${selectedCalendar}/atlas`
     }
 
     let nutrientBalanceLink: string | undefined

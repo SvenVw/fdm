@@ -52,7 +52,7 @@ export function SidebarFarm() {
         farmLinkDisplay = "Bedrijf"
     } else {
         farmLink = "/farm"
-        farmLinkDisplay = "Selecteer een bedrijf"
+        farmLinkDisplay = "Overzicht bedrijven"
     }
 
     let fieldsLink: string | undefined

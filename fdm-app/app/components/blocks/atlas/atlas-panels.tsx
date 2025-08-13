@@ -23,10 +23,12 @@ export function FieldsPanelHover({
     zoomLevelFields,
     layer,
     layerExclude,
+    clickRedirectsToDetailsPage = false,
 }: {
     zoomLevelFields: number
     layer: string
     layerExclude?: string[] | string
+    clickRedirectsToDetailsPage?: boolean
 }) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
@@ -71,9 +73,11 @@ export function FieldsPanelHover({
                                     <CardDescription>
                                         {layer === "fieldsSaved"
                                             ? `${features[0].properties.b_area} ha`
-                                            : layer === "fieldsAvailable"
-                                              ? "Klik om te selecteren"
-                                              : "Klik om te verwijderen"}
+                                            : clickRedirectsToDetailsPage
+                                              ? "Klik voor meer details over dit perceel"
+                                              : layer === "fieldsAvailable"
+                                                ? "Klik om te selecteren"
+                                                : "Klik om te verwijderen"}
                                     </CardDescription>
                                 </CardHeader>
                             </Card>,
@@ -101,7 +105,7 @@ export function FieldsPanelHover({
                 map.off("load", updatePanel)
             }
         }
-    }, [map, zoomLevelFields, layer, layerExclude])
+    }, [map, zoomLevelFields, layer, layerExclude, clickRedirectsToDetailsPage])
 
     return panel
 }
@@ -209,7 +213,11 @@ export function FieldsPanelSelection({
 
                     const cultivations = features.reduce(
                         (
-                            acc: { b_lu_name: string; b_lu_croprotation?: string; count: number }[],
+                            acc: {
+                                b_lu_name: string
+                                b_lu_croprotation?: string
+                                count: number
+                            }[],
                             feature,
                         ) => {
                             if (!feature.properties) return acc

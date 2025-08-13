@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react-router"
 import { LifeBuoy, Send } from "lucide-react"
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
@@ -101,14 +101,11 @@ export function SidebarSupport({
                     {clientConfig.analytics.sentry ? (
                         <SidebarMenuItem key="feedback">
                             <SidebarMenuButton
-                                asChild
                                 size="sm"
                                 onClick={openFeedbackForm}
                             >
-                                <NavLink to="#">
-                                    <Send />
-                                    <span>Feedback</span>
-                                </NavLink>
+                                <Send />
+                                <span>Feedback</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ) : null}
