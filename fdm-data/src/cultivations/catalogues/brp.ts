@@ -63,8 +63,11 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
             b_n_fixation: cultivation.b_n_fixation,
             b_lu_rest_oravib: cultivation.b_lu_rest_oravib,
             b_lu_variety_options:
-                cultivation.b_lu_variety_options !== null
-                    ? (cultivation.b_lu_variety_options.split("||") as string[])
+                cultivation.b_lu_variety_options != null
+                    ? cultivation.b_lu_variety_options
+                          .split("||")
+                          .map((s) => s.trim())
+                          .filter((s) => s.length > 0)
                     : null,
             hash: null,
         }
