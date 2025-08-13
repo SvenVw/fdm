@@ -690,6 +690,47 @@ describe("Cultivation Data Model", () => {
             expect(updatedCultivation.b_lu_variety).toEqual(newVariety)
         })
 
+        it("should clear an existing variety from a cultivation", async () => {
+            // First, add a cultivation with a variety
+            const variety = "variety1"
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                variety,
+            )
+
+            const cultivationWithVariety = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(cultivationWithVariety.b_lu_variety).toEqual(variety)
+
+            // Now, clear the variety
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                null,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.b_lu_variety).toBeNull()
+        })
+
         it("should add a new cultivation to the catalogue with variety options", async () => {
             const b_lu_catalogue = createId()
             const b_lu_variety_options = ["v1", "v2"]
