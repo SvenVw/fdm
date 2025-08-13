@@ -1035,37 +1035,45 @@ export async function updateCultivation(
                     .where(eq(schema.cultivations.b_lu, b_lu))
             }
 
-            if (b_lu_start) {
-                // Validate if sowing date is before termination date
-                if (!b_lu_end) {
-                    const result = await tx
+            if (b_lu_variety !== undefined) {
+                if (b_lu_variety) {
+                    // Determine which catalogue to validate against (new vs existing)
+                    const catalogueIdToValidate =
+                        b_lu_catalogue ?? existingCultivation[0].b_lu_catalogue
+
+                    // Validate if variety is listed as option for this cultivation
+                    const catalogueEntry = await tx
                         .select({
-                            b_lu_end: schema.cultivationEnding.b_lu_end,
+                            b_lu_variety_options:
+                                schema.cultivationsCatalogue
+                                    .b_lu_variety_options,
                         })
-                        .from(schema.cultivationEnding)
+                        .from(schema.cultivationsCatalogue)
                         .where(
-                            and(
-                                eq(schema.cultivationEnding.b_lu, b_lu),
-                                isNotNull(schema.cultivationEnding.b_lu_end),
+                            eq(
+                                schema.cultivationsCatalogue.b_lu_catalogue,
+                                catalogueIdToValidate, // Use new catalogue if provided
                             ),
                         )
                         .limit(1)
 
-                    if (result.length > 0) {
-                        if (
-                            b_lu_start.getTime() >= result[0].b_lu_end.getTime()
-                        ) {
-                            throw new Error(
-                                "Sowing date must be before termination date",
-                            )
-                        }
+                    if (
+                        catalogueEntry.length > 0 &&
+                        catalogueEntry[0].b_lu_variety_options &&
+                        !catalogueEntry[0].b_lu_variety_options.includes(
+                            b_lu_variety,
+                        )
+                    ) {
+                        throw new Error(
+                            "Variety not available for this cultivation",
+                        )
                     }
                 }
 
                 await tx
-                    .update(schema.cultivationStarting)
-                    .set({ updated: updated, b_lu_start: b_lu_start })
-                    .where(eq(schema.cultivationStarting.b_lu, b_lu))
+                    .update(schema.cultivations)
+                    .set({ b_lu_variety: b_lu_variety, updated: updated })
+                    .where(eq(schema.cultivations.b_lu, b_lu))
             }
 
             if (b_lu_end) {
