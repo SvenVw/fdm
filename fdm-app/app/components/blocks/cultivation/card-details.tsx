@@ -60,7 +60,7 @@ export function CultivationDetailsCard({
             m_cropresidue: cultivation.m_cropresidue ?? false,
             b_lu_variety: cultivation.b_lu_variety ?? null,
         })
-    }, [cultivation, form.reset])
+    }, [cultivation])
 
     const handleDeleteCultivation = () => {
         return fetcher.submit(null, { method: "delete" })
@@ -156,7 +156,7 @@ export function CultivationDetailsCard({
                                             <FormLabel>Variëteit</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
-                                                defaultValue={field.value ?? ""}
+                                                value={field.value ?? ""}
                                                 disabled={
                                                     b_lu_variety_options.length ===
                                                     0
