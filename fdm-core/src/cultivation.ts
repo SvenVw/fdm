@@ -344,6 +344,8 @@ export async function addCultivation(
             b_id,
             b_lu_start,
             b_lu_end,
+            m_cropresidue,
+            b_lu_variety,
         })
     }
 }
@@ -1148,6 +1150,8 @@ export async function updateCultivation(
             b_lu_catalogue,
             b_lu_start,
             b_lu_end,
+            m_cropresidue,
+            b_lu_variety,
         })
     }
 }
