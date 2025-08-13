@@ -19,6 +19,12 @@ export const CultivationDetailsFormSchema = z
             }
             return value
         }, z.coerce.boolean().optional().nullable()),
+        b_lu_variety: z.preprocess((value) => {
+            if (typeof value === "string") {
+                if (value.toLowerCase() === "null") return null
+            }
+            return value
+        }, z.string().optional().nullable()),
     })
     .refine(
         (data) => {
