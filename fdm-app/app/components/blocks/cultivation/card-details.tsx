@@ -156,7 +156,7 @@ export function CultivationDetailsCard({
                                             <FormLabel>Variëteit</FormLabel>
                                             <Select
                                                 onValueChange={field.onChange}
-                                                value={field.value ?? ""}
+                                                value={field.value ?? undefined}
                                                 disabled={
                                                     b_lu_variety_options.length ===
                                                     0
