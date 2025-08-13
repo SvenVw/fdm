@@ -1076,6 +1076,39 @@ export async function updateCultivation(
                     .where(eq(schema.cultivations.b_lu, b_lu))
             }
 
+            if (b_lu_start) {
+                // Validate if sowing date is before termination date
+                if (b_lu_end === undefined) {
+                    const result = await tx
+                        .select({
+                            b_lu_end: schema.cultivationEnding.b_lu_end,
+                        })
+                        .from(schema.cultivationEnding)
+                        .where(
+                            and(
+                                eq(schema.cultivationEnding.b_lu, b_lu),
+                                isNotNull(schema.cultivationEnding.b_lu_end),
+                            ),
+                        )
+                        .limit(1)
+
+                    if (result.length > 0 && result[0].b_lu_end) {
+                        if (
+                            b_lu_start.getTime() >= result[0].b_lu_end.getTime()
+                        ) {
+                            throw new Error(
+                                "Sowing date must be before termination date",
+                            )
+                        }
+                    }
+                }
+
+                await tx
+                    .update(schema.cultivationStarting)
+                    .set({ b_lu_start: b_lu_start, updated: updated })
+                    .where(eq(schema.cultivationStarting.b_lu, b_lu))
+            }
+
             if (b_lu_end) {
                 // Validate if terminatinge date is after sowing date
                 if (!b_lu_start) {
