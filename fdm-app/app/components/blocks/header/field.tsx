@@ -59,10 +59,12 @@ export function HeaderField({
                                                     "/cultivation",
                                                 )
                                                     ? `/farm/${b_id_farm}/${calendar}/field/${option.b_id}/cultivation`
-                                                    : currentPath.replace(
-                                                          b_id!,
-                                                          option.b_id,
-                                                      )
+                                                    : b_id
+                                                      ? currentPath.replace(
+                                                            b_id,
+                                                            option.b_id,
+                                                        )
+                                                      : `/farm/${b_id_farm}/${calendar}/field/${option.b_id}`
                                             }
                                         >
                                             {option.b_name}
