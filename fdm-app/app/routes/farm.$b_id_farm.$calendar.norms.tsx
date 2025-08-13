@@ -5,7 +5,7 @@ import {
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import { AlertTriangle } from "lucide-react"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, use } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -193,11 +193,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmNormsBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const [asyncData, setAsyncData] = useState(loaderData.asyncData)
-    useEffect(() => setAsyncData(loaderData.asyncData), [loaderData.asyncData])
-
-    const location = useLocation()
-    const page = location.pathname
 
     return (
         <SidebarInset>
@@ -215,9 +210,21 @@ export default function FarmNormsBlock() {
                         "Bekijk de gebruiksnormen voor je bedrijf en percelen."
                     }
                 />
-                <Suspense fallback={<NormsFallback />}>
-                    {asyncData.then(
-                        ({ farmNorms, fieldNorms, errorMessage }) => {
+                <Suspense
+                    key={`${loaderData.b_id_farm}#${loaderData.b_id}`}
+                    fallback={<NormsFallback />}
+                >
+                    {(() => {
+                        function Norms(
+                            loaderData: Awaited<ReturnType<typeof loader>>,
+                        ) {
+                            const { farmNorms, fieldNorms, errorMessage } = use(
+                                loaderData.asyncData,
+                            )
+
+                            const location = useLocation()
+                            const page = location.pathname
+
                             if (errorMessage) {
                                 return (
                                     <div className="flex items-center justify-center">
@@ -312,8 +319,10 @@ export default function FarmNormsBlock() {
                                     </div>
                                 </div>
                             )
-                        },
-                    )}
+                        }
+
+                        return <Norms {...loaderData} />
+                    })()}
                 </Suspense>
             </main>
         </SidebarInset>

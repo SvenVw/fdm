@@ -12,7 +12,7 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, use } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -113,20 +113,26 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmBalanceNitrogenOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const location = useLocation()
     const _navigation = useNavigation()
-    const page = location.pathname
-    const { farm, fields } = loaderData
-    const [asyncData, setAsyncData] = useState(loaderData.asyncData)
-    useEffect(() => setAsyncData(loaderData.asyncData), [loaderData.asyncData])
 
-    const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     return (
         <div className="space-y-4">
-            <Suspense fallback={<NitrogenBalanceFallback />}>
-                {asyncData.then(
-                    ({ nitrogenBalanceResult, errorMessage }) => {
-                        const resolvedNitrogenBalanceResult = nitrogenBalanceResult
+            <Suspense
+                key={loaderData.farm.b_id_farm}
+                fallback={<NitrogenBalanceFallback />}
+            >
+                {(() => {
+                    function FarmBalanceNitrogenOverview({
+                        farm,
+                        fields,
+                        asyncData,
+                    }: ReturnType<typeof useLoaderData<typeof loader>>) {
+                        const location = useLocation()
+                        const page = location.pathname
+                        const { nitrogenBalanceResult, errorMessage } =
+                            use(asyncData)
+                        const resolvedNitrogenBalanceResult =
+                            nitrogenBalanceResult
                         if (errorMessage) {
                             return (
                                 <div className="flex items-center justify-center">
@@ -217,6 +223,9 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             )
                         }
 
+                        const fieldsMap = new Map(
+                            fields.map((f) => [f.b_id, f]),
+                        )
                         return (
                             <>
                                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -397,7 +406,9 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                             </>
                         )
                     }
-                )}
+
+                    return <FarmBalanceNitrogenOverview {...loaderData} />
+                })()}
             </Suspense>
         </div>
     )

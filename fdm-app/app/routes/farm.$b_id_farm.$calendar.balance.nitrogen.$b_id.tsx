@@ -11,7 +11,7 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
-import { Suspense, useEffect, useState } from "react"
+import { Suspense, use } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -124,26 +124,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmBalanceNitrogenFieldBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const location = useLocation()
-    const page = location.pathname
-    const calendar = useCalendarStore((state) => state.calendar)
-
-    const { field, farm } = loaderData
-    const [nitrogenBalanceResult, setNitrogenBalanceResult] = useState(
-        loaderData.nitrogenBalanceResult,
-    )
-    useEffect(
-        () => setNitrogenBalanceResult(loaderData.nitrogenBalanceResult),
-        [loaderData.nitrogenBalanceResult],
-    )
 
     return (
         <div className="space-y-4">
-            <Suspense fallback={<NitrogenBalanceFallback />}>
-                {nitrogenBalanceResult.then(
-                    (resolvedNitrogenBalanceResult) => {
-                        const { input, result, errorMessage } =
-                            resolvedNitrogenBalanceResult
+            <Suspense
+                key={`${loaderData.farm.b_id_farm}#${loaderData.field.b_id}`}
+                fallback={<NitrogenBalanceFallback />}
+            >
+                {(() => {
+                    function NitrogenBalance({
+                        farm,
+                        field,
+                        nitrogenBalanceResult,
+                    }: Awaited<ReturnType<typeof loader>>) {
+                        const { input, result, errorMessage } = use(
+                            nitrogenBalanceResult,
+                        )
+
+                        const location = useLocation()
+                        const page = location.pathname
+                        const calendar = useCalendarStore(
+                            (state) => state.calendar,
+                        )
+
                         if (!input) {
                             return (
                                 <div className="flex items-center justify-center">
@@ -390,7 +393,9 @@ export default function FarmBalanceNitrogenFieldBlock() {
                             </>
                         )
                     }
-                )}
+
+                    return <NitrogenBalance {...loaderData} />
+                })()}
             </Suspense>
         </div>
     )
