@@ -819,6 +819,11 @@ describe("Catalogues syncing", () => {
             .limit(1)
 
         expect(catalogueWithVarietyOptions.length).toBeGreaterThan(0)
-        expect(Array.isArray(catalogueWithVarietyOptions[0].b_lu_variety_options)).toBe(true)
+        const options = catalogueWithVarietyOptions[0].b_lu_variety_options
+        expect(Array.isArray(options)).toBe(true)
+        expect(options.length).toBeGreaterThan(0)
+        expect(
+            options.every((s) => typeof s === "string" && s.trim().length > 0),
+        ).toBe(true)
     })
 })
