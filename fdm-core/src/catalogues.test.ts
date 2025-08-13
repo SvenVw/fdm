@@ -808,4 +808,22 @@ describe("Catalogues syncing", () => {
 
         expect(syncedItem[0].b_lu_name).not.toBe("Updated Name")
     })
+
+    it("should sync cultivation catalogue with variety options", async () => {
+        await syncCatalogues(fdm)
+
+        const catalogueWithVarietyOptions = await fdm
+            .select()
+            .from(schema.cultivationsCatalogue)
+            .where(isNotNull(schema.cultivationsCatalogue.b_lu_variety_options))
+            .limit(1)
+
+        expect(catalogueWithVarietyOptions.length).toBeGreaterThan(0)
+        const options = catalogueWithVarietyOptions[0].b_lu_variety_options
+        expect(Array.isArray(options)).toBe(true)
+        expect(options.length).toBeGreaterThan(0)
+        expect(
+            options.every((s) => typeof s === "string" && s.trim().length > 0),
+        ).toBe(true)
+    })
 })
