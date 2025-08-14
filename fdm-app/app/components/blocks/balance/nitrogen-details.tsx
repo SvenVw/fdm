@@ -8,7 +8,7 @@ import type {
     NitrogenSupplyFixationNumeric,
     NitrogenSupplyMineralizationNumeric,
     NitrogenSupplyNumeric,
-    NitrogenVolatilizationNumeric,
+    NitrogenEmissionNumeric,
 } from "@svenvw/fdm-calculator"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"
@@ -375,7 +375,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
     }
 
     const renderAmmoniaEmissions = (
-        ammonia: NitrogenVolatilizationNumeric["ammonia"],
+        ammonia: NitrogenEmissionNumeric["ammonia"],
         fieldInput: FieldInput,
     ) => {
         const sectionKey = "ammonia"
@@ -388,27 +388,24 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
                         {/* Render Fertilizers */}
-                        {renderFertilizersVolatilization(
+                        {renderFertilizersEmission(
                             ammonia.fertilizers,
                             fieldInput,
                         )}
 
                         {/* Render Residues */}
-                        {renderResiduesVolatilization(
-                            ammonia.residues,
-                            fieldInput,
-                        )}
+                        {renderResiduesEmission(ammonia.residues, fieldInput)}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
         )
     }
 
-    const renderFertilizersVolatilization = (
-        fertilizers: NitrogenVolatilizationNumeric["ammonia"]["fertilizers"],
+    const renderFertilizersEmission = (
+        fertilizers: NitrogenEmissionNumeric["ammonia"]["fertilizers"],
         fieldInput: FieldInput,
     ) => {
-        const sectionKey = "volatilization.ammonia.fertilizers"
+        const sectionKey = "emission.ammonia.fertilizers"
 
         return (
             <AccordionItem value={sectionKey}>
@@ -418,35 +415,35 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
                         {/* Render Mineral Fertilizers */}
-                        {renderFertilizerVolatilizations(
+                        {renderFertilizerEmissions(
                             fertilizers.mineral,
                             fieldInput,
                             "Minerale meststoffen",
-                            "volatilization.ammonia.fertilizers.mineral",
+                            "emission.ammonia.fertilizers.mineral",
                         )}
 
                         {/* Render Manure */}
-                        {renderFertilizerVolatilizations(
+                        {renderFertilizerEmissions(
                             fertilizers.manure,
                             fieldInput,
                             "Mest",
-                            "volatilization.ammonia.fertilizers.manure",
+                            "emission.ammonia.fertilizers.manure",
                         )}
 
                         {/* Render Compost */}
-                        {renderFertilizerVolatilizations(
+                        {renderFertilizerEmissions(
                             fertilizers.compost,
                             fieldInput,
                             "Compost",
-                            "volatilization.ammonia.fertilizers.compost",
+                            "emission.ammonia.fertilizers.compost",
                         )}
 
                         {/* Render other fertilizers */}
-                        {renderFertilizerVolatilizations(
+                        {renderFertilizerEmissions(
                             fertilizers.other,
                             fieldInput,
                             "Overig",
-                            "volatilization.ammonia.fertilizers.other",
+                            "emission.ammonia.fertilizers.other",
                         )}
                     </Accordion>
                 </AccordionContent>
@@ -454,11 +451,11 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
-    const renderResiduesVolatilization = (
-        residues: NitrogenVolatilizationNumeric["ammonia"]["residues"],
+    const renderResiduesEmission = (
+        residues: NitrogenEmissionNumeric["ammonia"]["residues"],
         fieldInput: FieldInput,
     ) => {
-        const sectionKey = "volatilization.ammonia.residues"
+        const sectionKey = "emission.ammonia.residues"
 
         return (
             <AccordionItem value={sectionKey}>
@@ -497,7 +494,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
-    const renderFertilizerVolatilizations = (
+    const renderFertilizerEmissions = (
         applications: {
             total: number
             applications: Array<{ id: string; value: number }>
@@ -557,23 +554,20 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
         )
     }
 
-    const renderVolatilization = (
-        volatilization: NitrogenVolatilizationNumeric,
+    const renderEmission = (
+        emission: NitrogenEmissionNumeric,
         fieldInput: FieldInput,
     ) => {
-        const sectionKey = "volatilization"
+        const sectionKey = "emission"
 
         return (
             <AccordionItem value={sectionKey}>
                 <AccordionTrigger>
-                    Emissie (Totaal): {volatilization.total} kg N / ha
+                    Emissie (Totaal): {emission.total} kg N / ha
                 </AccordionTrigger>
                 <AccordionContent>
                     <Accordion type="multiple" className="ml-4">
-                        {renderAmmoniaEmissions(
-                            volatilization.ammonia,
-                            fieldInput,
-                        )}
+                        {renderAmmoniaEmissions(emission.ammonia, fieldInput)}
                     </Accordion>
                 </AccordionContent>
             </AccordionItem>
@@ -585,7 +579,7 @@ const NitrogenBalanceDetails: React.FC<NitrogenBalanceDetailsProps> = ({
             <Accordion type="multiple" className="w-full">
                 {renderSupply(balanceData.supply, fieldInput)}
                 {renderRemoval(balanceData.removal, fieldInput)}
-                {renderVolatilization(balanceData.volatilization, fieldInput)}
+                {renderEmission(balanceData.emission, fieldInput)}
             </Accordion>
         </div>
     )

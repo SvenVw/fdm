@@ -284,7 +284,7 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                         <CardContent>
                                             <div className="text-2xl font-bold">
                                                 {
-                                                    resolvedNitrogenBalanceResult.volatilization
+                                                    resolvedNitrogenBalanceResult.emission
                                                 }
                                             </div>
                                             <p className="text-xs text-muted-foreground">
@@ -319,8 +319,8 @@ export default function FarmBalanceNitrogenOverviewBlock() {
                                                 removal={
                                                     resolvedNitrogenBalanceResult.removal
                                                 }
-                                                volatilization={
-                                                    resolvedNitrogenBalanceResult.volatilization
+                                                emission={
+                                                    resolvedNitrogenBalanceResult.emission
                                                 }
                                             />
                                         </CardContent>

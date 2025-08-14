@@ -1,3 +1,4 @@
+import type { JSX } from "react"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 import {
     type ChartConfig,
@@ -12,20 +13,18 @@ export function NitrogenBalanceChart({
     balance,
     supply,
     removal,
-    volatilization,
+    emission,
 }: {
     balance: number
     supply: number
     removal: number | undefined
-    volatilization: number | undefined
+    emission: number | undefined
 }): JSX.Element {
     const chartData = [
         {
             supply: supply,
             removal: removal ? Math.abs(removal) : undefined,
-            volatilization: volatilization
-                ? Math.abs(volatilization)
-                : undefined,
+            emission: emission ? Math.abs(emission) : undefined,
         },
     ]
 
@@ -38,7 +37,7 @@ export function NitrogenBalanceChart({
             label: "Afvoer",
             color: "hsl(var(--chart-2))",
         },
-        volatilization: {
+        emission: {
             label: "Emissie",
             color: "hsl(var(--chart-3))",
         },
@@ -81,8 +80,8 @@ export function NitrogenBalanceChart({
                     stackId={"b"}
                 />
                 <Bar
-                    dataKey="volatilization"
-                    fill="var(--color-volatilization)"
+                    dataKey="emission"
+                    fill="var(--color-emission)"
                     radius={5}
                     stackId={"b"}
                 />
