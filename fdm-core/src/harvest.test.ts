@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm"
-import { beforeEach, describe, expect, inject, it } from "vitest"
+import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import { enableCultivationCatalogue } from "./catalogues"
 import { addCultivation, addCultivationToCatalogue } from "./cultivation"
 import * as schema from "./db/schema"
@@ -7,7 +7,7 @@ import { addFarm } from "./farm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import { addField } from "./field"
-import { addHarvest, getHarvest, updateHarvest } from "./harvest"
+import { addHarvest, getHarvest, getHarvests, updateHarvest } from "./harvest"
 import { createId } from "./id"
 
 describe("Harvest Data Model", () => {
@@ -90,6 +90,7 @@ describe("Harvest Data Model", () => {
             b_lu_n_residue: 2,
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
+            b_lu_variety_options: null
         })
 
         await addCultivationToCatalogue(fdm, {
@@ -107,6 +108,7 @@ describe("Harvest Data Model", () => {
             b_lu_n_residue: 2,
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
+            b_lu_variety_options: ["Agria"]
         })
 
         b_lu_start = new Date("2024-01-01")
@@ -117,7 +119,40 @@ describe("Harvest Data Model", () => {
             b_id,
             b_lu_start,
         )
+    })
 
+    afterAll(async () => {
+        // Clean up the database after all tests have run
+        // You can add any necessary cleanup logic here
+    })
+
+    it("should add a new harvest to a cultivation", async () => {
+        const harvestDate = new Date("2024-08-01")
+        const yieldValue = 6000
+
+        const newHarvestId = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu,
+            harvestDate,
+            yieldValue,
+        )
+
+        expect(newHarvestId).toBeDefined()
+
+        const harvests = await getHarvests(fdm, principal_id, b_lu)
+        const newHarvest = harvests.find(
+            (h) => h.b_id_harvesting === newHarvestId,
+        )
+
+        expect(newHarvest).toBeDefined()
+        expect(newHarvest?.b_lu_harvest_date).toEqual(harvestDate)
+        expect(
+            newHarvest?.harvestable.harvestable_analyses[0].b_lu_yield,
+        ).toEqual(yieldValue)
+    })
+
+    it("should retrieve a harvest by its ID", async () => {
         b_id_harvesting = await addHarvest(
             fdm,
             principal_id,
@@ -131,9 +166,25 @@ describe("Harvest Data Model", () => {
             5,
             6,
         )
+        const harvest = await getHarvest(fdm, principal_id, b_id_harvesting)
+        expect(harvest).toBeDefined()
+        expect(harvest.b_id_harvesting).toEqual(b_id_harvesting)
     })
 
     it("should update an existing harvest", async () => {
+        b_id_harvesting = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu,
+            new Date("2024-07-01"),
+            5000,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+        )
         const newHarvestDate = new Date("2024-07-15")
         const newYield = 5500
         const newNHarvestable = 1.1
@@ -190,6 +241,19 @@ describe("Harvest Data Model", () => {
     })
 
     it("should throw an error when updating a harvest without permission", async () => {
+        b_id_harvesting = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu,
+            new Date("2024-07-01"),
+            5000,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+        )
         const other_principal_id = createId()
         await expect(
             updateHarvest(
@@ -205,6 +269,19 @@ describe("Harvest Data Model", () => {
     })
 
     it("should throw an error when updating with an invalid harvest date", async () => {
+        b_id_harvesting = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu,
+            new Date("2024-07-01"),
+            5000,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+        )
         const invalidHarvestDate = new Date("2023-12-31") // Before sowing date
         await expect(
             updateHarvest(
@@ -218,6 +295,19 @@ describe("Harvest Data Model", () => {
     })
 
     it("should update cultivation end date for 'once' harvestable cultivations", async () => {
+        b_id_harvesting = await addHarvest(
+            fdm,
+            principal_id,
+            b_lu,
+            new Date("2024-07-01"),
+            5000,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+        )
         const newHarvestDate = new Date("2024-08-01")
         await updateHarvest(
             fdm,

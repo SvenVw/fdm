@@ -30,6 +30,7 @@ import { addField } from "./field"
 import { addHarvest } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
+import type { FdmType } from "./fdm"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -118,6 +119,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: ["variety1", "variety2"],
             })
 
             b_lu_start = new Date("2024-01-01")
@@ -163,6 +165,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: ["variety1", "variety2"],
             })
 
             const cultivations = await getCultivationsFromCatalogue(
@@ -207,7 +210,7 @@ describe("Cultivation Data Model", () => {
                     b_lu_source: b_lu_source,
                     b_lu_name: "test-name",
                     b_lu_name_en: "test-name-en",
-                    b_lu_harvestable: "invalid-value",
+                    b_lu_harvestable: "invalid-value" as any,
                     b_lu_hcat3: "test-hcat3",
                     b_lu_hcat3_name: "test-hcat3-name",
                     b_lu_croprotation: "cereal",
@@ -216,6 +219,8 @@ describe("Cultivation Data Model", () => {
                     b_lu_n_harvestable: 4,
                     b_lu_n_residue: 2,
                     b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
                 }),
             ).rejects.toThrow()
         })
@@ -402,6 +407,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             await updateCultivation(
@@ -473,6 +479,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             const newSowingDate = new Date("2024-02-01")
@@ -516,6 +523,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 5,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
@@ -602,6 +610,163 @@ describe("Cultivation Data Model", () => {
                 ),
             ).rejects.toThrowError("Exception for updateCultivation")
         })
+
+        it("should add a new cultivation with a variety", async () => {
+            const b_lu_start = new Date("2024-02-01")
+            const b_lu_variety = "variety1"
+            const new_b_lu = await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue,
+                b_id,
+                b_lu_start,
+                undefined,
+                undefined,
+                b_lu_variety,
+            )
+            expect(new_b_lu).toBeDefined()
+
+            const cultivation = await getCultivation(
+                fdm,
+                principal_id,
+                new_b_lu,
+            )
+            expect(cultivation.b_lu).toBeDefined() // Check existence
+            expect(cultivation.b_lu_start).toEqual(b_lu_start) // Check value
+            expect(cultivation.b_lu_variety).toEqual(b_lu_variety)
+        })
+
+        it("should throw an error when adding a cultivation with an invalid variety", async () => {
+            const b_lu_start = new Date("2024-02-01")
+            const invalidVariety = "invalid-variety"
+            await expect(
+                addCultivation(
+                    fdm,
+                    principal_id,
+                    b_lu_catalogue,
+                    b_id,
+                    b_lu_start,
+                    undefined,
+                    undefined,
+                    invalidVariety,
+                ),
+            ).rejects.toThrowError("Exception for addCultivation")
+        })
+
+        it("should throw an error when updating with an invalid variety", async () => {
+            const invalidVariety = "invalid-variety"
+            await expect(
+                updateCultivation(
+                    fdm,
+                    principal_id,
+                    b_lu,
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
+                    invalidVariety,
+                ),
+            ).rejects.toThrowError("Exception for updateCultivation")
+        })
+
+        it("should update an existing cultivation with a variety", async () => {
+            const newVariety = "variety1"
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                newVariety,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.b_lu_variety).toEqual(newVariety)
+        })
+
+        it("should clear an existing variety from a cultivation", async () => {
+            // First, add a cultivation with a variety
+            const variety = "variety1"
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                variety,
+            )
+
+            const cultivationWithVariety = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(cultivationWithVariety.b_lu_variety).toEqual(variety)
+
+            // Now, clear the variety
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                undefined,
+                null,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.b_lu_variety).toBeNull()
+        })
+
+        it("should add a new cultivation to the catalogue with variety options", async () => {
+            const b_lu_catalogue = createId()
+            const b_lu_variety_options = ["v1", "v2"]
+
+            await addCultivationToCatalogue(fdm, {
+                b_lu_catalogue,
+                b_lu_source: b_lu_source,
+                b_lu_name: "Test Cultivation",
+                b_lu_name_en: "Test Cultivation (EN)",
+                b_lu_harvestable: "once",
+                b_lu_hcat3: "test-hcat3",
+                b_lu_hcat3_name: "Test HCAT3 Name",
+                b_lu_croprotation: "cereal",
+                b_lu_yield: 6000,
+                b_lu_hi: 0.4,
+                b_lu_n_harvestable: 4,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
+                b_lu_rest_oravib: false,
+                b_lu_variety_options: b_lu_variety_options,
+            })
+
+            const cultivations = await getCultivationsFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+
+            const cultivation = cultivations.find(
+                (c) => c.b_lu_catalogue === b_lu_catalogue,
+            )
+            expect(cultivation).toBeDefined()
+            expect(cultivation?.b_lu_variety_options).toEqual(
+                b_lu_variety_options,
+            )
+        })
     })
 
     describe("Cultivation Plan", () => {
@@ -610,7 +775,7 @@ describe("Cultivation Data Model", () => {
         let b_lu_catalogue: string
         let p_id: string
         let b_lu_source: string
-        let _p_source: string
+        let fdm: FdmType
         let principal_id: string
 
         beforeEach(async () => {
@@ -689,6 +854,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             await addCultivation(
@@ -857,6 +1023,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             // Add a second field
@@ -1001,6 +1168,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             // Add a cultivation 'Wheat' within the timeframe
@@ -1064,6 +1232,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             // Add a cultivation 'Wheat'
@@ -1188,6 +1357,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
+                b_lu_variety_options: null,
             })
 
             // Add a cultivation 'Wheat' - outside timeframe

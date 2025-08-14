@@ -9,6 +9,7 @@ export interface Cultivation {
     b_lu_hcat3: schema.cultivationsCatalogueTypeSelect["b_lu_hcat3"]
     b_lu_hcat3_name: schema.cultivationsCatalogueTypeSelect["b_lu_hcat3_name"]
     b_lu_croprotation: schema.cultivationsCatalogueTypeSelect["b_lu_croprotation"]
+    b_lu_variety: schema.cultivationsTypeSelect["b_lu_variety"]
     b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
     b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
     m_cropresidue: schema.cultivationEndingTypeSelect["m_cropresidue"]
@@ -18,6 +19,7 @@ export interface Cultivation {
 export interface CultivationPlan {
     b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"]
     b_lu_name: schema.cultivationsCatalogueTypeSelect["b_lu_name"]
+    b_lu_variety: schema.cultivationsTypeSelect["b_lu_variety"]
     b_area: number
     b_lu_start: schema.cultivationStartingTypeSelect["b_lu_start"]
     b_lu_end: schema.cultivationEndingTypeSelect["b_lu_end"]
