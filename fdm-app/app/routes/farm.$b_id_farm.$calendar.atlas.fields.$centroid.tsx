@@ -163,7 +163,6 @@ async function loadAsyncData(
                 isNatura2000Area,
                 regionTable2,
             },
-            calendar,
         }
     } catch (error) {
         return { errorMessage: String(error).replace("Error: ", "") }
