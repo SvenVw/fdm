@@ -26,8 +26,8 @@ import { FieldNutrientAdviceLayout } from "~/components/blocks/nutrient-advice/l
 import {
     KPISection,
     NutrientAdviceSection,
-} from "../components/blocks/nutrient-advice/sections"
-import { ErrorBlock } from "../components/custom/error"
+} from "~/components/blocks/nutrient-advice/sections"
+import { ErrorBlock } from "~/components/custom/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -89,6 +89,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     b_id,
                     timeframe,
                 )
+
                 const fertilizers = getFertilizers(
                     fdm,
                     session.principal_id,
@@ -106,32 +107,38 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     throw handleLoaderError("missing: cultivations")
                 }
 
+                const [
+                    resolvedCurrentSoilData,
+                    resolvedFertilizerApplications,
+                    resolvedFertilizers,
+                ] = await Promise.all([
+                    currentSoilData,
+                    fertilizerApplications,
+                    fertilizers,
+                ])
+
                 // For now take the first cultivation
                 const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
-                const doses = (async () =>
-                    calculateDose({
-                        applications: await fertilizerApplications,
-                        fertilizers: await fertilizers,
-                    }))()
+                const doses = calculateDose({
+                    applications: resolvedFertilizerApplications,
+                    fertilizers: resolvedFertilizers,
+                })
 
                 // Request nutrient advice
-                const nutrientAdvice = (async () =>
-                    getNutrientAdvice(
-                        b_lu_catalogue,
-                        field.b_centroid,
-                        await currentSoilData,
-                    ))()
+                const nutrientAdvice = await getNutrientAdvice(
+                    b_lu_catalogue,
+                    field.b_centroid,
+                    resolvedCurrentSoilData,
+                )
 
-                const obj = {
-                    nutrientAdvice: await nutrientAdvice,
-                    doses: await doses,
-                    fertilizerApplications: await fertilizerApplications,
-                    fertilizers: await fertilizers,
+                return {
+                    nutrientAdvice: nutrientAdvice,
+                    doses: doses,
+                    fertilizerApplications: resolvedFertilizerApplications,
+                    fertilizers: resolvedFertilizers,
                     errorMessage: undefined,
                 }
-
-                return obj
             } catch (error) {
                 return { errorMessage: String(error).replace("Error: ", "") }
             }
