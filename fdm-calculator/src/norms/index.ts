@@ -1,3 +1,4 @@
+import { FdmCalculatorError } from "../error"
 import { aggregateNormsToFarmLevel } from "./farm"
 import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/dierlijke-mest-gebruiksnorm"
 import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/fosfaatgebruiksnorm"
@@ -15,9 +16,13 @@ export function createFunctionsForNorms(b_region: "NL", year: "2025") {
                 aggregateNormsToFarmLevel: aggregateNormsToFarmLevel,
             }
         }
-        throw new Error("Year not supported")
+        throw new FdmCalculatorError("Year not supported", "YEAR_NOT_SUPPORTED", {
+            year,
+        })
     }
-    throw new Error("Region not supported")
+    throw new FdmCalculatorError("Region not supported", "REGION_NOT_SUPPORTED", {
+        b_region,
+    })
 }
 
 export function createFunctionsForFertilizerApplicationFilling(
@@ -29,28 +34,36 @@ export function createFunctionsForFertilizerApplicationFilling(
             // TODO: Implement fertilizer application filling functions for NL 2025
             return {
                 collectInputForFertilizerApplicationFilling: () => {
-                    throw new Error(
+                    throw new FdmCalculatorError(
                         "collectInputForFertilizerApplicationFilling is not implemented yet",
+                        "NOT_IMPLEMENTED",
                     )
                 },
                 calculateFertilizerApplicationFillingForNitrogen: () => {
-                    throw new Error(
+                    throw new FdmCalculatorError(
                         "calculateFertilizerApplicationFillingForNitrogen is not implemented yet",
+                        "NOT_IMPLEMENTED",
                     )
                 },
                 calculateFertilizerApplicationFillingForManure: () => {
-                    throw new Error(
+                    throw new FdmCalculatorError(
                         "calculateFertilizerApplicationFillingForManure is not implemented yet",
+                        "NOT_IMPLEMENTED",
                     )
                 },
                 calculateFertilizerApplicationFillingForPhosphate: () => {
-                    throw new Error(
+                    throw new FdmCalculatorError(
                         "calculateFertilizerApplicationFillingForPhosphate is not implemented yet",
+                        "NOT_IMPLEMENTED",
                     )
                 },
             }
         }
-        throw new Error("Year not supported")
+        throw new FdmCalculatorError("Year not supported", "YEAR_NOT_SUPPORTED", {
+            year,
+        })
     }
-    throw new Error("Region not supported")
+    throw new FdmCalculatorError("Region not supported", "REGION_NOT_SUPPORTED", {
+        b_region,
+    })
 }

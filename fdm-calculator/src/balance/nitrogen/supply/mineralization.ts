@@ -1,6 +1,7 @@
 import type { fdmSchema } from "@svenvw/fdm-core"
 import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
+import { FdmCalculatorError } from "../../../error"
 import type {
     NitrogenBalanceInput,
     NitrogenSupplyMineralization,
@@ -80,18 +81,32 @@ export function calculateNitrogenSupplyBySoilMineralizationUsingMinip(
         const a = w_temp_mean.minus(9).dividedBy(9)
         temperatureCorrection = new Decimal(2).pow(a)
     } else if (w_temp_mean.gt(27)) {
-        throw new Error("Average yearly temperature is too high")
+        throw new FdmCalculatorError(
+            "Average yearly temperature is too high",
+            "CALCULATION_FAILED",
+            { w_temp_mean },
+        )
     }
 
     if (a_c_of === null || a_c_of === undefined) {
-        throw new Error("No a_c_of value found in soil analysis for arable")
+        throw new FdmCalculatorError(
+            "No a_c_of value found in soil analysis for arable",
+            "MISSING_SOIL_PARAMETER",
+            { parameter: "a_c_of" },
+        )
     }
     if (a_cn_fr === null || a_cn_fr === undefined) {
-        throw new Error("No a_cn_fr value found in soil analysis for arable")
+        throw new FdmCalculatorError(
+            "No a_cn_fr value found in soil analysis for arable",
+            "MISSING_SOIL_PARAMETER",
+            { parameter: "a_cn_fr" },
+        )
     }
     if (a_density_sa === null || a_density_sa === undefined) {
-        throw new Error(
+        throw new FdmCalculatorError(
             "No a_density_sa value found in soil analysis for arable",
+            "MISSING_SOIL_PARAMETER",
+            { parameter: "a_density_sa" },
         )
     }
 

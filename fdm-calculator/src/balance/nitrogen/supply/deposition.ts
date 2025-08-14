@@ -1,6 +1,7 @@
 import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
 import Decimal from "decimal.js"
 import { fromUrl } from "geotiff"
+import { FdmCalculatorError } from "../../../error"
 import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 
 /**
@@ -99,8 +100,10 @@ export async function calculateNitrogenSupplyByDeposition(
 
         return { total: deposition }
     } catch (error) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `Error processing GeoTIFF for deposition calculation: ${String(error)}`,
+            "GEOSPATIAL_PROCESSING_ERROR",
+            { error },
         )
     }
 }

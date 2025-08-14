@@ -1,4 +1,5 @@
 import type { Field } from "@svenvw/fdm-core"
+import { FdmCalculatorError } from "../../../error"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
@@ -16,7 +17,7 @@ const FETCH_TIMEOUT_MS = 8000
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to `true` if the field's centroid is found within an GWBG-gebied,
  *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ * @throws {FdmCalculatorError} If there are issues fetching the file or processing its stream.
  */
 export async function isFieldInGWGBGebied(
     b_centroid: Field["b_centroid"],
@@ -39,8 +40,14 @@ export async function isFieldInGWGBGebied(
             signal: controller.signal,
         })
         if (!response.ok) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                "API_FETCH_FAILED",
+                {
+                    url,
+                    status: response.status,
+                    statusText: response.statusText,
+                },
             )
         }
         const json = await response.json()
@@ -48,11 +55,17 @@ export async function isFieldInGWGBGebied(
         return Boolean(feature)
     } catch (err) {
         if ((err as any)?.name === "AbortError") {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Timeout querying GWGB-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+                "API_TIMEOUT",
+                { timeout: FETCH_TIMEOUT_MS },
             )
         }
-        throw new Error(`Error querying GWGB-Gebied : ${String(err)}`)
+        throw new FdmCalculatorError(
+            `Error querying GWGB-Gebied : ${String(err)}`,
+            "GEOSPATIAL_PROCESSING_ERROR",
+            { error: String(err) },
+        )
     } finally {
         clearTimeout(timeout)
     }
@@ -67,7 +80,7 @@ export async function isFieldInGWGBGebied(
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to `true` if the field's centroid is found within an natura2000-gebied or within 100m buffer,
  *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ * @throws {FdmCalculatorError} If there are issues fetching the file or processing its stream.
  */
 export async function isFieldInNatura2000Gebied(
     b_centroid: Field["b_centroid"],
@@ -90,8 +103,14 @@ export async function isFieldInNatura2000Gebied(
             signal: controller.signal,
         })
         if (!response.ok) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                "API_FETCH_FAILED",
+                {
+                    url,
+                    status: response.status,
+                    statusText: response.statusText,
+                },
             )
         }
         const json = await response.json()
@@ -99,11 +118,17 @@ export async function isFieldInNatura2000Gebied(
         return Boolean(feature)
     } catch (err) {
         if ((err as any)?.name === "AbortError") {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Timeout querying Natura2000-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+                "API_TIMEOUT",
+                { timeout: FETCH_TIMEOUT_MS },
             )
         }
-        throw new Error(`Error querying Natura2000-Gebied : ${String(err)}`)
+        throw new FdmCalculatorError(
+            `Error querying Natura2000-Gebied : ${String(err)}`,
+            "GEOSPATIAL_PROCESSING_ERROR",
+            { error: String(err) },
+        )
     } finally {
         clearTimeout(timeout)
     }

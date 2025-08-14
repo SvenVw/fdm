@@ -1,5 +1,6 @@
 import type { HarvestableAnalysis } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import { FdmCalculatorError } from "../../../error"
 import type {
     CultivationDetail,
     FieldInput,
@@ -34,8 +35,10 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
         )
 
         if (!cultivationDetail) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Cultivation ${cultivation.b_lu} has no corresponding cultivation in cultivationDetails`,
+                "INVALID_CULTIVATION_DATA",
+                { cultivation },
             )
         }
 

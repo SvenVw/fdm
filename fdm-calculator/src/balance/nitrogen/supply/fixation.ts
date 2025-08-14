@@ -1,4 +1,5 @@
 import { Decimal } from "decimal.js"
+import { FdmCalculatorError } from "../../../error"
 import type {
     CultivationDetail,
     FieldInput,
@@ -30,8 +31,10 @@ export function calculateNitrogenFixation(
         )
 
         if (!cultivationDetail) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Cultivation ${cultivation.b_lu} has no corresponding cultivation in cultivationDetails`,
+                "INVALID_CULTIVATION_DATA",
+                { cultivation },
             )
         }
         const b_n_fixation = cultivationDetail.b_n_fixation

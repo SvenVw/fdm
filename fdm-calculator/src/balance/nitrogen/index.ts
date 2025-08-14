@@ -79,7 +79,10 @@ export async function calculateNitrogenBalance(
         // Convert the final result to use numbers instead of Decimals
         return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
     } catch (error) {
-        throw new Error(String(error))
+        if (error instanceof FdmCalculatorError) {
+            throw error
+        }
+        throw new FdmCalculatorError(String(error), "CALCULATION_FAILED", { error })
     }
 }
 

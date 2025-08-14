@@ -1,5 +1,6 @@
 import type { FertilizerApplication } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import { FdmCalculatorError } from "../../../../error"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -41,8 +42,10 @@ export function calculateAmmoniaEmissionsByManure(
         )
 
         if (!fertilizerDetail) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
+                "INVALID_FERTILIZER_DATA",
+                { application },
             )
         }
         const p_nh4_rt = new Decimal(fertilizerDetail.p_nh4_rt ?? 0)

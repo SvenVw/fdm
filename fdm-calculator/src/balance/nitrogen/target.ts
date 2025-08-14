@@ -1,5 +1,6 @@
 import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
+import { FdmCalculatorError } from "../../error"
 import type {
     CultivationDetail,
     FieldInput,
@@ -53,7 +54,11 @@ export function calculateTargetForNitrogenBalance(
     ) {
         soilType = "sand"
     } else {
-        throw new Error("Unknown soil type")
+        throw new FdmCalculatorError(
+            `Unknown soil type: ${soilAnalysis.b_soiltype_agr}`,
+            "MISSING_SOIL_PARAMETER",
+            { parameter: "b_soiltype_agr", value: soilAnalysis.b_soiltype_agr },
+        )
     }
 
     // Determine groundwaterclass
@@ -100,7 +105,11 @@ export function calculateTargetForNitrogenBalance(
     ) {
         groundwaterClass = "wet"
     } else {
-        throw new Error("Unknown groundwater class")
+        throw new FdmCalculatorError(
+            `Unknown groundwater class: ${soilAnalysis.b_gwl_class}`,
+            "MISSING_SOIL_PARAMETER",
+            { parameter: "b_gwl_class", value: soilAnalysis.b_gwl_class },
+        )
     }
 
     // Determine targetValue based on Ros et al. 2023
@@ -141,7 +150,11 @@ export function calculateTargetForNitrogenBalance(
     } else if (cultivationType === "arable" && soilType === "clay") {
         targetValue = new Decimal(125)
     } else {
-        throw new Error("Unknown combination of classes")
+        throw new FdmCalculatorError("Unknown combination of classes", "CALCULATION_FAILED", {
+            cultivationType,
+            soilType,
+            groundwaterClass,
+        })
     }
 
     // Adjust for the number of days

@@ -1,4 +1,5 @@
 import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
+import { FdmCalculatorError } from "../error"
 import type { Dose } from "./d"
 
 /**
@@ -42,7 +43,13 @@ export function calculateDose({
     fertilizers: Fertilizer[]
 }): { dose: Dose; applications: Dose[] } {
     if (applications.some((app) => app.p_app_amount < 0)) {
-        throw new Error("Application amounts must be non-negative")
+        throw new FdmCalculatorError(
+            "Application amounts must be non-negative",
+            "INVALID_APPLICATION_AMOUNT",
+            {
+                applications: applications.filter((app) => app.p_app_amount < 0),
+            },
+        )
     }
 
     const nutrientRates = [
@@ -66,7 +73,17 @@ export function calculateDose({
             nutrientRates.some((rate) => (fert[rate] ? fert[rate] < 0 : false)),
         )
     ) {
-        throw new Error("Nutrient rates must be non-negative")
+        throw new FdmCalculatorError(
+            "Nutrient rates must be non-negative",
+            "INVALID_FERTILIZER_DATA",
+            {
+                fertilizers: fertilizers.filter((fert) =>
+                    nutrientRates.some((rate) =>
+                        fert[rate] ? fert[rate] < 0 : false,
+                    ),
+                ),
+            },
+        )
     }
 
     const initialDose: Dose = {
@@ -95,8 +112,10 @@ export function calculateDose({
             (f) => f.p_id_catalogue === application.p_id_catalogue,
         )
         if (!fertilizer) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Fertilizer ${application.p_id_catalogue} not found for application ${application.p_app_id}`,
+                "INVALID_FERTILIZER_DATA",
+                { application },
             )
         }
         const currentDose = { ...initialDose, p_app_id: application.p_app_id }

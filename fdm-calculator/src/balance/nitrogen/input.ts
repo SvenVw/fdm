@@ -13,6 +13,7 @@ import {
     getHarvests,
     getSoilAnalyses,
 } from "@svenvw/fdm-core"
+import { FdmCalculatorError } from "../../error"
 import type { NitrogenBalanceInput } from "./types"
 
 /**
@@ -131,10 +132,11 @@ export async function collectInputForNitrogenBalance(
             }
         })
     } catch (error) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `Failed to collect nitrogen balance input for farm ${b_id_farm}: ${
                 error instanceof Error ? error.message : String(error)
             }`,
+            "CALCULATION_FAILED",
             { cause: error },
         )
     }

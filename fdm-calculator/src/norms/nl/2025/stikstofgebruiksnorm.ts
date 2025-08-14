@@ -2,6 +2,7 @@ import type { Field } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
+import { FdmCalculatorError } from "../../../error"
 import type {
     GebruiksnormResult,
     NitrogenStandard,
@@ -22,7 +23,7 @@ const FETCH_TIMEOUT_MS = 8000
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to `true` if the field's centroid is found within an NV-gebied,
  *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ * @throws {FdmCalculatorError} If there are issues fetching the file or processing its stream.
  */
 export async function isFieldInNVGebied(
     b_centroid: Field["b_centroid"],
@@ -45,8 +46,14 @@ export async function isFieldInNVGebied(
             signal: controller.signal,
         })
         if (!response.ok) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                "API_FETCH_FAILED",
+                {
+                    url,
+                    status: response.status,
+                    statusText: response.statusText,
+                },
             )
         }
         const json = await response.json()
@@ -54,11 +61,17 @@ export async function isFieldInNVGebied(
         return Boolean(feature)
     } catch (err) {
         if ((err as any)?.name === "AbortError") {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Timeout querying NV-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+                "API_TIMEOUT",
+                { timeout: FETCH_TIMEOUT_MS },
             )
         }
-        throw new Error(`Error querying NV-Gebied : ${String(err)}`)
+        throw new FdmCalculatorError(
+            `Error querying NV-Gebied : ${String(err)}`,
+            "GEOSPATIAL_PROCESSING_ERROR",
+            { error: String(err) },
+        )
     } finally {
         clearTimeout(timeout)
     }
@@ -73,7 +86,7 @@ export async function isFieldInNVGebied(
  *   This point is used to query the geographical data.
  * @returns A promise that resolves to a `RegionKey` (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") if the
  *   field's centroid is found within a defined soil region.
- * @throws {Error} If there are issues fetching the file, processing its stream,
+ * @throws {FdmCalculatorError} If there are issues fetching the file, processing its stream,
  *   or if the field's coordinates do not fall within any known region.
  *
  * @remarks
@@ -101,8 +114,14 @@ export async function getRegion(
             signal: controller.signal,
         })
         if (!response.ok) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                "API_FETCH_FAILED",
+                {
+                    url,
+                    status: response.status,
+                    statusText: response.statusText,
+                },
             )
         }
         const json = await response.json()
@@ -110,13 +129,27 @@ export async function getRegion(
         if (feature) {
             return feature.region as RegionKey
         }
+        throw new FdmCalculatorError(
+            `Region not found for coordinates: [${longitude}, ${latitude}]`,
+            "REGION_NOT_SUPPORTED",
+            { longitude, latitude },
+        )
     } catch (err) {
+        if (err instanceof FdmCalculatorError) {
+            throw err
+        }
         if ((err as any)?.name === "AbortError") {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Timeout querying Table2 Region after ${FETCH_TIMEOUT_MS}ms`,
+                "API_TIMEOUT",
+                { timeout: FETCH_TIMEOUT_MS },
             )
         }
-        throw new Error(`Error querying Table2 Region : ${String(err)}`)
+        throw new FdmCalculatorError(
+            `Error querying Table2 Region : ${String(err)}`,
+            "GEOSPATIAL_PROCESSING_ERROR",
+            { error: String(err) },
+        )
     } finally {
         clearTimeout(timeout)
     }
@@ -370,7 +403,7 @@ function calculateKorting(
  *   - `normSource`: The descriptive name from RVO Table 2 used for the calculation.
  *   - `kortingDescription`: A description of any korting (reduction) applied to the norm.
  * Returns `null` if no matching standard or applicable norm can be found for the given input.
- * @throws {Error} If the `hoofdteelt` cultivation cannot be found or if geographical data
+ * @throws {FdmCalculatorError} If the `hoofdteelt` cultivation cannot be found or if geographical data
  *   queries fail.
  *
  * @remarks
@@ -455,8 +488,10 @@ export async function getNL2025StikstofGebruiksNorm(
         }
     }
     if (!cultivation) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `Cultivation with b_lu_catalogue ${b_lu_catalogue} not found`,
+            "INVALID_CULTIVATION_DATA",
+            { b_lu_catalogue },
         )
     }
 
@@ -471,8 +506,13 @@ export async function getNL2025StikstofGebruiksNorm(
     )
 
     if (matchingStandards.length === 0) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `No matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue}.`,
+            "CULTIVATION_NORM_NOT_FOUND",
+            {
+                b_lu_catalogue,
+                year: 2025,
+            },
         )
     }
 
@@ -543,10 +583,17 @@ export async function getNL2025StikstofGebruiksNorm(
     }
 
     if (!selectedStandard) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `No specific matching nitrogen standard found for b_lu_catalogue ${b_lu_catalogue} with variety ${
                 cultivation.b_lu_variety || "N/A"
             } in region ${region}.`,
+            "CULTIVATION_NORM_NOT_FOUND",
+            {
+                b_lu_catalogue,
+                variety: cultivation.b_lu_variety || "N/A",
+                region,
+                year: 2025,
+            },
         )
     }
 
@@ -558,8 +605,14 @@ export async function getNL2025StikstofGebruiksNorm(
     )
 
     if (!applicableNorms) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `Applicable norms object is undefined for ${selectedStandard.cultivation_rvo_table2} in region ${region}.`,
+            "CULTIVATION_NORM_NOT_FOUND",
+            {
+                cultivation: selectedStandard.cultivation_rvo_table2,
+                region,
+                year: 2025,
+            },
         )
     }
 
@@ -567,8 +620,14 @@ export async function getNL2025StikstofGebruiksNorm(
         applicableNorms[region]
 
     if (!normsForRegion) {
-        throw new Error(
+        throw new FdmCalculatorError(
             `No norms found for region ${region} for ${selectedStandard.cultivation_rvo_table2}.`,
+            "CULTIVATION_NORM_NOT_FOUND",
+            {
+                cultivation: selectedStandard.cultivation_rvo_table2,
+                region,
+                year: 2025,
+            },
         )
     }
 

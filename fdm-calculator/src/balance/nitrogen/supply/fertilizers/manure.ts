@@ -1,4 +1,5 @@
 import { Decimal } from "decimal.js"
+import { FdmCalculatorError } from "../../../../error"
 import type {
     FertilizerDetail,
     FieldInput,
@@ -32,8 +33,10 @@ export function calculateNitrogenSupplyByManure(
         )
 
         if (!fertilizerDetail) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Fertilizer application ${application.p_app_id} has no fertilizerDetails`,
+                "INVALID_FERTILIZER_DATA",
+                { application },
             )
         }
         const p_n_rt = new Decimal(fertilizerDetail.p_n_rt ?? 0)

@@ -1,5 +1,6 @@
 import type { HarvestableAnalysis } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import { FdmCalculatorError } from "../../../error"
 import type {
     CultivationDetail,
     FieldInput,
@@ -31,8 +32,10 @@ export function calculateNitrogenRemovalByHarvests(
             return cultivation.b_lu === b_lu
         })?.b_lu_catalogue
         if (!b_lu_catalogue) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Harvest ${harvest.b_id_harvesting}: cultivation with b_lu '${b_lu}' is missing b_lu_catalogue`,
+                "INVALID_CULTIVATION_DATA",
+                { harvest },
             )
         }
 
@@ -40,8 +43,10 @@ export function calculateNitrogenRemovalByHarvests(
         const cultivationDetail = cultivationDetailsMap.get(b_lu_catalogue)
 
         if (!cultivationDetail) {
-            throw new Error(
+            throw new FdmCalculatorError(
                 `Cultivation ${b_lu_catalogue} has no corresponding cultivation in cultivationDetails`,
+                "INVALID_CULTIVATION_DATA",
+                { b_lu_catalogue },
             )
         }
 

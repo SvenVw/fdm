@@ -5,6 +5,7 @@ import {
     getField,
     type PrincipalId,
 } from "@svenvw/fdm-core"
+import { FdmCalculatorError } from "../error"
 import { calculateDose } from "./calculate-dose"
 import type { Dose } from "./d"
 
@@ -29,7 +30,7 @@ export async function getDoseForField({
     fdm: FdmType
     principal_id: PrincipalId
     b_id: string
-}): Promise<Dose> {
+}): Promise<{dose: Dose; applications: Dose[]}> {
     // Get the fertilizer applications for this field
     try {
         // Get the fertilizer applications for this field
@@ -49,8 +50,13 @@ export async function getDoseForField({
         // Calculate the dose per nutrient for this field
         return calculateDose({ applications, fertilizers })
     } catch (error) {
-        throw new Error(
+        if (error instanceof FdmCalculatorError) {
+            throw error
+        }
+        throw new FdmCalculatorError(
             `Failed to calculate dose for field ${b_id}: ${error.message}`,
+            "CALCULATION_FAILED",
+            { b_id, error },
         )
     }
 }

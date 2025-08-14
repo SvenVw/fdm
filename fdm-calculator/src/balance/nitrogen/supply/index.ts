@@ -1,3 +1,4 @@
+import { FdmCalculatorError } from "../../../error"
 import type {
     CultivationDetail,
     FertilizerDetail,
@@ -77,9 +78,13 @@ export async function calculateNitrogenSupply(
 
         return supply
     } catch (error) {
-        console.error("Error calculating nitrogen supply:", error)
-        throw new Error(
+        if (error instanceof FdmCalculatorError) {
+            throw error
+        }
+        throw new FdmCalculatorError(
             `Failed to calculate nitrogen supply: ${error instanceof Error ? error.message : "Unknown error"}`,
+            "CALCULATION_FAILED",
+            { error },
         )
     }
 }

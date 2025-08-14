@@ -1,4 +1,5 @@
 import Decimal from "decimal.js"
+import { FdmCalculatorError } from "../../../error"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import type {
@@ -143,8 +144,10 @@ export async function getNL2025FosfaatGebruiksNorm(
     const a_p_al = input.soilAnalysis.a_p_al
 
     if (!a_p_al || !a_p_cc) {
-        throw new Error(
+        throw new FdmCalculatorError(
             "Missing soil analysis data for NL 2025 Fosfaatgebruiksnorm",
+            "MISSING_SOIL_PARAMETER",
+            { a_p_al, a_p_cc },
         )
     }
 
@@ -158,7 +161,11 @@ export async function getNL2025FosfaatGebruiksNorm(
     const normsForKlasse = fosfaatNormsData[0][fosfaatKlasse]
 
     if (!normsForKlasse) {
-        throw new Error(`No phosphate norms found for class ${fosfaatKlasse}.`)
+        throw new FdmCalculatorError(
+            `No phosphate norms found for class ${fosfaatKlasse}.`,
+            "PHOSPHATE_NORM_NOT_FOUND",
+            { fosfaatKlasse },
+        )
     }
 
     // Select the specific norm based on whether it's grassland or arable land.
