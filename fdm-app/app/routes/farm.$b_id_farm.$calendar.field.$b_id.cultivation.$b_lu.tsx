@@ -5,6 +5,8 @@ import {
     getHarvests,
     removeCultivation,
     updateCultivation,
+    type CultivationCatalogue,
+    type CultivationCatalogueItem,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -106,11 +108,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Get available cultivations for the farm
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
+        let b_lu_variety_options: { value: string; label: string }[] = []
+        let b_lu_harvestable: HarvestableType = "none"
+
+        const cultivationsCatalogue: CultivationCatalogue[] =
+            await getCultivationsFromCatalogue(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
         // Map cultivations to options for the combobox
         const cultivationsCatalogueOptions = cultivationsCatalogue.map(
             (cultivation) => {
@@ -139,12 +145,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
 
-        let b_lu_harvestable: HarvestableType = "none"
-        const cultivationCatalogueItem = cultivationsCatalogue.find((item) => {
-            return item.b_lu_catalogue === cultivation.b_lu_catalogue
-        })
+        const cultivationCatalogueItem: CultivationCatalogueItem | undefined =
+            cultivationsCatalogue.find((item) => {
+                return item.b_lu_catalogue === cultivation.b_lu_catalogue
+            })
         if (cultivationCatalogueItem) {
             b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
+            if (cultivationCatalogueItem.b_lu_variety_options) {
+                b_lu_variety_options =
+                    cultivationCatalogueItem.b_lu_variety_options.map(
+                        (option: string) => ({
+                            value: option,
+                            label: option,
+                        }),
+                    )
+            }
         }
 
         // Return user information from loader
@@ -154,6 +169,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             cultivation: cultivation,
             harvests: harvests,
             b_lu_harvestable: b_lu_harvestable,
+            b_lu_variety_options: b_lu_variety_options,
             b_id_farm: b_id_farm,
             calendar: calendar,
         }
@@ -176,8 +192,7 @@ export default function FarmFieldsOverviewBlock() {
                 cultivation={loaderData.cultivation}
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
-                // b_id_farm={loaderData.b_id_farm}
-                // calendar={loaderData.calendar}
+                b_lu_variety_options={loaderData.b_lu_variety_options}
             />
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
@@ -223,7 +238,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 request,
                 CultivationDetailsFormSchema,
             )
-            const { b_lu_start, b_lu_end, m_cropresidue } = formValues
+            const { b_lu_start, b_lu_end, m_cropresidue, b_lu_variety } =
+                formValues
 
             await updateCultivation(
                 fdm,
@@ -233,6 +249,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_lu_start,
                 b_lu_end,
                 m_cropresidue,
+                b_lu_variety,
             )
 
             return dataWithSuccess(
