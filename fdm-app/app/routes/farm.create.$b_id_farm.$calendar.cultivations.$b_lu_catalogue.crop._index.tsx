@@ -3,6 +3,7 @@ import {
     getCultivationsFromCatalogue,
     type Harvest,
     updateCultivation,
+    type CultivationCatalogue,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -88,11 +89,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get the available cultivations
         let b_lu_harvestable: HarvestableType = "none"
-        const cultivationsCatalogue = await getCultivationsFromCatalogue(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
+        let b_lu_variety_options: { value: string; label: string }[] = []
+
+        const cultivationsCatalogue: CultivationCatalogue[] =
+            await getCultivationsFromCatalogue(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+            )
         const cultivationCatalogueItem = cultivationsCatalogue.find(
             (cultivation) => {
                 return cultivation.b_lu_catalogue === b_lu_catalogue
@@ -101,6 +105,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         if (cultivationCatalogueItem) {
             b_lu_harvestable = cultivationCatalogueItem.b_lu_harvestable
+            if (cultivationCatalogueItem.b_lu_variety_options) {
+                b_lu_variety_options =
+                    cultivationCatalogueItem.b_lu_variety_options.map(
+                        (option: string) => ({
+                            value: option,
+                            label: option,
+                        }),
+                    )
+            }
         }
 
         // Combine similar harvests across all fields of the target cultivation.
@@ -148,6 +161,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             cultivation: targetCultivation,
             b_lu_harvestable: b_lu_harvestable,
+            b_lu_variety_options: b_lu_variety_options,
             harvests: harvests,
             calendar: calendar,
         }
@@ -174,6 +188,7 @@ export default function FarmAFieldCultivationBlock() {
                 cultivation={loaderData.cultivation}
                 harvests={loaderData.harvests}
                 b_lu_harvestable={loaderData.b_lu_harvestable}
+                b_lu_variety_options={loaderData.b_lu_variety_options}
             />
             <CultivationHarvestsCard
                 harvests={loaderData.harvests}
@@ -244,6 +259,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                             undefined,
                             formValues.b_lu_start,
                             formValues.b_lu_end,
+                            formValues.m_cropresidue,
+                            formValues.b_lu_variety,
                         )
                     }
                 }),
