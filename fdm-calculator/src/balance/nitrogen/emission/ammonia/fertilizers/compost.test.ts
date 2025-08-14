@@ -105,12 +105,12 @@ describe("calculateNitrogenEmissionViaAmmoniaByCompost", () => {
         // app2: 500 * 0.4 * 0.264 / 1000 = 0.0528 kg N
         // Total: 0.34 + 0.0528 = 0.3928 kg N
 
-        expect(result.total.toNumber()).toBeCloseTo(0.3928)
+        expect(result.total.toNumber()).toBeCloseTo(-0.3928)
         expect(result.applications.length).toBe(2)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.34)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications[1].id).toBe("app2")
-        expect(result.applications[1].value.toNumber()).toBeCloseTo(0.0528)
+        expect(result.applications[1].value.toNumber()).toBeCloseTo(-0.0528)
     })
 
     it("should return 0 for applications that are not compost type", () => {
@@ -260,10 +260,10 @@ describe("calculateNitrogenEmissionViaAmmoniaByCompost", () => {
         // app2 (mineral): 0
         // Total: 0.34 kg N
 
-        expect(result.total.toNumber()).toBeCloseTo(0.34)
+        expect(result.total.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications.length).toBe(2)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.34)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications[1].id).toBe("app2")
         expect(result.applications[1].value.toNumber()).toBe(0)
     })

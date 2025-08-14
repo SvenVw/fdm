@@ -64,6 +64,7 @@ export function calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
             .times(p_n_rt)
             .times(emissionFactor)
             .dividedBy(1000) // convert from g N to kg N
+            .times(-1) // Return negative value
 
         return {
             id: application.p_app_id,

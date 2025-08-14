@@ -51,10 +51,10 @@ describe("calculateNitrogenEmissionViaAmmoniaByMineralFertilizers", () => {
         )
 
         // Expected value: 1000 * 0.8 * 0.1 / 1000 = 0.08 kg N
-        expect(result.total.toNumber()).toBeCloseTo(0.08)
+        expect(result.total.toNumber()).toBeCloseTo(-0.08)
         expect(result.applications.length).toBe(1)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.08)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.08)
     })
 
     it("should calculate ammonia emissions for mineral applications without p_ef_nh3 (using determineMineralAmmoniaEmmissionFactor)", () => {
@@ -96,10 +96,10 @@ describe("calculateNitrogenEmissionViaAmmoniaByMineralFertilizers", () => {
         // EF = 6.3189e-6 - 8.616e-7 + 2.2482e-5 = 2.79393e-5
         // Application value: 1000 * 0.8 * 2.79393e-5 / 1000 = 2.235144e-5 kg N
 
-        expect(result.total.toNumber()).toBeCloseTo(2.235144e-5)
+        expect(result.total.toNumber()).toBeCloseTo(-2.235144e-5)
         expect(result.applications.length).toBe(1)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(2.235144e-5)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-2.235144e-5)
     })
 
     it("should return 0 for applications that are not mineral type", () => {

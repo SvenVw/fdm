@@ -144,10 +144,10 @@ describe("calculateNitrogenEmissionViaAmmoniaByOtherFertilizers", () => {
             fertilizerDetailsMap,
         )
 
-        expect(result.total.toNumber()).toBeCloseTo(0.01)
+        expect(result.total.toNumber()).toBeCloseTo(-0.01)
         expect(result.applications.length).toBe(1)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.01)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.01)
     })
 
     it("should throw an error if fertilizerDetail is missing for an application", () => {
