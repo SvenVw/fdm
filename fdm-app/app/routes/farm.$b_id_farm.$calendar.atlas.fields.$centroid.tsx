@@ -3,30 +3,17 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    Await,
+    useLocation,
 } from "react-router"
-import { getSession } from "~/lib/auth.server"
 import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getCultivationCatalogue } from "@svenvw/fdm-data"
-import {
-    FarmTitle,
-    FarmTitleSkeleton,
-} from "~/components/blocks/farm/farm-title"
-import {
-    CultivationHistoryCard,
-    CultivationHistorySkeleton,
-} from "~/components/blocks/atlas-fields/cultivation-history"
-import {
-    SoilTextureCard,
-    SoilTextureSkeleton,
-} from "~/components/blocks/atlas-fields/soil-texture"
-import {
-    GroundwaterCard,
-    GroundwaterSkeleton,
-} from "~/components/blocks/atlas-fields/groundwater"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { CultivationHistoryCard } from "~/components/blocks/atlas-fields/cultivation-history"
+import { SoilTextureCard } from "~/components/blocks/atlas-fields/soil-texture"
+import { GroundwaterCard } from "~/components/blocks/atlas-fields/groundwater"
 import {
     FieldDetailsCard,
     FieldDetailsSkeleton,
@@ -40,6 +27,9 @@ import {
 } from "@svenvw/fdm-calculator"
 import { getFieldByCentroid } from "~/components/blocks/atlas-fields/query"
 import type { Feature, Point } from "geojson"
+import { use } from "react"
+import { FieldDetailsAtlasLayout } from "../components/blocks/atlas-fields/layout"
+import { ErrorBlock } from "../components/custom/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -52,7 +42,7 @@ export const meta: MetaFunction = () => {
     ]
 }
 
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
         const b_id_farm = params.b_id_farm
@@ -62,9 +52,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Farm ID is required",
             })
         }
-
-        // Get the session
-        const session = await getSession(request)
 
         // Get timeframe from calendar store
         const calendar = getCalendar(params)
@@ -84,6 +71,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Centroid must be in format: longitude,latitude",
             })
         }
+
+        return {
+            calendar,
+            centroid,
+            asyncData: loadAsyncData(calendar, latitude, longitude),
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
+    }
+}
+
+async function loadAsyncData(
+    calendar: string,
+    latitude: number,
+    longitude: number,
+) {
+    try {
         const fieldPromise = getFieldByCentroid(longitude, latitude, calendar)
         const field = {
             type: "Feature",
@@ -164,95 +168,73 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             calendar,
         }
     } catch (error) {
-        throw handleLoaderError(error)
+        return { errorMessage: String(error).replace("Error: ", "") }
     }
 }
 
 export default function FieldDetailsAtlasBlock() {
-    const {
-        cultivationHistory,
-        calendar,
-        soilParameterEstimates,
-        groundwaterEstimates,
-        fieldDetails,
-    } = useLoaderData<typeof loader>()
+    const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <main>
-            <Suspense fallback={<FarmTitleSkeleton />}>
-                <Await resolve={cultivationHistory}>
-                    {(resolvedCultivationHistory) => (
-                        <FarmTitle
-                            title={
-                                resolvedCultivationHistory.find(
-                                    (cultivation: { year: number }) =>
-                                        cultivation.year === Number(calendar),
-                                )?.b_lu_name ?? "Onbekend gewas"
-                            }
-                            description="Bekijk alle details over dit perceel"
-                        />
-                    )}
-                </Await>
-            </Suspense>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-10 items-start">
-                {/* Cultivation History - Mobile (order 2), Desktop (order 1) */}
-                <div className="order-2 lg:order-1 lg:col-span-1">
-                    <Suspense fallback={<CultivationHistorySkeleton />}>
-                        <Await resolve={cultivationHistory}>
-                            {(resolvedCultivationHistory) => (
-                                <CultivationHistoryCard
-                                    cultivationHistory={
-                                        resolvedCultivationHistory
-                                    }
-                                />
-                            )}
-                        </Await>
-                    </Suspense>
-                </div>
-                {/* Grouped Detail Cards - Mobile (order 1, 3, 4), Desktop (order 2) */}
-                <div className="contents lg:block lg:order-2 lg:col-span-2 lg:space-y-4">
-                    {/* Field Details - Mobile first (order 1) */}
-                    <div className="order-1">
-                        <Suspense fallback={<FieldDetailsSkeleton />}>
-                            <Await resolve={fieldDetails}>
-                                {(resolvedFieldDetails) => (
-                                    <FieldDetailsCard
-                                        fieldDetails={resolvedFieldDetails}
-                                    />
-                                )}
-                            </Await>
-                        </Suspense>
-                    </div>
-                    {/* Soil Texture - Mobile (order 3) */}
-                    <div className="order-3">
-                        <Suspense fallback={<SoilTextureSkeleton />}>
-                            <Await resolve={soilParameterEstimates}>
-                                {(resolvedSoilParameterEstimates) => (
-                                    <SoilTextureCard
-                                        soilParameterEstimates={
-                                            resolvedSoilParameterEstimates
-                                        }
-                                    />
-                                )}
-                            </Await>
-                        </Suspense>
-                    </div>
-                    {/* Ground Water - Mobile (order 4) */}
-                    <div className="order-4">
-                        <Suspense fallback={<GroundwaterSkeleton />}>
-                            <Await resolve={groundwaterEstimates}>
-                                {(resolvedGroundwaterEstimates) => (
-                                    <GroundwaterCard
-                                        groundwaterEstimates={
-                                            resolvedGroundwaterEstimates
-                                        }
-                                    />
-                                )}
-                            </Await>
-                        </Suspense>
-                    </div>
-                </div>
-            </div>
-        </main>
+        <Suspense key={loaderData.centroid} fallback={<FieldDetailsSkeleton />}>
+            <FieldDetailsAtlas {...loaderData} />
+        </Suspense>
+    )
+}
+
+function FieldDetailsAtlas({
+    calendar,
+    asyncData,
+}: Awaited<ReturnType<typeof loader>>) {
+    const {
+        fieldDetails,
+        cultivationHistory,
+        groundwaterEstimates,
+        soilParameterEstimates,
+        errorMessage,
+    } = use(asyncData)
+
+    const location = useLocation()
+
+    if (typeof errorMessage === "string") {
+        return (
+            <ErrorBlock
+                page={location.pathname}
+                timestamp={new Date().toISOString()}
+                status={500}
+                message={errorMessage}
+                stacktrace={undefined}
+            />
+        )
+    }
+
+    return (
+        <FieldDetailsAtlasLayout
+            title={
+                <FarmTitle
+                    title={
+                        cultivationHistory.find(
+                            (cultivation: { year: number }) =>
+                                cultivation.year === Number(calendar),
+                        )?.b_lu_name ?? "Onbekend gewas"
+                    }
+                    description="Bekijk alle details over dit perceel"
+                />
+            }
+            cultivationHistory={
+                <CultivationHistoryCard
+                    cultivationHistory={cultivationHistory}
+                />
+            }
+            fieldDetails={<FieldDetailsCard fieldDetails={fieldDetails} />}
+            soilTexture={
+                <SoilTextureCard
+                    soilParameterEstimates={soilParameterEstimates}
+                />
+            }
+            groundWater={
+                <GroundwaterCard groundwaterEstimates={groundwaterEstimates} />
+            }
+        />
     )
 }
