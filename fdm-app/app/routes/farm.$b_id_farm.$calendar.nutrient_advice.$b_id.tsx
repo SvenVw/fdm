@@ -151,7 +151,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function FieldNutrientAdviceBlock() {
-    const loaderData = useLoaderData()
+    const loaderData = useLoaderData<typeof loader>()
     const { field, nutrientsDescription } = loaderData
 
     const primaryNutrients = nutrientsDescription.filter(
@@ -172,7 +172,7 @@ export default function FieldNutrientAdviceBlock() {
 
     return (
         <Suspense
-            key={`${field.b_id_farm}#${field.b_id}`}
+            key={`${field.b_id_farm}#${loaderData.calendar}#${field.b_id}`}
             fallback={<FieldNutrientAdviceSkeleton {...splittedNutrients} />}
         >
             <FieldNutrientAdvice

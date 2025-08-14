@@ -140,15 +140,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         )
 
                         // Calculate the norms
-                        const normManure =
-                            await functionsForms.calculateNormForManure(input)
-                        const normPhosphate =
-                            await functionsForms.calculateNormForPhosphate(
-                                input,
-                            )
+                        const [normManure, normPhosphate, normNitrogen] =
+                            await Promise.all([
+                                functionsForms.calculateNormForManure(input),
+                                functionsForms.calculateNormForPhosphate(input),
+                                functionsForms.calculateNormForNitrogen(input),
+                            ])
                         // const normNitrogen = { normValue: 230, normSource: "test" }
-                        const normNitrogen =
-                            await functionsForms.calculateNormForNitrogen(input)
 
                         return {
                             b_id: field.b_id,
@@ -211,7 +209,7 @@ export default function FarmNormsBlock() {
                     }
                 />
                 <Suspense
-                    key={`${loaderData.b_id_farm}#${loaderData.b_id}`}
+                    key={`${loaderData.b_id_farm}#${loaderData.calendar}`}
                     fallback={<NormsFallback />}
                 >
                     <Norms {...loaderData} />

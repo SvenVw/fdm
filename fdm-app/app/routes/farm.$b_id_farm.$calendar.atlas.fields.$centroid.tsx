@@ -175,7 +175,7 @@ export default function FieldDetailsAtlasBlock() {
 
     return (
         <Suspense
-            key={loaderData.centroid}
+            key={`${loaderData.calendar}#${loaderData.centroid}`}
             fallback={<FieldDetailsAtlasSkeleton />}
         >
             <FieldDetailsAtlas {...loaderData} />
