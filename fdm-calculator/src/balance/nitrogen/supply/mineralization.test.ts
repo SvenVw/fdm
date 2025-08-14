@@ -112,6 +112,35 @@ describe("calculateNitrogenSupplyBySoilMineralization", () => {
         expect(result.total.toNumber()).toBeCloseTo(160, 0)
     })
 
+    it("should calculate mineralization for dalgrond soil", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2023-12-31",
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "dalgrond",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(20, 0)
+    })
+
     it("should return mineralization for arable land for grassland not in the May 15 - July 15 window", () => {
         const cultivations: FieldInput["cultivations"] = [
             {
