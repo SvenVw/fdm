@@ -13,7 +13,7 @@ export function getAvailableFieldsUrl(calendar: string): string {
 
     // Set version according to availability at FDM public datasets
     let version = "definitive"
-    if (year >= 2024) {
+    if (year >= 2025) {
         version = "draft"
     }
 
