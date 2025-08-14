@@ -11,17 +11,18 @@ This document explains how the nitrogen (N) balance is calculated within the FDM
 
 Nitrogen is a macronutrient essential for plant growth, playing a vital role in photosynthesis, protein synthesis, and overall crop development. However, nitrogen is also highly dynamic in agricultural systems, subject to various inputs, outputs, and transformations. An accurate nitrogen balance helps in understanding the nitrogen cycle on a farm, identifying potential nutrient deficiencies or surpluses, and guiding sustainable fertilization practices.
 
-The nitrogen balance for each field is determined by the formula:
+The final nitrogen balance for each field is determined by the formula:
 
 ```text
-N Balance (kg N / ha) = N Supply - N Removal - N Volatilization
+N Balance (kg N / ha) = N Supply - N Removal - N-NH3 Emission
 ```
 
+Where:
 *  **N Supply:** Nitrogen added to the field.
 *  **N Removal:** Nitrogen taken off the field.
-*  **N Volatilization:** Nitrogen lost to the atmosphere as gases (primarily ammonia).
+*  **N-NH3 Emission:** Nitrogen lost to the environment due to  ammonia volatilization.
 
-(Note: In the calculation, N Removal and N Volatilization are typically treated as negative values when summing components to derive the final balance.)
+(Note: In the calculation, N Removal and N-NH3 Emission are typically treated as negative values when summing components to derive the final balance.)
 
 The calculations are performed for a user-defined **Time Frame**.
 
@@ -106,66 +107,22 @@ Atmospheric deposition refers to the input of nitrogen compounds from the atmosp
 
 #### 3.1.4. Soil Mineralization
 
-Soil mineralization is a crucial biological process where organic nitrogen (N) compounds in soil organic matter (SOM) are converted by microorganisms into inorganic, plant-available forms, primarily ammonium (NH4+). This process is a significant natural source of nitrogen for crops, and its rate is influenced by factors such as SOM content, C / N ratio of organic matter, soil temperature, and moisture. The Minip model is an empirical model used to estimate this complex biological process.
-*  **Method (Minip Model):**
-  1.  The calculation uses soil parameters:
-        *  `a_c_of`: Organic carbon content (g C / kg soil).
-        *  `a_cn_fr`: C / N ratio (unitless).
-        *  `a_density_sa`: Soil bulk density (g / cm³).
-  2.  Fixed parameters for the model:
-        *  `w_temp_mean`: Average annual temperature = 10.6 °C.
-        *  `bouwvoor`: Topsoil depth = 20 cm.
-  3.  **Temperature Correction Factor (`temp_corr`):** This factor adjusts the mineralization rate based on the average temperature, reflecting that microbial activity (and thus mineralization) is highly temperature-dependent.
-        *  If `-1 < w_temp_mean <= 9` °C:
-            `temp_corr = w_temp_mean * 0.1`
-        *  If `9 < w_temp_mean <= 27` °C:
-            `temp_corr = 2 ^ ((w_temp_mean - 9) / 9)`
-        *  If `w_temp_mean > 27` °C, an error is thrown, as the model's applicability range is exceeded.
-  4.  **Decomposable Carbon Fraction (`cDec`, g C / kg soil):** This represents the portion of soil organic carbon that is readily available for microbial decomposition and subsequent nitrogen release.
-   Let `Tc` be `temp_corr`.
-   Let `C_org` be `a_c_of`.
-        ```
-        b = (Tc * 10 + 17)^(-0.6)
-        c = 17^(-0.6)
-        d = exp(4.7 * (b - c))
-        e = 1 - d
-        cDec = (C_org * e)  /  10
-        ```
-  5.  **Annual N Mineralization Rate (`N_min_annual`, kg N / ha / year):** This is the estimated amount of nitrogen released annually from the soil organic matter.
-   Let `CN` be `a_cn_fr`.
-   Let `D_bv` be `bouwvoor` (cm).
-   Let `rho_b` be `a_density_sa` (g / cm³).
-        ```
-        f = (1.5 * cDec) / CN
-        g = cDec / D_bv
-        N_min_annual = (f - g) * 10000 * (D_bv / 100) * rho_b
-        ```
-   *(Note: The formulas are presented in a simplified text format due to rendering issues with complex mathematical notation in this documentation environment.)*
-  6.  This annual rate is then capped (min: 5 kg N / ha / year, max: 250 kg N / ha / year) to ensure realistic agronomic values, preventing extreme estimations.
-  7.  The capped annual rate is pro-rated for the balance `Time Frame`:
-   `Mineralization_period (kg N / ha) = Capped_Annual_N_Min (kg N / ha / year) * (Days_in_TimeFrame + 1) / 365`
+Soil mineralization is a crucial biological process where organic nitrogen (N) compounds in soil organic matter (SOM) are converted by microorganisms into inorganic, plant-available forms, primarily ammonium (NH4+). This process can be a source of nitrogen for crops. The calculation of nitrogen mineralization is based on default values that depend on the soil type and land use (grassland or arable land).
 
-##### 3.1.4.1. Estimation of Missing Soil Parameters
+*   **Method:**
+    1.  The calculation is performed for each year within the specified `TimeFrame`.
+    2.  For each year, the system determines if the field is considered "grassland" or "arable land". A field is considered "grassland" for a given year if it has a cultivation with a crop rotation code corresponding to grassland (e.g., BRP code 265) that is active between May 15th and July 15th of that year. Otherwise, it is considered "arable land".
+    3.  Based on the soil type (`b_soiltype_agr`) and whether the field is grassland, a default annual N mineralization rate (kg N / ha / year) is assigned:
 
-Soil analysis data can sometimes be incomplete. To ensure the Minip model has all necessary inputs, missing parameters are estimated based on established agronomic relationships:
-*  **Organic Carbon (`a_c_of`) from SOM (`a_som_loi`):** Soil organic matter (SOM) is largely composed of carbon. This conversion estimates organic carbon content from the loss on ignition (LOI) method for SOM, using a common conversion factor.
-  `a_c_of (g C / kg) = a_som_loi (%) * 0.5 * 10`
-  (Clamped: 0.1-600 g C / kg).
-*  **SOM (`a_som_loi`) from Organic Carbon (`a_c_of`):** The inverse relationship is used to estimate SOM from organic carbon content.
-  `a_som_loi (%) = (a_c_of (g C / kg)  /  10) / 0.5`
-  (Clamped: 0.5-75%).
-*  **C / N Ratio (`a_cn_fr`):** The carbon-to-nitrogen ratio is a key indicator of organic matter quality and decomposition rates. It's calculated from the organic carbon and total nitrogen content.
-  `a_cn_fr = a_c_of (g C / kg) / (a_n_rt (mg N / kg) / 1000)`
-  (Clamped: 5-40).
-*  **Bulk Density (`a_density_sa`, g / cm³):** Bulk density reflects soil compaction and porosity, which influences water and air movement, and root growth. It is estimated based on organic matter content and soil texture (type), as organic matter generally lowers bulk density, and different soil textures have inherent density ranges.
-    *  For sandy / loess soils (e.g., "dekzand", "dalgrond", "duinzand", "loess"):
-     `a_density_sa = 1 / (a_som_loi (%) * 0.02525 + 0.6541)`
-    *  For other soil types:
-    Let `L` be `a_som_loi (%)`.
-        ```
-        a_density_sa = (0.00000067 * L^4) - (0.00007792 * L^3) + (0.00314712 * L^2) - (0.06039523 * L) + 1.33932206
-        ```
-        (Clamped: 0.5-3.0 g / cm³).
+| Soil Type (`b_soiltype_agr`) | Land Use | Annual N Mineralization (kg N / ha / year) |
+| :--- | :--- | :--- |
+| `dalgrond` | Arable or Grassland | 20 |
+| `veen` | Grassland | 160 |
+| `veen` | Arable Land | 20 |
+| Other | Arable or Grassland | 0 |
+
+    4.  The annual mineralization rate is then pro-rated for the number of days the field is active within the `TimeFrame` for that year:
+        `Mineralization_period (kg N / ha) = Annual_N_Min (kg N / ha / year) * Days_in_TimeFrame_for_the_year / 365`
 
 ### 3.2. Nitrogen Removal (kg N / ha)
 
@@ -192,15 +149,21 @@ Crop residues (e.g., straw, stover, roots) contain significant amounts of nitrog
 *  **Formula per cultivation:**
   `N_removed_residue (kg N / ha) = Residue_Mass (kg / ha) * N_Content_Residue (g N / kg) / 1000 * -1`
 
-### 3.3. Nitrogen Volatilization (kg N / ha)
+### 3.3. Nitrogen Emission (kg N / ha)
 
-Nitrogen volatilization refers to the loss of nitrogen to the atmosphere, primarily in the form of ammonia (NH₃) gas. This process is a significant pathway for nitrogen loss from agricultural systems, reducing the efficiency of nitrogen use and contributing to air pollution. The amount of ammonia volatilized depends on various factors, including the type of fertilizer, application method, environmental conditions, and soil properties.
+Nitrogen emission refers to the loss of nitrogen from the agricultural system to the wider environment. This includes losses to the atmosphere, such as ammonia (NH₃) volatilization, and losses to water, such as nitrate (NO₃⁻) leaching. Accurately quantifying these emissions is crucial for improving nitrogen use efficiency and minimizing environmental impacts like air and water pollution.
+
+The total N emission is the sum of all calculated emission pathways. Currently, this includes ammonia emissions from fertilizers and crop residues. In the future, this will be expanded to include nitrate leaching.
 
 The calculations for ammonia emissions are derived from the **NEMA model (Nutrient Emission Model for Agriculture)**, a Dutch model used to estimate nutrient losses from agricultural sources.
 
-The total N volatilized is the sum of ammonia emissions from fertilizers and crop residues. Ammonia from grazing is currently not calculated.
+#### 3.3.1. Nitrate Leaching (Future Implementation)
 
-#### 3.3.1. Ammonia from Fertilizers
+Nitrate leaching represents the loss of nitrogen to water bodies. In the FDM Calculator, this will be calculated as a fraction of the **Nitrogen Balance**. The balance is defined as `N Supply - N Removal - Ammonia Emission`. This approach acknowledges that leaching is primarily driven by the excess nitrogen that remains in the soil after crop uptake.
+
+*Note: This component is not yet implemented and currently returns `0`.*
+
+#### 3.3.2. Ammonia from Fertilizers
 
 Ammonia emissions from fertilizers are calculated differently depending on the fertilizer type.
 
@@ -253,7 +216,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
 
 
 
-#### 3.3.2. Ammonia from Crop Residues
+#### 3.3.3. Ammonia from Crop Residues
 
 Ammonia emissions from crop residues occur when residues are left on the field and decompose, releasing nitrogen compounds that can volatilize. The calculation of these emissions is based on the amount of nitrogen in the crop residues and a specific emission factor.
 
@@ -270,26 +233,26 @@ Ammonia emissions from crop residues occur when residues are left on the field a
 
 *Note: Ammonia emissions from crop residues are only calculated if the `m_cropresidue` flag is `false` or `null`, indicating that residues are incorporated into the soil rather than removed.*
 
-#### 3.3.3. Ammonia from Grazing
+#### 3.3.4. Ammonia from Grazing
 
 Ammonia emissions from grazing are currently not calculated in the FDM Calculator and are set to `0`.
 
 ## 4. Field and Farm Level Balance
 
-*  **Field Balance:** The individual N supply, removal, and volatilization components (in kg N / ha) are summed for each field to get the net N balance for that field.
+*  **Field Surplus (Field Balance):** For each field, the **N Surplus** is calculated as `N Supply - N Removal - Ammonia Emission`. This value is reported as the `balance` for each field in the output.
 *  **Farm Balance:**
-    1.  The total N supplied, removed, and volatilized for each field (kg N / ha * field area (ha) = kg N per field) are summed across all fields.
-    2.  These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance in kg N / ha.
+    1.  The total N supplied, removed, and total emitted (including ammonia and nitrate) for each field (kg N / ha * field area (ha) = kg N per field) are summed across all fields.
+    2.  These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance (`N Supply - N Removal - Total N Emission`) in kg N / ha.
 
 ## 5. Output
 
 The final output (`NitrogenBalanceNumeric`) provides:
-*  Overall farm balance, supply, removal, and volatilization (kg N / ha).
+*  Overall farm balance, supply, removal, and total emission (kg N / ha).
 *  A list of balances for each field (`NitrogenBalanceFieldNumeric`), which includes:
     *  Field ID.
-    *  Field-specific balance (kg N / ha).
+    *  Field-specific **N Surplus** (reported as `balance`, in kg N / ha). This is calculated as `N Supply - N Removal - Ammonia Emission`.
     *  Detailed breakdown of supply (total, fertilizers by type, fixation, deposition, mineralization).
     *  Detailed breakdown of removal (total, harvests, residues).
-    *  Detailed breakdown of volatilization (total, ammonia from fertilizers and residues).
+    *  Detailed breakdown of emission (total, plus sub-components for ammonia and nitrate).
 
 All values are rounded numbers.

@@ -3,11 +3,11 @@ import type {
     FertilizerDetail,
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
-} from "../../types"
-import { calculateAmmoniaEmissionsByCompost } from "./compost"
-import { calculateAmmoniaEmissionsByManure } from "./manure"
-import { calculateAmmoniaEmissionsByMineralFertilizers } from "./mineral"
-import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
+} from "../../../types"
+import { calculateNitrogenEmissionViaAmmoniaByCompost } from "./compost"
+import { calculateNitrogenEmissionViaAmmoniaByManure } from "./manure"
+import { calculateNitrogenEmissionViaAmmoniaByMineralFertilizers } from "./mineral"
+import { calculateNitrogenEmissionViaAmmoniaByOtherFertilizers } from "./other"
 
 /**
  * Calculates the total ammonia emission from all fertilizer sources (mineral, manure, compost and other fertilizers).
@@ -18,7 +18,7 @@ import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
  * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
  * @returns An object containing the total ammonia emitted by all fertilizers, as well as a breakdown by fertilizer type (mineral, manure, compost, other).
  */
-export function calculateAmmoniaEmissionsByFertilizers(
+export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
@@ -26,22 +26,23 @@ export function calculateAmmoniaEmissionsByFertilizers(
 ): NitrogenEmissionAmmoniaFertilizers {
     // Calculate the amount of ammonia emitted by mineral fertilizers
     const fertilizersAmmoniaEmissionsMineral =
-        calculateAmmoniaEmissionsByMineralFertilizers(
+        calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
             fertilizerApplications,
             fertilizerDetailsMap,
         )
 
     // Calculate the amount of ammonia emitted by manure
-    const fertilizersAmmoniaEmissionsManure = calculateAmmoniaEmissionsByManure(
-        cultivations,
-        fertilizerApplications,
-        cultivationDetailsMap,
-        fertilizerDetailsMap,
-    )
+    const fertilizersAmmoniaEmissionsManure =
+        calculateNitrogenEmissionViaAmmoniaByManure(
+            cultivations,
+            fertilizerApplications,
+            cultivationDetailsMap,
+            fertilizerDetailsMap,
+        )
 
     // Calculate the amount of ammonia emitted by compost
     const fertilizersAmmoniaEmissionsCompost =
-        calculateAmmoniaEmissionsByCompost(
+        calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -50,7 +51,7 @@ export function calculateAmmoniaEmissionsByFertilizers(
 
     // Calculate the amount of ammonia emitted by other fertilizers
     const fertilizersAmmoniaEmissionsByOtherFertilizers =
-        calculateAmmoniaEmissionsByOtherFertilizers(
+        calculateNitrogenEmissionViaAmmoniaByOtherFertilizers(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,

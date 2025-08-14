@@ -2,6 +2,8 @@ import type { fdmSchema } from "@svenvw/fdm-core"
 import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
 import type {
+    CultivationDetail,
+    FieldInput,
     NitrogenBalanceInput,
     NitrogenSupplyMineralization,
     SoilAnalysisPicked,
@@ -16,38 +18,109 @@ import type {
  * @returns The NitrogenSupplyMineralization object containing the total amount of Nitrogen mineralized.
  */
 export function calculateNitrogenSupplyBySoilMineralization(
+    cultivations: FieldInput["cultivations"],
     soilAnalysis: SoilAnalysisPicked,
+    cultivationDetails: Map<string, CultivationDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
 ): NitrogenSupplyMineralization {
-    let mineralizationValue =
-        calculateNitrogenSupplyBySoilMineralizationUsingMinip(
-            soilAnalysis.a_c_of,
-            soilAnalysis.a_cn_fr,
-            soilAnalysis.a_density_sa,
-        )
+    let totalMineralization = new Decimal(0)
+    const minerlizationPerYear = []
 
-    // Limit the min and max values for the mineralization
-    if (mineralizationValue.greaterThan(250)) {
-        mineralizationValue = new Decimal(250)
-    }
-    if (mineralizationValue.lessThan(5)) {
-        mineralizationValue = new Decimal(5)
-    }
+    const startYear = timeFrame.start.getFullYear()
+    const endYear = timeFrame.end.getFullYear()
 
-    // Adjust for the number of days
-    const timeFrameDays = new Decimal(
-        differenceInCalendarDays(timeFrame.end, timeFrame.start),
-    )
-    // Ensure timeFrameDays is positive
-    if (timeFrameDays.lessThanOrEqualTo(0)) {
-        return { total: new Decimal(0) }
+    for (let year = startYear; year <= endYear; year++) {
+        const may15 = new Date(year, 4, 15)
+        const july15 = new Date(year, 6, 15)
+
+        const isGrassland = cultivations.some((cultivation) => {
+            const cultivationDetail = cultivationDetails.get(
+                cultivation.b_lu_catalogue,
+            )
+            if (!cultivationDetail) return false
+
+            const cultivationStart = new Date(cultivation.b_lu_start)
+            const cultivationEnd = cultivation.b_lu_end
+                ? new Date(cultivation.b_lu_end)
+                : new Date("9999-12-31")
+
+            // Check if the cultivation is grassland and overlaps with the May 15th to July 15th window
+            return (
+                cultivationDetail.b_lu_croprotation === "grass" &&
+                cultivationStart <= july15 &&
+                cultivationEnd >= may15
+            )
+        })
+
+        const yearlyMineralization =
+            calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
+                soilAnalysis.b_soiltype_agr,
+                isGrassland,
+            )
+
+        const yearStartTime = new Date(year, 0, 1).getTime()
+        const yearEndTime = new Date(year + 1, 0, 1).getTime()
+        const timeframeStartTime = timeFrame.start.getTime()
+        const timeframeEndTime = timeFrame.end.getTime()
+
+        const overlapStart = Math.max(yearStartTime, timeframeStartTime)
+        const overlapEnd = Math.min(yearEndTime, timeframeEndTime)
+
+        if (overlapStart < overlapEnd) {
+            const daysInYear =
+                new Date(year, 1, 29).getMonth() === 1 ? 366 : 365
+            const overlapDays = differenceInCalendarDays(
+                new Date(overlapEnd),
+                new Date(overlapStart),
+            )
+            const adjustedMineralization = yearlyMineralization
+                .times(overlapDays)
+                .dividedBy(daysInYear)
+            totalMineralization = totalMineralization.add(
+                adjustedMineralization,
+            )
+            minerlizationPerYear.push({
+                year,
+                value: adjustedMineralization,
+            })
+        }
     }
-    const timeFrameFraction = timeFrameDays.add(1).dividedBy(365)
-    const mineralization = mineralizationValue.times(timeFrameFraction)
 
     return {
-        total: mineralization,
+        total: totalMineralization,
+        years: minerlizationPerYear,
     }
+}
+
+/**
+ * Calculates the default nitrogen supply by soil mineralization based on soil type and land use.
+ *
+ * @param b_soiltype_agr - The agricultural soil type from the soil analysis.
+ * @param is_grassland - A boolean indicating if the land is grassland.
+ * @returns The default mineralization value in kg N / ha / year as a Decimal.
+ */
+function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
+    b_soiltype_agr: SoilAnalysisPicked["b_soiltype_agr"],
+    is_grassland: boolean,
+): Decimal {
+    let mineralization = new Decimal(0)
+
+    // At Dalgrond set mineralization to 20 kg N / ha / year
+    if (b_soiltype_agr === "dalgrond") {
+        mineralization = new Decimal(20)
+    }
+
+    // At Veen, set default mineralization based on land use
+    if (b_soiltype_agr === "veen") {
+        if (is_grassland) {
+            mineralization = new Decimal(160)
+        } else {
+            // Arable or fallow
+            mineralization = new Decimal(20)
+        }
+    }
+
+    return mineralization
 }
 
 /**

@@ -4,20 +4,20 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-} from "../../types"
+} from "../../../types"
 import {
-    calculateAmmoniaEmissionsByManure,
+    calculateNitrogenEmissionViaAmmoniaByManure,
     determineManureAmmoniaEmissionFactor,
 } from "./manure"
 
-describe("calculateAmmoniaEmissionsByManure", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByManure", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
         const cultivations: FieldInput["cultivations"] = []
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
-        const result = calculateAmmoniaEmissionsByManure(
+        const result = calculateNitrogenEmissionViaAmmoniaByManure(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -99,7 +99,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByManure(
+        const result = calculateNitrogenEmissionViaAmmoniaByManure(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -111,12 +111,12 @@ describe("calculateAmmoniaEmissionsByManure", () => {
         // app2: 500 * 0.4 * 0.264 / 1000 = 0.0528 kg N (narrowband on grassland)
         // Total: 0.34 + 0.0528 = 0.3928 kg N
 
-        expect(result.total.toNumber()).toBeCloseTo(0.3928)
+        expect(result.total.toNumber()).toBeCloseTo(-0.3928)
         expect(result.applications.length).toBe(2)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.34)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications[1].id).toBe("app2")
-        expect(result.applications[1].value.toNumber()).toBeCloseTo(0.0528)
+        expect(result.applications[1].value.toNumber()).toBeCloseTo(-0.0528)
     })
 
     it("should return 0 for applications that are not manure type", () => {
@@ -148,7 +148,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByManure(
+        const result = calculateNitrogenEmissionViaAmmoniaByManure(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -178,7 +178,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         expect(() =>
-            calculateAmmoniaEmissionsByManure(
+            calculateNitrogenEmissionViaAmmoniaByManure(
                 cultivations,
                 fertilizerApplications,
                 cultivationDetailsMap,

@@ -37,6 +37,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { serverConfig } from "../lib/config.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -52,6 +53,8 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
+    const datasetsUrl = serverConfig.datasets_url
+
     // Get the farm id
     const b_id_farm = params.b_id_farm
     if (!b_id_farm) {
@@ -94,7 +97,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         session.principal_id,
         b_id_farm,
         timeframe,
-        String(process.env.FDM_PUBLIC_DATA_URL),
+        datasetsUrl,
     )
         .then(async (input) => {
             const result = await calculateNitrogenBalance(input)
@@ -318,7 +321,7 @@ function NitrogenBalance({
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">
-                            {result.volatilization.total}
+                            {result.emission.total}
                         </div>
                         <p className="text-xs text-muted-foreground">
                             kg N / ha
@@ -343,7 +346,7 @@ function NitrogenBalance({
                             balance={result.balance}
                             supply={result.supply.total}
                             removal={result.removal.total}
-                            volatilization={result.volatilization.total}
+                            emission={result.emission.total}
                         />
                     </CardContent>
                 </Card>
