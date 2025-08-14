@@ -297,7 +297,7 @@ export type NitrogenEmissionNitrate = {
     /**
      * The total amount of nitrate nitrogen emitted from the field.
      */
-    total: nitrate
+    total: Decimal
 }
 
 /**
