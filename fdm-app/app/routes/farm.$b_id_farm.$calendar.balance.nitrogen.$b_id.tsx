@@ -331,7 +331,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                         </CardHeader>
                                         <CardContent>
                                             <div className="text-2xl font-bold">
-                                                {result.volatilization.total}
+                                                {result.emission.total}
                                             </div>
                                             <p className="text-xs text-muted-foreground">
                                                 kg N / ha
@@ -360,9 +360,7 @@ export default function FarmBalanceNitrogenFieldBlock() {
                                                 balance={result.balance}
                                                 supply={result.supply.total}
                                                 removal={result.removal.total}
-                                                volatilization={
-                                                    result.volatilization.total
-                                                }
+                                                emission={result.emission.total}
                                             />
                                         </CardContent>
                                     </Card>
