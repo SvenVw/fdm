@@ -55,9 +55,9 @@ export class FdmCalculatorError extends Error {
      *   - `CALCULATION_FAILED`
      *   - `NOT_IMPLEMENTED`
      *
-     * @type {string}
+     * @type {FdmCalculatorErrorCodes}
      */
-    public code: string
+    public code: FdmCalculatorErrorCodes
 
     /**
      * An optional object containing relevant data about the error.
@@ -85,10 +85,29 @@ export class FdmCalculatorError extends Error {
      * @param {string} code A unique, machine-readable error code.
      * @param {Record<string, any>} [context] An optional payload with contextual data.
      */
-    constructor(message: string, code: string, context?: Record<string, any>) {
+    constructor(
+        message: string,
+        code: FdmCalculatorErrorCodes,
+        context?: Record<string, any>,
+    ) {
         super(message)
         this.name = "FdmCalculatorError"
         this.code = code
         this.context = context
     }
 }
+
+type FdmCalculatorErrorCodes =
+    | "MISSING_SOIL_PARAMETER"
+    | "INVALID_FERTILIZER_DATA"
+    | "INVALID_CULTIVATION_DATA"
+    | "INVALID_APPLICATION_AMOUNT"
+    | "CULTIVATION_NORM_NOT_FOUND"
+    | "REGION_NOT_SUPPORTED"
+    | "YEAR_NOT_SUPPORTED"
+    | "PHOSPHATE_NORM_NOT_FOUND"
+    | "API_FETCH_FAILED"
+    | "API_TIMEOUT"
+    | "GEOSPATIAL_PROCESSING_ERROR"
+    | "CALCULATION_FAILED"
+    | "NOT_IMPLEMENTED"
