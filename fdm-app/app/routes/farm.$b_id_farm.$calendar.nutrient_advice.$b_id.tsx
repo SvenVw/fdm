@@ -183,6 +183,15 @@ export default function FieldNutrientAdviceBlock() {
     )
 }
 
+/**
+ * Renders the page elements with asynchronously loaded data
+ *
+ * This has to be extracted into a separate component because of the `use(...)` hook.
+ * React will not render the component until `asyncData` resolves, but React Router
+ * handles it nicely via the `Suspense` component and server-to-client data streaming.
+ * If `use(...)` was added to `FieldNutrientAdviceBlock` instead, the Suspense
+ * would not render until `asyncData` resolves and the fallback would never be shown.
+ */
 function FieldNutrientAdvice({
     loaderData,
     primaryNutrients,
