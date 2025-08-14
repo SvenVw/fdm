@@ -23,8 +23,8 @@ export function NitrogenBalanceChart({
     const chartData = [
         {
             supply: supply,
-            removal: removal ? Math.abs(removal) : undefined,
-            emission: emission ? Math.abs(emission) : undefined,
+            removal: removal === undefined ? undefined : Math.abs(removal),
+            emission: emission === undefined ? undefined : Math.abs(emission),
         },
     ]
 
