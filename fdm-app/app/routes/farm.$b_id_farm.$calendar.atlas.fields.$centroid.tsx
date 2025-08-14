@@ -14,10 +14,7 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { CultivationHistoryCard } from "~/components/blocks/atlas-fields/cultivation-history"
 import { SoilTextureCard } from "~/components/blocks/atlas-fields/soil-texture"
 import { GroundwaterCard } from "~/components/blocks/atlas-fields/groundwater"
-import {
-    FieldDetailsCard,
-    FieldDetailsSkeleton,
-} from "~/components/blocks/atlas-fields/field-details"
+import { FieldDetailsCard } from "~/components/blocks/atlas-fields/field-details"
 import { Suspense } from "react"
 import {
     getRegion,
@@ -28,8 +25,9 @@ import {
 import { getFieldByCentroid } from "~/components/blocks/atlas-fields/query"
 import type { Feature, Point } from "geojson"
 import { use } from "react"
-import { FieldDetailsAtlasLayout } from "../components/blocks/atlas-fields/layout"
-import { ErrorBlock } from "../components/custom/error"
+import { FieldDetailsAtlasLayout } from "~/components/blocks/atlas-fields/layout"
+import { ErrorBlock } from "~/components/custom/error"
+import { FieldDetailsAtlasSkeleton } from "~/components/blocks/atlas-fields/skeleton"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -176,7 +174,10 @@ export default function FieldDetailsAtlasBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <Suspense key={loaderData.centroid} fallback={<FieldDetailsSkeleton />}>
+        <Suspense
+            key={loaderData.centroid}
+            fallback={<FieldDetailsAtlasSkeleton />}
+        >
             <FieldDetailsAtlas {...loaderData} />
         </Suspense>
     )
