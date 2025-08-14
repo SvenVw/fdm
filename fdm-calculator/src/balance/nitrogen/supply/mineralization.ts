@@ -67,7 +67,8 @@ export function calculateNitrogenSupplyBySoilMineralization(
         const overlapEnd = Math.min(yearEndTime, timeframeEndTime)
 
         if (overlapStart < overlapEnd) {
-            const daysInYear = 365
+            const daysInYear =
+                new Date(year, 1, 29).getMonth() === 1 ? 366 : 365
             const overlapDays = differenceInCalendarDays(
                 new Date(overlapEnd),
                 new Date(overlapStart),
