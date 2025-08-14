@@ -12,7 +12,7 @@ vi.mock("./manure", () => ({
     determineManureAmmoniaEmissionFactor: vi.fn(() => new Decimal(0.1)), // Mocked emission factor
 }))
 
-describe(" calculateNitrogenEmissionViaAmmoniaByOtherFertilizers", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByOtherFertilizers", () => {
     const mockCultivations: FieldInput["cultivations"] = []
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
 

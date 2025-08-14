@@ -6,18 +6,18 @@ import type {
     FieldInput,
 } from "../../../types"
 import {
-    calculateAmmoniaEmissionsByManure,
+    calculateNitrogenEmissionViaAmmoniaByManure,
     determineManureAmmoniaEmissionFactor,
 } from "./manure"
 
-describe("calculateAmmoniaEmissionsByManure", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByManure", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
         const cultivations: FieldInput["cultivations"] = []
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
-        const result = calculateAmmoniaEmissionsByManure(
+        const result = calculateNitrogenEmissionViaAmmoniaByManure(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -99,7 +99,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByManure(
+        const result = calculateNitrogenEmissionViaAmmoniaByManure(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -148,7 +148,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByManure(
+        const result = calculateNitrogenEmissionViaAmmoniaByManure(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -178,7 +178,7 @@ describe("calculateAmmoniaEmissionsByManure", () => {
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         expect(() =>
-            calculateAmmoniaEmissionsByManure(
+            calculateNitrogenEmissionViaAmmoniaByManure(
                 cultivations,
                 fertilizerApplications,
                 cultivationDetailsMap,

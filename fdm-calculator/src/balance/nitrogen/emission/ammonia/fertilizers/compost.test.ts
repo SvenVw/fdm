@@ -4,16 +4,16 @@ import type {
     FertilizerDetail,
     FieldInput,
 } from "../../../types"
-import { calculateAmmoniaEmissionsByCompost } from "./compost"
+import { calculateNitrogenEmissionViaAmmoniaByCompost } from "./compost"
 
-describe("calculateAmmoniaEmissionsByCompost", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByCompost", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
         const cultivations: FieldInput["cultivations"] = []
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -93,7 +93,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -141,7 +141,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -170,7 +170,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         expect(() =>
-            calculateAmmoniaEmissionsByCompost(
+            calculateNitrogenEmissionViaAmmoniaByCompost(
                 cultivations,
                 fertilizerApplications,
                 cultivationDetailsMap,
@@ -248,7 +248,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,

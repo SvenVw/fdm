@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest"
 import type { FertilizerDetail, FieldInput } from "../../../types"
 import {
-    calculateAmmoniaEmissionsByMineralFertilizers,
+    calculateNitrogenEmissionViaAmmoniaByMineralFertilizers,
     determineMineralAmmoniaEmissionFactor,
 } from "./mineral"
 
-describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByMineralFertilizers", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
-        const result = calculateAmmoniaEmissionsByMineralFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
             fertilizerApplications,
             fertilizerDetailsMap,
         )
@@ -45,7 +45,7 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByMineralFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
             fertilizerApplications,
             fertilizerDetailsMap,
         )
@@ -83,7 +83,7 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByMineralFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
             fertilizerApplications,
             fertilizerDetailsMap,
         )
@@ -128,7 +128,7 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByMineralFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
             fertilizerApplications,
             fertilizerDetailsMap,
         )
@@ -153,7 +153,7 @@ describe("calculateAmmoniaEmissionsByMineralFertilizers", () => {
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         expect(() =>
-            calculateAmmoniaEmissionsByMineralFertilizers(
+            calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
                 fertilizerApplications,
                 fertilizerDetailsMap,
             ),
