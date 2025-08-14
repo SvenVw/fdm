@@ -4,7 +4,7 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-} from "../../types"
+} from "../../../types"
 import {
     calculateAmmoniaEmissionsByManure,
     determineManureAmmoniaEmissionFactor,

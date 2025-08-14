@@ -290,19 +290,34 @@ export type NitrogenEmissionAmmonia = {
 }
 
 /**
- * Represents the total nitrogen volatilization for a field, specifically through ammonia emissions.
+ * Represents the total nitrate nitrogen emissions for a field.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
-export type NitrogenVolatilization = {
+export type NitrogenEmissionNitrate = {
+    /**
+     * The total amount of nitrate nitrogen emitted from the field.
+     */
+    total: nitrate
+}
+
+/**
+ * Represents the total nitrogen emitted for a field, specifically through ammonia emissions and nitrate leaching.
+ * All values are in kilograms of nitrogen per hectare (kg N / ha).
+ */
+export type NitrogenEmission = {
     total: Decimal
     /**
      * The total amount of nitrogen volatilized as ammonia.
      */
     ammonia: NitrogenEmissionAmmonia
+    /**
+     * The total amount of nitrogen leached as nitrate.
+     */
+    nitrate: NitrogenEmissionNitrate
 }
 
 /**
- * Represents the nitrogen balance for a single field, including supply, removal, and volatilization.
+ * Represents the nitrogen balance for a single field, including supply, removal, and emission.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
 export type NitrogenBalanceField = {
@@ -311,7 +326,7 @@ export type NitrogenBalanceField = {
      */
     b_id: string
     /**
-     * The overall nitrogen balance for the field, calculated as supply minus removal minus volatilization.
+     * The overall nitrogen balance for the field.
      */
     balance: Decimal
     /**
@@ -323,9 +338,9 @@ export type NitrogenBalanceField = {
      */
     removal: NitrogenRemoval
     /**
-     * The total nitrogen volatilization from the field.
+     * The total nitrogen emission from the field.
      */
-    volatilization: NitrogenVolatilization
+    emission: NitrogenEmission
     /**
      * The target value for the nitrogen balance for the field
      */
@@ -338,7 +353,7 @@ export type NitrogenBalanceField = {
  */
 export type NitrogenBalance = {
     /**
-     * The overall nitrogen balance across all fields, likely a sum or average of individual field balances.
+     * The overall nitrogen balance across all fields, a sum or average of individual field balances.
      */
     balance: Decimal
     /**
@@ -350,9 +365,9 @@ export type NitrogenBalance = {
      */
     removal: Decimal
     /**
-     * The total nitrogen volatilization across all fields.
+     * The total nitrogen emission across all fields.
      */
-    volatilization: Decimal
+    emission: Decimal
     /**
      * The average target value for the nitrogen balance for all the fields
      */
@@ -528,8 +543,8 @@ export type NitrogenEmissionAmmoniaNumeric = {
     grazing: undefined
 }
 
-// Numeric version of NitrogenVolatilization
-export type NitrogenVolatilizationNumeric = {
+// Numeric version of NitrogenEmission
+export type NitrogenEmissionNumeric = {
     total: number
     ammonia: NitrogenEmissionAmmoniaNumeric
 }
@@ -541,7 +556,7 @@ export type NitrogenBalanceFieldNumeric = {
     supply: NitrogenSupplyNumeric
     removal: NitrogenRemovalNumeric
     target: number
-    volatilization: NitrogenVolatilizationNumeric
+    emission: NitrogenEmissionNumeric
 }
 
 // Numeric version of NitrogenBalance
@@ -549,7 +564,7 @@ export type NitrogenBalanceNumeric = {
     balance: number
     supply: number
     removal: number
-    volatilization: number
+    emission: number
     target: number
     fields: NitrogenBalanceFieldNumeric[]
 }

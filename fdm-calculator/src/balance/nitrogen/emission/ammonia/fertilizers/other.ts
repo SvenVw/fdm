@@ -4,29 +4,29 @@ import type {
     FertilizerDetail,
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
-} from "../../types"
+} from "../../../types"
 import { determineManureAmmoniaEmissionFactor } from "./manure"
 
 /**
- * Calculates the ammonia emissions specifically from compost applications.
+ * Calculates the ammonia emissions from "other" fertilizer types.
  *
- * This function iterates through fertilizer applications, filters for compost types,
- * determines the appropriate emission factor, and calculates the ammonia emissions
- * for each relevant application. It then aggregates these values to provide a total.
+ * This function iterates through fertilizer applications and filters out known
+ * types (manure, mineral, compost). For any remaining "other" fertilizer types,
+ * the ammonia emission is currently calculated like manure and other organic fertilizers.
  *
  * @param cultivations - An array of cultivation records for the field.
  * @param fertilizerApplications - An array of fertilizer application records.
  * @param cultivationDetailsMap - A Map where keys are cultivation IDs and values are detailed cultivation information.
  * @param fertilizerDetailsMap - A Map where keys are fertilizer catalogue IDs and values are detailed fertilizer information.
- * @returns An object containing the total ammonia emissions from compost and a breakdown by individual application.
+ * @returns An object containing the total ammonia emissions from other fertilizers and a breakdown by individual application.
  * @throws Error if a fertilizer application references a non-existent fertilizer detail.
  */
-export function calculateAmmoniaEmissionsByCompost(
+export function calculateNitrogenEmissionViaAmmoniaByOtherFertilizers(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
-): NitrogenEmissionAmmoniaFertilizers["compost"] {
+): NitrogenEmissionAmmoniaFertilizers["other"] {
     if (fertilizerApplications.length === 0) {
         return {
             total: new Decimal(0),
@@ -46,8 +46,12 @@ export function calculateAmmoniaEmissionsByCompost(
         }
         const p_nh4_rt = new Decimal(fertilizerDetail.p_nh4_rt ?? 0)
 
-        // If the fertilizer used is not of the type compost
-        if (fertilizerDetail.p_type !== "compost") {
+        // If the fertilizer used is not of the type other fertilizers
+        if (
+            fertilizerDetail.p_type === "manure" ||
+            fertilizerDetail.p_type === "mineral" ||
+            fertilizerDetail.p_type === "compost"
+        ) {
             return {
                 id: application.p_app_id,
                 value: new Decimal(0),
@@ -61,7 +65,7 @@ export function calculateAmmoniaEmissionsByCompost(
             cultivationDetailsMap,
         )
 
-        // Calculate for this application the amount of Nitrogen supplied by compost
+        // Calculate for this application the amount of Nitrogen supplied by manure
         const p_app_amount = new Decimal(application.p_app_amount ?? 0)
         const applicationValue = p_app_amount
             .times(p_nh4_rt)
@@ -74,7 +78,7 @@ export function calculateAmmoniaEmissionsByCompost(
         }
     })
 
-    // Calculate the total amount of Nitrogen supplied by compost
+    // Calculate the total amount of Nitrogen supplied by other fertilizers
     const totalValue = applications.reduce((acc, application) => {
         return acc.add(application.value)
     }, Decimal(0))

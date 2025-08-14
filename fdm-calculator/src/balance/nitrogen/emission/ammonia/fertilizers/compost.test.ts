@@ -3,7 +3,7 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-} from "../../types"
+} from "../../../types"
 import { calculateAmmoniaEmissionsByCompost } from "./compost"
 
 describe("calculateAmmoniaEmissionsByCompost", () => {

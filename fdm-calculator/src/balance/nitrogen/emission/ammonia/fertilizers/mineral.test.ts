@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import type { FertilizerDetail, FieldInput } from "../../types"
+import type { FertilizerDetail, FieldInput } from "../../../types"
 import {
     calculateAmmoniaEmissionsByMineralFertilizers,
     determineMineralAmmoniaEmissionFactor,

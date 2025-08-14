@@ -4,15 +4,15 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-} from "../../types"
-import { calculateAmmoniaEmissionsByOtherFertilizers } from "./other"
+} from "../../../types"
+import { calculateNitrogenEmissionViaAmmoniaByOtherFertilizers } from "./other"
 
 // Mock the determineManureAmmoniaEmissionFactor function
 vi.mock("./manure", () => ({
     determineManureAmmoniaEmissionFactor: vi.fn(() => new Decimal(0.1)), // Mocked emission factor
 }))
 
-describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
+describe(" calculateNitrogenEmissionViaAmmoniaByOtherFertilizers", () => {
     const mockCultivations: FieldInput["cultivations"] = []
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
 
@@ -20,7 +20,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
-        const result = calculateAmmoniaEmissionsByOtherFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByOtherFertilizers(
             mockCultivations,
             fertilizerApplications,
             mockCultivationDetailsMap,
@@ -97,7 +97,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByOtherFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByOtherFertilizers(
             mockCultivations,
             fertilizerApplications,
             mockCultivationDetailsMap,
@@ -137,7 +137,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByOtherFertilizers(
+        const result = calculateNitrogenEmissionViaAmmoniaByOtherFertilizers(
             mockCultivations,
             fertilizerApplications,
             mockCultivationDetailsMap,
@@ -164,7 +164,7 @@ describe("calculateAmmoniaEmissionsByOtherFertilizers", () => {
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         expect(() =>
-            calculateAmmoniaEmissionsByOtherFertilizers(
+            calculateNitrogenEmissionViaAmmoniaByOtherFertilizers(
                 mockCultivations,
                 fertilizerApplications,
                 mockCultivationDetailsMap,

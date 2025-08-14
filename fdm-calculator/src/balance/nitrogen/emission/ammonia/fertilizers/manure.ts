@@ -5,7 +5,7 @@ import type {
     FertilizerDetail,
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
-} from "../../types"
+} from "../../../types"
 
 /**
  * Calculates the ammonia emissions specifically from manure applications.
@@ -22,7 +22,7 @@ import type {
  * @returns An object containing the total ammonia emissions from manure and a breakdown by individual application.
  * @throws Error if a fertilizer application references a non-existent fertilizer detail.
  */
-export function calculateAmmoniaEmissionsByManure(
+export function calculateNitrogenEmissionViaAmmoniaByManure(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
