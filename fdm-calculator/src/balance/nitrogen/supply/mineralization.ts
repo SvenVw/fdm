@@ -100,7 +100,7 @@ export function calculateNitrogenSupplyBySoilMineralization(
  * @returns The default mineralization value in kg N / ha / year as a Decimal.
  */
 function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
-    b_soiltype_agr: fdmSchema.soilAnalysisTypeSelect["b_soiltype_agr"],
+    b_soiltype_agr: SoilAnalysisPicked["b_soiltype_agr"],
     is_grassland: boolean,
 ): Decimal {
     let mineralization = new Decimal(0)
@@ -110,7 +110,7 @@ function calculateNitrogenSupplyBySoilMineralizationUsingDefaults(
         mineralization = new Decimal(20)
     }
 
-    // At Veen check if it Grassland or Arable to set the default value for mineralization
+    // At Veen, set default mineralization based on land use
     if (b_soiltype_agr === "veen") {
         if (is_grassland) {
             mineralization = new Decimal(160)
