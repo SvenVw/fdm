@@ -11,17 +11,18 @@ This document explains how the nitrogen (N) balance is calculated within the FDM
 
 Nitrogen is a macronutrient essential for plant growth, playing a vital role in photosynthesis, protein synthesis, and overall crop development. However, nitrogen is also highly dynamic in agricultural systems, subject to various inputs, outputs, and transformations. An accurate nitrogen balance helps in understanding the nitrogen cycle on a farm, identifying potential nutrient deficiencies or surpluses, and guiding sustainable fertilization practices.
 
-The nitrogen balance for each field is determined by the formula:
+The final nitrogen balance for each field is determined by the formula:
 
 ```text
-N Balance (kg N / ha) = N Supply - N Removal - N Volatilization
+N Balance (kg N / ha) = N Supply - N Removal - N-NH3 Emission
 ```
 
+Where:
 *  **N Supply:** Nitrogen added to the field.
 *  **N Removal:** Nitrogen taken off the field.
-*  **N Volatilization:** Nitrogen lost to the atmosphere as gases (primarily ammonia).
+*  **N-NH3 Emission:** Nitrogen lost to the environment due to  ammonia volatilization.
 
-(Note: In the calculation, N Removal and N Volatilization are typically treated as negative values when summing components to derive the final balance.)
+(Note: In the calculation, N Removal and N-NH3 Emission are typically treated as negative values when summing components to derive the final balance.)
 
 The calculations are performed for a user-defined **Time Frame**.
 
@@ -148,15 +149,21 @@ Crop residues (e.g., straw, stover, roots) contain significant amounts of nitrog
 *  **Formula per cultivation:**
   `N_removed_residue (kg N / ha) = Residue_Mass (kg / ha) * N_Content_Residue (g N / kg) / 1000 * -1`
 
-### 3.3. Nitrogen Volatilization (kg N / ha)
+### 3.3. Nitrogen Emission (kg N / ha)
 
-Nitrogen volatilization refers to the loss of nitrogen to the atmosphere, primarily in the form of ammonia (NH₃) gas. This process is a significant pathway for nitrogen loss from agricultural systems, reducing the efficiency of nitrogen use and contributing to air pollution. The amount of ammonia volatilized depends on various factors, including the type of fertilizer, application method, environmental conditions, and soil properties.
+Nitrogen emission refers to the loss of nitrogen from the agricultural system to the wider environment. This includes losses to the atmosphere, such as ammonia (NH₃) volatilization, and losses to water, such as nitrate (NO₃⁻) leaching. Accurately quantifying these emissions is crucial for improving nitrogen use efficiency and minimizing environmental impacts like air and water pollution.
+
+The total N emission is the sum of all calculated emission pathways. Currently, this includes ammonia emissions from fertilizers and crop residues. In the future, this will be expanded to include nitrate leaching.
 
 The calculations for ammonia emissions are derived from the **NEMA model (Nutrient Emission Model for Agriculture)**, a Dutch model used to estimate nutrient losses from agricultural sources.
 
-The total N volatilized is the sum of ammonia emissions from fertilizers and crop residues. Ammonia from grazing is currently not calculated.
+#### 3.3.1. Nitrate Leaching (Future Implementation)
 
-#### 3.3.1. Ammonia from Fertilizers
+Nitrate leaching represents the loss of nitrogen to water bodies. In the FDM Calculator, this will be calculated as a fraction of the **Nitrogen Balance**. The balance is defined as `N Supply - N Removal - Ammonia Emission`. This approach acknowledges that leaching is primarily driven by the excess nitrogen that remains in the soil after crop uptake.
+
+*Note: This component is not yet implemented and currently returns `0`.*
+
+#### 3.3.2. Ammonia from Fertilizers
 
 Ammonia emissions from fertilizers are calculated differently depending on the fertilizer type.
 
@@ -209,7 +216,7 @@ Ammonia emissions from fertilizers are calculated differently depending on the f
 
 
 
-#### 3.3.2. Ammonia from Crop Residues
+#### 3.3.3. Ammonia from Crop Residues
 
 Ammonia emissions from crop residues occur when residues are left on the field and decompose, releasing nitrogen compounds that can volatilize. The calculation of these emissions is based on the amount of nitrogen in the crop residues and a specific emission factor.
 
@@ -226,26 +233,26 @@ Ammonia emissions from crop residues occur when residues are left on the field a
 
 *Note: Ammonia emissions from crop residues are only calculated if the `m_cropresidue` flag is `false` or `null`, indicating that residues are incorporated into the soil rather than removed.*
 
-#### 3.3.3. Ammonia from Grazing
+#### 3.3.4. Ammonia from Grazing
 
 Ammonia emissions from grazing are currently not calculated in the FDM Calculator and are set to `0`.
 
 ## 4. Field and Farm Level Balance
 
-*  **Field Balance:** The individual N supply, removal, and volatilization components (in kg N / ha) are summed for each field to get the net N balance for that field.
+*  **Field Surplus (Field Balance):** For each field, the **N Surplus** is calculated as `N Supply - N Removal - Ammonia Emission`. This value is reported as the `balance` for each field in the output.
 *  **Farm Balance:**
-    1.  The total N supplied, removed, and volatilized for each field (kg N / ha * field area (ha) = kg N per field) are summed across all fields.
-    2.  These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance in kg N / ha.
+    1.  The total N supplied, removed, and total emitted (including ammonia and nitrate) for each field (kg N / ha * field area (ha) = kg N per field) are summed across all fields.
+    2.  These total farm-level amounts (in kg N) are then divided by the total farm area (ha) to provide an average farm-level balance (`N Supply - N Removal - Total N Emission`) in kg N / ha.
 
 ## 5. Output
 
 The final output (`NitrogenBalanceNumeric`) provides:
-*  Overall farm balance, supply, removal, and volatilization (kg N / ha).
+*  Overall farm balance, supply, removal, and total emission (kg N / ha).
 *  A list of balances for each field (`NitrogenBalanceFieldNumeric`), which includes:
     *  Field ID.
-    *  Field-specific balance (kg N / ha).
+    *  Field-specific **N Surplus** (reported as `balance`, in kg N / ha). This is calculated as `N Supply - N Removal - Ammonia Emission`.
     *  Detailed breakdown of supply (total, fertilizers by type, fixation, deposition, mineralization).
     *  Detailed breakdown of removal (total, harvests, residues).
-    *  Detailed breakdown of volatilization (total, ammonia from fertilizers and residues).
+    *  Detailed breakdown of emission (total, plus sub-components for ammonia and nitrate).
 
 All values are rounded numbers.
