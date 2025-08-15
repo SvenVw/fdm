@@ -1106,10 +1106,21 @@ export async function updateCultivation(
                     .set({
                         updated: updated,
                         b_lu_end: b_lu_end,
+                    })
+                    .where(eq(schema.cultivationEnding.b_lu, b_lu))
+            }
+
+            if (m_cropresidue !== undefined) {
+                await tx
+                    .update(schema.cultivationEnding)
+                    .set({
+                        updated: updated,
                         m_cropresidue: m_cropresidue,
                     })
                     .where(eq(schema.cultivationEnding.b_lu, b_lu))
+            }
 
+            if (b_lu_end) {
                 const harvestableType = await getHarvestableTypeOfCultivation(
                     tx,
                     b_lu,

@@ -579,6 +579,25 @@ describe("Cultivation Data Model", () => {
             expect(updatedCultivation.m_cropresidue).toEqual(false)
         })
 
+        it("should update a cultivation with only the crop residue", async () => {
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                true,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.m_cropresidue).toEqual(true)
+        })
+
         it("should throw an error when updating with invalid sowing date - before termination date", async () => {
             const newSowingDate = new Date("2024-04-01") //Invalid date - after termination
             const newTerminationDate = new Date("2024-03-01")
