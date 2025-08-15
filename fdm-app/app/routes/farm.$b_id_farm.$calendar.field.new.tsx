@@ -210,6 +210,15 @@ export default function Index() {
         null,
     )
 
+    function setDialogOpen(value: boolean) {
+        if (value) {
+            setOpen(true)
+        } else {
+            setSelectedField(null)
+            setOpen(false)
+        }
+    }
+
     const handleSelectField = (feature: Feature<Polygon>) => {
         setSelectedField(feature)
         setOpen(true)
@@ -340,7 +349,7 @@ export default function Index() {
             {selectedField && (
                 <FieldDetailsDialog
                     open={open}
-                    setOpen={setOpen}
+                    setOpen={setDialogOpen}
                     field={selectedField as Feature<Polygon>}
                     cultivationOptions={loaderData.cultivationOptions}
                     fieldNameDefault={loaderData.fieldNameDefault}
