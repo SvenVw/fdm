@@ -55,7 +55,8 @@ export function calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
         if (p_ef_nh3) {
             emissionFactor = new Decimal(p_ef_nh3)
         } else {
-            emissionFactor = determineMineralAmmoniaEmissionFactor(application)
+            emissionFactor =
+                determineMineralAmmoniaEmissionFactor(fertilizerDetail)
         }
 
         // Calculate for this application the amount of Nitrogen supplied by mineral fertilizer
@@ -63,6 +64,7 @@ export function calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
         const applicationValue = p_app_amount
             .times(p_n_rt)
             .times(emissionFactor)
+            .dividedBy(100) // Convert from percentage to factor
             .dividedBy(1000) // convert from g N to kg N
             .times(-1) // Return negative value
 
