@@ -1000,43 +1000,6 @@ export async function updateCultivation(
 
             if (b_lu_variety !== undefined) {
                 if (b_lu_variety) {
-                    // Validate if variety is listed as option for this cultivation
-                    const catalogueEntry = await tx
-                        .select({
-                            b_lu_variety_options:
-                                schema.cultivationsCatalogue
-                                    .b_lu_variety_options,
-                        })
-                        .from(schema.cultivationsCatalogue)
-                        .where(
-                            eq(
-                                schema.cultivationsCatalogue.b_lu_catalogue,
-                                existingCultivation[0].b_lu_catalogue,
-                            ),
-                        )
-                        .limit(1)
-
-                    if (
-                        catalogueEntry.length > 0 &&
-                        catalogueEntry[0].b_lu_variety_options &&
-                        !catalogueEntry[0].b_lu_variety_options.includes(
-                            b_lu_variety,
-                        )
-                    ) {
-                        throw new Error(
-                            "Variety not available for this cultivation",
-                        )
-                    }
-                }
-
-                await tx
-                    .update(schema.cultivations)
-                    .set({ b_lu_variety: b_lu_variety, updated: updated })
-                    .where(eq(schema.cultivations.b_lu, b_lu))
-            }
-
-            if (b_lu_variety !== undefined) {
-                if (b_lu_variety) {
                     // Determine which catalogue to validate against (new vs existing)
                     const catalogueIdToValidate =
                         b_lu_catalogue ?? existingCultivation[0].b_lu_catalogue
