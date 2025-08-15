@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.22.1
+
+### Patch Changes
+
+- Fix deployment issue
+
 ## 0.22.0
 
 ### Minor Changes
