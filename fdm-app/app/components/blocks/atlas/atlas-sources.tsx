@@ -136,23 +136,16 @@ function handleFieldClick(
 export function FieldsSourceAvailable({
     id,
     calendar,
-    exclude,
     zoomLevelFields,
     redirectToDetailsPage = false,
     children,
 }: {
     id: string
     calendar: string
-    exclude: Field[]
     zoomLevelFields: number
     redirectToDetailsPage: boolean
     children: JSX.Element
 }) {
-    const unwantedIds = new Set(
-        exclude
-            ? exclude.map((f) => f.properties.b_id_source).filter((id) => id)
-            : [],
-    )
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
     const availableFieldsUrl = getAvailableFieldsUrl(calendar)
@@ -227,11 +220,6 @@ export function FieldsSourceAvailable({
                             const featureClass = generateFeatureClass()
 
                             for await (const feature of iter) {
-                                if (
-                                    !unwantedIds.has(
-                                        feature.properties!.b_id_source,
-                                    )
-                                ) {
                                     const catalogueKey =
                                         feature.properties?.b_lu_catalogue
                                     featureClass.features.push({
@@ -244,8 +232,7 @@ export function FieldsSourceAvailable({
                                                     catalogueKey
                                                 ]?.b_lu_croprotation,
                                         },
-                                    })
-                                }
+                                    })                           
                                 i += 1
                             }
                             setData(featureClass)
@@ -277,7 +264,6 @@ export function FieldsSourceAvailable({
         map,
         availableFieldsUrl,
         zoomLevelFields,
-        unwantedIds,
         cultivationCataloguePromise,
     ])
 
