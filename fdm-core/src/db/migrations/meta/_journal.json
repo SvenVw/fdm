@@ -90,14 +90,14 @@
             "idx": 12,
             "version": "7",
             "when": 1754661913554,
-            "tag": "0012_legal_boomer",
+            "tag": "0012_v0-24-0-1",
             "breakpoints": true
         },
         {
             "idx": 13,
             "version": "7",
             "when": 1755074095394,
-            "tag": "0013_jittery_warbird",
+            "tag": "0013_v0-24-0-2",
             "breakpoints": true
         }
     ]
