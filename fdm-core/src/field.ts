@@ -77,6 +77,19 @@ export async function addField(
             }
             await tx.insert(schema.fields).values(fieldData)
 
+            // Validate b_acquiring_method is of the possible options, otherwise log an warning and insert 'unknown'
+            if (
+                b_acquiring_method &&
+                !schema.acquiringMethodOptions
+                    .map((option) => option.value)
+                    .includes(b_acquiring_method)
+            ) {
+                console.warn(
+                    `Invalid b_acquiring_method: ${b_acquiring_method}. Inserting as 'unknown'.`,
+                )
+                b_acquiring_method = "unknown"
+            }
+
             // Insert relation between farm and field
             const fieldAcquiringData = {
                 b_id,

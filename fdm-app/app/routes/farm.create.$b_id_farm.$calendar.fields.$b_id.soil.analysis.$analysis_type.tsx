@@ -74,6 +74,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "Type of soil analysis required",
             })
         }
+        if (
+            soilAnalysisType !== "all" &&
+            soilAnalysisType !== "standard" &&
+            soilAnalysisType !== "nmin" &&
+            soilAnalysisType !== "derogation"
+        ) {
+            throw data("Invalid type of soil analysis", {
+                status: 400,
+                statusText: "Invalid type of soil analysis",
+            })
+        }
         const soilAnalysisParameterDescription =
             getSoilParametersForSoilAnalysisType(soilAnalysisType)
 

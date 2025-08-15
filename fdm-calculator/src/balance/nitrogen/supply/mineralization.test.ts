@@ -1,98 +1,258 @@
-import Decimal from "decimal.js"
 import { describe, expect, it } from "vitest"
 import type {
+    CultivationDetail,
+    FieldInput,
     NitrogenBalanceInput,
-    NitrogenSupplyMineralization,
     SoilAnalysisPicked,
 } from "../types"
-import {
-    calculateNitrogenSupplyBySoilMineralization,
-    calculateNitrogenSupplyBySoilMineralizationUsingMinip,
-} from "./mineralization"
+import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
 
 describe("calculateNitrogenSupplyBySoilMineralization", () => {
+    const mockCultivationDetails = new Map<string, CultivationDetail>([
+        [
+            "1",
+            {
+                b_lu_catalogue: "1",
+                b_lu_croprotation: "grass",
+                b_lu_yield: null,
+                b_lu_hi: null,
+                b_lu_n_harvestable: null,
+                b_lu_n_residue: null,
+                b_n_fixation: null,
+            },
+        ],
+        [
+            "2",
+            {
+                b_lu_catalogue: "2",
+                b_lu_croprotation: "grass",
+                b_lu_yield: null,
+                b_lu_hi: null,
+                b_lu_n_harvestable: null,
+                b_lu_n_residue: null,
+                b_n_fixation: null,
+            },
+        ],
+        [
+            "3",
+            {
+                b_lu_catalogue: "3",
+                b_lu_croprotation: "corn",
+                b_lu_yield: null,
+                b_lu_hi: null,
+                b_lu_n_harvestable: null,
+                b_lu_n_residue: null,
+                b_n_fixation: null,
+            },
+        ],
+    ])
+
     const mockSoilAnalysis: SoilAnalysisPicked = {
-        a_c_of: 20, // Example value
-        a_cn_fr: 10, // Example value
-        a_density_sa: 1.2, // Example value
         b_soiltype_agr: "zand",
-        a_n_rt: 1,
-        a_som_loi: 1,
+        a_c_of: null,
+        a_cn_fr: null,
+        a_density_sa: null,
+        a_n_rt: null,
+        a_som_loi: null,
+        b_gwl_class: null,
     }
 
-    const mockTimeFrame: NitrogenBalanceInput["timeFrame"] = {
-        start: new Date("2023-01-01"),
-        end: new Date("2023-12-31"),
-    }
-
-    it("should calculate nitrogen supply by soil mineralization correctly", () => {
-        const result: NitrogenSupplyMineralization =
-            calculateNitrogenSupplyBySoilMineralization(
-                mockSoilAnalysis,
-                mockTimeFrame,
-            )
-
-        expect(result.total).toBeInstanceOf(Decimal)
-        expect(result.total.toNumber()).toBeCloseTo(97.24, 2) // Expected value based on the mock data
-    })
-    it("should return 0 if the time frame is negative or zero", () => {
-        const zeroTimeFrame: NitrogenBalanceInput["timeFrame"] = {
+    it("should return zero for non-grassland cultivation", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2023-12-31",
+                b_lu_catalogue: "3",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
             start: new Date("2023-01-01"),
-            end: new Date("2023-01-01"), // Same start and end date
-        }
-        const negativeTimeFrame: NitrogenBalanceInput["timeFrame"] = {
-            start: new Date("2023-01-02"),
-            end: new Date("2023-01-01"), // End date before start date
+            end: new Date("2023-12-31"),
         }
 
-        expect(
-            calculateNitrogenSupplyBySoilMineralization(
-                mockSoilAnalysis,
-                zeroTimeFrame,
-            ).total.toNumber(),
-        ).toBe(0)
-        expect(
-            calculateNitrogenSupplyBySoilMineralization(
-                mockSoilAnalysis,
-                negativeTimeFrame,
-            ).total.toNumber(),
-        ).toBe(0)
-    })
-
-    it("should return 250 if organic carbon is above 250", () => {
-        const mockSoilAnalysis2: SoilAnalysisPicked = {
-            a_c_of: 350, // Example value
-            a_cn_fr: 10, // Example value
-            a_density_sa: 1.2, // Example value
-            b_soiltype_agr: "zand",
-            a_n_rt: 1,
-            a_som_loi: 1,
-        }
-
-        const result: NitrogenSupplyMineralization =
-            calculateNitrogenSupplyBySoilMineralization(
-                mockSoilAnalysis2,
-                mockTimeFrame,
-            )
-
-        expect(result.total).toBeInstanceOf(Decimal)
-        expect(result.total.toNumber()).toBe(250)
-    })
-})
-
-describe("calculateNitrogenSupplyBySoilMineralizationUsingMinip", () => {
-    it("should calculate nitrogen mineralization correctly using Minip", () => {
-        const a_c_of = 20
-        const a_cn_fr = 10
-        const a_density_sa = 1.2
-
-        const result = calculateNitrogenSupplyBySoilMineralizationUsingMinip(
-            a_c_of,
-            a_cn_fr,
-            a_density_sa,
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            mockSoilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
         )
 
-        expect(result).toBeInstanceOf(Decimal)
-        expect(result.toNumber()).toBeCloseTo(97.24, 2)
+        expect(result.total.toNumber()).toBe(0)
+    })
+
+    it("should calculate mineralization for grassland on veen soil", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2023-12-31",
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "veen",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(160, 0)
+    })
+
+    it("should calculate mineralization for dalgrond soil", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2023-12-31",
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "dalgrond",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(20, 0)
+    })
+
+    it("should return mineralization for arable land for grassland not in the May 15 - July 15 window", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2023-05-14",
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "veen",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(20, 0)
+    })
+
+    it("should handle undefined cultivation end date", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: undefined,
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-12-31"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "veen",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(160, 0)
+    })
+
+    it("should calculate mineralization for a partial year", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2023-12-31",
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2023-06-30"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "veen",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(78.9, 1)
+    })
+
+    it("should calculate mineralization over multiple years", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "c1",
+                b_lu_start: "2023-01-01",
+                b_lu_end: "2024-12-31",
+                b_lu_catalogue: "1",
+                m_cropresidue: false,
+            },
+        ]
+        const timeFrame: NitrogenBalanceInput["timeFrame"] = {
+            start: new Date("2023-01-01"),
+            end: new Date("2024-12-31"),
+        }
+        const soilAnalysis: SoilAnalysisPicked = {
+            ...mockSoilAnalysis,
+            b_soiltype_agr: "veen",
+        }
+
+        const result = calculateNitrogenSupplyBySoilMineralization(
+            cultivations,
+            soilAnalysis,
+            mockCultivationDetails,
+            timeFrame,
+        )
+
+        expect(result.total.toNumber()).toBeCloseTo(320, 0)
     })
 })

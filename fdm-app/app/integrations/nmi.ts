@@ -51,6 +51,9 @@ export async function getSoilParameterEstimates(
     a_zn_cc: number
     b_soiltype_agr: string
     b_gwl_class: string
+    b_gwl_ghg: number
+    b_gwl_glg: number
+    cultivations: { year: number; b_lu_brp: number }[]
     a_source: string
     a_depth_upper: number
     a_depth_lower: number | undefined
@@ -140,6 +143,9 @@ const soilParameterEstimatesSchema = z.object({
     a_zn_cc: z.number(),
     b_soiltype_agr: z.string(),
     b_gwl_class: z.string(),
+    b_gwl_ghg: z.number(),
+    b_gwl_glg: z.number(),
+    cultivations: z.array(z.object({ year: z.number(), b_lu_brp: z.number() })),
     a_source: z.string(),
 })
 
@@ -151,7 +157,7 @@ export async function extractSoilAnalysis(formData: FormData) {
     }
 
     // Validate that FormData contains a file
-    const file = formData.get("file") as File
+    const file = formData.get("soilAnalysisFile") as File
     if (!file || !(file instanceof File)) {
         throw new Error("No file provided in FormData")
     }

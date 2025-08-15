@@ -6,30 +6,22 @@ import {
     getFertilizers,
     getField,
 } from "@svenvw/fdm-core"
-import { Tally1, Tally2, Tally3 } from "lucide-react"
-import { Suspense } from "react"
+import { Suspense, use } from "react"
 import {
-    Await,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    useLocation,
 } from "react-router"
-import { NutrientCard } from "~/components/blocks/nutrient-advice/cards"
-import {
-    NutrientKPICardForNutrientDeficit,
-    NutrientKPICardForNutrientExcess,
-    NutrientKPICardForTotalApplications,
-} from "~/components/blocks/nutrient-advice/kpi"
+import { FieldNutrientAdviceLayout } from "~/components/blocks/nutrient-advice/layout"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
-import { NutrientCardSkeleton } from "~/components/blocks/nutrient-advice/skeletons"
-import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
+    KPISection,
+    NutrientAdviceSection,
+} from "~/components/blocks/nutrient-advice/sections"
+import { FieldNutrientAdviceSkeleton } from "~/components/blocks/nutrient-advice/skeletons"
+import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
+import { ErrorBlock } from "~/components/custom/error"
 import { getNutrientAdvice } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -83,58 +75,82 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const field = await getField(fdm, session.principal_id, b_id)
 
-        const currentSoilData = await getCurrentSoilData(
-            fdm,
-            session.principal_id,
-            b_id,
-        )
+        const asyncData = (async () => {
+            try {
+                const currentSoilData = getCurrentSoilData(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                )
 
-        const fertilizerApplications = await getFertilizerApplications(
-            fdm,
-            session.principal_id,
-            b_id,
-            timeframe,
-        )
-        const fertilizers = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
+                const fertilizerApplications = getFertilizerApplications(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                    timeframe,
+                )
 
-        const doses = calculateDose({
-            applications: fertilizerApplications,
-            fertilizers,
-        })
+                const fertilizers = getFertilizers(
+                    fdm,
+                    session.principal_id,
+                    b_id_farm,
+                )
 
-        const cultivations = await getCultivations(
-            fdm,
-            session.principal_id,
-            b_id,
-            timeframe,
-        )
-        if (!cultivations.length) {
-            throw handleLoaderError("missing: cultivations")
-        }
-        // For now take the first cultivation
-        const b_lu_catalogue = cultivations[0].b_lu_catalogue
+                const cultivations = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    b_id,
+                    timeframe,
+                )
 
-        // Request nutrient advice
-        const nutrientAdvice = getNutrientAdvice(
-            b_lu_catalogue,
-            field.b_centroid,
-            currentSoilData,
-        )
+                if (!cultivations.length) {
+                    throw handleLoaderError("missing: cultivations")
+                }
+
+                const [
+                    resolvedCurrentSoilData,
+                    resolvedFertilizerApplications,
+                    resolvedFertilizers,
+                ] = await Promise.all([
+                    currentSoilData,
+                    fertilizerApplications,
+                    fertilizers,
+                ])
+
+                // For now take the first cultivation
+                const b_lu_catalogue = cultivations[0].b_lu_catalogue
+
+                const doses = calculateDose({
+                    applications: resolvedFertilizerApplications,
+                    fertilizers: resolvedFertilizers,
+                })
+
+                // Request nutrient advice
+                const nutrientAdvice = await getNutrientAdvice(
+                    b_lu_catalogue,
+                    field.b_centroid,
+                    resolvedCurrentSoilData,
+                )
+
+                return {
+                    nutrientAdvice: nutrientAdvice,
+                    doses: doses,
+                    fertilizerApplications: resolvedFertilizerApplications,
+                    fertilizers: resolvedFertilizers,
+                    errorMessage: undefined,
+                }
+            } catch (error) {
+                return { errorMessage: String(error).replace("Error: ", "") }
+            }
+        })()
 
         const nutrientsDescription = getNutrientsDescription()
 
         return {
             field: field,
-            nutrientAdvice: nutrientAdvice,
             nutrientsDescription: nutrientsDescription,
-            doses: doses,
-            fertilizerApplications: fertilizerApplications,
-            fertilizers: fertilizers,
             calendar: calendar,
+            asyncData: asyncData,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -142,15 +158,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 export default function FieldNutrientAdviceBlock() {
-    const {
-        field,
-        nutrientAdvice,
-        nutrientsDescription,
-        doses,
-        fertilizerApplications,
-        fertilizers,
-        calendar,
-    } = useLoaderData()
+    const loaderData = useLoaderData<typeof loader>()
+    const { field, nutrientsDescription } = loaderData
 
     const primaryNutrients = nutrientsDescription.filter(
         (item: NutrientDescription) => item.type === "primary",
@@ -162,162 +171,92 @@ export default function FieldNutrientAdviceBlock() {
         (item: NutrientDescription) => item.type === "trace",
     )
 
+    const splittedNutrients = {
+        primaryNutrients,
+        secondaryNutrients,
+        traceNutrients,
+    }
+
     return (
-        <div className="grid grid-cols-1 gap-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Tally1 className="h-5 w-5" />
-                        NPK
-                    </CardTitle>
-                    <CardDescription>
-                        Essentiële nutriënten voor een optimale groei en
-                        ontwikkeling van gewassen
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <Suspense
-                            fallback={primaryNutrients.map((nutrient) => (
-                                <NutrientCardSkeleton key={nutrient.symbol} />
-                            ))}
-                        >
-                            <Await resolve={nutrientAdvice}>
-                                {(nutrientAdvice) =>
-                                    primaryNutrients.map(
-                                        (nutrient: NutrientDescription) => (
-                                            <NutrientCard
-                                                key={nutrient.symbol}
-                                                description={nutrient}
-                                                advice={
-                                                    nutrientAdvice[
-                                                        nutrient.adviceParameter
-                                                    ]
-                                                }
-                                                doses={doses}
-                                                fertilizerApplications={
-                                                    fertilizerApplications
-                                                }
-                                                fertilizers={fertilizers}
-                                                to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                                            />
-                                        ),
-                                    )
-                                }
-                            </Await>
-                        </Suspense>
-                    </div>
-                </CardContent>
-            </Card>
+        <Suspense
+            key={`${field.b_id_farm}#${loaderData.calendar}#${field.b_id}`}
+            fallback={<FieldNutrientAdviceSkeleton {...splittedNutrients} />}
+        >
+            <FieldNutrientAdvice
+                loaderData={loaderData}
+                {...splittedNutrients}
+            />
+        </Suspense>
+    )
+}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <NutrientKPICardForTotalApplications
-                    doses={doses}
-                    fertilizerApplications={fertilizerApplications}
-                />
+/**
+ * Renders the page elements with asynchronously loaded data
+ *
+ * This has to be extracted into a separate component because of the `use(...)` hook.
+ * React will not render the component until `asyncData` resolves, but React Router
+ * handles it nicely via the `Suspense` component and server-to-client data streaming.
+ * If `use(...)` was added to `FieldNutrientAdviceBlock` instead, the Suspense
+ * would not render until `asyncData` resolves and the fallback would never be shown.
+ */
+function FieldNutrientAdvice({
+    loaderData,
+    primaryNutrients,
+    secondaryNutrients,
+    traceNutrients,
+}: {
+    loaderData: Awaited<ReturnType<typeof loader>>
+    primaryNutrients: NutrientDescription[]
+    secondaryNutrients: NutrientDescription[]
+    traceNutrients: NutrientDescription[]
+}) {
+    const { field, calendar, nutrientsDescription } = loaderData
+    const asyncData = use(loaderData.asyncData)
+    const location = useLocation()
 
-                <NutrientKPICardForNutrientDeficit
-                    descriptions={nutrientsDescription}
-                    advices={nutrientAdvice}
-                    doses={doses}
+    if (typeof asyncData.errorMessage === "string") {
+        return (
+            <ErrorBlock
+                status={500}
+                message={asyncData.errorMessage}
+                stacktrace={undefined}
+                page={location.pathname}
+                timestamp={new Date().toISOString()}
+            />
+        )
+    }
+    return (
+        <FieldNutrientAdviceLayout
+            primaryNutrientsSection={
+                <NutrientAdviceSection
+                    nutrients={primaryNutrients}
+                    field={field}
+                    calendar={calendar}
+                    asyncData={asyncData}
                 />
-
-                <NutrientKPICardForNutrientExcess
-                    descriptions={nutrientsDescription}
-                    advices={nutrientAdvice}
-                    doses={doses}
+            }
+            kpiSection={
+                <KPISection
+                    asyncData={asyncData}
+                    nutrientsDescription={nutrientsDescription}
                 />
-            </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Tally2 className="h-5 w-5" />
-                        Organische stof en secondaire nutriënten
-                    </CardTitle>
-                    <CardDescription>
-                        Ondersteunende nutriënten die essentieel zijn voor de
-                        gezondheid van de bodem en de ontwikkeling van planten
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <Suspense
-                            fallback={secondaryNutrients.map((nutrient) => (
-                                <NutrientCardSkeleton key={nutrient.symbol} />
-                            ))}
-                        >
-                            <Await resolve={nutrientAdvice}>
-                                {(nutrientAdvice) =>
-                                    secondaryNutrients.map(
-                                        (nutrient: NutrientDescription) => (
-                                            <NutrientCard
-                                                key={nutrient.symbol}
-                                                description={nutrient}
-                                                advice={
-                                                    nutrientAdvice[
-                                                        nutrient.adviceParameter
-                                                    ]
-                                                }
-                                                doses={doses}
-                                                fertilizerApplications={
-                                                    fertilizerApplications
-                                                }
-                                                fertilizers={fertilizers}
-                                                to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                                            />
-                                        ),
-                                    )
-                                }
-                            </Await>
-                        </Suspense>
-                    </div>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Tally3 className="h-5 w-5" />
-                        Spoorelementen
-                    </CardTitle>
-                    <CardDescription>
-                        Essentiële micronutriënten voor een optimale gezondheid
-                        en ontwikkeling van planten
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <Suspense
-                            fallback={traceNutrients.map((nutrient) => (
-                                <NutrientCardSkeleton key={nutrient.symbol} />
-                            ))}
-                        >
-                            <Await resolve={nutrientAdvice}>
-                                {(nutrientAdvice) =>
-                                    traceNutrients.map(
-                                        (nutrient: NutrientDescription) => (
-                                            <NutrientCard
-                                                key={nutrient.symbol}
-                                                description={nutrient}
-                                                advice={
-                                                    nutrientAdvice[
-                                                        nutrient.adviceParameter
-                                                    ]
-                                                }
-                                                doses={doses}
-                                                fertilizerApplications={
-                                                    fertilizerApplications
-                                                }
-                                                fertilizers={fertilizers}
-                                                to={`/farm/${field.b_id_farm}/${calendar}/field/${field.b_id}/fertilizer`}
-                                            />
-                                        ),
-                                    )
-                                }
-                            </Await>
-                        </Suspense>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+            }
+            secondaryNutrientsSection={
+                <NutrientAdviceSection
+                    nutrients={secondaryNutrients}
+                    field={field}
+                    calendar={calendar}
+                    asyncData={asyncData}
+                />
+            }
+            traceNutrientsSection={
+                <NutrientAdviceSection
+                    nutrients={traceNutrients}
+                    field={field}
+                    calendar={calendar}
+                    asyncData={asyncData}
+                />
+            }
+        />
     )
 }

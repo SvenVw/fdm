@@ -30,12 +30,10 @@ import type { FertilizerOption } from "./types.d"
 export function FertilizerApplicationForm({
     options,
     action,
-    onSuccess,
     navigation,
 }: {
     options: FertilizerOption[]
     action: string
-    onSuccess?: () => void
     navigation: Navigation
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -50,19 +48,13 @@ export function FertilizerApplicationForm({
     })
     const p_id = form.watch("p_id")
     const selectedFertilizer = options.find((option) => option.value === p_id)
+    const isSubmitting = navigation.state === "submitting"
 
     useEffect(() => {
         if (p_id) {
             form.setValue("p_app_method", "")
         }
     }, [p_id, form.setValue])
-
-    useEffect(() => {
-        if (form.formState.isSubmitSuccessful && navigation.state === "idle") {
-            form.reset()
-            onSuccess?.()
-        }
-    }, [form.formState, form.reset, onSuccess, navigation.state])
 
     return (
         <RemixFormProvider {...form}>
@@ -72,7 +64,7 @@ export function FertilizerApplicationForm({
                 onSubmit={form.handleSubmit}
                 method="post"
             >
-                <fieldset disabled={form.formState.isSubmitting}>
+                <fieldset disabled={isSubmitting}>
                     <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
                         {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
                         <Combobox
@@ -177,7 +169,7 @@ export function FertilizerApplicationForm({
                         <div className="invisible" />
                         <div className="ml-auto">
                             <Button type="submit">
-                                {form.formState.isSubmitting ? (
+                                {isSubmitting ? (
                                     <div className="flex items-center space-x-2">
                                         <LoadingSpinner />
                                         <span>Opslaan...</span>

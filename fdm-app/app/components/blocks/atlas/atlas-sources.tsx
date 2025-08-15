@@ -1,10 +1,24 @@
+import {
+    type CatalogueCultivationItem,
+    getCultivationCatalogue,
+} from "@svenvw/fdm-data"
+import centroid from "@turf/centroid"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react"
+import {
+    type Dispatch,
+    type JSX,
+    type ReactNode,
+    type SetStateAction,
+    useEffect,
+    useMemo,
+    useState,
+} from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
-import type { FieldsAvailableUrlType } from "./atlas.d"
+import { useNavigate } from "react-router"
 import { generateFeatureClass } from "./atlas-functions"
+import { getAvailableFieldsUrl } from "./atlas-url"
 
 export function FieldsSourceNotClickable({
     id,
@@ -13,7 +27,7 @@ export function FieldsSourceNotClickable({
 }: {
     id: string
     fieldsData: FeatureCollection
-    children: JSX.Element
+    children: ReactNode
 }) {
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -28,9 +42,11 @@ export function FieldsSourceSelected({
     fieldsData,
     setFieldsData,
     children,
+    excludedLayerId,
 }: {
     id: string
     availableLayerId: string
+    excludedLayerId?: string
     fieldsData: FeatureCollection
     setFieldsData: React.Dispatch<
         React.SetStateAction<FeatureCollection>
@@ -43,12 +59,24 @@ export function FieldsSourceSelected({
         function clickOnMap(evt) {
             if (!map) return
 
+            if (
+                map.queryRenderedFeatures(evt.point, {
+                    layers: [excludedLayerId],
+                }).length
+            ) {
+                return
+            }
+
             const features = map.queryRenderedFeatures(evt.point, {
                 layers: [availableLayerId],
             })
             console.log(features)
 
-            if (features.length > 0) {
+            if (
+                features.length > 0 &&
+                features[0].layer &&
+                features[0].layer !== excludedLayerId
+            ) {
                 handleFieldClick(features[0], setFieldsData)
             }
         }
@@ -59,7 +87,7 @@ export function FieldsSourceSelected({
                 map.off("click", clickOnMap)
             }
         }
-    }, [map, availableLayerId, setFieldsData])
+    }, [map, availableLayerId, excludedLayerId, setFieldsData])
 
     return (
         <Source id={id} type="geojson" data={fieldsData}>
@@ -106,19 +134,65 @@ function handleFieldClick(
 
 export function FieldsSourceAvailable({
     id,
-    url,
+    calendar,
     zoomLevelFields,
+    redirectToDetailsPage = false,
     children,
 }: {
     id: string
-    url: FieldsAvailableUrlType
+    calendar: string
     zoomLevelFields: number
+    redirectToDetailsPage: boolean
     children: JSX.Element
 }) {
-    if (!url) return null
-
     const { current: map } = useMap()
     const [data, setData] = useState(generateFeatureClass())
+    const availableFieldsUrl = getAvailableFieldsUrl(calendar)
+
+    const navigate = useNavigate()
+
+    const cultivationCataloguePromise = useMemo(async () => {
+        try {
+            const items = await getCultivationCatalogue("brp")
+            const result: Record<string, CatalogueCultivationItem> = {}
+            for (const item of items) {
+                result[item.b_lu_catalogue] = item
+            }
+            return result
+        } catch (err) {
+            console.error(
+                "Failed to load cultivation catalogue; defaulting to other color.",
+                err,
+            )
+            return {}
+        }
+    }, [])
+
+    useEffect(() => {
+        if (map && redirectToDetailsPage) {
+            const handleClick = (e: any) => {
+                // Get the coordinates of the centroid of the clicked field
+                if (e.features) {
+                    try {
+                        const clickedFeature = e.features[0]
+                        const featureCentroid = centroid(clickedFeature)
+                        const featureCentroidCoordinates =
+                            featureCentroid.geometry.coordinates.join(",")
+                        navigate(featureCentroidCoordinates)
+                    } catch (error) {
+                        console.error(
+                            "Failed to calculate centroid or navigate:",
+                            error,
+                        )
+                    }
+                }
+            }
+            map.on("click", id, handleClick)
+            return () => {
+                map.off("click", id, handleClick)
+            }
+        }
+    }, [map, id, redirectToDetailsPage, navigate])
 
     useEffect(() => {
         async function loadData() {
@@ -136,16 +210,26 @@ export function FieldsSourceAvailable({
                             minY: 0.9995 * minY,
                             maxY: 1.0005 * maxY,
                         }
+                        const cultivationCatalogue =
+                            await cultivationCataloguePromise
                         try {
-                            const iter = deserialize(url, bbox)
+                            const iter = deserialize(availableFieldsUrl, bbox)
 
                             let i = 0
                             const featureClass = generateFeatureClass()
 
                             for await (const feature of iter) {
+                                const catalogueKey =
+                                    feature.properties?.b_lu_catalogue
                                 featureClass.features.push({
                                     ...feature,
                                     id: i,
+                                    properties: {
+                                        ...feature.properties,
+                                        b_lu_croprotation:
+                                            cultivationCatalogue[catalogueKey]
+                                                ?.b_lu_croprotation,
+                                    },
                                 })
                                 i += 1
                             }
@@ -174,7 +258,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [map, url, zoomLevelFields])
+    }, [map, availableFieldsUrl, zoomLevelFields, cultivationCataloguePromise])
 
     return (
         <Source id={id} type="geojson" data={data}>

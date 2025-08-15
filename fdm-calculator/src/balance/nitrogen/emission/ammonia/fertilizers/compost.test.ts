@@ -3,17 +3,17 @@ import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
-} from "../../types"
-import { calculateAmmoniaEmissionsByCompost } from "./compost"
+} from "../../../types"
+import { calculateNitrogenEmissionViaAmmoniaByCompost } from "./compost"
 
-describe("calculateAmmoniaEmissionsByCompost", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByCompost", () => {
     it("should return total 0 and empty applications array if no fertilizer applications are provided", () => {
         const cultivations: FieldInput["cultivations"] = []
         const fertilizerApplications: FieldInput["fertilizerApplications"] = []
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -93,7 +93,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -105,12 +105,12 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
         // app2: 500 * 0.4 * 0.264 / 1000 = 0.0528 kg N
         // Total: 0.34 + 0.0528 = 0.3928 kg N
 
-        expect(result.total.toNumber()).toBeCloseTo(0.3928)
+        expect(result.total.toNumber()).toBeCloseTo(-0.3928)
         expect(result.applications.length).toBe(2)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.34)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications[1].id).toBe("app2")
-        expect(result.applications[1].value.toNumber()).toBeCloseTo(0.0528)
+        expect(result.applications[1].value.toNumber()).toBeCloseTo(-0.0528)
     })
 
     it("should return 0 for applications that are not compost type", () => {
@@ -141,7 +141,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -170,7 +170,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
         const fertilizerDetailsMap = new Map<string, FertilizerDetail>()
 
         expect(() =>
-            calculateAmmoniaEmissionsByCompost(
+            calculateNitrogenEmissionViaAmmoniaByCompost(
                 cultivations,
                 fertilizerApplications,
                 cultivationDetailsMap,
@@ -248,7 +248,7 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
             ],
         ])
 
-        const result = calculateAmmoniaEmissionsByCompost(
+        const result = calculateNitrogenEmissionViaAmmoniaByCompost(
             cultivations,
             fertilizerApplications,
             cultivationDetailsMap,
@@ -260,10 +260,10 @@ describe("calculateAmmoniaEmissionsByCompost", () => {
         // app2 (mineral): 0
         // Total: 0.34 kg N
 
-        expect(result.total.toNumber()).toBeCloseTo(0.34)
+        expect(result.total.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications.length).toBe(2)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(0.34)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.34)
         expect(result.applications[1].id).toBe("app2")
         expect(result.applications[1].value.toNumber()).toBe(0)
     })

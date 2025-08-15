@@ -227,6 +227,7 @@ export default function Index() {
     const id = "fieldsSaved"
     const fields = loaderData.featureCollection
     const fieldsSavedStyle = getFieldsStyle(id)
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
     const form = useRemixForm({
         mode: "onTouched",
@@ -384,6 +385,7 @@ export default function Index() {
                                     fieldsData={fields}
                                 >
                                     <Layer {...fieldsSavedStyle} />
+                                    <Layer {...fieldsSavedOutlineStyle} />
                                 </FieldsSourceNotClickable>
                             </MapGL>
                         ) : (

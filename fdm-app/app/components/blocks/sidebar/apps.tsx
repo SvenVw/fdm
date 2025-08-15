@@ -34,13 +34,13 @@ export function SidebarApps() {
     } else if (farmId) {
         atlasLink = `/farm/${farmId}/${selectedCalendar}/atlas`
     } else {
-        atlasLink = undefined
+        atlasLink = `/farm/undefined/${selectedCalendar}/atlas`
     }
 
     let nutrientBalanceLink: string | undefined
     if (isCreateFarmWizard) {
         nutrientBalanceLink = undefined
-    } else if (farmId) {
+    } else if (farmId && farmId !== "undefined") {
         nutrientBalanceLink = `/farm/${farmId}/${selectedCalendar}/balance`
     } else {
         nutrientBalanceLink = undefined
@@ -49,7 +49,7 @@ export function SidebarApps() {
     let nutrientAdviceLink: string | undefined
     if (isCreateFarmWizard) {
         nutrientAdviceLink = undefined
-    } else if (farmId) {
+    } else if (farmId && farmId !== "undefined") {
         nutrientAdviceLink = `/farm/${farmId}/${selectedCalendar}/nutrient_advice`
     } else {
         nutrientAdviceLink = undefined
@@ -58,7 +58,7 @@ export function SidebarApps() {
     let normsLink: string | undefined
     if (isCreateFarmWizard) {
         normsLink = undefined
-    } else if (farmId) {
+    } else if (farmId && farmId !== "undefined") {
         normsLink = `/farm/${farmId}/${selectedCalendar}/norms`
     } else {
         normsLink = undefined

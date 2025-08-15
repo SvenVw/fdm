@@ -1,6 +1,5 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarms } from "@svenvw/fdm-core"
 import {
-    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
@@ -9,13 +8,13 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { HeaderAtlas } from "~/components/blocks/header/atlas"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -45,33 +44,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     try {
         // Get the farm id
         const b_id_farm = params.b_id_farm
-        if (!b_id_farm) {
-            throw data("Farm ID is required", {
-                status: 400,
-                statusText: "Farm ID is required",
-            })
-        }
 
         // Get the session
         const session = await getSession(request)
 
-        // Get details of farm
-        let farm = null
-        try {
-            farm = await getFarm(fdm, session.principal_id, b_id_farm)
-            if (!farm) {
-                throw data("Farm is not found", {
-                    status: 404,
-                    statusText: "Farm is not found",
-                })
-            }
-        } catch (error) {
-            console.error("Failed to fetch farm details:", error)
-            throw data("Failed to fetch farm details", {
-                status: 500,
-                statusText: "Internal Server Error",
-            })
-        }
+        // Get the calendar
+        const calendar = getCalendar(params)
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
@@ -88,18 +66,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        const atlasLayerOptions = [
-            { atlasLayerId: "fields", atlasLayerName: "Percelen" },
-            { atlasLayerId: "soil", atlasLayerName: "Bodem" },
-            { atlasLayerId: "elevation", atlasLayerName: "Hoogtekaart" },
-        ]
-
         // Return user information from loader
         return {
-            farm: farm,
             b_id_farm: b_id_farm,
+            calendar: calendar,
             farmOptions: farmOptions,
-            atlasLayerOptions: atlasLayerOptions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -122,29 +93,32 @@ export default function FarmContentBlock() {
 
     // Get the current layer
     const pathname = location.pathname
-    const pathSegments = pathname.split("/")
-    const layerSelected = pathSegments[pathSegments.length - 1]
+
+    // Add back to map button when visiting the field details page
+    const isFieldDetailsPage =
+        pathname.includes("/atlas/fields/") &&
+        pathname.split("/atlas/fields/")[1]?.includes(",")
+    let headerAction:
+        | { to: string; label: string; disabled: boolean }
+        | undefined
+    if (isFieldDetailsPage) {
+        headerAction = {
+            to: `/farm/${loaderData.b_id_farm}/${loaderData.calendar}/atlas/fields`,
+            label: "Terug",
+            disabled: false,
+        }
+    }
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
+            <Header action={headerAction}>
                 <HeaderFarm
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderAtlas
-                    b_id_farm={loaderData.b_id_farm}
-                    selectedAtlasLayerId={layerSelected}
-                    atlasLayerOptions={loaderData.atlasLayerOptions}
-                />
+                <HeaderAtlas b_id_farm={loaderData.b_id_farm} />
             </Header>
             <main>
-                <FarmTitle
-                    title={"Kaarten"}
-                    description={
-                        "Bekijk verschillende kaartlagen van je bedrijf"
-                    }
-                />
                 <ClientOnly
                     fallback={<Skeleton className="h-full w-full rounded-xl" />}
                 >

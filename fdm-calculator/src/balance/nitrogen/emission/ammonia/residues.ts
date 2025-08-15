@@ -4,7 +4,7 @@ import type {
     CultivationDetail,
     FieldInput,
     NitrogenEmissionAmmoniaResidues,
-} from "../types"
+} from "../../types"
 
 /**
  * Calculates the amount of Nitrogen volatilized via ammonia emissions from crop residues.
@@ -16,7 +16,7 @@ import type {
  * @param harvests - A list of harvests from the field.
  * @param cultivationDetailsMap - The map of cultivation details.
  */
-export function calculateNitrogenVolatizationViaAmmoniaByResidue(
+export function calculateNitrogenEmissionViaAmmoniaByResidues(
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
     cultivationDetailsMap: Map<string, CultivationDetail>,
@@ -73,7 +73,6 @@ export function calculateNitrogenVolatizationViaAmmoniaByResidue(
             }
 
             // Fallback to default yield from cultivation_catalogue
-            // Fallback to default yield from cultivation catalogue
             if (yieldForThisHarvest === null) {
                 yieldForThisHarvest = new Decimal(
                     cultivationDetail.b_lu_yield ?? 0,

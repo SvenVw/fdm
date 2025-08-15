@@ -1,5 +1,18 @@
 # fdm-calculator
 
+## 0.6.0
+
+### Minor Changes
+
+- 140e957: Refactor nitrogen balance: replace "volatilization" with "emission" to enable inclusion of nitrate leaching.
+- 34b6e57: Use default values for mineralization instead of calculating it using MINIP.
+- 12dbc4c: Export the function getRegion, isFieldInNVGebied, isFieldInGWGBGebie and isFieldInNatura2000Gebied
+
+### Patch Changes
+
+- Updated dependencies [344e75c]
+  - @svenvw/fdm-core@0.24.0
+
 ## 0.5.3
 
 ### Patch Changes

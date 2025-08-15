@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
 import { Separator } from "~/components/ui/separator"
+import { FieldNutrientAdviceLayout } from "./layout"
 
 export function NutrientCardSkeleton() {
     return (
@@ -57,5 +58,37 @@ export function NutrientAdviceFallback() {
             <NutrientCardSkeleton />
             <NutrientCardSkeleton />
         </div>
+    )
+}
+
+export function NutrientCardSkeletonRepeat({ count }: { count: number }) {
+    return [...new Array(count)].map((_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: all items are the same
+        <NutrientCardSkeleton key={i} />
+    ))
+}
+
+export function FieldNutrientAdviceSkeleton({
+    primaryNutrients,
+    secondaryNutrients,
+    traceNutrients,
+}: {
+    primaryNutrients: unknown[]
+    secondaryNutrients: unknown[]
+    traceNutrients: unknown[]
+}) {
+    return (
+        <FieldNutrientAdviceLayout
+            primaryNutrientsSection={
+                <NutrientCardSkeletonRepeat count={primaryNutrients.length} />
+            }
+            kpiSection={<NutrientCardSkeletonRepeat count={3} />}
+            secondaryNutrientsSection={
+                <NutrientCardSkeletonRepeat count={secondaryNutrients.length} />
+            }
+            traceNutrientsSection={
+                <NutrientCardSkeletonRepeat count={traceNutrients.length} />
+            }
+        />
     )
 }

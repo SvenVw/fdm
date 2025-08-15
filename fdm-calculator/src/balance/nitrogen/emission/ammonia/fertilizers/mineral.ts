@@ -3,7 +3,7 @@ import type {
     FertilizerDetail,
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
-} from "../../types"
+} from "../../../types"
 
 /**
  * Calculates the ammonia emissions specifically from mineral fertilizer applications.
@@ -18,7 +18,7 @@ import type {
  * @returns An object containing the total ammonia emissions from mineral fertilizers and a breakdown by individual application.
  * @throws Error if a fertilizer application references a non-existent fertilizer detail.
  */
-export function calculateAmmoniaEmissionsByMineralFertilizers(
+export function calculateNitrogenEmissionViaAmmoniaByMineralFertilizers(
     fertilizerApplications: FieldInput["fertilizerApplications"],
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
 ): NitrogenEmissionAmmoniaFertilizers["mineral"] {
@@ -55,7 +55,8 @@ export function calculateAmmoniaEmissionsByMineralFertilizers(
         if (p_ef_nh3) {
             emissionFactor = new Decimal(p_ef_nh3)
         } else {
-            emissionFactor = determineMineralAmmoniaEmissionFactor(application)
+            emissionFactor =
+                determineMineralAmmoniaEmissionFactor(fertilizerDetail)
         }
 
         // Calculate for this application the amount of Nitrogen supplied by mineral fertilizer
@@ -63,7 +64,9 @@ export function calculateAmmoniaEmissionsByMineralFertilizers(
         const applicationValue = p_app_amount
             .times(p_n_rt)
             .times(emissionFactor)
+            .dividedBy(100) // Convert from percentage to factor
             .dividedBy(1000) // convert from g N to kg N
+            .times(-1) // Return negative value
 
         return {
             id: application.p_app_id,

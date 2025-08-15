@@ -1,5 +1,18 @@
 # Changelog fdm-core
 
+## 0.24.0
+
+### Minor Changes
+
+- 344e75c: Add `b_lu_variety` to `cultivations` for selecting the variety of a cultivation and `b_lu_variety_options` to list the possible varieties of a cultivation
+
+### Patch Changes
+
+- Updated dependencies [34ce6df]
+- Updated dependencies [5790000]
+- Updated dependencies [34ce6df]
+  - @svenvw/fdm-data@0.16.0
+
 ## 0.23.2
 
 ### Patch Changes

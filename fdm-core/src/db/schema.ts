@@ -293,6 +293,7 @@ export const cultivations = fdmSchema.table(
         b_lu_catalogue: text()
             .notNull()
             .references(() => cultivationsCatalogue.b_lu_catalogue),
+        b_lu_variety: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -368,6 +369,8 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
         b_n_fixation: numericCasted(),
+        b_lu_rest_oravib: boolean(),
+        b_lu_variety_options: text().array(),
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),

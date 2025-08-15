@@ -16,14 +16,23 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
+import {
     CultivationDetailsFormSchema,
     type CultivationDetailsFormSchemaType,
 } from "./schema"
 
 export function CultivationDetailsCard({
     cultivation,
+    b_lu_variety_options,
 }: {
     cultivation: Cultivation
+    b_lu_variety_options: { value: string; label: string }[]
 }) {
     const fetcher = useFetcher()
     const form = useRemixForm<CultivationDetailsFormSchemaType>({
@@ -35,6 +44,7 @@ export function CultivationDetailsCard({
                 ? new Date(cultivation.b_lu_end)
                 : null,
             m_cropresidue: cultivation.m_cropresidue ?? false,
+            b_lu_variety: cultivation.b_lu_variety ?? null,
         },
     })
 
@@ -48,6 +58,7 @@ export function CultivationDetailsCard({
                 ? new Date(cultivation.b_lu_end)
                 : null,
             m_cropresidue: cultivation.m_cropresidue ?? false,
+            b_lu_variety: cultivation.b_lu_variety ?? null,
         })
     }, [cultivation, form.reset])
 
@@ -92,7 +103,7 @@ export function CultivationDetailsCard({
                             }
                             className="space-y-4"
                         >
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid lg:grid-cols-2 gap-4">
                                 <DatePicker
                                     form={form}
                                     name="b_lu_start"
@@ -106,7 +117,7 @@ export function CultivationDetailsCard({
                                     description=""
                                 />
                             </div>
-                            <div className="grid grid-cols-2 gap-4 items-end">
+                            <div className="grid lg:grid-cols-2 gap-4 items-end">
                                 <FormField
                                     control={form.control}
                                     name="m_cropresidue"
@@ -120,6 +131,12 @@ export function CultivationDetailsCard({
                                                     onCheckedChange={
                                                         field.onChange
                                                     }
+                                                    disabled={
+                                                        form.formState
+                                                            .isSubmitting ||
+                                                        fetcher.state ===
+                                                            "submitting"
+                                                    }
                                                 />
                                             </FormControl>
                                             <div className="space-y-1 leading-none">
@@ -131,6 +148,55 @@ export function CultivationDetailsCard({
                                         </FormItem>
                                     )}
                                 />
+                                <FormField
+                                    control={form.control}
+                                    name="b_lu_variety"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Variëteit</FormLabel>
+                                            <Select
+                                                onValueChange={field.onChange}
+                                                value={field.value ?? undefined}
+                                                disabled={
+                                                    b_lu_variety_options.length ===
+                                                    0
+                                                }
+                                            >
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue
+                                                            placeholder={
+                                                                b_lu_variety_options.length ===
+                                                                0
+                                                                    ? "Geen varieteiten beschikbaar"
+                                                                    : "Selecteer een variëteit"
+                                                            }
+                                                        />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {b_lu_variety_options.map(
+                                                        (option) => (
+                                                            <SelectItem
+                                                                key={
+                                                                    option.value
+                                                                }
+                                                                value={
+                                                                    option.value
+                                                                }
+                                                            >
+                                                                {option.label}
+                                                            </SelectItem>
+                                                        ),
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                            <div className="flex justify-end">
                                 <Button
                                     type="submit"
                                     disabled={

@@ -1,5 +1,5 @@
-import * as Sentry from "@sentry/node"
 import { nodeProfilingIntegration } from "@sentry/profiling-node"
+import * as Sentry from "@sentry/react-router"
 
 const requiredEnvVars = [
     "VITE_SENTRY_DSN",
@@ -18,4 +18,6 @@ Sentry.init({
     integrations: [nodeProfilingIntegration()],
     tracesSampleRate: Number(process.env.VITE_SENTRY_TRACE_SAMPLE_RATE),
     profilesSampleRate: Number(process.env.VITE_SENTRY_PROFILE_SAMPLE_RATE),
+    environment: process.env.NODE_ENV ?? "development",
+    release: process.env.npm_package_version,
 })

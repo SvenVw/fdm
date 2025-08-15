@@ -38,6 +38,10 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
                     p_id_catalogue: "app1",
                     p_n_rt: 20,
                     p_type: "mineral",
+                    p_ef_nh3: null,
+                    p_nh4_rt: null,
+                    p_no3_rt: null,
+                    p_s_rt: null,
                 },
             ],
             [
@@ -46,6 +50,10 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
                     p_id_catalogue: "app2",
                     p_n_rt: 15,
                     p_type: "mineral",
+                    p_ef_nh3: null,
+                    p_nh4_rt: null,
+                    p_no3_rt: null,
+                    p_s_rt: null,
                 },
             ],
         ])

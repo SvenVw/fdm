@@ -1,15 +1,15 @@
 import { Decimal } from "decimal.js"
 import { describe, expect, it } from "vitest"
-import type { CultivationDetail, FieldInput } from "../types"
-import { calculateNitrogenVolatizationViaAmmoniaByResidue } from "./residues"
+import type { CultivationDetail, FieldInput } from "../../types"
+import { calculateNitrogenEmissionViaAmmoniaByResidues } from "./residues"
 
-describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
+describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
     it("should return 0 if no cultivations are provided", () => {
         const cultivations: FieldInput["cultivations"] = []
         const harvests: FieldInput["harvests"] = []
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
 
-        const result = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
             cultivations,
             harvests,
             cultivationDetailsMap,
@@ -45,7 +45,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             ],
         ])
 
-        const result = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
             cultivations,
             harvests,
             cultivationDetailsMap,
@@ -99,7 +99,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             ],
         ])
 
-        const result = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
             cultivations,
             harvests,
             cultivationDetailsMap,
@@ -126,7 +126,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
         const cultivationDetailsMap = new Map<string, CultivationDetail>()
 
         expect(() =>
-            calculateNitrogenVolatizationViaAmmoniaByResidue(
+            calculateNitrogenEmissionViaAmmoniaByResidues(
                 cultivations,
                 harvests,
                 cultivationDetailsMap,
@@ -162,7 +162,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             ],
         ])
 
-        const result = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
             cultivations,
             harvests,
             cultivationDetailsMap,
@@ -199,7 +199,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             ],
         ])
 
-        const result = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
             cultivations,
             harvests,
             cultivationDetailsMap,
@@ -247,7 +247,7 @@ describe("calculateNitrogenVolatizationViaAmmoniaByResidue", () => {
             ],
         ])
 
-        const result = calculateNitrogenVolatizationViaAmmoniaByResidue(
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
             cultivations,
             harvests,
             cultivationDetailsMap,
