@@ -6,10 +6,7 @@ import {
 } from "react-router"
 import { HeaderAbout } from "~/components/blocks/header/about"
 import { Header } from "~/components/blocks/header/base"
-import {
-    Changelog1,
-    type ChangelogEntry,
-} from "~/components/import/changelog1"
+import { Changelog1, type ChangelogEntry } from "~/components/import/changelog1"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
@@ -26,6 +23,24 @@ export const meta: MetaFunction = () => {
 }
 
 export const changelogEntries: ChangelogEntry[] = [
+    {
+        version: "v0.22.0",
+        date: "15 Augustus 2025",
+        title: "Atlas is vernieuwd, BRP 2025 en meer",
+        description:
+            "Deze update introduceert een vernieuwde Atlas app, toevoeging van gewasvariëteit, bijgewerkte percelen voor 2025, nieuwe gewassen en een opnieuw ontworpen startpagina voor een betere start.",
+        items: [
+            "Vernieuwde Atlas: De Atlas-app is opnieuw ontworpen voor een beter overzicht en meer gebruiksgemak. U kunt nu direct alle beschikbare percelen zien, zonder eerst een bedrijf te selecteren. Klik op een perceel om direct de details te zien, zoals de gewashistorie, wanneer een rustgewas op het perceel heeft gestaan, bodemtextuur en grondwater.",
+            "Percelen obv geselecteerd jaar: De percelen die op de Atlas worden getoond, zijn nu van het jaar dat u in de kalender heeft geselecteerd. Zo ziet u altijd de juiste percelen voor het juiste jaar. De beschikbare percelen voor 2025 zijn nu ook toegevoegd.",
+            "Percelen gekleurd obv Gewascategorie: De percelen op de kaart zijn gekleurd aan de hand van de gewascategorie. Hiermee wordt de kaart duidelijler leesbaar en ziet u eenvoudig wat voor soort gewassen er staan. De popgeslagen en geselecteerde percelen hebben nu een gekleurde rand in plaats van een gekleurde vulling.",
+            "Verbeterde Wizard voor Bedrijf Aanmaken: De wizard voor het aanmaken van een bedrijf is verbeterd. U kunt nu direct vanuit de wizard terug naar de Atlas om meer percelen te selecteren. De percelen die u al heeft toegevoegd, worden nu ook op de kaart getoond.",
+            "Toevoeging van Variëteit: U kunt nu de variëteit van een gewas selecteren (op dit moment alleen nog voor aardappelen en buitenbloemen). De variëteit wordt nu ook gebruiikt bij het bepalen van de stiksotfgebruiksnorm.",
+            "Nieuwe Gewassen toegevoegd: De nieuwe BRP gewassen voor 2025 zijn toegevoegd.",
+            "Nieuwe Startpagina: De startpagina na het inloggen is opnieuw ontworpen met kaarten die u direct toegang geven tot het aanmaken van een nieuw bedrijf of het verkennen van de Atlas. Nieuwe gebruikers krijgen een uitgebreidere introductie te zien.",
+            "Snellere Pagina's: De pagina's voor de nutriëntenbalans, het nutriëntenadvies en de normen laden nu sneller, zodat u direct aan de slag kunt.",
+            "Bugfixes: Er zijn verschillende bugs opgelost, waaronder een probleem waarbij de kaart voor het toevoegen van een nieuw perceel niet interactief was als er nog geen percelen waren.",
+        ],
+    },
     {
         version: "v0.21.0",
         date: "31 Juli 2025",
