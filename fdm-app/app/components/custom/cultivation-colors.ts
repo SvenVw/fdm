@@ -19,7 +19,10 @@ export function getCultivationTypesHavingColors() {
 
 export function getCultivationColor(cultivationType: string | undefined) {
     if (cultivationType) {
-        return CROP_ROTATION_COLORS[cultivationType?.toLowerCase()] ?? CROP_ROTATION_COLORS.other
+        return (
+            CROP_ROTATION_COLORS[cultivationType?.toLowerCase()] ??
+            CROP_ROTATION_COLORS.other
+        )
     }
     return CROP_ROTATION_COLORS.other
 }

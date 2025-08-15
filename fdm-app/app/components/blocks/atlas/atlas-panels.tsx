@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
 import { data, NavLink, useFetcher } from "react-router"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
@@ -17,7 +18,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
-import { getCultivationColor } from "~/components/custom/cultivation-colors"
 
 export function FieldsPanelHover({
     zoomLevelFields,
@@ -339,7 +339,14 @@ export function FieldsPanelSelection({
             }
         }
         updatePanel()
-    }, [fields, isSubmitting, map, submitSelectedFields])
+    }, [
+        fields,
+        isSubmitting,
+        map,
+        submitSelectedFields,
+        continueTo,
+        numFieldsSaved,
+    ])
 
     return panel
 }

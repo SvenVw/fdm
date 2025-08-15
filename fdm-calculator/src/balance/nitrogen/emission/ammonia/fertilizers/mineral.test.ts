@@ -99,7 +99,9 @@ describe("calculateNitrogenEmissionViaAmmoniaByMineralFertilizers", () => {
         expect(result.total.toNumber()).toBeCloseTo(-2.235144e-5)
         expect(result.applications.length).toBe(1)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(-2.235144e-5)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(
+            -2.235144e-5,
+        )
     })
 
     it("should return 0 for applications that are not mineral type", () => {

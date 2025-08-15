@@ -19,6 +19,7 @@ import {
 } from "./cultivation"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
+import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
@@ -30,7 +31,6 @@ import { addField } from "./field"
 import { addHarvest } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
-import type { FdmType } from "./fdm"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType

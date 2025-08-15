@@ -6,6 +6,7 @@ import {
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
+import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenSupply } from "./supply"
 import { calculateTargetForNitrogenBalance } from "./target"
@@ -19,7 +20,6 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
-import { calculateNitrogenEmission } from "./emission"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.

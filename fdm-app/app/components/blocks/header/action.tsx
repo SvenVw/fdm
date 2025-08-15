@@ -1,7 +1,7 @@
+import type { JSX } from "react"
 import { NavLink } from "react-router"
 import { cn } from "@/app/lib/utils"
 import { Button } from "../../ui/button"
-import type { JSX } from "react"
 
 export interface HeaderActionProps {
     label: string

@@ -90,7 +90,7 @@ describe("Harvest Data Model", () => {
             b_lu_n_residue: 2,
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
-            b_lu_variety_options: null
+            b_lu_variety_options: null,
         })
 
         await addCultivationToCatalogue(fdm, {
@@ -108,7 +108,7 @@ describe("Harvest Data Model", () => {
             b_lu_n_residue: 2,
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
-            b_lu_variety_options: ["Agria"]
+            b_lu_variety_options: ["Agria"],
         })
 
         b_lu_start = new Date("2024-01-01")

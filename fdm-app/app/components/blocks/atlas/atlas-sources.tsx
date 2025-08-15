@@ -1,7 +1,11 @@
+import {
+    type CatalogueCultivationItem,
+    getCultivationCatalogue,
+} from "@svenvw/fdm-data"
+import centroid from "@turf/centroid"
 import { deserialize } from "flatgeobuf/lib/mjs/geojson.js"
 import type { FeatureCollection, GeoJsonProperties, Geometry } from "geojson"
 import throttle from "lodash.throttle"
-import centroid from "@turf/centroid"
 import {
     type Dispatch,
     type JSX,
@@ -12,14 +16,9 @@ import {
     useState,
 } from "react"
 import { Source, useMap } from "react-map-gl/mapbox"
-import { generateFeatureClass } from "./atlas-functions"
-import type { Field } from "@svenvw/fdm-core"
-import { getAvailableFieldsUrl } from "./atlas-url"
 import { useNavigate } from "react-router"
-import {
-    type CatalogueCultivationItem,
-    getCultivationCatalogue,
-} from "@svenvw/fdm-data"
+import { generateFeatureClass } from "./atlas-functions"
+import { getAvailableFieldsUrl } from "./atlas-url"
 
 export function FieldsSourceNotClickable({
     id,
@@ -220,19 +219,18 @@ export function FieldsSourceAvailable({
                             const featureClass = generateFeatureClass()
 
                             for await (const feature of iter) {
-                                    const catalogueKey =
-                                        feature.properties?.b_lu_catalogue
-                                    featureClass.features.push({
-                                        ...feature,
-                                        id: i,
-                                        properties: {
-                                            ...feature.properties,
-                                            b_lu_croprotation:
-                                                cultivationCatalogue[
-                                                    catalogueKey
-                                                ]?.b_lu_croprotation,
-                                        },
-                                    })                           
+                                const catalogueKey =
+                                    feature.properties?.b_lu_catalogue
+                                featureClass.features.push({
+                                    ...feature,
+                                    id: i,
+                                    properties: {
+                                        ...feature.properties,
+                                        b_lu_croprotation:
+                                            cultivationCatalogue[catalogueKey]
+                                                ?.b_lu_croprotation,
+                                    },
+                                })
                                 i += 1
                             }
                             setData(featureClass)
@@ -260,12 +258,7 @@ export function FieldsSourceAvailable({
                 map.off("zoomend", throttledLoadData)
             }
         }
-    }, [
-        map,
-        availableFieldsUrl,
-        zoomLevelFields,
-        cultivationCataloguePromise,
-    ])
+    }, [map, availableFieldsUrl, zoomLevelFields, cultivationCataloguePromise])
 
     return (
         <Source id={id} type="geojson" data={data}>

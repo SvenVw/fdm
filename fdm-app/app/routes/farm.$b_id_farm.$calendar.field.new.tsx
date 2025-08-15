@@ -298,12 +298,16 @@ export default function Index() {
                                             f.source === fieldsAvailableId &&
                                             f.geometry?.type === "Polygon",
                                     )
-                                    const savedPolygonFeature = evt.features.find(
-                                        (f) =>
-                                            f.source === fieldsSavedId &&
-                                            f.geometry?.type === "Polygon",
-                                    )
-                                    if (polygonFeature && !savedPolygonFeature) {
+                                    const savedPolygonFeature =
+                                        evt.features.find(
+                                            (f) =>
+                                                f.source === fieldsSavedId &&
+                                                f.geometry?.type === "Polygon",
+                                        )
+                                    if (
+                                        polygonFeature &&
+                                        !savedPolygonFeature
+                                    ) {
                                         handleSelectField(
                                             polygonFeature as Feature<Polygon>,
                                         )
@@ -316,7 +320,7 @@ export default function Index() {
                                 <FieldsSourceAvailable
                                     id={fieldsAvailableId}
                                     calendar={loaderData.calendar}
-                                    zoomLevelFields={ZOOM_LEVEL_FIELDS}                           
+                                    zoomLevelFields={ZOOM_LEVEL_FIELDS}
                                     redirectToDetailsPage={false}
                                 >
                                     <Layer {...fieldsAvailableStyle} />

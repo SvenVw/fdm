@@ -1,6 +1,6 @@
-import { Layer, Map as MapGL } from "react-map-gl/mapbox"
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
+import { Layer, Map as MapGL } from "react-map-gl/mapbox"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
