@@ -1,5 +1,11 @@
 # Changelog fdm-app
 
+## 0.22.2
+
+### Patch Changes
+
+- faa29b3: Fix issue with loading the variable for the colors of the field in production
+
 ## 0.22.1
 
 ### Patch Changes
