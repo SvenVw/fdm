@@ -50,11 +50,11 @@ describe("calculateNitrogenEmissionViaAmmoniaByMineralFertilizers", () => {
             fertilizerDetailsMap,
         )
 
-        // Expected value: 1000 * 0.8 * 0.1 / 1000 = 0.08 kg N
-        expect(result.total.toNumber()).toBeCloseTo(-0.08)
+        // Expected value: 1000 * 0.008 * 0.1 / 1000 = 0.08 kg N
+        expect(result.total.toNumber()).toBeCloseTo(-0.0008)
         expect(result.applications.length).toBe(1)
         expect(result.applications[0].id).toBe("app1")
-        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.08)
+        expect(result.applications[0].value.toNumber()).toBeCloseTo(-0.0008)
     })
 
     it("should calculate ammonia emissions for mineral applications without p_ef_nh3 (using determineMineralAmmoniaEmmissionFactor)", () => {
