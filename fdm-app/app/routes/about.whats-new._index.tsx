@@ -132,8 +132,8 @@ export const changelogEntries: ChangelogEntry[] = [
     {
         version: "v0.17.0",
         date: "14 Maart 2025",
-        title: `Lancering ${clientConfig.name} 🎉`,
-        description: `${clientConfig.name} is gelanceerd! Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen.`,
+        title: `Lancering 🎉`,
+        description: `Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen.`,
         items: [
             "Account aanmaken",
             "Bedrijven aanmaken",
