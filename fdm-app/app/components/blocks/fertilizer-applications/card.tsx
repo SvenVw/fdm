@@ -2,7 +2,7 @@ import type { Dose } from "@svenvw/fdm-calculator"
 import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
 import { Lightbulb, Scale } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useFetcher, useLocation, useNavigation } from "react-router"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -153,6 +153,7 @@ export function FertilizerApplicationCard({
     const location = useLocation()
     const navigation = useNavigation()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const previousNavigationState = useRef(navigation.state)
 
     const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
@@ -161,10 +162,15 @@ export function FertilizerApplicationCard({
     }
 
     useEffect(() => {
-        if (navigation.state === "idle" && fetcher.state === "idle") {
+        const wasNotIdle = previousNavigationState.current !== "idle"
+        const isIdle = navigation.state === "idle"
+
+        if (wasNotIdle && isIdle) {
             setIsDialogOpen(false)
         }
-    }, [navigation.state, fetcher.state])
+
+        previousNavigationState.current = navigation.state
+    }, [navigation.state])
 
     const detailCards = constructCards(dose)
 
@@ -193,7 +199,6 @@ export function FertilizerApplicationCard({
                         <FertilizerApplicationForm
                             options={fertilizerOptions}
                             action={location.pathname}
-                            onSuccess={() => setIsDialogOpen(false)}
                             navigation={navigation}
                         />
                     </DialogContent>
