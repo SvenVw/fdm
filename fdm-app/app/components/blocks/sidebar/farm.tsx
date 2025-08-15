@@ -47,7 +47,7 @@ export function SidebarFarm() {
     if (isCreateFarmWizard) {
         farmLink = "/farm"
         farmLinkDisplay = "Terug naar bedrijven"
-    } else if (farmId) {
+    } else if (farmId && farmId !== "undefined") {
         farmLink = `/farm/${farmId}`
         farmLinkDisplay = "Bedrijf"
     } else {
@@ -58,14 +58,14 @@ export function SidebarFarm() {
     let fieldsLink: string | undefined
     if (isCreateFarmWizard) {
         fieldsLink = undefined
-    } else if (farmId) {
+    } else if (farmId && farmId !== "undefined") {
         fieldsLink = `/farm/${farmId}/${selectedCalendar}/field`
     } else {
         fieldsLink = undefined
     }
 
     let fertilizersLink: string | undefined
-    if (farmId) {
+    if (farmId && farmId !== "undefined") {
         fertilizersLink = `/farm/${farmId}/fertilizers`
     } else {
         fertilizersLink = undefined

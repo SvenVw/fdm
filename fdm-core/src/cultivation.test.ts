@@ -19,6 +19,7 @@ import {
 } from "./cultivation"
 import * as schema from "./db/schema"
 import { addFarm } from "./farm"
+import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
 import {
@@ -30,7 +31,6 @@ import { addField } from "./field"
 import { addHarvest } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
-import type { FdmType } from "./fdm"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType
@@ -577,6 +577,25 @@ describe("Cultivation Data Model", () => {
             )
             expect(updatedCultivation.b_lu_end).toEqual(newTerminateDate)
             expect(updatedCultivation.m_cropresidue).toEqual(false)
+        })
+
+        it("should update a cultivation with only the crop residue", async () => {
+            await updateCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+                undefined,
+                undefined,
+                undefined,
+                true,
+            )
+
+            const updatedCultivation = await getCultivation(
+                fdm,
+                principal_id,
+                b_lu,
+            )
+            expect(updatedCultivation.m_cropresidue).toEqual(true)
         })
 
         it("should throw an error when updating with invalid sowing date - before termination date", async () => {

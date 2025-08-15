@@ -1,6 +1,5 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarms } from "@svenvw/fdm-core"
 import {
-    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
@@ -15,10 +14,10 @@ import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getCalendar } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

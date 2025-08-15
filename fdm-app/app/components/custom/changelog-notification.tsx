@@ -1,10 +1,11 @@
+import { ArrowRight, Circle, X } from "lucide-react"
 import { NavLink } from "react-router"
-import { X, ArrowRight, Circle } from "lucide-react"
-import { useChangelogStore } from "~/store/changelog"
 import { Button } from "~/components/ui/button"
+import { useChangelogStore } from "~/store/changelog"
 
 export function ChangelogNotification() {
-    const { hasNewUpdates, latestUpdateTitle, markAllAsSeen } = useChangelogStore()
+    const { hasNewUpdates, latestUpdateTitle, markAllAsSeen } =
+        useChangelogStore()
 
     if (!hasNewUpdates || !latestUpdateTitle) {
         return null

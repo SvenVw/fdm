@@ -1,4 +1,5 @@
 import type { Feature, Polygon } from "geojson"
+import { CircleQuestionMark } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -6,7 +7,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "~/components/ui/dialog"
-import { CircleQuestionMark } from "lucide-react"
 import {
     Tooltip,
     TooltipContent,

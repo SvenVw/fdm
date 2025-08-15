@@ -33,6 +33,9 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"
+import { SidebarInset } from "../components/ui/sidebar"
+import { Header } from "../components/blocks/header/base"
+import { HeaderFarmCreate } from "../components/blocks/header/create-farm"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -98,53 +101,44 @@ export default function CreateFarmAccessStep() {
         useLoaderData<typeof loader>()
 
     return (
-        <div className="space-y-6 p-10 pb-16">
-            <header className="flex items-center justify-between">
-                <div>
-                    <Breadcrumb>
-                        <BreadcrumbList>
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>
-                                    Maak een bedrijf
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>{b_name_farm}</BreadcrumbLink>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <BreadcrumbLink>
-                                    Toegang instellen
-                                </BreadcrumbLink>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
-                    <h2 className="text-2xl font-bold tracking-tight mt-2">
-                        Toegang instellen (Optioneel)
-                    </h2>
-                    <p className="text-muted-foreground">
-                        Nodig nu alvast gebruikers of organisaties uit, of
-                        voltooi de wizard.
-                    </p>
-                </div>
-                <NavLink to={`/farm/${b_id_farm}`}>
-                    {" "}
-                    {/* Navigate to the main farm page */}
-                    <Button>Voltooien</Button>
-                </NavLink>
-            </header>
-            <Separator className="my-6" />
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={b_name_farm} />
+            </Header>
+            <main>
+                <div className="space-y-6 p-10 pb-0">
+                    <div className="flex items-center">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-bold tracking-tight mt-2">
+                                Toegang instellen (Optioneel)
+                            </h2>
+                            <p className="text-muted-foreground">
+                                Nodig nu alvast gebruikers of organisaties uit,
+                                of voltooi de wizard.
+                            </p>
+                        </div>
 
-            {/* Access Cards */}
-            <div className="grid md:grid-cols-3 gap-4">
-                <AccessManagementCard
-                    principals={principals}
-                    hasSharePermission={hasSharePermission}
-                />
-                <AccessInfoCard />
-            </div>
-        </div>
+                        <div className="ml-auto">
+                            <Button asChild>
+                                <NavLink to={`/farm/${b_id_farm}`}>
+                                    {" "}
+                                    {/* Navigate to the main farm page */}
+                                    Voltooien
+                                </NavLink>
+                            </Button>
+                        </div>
+                    </div>
+                    <Separator className="my-6" />
+                    <div className="grid md:grid-cols-3 gap-4">
+                        <AccessManagementCard
+                            principals={principals}
+                            hasSharePermission={hasSharePermission}
+                        />
+                        <AccessInfoCard />
+                    </div>
+                </div>
+            </main>
+        </SidebarInset>
     )
 }
 

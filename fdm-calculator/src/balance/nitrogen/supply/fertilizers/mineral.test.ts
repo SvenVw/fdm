@@ -53,7 +53,7 @@ describe("calculateNitrogenSupplyByMineralFertilizers", () => {
                     p_ef_nh3: null,
                     p_nh4_rt: null,
                     p_no3_rt: null,
-                    p_s_rt: null
+                    p_s_rt: null,
                 },
             ],
         ])

@@ -19,14 +19,13 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { getCalendar, getCalendarSelection } from "../lib/calendar"
+import { getCalendarSelection } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {

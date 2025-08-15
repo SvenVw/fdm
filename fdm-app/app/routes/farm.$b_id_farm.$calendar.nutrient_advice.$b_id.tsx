@@ -13,21 +13,21 @@ import {
     useLoaderData,
     useLocation,
 } from "react-router"
+import { FieldNutrientAdviceLayout } from "~/components/blocks/nutrient-advice/layout"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
+import {
+    KPISection,
+    NutrientAdviceSection,
+} from "~/components/blocks/nutrient-advice/sections"
 import { FieldNutrientAdviceSkeleton } from "~/components/blocks/nutrient-advice/skeletons"
 import type { NutrientDescription } from "~/components/blocks/nutrient-advice/types"
+import { ErrorBlock } from "~/components/custom/error"
 import { getNutrientAdvice } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FieldNutrientAdviceLayout } from "~/components/blocks/nutrient-advice/layout"
-import {
-    KPISection,
-    NutrientAdviceSection,
-} from "~/components/blocks/nutrient-advice/sections"
-import { ErrorBlock } from "~/components/custom/error"
 
 // Meta
 export const meta: MetaFunction = () => {

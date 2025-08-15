@@ -7,7 +7,6 @@ import type {
 import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 import { calculateNitrogenEmissionViaAmmoniaByResidues } from "./residues"
 
-
 /**
  * Calculates the total nitrogen volatilization from a field, through ammonia emissions from fertilizer appplications and crop residues.
  *

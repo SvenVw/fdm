@@ -1,7 +1,6 @@
 import * as Sentry from "@sentry/react-router"
 import { LifeBuoy, Send } from "lucide-react"
 import { useEffect, useState } from "react"
-import { NavLink } from "react-router"
 import { toast } from "sonner"
 import { clientConfig } from "@/app/lib/config"
 import {

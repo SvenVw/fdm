@@ -1,3 +1,5 @@
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { Badge } from "~/components/ui/badge"
 import {
     Card,
     CardContent,
@@ -6,8 +8,6 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { Skeleton } from "~/components/ui/skeleton"
-import { Badge } from "~/components/ui/badge"
-import { getCultivationColor } from "~/components/custom/cultivation-colors"
 
 type CultivationHistory = {
     year: number

@@ -1,5 +1,12 @@
 # fdm-docs
 
+## 0.7.0
+
+### Minor Changes
+
+- 9cf8827: Update the explanation of how mineralization is calculated in the nitrogen balance: use default values instead of MINIP calculations.
+- eb59f37: Update the nitrogen balance description to reflect replacing "volatilization" with "emission".
+
 ## 0.6.1
 
 ### Patch Changes

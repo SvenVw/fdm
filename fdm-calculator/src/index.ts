@@ -24,15 +24,15 @@ export {
     createFunctionsForNorms,
 } from "./norms"
 export type { AggregatedNormsToFarmLevel } from "./norms/farm"
-export type {
-    GebruiksnormResult,
-    NL2025NormsInput,
-} from "./norms/nl/2025/types.d"
-export {
-    getRegion,
-    isFieldInNVGebied,
-} from "./norms/nl/2025/stikstofgebruiksnorm"
 export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
 } from "./norms/nl/2025/dierlijke-mest-gebruiksnorm"
+export {
+    getRegion,
+    isFieldInNVGebied,
+} from "./norms/nl/2025/stikstofgebruiksnorm"
+export type {
+    GebruiksnormResult,
+    NL2025NormsInput,
+} from "./norms/nl/2025/types.d"

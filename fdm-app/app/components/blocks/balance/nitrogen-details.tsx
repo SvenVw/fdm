@@ -1,6 +1,7 @@
 import type {
     FieldInput,
     NitrogenBalanceNumeric,
+    NitrogenEmissionNumeric,
     NitrogenRemovalHarvestsNumeric,
     NitrogenRemovalNumeric,
     NitrogenRemovalResiduesNumeric,
@@ -8,7 +9,6 @@ import type {
     NitrogenSupplyFixationNumeric,
     NitrogenSupplyMineralizationNumeric,
     NitrogenSupplyNumeric,
-    NitrogenEmissionNumeric,
 } from "@svenvw/fdm-calculator"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale/nl"

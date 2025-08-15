@@ -1,7 +1,7 @@
 import { reactRouter } from "@react-router/dev/vite"
 import {
-    sentryReactRouter,
     type SentryReactRouterBuildOptions,
+    sentryReactRouter,
 } from "@sentry/react-router"
 import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
