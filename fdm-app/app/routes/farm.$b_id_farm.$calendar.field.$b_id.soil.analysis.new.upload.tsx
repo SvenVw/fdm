@@ -168,7 +168,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (!soilAnalysis.b_sampling_date) {
             throw new Error("Missing required b_sampling_date")
         }
-        if (!soilAnalysis.a_depth_upper) {
+        if (soilAnalysis.a_depth_upper === undefined || soilAnalysis.a_depth_upper === null) {
             throw new Error("Missing required a_depth_upper value")
         }
 

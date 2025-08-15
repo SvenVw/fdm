@@ -157,7 +157,7 @@ export async function extractSoilAnalysis(formData: FormData) {
     }
 
     // Validate that FormData contains a file
-    const file = formData.get("file") as File
+    const file = formData.get("soilAnalysisFile") as File
     if (!file || !(file instanceof File)) {
         throw new Error("No file provided in FormData")
     }
