@@ -1636,12 +1636,12 @@ describe("isCultivationWithinTimeframe", () => {
         ).toBe(true)
     })
 
-    it("should return false if cultivation has only start date and is before timeframe", () => {
+    it("should return true if cultivation has only start date and is before timeframe", () => {
         const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
         const b_lu_end = null
         expect(
             isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(false)
+        ).toBe(true)
     })
 
     it("should return false if cultivation has only start date and is after timeframe", () => {
