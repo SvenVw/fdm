@@ -849,7 +849,7 @@ export function isCultivationWithinTimeframe(
             (b_lu_start <= timeframe.start && b_lu_end >= timeframe.end)
         )
     }
-    return b_lu_start >= timeframe.start && b_lu_start <= timeframe.end
+    return b_lu_start <= timeframe.end
 }
 
 /**
