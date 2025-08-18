@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test"
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-    testDir: "./tests/login-tests",
+    testDir: "./tests/login",
     /* Run tests in files in parallel */
     fullyParallel: true,
     /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -14,7 +14,7 @@ export default defineConfig({
     /* Opt out of parallel tests on CI. */
     workers: process.env.CI ? 1 : undefined,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-    reporter: "html",
+    reporter: process.env.CI ? [["dot"], ["json"]] : [["list"], ["json"]],
     /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
     use: {
         /* Base URL to use in actions like `await page.goto('/')`. */
@@ -35,7 +35,7 @@ export default defineConfig({
     /* Start the server in a CI environment such as GitHub Actions */
     webServer: {
         command:
-            "pnpm dotenvx run -- c8 -c v8-reporter.config.json --reports-dir coverage/login react-router-serve ./build/server/index.js",
+            "pnpm dotenvx run -- c8 -c v8-reporter.config.json react-router-serve ./build/server/index.js",
         env: {
             WRITE_MAGIC_LINK_FILE: "1",
         },

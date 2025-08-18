@@ -370,13 +370,37 @@ jobs:
         run: pnpm test-login-ci
         working-directory: ./fdm-app
 
+      - name: Move client coverage report for login tests
+        run: mv coverage/coverage-final.json coverage/coverage-final-login.json
+        working-directory: ./fdm-app
+
+      - name: Compile server coverage report
+        run: pnpm coverage-report-ci
+        working-directory: ./fdm-app
+
+      - name: Move server coverage report for login tests
+        run: mv coverage/coverage-final.json coverage/coverage-final-login-server.json
+        working-directory: ./fdm-app
+
       - name: Run app tests with coverage
         run: pnpm test-ci
+        working-directory: ./fdm-app
+
+      - name: Move client coverage report for app tests
+        run: mv coverage/coverage-final.json coverage/coverage-final-app.json
+        working-directory: ./fdm-app
+
+      - name: Compile server coverage report
+        run: pnpm coverage-report-ci
+        working-directory: ./fdm-app
+
+      - name: Move server coverage report for app tests
+        run: mv coverage/coverage-final.json coverage/coverage-final-app-server.json
         working-directory: ./fdm-app
 
       - name: fdm-app - Upload results to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./fdm-app/coverage/**/*.json
+          files: ./fdm-app/coverage/coverage-final*.json
           flags: fdm-app
           token: ${{ secrets.CODECOV_TOKEN }}
