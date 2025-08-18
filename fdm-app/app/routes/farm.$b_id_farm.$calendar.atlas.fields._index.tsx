@@ -1,3 +1,5 @@
+import { getFields } from "@svenvw/fdm-core"
+import type { FeatureCollection } from "geojson"
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
     Layer,
@@ -5,8 +7,6 @@ import {
     type ViewState,
     type ViewStateChangeEvent,
 } from "react-map-gl/mapbox"
-import { getFields } from "@svenvw/fdm-core"
-import type { FeatureCollection } from "geojson"
 import type { MetaFunction } from "react-router"
 import { type LoaderFunctionArgs, useLoaderData } from "react-router"
 import { ZOOM_LEVEL_FIELDS } from "~/components/blocks/atlas/atlas"

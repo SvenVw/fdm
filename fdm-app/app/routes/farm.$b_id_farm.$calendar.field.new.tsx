@@ -210,6 +210,15 @@ export default function Index() {
         null,
     )
 
+    function setDialogOpen(value: boolean) {
+        if (value) {
+            setOpen(true)
+        } else {
+            setSelectedField(null)
+            setOpen(false)
+        }
+    }
+
     const handleSelectField = (feature: Feature<Polygon>) => {
         setSelectedField(feature)
         setOpen(true)
@@ -289,12 +298,16 @@ export default function Index() {
                                             f.source === fieldsAvailableId &&
                                             f.geometry?.type === "Polygon",
                                     )
-                                    const savedPolygonFeature = evt.features.find(
-                                        (f) =>
-                                            f.source === fieldsSavedId &&
-                                            f.geometry?.type === "Polygon",
-                                    )
-                                    if (polygonFeature && !savedPolygonFeature) {
+                                    const savedPolygonFeature =
+                                        evt.features.find(
+                                            (f) =>
+                                                f.source === fieldsSavedId &&
+                                                f.geometry?.type === "Polygon",
+                                        )
+                                    if (
+                                        polygonFeature &&
+                                        !savedPolygonFeature
+                                    ) {
                                         handleSelectField(
                                             polygonFeature as Feature<Polygon>,
                                         )
@@ -308,7 +321,6 @@ export default function Index() {
                                     id={fieldsAvailableId}
                                     calendar={loaderData.calendar}
                                     zoomLevelFields={ZOOM_LEVEL_FIELDS}
-                                    exclude={fieldsSaved.features}
                                     redirectToDetailsPage={false}
                                 >
                                     <Layer {...fieldsAvailableStyle} />
@@ -340,7 +352,7 @@ export default function Index() {
             {selectedField && (
                 <FieldDetailsDialog
                     open={open}
-                    setOpen={setOpen}
+                    setOpen={setDialogOpen}
                     field={selectedField as Feature<Polygon>}
                     cultivationOptions={loaderData.cultivationOptions}
                     fieldNameDefault={loaderData.fieldNameDefault}

@@ -1,5 +1,57 @@
 # Changelog fdm-app
 
+## 0.22.2
+
+### Patch Changes
+
+- faa29b3: Fix issue with loading the variable for the colors of the field in production
+
+## 0.22.1
+
+### Patch Changes
+
+- Fix deployment issue
+
+## 0.22.0
+
+### Minor Changes
+
+- 8eef979: Replace environment variable FDM_PUBLIC_DATA with PUBLIC_FDM_DATASETS_URL
+- f76e542: Redesign fields at Atlas to show all fields and redirect to details page when clicked
+- d0b583e: Show available fields in different colors based on cultivation type.
+- fbbf8b0: Add `CultivationDetailsCard` to enable the user, when applicable for this cultivation, to select a variety.
+- e3be520: Redesigned the page for "whats-new" by introducing a new changelog component
+- f62e218: Add a button at the fields page on the farm create wizard to go back to the atlas page to select more fields
+- f62e218: On the farm create wizard atlas page show the already stored fields as well, next to the available fields and selected fields
+- af9b222: Add at Atlas Fields that when a field is clicked, details about that field, like cultivation history and soil texture are shown on fields details page
+- cb2b139: Atlas is now also available without selecting a farm first
+- 714bb03: Add `b_lu_rest_oravib` as parameter to cultivationCatalogue. This boolean parameter specifies if the cultivation is classified as 'rustgewas'.
+- d5edaf0: Atlas: show the available-fields dataset for the selected calendar year
+- 5c51ccb: Redesign the landing page after signin with cards that show new farm and atlas. When first logged in show 2 detailed cards with the background information about the farm and atlas tool
+- f62e218: Color of selected fields is changed from red to yellow
+- d242f3a: Make nutrient balance, nutrient advice, and norms pages load quickly before any expensive calculations so they properly show their spinners.
+- 6b21590: Add notification to sidebar in case a new entry is available at the "whats-new" page
+- d0b583e: Selected fields now have an outline instead of a different fill color in the farm creation wizard atlas.
+- f62e218: When additional fields are created through the wizard they are named with numbers starting from the number of previously created fields
+
+### Patch Changes
+
+- fb59ff3: Dismissing the add field dialog in the add field atlas screen no longer produces an error.
+- c0cb40c: Switch the 2024 available fields layer from "draft" to "definitive".
+- c246926: Migrate Sentry to `@sentry/react-router` (RRv7 integration with improved routing-aware tracing and profiling)
+- 4faf86c: When using the header on a field’s cultivations page to switch fields, also update the information shown in the cultivation details card.
+- a88f105: Fixes that map for adding a new field was not interactive when the farm did not have a field yet
+- Updated dependencies [344e75c]
+- Updated dependencies [34ce6df]
+- Updated dependencies [140e957]
+- Updated dependencies [5790000]
+- Updated dependencies [34b6e57]
+- Updated dependencies [12dbc4c]
+- Updated dependencies [34ce6df]
+  - @svenvw/fdm-core@0.24.0
+  - @svenvw/fdm-data@0.16.0
+  - @svenvw/fdm-calculator@0.6.0
+
 ## 0.21.0
 
 ### Minor Changes

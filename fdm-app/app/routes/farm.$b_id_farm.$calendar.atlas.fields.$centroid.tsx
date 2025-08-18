@@ -1,33 +1,32 @@
 import {
+    getRegion,
+    isFieldInGWGBGebied,
+    isFieldInNatura2000Gebied,
+    isFieldInNVGebied,
+} from "@svenvw/fdm-calculator"
+import { getCultivationCatalogue } from "@svenvw/fdm-data"
+import type { Feature, Point } from "geojson"
+import { Suspense, use } from "react"
+import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
     useLocation,
 } from "react-router"
+import { CultivationHistoryCard } from "~/components/blocks/atlas-fields/cultivation-history"
+import { FieldDetailsCard } from "~/components/blocks/atlas-fields/field-details"
+import { GroundwaterCard } from "~/components/blocks/atlas-fields/groundwater"
+import { FieldDetailsAtlasLayout } from "~/components/blocks/atlas-fields/layout"
+import { getFieldByCentroid } from "~/components/blocks/atlas-fields/query"
+import { FieldDetailsAtlasSkeleton } from "~/components/blocks/atlas-fields/skeleton"
+import { SoilTextureCard } from "~/components/blocks/atlas-fields/soil-texture"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { ErrorBlock } from "~/components/custom/error"
+import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
-import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
-import { getCultivationCatalogue } from "@svenvw/fdm-data"
-import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { CultivationHistoryCard } from "~/components/blocks/atlas-fields/cultivation-history"
-import { SoilTextureCard } from "~/components/blocks/atlas-fields/soil-texture"
-import { GroundwaterCard } from "~/components/blocks/atlas-fields/groundwater"
-import { FieldDetailsCard } from "~/components/blocks/atlas-fields/field-details"
-import { Suspense } from "react"
-import {
-    getRegion,
-    isFieldInGWGBGebied,
-    isFieldInNatura2000Gebied,
-    isFieldInNVGebied,
-} from "@svenvw/fdm-calculator"
-import { getFieldByCentroid } from "~/components/blocks/atlas-fields/query"
-import type { Feature, Point } from "geojson"
-import { use } from "react"
-import { FieldDetailsAtlasLayout } from "~/components/blocks/atlas-fields/layout"
-import { ErrorBlock } from "~/components/custom/error"
-import { FieldDetailsAtlasSkeleton } from "~/components/blocks/atlas-fields/skeleton"
 
 // Meta
 export const meta: MetaFunction = () => {

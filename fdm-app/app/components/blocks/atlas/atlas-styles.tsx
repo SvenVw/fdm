@@ -5,16 +5,6 @@ import {
     getCultivationTypesHavingColors,
 } from "~/components/custom/cultivation-colors"
 
-const baseFieldsFillColorExpr: ExpressionSpecification = [
-    "match",
-    ["get", "b_lu_croprotation"],
-    ...getCultivationTypesHavingColors().flatMap((k) => [
-        k,
-        getCultivationColor(k),
-    ]),
-    getCultivationColor("other"),
-]
-
 export function getFieldsStyle(layerId: string): LayerProps {
     const style = getFieldsStyleInner(layerId)
     style.id = layerId
@@ -22,6 +12,16 @@ export function getFieldsStyle(layerId: string): LayerProps {
 }
 
 function getFieldsStyleInner(layerId: string): LayerProps {
+    const baseFieldsFillColorExpr: ExpressionSpecification = [
+        "match",
+        ["get", "b_lu_croprotation"],
+        ...getCultivationTypesHavingColors().flatMap((k) => [
+            k,
+            getCultivationColor(k),
+        ]),
+        getCultivationColor("other"),
+    ]
+
     const baseFillStyles = {}
 
     const baseLineStyles = {

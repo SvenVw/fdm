@@ -1,5 +1,13 @@
 # fdm-data
 
+## 0.16.0
+
+### Minor Changes
+
+- 34ce6df: Add the new BRP 2025 crops to the brp cultivation dataset
+- 5790000: Add `b_lu_variety_options` to cultivation catalogue items to list the possible varieties for a cultivation.
+- 34ce6df: Add the `b_lu_rest_oravib` property to the BRP cultivation dataset
+
 ## 0.15.0
 
 ### Minor Changes

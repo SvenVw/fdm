@@ -60,7 +60,7 @@ export function CultivationDetailsCard({
             m_cropresidue: cultivation.m_cropresidue ?? false,
             b_lu_variety: cultivation.b_lu_variety ?? null,
         })
-    }, [cultivation])
+    }, [cultivation, form.reset])
 
     const handleDeleteCultivation = () => {
         return fetcher.submit(null, { method: "delete" })
