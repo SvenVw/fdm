@@ -203,7 +203,7 @@ export async function addCultivation(
                 }
 
                 // Validate if terminate date is after sowing date
-                if (b_lu_end <= b_lu_start) {
+                if (b_lu_end.getTime() < b_lu_start.getTime()) {
                     throw new Error("Terminate date must be after sowing date")
                 }
             }
@@ -812,7 +812,6 @@ export async function getCultivationPlan(
     }
 }
 
-
 /**
  * Removes a cultivation and its related sowing and termination records from the database.
  *
@@ -920,7 +919,7 @@ export async function updateCultivation(
         if (
             b_lu_start &&
             b_lu_end &&
-            b_lu_end.getTime() <= b_lu_start.getTime()
+            b_lu_end.getTime() < b_lu_start.getTime()
         ) {
             throw new Error("Terminate date must be after sowing date")
         }
