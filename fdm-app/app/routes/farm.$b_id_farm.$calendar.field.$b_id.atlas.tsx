@@ -1,5 +1,4 @@
 import { Layer, Map as MapGL } from "react-map-gl/mapbox"
-import "mapbox-gl/dist/mapbox-gl.css"
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import type { MetaFunction } from "react-router"
@@ -107,6 +106,7 @@ export default function FarmFieldAtlasBlock() {
     const fields = loaderData.field
     const viewState = getViewState(fields)
     const fieldsSavedStyle = getFieldsStyle(id)
+    const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
     return (
         <div className="space-y-6">
@@ -139,6 +139,7 @@ export default function FarmFieldAtlasBlock() {
                                 fieldsData={fields}
                             >
                                 <Layer {...fieldsSavedStyle} />
+                                <Layer {...fieldsSavedOutlineStyle} />
                             </FieldsSourceNotClickable>
                         </MapGL>
                     )}

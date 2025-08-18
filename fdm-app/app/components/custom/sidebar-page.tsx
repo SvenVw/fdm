@@ -9,7 +9,12 @@ export interface SidebarPageProps extends React.HTMLAttributes<HTMLElement> {
     }[]
 }
 
-export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
+export function SidebarPage({
+    className,
+    items,
+    children,
+    ...props
+}: SidebarPageProps) {
     const { pathname } = useLocation()
 
     return (
@@ -37,6 +42,8 @@ export function SidebarPage({ className, items, ...props }: SidebarPageProps) {
                     {item.title}
                 </NavLink>
             ))}
+
+            {children}
         </nav>
     )
 }

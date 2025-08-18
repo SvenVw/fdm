@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
 import { Separator } from "~/components/ui/separator"
+import { FieldNutrientAdviceLayout } from "./layout"
 
 export function NutrientCardSkeleton() {
     return (
@@ -29,7 +30,10 @@ export function NutrientCardSkeleton() {
                     <Separator />
                     <div className="space-y-3">
                         {[...Array(2)].map((_, i) => (
-                            <div key={`skeleton-detail-${i}`} className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                            <div
+                                key={`skeleton-detail-${i}`}
+                                className="flex justify-between items-center p-2 bg-muted/50 rounded"
+                            >
                                 <div className="space-y-1">
                                     <p className="h-4 w-32 bg-muted rounded" />
                                     <p className="h-3 w-24 bg-muted rounded" />
@@ -54,5 +58,37 @@ export function NutrientAdviceFallback() {
             <NutrientCardSkeleton />
             <NutrientCardSkeleton />
         </div>
+    )
+}
+
+export function NutrientCardSkeletonRepeat({ count }: { count: number }) {
+    return [...new Array(count)].map((_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: all items are the same
+        <NutrientCardSkeleton key={i} />
+    ))
+}
+
+export function FieldNutrientAdviceSkeleton({
+    primaryNutrients,
+    secondaryNutrients,
+    traceNutrients,
+}: {
+    primaryNutrients: unknown[]
+    secondaryNutrients: unknown[]
+    traceNutrients: unknown[]
+}) {
+    return (
+        <FieldNutrientAdviceLayout
+            primaryNutrientsSection={
+                <NutrientCardSkeletonRepeat count={primaryNutrients.length} />
+            }
+            kpiSection={<NutrientCardSkeletonRepeat count={3} />}
+            secondaryNutrientsSection={
+                <NutrientCardSkeletonRepeat count={secondaryNutrients.length} />
+            }
+            traceNutrientsSection={
+                <NutrientCardSkeletonRepeat count={traceNutrients.length} />
+            }
+        />
     )
 }

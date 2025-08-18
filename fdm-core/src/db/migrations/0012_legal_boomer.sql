@@ -1,0 +1,1 @@
+ALTER TABLE "fdm"."cultivations_catalogue" ADD COLUMN "b_lu_rest_oravib" boolean;

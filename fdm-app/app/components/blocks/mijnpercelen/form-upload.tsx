@@ -10,16 +10,19 @@ import {
 import { useEffect, useRef, useState } from "react"
 import { Form, NavLink, useActionData, useNavigation } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { parseDbf } from "shpjs"
+import { toast as notify } from "sonner"
 import { z } from "zod"
 import { cn } from "@/app/lib/utils"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { Button } from "~/components/ui/button"
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "~/components/ui/accordion"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -34,10 +37,7 @@ import {
     FormMessage,
 } from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { MijnPercelenUploadAnimation } from "./upload-animation"
-import { parseDbf } from "shpjs"
-import { toast as notify } from "sonner"
 
 type UploadState = "idle" | "animating" | "success" | "error"
 

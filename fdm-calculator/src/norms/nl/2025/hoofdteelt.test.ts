@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest"
-import type { NL2025NormsInputForCultivation } from "./types"
+import { describe, expect, it } from "vitest"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+import type { NL2025NormsInputForCultivation } from "./types"
 
 describe("determineNL2025Hoofdteelt", () => {
     it("should return the cultivation with the longest duration in the period", async () => {

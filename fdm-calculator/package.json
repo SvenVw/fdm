@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-calculator",
     "private": false,
-    "version": "0.4.1",
+    "version": "0.5.3",
     "description": "Calculate various insights based on the Farm Data Model",
     "license": "MIT",
     "homepage": "https://github.com/SvenVw/fdm",
@@ -23,7 +23,9 @@
             }
         }
     },
-    "files": ["dist"],
+    "files": [
+        "dist"
+    ],
     "scripts": {
         "dev": "dotenvx run -- vite",
         "db:generate": "npx drizzle-kit generate",
@@ -59,5 +61,5 @@
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.13.1"
+    "packageManager": "pnpm@10.14.0"
 }

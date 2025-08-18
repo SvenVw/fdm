@@ -26,6 +26,8 @@ export interface CatalogueCultivationItem {
     b_lu_n_harvestable: number
     b_lu_n_residue: number
     b_n_fixation: number
+    b_lu_rest_oravib: boolean
+    b_lu_variety_options: string[] | null
     hash: string | null
 }
 

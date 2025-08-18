@@ -1,15 +1,17 @@
 import type { Field } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {
     GebruiksnormResult,
     NitrogenStandard,
     NL2025NormsInput,
+    NL2025NormsInputForCultivation,
     NormsByRegion,
     RegionKey,
-    NL2025NormsInputForCultivation,
 } from "./types"
-import { determineNL2025Hoofdteelt } from "./hoofdteelt"
+
+const FETCH_TIMEOUT_MS = 8000
 
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.
@@ -30,21 +32,35 @@ export async function isFieldInNVGebied(
 
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+
+    const params = new URLSearchParams()
+    params.append("locations", `[[${longitude}, ${latitude}]]`)
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     try {
-        const params = new URLSearchParams()
-        params.append("locations", `[[${longitude}, ${latitude}]]`)
-        const response = await fetch(`${url}?${params.toString()}`)
+        const response = await fetch(`${url}?${params.toString()}`, {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+        })
         if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+            throw new Error(
+                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+            )
         }
         const json = await response.json()
-        const feature = json[0][0]
-        if (feature) {
-            return true
-        }
-        return false
+        const feature = json?.[0]?.[0]
+        return Boolean(feature)
     } catch (err) {
+        if ((err as any)?.name === "AbortError") {
+            throw new Error(
+                `Timeout querying NV-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+            )
+        }
         throw new Error(`Error querying NV-Gebied : ${String(err)}`)
+    } finally {
+        clearTimeout(timeout)
     }
 }
 
@@ -72,25 +88,38 @@ export async function getRegion(
 
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+
+    const params = new URLSearchParams()
+    params.append("locations", `[[${longitude}, ${latitude}]]`)
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     try {
-        const params = new URLSearchParams()
-        params.append("locations", `[[${longitude}, ${latitude}]]`)
-        const response = await fetch(`${url}?${params.toString()}`)
+        const response = await fetch(`${url}?${params.toString()}`, {
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+        })
         if (!response.ok) {
-            throw new Error(`Failed to fetch ${url}: ${response.statusText}`)
+            throw new Error(
+                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+            )
         }
         const json = await response.json()
-        const feature = json[0][0]
+        const feature = json?.[0]?.[0]
         if (feature) {
             return feature.region as RegionKey
         }
     } catch (err) {
-        throw new Error(`Error querying region: ${String(err)}`)
+        if ((err as any)?.name === "AbortError") {
+            throw new Error(
+                `Timeout querying Table2 Region after ${FETCH_TIMEOUT_MS}ms`,
+            )
+        }
+        throw new Error(`Error querying Table2 Region : ${String(err)}`)
+    } finally {
+        clearTimeout(timeout)
     }
-
-    throw new Error(
-        `Could not determine region for coordinates: lat ${latitude}, lon ${longitude}`,
-    )
 }
 
 /**

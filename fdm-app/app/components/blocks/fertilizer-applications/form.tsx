@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
+import type { Navigation } from "react-router"
 import { Form } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
@@ -29,9 +30,13 @@ import type { FertilizerOption } from "./types.d"
 export function FertilizerApplicationForm({
     options,
     action,
+    onSuccess,
+    navigation,
 }: {
     options: FertilizerOption[]
     action: string
+    onSuccess?: () => void
+    navigation: Navigation
 }) {
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -53,10 +58,11 @@ export function FertilizerApplicationForm({
     }, [p_id, form.setValue])
 
     useEffect(() => {
-        if (form.formState.isSubmitSuccessful) {
+        if (form.formState.isSubmitSuccessful && navigation.state === "idle") {
             form.reset()
+            onSuccess?.()
         }
-    }, [form.formState, form.reset])
+    }, [form.formState, form.reset, onSuccess, navigation.state])
 
     return (
         <RemixFormProvider {...form}>

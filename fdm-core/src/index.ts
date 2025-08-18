@@ -50,6 +50,12 @@ export type {
     CultivationPlan,
 } from "./cultivation.d"
 export {
+    addDerogation,
+    isDerogationGrantedForYear,
+    listDerogations,
+    removeDerogation,
+} from "./derogation"
+export {
     addFarm,
     getFarm,
     getFarms,
@@ -85,13 +91,21 @@ export type {
     FertilizerParameterDescriptionItem,
     FertilizerParameters,
 } from "./fertilizer.d"
-export { addField, getField, getFields, updateField, removeField, listAvailableAcquiringMethods } from "./field"
+export {
+    addField,
+    getField,
+    getFields,
+    listAvailableAcquiringMethods,
+    removeField,
+    updateField,
+} from "./field"
 export type { Field } from "./field.d"
 export {
     addHarvest,
     getHarvest,
     getHarvests,
     removeHarvest,
+    updateHarvest,
 } from "./harvest"
 export type {
     Harvest,
@@ -134,4 +148,3 @@ export type {
     SoilParameters,
 } from "./soil.d"
 export type { Timeframe } from "./timeframe.d"
-export { isDerogationGrantedForYear, addDerogation, removeDerogation, listDerogations} from "./derogation"

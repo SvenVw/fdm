@@ -1,11 +1,11 @@
 import geojsonExtent from "@mapbox/geojson-extent"
 import type { FeatureCollection } from "geojson"
 
-function getBounds(fields: FeatureCollection | null) {
+function getBounds(fields: FeatureCollection | null | undefined) {
     const initialBounds = [3.1, 50.7, 7.2, 53.6]
 
     let bounds = initialBounds
-    if (fields) {
+    if (fields && fields.features.length > 0) {
         try {
             bounds = geojsonExtent(fields)
         } catch (error) {
@@ -16,7 +16,7 @@ function getBounds(fields: FeatureCollection | null) {
     return bounds
 }
 
-export function getViewState(fields: FeatureCollection | null) {
+export function getViewState(fields: FeatureCollection | null | undefined) {
     if (fields) {
         const bounds = getBounds(fields)
 
@@ -31,7 +31,6 @@ export function getViewState(fields: FeatureCollection | null) {
     }
 
     const viewState = {
-        fitBoundsOptions: { padding: 100 },
         longitude: 4.9, // Default longitude for initial view
         latitude: 52.2, // Default latitude for initial view
         zoom: 6, // Default zoom level

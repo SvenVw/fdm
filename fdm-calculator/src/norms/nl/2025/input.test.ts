@@ -1,12 +1,12 @@
-import { describe, it, expect, vi } from "vitest"
-import { collectNL2025InputForNorms } from "./input"
-import * as fdmCore from "@svenvw/fdm-core"
 import type {
-    Field,
     Cultivation,
-    SoilAnalysis,
     FdmType,
+    Field,
+    SoilAnalysis,
 } from "@svenvw/fdm-core"
+import * as fdmCore from "@svenvw/fdm-core"
+import { describe, expect, it, vi } from "vitest"
+import { collectNL2025InputForNorms } from "./input"
 
 vi.mock("@svenvw/fdm-core", async () => {
     const actual = await vi.importActual("@svenvw/fdm-core")

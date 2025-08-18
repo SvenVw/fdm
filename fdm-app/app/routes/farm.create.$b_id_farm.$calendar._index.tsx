@@ -1,14 +1,15 @@
-import { UploadCloud, Map as MapIcon } from "lucide-react"
+import { getFarm } from "@svenvw/fdm-core"
+import { Map as MapIcon, UploadCloud } from "lucide-react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
-import { data, Link, NavLink, useLoaderData } from "react-router"
+import { data, NavLink, useLoaderData } from "react-router"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "~/components/ui/accordion"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -20,7 +21,6 @@ import {
 import { SidebarInset } from "~/components/ui/sidebar"
 import { clientConfig } from "~/lib/config"
 import { getSession } from "../lib/auth.server"
-import { getFarm } from "@svenvw/fdm-core"
 import { fdm } from "../lib/fdm.server"
 
 // Meta

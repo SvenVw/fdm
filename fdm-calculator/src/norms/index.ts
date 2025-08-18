@@ -26,19 +26,27 @@ export function createFunctionsForFertilizerApplicationFilling(
 ) {
     if (b_region === "NL") {
         if (year === "2025") {
-             // TODO: Implement fertilizer application filling functions for NL 2025
+            // TODO: Implement fertilizer application filling functions for NL 2025
             return {
                 collectInputForFertilizerApplicationFilling: () => {
-                    throw new Error("collectInputForFertilizerApplicationFilling is not implemented yet")
+                    throw new Error(
+                        "collectInputForFertilizerApplicationFilling is not implemented yet",
+                    )
                 },
                 calculateFertilizerApplicationFillingForNitrogen: () => {
-                    throw new Error("calculateFertilizerApplicationFillingForNitrogen is not implemented yet")
+                    throw new Error(
+                        "calculateFertilizerApplicationFillingForNitrogen is not implemented yet",
+                    )
                 },
                 calculateFertilizerApplicationFillingForManure: () => {
-                    throw new Error("calculateFertilizerApplicationFillingForManure is not implemented yet")
+                    throw new Error(
+                        "calculateFertilizerApplicationFillingForManure is not implemented yet",
+                    )
                 },
                 calculateFertilizerApplicationFillingForPhosphate: () => {
-                    throw new Error("calculateFertilizerApplicationFillingForPhosphate is not implemented yet")
+                    throw new Error(
+                        "calculateFertilizerApplicationFillingForPhosphate is not implemented yet",
+                    )
                 },
             }
         }

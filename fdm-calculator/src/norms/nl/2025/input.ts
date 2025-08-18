@@ -1,10 +1,10 @@
 import {
+    type FdmType,
     getCultivations,
     getCurrentSoilData,
-    type Timeframe,
-    type FdmType,
     getField,
     isDerogationGrantedForYear,
+    type Timeframe,
 } from "@svenvw/fdm-core"
 import type { NL2025NormsInput } from "./types.d"
 

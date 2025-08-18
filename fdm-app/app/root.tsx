@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react-router"
 import mapBoxStyle from "mapbox-gl/dist/mapbox-gl.css?url"
 import posthog from "posthog-js"
 import { useEffect } from "react"
@@ -21,6 +21,7 @@ import { Banner } from "~/components/custom/banner"
 import { ErrorBlock } from "~/components/custom/error"
 import { Toaster } from "~/components/ui/sonner"
 import { clientConfig } from "~/lib/config"
+import { useChangelogStore } from "~/store/changelog"
 import styles from "~/tailwind.css?url"
 import type { Route } from "./+types/root"
 
@@ -48,6 +49,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
             PUBLIC_FDM_URL: process.env.PUBLIC_FDM_URL,
             PUBLIC_FDM_NAME: process.env.PUBLIC_FDM_NAME,
             PUBLIC_FDM_PRIVACY_URL: process.env.PUBLIC_FDM_PRIVACY_URL,
+            PUBLIC_FDM_DATASETS_URL: process.env.PUBLIC_FDM_DATASETS_URL,
             PUBLIC_MAPBOX_TOKEN: process.env.PUBLIC_MAPBOX_TOKEN,
             PUBLIC_SENTRY_DSN: process.env.PUBLIC_SENTRY_DSN,
             PUBLIC_SENTRY_ORG: process.env.PUBLIC_SENTRY_ORG,
@@ -90,6 +92,11 @@ export function Layout() {
             posthog.capture("$pageview")
         }
     }, [location])
+
+    // Initialize changelog store
+    useEffect(() => {
+        useChangelogStore.getState().initializeChangelog()
+    }, [])
 
     // Hook to show the toasts
     useEffect(() => {

@@ -1,16 +1,15 @@
 import { getField, removeField } from "@svenvw/fdm-core"
 import {
-    data,
     type ActionFunctionArgs,
+    data,
+    Form,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
-    Form,
 } from "react-router"
-import { getSession } from "~/lib/auth.server"
-import { clientConfig } from "~/lib/config"
-import { handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
+import { RemixFormProvider, useRemixForm } from "remix-hook-form"
+import { redirectWithSuccess } from "remix-toast"
+import { FieldDeleteDialog } from "~/components/blocks/field/delete"
 import {
     Card,
     CardContent,
@@ -18,10 +17,11 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { redirectWithSuccess } from "remix-toast"
+import { getSession } from "~/lib/auth.server"
+import { clientConfig } from "~/lib/config"
+import { handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { getCalendar } from "../lib/calendar"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
-import { FieldDeleteDialog } from "~/components/blocks/field/delete"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -121,12 +121,11 @@ export default function FieldDeletePage() {
                             onSubmit={form.handleSubmit}
                             method="post"
                         >
-                            <fieldset
-                                disabled={
-                                    form.formState.isSubmitting
-                                }
-                            >
-                                <FieldDeleteDialog fieldName={field.b_name} isSubmitting={form.formState.isSubmitting} />
+                            <fieldset disabled={form.formState.isSubmitting}>
+                                <FieldDeleteDialog
+                                    fieldName={field.b_name}
+                                    isSubmitting={form.formState.isSubmitting}
+                                />
                             </fieldset>
                         </Form>
                     </RemixFormProvider>

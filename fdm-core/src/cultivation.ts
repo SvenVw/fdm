@@ -9,6 +9,7 @@ import {
     lte,
     or,
     type SQL,
+    sql,
 } from "drizzle-orm"
 import { checkPermission } from "./authorization"
 import type { PrincipalId } from "./authorization.d"
@@ -93,7 +94,7 @@ export async function getCultivationsFromCatalogue(
  * Adds a new cultivation to the catalogue.
  *
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
- * @param properties The properties of the cultivation to add.
+ * @param properties The properties of the cultivation to add. This includes fields like `b_lu_catalogue`, `b_lu_name`, `b_lu_harvestable`, and optionally `b_lu_variety_options` to specify available varieties.
  * @returns A Promise that resolves when the cultivation is added.
  * @throws If the insertion fails.
  * @alpha
@@ -114,6 +115,8 @@ export async function addCultivationToCatalogue(
         b_lu_n_harvestable: schema.cultivationsCatalogueTypeInsert["b_lu_n_harvestable"]
         b_lu_n_residue: schema.cultivationsCatalogueTypeInsert["b_lu_n_residue"]
         b_n_fixation: schema.cultivationsCatalogueTypeInsert["b_n_fixation"]
+        b_lu_rest_oravib: schema.cultivationsCatalogueTypeInsert["b_lu_rest_oravib"]
+        b_lu_variety_options: schema.cultivationsCatalogueTypeInsert["b_lu_variety_options"]
     },
 ): Promise<void> {
     try {
@@ -156,6 +159,7 @@ export async function addCultivationToCatalogue(
  * @param b_lu_start - The sowing date of the cultivation.
  * @param b_lu_end - The optional termination date of the cultivation.
  * @param m_cropresidue - (Optional) Whether crop residues are left on the field or not after termination of the cultivation.
+ * @param b_lu_variety - (Optional) The variety of the cultivation.
  * @returns A promise that resolves with the unique ID of the newly added cultivation.
  * @throws {Error} If the sowing date is invalid, the termination date is invalid or not after the sowing date, the field or catalogue entry does not exist, or a duplicate cultivation is detected.
  * @alpha
@@ -168,6 +172,7 @@ export async function addCultivation(
     b_lu_start: schema.cultivationStartingTypeInsert["b_lu_start"],
     b_lu_end?: schema.cultivationEndingTypeInsert["b_lu_end"],
     m_cropresidue?: schema.cultivationEndingTypeInsert["m_cropresidue"],
+    b_lu_variety?: schema.cultivationsTypeInsert["b_lu_variety"],
 ): Promise<schema.cultivationsTypeSelect["b_lu"]> {
     try {
         await checkPermission(
@@ -262,9 +267,39 @@ export async function addCultivation(
                 throw new Error("Cultivation already exists")
             }
 
+            // Validate when b_lu_variety is provided for the cultivation that the variety provided is listed as an option in the cultivation catalogue
+            if (b_lu_variety) {
+                const catalogueEntry = await tx
+                    .select({
+                        b_lu_variety_options:
+                            schema.cultivationsCatalogue.b_lu_variety_options,
+                    })
+                    .from(schema.cultivationsCatalogue)
+                    .where(
+                        eq(
+                            schema.cultivationsCatalogue.b_lu_catalogue,
+                            b_lu_catalogue,
+                        ),
+                    )
+                    .limit(1)
+
+                if (
+                    catalogueEntry.length > 0 &&
+                    catalogueEntry[0].b_lu_variety_options &&
+                    !catalogueEntry[0].b_lu_variety_options.includes(
+                        b_lu_variety,
+                    )
+                ) {
+                    throw new Error(
+                        "Variety not available for this cultivation",
+                    )
+                }
+            }
+
             await tx.insert(schema.cultivations).values({
                 b_lu: b_lu,
                 b_lu_catalogue: b_lu_catalogue,
+                b_lu_variety: b_lu_variety,
             })
 
             await tx.insert(schema.cultivationStarting).values({
@@ -309,6 +344,8 @@ export async function addCultivation(
             b_id,
             b_lu_start,
             b_lu_end,
+            m_cropresidue,
+            b_lu_variety,
         })
     }
 }
@@ -351,6 +388,7 @@ export async function getCultivation(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_croprotation:
                     schema.cultivationsCatalogue.b_lu_croprotation,
+                b_lu_variety: schema.cultivations.b_lu_variety,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -440,6 +478,7 @@ export async function getCultivations(
                 b_lu_hcat3_name: schema.cultivationsCatalogue.b_lu_hcat3_name,
                 b_lu_croprotation:
                     schema.cultivationsCatalogue.b_lu_croprotation,
+                b_lu_variety: schema.cultivations.b_lu_variety,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -583,9 +622,11 @@ export async function getCultivationPlan(
             .select({
                 b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
                 b_lu_name: schema.cultivationsCatalogue.b_lu_name,
+                b_lu_variety: schema.cultivations.b_lu_variety,
                 b_lu: schema.cultivations.b_lu,
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
+                b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -698,6 +739,7 @@ export async function getCultivationPlan(
                 let existingCultivation = acc.find(
                     (item) =>
                         item.b_lu_catalogue === curr.b_lu_catalogue &&
+                        item.b_lu_variety === curr.b_lu_variety &&
                         (item.b_lu_start?.getTime() ?? 0) ===
                             (curr.b_lu_start?.getTime() ?? 0) &&
                         (item.b_lu_end?.getTime() ?? 0) ===
@@ -719,6 +761,8 @@ export async function getCultivationPlan(
                     existingCultivation = {
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
+                        b_lu_variety: curr.b_lu_variety,
+                        b_area: 0,
                         b_lu_start: curr.b_lu_start,
                         b_lu_end: curr.b_lu_end,
                         m_cropresidue: curr.m_cropresidue,
@@ -735,11 +779,15 @@ export async function getCultivationPlan(
                     existingField = {
                         b_lu: curr.b_lu,
                         b_id: curr.b_id,
+                        b_area: curr.b_area,
                         b_name: curr.b_name,
                         fertilizer_applications: [],
                         harvests: [],
                     }
                     existingCultivation.fields.push(existingField)
+                    if (curr.b_area) {
+                        existingCultivation.b_area += curr.b_area
+                    }
                 }
 
                 if (curr.p_app_id) {
@@ -845,6 +893,11 @@ export async function removeCultivation(
                 throw new Error("Cultivation does not exist")
             }
 
+            // Delete associated harvest records first
+            await tx
+                .delete(schema.cultivationHarvesting)
+                .where(eq(schema.cultivationHarvesting.b_lu, b_lu))
+
             await tx
                 .delete(schema.cultivationEnding)
                 .where(eq(schema.cultivationEnding.b_lu, b_lu))
@@ -874,6 +927,7 @@ export async function removeCultivation(
  * @param b_lu_start - (Optional) The updated sowing date; when provided with a termination date, it must precede it.
  * @param b_lu_end - (Optional) The updated termination date; if provided, it must be later than the sowing date.
  * @param m_cropresidue - (Optional) Whether crop residues are left on the field or not after termination of the cultivation.
+ * @param b_lu_variety - (Optional) The updated variety of the cultivation.
  * @returns A Promise that resolves upon successful completion of the update.
  *
  * @throws {Error} If the cultivation does not exist, if date validations fail, or if the update operation encounters an issue.
@@ -888,6 +942,7 @@ export async function updateCultivation(
     b_lu_start?: schema.cultivationStartingTypeInsert["b_lu_start"],
     b_lu_end?: schema.cultivationEndingTypeInsert["b_lu_end"],
     m_cropresidue?: schema.cultivationEndingTypeInsert["m_cropresidue"],
+    b_lu_variety?: schema.cultivationsTypeInsert["b_lu_variety"],
 ): Promise<void> {
     try {
         const updated = new Date()
@@ -943,9 +998,87 @@ export async function updateCultivation(
                     .where(eq(schema.cultivations.b_lu, b_lu))
             }
 
+            if (b_lu_variety !== undefined) {
+                if (b_lu_variety) {
+                    // Validate if variety is listed as option for this cultivation
+                    const catalogueEntry = await tx
+                        .select({
+                            b_lu_variety_options:
+                                schema.cultivationsCatalogue
+                                    .b_lu_variety_options,
+                        })
+                        .from(schema.cultivationsCatalogue)
+                        .where(
+                            eq(
+                                schema.cultivationsCatalogue.b_lu_catalogue,
+                                existingCultivation[0].b_lu_catalogue,
+                            ),
+                        )
+                        .limit(1)
+
+                    if (
+                        catalogueEntry.length > 0 &&
+                        catalogueEntry[0].b_lu_variety_options &&
+                        !catalogueEntry[0].b_lu_variety_options.includes(
+                            b_lu_variety,
+                        )
+                    ) {
+                        throw new Error(
+                            "Variety not available for this cultivation",
+                        )
+                    }
+                }
+
+                await tx
+                    .update(schema.cultivations)
+                    .set({ b_lu_variety: b_lu_variety, updated: updated })
+                    .where(eq(schema.cultivations.b_lu, b_lu))
+            }
+
+            if (b_lu_variety !== undefined) {
+                if (b_lu_variety) {
+                    // Determine which catalogue to validate against (new vs existing)
+                    const catalogueIdToValidate =
+                        b_lu_catalogue ?? existingCultivation[0].b_lu_catalogue
+
+                    // Validate if variety is listed as option for this cultivation
+                    const catalogueEntry = await tx
+                        .select({
+                            b_lu_variety_options:
+                                schema.cultivationsCatalogue
+                                    .b_lu_variety_options,
+                        })
+                        .from(schema.cultivationsCatalogue)
+                        .where(
+                            eq(
+                                schema.cultivationsCatalogue.b_lu_catalogue,
+                                catalogueIdToValidate, // Use new catalogue if provided
+                            ),
+                        )
+                        .limit(1)
+
+                    if (
+                        catalogueEntry.length > 0 &&
+                        catalogueEntry[0].b_lu_variety_options &&
+                        !catalogueEntry[0].b_lu_variety_options.includes(
+                            b_lu_variety,
+                        )
+                    ) {
+                        throw new Error(
+                            "Variety not available for this cultivation",
+                        )
+                    }
+                }
+
+                await tx
+                    .update(schema.cultivations)
+                    .set({ b_lu_variety: b_lu_variety, updated: updated })
+                    .where(eq(schema.cultivations.b_lu, b_lu))
+            }
+
             if (b_lu_start) {
                 // Validate if sowing date is before termination date
-                if (!b_lu_end) {
+                if (b_lu_end === undefined) {
                     const result = await tx
                         .select({
                             b_lu_end: schema.cultivationEnding.b_lu_end,
@@ -959,7 +1092,7 @@ export async function updateCultivation(
                         )
                         .limit(1)
 
-                    if (result.length > 0) {
+                    if (result.length > 0 && result[0].b_lu_end) {
                         if (
                             b_lu_start.getTime() >= result[0].b_lu_end.getTime()
                         ) {
@@ -972,7 +1105,7 @@ export async function updateCultivation(
 
                 await tx
                     .update(schema.cultivationStarting)
-                    .set({ updated: updated, b_lu_start: b_lu_start })
+                    .set({ b_lu_start: b_lu_start, updated: updated })
                     .where(eq(schema.cultivationStarting.b_lu, b_lu))
             }
 
@@ -1058,6 +1191,8 @@ export async function updateCultivation(
             b_lu_catalogue,
             b_lu_start,
             b_lu_end,
+            m_cropresidue,
+            b_lu_variety,
         })
     }
 }

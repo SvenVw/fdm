@@ -4,7 +4,7 @@
  * For more information, see https://remix.run/file-conventions/entry.client
  */
 
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react-router"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 import { StrictMode, startTransition } from "react"
@@ -18,7 +18,7 @@ if (clientConfig.analytics.sentry) {
         dsn: sentryConfig.dsn,
         environment: import.meta.env.NODE_ENV,
         integrations: [
-            Sentry.browserTracingIntegration(),
+            Sentry.reactRouterTracingIntegration(),
             Sentry.replayIntegration(),
             Sentry.feedbackIntegration({
                 autoInject: false,

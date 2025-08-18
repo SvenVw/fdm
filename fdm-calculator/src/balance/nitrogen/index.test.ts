@@ -34,6 +34,8 @@ describe("calculateNitrogenBalance", () => {
                             b_lu: "cultivation1",
                             b_lu_catalogue: "catalogue1",
                             m_cropresidue: true,
+                            b_lu_start: new Date("2023-01-01"),
+                            b_lu_end: new Date("2023-12-31"),
                         },
                     ],
                     harvests: [
@@ -108,7 +110,7 @@ describe("calculateNitrogenBalance", () => {
         expect(typeof result.balance).toBe("number")
         expect(typeof result.supply).toBe("number")
         expect(typeof result.removal).toBe("number")
-        expect(typeof result.volatilization).toBe("number")
+        expect(typeof result.emission).toBe("number")
         expect(typeof result.target).toBe("number")
         expect(Array.isArray(result.fields)).toBe(true)
     })

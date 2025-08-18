@@ -2,6 +2,7 @@ interface RuntimeConfig {
     PUBLIC_FDM_URL?: string
     PUBLIC_FDM_NAME?: string
     PUBLIC_FDM_PRIVACY_URL?: string
+    PUBLIC_FDM_DATASETS_URL?: string
     PUBLIC_MAPBOX_TOKEN?: string
     PUBLIC_SENTRY_DSN?: string
     PUBLIC_SENTRY_ORG?: string

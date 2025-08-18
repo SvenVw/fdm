@@ -19,10 +19,10 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
-import { calculateNitrogenVolatilization } from "./volatization"
+import { calculateNitrogenEmission } from "./emission"
 
 /**
- * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and volatilization.
+ * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.
  *
  * This function takes comprehensive input data, including field details, fertilizer information,
  * and cultivation practices, to provide a detailed nitrogen balance analysis. It processes each field
@@ -84,11 +84,11 @@ export async function calculateNitrogenBalance(
 }
 
 /**
- * Calculates the nitrogen balance for a single field, considering nitrogen supply, removal, and volatilization.
+ * Calculates the nitrogen balance for a single field, considering nitrogen supply, removal, and emission.
  *
  * This function performs a detailed calculation of the nitrogen balance for a single field,
  * taking into account various sources of nitrogen supply (e.g., fertilizers, mineralization),
- * nitrogen removal (e.g., harvest, crop residues), and nitrogen losses through volatilization.
+ * nitrogen removal (e.g., harvest, crop residues), and nitrogen losses through emission.
  *
  * The calculation relies on detailed input parameters, including:
  *   - field characteristics
@@ -154,7 +154,7 @@ export async function calculateNitrogenBalanceField(
     )
 
     // Calculate the amount of Nitrogen that is volatilized
-    const volatilization = calculateNitrogenVolatilization(
+    const emission = calculateNitrogenEmission(
         cultivations,
         harvests,
         fertilizerApplications,
@@ -172,10 +172,10 @@ export async function calculateNitrogenBalanceField(
 
     return {
         b_id: fieldDetails.b_id,
-        balance: supply.total.add(removal.total).add(volatilization.total),
+        balance: supply.total.add(removal.total).add(emission.ammonia.total),
         supply: supply,
         removal: removal,
-        volatilization: volatilization,
+        emission: emission,
         target: target,
     }
 }
@@ -185,10 +185,10 @@ export async function calculateNitrogenBalanceField(
  *
  * This function takes an array of nitrogen balance results for individual fields and aggregates
  * them to provide an overall nitrogen balance for the entire farm. It calculates weighted
- * averages of nitrogen supply, removal, and volatilization based on the area of each field.
+ * averages of nitrogen supply, removal, and emission based on the area of each field.
  *
  * The function returns a comprehensive nitrogen balance for the farm, including total supply,
- * removal, volatilization, and the overall balance.
+ * removal, emission, and the overall balance.
  * @param fieldsWithBalance - An array of nitrogen balance results for individual fields.
  * @returns The aggregated nitrogen balance for the farm.
  */
@@ -203,10 +203,10 @@ export function calculateNitrogenBalancesFieldToFarm(
         Decimal(0),
     )
 
-    // Calculate total weighted supply, removal, and volatilization across the farm
+    // Calculate total weighted supply, removal, and emission across the farm
     let totalFarmSupply = Decimal(0)
     let totalFarmRemoval = Decimal(0)
-    let totalFarmVolatilization = Decimal(0)
+    let totalFarmEmission = Decimal(0)
     let totalFarmTarget = Decimal(0)
 
     for (const fieldBalance of fieldsWithBalance) {
@@ -229,8 +229,8 @@ export function calculateNitrogenBalancesFieldToFarm(
         totalFarmRemoval = totalFarmRemoval.add(
             fieldBalance.removal.total.times(fieldArea),
         )
-        totalFarmVolatilization = totalFarmVolatilization.add(
-            fieldBalance.volatilization.total.times(fieldArea),
+        totalFarmEmission = totalFarmEmission.add(
+            fieldBalance.emission.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
             fieldBalance.target.times(fieldArea),
@@ -244,24 +244,24 @@ export function calculateNitrogenBalancesFieldToFarm(
     const avgFarmRemoval = totalFarmArea.isZero()
         ? Decimal(0)
         : totalFarmRemoval.dividedBy(totalFarmArea)
-    const avgFarmVolatilization = totalFarmArea.isZero()
+    const avgFarmEmission = totalFarmArea.isZero()
         ? Decimal(0)
-        : totalFarmVolatilization.dividedBy(totalFarmArea)
+        : totalFarmEmission.dividedBy(totalFarmArea)
     const avgFarmTarget = totalFarmArea.isZero()
         ? Decimal(0)
         : totalFarmTarget.dividedBy(totalFarmArea)
 
-    // Calculate the average balance at farm level (Supply + Removal + Volatilization)
+    // Calculate the average balance at farm level (Supply + Removal + Emission)
     const avgFarmBalance = avgFarmSupply
         .add(avgFarmRemoval)
-        .add(avgFarmVolatilization)
+        .add(avgFarmEmission)
 
     // Return the farm with average balances per hectare
     const farmWithBalance: NitrogenBalance = {
         balance: avgFarmBalance,
         supply: avgFarmSupply,
         removal: avgFarmRemoval,
-        volatilization: avgFarmVolatilization,
+        emission: avgFarmEmission,
         target: avgFarmTarget,
         fields: fieldsWithBalance,
     }

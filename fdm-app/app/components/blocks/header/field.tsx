@@ -55,12 +55,16 @@ export function HeaderField({
                                     >
                                         <NavLink
                                             to={
-                                                b_id
-                                                    ? currentPath.replace(
-                                                          b_id,
-                                                          option.b_id,
-                                                      )
-                                                    : `/farm/${b_id_farm}/${calendar}/field/${option.b_id}/`
+                                                currentPath.includes(
+                                                    "/cultivation",
+                                                )
+                                                    ? `/farm/${b_id_farm}/${calendar}/field/${option.b_id}/cultivation`
+                                                    : b_id
+                                                      ? currentPath.replace(
+                                                            b_id,
+                                                            option.b_id,
+                                                        )
+                                                      : `/farm/${b_id_farm}/${calendar}/field/${option.b_id}`
                                             }
                                         >
                                             {option.b_name}

@@ -1,10 +1,10 @@
-import { describe, it, expect } from "vitest"
+import type { Field } from "@svenvw/fdm-core"
+import { describe, expect, it } from "vitest"
 import {
     getNL2025StikstofGebruiksNorm,
     getRegion,
     isFieldInNVGebied,
 } from "./stikstofgebruiksnorm"
-import type { Field } from "@svenvw/fdm-core"
 import type { NL2025NormsInput, NL2025NormsInputForCultivation } from "./types"
 
 describe("stikstofgebruiksnorm helpers", () => {
@@ -17,6 +17,12 @@ describe("stikstofgebruiksnorm helpers", () => {
 
     it("should correctly identify a field not in an NV Gebied", async () => {
         const centroidOutsideNV = [5.1, 52.1] // Known point outside NV Gebied
+        const result = await isFieldInNVGebied(centroidOutsideNV)
+        expect(result).toBe(false)
+    })
+
+    it("should correctly identify a field not in an NV Gebied, but with single array response (see #205)", async () => {
+        const centroidOutsideNV = [5.5527872994244785, 52.92595151470198] // Known point outside NV Gebied
         const result = await isFieldInNVGebied(centroidOutsideNV)
         expect(result).toBe(false)
     })

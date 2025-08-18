@@ -1,5 +1,50 @@
 # fdm-calculator
 
+## 0.5.3
+
+### Patch Changes
+
+- 9b71a8f: Give Natura 2000 and GWBG derogation norms priority over NV-gebied
+- 74dbb41: Add Natura 2000 proximity check to derogation norm calculation
+- 03f2d99: Fix derogation norm for GWBG-gebieden: 170 kg N/ha
+
+## 0.5.2
+
+### Patch Changes
+
+- 11136b2: Fix issues with tests that used outdated gwl classes
+- Updated dependencies [828ad89]
+  - @svenvw/fdm-core@0.23.2
+
+## 0.5.1
+
+### Patch Changes
+
+- 48b94c3: Support the updated classed for `b_gwl_class` at `calculateTargetForNitrogenBalance`
+- Updated dependencies [d331cca]
+  - @svenvw/fdm-core@0.23.1
+
+## 0.5.0
+
+### Minor Changes
+
+- Implement detailed calculations for `norms` in The Netherlands for 2025, including stikstofgebruiksnorm, fosfaatgebruiksnorm and dierlijke mest norm
+- Add setup for `norms` to provide functions for regions and years to calculate the amount of fertilizer that can be applied according to local legislation
+
+### Patch Changes
+
+- db5e7fe: Update dependencies
+- f19238b: Fix calculation of crop residue biomass at nitrogen balance calculation
+- Updated dependencies [52e0959]
+- Updated dependencies [0f8e4eb]
+- Updated dependencies [db5e7fe]
+- Updated dependencies [b502367]
+- Updated dependencies [b40cffa]
+- Updated dependencies [cbf5340]
+- Updated dependencies [51722cc]
+- Updated dependencies [2ac1471]
+  - @svenvw/fdm-core@0.23.0
+
 ## 0.4.1
 
 ### Patch Changes

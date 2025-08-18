@@ -1,4 +1,4 @@
-import * as Sentry from "@sentry/react"
+import * as Sentry from "@sentry/react-router"
 import { LifeBuoy, Send } from "lucide-react"
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router"
@@ -11,6 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "~/components/ui/sidebar"
+import { ChangelogNotification } from "../../custom/changelog-notification"
 
 export function SidebarSupport({
     name,
@@ -87,6 +88,7 @@ export function SidebarSupport({
         <SidebarGroup className="mt-auto">
             <SidebarGroupContent>
                 <SidebarMenu>
+                    <ChangelogNotification />
                     <SidebarMenuItem key="support">
                         <SidebarMenuButton
                             size="sm"
@@ -99,14 +101,11 @@ export function SidebarSupport({
                     {clientConfig.analytics.sentry ? (
                         <SidebarMenuItem key="feedback">
                             <SidebarMenuButton
-                                asChild
                                 size="sm"
                                 onClick={openFeedbackForm}
                             >
-                                <NavLink to="#">
-                                    <Send />
-                                    <span>Feedback</span>
-                                </NavLink>
+                                <Send />
+                                <span>Feedback</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ) : null}

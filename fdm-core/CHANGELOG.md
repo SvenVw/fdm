@@ -1,5 +1,36 @@
 # Changelog fdm-core
 
+## 0.23.2
+
+### Patch Changes
+
+- 828ad89: Remove unnecessary line in DB migration
+
+## 0.23.1
+
+### Patch Changes
+
+- d331cca: Fix that the classes of `b_gwl_class` are aligned with the latest definition
+
+## 0.23.0
+
+### Minor Changes
+
+- 52e0959: Add `b_area` to output `getCultivationPlan`
+- 0f8e4eb: Refactor b_acquiring_method options to align with RVO codes
+- b502367: Add function updateHarvest to update values of an harvest event
+- b40cffa: Add derogation and functions to manage derogation `addDerogation`, `removeDerogation`, `listDerogations` and `isDerogationGrantedForYear`
+- 51722cc: Add `listAvailableAcquiringMethods` to retrieve all acquiring-method options.
+- 2ac1471: Add function `removeField` to delete a field and all cascading data (e.g. cultivations, soil analysis, etc.) as well
+
+### Patch Changes
+
+- db5e7fe: Update dependencies
+- cbf5340: Fix exception when removing a cultivation with an harvest
+- Updated dependencies [db5e7fe]
+- Updated dependencies [6821ee9]
+  - @svenvw/fdm-data@0.15.0
+
 ## 0.22.1
 
 ### Patch Changes
@@ -62,7 +93,6 @@
 - f05e1cb: Add `b_lu_hi` as property of cultivation catalogue. It represents the fraction of the crop biomass that is commercially valueable
 - 286abb9: The response of `getFarm` and `getFarms` include now the roles on the farm that the principal has
 - bdf0cb0: This change introduces a suite of helper functions within `fdm-core` to facilitate comprehensive organization management and user interaction as `better-auth` does not provide server functions to interact with organizations. These functions enable users and administrators to manage organizations, invite members, and control access.
-
   - `createOrganization`: Creates a new organization.
   - `updateOrganization`: Updates an existing organization.
   - `getOrganization`: Retrieves information about a specific organization.
@@ -90,7 +120,6 @@
 - 6676992: Adds functions to manage user and organization access to farms.
 
   **New Functions:**
-
   - `grantRoleToFarm`: Grants a role to a principal (user/org) on a farm.
   - `isAllowedToShareFarm`: Checks if a principal can share a farm.
   - `listPrincipalsForFarm`: Lists principals with access to a farm.
@@ -333,9 +362,7 @@
 - c316d5c: Add `b_area` with the area of the field in hectares to the output of `getField` and `getFields`
 - b1dea77: Export type `FdmServerType`
 - 49aa60c: Add cultivation management functionality with the following features:
-
   - Catalogue Management:
-
     - `addCultivationToCatalogue`: Adds new cultivation entries to the catalogue
     - `getCultivationsFromCatalogue`: Retrieves available cultivations
     - `extendCultivationsCatalogue`: Extends catalogue with BRP data (partially implemented)
@@ -348,7 +375,6 @@
     - `getCultivationPlan`: Retrieves farm-level cultivation planning
 
   Known limitations:
-
   - BRP catalogue integration needs additional work (see index.test.ts)
   - Edge case handling for duplicate entries and invalid data pending
   - Test coverage to be expanded for error scenarios

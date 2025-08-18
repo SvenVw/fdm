@@ -293,6 +293,7 @@ export const cultivations = fdmSchema.table(
         b_lu_catalogue: text()
             .notNull()
             .references(() => cultivationsCatalogue.b_lu_catalogue),
+        b_lu_variety: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
@@ -368,6 +369,8 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_lu_n_harvestable: numericCasted(),
         b_lu_n_residue: numericCasted(),
         b_n_fixation: numericCasted(),
+        b_lu_rest_oravib: boolean(),
+        b_lu_variety_options: text().array(),
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
@@ -515,27 +518,37 @@ export const soiltypeEnum = fdmSchema.enum(
 )
 
 export const gwlClassesOptions = [
-    { value: "II", label: "II" },
-    { value: "IV", label: "IV" },
-    { value: "IIIb", label: "IIIb" },
-    { value: "V", label: "V" },
-    { value: "VI", label: "VI" },
-    { value: "VII", label: "VII" },
-    { value: "Vb", label: "Vb" },
-    { value: "-", label: "-" },
-    { value: "Va", label: "Va" },
-    { value: "III", label: "III" },
-    { value: "VIII", label: "VIII" },
-    { value: "sVI", label: "sVI" },
     { value: "I", label: "I" },
+    { value: "Ia", label: "Ia" },
+    { value: "Ic", label: "Ic" },
+    { value: "II", label: "II" },
+    { value: "IIa", label: "IIa" },
     { value: "IIb", label: "IIb" },
-    { value: "sVII", label: "sVII" },
+    { value: "IIc", label: "IIc" },
+    { value: "III", label: "III" },
+    { value: "IIIa", label: "IIIa" },
+    { value: "IIIb", label: "IIIb" },
+    { value: "IV", label: "IV" },
     { value: "IVu", label: "IVu" },
-    { value: "bVII", label: "bVII" },
+    { value: "IVc", label: "IVc" },
+    { value: "V", label: "V" },
+    { value: "Va", label: "Va" },
+    { value: "Vao", label: "Vao" },
+    { value: "Vad", label: "Vad" },
+    { value: "Vb", label: "Vb" },
+    { value: "Vbo", label: "Vbo" },
+    { value: "Vbd", label: "Vbd" },
     { value: "sV", label: "sV" },
     { value: "sVb", label: "sVb" },
-    { value: "bVI", label: "bVI" },
-    { value: "IIIa", label: "IIIa" },
+    { value: "VI", label: "VI" },
+    { value: "VIo", label: "VIo" },
+    { value: "VId", label: "VId" },
+    { value: "VII", label: "VII" },
+    { value: "VIIo", label: "VIIo" },
+    { value: "VIId", label: "VIId" },
+    { value: "VIII", label: "VIII" },
+    { value: "VIIIo", label: "VIIIo" },
+    { value: "VIIId", label: "VIIId" },
 ]
 export const gwlClassEnum = fdmSchema.enum(
     "b_gwl_class",
@@ -660,15 +673,12 @@ export type soilSamplingTypeSelect = typeof soilSampling.$inferSelect
 export type soilSamplingTypeInsert = typeof soilSampling.$inferInsert
 
 // Define derogations table
-export const derogations = fdmSchema.table(
-    "derogations",
-    {
-        b_id_derogation: text().primaryKey(),
-        b_derogation_year: integer().notNull(),
-        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
-        updated: timestamp({ withTimezone: true }),
-    },
-)
+export const derogations = fdmSchema.table("derogations", {
+    b_id_derogation: text().primaryKey(),
+    b_derogation_year: integer().notNull(),
+    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated: timestamp({ withTimezone: true }),
+})
 
 export type derogationsTypeSelect = typeof derogations.$inferSelect
 export type derogationsTypeInsert = typeof derogations.$inferInsert
@@ -689,14 +699,18 @@ export const derogationApplying = fdmSchema.table(
     (table) => {
         return [
             {
-                pk: primaryKey({ columns: [table.b_id_farm, table.b_id_derogation] }),
+                pk: primaryKey({
+                    columns: [table.b_id_farm, table.b_id_derogation],
+                }),
             },
         ]
     },
 )
 
-export type derogationApplyingTypeSelect = typeof derogationApplying.$inferSelect
-export type derogationApplyingTypeInsert = typeof derogationApplying.$inferInsert
+export type derogationApplyingTypeSelect =
+    typeof derogationApplying.$inferSelect
+export type derogationApplyingTypeInsert =
+    typeof derogationApplying.$inferInsert
 
 // Define fertilizer_catalogue_enabling table
 export const fertilizerCatalogueEnabling = fdmSchema.table(

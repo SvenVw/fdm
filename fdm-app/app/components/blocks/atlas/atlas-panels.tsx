@@ -4,7 +4,7 @@ import { Check, Info } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import type { MapBoxZoomEvent, MapMouseEvent } from "react-map-gl/mapbox"
 import { useMap } from "react-map-gl/mapbox"
-import { data, useFetcher } from "react-router"
+import { data, NavLink, useFetcher } from "react-router"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
@@ -17,15 +17,18 @@ import {
     CardTitle,
 } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
 
 export function FieldsPanelHover({
     zoomLevelFields,
     layer,
     layerExclude,
+    clickRedirectsToDetailsPage = false,
 }: {
     zoomLevelFields: number
     layer: string
-    layerExclude?: string
+    layerExclude?: string[] | string
+    clickRedirectsToDetailsPage?: boolean
 }) {
     const { current: map } = useMap()
     const [panel, setPanel] = useState<React.ReactNode | null>(null)
@@ -43,7 +46,9 @@ export function FieldsPanelHover({
                         const featuresExclude = map.queryRenderedFeatures(
                             evt.point,
                             {
-                                layers: [layerExclude],
+                                layers: Array.isArray(layerExclude)
+                                    ? layerExclude
+                                    : [layerExclude],
                             },
                         )
                         if (featuresExclude && featuresExclude.length > 0) {
@@ -68,9 +73,11 @@ export function FieldsPanelHover({
                                     <CardDescription>
                                         {layer === "fieldsSaved"
                                             ? `${features[0].properties.b_area} ha`
-                                            : layer === "fieldsAvailable"
-                                              ? "Klik om te selecteren"
-                                              : "Klik om te verwijderen"}
+                                            : clickRedirectsToDetailsPage
+                                              ? "Klik voor meer details over dit perceel"
+                                              : layer === "fieldsAvailable"
+                                                ? "Klik om te selecteren"
+                                                : "Klik om te verwijderen"}
                                     </CardDescription>
                                 </CardHeader>
                             </Card>,
@@ -93,10 +100,12 @@ export function FieldsPanelHover({
             map.on("load", updatePanel)
             return () => {
                 map.off("mousemove", throttledUpdatePanel)
+                map.off("click", updatePanel)
                 map.off("zoom", throttledUpdatePanel)
+                map.off("load", updatePanel)
             }
         }
-    }, [map, zoomLevelFields, layer, layerExclude])
+    }, [map, zoomLevelFields, layer, layerExclude, clickRedirectsToDetailsPage])
 
     return panel
 }
@@ -150,8 +159,12 @@ export function FieldsPanelZoom({
 
 export function FieldsPanelSelection({
     fields,
+    numFieldsSaved,
+    continueTo,
 }: {
     fields: FeatureCollection
+    numFieldsSaved: number
+    continueTo: string
 }) {
     const fetcher = useFetcher()
     const { current: map } = useMap()
@@ -161,6 +174,7 @@ export function FieldsPanelSelection({
 
     const submitSelectedFields = useCallback(
         async (fields: FeatureCollection) => {
+            if (fields.features.length === 0) return
             try {
                 const formSelectedFields = new FormData()
                 formSelectedFields.append(
@@ -199,7 +213,11 @@ export function FieldsPanelSelection({
 
                     const cultivations = features.reduce(
                         (
-                            acc: { b_lu_name: string; count: number }[],
+                            acc: {
+                                b_lu_name: string
+                                b_lu_croprotation?: string
+                                count: number
+                            }[],
                             feature,
                         ) => {
                             if (!feature.properties) return acc
@@ -213,6 +231,8 @@ export function FieldsPanelSelection({
                             } else {
                                 acc.push({
                                     b_lu_name: feature.properties.b_lu_name,
+                                    b_lu_croprotation:
+                                        feature.properties.b_lu_croprotation,
                                     count: 1,
                                 })
                             }
@@ -238,7 +258,15 @@ export function FieldsPanelSelection({
                                             key={cultivation.b_lu_name}
                                             className="mb-2 grid grid-cols-[25px_1fr] items-start pb-2 last:mb-0 last:pb-0"
                                         >
-                                            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-green-500" />
+                                            <span
+                                                className="flex h-2 w-2 translate-y-1 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        getCultivationColor(
+                                                            cultivation.b_lu_croprotation,
+                                                        ),
+                                                }}
+                                            />
                                             <div className="space-y-1">
                                                 <p className="text-sm font-medium leading-none">
                                                     {cultivation.b_lu_name}
@@ -278,18 +306,32 @@ export function FieldsPanelSelection({
                     )
                 } else {
                     setPanel(
-                        <Card className={cn("w-[380px]")}>
+                        <Card>
                             <CardHeader>
                                 <CardTitle>Percelen</CardTitle>
                                 <CardDescription>
-                                    Je hebt geen percelen geselecteerd
+                                    {numFieldsSaved > 0
+                                        ? "Je hebt geen nieuwe percelen geselecteerd"
+                                        : "Je hebt geen percelen geselecteerd"}
                                 </CardDescription>
                             </CardHeader>
                             <CardContent className="grid gap-4" />
                             <CardFooter>
-                                <Button className="w-full" disabled>
-                                    <Check /> Sla geselecteerde percelen op
-                                </Button>
+                                {numFieldsSaved > 0 ? (
+                                    <Button asChild className="w-full">
+                                        <NavLink
+                                            to={continueTo}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Check />
+                                            <span>Doorgaan</span>
+                                        </NavLink>
+                                    </Button>
+                                ) : (
+                                    <Button className="w-full" disabled>
+                                        <Check /> Sla geselecteerde percelen op
+                                    </Button>
+                                )}
                             </CardFooter>
                         </Card>,
                     )
