@@ -1297,6 +1297,36 @@ describe("Cultivation Data Model", () => {
             expect(cornCultivation).toBeDefined() // Corn cultivation should also be found
         })
 
+        it("should get cultivation plan for a farm when cultivation has only start date and is before timeframe", async () => {
+            // Add a cultivation that starts before the timeframe and has no end date
+            await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue, // Wheat
+                b_id,
+                new Date("2022-06-15"),
+            )
+
+            const timeframe = {
+                start: new Date("2023-01-01"),
+                end: new Date("2023-12-31"),
+            }
+
+            const cultivationPlan = await getCultivationPlan(
+                fdm,
+                principal_id,
+                b_id_farm,
+                timeframe,
+            )
+
+            expect(cultivationPlan).toBeDefined()
+            expect(cultivationPlan.length).toBe(1)
+            const wheatCultivation = cultivationPlan.find(
+                (c) => c.b_lu_catalogue === b_lu_catalogue,
+            )
+            expect(wheatCultivation).toBeDefined() // Wheat cultivation should be found
+        })
+
         it("should correctly calculate the total area of a cultivation across multiple fields", async () => {
             const b_id2 = await addField(
                 fdm,
