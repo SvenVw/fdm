@@ -1,4 +1,4 @@
-import { and, eq, gte, isNotNull, lte, or, sql } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 import { afterAll, beforeEach, describe, expect, inject, it } from "vitest"
 import {
     enableCultivationCatalogue,
@@ -7,13 +7,11 @@ import {
 import {
     addCultivation,
     addCultivationToCatalogue,
-    buildDateRangeCondition,
-    buildDateRangeConditionEnding,
+    buildCultivationTimeframeCondition,
     getCultivation,
     getCultivationPlan,
     getCultivations,
     getCultivationsFromCatalogue,
-    isCultivationWithinTimeframe,
     removeCultivation,
     updateCultivation,
 } from "./cultivation"
@@ -293,6 +291,14 @@ describe("Cultivation Data Model", () => {
                 principal_id,
                 b_lu_catalogue,
                 b_id,
+                new Date("2023-05-01"),
+                new Date("2023-06-01"),
+            )
+            await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue,
+                b_id,
                 new Date("2024-03-01"),
             )
             await addCultivation(
@@ -310,6 +316,14 @@ describe("Cultivation Data Model", () => {
                 b_id,
                 new Date("2024-07-01"),
             )
+            await addCultivation(
+                fdm,
+                principal_id,
+                b_lu_catalogue,
+                b_id,
+                new Date("2025-05-01"),
+                new Date("2025-06-01"),
+            )
 
             const cultivations = await getCultivations(
                 fdm,
@@ -317,7 +331,7 @@ describe("Cultivation Data Model", () => {
                 b_id,
                 { start: new Date("2024-02-01"), end: new Date("2024-05-03") },
             )
-            expect(cultivations.length).toBe(2)
+            expect(cultivations.length).toBe(3)
             expect(cultivations[0].b_lu_start).toEqual(new Date("2024-05-01"))
             expect(cultivations[1].b_lu_start).toEqual(new Date("2024-03-01"))
 
@@ -327,7 +341,7 @@ describe("Cultivation Data Model", () => {
                 b_id,
                 { start: new Date("2024-04-01"), end: new Date("2024-08-01") },
             )
-            expect(cultivations2.length).toBe(2)
+            expect(cultivations2.length).toBe(4)
             expect(cultivations2[0].b_lu_start).toEqual(new Date("2024-07-01"))
             expect(cultivations2[1].b_lu_start).toEqual(new Date("2024-05-01"))
 
@@ -337,7 +351,7 @@ describe("Cultivation Data Model", () => {
                 b_id,
                 { start: new Date("2024-06-01"), end: new Date("2024-06-01") },
             )
-            expect(cultivations3.length).toBe(1)
+            expect(cultivations3.length).toBe(3)
             expect(cultivations3[0].b_lu_start).toEqual(new Date("2024-05-01"))
         })
 
@@ -1428,8 +1442,8 @@ describe("Cultivation Data Model", () => {
             )
 
             const timeframe = {
-                start: new Date("2025-03-01"),
-                end: new Date("2025-04-01"),
+                start: new Date("2021-03-01"),
+                end: new Date("2022-04-01"),
             }
 
             const cultivationPlan = await getCultivationPlan(
@@ -1440,7 +1454,7 @@ describe("Cultivation Data Model", () => {
             )
 
             expect(cultivationPlan).toBeDefined()
-            expect(cultivationPlan.length).toBe(0) // Expecting empty array as no cultivations within timeframe
+            expect(cultivationPlan.length).toBe(0)
         })
     })
 })
@@ -1480,237 +1494,408 @@ describe("getCultivationsFromCatalogue error handling", () => {
     })
 })
 
-describe("buildDateRangeCondition", () => {
-    it("should return undefined when both dateStart and dateEnd are null or undefined", () => {
-        expect(buildDateRangeCondition(null, null)).toBeUndefined()
-        expect(buildDateRangeCondition(undefined, undefined)).toBeUndefined()
-        expect(buildDateRangeCondition(null, undefined)).toBeUndefined()
-        expect(buildDateRangeCondition(undefined, null)).toBeUndefined()
-    })
+describe("buildCultivationTimeframeCondition", () => {
+    let fdm: FdmType
+    let principal_id: string
+    let b_id_farm: string
+    let b_id: string
+    let b_lu_catalogue: string
+    let b_lu_source: string
 
-    it("should return gte condition when only dateStart is provided", () => {
-        const dateStart = new Date("2024-01-01")
-        const result = buildDateRangeCondition(dateStart, null)
-        expect(result).toEqual(
-            gte(schema.cultivationStarting.b_lu_start, dateStart),
+    beforeEach(async () => {
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
+
+        principal_id = createId()
+        b_id_farm = await addFarm(
+            fdm,
+            principal_id,
+            "Test Farm",
+            "123456",
+            "123 Farm Lane",
+            "12345",
         )
-    })
-
-    it("should return lte condition when only dateEnd is provided", () => {
-        const dateEnd = new Date("2024-12-31")
-        const result = buildDateRangeCondition(null, dateEnd)
-        expect(result).toEqual(
-            lte(schema.cultivationStarting.b_lu_start, dateEnd),
+        b_id = await addField(
+            fdm,
+            principal_id,
+            b_id_farm,
+            "test field",
+            "test source",
+            {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [30, 10],
+                        [40, 40],
+                        [20, 40],
+                        [10, 20],
+                        [30, 10],
+                    ],
+                ],
+            },
+            new Date("2023-01-01"),
+            "nl_01",
+            new Date("2024-01-01"),
         )
-    })
-
-    it("should return and condition when both dateStart and dateEnd are provided", () => {
-        const dateStart = new Date("2024-01-01")
-        const dateEnd = new Date("2024-12-31")
-        const result = buildDateRangeCondition(dateStart, dateEnd)
-        expect(result).toEqual(
-            and(
-                gte(schema.cultivationStarting.b_lu_start, dateStart),
-                lte(schema.cultivationStarting.b_lu_start, dateEnd),
-            ),
+        b_lu_source = "custom"
+        b_lu_catalogue = createId()
+        await enableCultivationCatalogue(
+            fdm,
+            principal_id,
+            b_id_farm,
+            b_lu_source,
         )
+        await addCultivationToCatalogue(fdm, {
+            b_lu_catalogue,
+            b_lu_source,
+            b_lu_name: "Wheat",
+            b_lu_name_en: "Wheat",
+            b_lu_harvestable: "once",
+            b_lu_hcat3: "1",
+            b_lu_hcat3_name: "test",
+            b_lu_croprotation: "cereal",
+            b_lu_yield: 6000,
+            b_lu_hi: 0.4,
+            b_lu_n_harvestable: 4,
+            b_lu_n_residue: 2,
+            b_n_fixation: 0,
+            b_lu_rest_oravib: false,
+            b_lu_variety_options: null,
+        })
     })
-})
 
-describe("buildDateRangeConditionEnding", () => {
-    it("should return undefined when both dateStart and dateEnd are null or undefined", () => {
-        expect(buildDateRangeConditionEnding(null, null)).toBeUndefined()
-        expect(
-            buildDateRangeConditionEnding(undefined, undefined),
-        ).toBeUndefined()
-        expect(buildDateRangeConditionEnding(null, undefined)).toBeUndefined()
-        expect(buildDateRangeConditionEnding(undefined, null)).toBeUndefined()
-    })
-
-    it("should return or condition with gte when only dateStart is provided", () => {
-        const dateStart = new Date("2024-01-01")
-        const result = buildDateRangeConditionEnding(dateStart, null)
-        expect(result).toEqual(
-            or(
-                gte(schema.cultivationEnding.b_lu_end, dateStart),
-                and(
-                    isNotNull(schema.cultivationEnding.b_lu_end),
-                    gte(schema.cultivationStarting.b_lu_start, dateStart),
-                ),
-            ),
+    // Test cases for buildCultivationTimeframeCondition (via getCultivations)
+    it("should include cultivation if start date is within timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-06-15T00:00:00.000Z"),
+            new Date("2024-01-15T00:00:00.000Z"),
         )
-    })
-
-    it("should return or condition with lte when only dateEnd is provided", () => {
-        const dateEnd = new Date("2024-12-31")
-        const result = buildDateRangeConditionEnding(null, dateEnd)
-        expect(result).toEqual(
-            or(
-                lte(schema.cultivationEnding.b_lu_end, dateEnd),
-                and(
-                    isNotNull(schema.cultivationEnding.b_lu_end),
-                    lte(schema.cultivationStarting.b_lu_start, dateEnd),
-                ),
-            ),
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
         )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return and condition with or conditions when both dateStart and dateEnd are provided", () => {
-        const dateStart = new Date("2024-01-01")
-        const dateEnd = new Date("2024-12-31")
-        const result = buildDateRangeConditionEnding(dateStart, dateEnd)
-        expect(result).toEqual(
-            and(
-                or(
-                    gte(schema.cultivationEnding.b_lu_end, dateStart),
-                    and(
-                        isNotNull(schema.cultivationEnding.b_lu_end),
-                        gte(schema.cultivationStarting.b_lu_start, dateStart),
-                    ),
-                ),
-                or(
-                    lte(schema.cultivationEnding.b_lu_end, dateEnd),
-                    and(
-                        isNotNull(schema.cultivationEnding.b_lu_end),
-                        lte(schema.cultivationStarting.b_lu_start, dateEnd),
-                    ),
-                ),
-            ),
+    it("should include cultivation if end date is within timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2022-12-15T00:00:00.000Z"),
+            new Date("2023-06-15T00:00:00.000Z"),
         )
-    })
-})
-
-describe("isCultivationWithinTimeframe", () => {
-    const timeframe: Timeframe = {
-        start: new Date("2023-01-01T00:00:00.000Z"),
-        end: new Date("2023-12-31T23:59:59.999Z"),
-    }
-
-    it("should return true if start date is within timeframe", () => {
-        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
-        const b_lu_end = new Date("2024-01-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if end date is within timeframe", () => {
-        const b_lu_start = new Date("2022-12-15T00:00:00.000Z")
-        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if it spans the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2022-06-15T00:00:00.000Z"),
+            new Date("2024-06-15T00:00:00.000Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if cultivation spans the timeframe", () => {
-        const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
-        const b_lu_end = new Date("2024-06-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should exclude cultivation if it is entirely before the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2022-01-01T00:00:00.000Z"),
+            new Date("2022-12-31T23:59:59.999Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(0)
     })
 
-    it("should return false if cultivation is entirely before the timeframe", () => {
-        const b_lu_start = new Date("2022-01-01T00:00:00.000Z")
-        const b_lu_end = new Date("2022-12-31T23:59:59.999Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(false)
+    it("should exclude cultivation if it is entirely after the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2024-01-01T00:00:00.000Z"),
+            new Date("2024-12-31T23:59:59.999Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(0)
     })
 
-    it("should return false if cultivation is entirely after the timeframe", () => {
-        const b_lu_start = new Date("2024-01-01T00:00:00.000Z")
-        const b_lu_end = new Date("2024-12-31T23:59:59.999Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(false)
+    it("should include cultivation if start date is at the beginning of the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-01-01T00:00:00.000Z"),
+            new Date("2023-06-15T00:00:00.000Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if start date is at the beginning of the timeframe", () => {
-        const b_lu_start = new Date("2023-01-01T00:00:00.000Z")
-        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if start date is at the end of the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-12-31T23:59:59.999Z"),
+            new Date("2024-06-15T00:00:00.000Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if start date is at the end of the timeframe", () => {
-        const b_lu_start = new Date("2023-12-31T23:59:59.999Z")
-        const b_lu_end = new Date("2024-06-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if end date is at the beginning of the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2022-06-15T00:00:00.000Z"),
+            new Date("2023-01-01T00:00:00.000Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if end date is at the beginning of the timeframe", () => {
-        const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
-        const b_lu_end = new Date("2023-01-01T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if end date is at the end of the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-06-15T00:00:00.000Z"),
+            new Date("2023-12-31T23:59:59.999Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if end date is at the end of the timeframe", () => {
-        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
-        const b_lu_end = new Date("2023-12-31T23:59:59.999Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if it has only start date and is within timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-06-15T00:00:00.000Z"),
+            null as any,
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if cultivation has only start date and is within timeframe", () => {
-        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
-        const b_lu_end = null
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if it has only start date and is before timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2022-06-15T00:00:00.000Z"),
+            null as any,
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if cultivation has only start date and is before timeframe", () => {
-        const b_lu_start = new Date("2022-06-15T00:00:00.000Z")
-        const b_lu_end = null
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should exclude cultivation if it has only start date and is after timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2024-06-15T00:00:00.000Z"),
+            null as any,
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(0)
     })
 
-    it("should return false if cultivation has only start date and is after timeframe", () => {
-        const b_lu_start = new Date("2024-06-15T00:00:00.000Z")
-        const b_lu_end = null
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(false)
+    it("should include cultivation if start and end date are the same as the start of the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-01-01T00:00:00.000Z"),
+            new Date("2023-01-01T00:00:00.000Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return false if cultivation has no start date", () => {
-        const b_lu_start = null
-        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(false)
+    it("should include cultivation if start and end date are the same as the end of the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-12-31T23:59:59.999Z"),
+            new Date("2023-12-31T23:59:59.999Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 
-    it("should return true if start and end date are the same as the start of the timeframe", () => {
-        const b_lu_start = new Date("2023-01-01T00:00:00.000Z")
-        const b_lu_end = new Date("2023-01-01T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
-    })
-
-    it("should return true if start and end date are the same as the end of the timeframe", () => {
-        const b_lu_start = new Date("2023-12-31T23:59:59.999Z")
-        const b_lu_end = new Date("2023-12-31T23:59:59.999Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
-    })
-
-    it("should return true if start and end date are the same and within the timeframe", () => {
-        const b_lu_start = new Date("2023-06-15T00:00:00.000Z")
-        const b_lu_end = new Date("2023-06-15T00:00:00.000Z")
-        expect(
-            isCultivationWithinTimeframe(b_lu_start, b_lu_end, timeframe),
-        ).toBe(true)
+    it("should include cultivation if start and end date are the same and within the timeframe", async () => {
+        await addCultivation(
+            fdm,
+            principal_id,
+            b_lu_catalogue,
+            b_id,
+            new Date("2023-06-15T00:00:00.000Z"),
+            new Date("2023-06-15T00:00:00.000Z"),
+        )
+        const timeframe = {
+            start: new Date("2023-01-01T00:00:00.000Z"),
+            end: new Date("2023-12-31T23:59:59.999Z"),
+        }
+        const cultivations = await getCultivations(
+            fdm,
+            principal_id,
+            b_id,
+            timeframe,
+        )
+        expect(cultivations.length).toBe(1)
     })
 })
