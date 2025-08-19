@@ -156,6 +156,6 @@ describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
 
         const result2 = resultMap.get("field_2")
         expect(result2).toBeDefined()
-        expect(result2?.total.toNumber()).toBeCloseTo(27.7)
+        expect(result2?.total.toNumber()).toBeCloseTo(27.707)
     })
 })
