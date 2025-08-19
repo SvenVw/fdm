@@ -494,10 +494,12 @@ export async function getCultivations(
                 ),
             )
             .where(
-                and(
-                    eq(schema.cultivationStarting.b_id, b_id),
-                    timeframeCondition,
-                ),
+                timeframeCondition
+                    ? and(
+                          eq(schema.cultivationStarting.b_id, b_id),
+                          timeframeCondition,
+                      )
+                    : eq(schema.cultivationStarting.b_id, b_id),
             )
             .orderBy(
                 desc(schema.cultivationStarting.b_lu_start),
@@ -714,12 +716,22 @@ export async function getCultivationPlan(
                 ),
             )
             .where(
-                and(
-                    eq(schema.farms.b_id_farm, b_id_farm),
-                    isNotNull(schema.cultivationsCatalogue.b_lu_catalogue),
-                    isNotNull(schema.cultivationStarting.b_id),
-                    timeframeCondition,
-                ),
+                timeframeCondition
+                    ? and(
+                          eq(schema.farms.b_id_farm, b_id_farm),
+                          isNotNull(
+                              schema.cultivationsCatalogue.b_lu_catalogue,
+                          ),
+                          isNotNull(schema.cultivationStarting.b_id),
+                          timeframeCondition,
+                      )
+                    : and(
+                          eq(schema.farms.b_id_farm, b_id_farm),
+                          isNotNull(
+                              schema.cultivationsCatalogue.b_lu_catalogue,
+                          ),
+                          isNotNull(schema.cultivationStarting.b_id),
+                      ),
             )
 
         const cultivationPlan = cultivations.reduce(
