@@ -72,7 +72,6 @@ describe("collectInputForNitrogenBalance", () => {
         start: new Date("2023-01-01"),
         end: new Date("2023-12-31"),
     }
-    const fdmPublicDataUrl = "https://example.com/public-data"
 
     beforeEach(() => {
         vi.resetAllMocks()
@@ -80,27 +79,39 @@ describe("collectInputForNitrogenBalance", () => {
 
     it("should collect input successfully when all data is available", async () => {
         // Mock data
-        const mockFieldsData: Pick<Field, "b_id" | "b_centroid" | "b_area">[] =
-            [
-                {
-                    b_id: "field-1",
-                    b_centroid: { type: "Point", coordinates: [0, 0] },
-                    b_area: 10,
-                },
-                {
-                    b_id: "field-2",
-                    b_centroid: { type: "Point", coordinates: [1, 1] },
-                    b_area: 20,
-                },
-            ]
+        const mockFieldsData: Pick<
+            Field,
+            "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end"
+        >[] = [
+            {
+                b_id: "field-1",
+                b_centroid: { type: "Point", coordinates: [0, 0] },
+                b_area: 10,
+                b_start: new Date("2023-01-01"),
+                b_end: new Date("2023-12-31"),
+            },
+            {
+                b_id: "field-2",
+                b_centroid: { type: "Point", coordinates: [1, 1] },
+                b_area: 20,
+                b_start: new Date("2023-01-01"),
+                b_end: new Date("2023-12-31"),
+            },
+        ]
         const mockCultivationsData: Pick<
             Cultivation,
-            "b_lu" | "b_lu_catalogue" | "m_cropresidue"
+            | "b_lu"
+            | "b_lu_catalogue"
+            | "m_cropresidue"
+            | "b_lu_start"
+            | "b_lu_end"
         >[] = [
             {
                 b_lu: "cult-1",
                 b_lu_catalogue: "cat-cult-1",
                 m_cropresidue: 0.5,
+                b_lu_start: new Date("2023-04-01"),
+                b_lu_end: new Date("2023-09-01"),
             },
         ]
         const mockHarvestsData: Harvest[] = [
@@ -123,6 +134,9 @@ describe("collectInputForNitrogenBalance", () => {
             | "a_density_sa"
             | "a_n_rt"
             | "b_soiltype_agr"
+            | "b_sampling_date"
+            | "a_som_loi"
+            | "b_gwl_class"
         >[] = [
             {
                 a_id: "sa-1",
@@ -131,6 +145,9 @@ describe("collectInputForNitrogenBalance", () => {
                 a_density_sa: 1.5,
                 a_n_rt: 100,
                 b_soiltype_agr: "SAND",
+                b_sampling_date: new Date("2023-05-01"),
+                a_som_loi: 5,
+                b_gwl_class: "HIGH",
             },
         ]
         const mockFertilizerApplicationsData: FertilizerApplication[] = [
@@ -149,9 +166,11 @@ describe("collectInputForNitrogenBalance", () => {
             {
                 p_id_catalogue: "fert-cat-1",
                 p_n_rt: 5,
-                p_type_manure: "cattle",
-                p_type_mineral: null,
-                p_type_compost: null,
+                p_type: "manure",
+                p_no3_rt: 1,
+                p_nh4_rt: 2,
+                p_s_rt: 0,
+                p_ef_nh3: 0.1,
             },
         ]
         const mockCultivationDetailsData: CultivationDetail[] = [
@@ -184,7 +203,6 @@ describe("collectInputForNitrogenBalance", () => {
             principal_id,
             b_id_farm,
             timeframe,
-            fdmPublicDataUrl,
         )
 
         const expectedFieldInputs: FieldInput[] = mockFieldsData.map(
@@ -202,7 +220,6 @@ describe("collectInputForNitrogenBalance", () => {
             fertilizerDetails: mockFertilizerDetailsData,
             cultivationDetails: mockCultivationDetailsData,
             timeFrame: timeframe,
-            fdmPublicDataUrl: fdmPublicDataUrl,
         }
 
         expect(result).toEqual(expectedResult)
@@ -265,20 +282,23 @@ describe("collectInputForNitrogenBalance", () => {
                 principal_id,
                 b_id_farm,
                 timeframe,
-                fdmPublicDataUrl,
             ),
         ).rejects.toThrow(errorMessage)
     })
 
     it("should throw an error if getCultivations fails for a field", async () => {
-        const mockFieldsData: Pick<Field, "b_id" | "b_centroid" | "b_area">[] =
-            [
-                {
-                    b_id: "field-1",
-                    b_centroid: { type: "Point", coordinates: [0, 0] },
-                    b_area: 10,
-                },
-            ]
+        const mockFieldsData: Pick<
+            Field,
+            "b_id" | "b_centroid" | "b_area" | "b_start" | "b_end"
+        >[] = [
+            {
+                b_id: "field-1",
+                b_centroid: { type: "Point", coordinates: [0, 0] },
+                b_area: 10,
+                b_start: new Date("2023-01-01"),
+                b_end: new Date("2023-12-31"),
+            },
+        ]
         mockedGetFields.mockResolvedValue(mockFieldsData)
 
         const errorMessage = "Failed to get cultivations"
@@ -290,7 +310,6 @@ describe("collectInputForNitrogenBalance", () => {
                 principal_id,
                 b_id_farm,
                 timeframe,
-                fdmPublicDataUrl,
             ),
         ).rejects.toThrow(errorMessage)
     })
@@ -308,7 +327,6 @@ describe("collectInputForNitrogenBalance", () => {
                 principal_id,
                 b_id_farm,
                 timeframe,
-                fdmPublicDataUrl,
             ),
         ).rejects.toThrow(errorMessage)
     })
@@ -323,7 +341,6 @@ describe("collectInputForNitrogenBalance", () => {
             principal_id,
             b_id_farm,
             timeframe,
-            fdmPublicDataUrl,
         )
 
         const expectedResult: NitrogenBalanceInput = {
@@ -331,7 +348,6 @@ describe("collectInputForNitrogenBalance", () => {
             fertilizerDetails: [],
             cultivationDetails: [],
             timeFrame: timeframe,
-            fdmPublicDataUrl: fdmPublicDataUrl,
         }
 
         expect(result).toEqual(expectedResult)
