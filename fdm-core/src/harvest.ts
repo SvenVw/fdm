@@ -430,9 +430,9 @@ export async function checkHarvestDateCompability(
         throw new Error("Sowing date does not exist")
     }
 
-    // If cultivation has harvest date before sowing date throw an error
-    if (b_lu_harvest_date.getTime() <= sowingDate[0].b_lu_start.getTime()) {
-        throw new Error("Harvest date must be after sowing date")
+    // If cultivation has harvest date before or on sowing date throw an error
+    if (b_lu_harvest_date.getTime() < sowingDate[0].b_lu_start.getTime()) {
+        throw new Error("Harvest date must be after or on sowing date")
     }
 
     const terminatingDate = await tx
@@ -558,10 +558,9 @@ export async function updateHarvest(
             }
 
             if (
-                b_lu_harvest_date.getTime() <=
-                sowingDate[0].b_lu_start.getTime()
+                b_lu_harvest_date.getTime() < sowingDate[0].b_lu_start.getTime()
             ) {
-                throw new Error("Harvest date must be after sowing date")
+                throw new Error("Harvest date must be after or on sowing date")
             }
 
             const b_lu_harvestable = await getHarvestableTypeOfCultivation(
