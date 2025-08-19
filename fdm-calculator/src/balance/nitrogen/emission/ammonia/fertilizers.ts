@@ -77,19 +77,8 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                     })
                     break
                 }
-                case "manure":
-                case "compost":
-                default: {
-                    // This covers "other" types as well, as per previous logic
-                    if (
-                        fertilizerDetail.p_type !== "manure" &&
-                        fertilizerDetail.p_type !== "compost" &&
-                        fertilizerDetail.p_type !== "mineral"
-                    ) {
-                        // This is an "other" type
-                    }
-
-                    const p_nh4_rt_organic = new Decimal(
+                default: { // For manure, compost and other
+                       const p_nh4_rt_organic = new Decimal(
                         fertilizerDetail.p_nh4_rt ?? 0,
                     )
                     emissionFactor = determineManureAmmoniaEmissionFactor(
@@ -118,6 +107,7 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                             value: applicationValue,
                         })
                     } else {
+                        // For "other" types
                         acc.other.total = acc.other.total.add(applicationValue)
                         acc.other.applications.push({
                             id: application.p_app_id,
