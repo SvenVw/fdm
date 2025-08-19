@@ -440,6 +440,7 @@ export type FertilizerDetail = Pick<
     | "p_s_rt" // Sulfur content (g SO3 / kg fertilizer)
     | "p_ef_nh3" // Ammonia emmission factor
     | "p_type"
+    | "p_inhibitor"
 >
 
 /**

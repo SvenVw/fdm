@@ -1,12 +1,10 @@
 import { describe, expect, it, vi } from "vitest"
-import Decimal from "decimal.js"
 import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
 } from "../../types"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
 
 describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()

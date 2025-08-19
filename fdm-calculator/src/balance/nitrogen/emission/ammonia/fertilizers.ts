@@ -153,7 +153,7 @@ function determineMineralAmmoniaEmissionFactor(
     const p_nh4_rt = new Decimal(fertilizerDetail.p_nh4_rt ?? 0)
     const p_n_org = p_n_rt.minus(p_no3_rt).minus(p_nh4_rt)
     const p_s_rt = new Decimal(fertilizerDetail.p_s_rt ?? 0)
-    const p_inhibitor = false
+    const p_inhibitor = fertilizerDetail.p_inhibitor ?? false
 
     const a = p_inhibitor
         ? p_n_org.pow(2).times(new Decimal(3.166e-5))
@@ -203,20 +203,21 @@ function determineManureAmmoniaEmissionFactor(
             }
         }
     })
-    const isGrasslands = currentCultvations.map((x) => {
+    const isGrassland = currentCultvations.some((x) => {
         const type = cultivationDetails.get(x.b_lu_catalogue)
-        if (type?.b_lu_croprotation === "grass") {
-            return true
-        }
-        return false
+        return type?.b_lu_croprotation === "grass"
     })
-    const hasGrasslands = isGrasslands.some((x) => x === true)
 
     // Check if a crop is present at time of fertilizer application
-    const isCropland = currentCultvations.length > 0
+    const isCropland =
+        currentCultvations.length > 0 &&
+        currentCultvations.some((x) => {
+            const type = cultivationDetails.get(x.b_lu_catalogue)
+            return type?.b_lu_croprotation !== "grass"
+        })
 
     // Determine the Emission factor
-    if (hasGrasslands) {
+    if (isGrassland) {
         if (p_app_method === "broadcasting") {
             return new Decimal(0.68)
         }
