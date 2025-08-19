@@ -203,7 +203,7 @@ export async function addCultivation(
                 }
 
                 // Validate if terminate date is after sowing date
-                if (b_lu_end.getTime() < b_lu_start.getTime()) {
+                if (b_lu_end.getTime() <= b_lu_start.getTime()) {
                     throw new Error("Terminate date must be after sowing date")
                 }
             }
