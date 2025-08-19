@@ -45,6 +45,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             session,
         }
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

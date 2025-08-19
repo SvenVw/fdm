@@ -275,6 +275,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
         })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

@@ -262,6 +262,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             { message: "Meststof is bijgewerkt! 🎉" },
         )
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

@@ -320,6 +320,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
         throw new Error("Invalid request method")
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

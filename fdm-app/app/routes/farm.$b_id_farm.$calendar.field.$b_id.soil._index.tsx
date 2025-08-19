@@ -225,6 +225,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             statusText: "Method not allowed",
         })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

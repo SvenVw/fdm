@@ -380,7 +380,7 @@ const FormSchema = z.object({
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         if (!params.slug) {
-            throw handleActionError("not found: organization")
+            return handleActionError("not found: organization")
         }
         const formValues = await extractFormValuesFromRequest(
             request,
@@ -393,7 +393,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             session.user.id,
         )
         if (!organization) {
-            throw handleActionError("not found: organization")
+            return handleActionError("not found: organization")
         }
 
         if (formValues.intent === "invite_user") {
@@ -473,6 +473,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
         throw new Error("invalid intent")
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

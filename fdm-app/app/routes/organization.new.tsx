@@ -260,7 +260,7 @@ export async function action({ request }: ActionFunctionArgs) {
             message: `Organisatie ${formValues.name} is aangemaakt! 🎉`,
         })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }
 
