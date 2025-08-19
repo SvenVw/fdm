@@ -66,7 +66,7 @@ export async function calculateNitrogenBalance(
         // Instead of running all fields in parallel with Promise.all, which can
         // overwhelm the server for farms with many fields, we process them in
         // smaller, manageable chunks. This provides more stable performance.
-        const batchSize = 20 // A sensible default, can be tuned based on profiling.
+        const batchSize = 50 // A sensible default, can be tuned based on profiling.
         const fieldsWithBalance: NitrogenBalanceField[] = []
 
         for (let i = 0; i < fields.length; i += batchSize) {
