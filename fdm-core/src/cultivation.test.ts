@@ -256,6 +256,19 @@ describe("Cultivation Data Model", () => {
             ).rejects.toThrow("Exception for addCultivation")
         })
 
+        it("should return a validation error if start and end date are the same", async () => {
+            await expect(
+                addCultivation(
+                    fdm,
+                    principal_id,
+                    b_lu_catalogue,
+                    b_id,
+                    new Date("2023-06-15T00:00:00.000Z"),
+                    new Date("2023-06-15T00:00:00.000Z"),
+                ),
+            ).rejects.toThrow("Exception for addCultivation")
+        })
+
         it("should throw an error when adding a cultivation with an invalid field ID", async () => {
             const invalid_b_id = "invalid-field-id"
 
@@ -1831,71 +1844,5 @@ describe("buildCultivationTimeframeCondition", () => {
             timeframe,
         )
         expect(cultivations.length).toBe(0)
-    })
-
-    it("should include cultivation if start and end date are the same as the start of the timeframe", async () => {
-        await addCultivation(
-            fdm,
-            principal_id,
-            b_lu_catalogue,
-            b_id,
-            new Date("2023-01-01T00:00:00.000Z"),
-            new Date("2023-01-01T00:00:00.000Z"),
-        )
-        const timeframe = {
-            start: new Date("2023-01-01T00:00:00.000Z"),
-            end: new Date("2023-12-31T23:59:59.999Z"),
-        }
-        const cultivations = await getCultivations(
-            fdm,
-            principal_id,
-            b_id,
-            timeframe,
-        )
-        expect(cultivations.length).toBe(1)
-    })
-
-    it("should include cultivation if start and end date are the same as the end of the timeframe", async () => {
-        await addCultivation(
-            fdm,
-            principal_id,
-            b_lu_catalogue,
-            b_id,
-            new Date("2023-12-31T23:59:59.999Z"),
-            new Date("2023-12-31T23:59:59.999Z"),
-        )
-        const timeframe = {
-            start: new Date("2023-01-01T00:00:00.000Z"),
-            end: new Date("2023-12-31T23:59:59.999Z"),
-        }
-        const cultivations = await getCultivations(
-            fdm,
-            principal_id,
-            b_id,
-            timeframe,
-        )
-        expect(cultivations.length).toBe(1)
-    })
-
-    it("should include cultivation if start and end date are the same and within the timeframe", async () => {
-        await addCultivation(
-            fdm,
-            principal_id,
-            b_lu_catalogue,
-            b_id,
-            new Date("2023-06-15T00:00:00.000Z"),
-            new Date("2023-06-15T00:00:00.000Z"),
-        )
-        const timeframe = {
-            start: new Date("2023-01-01T00:00:00.000Z"),
-            end: new Date("2023-12-31T23:59:59.999Z"),
-        }
-        const cultivations = await getCultivations(
-            fdm,
-            principal_id,
-            b_id,
-            timeframe,
-        )
-        expect(cultivations.length).toBe(1)
     })
 })
