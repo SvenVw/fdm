@@ -9,6 +9,7 @@ import {
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenSupply } from "./supply"
+import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
 import { calculateTargetForNitrogenBalance } from "./target"
 import type {
     CultivationDetail,
@@ -52,10 +53,34 @@ export async function calculateNitrogenBalance(
             cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
         )
 
-        // Calculate for each field the nitrogen balance
-        const fieldsWithBalance = await Promise.all(
-            fields.map(async (field: FieldInput) => {
-                return await calculateNitrogenBalanceField(
+        // Fetch all deposition data in a single, batched request to avoid requesting the GeoTIIF for every field
+        const depositionByField =
+            await calculateAllFieldsNitrogenSupplyByDeposition(
+                fields,
+                timeFrame,
+                fdmPublicDataUrl,
+            )
+
+        // 
+        // Process fields in batches to control concurrency.
+        // Instead of running all fields in parallel with Promise.all, which can
+        // overwhelm the server for farms with many fields, we process them in
+        // smaller, manageable chunks. This provides more stable performance.
+        const batchSize = 20 // A sensible default, can be tuned based on profiling.
+        const fieldsWithBalance: NitrogenBalanceField[] = []
+
+        for (let i = 0; i < fields.length; i += batchSize) {
+            const batch = fields.slice(i, i + batchSize)
+            const batchResults = batch.map((field: FieldInput) => {
+                const depositionSupply = depositionByField.get(field.field.b_id)
+                if (!depositionSupply) {
+                    // This should not happen if the deposition calculation is correct
+                    throw new Error(
+                        `Deposition data not found for field ${field.field.b_id}`,
+                    )
+                }
+
+                return calculateNitrogenBalanceField(
                     field.field,
                     field.cultivations,
                     field.harvests,
@@ -64,13 +89,14 @@ export async function calculateNitrogenBalance(
                     fertilizerDetailsMap,
                     cultivationDetailsMap,
                     timeFrame,
-                    fdmPublicDataUrl,
+                    depositionSupply,
                 )
-            }),
-        )
+            })
+
+            fieldsWithBalance.push(...batchResults)
+        }
 
         // Aggregate the field balances to farm level
-        // calculateNitrogenBalancesFieldToFarm returns NitrogenBalance (with Decimals)
         const farmWithBalanceDecimal = calculateNitrogenBalancesFieldToFarm(
             fieldsWithBalance,
             fields,
@@ -105,11 +131,11 @@ export async function calculateNitrogenBalance(
  * @param fertilizerDetailsMap - A map containing details for each fertilizer.
  * @param cultivationDetailsMap - A map containing details for each cultivation.
  * @param timeFrame - The time frame for the calculation.
- * @param fdmPublicDataUrl - The URL for accessing public FDM data.
- * @returns A promise that resolves with the calculated nitrogen balance for the field.
+ * @param depositionSupply - The pre-calculated nitrogen supply from deposition.
+ * @returns The calculated nitrogen balance for the field.
  * @throws Throws an error if any of the calculations fail.
  */
-export async function calculateNitrogenBalanceField(
+export function calculateNitrogenBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
@@ -118,8 +144,8 @@ export async function calculateNitrogenBalanceField(
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     cultivationDetailsMap: Map<string, CultivationDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
-    fdmPublicDataUrl: string,
-): Promise<NitrogenBalanceField> {
+    depositionSupply: NitrogenBalanceField["supply"]["deposition"],
+): NitrogenBalanceField {
     // Get the details of the field
     const fieldDetails = field
 
@@ -135,15 +161,14 @@ export async function calculateNitrogenBalanceField(
     }
 
     // Calculate the amount of Nitrogen supplied
-    const supply = await calculateNitrogenSupply(
-        field,
+    const supply = calculateNitrogenSupply(
         cultivations,
         fertilizerApplications,
         soilAnalysis,
         cultivationDetailsMap,
         fertilizerDetailsMap,
+        depositionSupply,
         timeFrame,
-        fdmPublicDataUrl,
     )
 
     // Calculate the amount of Nitrogen removed
