@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from "vitest"
+import Decimal from "decimal.js"
 import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
 } from "../../types"
+import type { FertilizerApplication } from "@svenvw/fdm-core"
 
 describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
@@ -84,7 +86,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             b_lu: "cult-1",
             b_lu_catalogue: "grassland-cultivation",
             b_lu_start: new Date("2024-01-01"),
-            b_lu_end: new Date("2024-12-31"),
+            b_lu_end: new Date("2024-02-29"), // Ends before cropland starts
             m_cropresidue: undefined,
         },
         {
@@ -125,9 +127,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // Emission = 1000 * 100 * 0.60296 / 100 / 1000 * -1 = -0.60296 kg N
         expect(result.mineral.total.toFixed(5)).toBe("-0.60296")
         expect(result.total.toFixed(5)).toBe("-0.60296")
-        expect(result.mineral.applications[0].value.toFixed(5)).toBe(
-            "-0.60296",
-        )
+        expect(result.mineral.applications[0].value.toFixed(5)).toBe("-0.60296")
     })
 
     it("should calculate total ammonia emission for mineral fertilizers with predefined emission factor", () => {
@@ -162,7 +162,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-3",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 2000, // g
-                p_app_date: new Date("2024-05-01"), // Within grassland cultivation
+                p_app_date: new Date("2024-02-01"), // Only grassland active
                 p_app_method: "broadcasting",
                 p_name_nl: "Manure 1",
                 p_id: "man1",
@@ -189,7 +189,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-4",
                 p_id_catalogue: "compost-fertilizer",
                 p_app_amount: 1500, // g
-                p_app_date: new Date("2024-05-01"), // Within cropland cultivation
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "incorporation",
                 p_name_nl: "Compost 1",
                 p_id: "comp1",
@@ -252,7 +252,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-3",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 2000,
-                p_app_date: new Date("2024-05-01"),
+                p_app_date: new Date("2024-05-01"), // Cropland active, so cropland EF
                 p_app_method: "broadcasting",
                 p_name_nl: "Manure 1",
                 p_id: "man1",
@@ -276,12 +276,12 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         )
 
         // Mineral: -0.60296
-        // Manure: -27.2
+        // Manure (broadcasting on cropland): 2000 * 20 * 0.69 / 1000 * -1 = -27.6 kg N
         // Compost: -4.95
-        // Total = -0.60296 - 27.2 - 4.95 = -32.75296
-        expect(result.total.toFixed(5)).toBe("-32.75296")
+        // Total = -0.60296 - 27.6 - 4.95 = -33.15296
+        expect(result.total.toFixed(5)).toBe("-33.15296")
         expect(result.mineral.total.toFixed(5)).toBe("-0.60296")
-        expect(result.manure.total.toFixed(1)).toBe("-27.2")
+        expect(result.manure.total.toFixed(1)).toBe("-27.6")
         expect(result.compost.total.toFixed(2)).toBe("-4.95")
         expect(result.other.total.toFixed(0)).toBe("0")
     })
@@ -393,7 +393,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-8",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Grassland
+                p_app_date: new Date("2024-02-01"), // Grassland only
                 p_app_method: "narrowband",
                 p_name_nl: "Manure Narrowband",
                 p_id: "man-nb",
@@ -415,7 +415,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-9",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Grassland
+                p_app_date: new Date("2024-02-01"), // Grassland only
                 p_app_method: "slotted coulter",
                 p_name_nl: "Manure Slotted Coulter",
                 p_id: "man-sc",
@@ -437,7 +437,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-10",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Grassland
+                p_app_date: new Date("2024-02-01"), // Grassland only
                 p_app_method: "shallow injection",
                 p_name_nl: "Manure Shallow Injection",
                 p_id: "man-si",
@@ -459,7 +459,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-11",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Cropland
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "incorporation 2 tracks",
                 p_name_nl: "Manure Inc 2 Tracks",
                 p_id: "man-inc2",
@@ -481,7 +481,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-12",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Cropland
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "narrowband",
                 p_name_nl: "Manure Narrowband",
                 p_id: "man-nb-crop",
@@ -503,7 +503,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-13",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Cropland
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "slotted coulter",
                 p_name_nl: "Manure Slotted Coulter",
                 p_id: "man-sc-crop",
@@ -525,7 +525,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-14",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Cropland
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "shallow injection",
                 p_name_nl: "Manure Shallow Injection",
                 p_id: "man-si-crop",
@@ -547,7 +547,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-15",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Cropland
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "incorporation",
                 p_name_nl: "Manure Incorporation",
                 p_id: "man-inc",
@@ -679,13 +679,15 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-21",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Grassland
+                p_app_date: new Date("2024-02-01"), // Grassland only
                 p_app_method: "unsupported-method",
                 p_name_nl: "Manure Unsupported",
                 p_id: "man-unsupported",
             },
         ]
-        const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {})
         const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
             mockCultivations,
             fertilizerApplications,
@@ -705,13 +707,15 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-22",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"), // Cropland
+                p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "unsupported-method",
                 p_name_nl: "Manure Unsupported",
                 p_id: "man-unsupported-crop",
             },
         ]
-        const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {})
         const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
             mockCultivations,
             fertilizerApplications,
@@ -720,7 +724,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         )
         expect(result.manure.total.toFixed(0)).toBe("0")
         expect(consoleWarnSpy).toHaveBeenCalledWith(
-            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported-crop)  for cropland",
+            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported-crop) for cropland",
         )
         consoleWarnSpy.mockRestore()
     })
@@ -737,7 +741,9 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id: "man-unsupported-bare",
             },
         ]
-        const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(() => {})
+        const consoleWarnSpy = vi
+            .spyOn(console, "warn")
+            .mockImplementation(() => {})
         const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
             mockCultivations,
             fertilizerApplications,
@@ -757,7 +763,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-24",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-06-15"), // Within grassland cultivation
+                p_app_date: new Date("2024-02-01"), // Only grassland active
                 p_app_method: "broadcasting",
                 p_name_nl: "Manure Grassland Date",
                 p_id: "man-grass-date",
@@ -780,7 +786,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-25",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-04-01"), // Within cropland cultivation
+                p_app_date: new Date("2024-04-01"), // Only cropland active
                 p_app_method: "broadcasting",
                 p_name_nl: "Manure Cropland Date",
                 p_id: "man-crop-date",

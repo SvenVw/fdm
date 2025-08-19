@@ -77,8 +77,9 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                     })
                     break
                 }
-                default: { // For manure, compost and other
-                       const p_nh4_rt_organic = new Decimal(
+                default: {
+                    // For manure, compost and other
+                    const p_nh4_rt_organic = new Decimal(
                         fertilizerDetail.p_nh4_rt ?? 0,
                     )
                     emissionFactor = determineManureAmmoniaEmissionFactor(
@@ -188,36 +189,41 @@ function determineManureAmmoniaEmissionFactor(
     const p_app_date = fertilizerApplication.p_app_date
     const p_app_method = fertilizerApplication.p_app_method
 
-    // Check if at date of application method grassland is present
-    const currentCultvations = cultivations.filter((cultivation) => {
+    const activeCultivations = cultivations.filter((cultivation) => {
         if (cultivation.b_lu_end) {
-            if (
+            return (
                 cultivation.b_lu_start.getTime() <= p_app_date.getTime() &&
                 cultivation.b_lu_end.getTime() >= p_app_date.getTime()
-            ) {
-                return true
-            }
-        } else {
-            if (cultivation.b_lu_start.getTime() <= p_app_date.getTime()) {
-                return true
-            }
+            )
         }
-    })
-    const isGrassland = currentCultvations.some((x) => {
-        const type = cultivationDetails.get(x.b_lu_catalogue)
-        return type?.b_lu_croprotation === "grass"
+        return cultivation.b_lu_start.getTime() <= p_app_date.getTime()
     })
 
-    // Check if a crop is present at time of fertilizer application
-    const isCropland =
-        currentCultvations.length > 0 &&
-        currentCultvations.some((x) => {
-            const type = cultivationDetails.get(x.b_lu_catalogue)
-            return type?.b_lu_croprotation !== "grass"
-        })
+    let landType: "grassland" | "cropland" | "bare soil" = "bare soil"
 
-    // Determine the Emission factor
-    if (isGrassland) {
+    // Determine land type based on active cultivations, prioritizing cropland
+    let hasGrassland = false
+    let hasCropland = false
+
+    for (const cultivation of activeCultivations) {
+        const type = cultivationDetails.get(cultivation.b_lu_catalogue)
+        if (type?.b_lu_croprotation === "crop") {
+            hasCropland = true
+        } else if (type?.b_lu_croprotation === "grass") {
+            hasGrassland = true
+        }
+    }
+
+    if (hasCropland) {
+        landType = "cropland"
+    } else if (hasGrassland) {
+        landType = "grassland"
+    } else {
+        landType = "bare soil"
+    }
+
+    // Determine the Emission factor based on active cultivation type
+    if (landType === "grassland") {
         if (p_app_method === "broadcasting") {
             return new Decimal(0.68)
         }
@@ -234,8 +240,7 @@ function determineManureAmmoniaEmissionFactor(
             `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) on grassland`,
         )
         return new Decimal(0)
-    }
-    if (isCropland) {
+    } else if (landType === "cropland") {
         if (p_app_method === "broadcasting") {
             return new Decimal(0.69)
         }
@@ -255,32 +260,32 @@ function determineManureAmmoniaEmissionFactor(
             return new Decimal(0.22)
         }
         console.warn(
-            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id})  for cropland`,
+            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for cropland`,
+        )
+        return new Decimal(0)
+    } else {
+        // Bare soil
+        if (p_app_method === "broadcasting") {
+            return new Decimal(0.69)
+        }
+        if (p_app_method === "incorporation 2 tracks") {
+            return new Decimal(0.46)
+        }
+        if (p_app_method === "narrowband") {
+            return new Decimal(0.36)
+        }
+        if (p_app_method === "slotted coulter") {
+            return new Decimal(0.3)
+        }
+        if (p_app_method === "shallow injection") {
+            return new Decimal(0.25)
+        }
+        if (p_app_method === "incorporation") {
+            return new Decimal(0.22)
+        }
+        console.warn(
+            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
         )
         return new Decimal(0)
     }
-
-    // Bare soil
-    if (p_app_method === "broadcasting") {
-        return new Decimal(0.69)
-    }
-    if (p_app_method === "incorporation 2 tracks") {
-        return new Decimal(0.46)
-    }
-    if (p_app_method === "narrowband") {
-        return new Decimal(0.36)
-    }
-    if (p_app_method === "slotted coulter") {
-        return new Decimal(0.3)
-    }
-    if (p_app_method === "shallow injection") {
-        return new Decimal(0.25)
-    }
-    if (p_app_method === "incorporation") {
-        return new Decimal(0.22)
-    }
-    console.warn(
-        `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
-    )
-    return new Decimal(0)
 }
