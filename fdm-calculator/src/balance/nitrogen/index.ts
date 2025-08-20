@@ -385,23 +385,23 @@ export function combineSoilAnalyses(
             )?.[prop] || null
     }
 
-    // When values for soil parameters are not available try to estimate them with convertsion functions
-    if (!soilAnalysis.a_c_of) {
+    // When values for soil parameters are not available try to estimate them with conversion functions
+    if (soilAnalysis.a_c_of == null) {
         soilAnalysis.a_c_of = calculateOrganicCarbon(soilAnalysis.a_som_loi)
     }
 
-    if (!soilAnalysis.a_som_loi) {
+    if (soilAnalysis.a_som_loi == null) {
         soilAnalysis.a_som_loi = calculateOrganicMatter(soilAnalysis.a_c_of)
     }
 
-    if (!soilAnalysis.a_cn_fr) {
+    if (soilAnalysis.a_cn_fr == null) {
         soilAnalysis.a_cn_fr = calculateCarbonNitrogenRatio(
             soilAnalysis.a_c_of,
             soilAnalysis.a_n_rt,
         )
     }
 
-    if (!soilAnalysis.a_density_sa) {
+    if (soilAnalysis.a_density_sa == null) {
         soilAnalysis.a_density_sa = calculateBulkDensity(
             soilAnalysis.a_som_loi,
             soilAnalysis.b_soiltype_agr,
