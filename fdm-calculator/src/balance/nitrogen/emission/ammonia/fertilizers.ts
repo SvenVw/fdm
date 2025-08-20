@@ -66,7 +66,6 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                     applicationValue = p_app_amount
                         .times(p_n_rt_mineral)
                         .times(emissionFactor)
-                        .dividedBy(100) // Convert from percentage to factor
                         .dividedBy(1000) // convert from g N to kg N
                         .times(-1) // Return negative value
 
