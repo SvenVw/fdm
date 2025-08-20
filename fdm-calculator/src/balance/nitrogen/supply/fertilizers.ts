@@ -42,26 +42,9 @@ export function calculateNitrogenSupplyByFertilizers(
             const p_app_amount = new Decimal(application.p_app_amount ?? 0)
             let applicationValue = new Decimal(0)
 
-            // Apply specific unit conversions based on fertilizer type if necessary
-            if (fertilizerDetail.p_type === "mineral") {
-                applicationValue = p_app_amount.times(p_n_rt.dividedBy(1000)) // Convert from g N / kg to kg N / kg
-            } else if (fertilizerDetail.p_type === "manure") {
-                applicationValue = p_app_amount.times(p_n_rt).dividedBy(1000) // convert from g N to kg N
-            } else if (fertilizerDetail.p_type === "compost") {
-                applicationValue = p_app_amount.times(p_n_rt.dividedBy(1000)) // Convert from g N / kg to kg N / kg
-            } else {
-                // For "other" types, ensure it's not one of the specific types
-                if (
-                    fertilizerDetail.p_type !== "manure" &&
-                    fertilizerDetail.p_type !== "mineral" &&
-                    fertilizerDetail.p_type !== "compost"
-                ) {
-                    applicationValue = p_app_amount.times(
-                        p_n_rt.dividedBy(1000),
-                    ) // Convert from g N / kg to kg N / kg
-                }
-            }
-
+            // p_n_rt is g N per kg fertilizer; p_app_amount is kg fertilizer / ha
+            // applicationValue is kg N / ha
+            applicationValue = p_app_amount.times(p_n_rt).dividedBy(1000)
             const newApplicationEntry = {
                 id: application.p_app_id,
                 value: applicationValue,
