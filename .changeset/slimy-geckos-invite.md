@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Improve performance at nitrogen balance calculation for supply of fertilizer application by interating only once over each fertilizer application
+Improve nitrogen balance calculation performance for fertilizer supply by iterating over each fertilizer application only once.

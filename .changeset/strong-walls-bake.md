@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Improve performance at nitrogen balance for retrieving deposition values by requesting more efficient the remote GeoTIFF
+Improve nitrogen balance performance by retrieving deposition values more efficiently from the remote GeoTIFF (batched requests + caching)

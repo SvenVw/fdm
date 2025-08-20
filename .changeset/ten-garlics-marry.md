@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Improve performance at nitrogen balance calculation for ammonia emissions of fertilizer application by interating only once over each fertilizer application
+Improve nitrogen balance calculation performance for ammonia emissions from fertilizer applications by iterating over each application only once.
