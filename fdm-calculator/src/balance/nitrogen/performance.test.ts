@@ -129,7 +129,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
                     fertilizerDetails[
                         Math.floor(Math.random() * fertilizerDetails.length)
                     ].p_id_catalogue,
-                p_amount: Math.floor(Math.random() * 500 + 100), // 100-600
+                p_app_amount: Math.floor(Math.random() * 500 + 100), // 100-600
                 b_id: fieldId,
                 b_id_farm: "test-farm",
                 p_app_date: new Date(2023, 4, 1),
