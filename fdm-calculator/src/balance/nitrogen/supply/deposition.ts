@@ -97,6 +97,12 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
         const heightPct = (latitude - bbox[1]) / bboxHeight
         const xPx = Math.floor(pixelWidth * widthPct)
         const yPx = Math.floor(pixelHeight * (1 - heightPct))
+        // Explicit OOB check: centroids outside the TIFF should return zero
+        if (xPx < 0 || xPx >= pixelWidth || yPx < 0 || yPx >= pixelHeight) {
+            return {
+                total: new Decimal(0),
+            }
+        }
         const window = [xPx, yPx, xPx + 1, yPx + 1]
 
         // Read the raster data for this specific field's window.
