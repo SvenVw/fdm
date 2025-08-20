@@ -1,5 +1,16 @@
 # Changelog fdm-app
 
+## 0.22.3
+
+### Patch Changes
+
+- 8cb3c92: Ensure the selected field’s cultivation is preselected when adding a new field on the New Fields page
+- bedd5a4: Increase streamTimeout from 10 seconds to 30 seconds to enable longer running calculations
+- Updated dependencies [e964a18]
+- Updated dependencies [0c29661]
+  - @svenvw/fdm-core@0.24.1
+  - @svenvw/fdm-calculator@0.6.0
+
 ## 0.22.2
 
 ### Patch Changes
