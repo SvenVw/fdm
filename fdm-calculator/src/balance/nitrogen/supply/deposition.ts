@@ -9,7 +9,8 @@ import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
  * the potentially large TIFF file is only downloaded and parsed once.
  * Subsequent calls will reuse the cached object, saving network and CPU resources.
  */
-let tiffCache: GeoTIFF | null = null
+const tiffCache = new Map<string, GeoTIFF>()
+const tiffPromiseCache = new Map<string, Promise<GeoTIFF>>()
 
 /**
  * Fetches and caches the GeoTIFF object for nitrogen deposition data.
@@ -21,11 +22,6 @@ let tiffCache: GeoTIFF | null = null
  * @throws Throws an error if the GeoTIFF file cannot be fetched or parsed.
  */
 async function getTiff(fdmPublicDataUrl: string): Promise<GeoTIFF> {
-    // Return the cached object if it exists
-    if (tiffCache) {
-        return tiffCache
-    }
-
     // Settings for the GeoTIFF file.
     // Currently, only the year 2022 is available.
     // TODO: Add support for multiple years when data becomes available.
@@ -33,21 +29,30 @@ async function getTiff(fdmPublicDataUrl: string): Promise<GeoTIFF> {
     const region = "nl"
     const url = `${fdmPublicDataUrl}deposition/${region}/ntot_${year}.tiff`
 
-    try {
-        // The `fromUrl` function from geotiff.js is efficient. It initially only
-        // fetches the headers of the TIFF file using HTTP Range Requests.
-        // The full image data is not downloaded at this stage.
-        const tiff = await fromUrl(url)
-        // Store the successfully fetched object in the cache.
-        tiffCache = tiff
-        return tiff
-    } catch (error) {
-        // Clear cache on failure to allow for retries
-        tiffCache = null
-        throw new Error(
-            `Failed to fetch or parse GeoTIFF from ${url}: ${String(error)}`,
-        )
-    }
+    // Return cached object if it exists
+    const cached = tiffCache.get(url)
+    if (cached) return cached
+
+    // Deduplicate in-flight fetches
+    const inFlight = tiffPromiseCache.get(url)
+    if (inFlight) return inFlight
+
+    const promise = (async () => {
+        try {
+            // fromUrl fetches headers first (HTTP Range) and lazily reads data
+            const tiff = await fromUrl(url)
+            tiffCache.set(url, tiff)
+            tiffPromiseCache.delete(url)
+            return tiff
+        } catch (error) {
+            tiffPromiseCache.delete(url)
+            throw new Error(
+                `Failed to fetch or parse GeoTIFF from ${url}: ${String(error)}`,
+            )
+        }
+    })()
+    tiffPromiseCache.set(url, promise)
+    return promise
 }
 
 /**
