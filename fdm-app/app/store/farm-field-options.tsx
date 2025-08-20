@@ -43,7 +43,7 @@ interface FarmFieldOptionsStore {
 }
 
 export const useFarmFieldOptionsStore = create<FarmFieldOptionsStore>(
-    (set) => ({
+    (set, get) => ({
         farmOptions: [],
         fieldOptions: [],
         setFarmOptions(farmOptions) {
@@ -53,10 +53,10 @@ export const useFarmFieldOptionsStore = create<FarmFieldOptionsStore>(
             set({ fieldOptions })
         },
         getFarmById(b_id_farm) {
-            return this.farmOptions.find((f) => f.b_id_farm === b_id_farm)
+            return get().farmOptions.find((f) => f.b_id_farm === b_id_farm)
         },
         getFieldById(b_id) {
-            return this.fieldOptions.find((f) => f.b_id === b_id)
+            return get().fieldOptions.find((f) => f.b_id === b_id)
         },
     }),
 )
