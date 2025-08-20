@@ -1,12 +1,10 @@
 import { describe, expect, it, vi } from "vitest"
-import Decimal from "decimal.js"
 import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
 } from "../../types"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
 
 describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
@@ -38,7 +36,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_nh4_rt: 50,
         p_s_rt: 10,
         p_ef_nh3: undefined,
-        p_inhibitor: false,
+        // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("mineral-fertilizer-2", {
         p_id_catalogue: "mineral-fertilizer-2",
@@ -48,7 +46,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_nh4_rt: 0,
         p_s_rt: 0,
         p_ef_nh3: 0.15, // Predefined emission factor
-        p_inhibitor: false,
+        // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("manure-fertilizer", {
         p_id_catalogue: "manure-fertilizer",
@@ -58,7 +56,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_nh4_rt: 20,
         p_s_rt: 0,
         p_ef_nh3: undefined,
-        p_inhibitor: false,
+        // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("compost-fertilizer", {
         p_id_catalogue: "compost-fertilizer",
@@ -68,7 +66,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_nh4_rt: 15,
         p_s_rt: 0,
         p_ef_nh3: undefined,
-        p_inhibitor: false,
+        // p_inhibitor: false,
     })
     mockFertilizerDetailsMap.set("other-fertilizer", {
         p_id_catalogue: "other-fertilizer",
@@ -78,7 +76,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         p_nh4_rt: 10,
         p_s_rt: 0,
         p_ef_nh3: undefined,
-        p_inhibitor: false,
+        // p_inhibitor: false,
     })
 
     const mockCultivations: FieldInput["cultivations"] = [
@@ -309,44 +307,45 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         ).toThrow("Fertilizer application app-missing has no fertilizerDetails")
     })
 
-    it("should calculate mineral ammonia emission factor correctly with inhibitor", () => {
-        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
-            {
-                p_app_id: "app-6",
-                p_id_catalogue: "mineral-fertilizer-inhibitor",
-                p_app_amount: 1000,
-                p_app_date: new Date("2024-05-01"),
-                p_app_method: "broadcasting",
-                p_name_nl: "Mineral Inhibitor",
-                p_id: "min-inh",
-            },
-        ]
-        mockFertilizerDetailsMap.set("mineral-fertilizer-inhibitor", {
-            p_id_catalogue: "mineral-fertilizer-inhibitor",
-            p_type: "mineral",
-            p_n_rt: 100,
-            p_no3_rt: 20,
-            p_nh4_rt: 30,
-            p_s_rt: 5,
-            p_ef_nh3: undefined,
-            p_inhibitor: true, // This should be handled by the internal function
-        })
+    // TODO: implement p_inhibitor for fertilizers
+    // it("should calculate mineral ammonia emission factor correctly with inhibitor", () => {
+    //     const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+    //         {
+    //             p_app_id: "app-6",
+    //             p_id_catalogue: "mineral-fertilizer-inhibitor",
+    //             p_app_amount: 1000,
+    //             p_app_date: new Date("2024-05-01"),
+    //             p_app_method: "broadcasting",
+    //             p_name_nl: "Mineral Inhibitor",
+    //             p_id: "min-inh",
+    //         },
+    //     ]
+    //     mockFertilizerDetailsMap.set("mineral-fertilizer-inhibitor", {
+    //         p_id_catalogue: "mineral-fertilizer-inhibitor",
+    //         p_type: "mineral",
+    //         p_n_rt: 100,
+    //         p_no3_rt: 20,
+    //         p_nh4_rt: 30,
+    //         p_s_rt: 5,
+    //         p_ef_nh3: undefined,
+    //         // p_inhibitor: true,
+    //     })
 
-        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
-            mockCultivations,
-            fertilizerApplications,
-            mockCultivationDetailsMap,
-            mockFertilizerDetailsMap,
-        )
+    //     const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+    //         mockCultivations,
+    //         fertilizerApplications,
+    //         mockCultivationDetailsMap,
+    //         mockFertilizerDetailsMap,
+    //     )
 
-        // p_n_org = 100 - 20 - 30 = 50
-        // a = 50^2 * 3.166e-5 = 2500 * 0.00003166 = 0.07915
-        // b = 20 * 5 * -4.308e-5 = 100 * -0.00004308 = -0.004308
-        // c = 30^2 * 2.498e-4 = 900 * 0.0002498 = 0.22482
-        // EF = 0.07915 - 0.004308 + 0.22482 = 0.299662
-        // Emission = 1000 * 100 * 0.299662 / 100 / 1000 * -1 = -0.299662 kg N
-        expect(result.mineral.total.toFixed(6)).toBe("-0.299662")
-    })
+    //     // p_n_org = 100 - 20 - 30 = 50
+    //     // a = 50^2 * 3.166e-5 = 2500 * 0.00003166 = 0.07915
+    //     // b = 20 * 5 * -4.308e-5 = 100 * -0.00004308 = -0.004308
+    //     // c = 30^2 * 2.498e-4 = 900 * 0.0002498 = 0.22482
+    //     // EF = 0.07915 - 0.004308 + 0.22482 = 0.299662
+    //     // Emission = 1000 * 100 * 0.299662 / 100 / 1000 * -1 = -0.299662 kg N
+    //     expect(result.mineral.total.toFixed(6)).toBe("-0.299662")
+    // })
 
     it("should calculate mineral ammonia emission factor correctly without inhibitor", () => {
         const fertilizerApplications: FieldInput["fertilizerApplications"] = [
@@ -368,7 +367,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             p_nh4_rt: 30,
             p_s_rt: 5,
             p_ef_nh3: undefined,
-            p_inhibitor: false, // This should be handled by the internal function
+            // p_inhibitor: false,
         })
 
         const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(

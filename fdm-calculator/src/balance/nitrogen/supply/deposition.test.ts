@@ -42,8 +42,8 @@ describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
                 b_centroid: [5.0, 52.0],
                 b_area: 100000,
                 b_id: "test_field_1",
-                b_start: new Date("2025-01-01"),
-                b_end: new Date("2025-12-31"),
+                b_start: new Date("2023-01-01"),
+                b_end: new Date("2023-12-31"),
             },
             cultivations: [],
             harvests: [],
@@ -63,7 +63,7 @@ describe("calculateAllFieldsNitrogenSupplyByDeposition", () => {
         )
         let result = resultMap.get("test_field_1")
         expect(result).toBeDefined()
-        expect(result?.total.toNumber()).toBeCloseTo(19.626)
+        expect(result?.total.toNumber()).toBeCloseTo(19.572)
 
         // Test with half a year
         timeFrame = {

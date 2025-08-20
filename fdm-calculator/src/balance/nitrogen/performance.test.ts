@@ -5,9 +5,7 @@ import type {
     FertilizerDetail,
     FieldInput,
     NitrogenBalanceInput,
-    SoilAnalysisPicked,
 } from "./types"
-import { Decimal } from "decimal.js"
 
 /**
  * Utility function to generate mock data for performance testing.
