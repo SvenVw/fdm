@@ -78,7 +78,7 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
             {
                 b_lu: `cult-${fieldId}-1`,
                 b_lu_catalogue: "cat-cult-1",
-                m_cropresidue: 0.5,
+                m_cropresidue: false,
                 b_lu_start: new Date(2023, 3, 1),
                 b_lu_end: new Date(2023, 8, 1),
             },

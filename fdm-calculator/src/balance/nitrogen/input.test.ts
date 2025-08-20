@@ -109,7 +109,7 @@ describe("collectInputForNitrogenBalance", () => {
             {
                 b_lu: "cult-1",
                 b_lu_catalogue: "cat-cult-1",
-                m_cropresidue: 0.5,
+                m_cropresidue: false,
                 b_lu_start: new Date("2023-04-01"),
                 b_lu_end: new Date("2023-09-01"),
             },
