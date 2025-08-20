@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.24.1
+
+### Patch Changes
+
+- e964a18: Fix to return cultivations at `getCultivationPlan` and `getCultivation` when cultivation starts before `timeFrame.start` and has no `ending date
+- 0c29661: Fixes validation check that harvest or end date of cultivation cannot happen on start date of cultivation
+
 ## 0.24.0
 
 ### Minor Changes
