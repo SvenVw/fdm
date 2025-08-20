@@ -122,10 +122,12 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // b = 50 * 10 * -4.308e-5 = -0.02154
         // c = 50^2 * 2.498e-4 = 2500 * 0.0002498 = 0.6245
         // EF = 0 - 0.02154 + 0.6245 = 0.60296
-        // Emission = 1000 * 100 * 0.60296 / 100 / 1000 * -1 = -0.60296 kg N
-        expect(result.mineral.total.toFixed(5)).toBe("-0.60296")
-        expect(result.total.toFixed(5)).toBe("-0.60296")
-        expect(result.mineral.applications[0].value.toFixed(5)).toBe("-0.60296")
+        // Emission = 1000 * 100 * 0.60296 / 100  * -1 = -60.296 kg N
+        expect(result.mineral.total.toFixed(5)).toBe("-60.29600")
+        expect(result.total.toFixed(5)).toBe("-60.29600")
+        expect(result.mineral.applications[0].value.toFixed(5)).toBe(
+            "-60.29600",
+        )
     })
 
     it("should calculate total ammonia emission for mineral fertilizers with predefined emission factor", () => {
@@ -148,10 +150,10 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockFertilizerDetailsMap,
         )
 
-        // Emission = 500 * 80 * 0.15 / 100 / 1000 * -1 = -0.06 kg N
-        expect(result.mineral.total.toFixed(2)).toBe("-0.06")
-        expect(result.total.toFixed(2)).toBe("-0.06")
-        expect(result.mineral.applications[0].value.toFixed(2)).toBe("-0.06")
+        // Emission = 500 * 80 / 1000 * 0.15 * -1 = -6 kg N
+        expect(result.mineral.total.toFixed(2)).toBe("-6.00")
+        expect(result.total.toFixed(2)).toBe("-6.00")
+        expect(result.mineral.applications[0].value.toFixed(2)).toBe("-6.00")
     })
 
     it("should calculate total ammonia emission for manure fertilizers on grassland", () => {
@@ -273,12 +275,12 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockFertilizerDetailsMap,
         )
 
-        // Mineral: -0.60296
-        // Manure (broadcasting on cropland): 2000 * 20 * 0.69 / 1000 * -1 = -27.6 kg N
+        // Mineral: -60.296
+        // Manure (broadcasting on cropland): 2000 * 20 / 1000 * 0.69 * -1 = -27.6 kg N
         // Compost: -4.95
-        // Total = -0.60296 - 27.6 - 4.95 = -33.15296
-        expect(result.total.toFixed(5)).toBe("-33.15296")
-        expect(result.mineral.total.toFixed(5)).toBe("-0.60296")
+        // Total = -60.296 - 27.6 - 4.95 = -33.15296
+        expect(result.total.toFixed(5)).toBe("-92.84600")
+        expect(result.mineral.total.toFixed(5)).toBe("-60.29600")
         expect(result.manure.total.toFixed(1)).toBe("-27.6")
         expect(result.compost.total.toFixed(2)).toBe("-4.95")
         expect(result.other.total.toFixed(0)).toBe("0")
@@ -382,8 +384,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // b = 20 * 5 * -4.308e-5 = 100 * -0.00004308 = -0.004308
         // c = 30^2 * 2.498e-4 = 900 * 0.0002498 = 0.22482
         // EF = 0.175525 - 0.004308 + 0.22482 = 0.396037
-        // Emission = 1000 * 100 * 0.396037 / 100 / 1000 * -1 = -0.396037 kg N
-        expect(result.mineral.total.toFixed(6)).toBe("-0.396037")
+        // Emission = 1000 * 100 * 0.396037 / 1000 * -1 = -39.6037 kg N
+        expect(result.mineral.total.toFixed(6)).toBe("-39.603700")
     })
 
     it("should calculate manure ammonia emission factor correctly for grassland - narrowband", () => {
