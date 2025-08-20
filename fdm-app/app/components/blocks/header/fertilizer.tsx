@@ -1,5 +1,7 @@
 import { ChevronDown } from "lucide-react"
+import { useEffect } from "react"
 import { NavLink, useLocation } from "react-router"
+import { create } from "zustand"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -12,16 +14,44 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 
+const useFertilizerOptionsStore = create<{
+    fertilizerOptions: HeaderFertilizerOption[] | undefined
+    setFertilizerOptions(fertilizerOptions: HeaderFertilizerOption[]): void
+}>((set) => ({
+    fertilizerOptions: undefined,
+    setFertilizerOptions(fertilizerOptions) {
+        set({ fertilizerOptions })
+    },
+}))
+
 export function HeaderFertilizer({
     b_id_farm,
     p_id,
-    fertilizerOptions,
+    fertilizerOptions: pFertilizerOptions,
 }: {
     b_id_farm: string
     p_id: string | undefined
-    fertilizerOptions: HeaderFertilizerOption[]
+    fertilizerOptions: HeaderFertilizerOption[] | undefined
 }) {
     const location = useLocation()
+    const fertilizerOptionsStore = useFertilizerOptionsStore()
+
+    useEffect(() => {
+        if (
+            pFertilizerOptions &&
+            pFertilizerOptions !== fertilizerOptionsStore.fertilizerOptions
+        ) {
+            fertilizerOptionsStore.setFertilizerOptions(pFertilizerOptions)
+        }
+    }, [
+        pFertilizerOptions,
+        fertilizerOptionsStore.fertilizerOptions,
+        fertilizerOptionsStore.setFertilizerOptions,
+    ])
+
+    const fertilizerOptions =
+        pFertilizerOptions ?? fertilizerOptionsStore.fertilizerOptions
+
     const currentPath = String(location.pathname)
 
     return (
@@ -32,7 +62,7 @@ export function HeaderFertilizer({
                     Meststof
                 </BreadcrumbLink>
             </BreadcrumbItem>
-            {fertilizerOptions.length > 0 ? (
+            {fertilizerOptions && fertilizerOptions.length > 0 ? (
                 <>
                     <BreadcrumbSeparator />
                     <BreadcrumbItem>
@@ -70,16 +100,18 @@ export function HeaderFertilizer({
                     </BreadcrumbItem>
                 </>
             ) : (
-                <>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                        <BreadcrumbLink
-                            href={`/farm/${b_id_farm}/fertilizers/new`}
-                        >
-                            Nieuwe meststof
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                </>
+                fertilizerOptions && (
+                    <>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink
+                                href={`/farm/${b_id_farm}/fertilizers/new`}
+                            >
+                                Nieuwe meststof
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </>
+                )
             )}
         </>
     )

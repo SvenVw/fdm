@@ -1,7 +1,13 @@
 import { data, type LoaderFunctionArgs, type MetaFunction } from "react-router"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
+import type { Route } from "../+types/root"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -47,4 +53,22 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     } catch (error) {
         return handleActionError(error)
     }
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const { params } = props
+
+    console.log(params)
+    return (
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={farmFieldOptionsStore.farmOptions}
+                />
+            </Header>
+            <InlineErrorBoundary {...props} />
+        </SidebarInset>
+    )
 }

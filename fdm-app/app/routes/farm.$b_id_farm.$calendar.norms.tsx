@@ -26,11 +26,14 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { HeaderNorms } from "../components/blocks/header/norms"
-import { Alert, AlertDescription } from "../components/ui/alert"
-import { Button } from "../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
-import { Separator } from "../components/ui/separator"
+import type { Route } from "../+types/root"
+import { HeaderNorms } from "~/components/blocks/header/norms"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -311,5 +314,26 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
                 </NavLink>
             </div>
         </div>
+    )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const { params } = props
+
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+
+    return (
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={farmFieldOptionsStore.farmOptions}
+                />
+                <HeaderNorms b_id_farm={params.b_id_farm} />
+            </Header>
+            <main>
+                <InlineErrorBoundary {...props} />
+            </main>
+        </SidebarInset>
     )
 }

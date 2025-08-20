@@ -12,6 +12,7 @@ import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
 import { HeaderField } from "~/components/blocks/header/field"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -19,6 +20,49 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
+import type { Route } from "../+types/root"
+
+/**
+ * Return title and destination url for each sidebar item that should be available
+ *
+ * @param b_id_farm farm id
+ * @param calendar calendar year
+ * @param b_id field id
+ * @returns list of sidebar item data
+ */
+function getSidebarPageItems(
+    b_id_farm: string,
+    calendar: string,
+    b_id: string,
+) {
+    return [
+        {
+            to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/overview`,
+            title: "Overzicht",
+        },
+        {
+            to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation`,
+            title: "Gewassen",
+        },
+        {
+            to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
+            title: "Bemesting",
+        },
+        {
+            to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/soil`,
+            title: "Bodem",
+        },
+        {
+            to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
+            title: "Kaart",
+        },
+        {
+            to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/delete`,
+            title: "Verwijderen",
+        },
+    ]
+}
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -128,32 +172,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Create the items for sidebar page
-        const sidebarPageItems = [
-            {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/overview`,
-                title: "Overzicht",
-            },
-            {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/cultivation`,
-                title: "Gewassen",
-            },
-            {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
-                title: "Bemesting",
-            },
-            {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/soil`,
-                title: "Bodem",
-            },
-            {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/atlas`,
-                title: "Kaart",
-            },
-            {
-                to: `/farm/${b_id_farm}/${calendar}/field/${b_id}/delete`,
-                title: "Verwijderen",
-            },
-        ]
+        const sidebarPageItems = getSidebarPageItems(b_id_farm, calendar, b_id)
 
         // Return user information from loader
         return {
@@ -211,6 +230,60 @@ export default function FarmFieldIndex() {
                     <Outlet />
                 </FarmContent>
             </main>
+        </SidebarInset>
+    )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const { params } = props
+
+    const cachedFarm = farmFieldOptionsStore.getFieldById(params.b_id_farm)
+    const cachedFarmName = cachedFarm
+        ? (cachedFarm.b_name ?? "Naam Onbekend")
+        : "Onbekend Perceel"
+
+    return (
+        <SidebarInset>
+            <Header
+                action={{
+                    to: `/farm/${params.b_id_farm}/${params.calendar}/field/`,
+                    label: "Terug naar percelen",
+                    disabled: false,
+                }}
+            >
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={farmFieldOptionsStore.farmOptions}
+                />
+                <HeaderField
+                    b_id_farm={params.b_id}
+                    fieldOptions={farmFieldOptionsStore.fieldOptions}
+                    b_id={params.b_id}
+                />
+            </Header>
+
+            {params.b_id_farm && params.calendar && params.b_id ? (
+                <main>
+                    <FarmTitle
+                        title={cachedFarmName}
+                        description={"Beheer hier de gegevens van dit perceel"}
+                    />
+                    <FarmContent
+                        sidebarItems={getSidebarPageItems(
+                            params.b_id_farm,
+                            params.calendar,
+                            params.b_id,
+                        )}
+                    >
+                        <InlineErrorBoundary {...props} />
+                    </FarmContent>
+                </main>
+            ) : (
+                <main>
+                    <InlineErrorBoundary {...props} />
+                </main>
+            )}
         </SidebarInset>
     )
 }

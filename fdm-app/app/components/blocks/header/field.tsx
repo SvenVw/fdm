@@ -1,6 +1,8 @@
 import { ChevronDown } from "lucide-react"
+import { useEffect } from "react"
 import { NavLink, useLocation } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
+import { useFarmFieldOptionsStore } from "@/app/store/farm-field-options"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -25,6 +27,12 @@ export function HeaderField({
     const location = useLocation()
     const currentPath = String(location.pathname)
     const calendar = useCalendarStore((state) => state.calendar)
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    useEffect(() => {
+        if (fieldOptions && fieldOptions.length > 0) {
+            farmFieldOptionsStore.setFieldOptions(fieldOptions)
+        }
+    }, [fieldOptions, farmFieldOptionsStore.setFieldOptions])
 
     return (
         <>
@@ -91,7 +99,7 @@ export function HeaderField({
     )
 }
 
-type HeaderFieldOption = {
+export type HeaderFieldOption = {
     b_id: string
     b_name: string | undefined | null
 }
