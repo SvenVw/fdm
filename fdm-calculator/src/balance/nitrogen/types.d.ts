@@ -69,7 +69,7 @@ export type NitrogenSupplyFertilizers = {
          */
         total: Decimal
         /**
-         * A detailed list of individual other fertilzer applications.
+         * A detailed list of individual other fertilizer applications.
          * Each entry includes the application's unique identifier (`id`) and the amount of nitrogen supplied (`value`).
          */
         applications: { id: string; value: Decimal }[]
@@ -438,7 +438,7 @@ export type FertilizerDetail = Pick<
     | "p_no3_rt" // Nitrate content (g N / kg fertilizer)
     | "p_nh4_rt" // Ammonium content (g N / kg fertilizer)
     | "p_s_rt" // Sulfur content (g SO3 / kg fertilizer)
-    | "p_ef_nh3" // Ammonia emmission factor
+    | "p_ef_nh3" // Ammonia emission factor
     | "p_type"
     // | "p_inhibitor" // TODO: implement inhibitor types
 >
@@ -524,6 +524,18 @@ export type NitrogenEmissionAmmoniaFertilizersNumeric = {
         applications: { id: string; value: number }[]
     }
     manure: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    mineral: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    compost: {
+        total: number
+        applications: { id: string; value: number }[]
+    }
+    other: {
         total: number
         applications: { id: string; value: number }[]
     }

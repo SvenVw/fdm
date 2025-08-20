@@ -101,7 +101,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             {
                 p_app_id: "app-1",
                 p_id_catalogue: "mineral-fertilizer-1",
-                p_app_amount: 1000, // g
+                p_app_amount: 1000, // kg / ha
                 p_app_date: new Date("2024-05-01"),
                 p_app_method: "broadcasting",
                 p_name_nl: "Mineral 1",
@@ -133,7 +133,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             {
                 p_app_id: "app-2",
                 p_id_catalogue: "mineral-fertilizer-2",
-                p_app_amount: 500, // g
+                p_app_amount: 500, // kg / ha
                 p_app_date: new Date("2024-05-01"),
                 p_app_method: "broadcasting",
                 p_name_nl: "Mineral 2",
@@ -159,7 +159,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             {
                 p_app_id: "app-3",
                 p_id_catalogue: "manure-fertilizer",
-                p_app_amount: 2000, // g
+                p_app_amount: 2000, // kg / ha
                 p_app_date: new Date("2024-02-01"), // Only grassland active
                 p_app_method: "broadcasting",
                 p_name_nl: "Manure 1",
@@ -186,7 +186,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             {
                 p_app_id: "app-4",
                 p_id_catalogue: "compost-fertilizer",
-                p_app_amount: 1500, // g
+                p_app_amount: 1500, // kg / ha
                 p_app_date: new Date("2024-05-01"), // Cropland active
                 p_app_method: "incorporation",
                 p_name_nl: "Compost 1",
@@ -213,7 +213,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             {
                 p_app_id: "app-5",
                 p_id_catalogue: "other-fertilizer",
-                p_app_amount: 1000, // g
+                p_app_amount: 1000, // kg / ha
                 p_app_date: new Date("2025-01-01"), // Outside any cultivation, so bare soil
                 p_app_method: "slotted coulter",
                 p_name_nl: "Other 1",
@@ -392,7 +392,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-8",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_date: new Date("2024-02-01"), // kg / harassland only
                 p_app_method: "narrowband",
                 p_name_nl: "Manure Narrowband",
                 p_id: "man-nb",
@@ -414,7 +414,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-9",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_date: new Date("2024-02-01"), // kg / harassland only
                 p_app_method: "slotted coulter",
                 p_name_nl: "Manure Slotted Coulter",
                 p_id: "man-sc",
@@ -436,7 +436,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-10",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_date: new Date("2024-02-01"), // kg / harassland only
                 p_app_method: "shallow injection",
                 p_name_nl: "Manure Shallow Injection",
                 p_id: "man-si",
@@ -678,7 +678,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_app_id: "app-21",
                 p_id_catalogue: "manure-fertilizer",
                 p_app_amount: 1000,
-                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_date: new Date("2024-02-01"), // kg / harassland only
                 p_app_method: "unsupported-method",
                 p_name_nl: "Manure Unsupported",
                 p_id: "man-unsupported",
