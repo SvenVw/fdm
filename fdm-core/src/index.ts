@@ -65,6 +65,7 @@ export {
     revokePrincipalFromFarm,
     updateFarm,
     updateRoleOfPrincipalAtFarm,
+    removeFarm,
 } from "./farm"
 export type { FdmType } from "./fdm.d"
 export { createFdmServer } from "./fdm-server"

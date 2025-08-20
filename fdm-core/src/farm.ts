@@ -2,10 +2,10 @@ import { asc, eq, inArray } from "drizzle-orm"
 import {
     checkPermission,
     getRolesOfPrincipalForResource,
-    grantRole,
     listPrincipalsForResource,
     listResources,
     revokePrincipal,
+    grantRole,
     updateRole,
 } from "./authorization"
 import type { PrincipalId, Role } from "./authorization.d"
@@ -15,6 +15,7 @@ import type { FdmType } from "./fdm"
 import { createId } from "./id"
 import { getPrincipal, identifyPrincipal } from "./principal"
 import type { Principal } from "./principal.d"
+import { removeField } from "./field"
 
 /**
  * Creates a new farm record and assigns the "owner" role to the specified principal.
@@ -539,5 +540,104 @@ export async function isAllowedToShareFarm(
         return true
     } catch (_err) {
         return false
+    }
+}
+
+/**
+ * Removes a farm and all its associated data.
+ *
+ * This function checks if the principal has permission to delete the farm, then proceeds to delete
+ * the farm and all cascading data, including fields, associated events and assets (like fertilizer
+ * application, soil analysis), farm-related data (like fertilizers, catalogue enabling), and
+ * principal permissions.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The unique identifier of the principal performing the operation.
+ * @param b_id_farm - The unique identifier of the farm to be removed.
+ * @returns A promise that resolves when the farm has been successfully removed.
+ *
+ * @throws {Error} If the principal does not have permission to delete the farm.
+ *
+ * @alpha
+ */
+export async function removeFarm(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+): Promise<void> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "removeFarm",
+        )
+
+        await fdm.transaction(async (tx: FdmType) => {
+            // Step 1: Get all fields for the given farm
+            const fields = await tx
+                .select({ b_id: schema.fieldAcquiring.b_id })
+                .from(schema.fieldAcquiring)
+                .where(eq(schema.fieldAcquiring.b_id_farm, b_id_farm))
+
+            // Step 2: Remove each field and its associated data
+            if (fields.length > 0) {
+                const fieldIds = fields.map(
+                    (f: { b_id: schema.fieldsTypeSelect["b_id"] }) => f.b_id,
+                )
+                for (const fieldId of fieldIds) {
+                    await removeField(tx, principal_id, fieldId)
+                }
+            }
+
+            // Step 3: Delete farm-specific data
+            await tx
+                .delete(schema.fertilizerAcquiring)
+                .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
+            await tx
+                .delete(schema.derogationApplying)
+                .where(eq(schema.derogationApplying.b_id_farm, b_id_farm))
+            await tx
+                .delete(schema.fertilizerCatalogueEnabling)
+                .where(
+                    eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm),
+                )
+            await tx
+                .delete(schema.cultivationCatalogueSelecting)
+                .where(
+                    eq(
+                        schema.cultivationCatalogueSelecting.b_id_farm,
+                        b_id_farm,
+                    ),
+                )
+            // Delete custom fertilizers from the catalogue that belong to this farm
+            await tx
+                .delete(schema.fertilizersCatalogue)
+                .where(eq(schema.fertilizersCatalogue.p_source, b_id_farm))
+
+            // Step 4: Revoke all principals from the farm
+            const principals = await listPrincipalsForResource(
+                tx,
+                "farm",
+                b_id_farm,
+            )
+            for (const principal of principals) {
+                await revokePrincipal(
+                    tx,
+                    "farm",
+                    b_id_farm,
+                    principal.principal_id,
+                )
+            }
+
+            // Step 5: Finally, delete the farm itself
+            await tx
+                .delete(schema.farms)
+                .where(eq(schema.farms.b_id_farm, b_id_farm))
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for removeFarm", { b_id_farm })
     }
 }
