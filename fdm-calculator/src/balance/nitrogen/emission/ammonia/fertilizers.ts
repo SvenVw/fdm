@@ -55,7 +55,7 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                     )
                     const p_ef_nh3_mineral = fertilizerDetail.p_ef_nh3
 
-                    if (p_ef_nh3_mineral) {
+                    if (p_ef_nh3_mineral != null) {
                         emissionFactor = new Decimal(p_ef_nh3_mineral)
                     } else {
                         emissionFactor =
@@ -63,6 +63,10 @@ export function calculateNitrogenEmissionViaAmmoniaByFertilizers(
                                 fertilizerDetail,
                             )
                     }
+                    // Clamp to [0..1] to ensure sane fraction values
+                    if (emissionFactor.lt(0)) emissionFactor = new Decimal(0)
+                    if (emissionFactor.gt(1)) emissionFactor = new Decimal(1)
+
                     applicationValue = p_app_amount
                         .times(p_n_rt_mineral)
                         .times(emissionFactor)
