@@ -1,5 +1,5 @@
-import type { fdmSchema } from "@svenvw/fdm-core"
-import { Decimal } from "decimal.js"
+import { type fdmSchema } from "@svenvw/fdm-core"
+import Decimal from "decimal.js"
 import {
     calculateBulkDensity,
     calculateCarbonNitrogenRatio,
@@ -61,7 +61,7 @@ export async function calculateNitrogenBalance(
                 fdmPublicDataUrl,
             )
 
-        // 
+        //
         // Process fields in batches to control concurrency.
         // Instead of running all fields in parallel with Promise.all, which can
         // overwhelm the server for farms with many fields, we process them in
@@ -152,12 +152,16 @@ export function calculateNitrogenBalanceField(
     // Combine soil analyses
     const soilAnalysis = combineSoilAnalyses(soilAnalyses)
 
-    // If timeframe is broader than field existence, shorten it
-    if (field.b_start?.getTime() > timeFrame.start.getTime()) {
-        timeFrame.start = field.b_start
-    }
-    if (field.b_end?.getTime() < timeFrame.end.getTime()) {
-        timeFrame.end = field.b_end
+    // Use a field-local timeframe (intersection with input timeframe)
+    const timeFrameField = {
+        start:
+            field.b_start && field.b_start.getTime() > timeFrame.start.getTime()
+                ? field.b_start
+                : timeFrame.start,
+        end:
+            field.b_end && field.b_end.getTime() < timeFrame.end.getTime()
+                ? field.b_end
+                : timeFrame.end,
     }
 
     // Calculate the amount of Nitrogen supplied
@@ -168,7 +172,7 @@ export function calculateNitrogenBalanceField(
         cultivationDetailsMap,
         fertilizerDetailsMap,
         depositionSupply,
-        timeFrame,
+        timeFrameField,
     )
 
     // Calculate the amount of Nitrogen removed
@@ -192,7 +196,7 @@ export function calculateNitrogenBalanceField(
         cultivations,
         soilAnalysis,
         cultivationDetailsMap,
-        timeFrame,
+        timeFrameField,
     )
 
     return {
@@ -229,10 +233,10 @@ export function calculateNitrogenBalancesFieldToFarm(
     )
 
     // Calculate total weighted supply, removal, and emission across the farm
-    let totalFarmSupply = Decimal(0)
-    let totalFarmRemoval = Decimal(0)
-    let totalFarmEmission = Decimal(0)
-    let totalFarmTarget = Decimal(0)
+    let totalFarmSupply = new Decimal(0)
+    let totalFarmRemoval = new Decimal(0)
+    let totalFarmEmission = new Decimal(0)
+    let totalFarmTarget = new Decimal(0)
 
     for (const fieldBalance of fieldsWithBalance) {
         const fieldInput = fields.find(
@@ -255,7 +259,7 @@ export function calculateNitrogenBalancesFieldToFarm(
             fieldBalance.removal.total.times(fieldArea),
         )
         totalFarmEmission = totalFarmEmission.add(
-            fieldBalance.emission.total.times(fieldArea),
+            fieldBalance.emission.ammonia.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
             fieldBalance.target.times(fieldArea),
@@ -264,16 +268,16 @@ export function calculateNitrogenBalancesFieldToFarm(
 
     // Calculate average values per hectare for the farm
     const avgFarmSupply = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmSupply.dividedBy(totalFarmArea)
     const avgFarmRemoval = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmRemoval.dividedBy(totalFarmArea)
     const avgFarmEmission = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmEmission.dividedBy(totalFarmArea)
     const avgFarmTarget = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmTarget.dividedBy(totalFarmArea)
 
     // Calculate the average balance at farm level (Supply + Removal + Emission)

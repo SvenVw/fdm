@@ -116,7 +116,7 @@ describe("collectInputForNitrogenBalance", () => {
         ]
         const mockHarvestsData: Harvest[] = [
             {
-                b_harvesting_id: "harvest-1",
+                b_id_harvesting: "harvest-1",
                 b_lu: "cult-1",
                 b_lu_harvest_date: new Date(),
                 b_lu_yield: 1000,
@@ -152,14 +152,12 @@ describe("collectInputForNitrogenBalance", () => {
         ]
         const mockFertilizerApplicationsData: FertilizerApplication[] = [
             {
-                b_fertilizing_id: "fa-1",
-                p_id_fertilizer: "fert-1",
-                p_amount: 100,
-                p_id_field: "field-1",
-                p_id_farm: b_id_farm,
-                p_date_applying: new Date(),
-                p_principal_id_field: principal_id,
-                p_principal_id_farm: principal_id,
+                p_app_id: "fa-1",
+                p_id_catalogue: "fert-1",
+                p_name_nl: 'test-product',
+                p_app_amount: 100,
+                p_app_method: "broadcasting", // match one of ApplicationMethods
+                p_app_date: new Date(),
             },
         ]
         const mockFertilizerDetailsData: FertilizerDetail[] = [
