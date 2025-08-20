@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Fix that cultivation of selected field is shown when adding a new field at new fields page
+Ensure the selected field’s cultivation is preselected when adding a new field on the New Fields page
