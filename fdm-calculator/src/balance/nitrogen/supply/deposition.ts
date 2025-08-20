@@ -88,16 +88,21 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
     const noDataValue =
         typeof _noData === "string" ? Number.parseFloat(_noData) : _noData
 
-    // Calculate the time frame fraction once to reuse in each promise.
-    const timeFrameDays = new Decimal(
-        differenceInCalendarDays(timeFrame.end, timeFrame.start),
-    )
-    const timeFrameFraction = timeFrameDays.isPositive()
-        ? timeFrameDays.add(1).dividedBy(365)
-        : new Decimal(0)
-
     // Step 2: Create an array of promises to calculate deposition for each field concurrently.
     const depositionPromises = fields.map(async (field) => {
+        // Compute per-field effective timeframe (intersection with field existence)
+        const fStart = field.field.b_start ?? timeFrame.start
+        const fEnd = field.field.b_end ?? timeFrame.end
+        const effectiveStart = new Date(
+            Math.max(fStart.getTime(), timeFrame.start.getTime()),
+        )
+        const effectiveEnd = new Date(
+            Math.min(fEnd.getTime(), timeFrame.end.getTime()),
+        )
+        const days = differenceInCalendarDays(effectiveEnd, effectiveStart)
+        const fraction =
+            days >= 0 ? new Decimal(days).add(1).dividedBy(365) : new Decimal(0)
+
         // Convert geographic coordinates to pixel coordinates.
         const [longitude, latitude] = field.field.b_centroid
         const widthPct = (longitude - bbox[0]) / bboxWidth
@@ -129,7 +134,7 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
                 Number.isNaN(noDataValue as number) ||
                 value !== noDataValue)
         ) {
-            depositionValue = new Decimal(value).times(timeFrameFraction)
+            depositionValue = new Decimal(value).times(fraction)
         }
 
         return {
