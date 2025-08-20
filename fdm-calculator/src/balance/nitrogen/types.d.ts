@@ -440,7 +440,7 @@ export type FertilizerDetail = Pick<
     | "p_s_rt" // Sulfur content (g SO3 / kg fertilizer)
     | "p_ef_nh3" // Ammonia emmission factor
     | "p_type"
-    | "p_inhibitor"
+    // | "p_inhibitor" // TODO: implement inhibitor types
 >
 
 /**
@@ -483,7 +483,6 @@ export type NitrogenSupplyFixationNumeric = {
     cultivations: { id: string; value: number }[]
 }
 
-// Numeric version of NitrogenSupplyMineralization
 // Numeric version of NitrogenSupplyMineralization
 export type NitrogenSupplyMineralizationNumeric = {
     total: number

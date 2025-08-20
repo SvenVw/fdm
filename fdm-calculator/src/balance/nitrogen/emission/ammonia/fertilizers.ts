@@ -154,7 +154,7 @@ function determineMineralAmmoniaEmissionFactor(
     const p_nh4_rt = new Decimal(fertilizerDetail.p_nh4_rt ?? 0)
     const p_n_org = p_n_rt.minus(p_no3_rt).minus(p_nh4_rt)
     const p_s_rt = new Decimal(fertilizerDetail.p_s_rt ?? 0)
-    const p_inhibitor = fertilizerDetail.p_inhibitor ?? false
+    const p_inhibitor = false // TODO: implement inhbiitor details for fertilizers
 
     const a = p_inhibitor
         ? p_n_org.pow(2).times(new Decimal(3.166e-5))
