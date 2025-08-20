@@ -30,6 +30,8 @@ export async function getCatalogueBaat(): Promise<CatalogueFertilizer> {
                     : (fertilizer.p_app_method_options.split(
                           "||",
                       ) as ApplicationMethods[]),
+            p_ef_nh3:
+                fertilizer.p_ef_nh3 === undefined ? null : fertilizer.p_ef_nh3,
             p_dm: fertilizer.p_dm === undefined ? null : fertilizer.p_dm,
             p_density:
                 fertilizer.p_density === undefined

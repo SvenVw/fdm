@@ -10,6 +10,7 @@ describe("hashFertilizer", () => {
             p_name_nl: "Test Fertilizer",
             p_name_en: "Test Fertilizer (EN)",
             p_description: "This is a test fertilizer",
+            p_ef_nh3: 0.05,
             p_dm: 37,
             p_density: 20,
             p_om: 20,
