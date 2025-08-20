@@ -163,6 +163,11 @@ export function calculateNitrogenBalanceField(
                 ? field.b_end
                 : timeFrame.end,
     }
+    // Normalize: ensure start <= end
+    if (timeFrameField.end.getTime() < timeFrameField.start.getTime()) {
+        // Clamp to an empty interval at the boundary to signal “no overlap”
+        timeFrameField.end = timeFrameField.start
+    }
 
     // Calculate the amount of Nitrogen supplied
     const supply = calculateNitrogenSupply(
