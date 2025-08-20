@@ -593,16 +593,43 @@ export async function removeFarm(
             }
 
             // Step 3: Delete farm-specific data
+            // Get all fertilizer IDs associated with this farm
+            const fertilizerIdsToDelete = await tx
+                .select({ p_id: schema.fertilizerAcquiring.p_id })
+                .from(schema.fertilizerAcquiring)
+                .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
+
+            // Delete fertilizer acquiring records
             await tx
                 .delete(schema.fertilizerAcquiring)
                 .where(eq(schema.fertilizerAcquiring.b_id_farm, b_id_farm))
+
+            // Delete fertilizer picking records associated with this farm's custom fertilizers
+            await tx
+                .delete(schema.fertilizerPicking)
+                .where(eq(schema.fertilizerPicking.p_id_catalogue, b_id_farm))
+
+            // Delete fertilizer picking records associated with acquired fertilizers of this farm
+            if (fertilizerIdsToDelete.length > 0) {
+                const pIds = fertilizerIdsToDelete.map(
+                    (f: { p_id: schema.fertilizersTypeSelect["p_id"] }) =>
+                        f.p_id,
+                )
+                await tx
+                    .delete(schema.fertilizerPicking)
+                    .where(inArray(schema.fertilizerPicking.p_id, pIds))
+            }
+
             await tx
                 .delete(schema.derogationApplying)
                 .where(eq(schema.derogationApplying.b_id_farm, b_id_farm))
             await tx
                 .delete(schema.fertilizerCatalogueEnabling)
                 .where(
-                    eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm),
+                    eq(
+                        schema.fertilizerCatalogueEnabling.b_id_farm,
+                        b_id_farm,
+                    ),
                 )
             await tx
                 .delete(schema.cultivationCatalogueSelecting)
@@ -612,10 +639,40 @@ export async function removeFarm(
                         b_id_farm,
                     ),
                 )
+
             // Delete custom fertilizers from the catalogue that belong to this farm
             await tx
                 .delete(schema.fertilizersCatalogue)
                 .where(eq(schema.fertilizersCatalogue.p_source, b_id_farm))
+
+            // Delete fertilizers if they are no longer associated with any farm
+            if (fertilizerIdsToDelete.length > 0) {
+                const pIds = fertilizerIdsToDelete.map(
+                    (f: { p_id: schema.fertilizersTypeSelect["p_id"] }) =>
+                        f.p_id,
+                )
+                const stillReferencedFertilizers = await tx
+                    .select({ p_id: schema.fertilizerAcquiring.p_id })
+                    .from(schema.fertilizerAcquiring)
+                    .where(inArray(schema.fertilizerAcquiring.p_id, pIds))
+
+                const referencedPIds = new Set(
+                    stillReferencedFertilizers.map(
+                        (f: { p_id: schema.fertilizersTypeSelect["p_id"] }) =>
+                            f.p_id,
+                    ),
+                )
+                const fertilizersToRemove = pIds.filter(
+                    (p_id: schema.fertilizersTypeSelect["p_id"]) =>
+                        !referencedPIds.has(p_id),
+                )
+
+                if (fertilizersToRemove.length > 0) {
+                    await tx
+                        .delete(schema.fertilizers)
+                        .where(inArray(schema.fertilizers.p_id, fertilizersToRemove))
+                }
+            }
 
             // Step 4: Revoke all principals from the farm
             const principals = await listPrincipalsForResource(
