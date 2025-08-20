@@ -84,7 +84,9 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
     const pixelHeight = image.getHeight()
     const bboxWidth = bbox[2] - bbox[0]
     const bboxHeight = bbox[3] - bbox[1]
-    const noDataValue = image.getGDALNoData()
+    const _noData = image.getGDALNoData()
+    const noDataValue =
+        typeof _noData === "string" ? Number.parseFloat(_noData) : _noData
 
     // Calculate the time frame fraction once to reuse in each promise.
     const timeFrameDays = new Decimal(
@@ -105,7 +107,8 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
         // Explicit OOB check: centroids outside the TIFF should return zero
         if (xPx < 0 || xPx >= pixelWidth || yPx < 0 || yPx >= pixelHeight) {
             return {
-                total: new Decimal(0),
+                fieldId: field.field.b_id,
+                deposition: { total: new Decimal(0) },
             }
         }
         const window = [xPx, yPx, xPx + 1, yPx + 1]
@@ -122,7 +125,9 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
         // Check if the value is valid and not the 'NoData' value.
         if (
             value !== undefined &&
-            (noDataValue === null || value !== noDataValue)
+            (noDataValue === null ||
+                Number.isNaN(noDataValue as number) ||
+                value !== noDataValue)
         ) {
             depositionValue = new Decimal(value).times(timeFrameFraction)
         }
