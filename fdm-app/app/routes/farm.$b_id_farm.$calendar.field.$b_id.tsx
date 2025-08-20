@@ -238,9 +238,9 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
     const farmFieldOptionsStore = useFarmFieldOptionsStore()
     const { params } = props
 
-    const cachedFarm = farmFieldOptionsStore.getFieldById(params.b_id_farm)
-    const cachedFarmName = cachedFarm
-        ? (cachedFarm.b_name ?? "Naam Onbekend")
+    const cachedField = farmFieldOptionsStore.getFieldById(params.b_id)
+    const cachedFieldName = cachedField
+        ? (cachedField.b_name ?? "Naam Onbekend")
         : "Onbekend Perceel"
 
     return (
@@ -257,7 +257,7 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
                     farmOptions={farmFieldOptionsStore.farmOptions}
                 />
                 <HeaderField
-                    b_id_farm={params.b_id}
+                    b_id_farm={params.b_id_farm}
                     fieldOptions={farmFieldOptionsStore.fieldOptions}
                     b_id={params.b_id}
                 />
@@ -266,7 +266,7 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
             {params.b_id_farm && params.calendar && params.b_id ? (
                 <main>
                     <FarmTitle
-                        title={cachedFarmName}
+                        title={cachedFieldName}
                         description={"Beheer hier de gegevens van dit perceel"}
                     />
                     <FarmContent
