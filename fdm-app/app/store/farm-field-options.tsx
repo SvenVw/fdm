@@ -27,6 +27,13 @@ interface FarmFieldOptionsStore {
      */
     setFieldOptions(fieldOptions: HeaderFieldOption[]): void
     /**
+     * Adds a singe farm option so it is later found by getFarmById
+     *
+     * @param b_id_farm The farm id
+     * @param b_name_farm The farm name
+     */
+    addFarmOption(b_id_farm: string, b_name_farm: string): void
+    /**
      * Tries to get the cached farm with the given id, otherwise returns undefined.
      *
      * @param b_id_farm The farm id
@@ -52,11 +59,20 @@ export const useFarmFieldOptionsStore = create<FarmFieldOptionsStore>(
         setFieldOptions(fieldOptions) {
             set({ fieldOptions })
         },
+        addFarmOption(b_id_farm, b_name_farm) {
+            console.log("adding farm option")
+            const item = { b_id_farm, b_name_farm }
+            set({ farmOptions: [item, ...get().farmOptions] })
+        },
         getFarmById(b_id_farm) {
-            return get().farmOptions.find((f) => f.b_id_farm === b_id_farm)
+            if (b_id_farm) {
+                return get().farmOptions.find((f) => f.b_id_farm === b_id_farm)
+            }
         },
         getFieldById(b_id) {
-            return get().fieldOptions.find((f) => f.b_id === b_id)
+            if (b_id) {
+                return get().fieldOptions.find((f) => f.b_id === b_id)
+            }
         },
     }),
 )

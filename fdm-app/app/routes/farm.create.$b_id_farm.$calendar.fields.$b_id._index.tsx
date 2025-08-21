@@ -58,7 +58,9 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FieldDeleteDialog } from "../components/blocks/field/delete"
+import type { Route } from "../+types/root"
+import { FieldDeleteDialog } from "~/components/blocks/field/delete"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -523,4 +525,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
     } catch (error) {
         return handleActionError(error)
     }
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    return (
+        <div className="space-y-6">
+            <InlineErrorBoundary {...props} />
+        </div>
+    )
 }

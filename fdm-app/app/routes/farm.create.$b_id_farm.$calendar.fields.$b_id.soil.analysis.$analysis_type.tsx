@@ -5,6 +5,7 @@ import {
     data,
     type LoaderFunctionArgs,
     NavLink,
+    redirect,
     useLoaderData,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
@@ -14,7 +15,7 @@ import { getSoilParametersForSoilAnalysisType } from "~/components/blocks/soil/p
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
@@ -94,7 +95,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             soilParameterDescription: soilAnalysisParameterDescription,
         }
     } catch (error) {
-        throw handleLoaderError(error)
+        const response = await handleActionError(error)
+        if (response.init) {
+            return redirect(
+                `/farm/create/${params.b_id_farm}/${params.calendar}/fields/${params.b_id}/soil/analysis`,
+                response.init,
+            )
+        }
+        return response
     }
 }
 

@@ -10,6 +10,7 @@ import {
     type ActionFunctionArgs,
     data,
     type LoaderFunctionArgs,
+    redirect,
 } from "react-router"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import {
@@ -18,7 +19,7 @@ import {
 } from "~/components/blocks/soil/form-upload"
 import { extractSoilAnalysis } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
-import { handleActionError, handleLoaderError } from "~/lib/error"
+import { handleActionError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 
 /**
@@ -71,7 +72,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             soilParameterDescription: soilParameterDescription,
         }
     } catch (error) {
-        throw handleLoaderError(error)
+        const response = await handleActionError(error)
+        if (response.init) {
+            return redirect(
+                `/farm/create/${params.b_id_farm}/${params.calendar}/fields/${params.b_id}/soil/analysis`,
+                response.init,
+            )
+        }
+        return response
     }
 }
 

@@ -15,6 +15,9 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import type { Route } from "../+types/root"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { useFarmFieldOptionsStore } from "../store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -129,6 +132,35 @@ export default function Index() {
                         </div>
                     </div>
                 </div>
+            </main>
+        </>
+    )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const { params } = props
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const cachedFarmName = farmFieldOptionsStore.getFarmById(
+        params.b_id_farm,
+    )?.b_name_farm
+
+    return (
+        <>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={cachedFarmName} />
+            </Header>
+            <main>
+                <FarmTitle
+                    title={"Gewassen in bouwplan"}
+                    description={
+                        "Werk de eigenschappen per gewas in je bouwplan bij."
+                    }
+                    action={{
+                        to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers`,
+                        label: "Doorgaan",
+                    }}
+                />
+                <InlineErrorBoundary {...props} />
             </main>
         </>
     )
