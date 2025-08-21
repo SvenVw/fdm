@@ -59,7 +59,6 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
     const farmFieldOptionsStore = useFarmFieldOptionsStore()
     const { params } = props
 
-    console.log(params)
     return (
         <SidebarInset>
             <Header action={undefined}>
