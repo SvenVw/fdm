@@ -2,12 +2,11 @@ import { getFarm, isAllowedToDeleteFarm, removeFarm } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
     data,
-    Form,
     type LoaderFunctionArgs,
     type MetaFunction,
     useLoaderData,
+    useNavigation,
 } from "react-router"
-import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { FarmDeleteDialog } from "~/components/blocks/farm/delete"
 import {
@@ -91,12 +90,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmSettingsDeleteBlock() {
     const { farm, canDeleteFarm } = useLoaderData<typeof loader>()
 
-    const form = useRemixForm({
-        mode: "onTouched",
-        defaultValues: {},
-        submitData: {},
-    })
-
+    const navigation = useNavigation()
+    const isSubmitting =
+        navigation.state === "submitting" &&
+        navigation.formMethod?.toLowerCase() === "delete"
     return (
         <div className="space-y-6">
             <div>
@@ -120,24 +117,10 @@ export default function FarmSettingsDeleteBlock() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <RemixFormProvider {...form}>
-                            <Form
-                                id="formFarmDelete"
-                                onSubmit={form.handleSubmit}
-                                method="post"
-                            >
-                                <fieldset
-                                    disabled={form.formState.isSubmitting}
-                                >
-                                    <FarmDeleteDialog
-                                        farmName={farm.b_name_farm || ""}
-                                        isSubmitting={
-                                            form.formState.isSubmitting
-                                        }
-                                    />
-                                </fieldset>
-                            </Form>
-                        </RemixFormProvider>
+                        <FarmDeleteDialog
+                            farmName={farm.b_name_farm || ""}
+                            isSubmitting={isSubmitting}
+                        />
                     </CardContent>
                 </Card>
             ) : null}
