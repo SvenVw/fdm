@@ -81,7 +81,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Return farm information from loader
         return {
             farm: farm,
-            canDeleteFarm: !canDeleteFarm,
+            canDeleteFarm: canDeleteFarm,
         }
     } catch (error) {
         throw handleLoaderError(error)
