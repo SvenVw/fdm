@@ -22,12 +22,14 @@ export function HeaderFarm({
     farmOptions: HeaderFarmOption[]
 }) {
     const location = useLocation()
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const setStoredFarmOptions = useFarmFieldOptionsStore(
+        (s) => s.setFarmOptions,
+    )
     useEffect(() => {
         if (farmOptions && farmOptions.length > 0) {
-            farmFieldOptionsStore.setFarmOptions(farmOptions)
+            setStoredFarmOptions(farmOptions)
         }
-    }, [farmOptions, farmFieldOptionsStore.setFarmOptions])
+    }, [farmOptions, setStoredFarmOptions])
 
     const currentPath = String(location.pathname)
 

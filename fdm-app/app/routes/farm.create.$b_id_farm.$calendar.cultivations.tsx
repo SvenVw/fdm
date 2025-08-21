@@ -17,7 +17,7 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import type { Route } from "../+types/root"
 import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
-import { useFarmFieldOptionsStore } from "../store/farm-field-options"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {

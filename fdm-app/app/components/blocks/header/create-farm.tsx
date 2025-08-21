@@ -14,12 +14,14 @@ export function HeaderFarmCreate({
 }) {
     const location = useLocation()
     const params = useParams()
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const addFarmOptionToTheStore = useFarmFieldOptionsStore(
+        (s) => s.addFarmOption,
+    )
     useEffect(() => {
         if (params.b_id_farm && b_name_farm) {
-            farmFieldOptionsStore.addFarmOption(params.b_id_farm, b_name_farm)
+            addFarmOptionToTheStore(params.b_id_farm, b_name_farm)
         }
-    }, [params.b_id_farm, b_name_farm, farmFieldOptionsStore.addFarmOption])
+    }, [params.b_id_farm, b_name_farm, addFarmOptionToTheStore])
 
     const currentPath = String(location.pathname)
 

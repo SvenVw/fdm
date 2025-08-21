@@ -4,6 +4,8 @@ import type { HeaderFieldOption } from "~/components/blocks/header/field"
 
 /**
  * Cache for farm and field options, to be used in error boundaries only.
+ *
+ * Do not use this store server-side
  */
 interface FarmFieldOptionsStore {
     /**
@@ -60,9 +62,20 @@ export const useFarmFieldOptionsStore = create<FarmFieldOptionsStore>(
             set({ fieldOptions })
         },
         addFarmOption(b_id_farm, b_name_farm) {
-            console.log("adding farm option")
-            const item = { b_id_farm, b_name_farm }
-            set({ farmOptions: [item, ...get().farmOptions] })
+            set((state) => {
+                const item = { b_id_farm, b_name_farm }
+
+                const duplicateIndex = state.farmOptions.findIndex(
+                    (f) => f.b_id_farm === b_id_farm,
+                )
+                if (duplicateIndex > -1) {
+                    const newFarmOptions = state.farmOptions.slice()
+                    newFarmOptions[duplicateIndex] = item
+                    return { farmOptions: newFarmOptions }
+                }
+
+                return { farmOptions: [item, ...get().farmOptions] }
+            })
         },
         getFarmById(b_id_farm) {
             if (b_id_farm) {
