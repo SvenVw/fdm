@@ -335,7 +335,7 @@ export async function grantRoleToFarm(
 
             await grantRole(tx, "farm", role, b_id_farm, targetDetails.id)
 
-            // Check if at least 1 ownwer is still prestent on this farm
+            // Check if at least 1 owner is still prestent on this farm
             const owners = await listPrincipalsForResource(
                 tx,
                 "farm",
@@ -393,7 +393,7 @@ export async function updateRoleOfPrincipalAtFarm(
 
             await updateRole(tx, "farm", role, b_id_farm, targetDetails.id)
 
-            // Check if at least 1 ownwer is still prestent on this farm
+            // Check if at least 1 owner is still prestent on this farm
             const owners = await listPrincipalsForResource(
                 tx,
                 "farm",
@@ -448,7 +448,7 @@ export async function revokePrincipalFromFarm(
 
             await revokePrincipal(tx, "farm", b_id_farm, targetDetails.id)
 
-            // Check if at least 1 ownwer is still prestent on this farm
+            // Check if at least 1 owner is still prestent on this farm
             const owners = await listPrincipalsForResource(
                 tx,
                 "farm",

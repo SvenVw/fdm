@@ -176,7 +176,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         await removeFarm(fdm, session.principal_id, b_id_farm)
 
         // Redirect to the farm overview page after successful deletion
-        return redirectWithSuccess("/farm", "Bedrijf> is verwijderd")
+        return redirectWithSuccess("/farm", "Bedrijf is verwijderd")
     } catch (error) {
         throw handleLoaderError(error)
     }
