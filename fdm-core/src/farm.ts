@@ -95,6 +95,8 @@ export async function getFarm(
     b_businessid_farm: schema.farmsTypeSelect["b_businessid_farm"]
     b_address_farm: schema.farmsTypeSelect["b_address_farm"]
     b_postalcode_farm: schema.farmsTypeSelect["b_postalcode_farm"]
+    b_id_principal: PrincipalId
+    b_id_principal_owner: PrincipalId
     roles: Role[]
 }> {
     try {
@@ -128,8 +130,18 @@ export async function getFarm(
                 principal_id,
             )
 
+            // Get all principals for the farm to find the owner
+            const allPrincipals = await listPrincipalsForResource(
+                tx,
+                "farm",
+                b_id_farm,
+            )
+            const ownerPrincipal = allPrincipals.find((p) => p.role === "owner")
+
             const farm = {
                 ...results[0],
+                b_id_principal: principal_id,
+                b_id_principal_owner: ownerPrincipal?.principal_id || "", // Fallback if no owner is found
                 roles: roles,
             }
 
@@ -544,6 +556,37 @@ export async function isAllowedToShareFarm(
 }
 
 /**
+ * Checks if the specified principal is allowed to delete a given farm.
+ *
+ * This function verifies if the acting principal has 'write' permission on the farm.
+ *
+ * @param fdm - The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal whose permissions are being checked.
+ * @param b_id_farm - The identifier of the farm.
+ *
+ * @returns A Promise that resolves to true if the principal has 'write' permission, false otherwise.
+ */
+export async function isAllowedToDeleteFarm(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeInsert["b_id_farm"],
+): Promise<boolean> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "write",
+            b_id_farm,
+            principal_id,
+            "isAllowedToDeleteFarm",
+        )
+        return true
+    } catch (_err) {
+        return false
+    }
+}
+
+/**
  * Removes a farm and all its associated data.
  *
  * This function checks if the principal has permission to delete the farm, then proceeds to delete
@@ -626,10 +669,7 @@ export async function removeFarm(
             await tx
                 .delete(schema.fertilizerCatalogueEnabling)
                 .where(
-                    eq(
-                        schema.fertilizerCatalogueEnabling.b_id_farm,
-                        b_id_farm,
-                    ),
+                    eq(schema.fertilizerCatalogueEnabling.b_id_farm, b_id_farm),
                 )
             await tx
                 .delete(schema.cultivationCatalogueSelecting)
@@ -670,7 +710,12 @@ export async function removeFarm(
                 if (fertilizersToRemove.length > 0) {
                     await tx
                         .delete(schema.fertilizers)
-                        .where(inArray(schema.fertilizers.p_id, fertilizersToRemove))
+                        .where(
+                            inArray(
+                                schema.fertilizers.p_id,
+                                fertilizersToRemove,
+                            ),
+                        )
                 }
             }
 

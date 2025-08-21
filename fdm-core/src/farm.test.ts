@@ -13,6 +13,7 @@ import {
     updateFarm,
     updateRoleOfPrincipalAtFarm,
     removeFarm,
+    isAllowedToDeleteFarm,
 } from "./farm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
@@ -550,6 +551,29 @@ describe("Farm Functions", () => {
             const other_principal_id = createId()
 
             const isAllowed = await isAllowedToShareFarm(
+                fdm,
+                other_principal_id,
+                b_id_farm,
+            )
+
+            expect(isAllowed).toBe(false)
+        })
+    })
+
+    describe("isAllowedToDeleteFarm", () => {
+        it("should return true if principal is allowed to delete the farm", async () => {
+            const isAllowed = await isAllowedToDeleteFarm(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+            expect(isAllowed).toBe(true)
+        })
+
+        it("should return false if principal is not allowed to delete the farm", async () => {
+            const other_principal_id = createId()
+
+            const isAllowed = await isAllowedToDeleteFarm(
                 fdm,
                 other_principal_id,
                 b_id_farm,

@@ -61,6 +61,7 @@ export {
     getFarms,
     grantRoleToFarm,
     isAllowedToShareFarm,
+    isAllowedToDeleteFarm,
     listPrincipalsForFarm,
     revokePrincipalFromFarm,
     updateFarm,
