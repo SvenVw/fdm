@@ -1,8 +1,7 @@
 import { Decimal } from "decimal.js"
-// c:\Users\sven.verweij\Applications\fdm\fdm-calculator\src\balance\nitrogen\supply\fertilizers\index.test.ts
 import { describe, expect, it } from "vitest"
-import type { FertilizerDetail, FieldInput } from "../../types"
-import { calculateNitrogenSupplyByFertilizers } from "."
+import type { FertilizerDetail, FieldInput } from "../types"
+import { calculateNitrogenSupplyByFertilizers } from "./fertilizers"
 
 describe("calculateNitrogenSupplyByFertilizers", () => {
     it("should return 0 if no fertilizer applications are provided", () => {
@@ -43,6 +42,10 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 {
                     p_id_catalogue: "mineral1",
                     p_n_rt: 20,
+                    p_no3_rt: 0,
+                    p_nh4_rt: 0,
+                    p_s_rt: 0,
+                    p_ef_nh3: 0,
                     p_type: "mineral",
                 },
             ],
@@ -51,6 +54,10 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 {
                     p_id_catalogue: "manure1",
                     p_n_rt: 15,
+                    p_no3_rt: 0,
+                    p_nh4_rt: 0,
+                    p_s_rt: 0,
+                    p_ef_nh3: 0,
                     p_type: "manure",
                 },
             ],
@@ -59,6 +66,10 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 {
                     p_id_catalogue: "compost1",
                     p_n_rt: 10,
+                    p_no3_rt: 0,
+                    p_nh4_rt: 0,
+                    p_s_rt: 0,
+                    p_ef_nh3: 0,
                     p_type: "compost",
                 },
             ],
@@ -67,6 +78,10 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 {
                     p_id_catalogue: "other1",
                     p_n_rt: 10,
+                    p_no3_rt: 0,
+                    p_nh4_rt: 0,
+                    p_s_rt: 0,
+                    p_ef_nh3: 0,
                     p_type: "other",
                 },
             ],
@@ -100,6 +115,10 @@ describe("calculateNitrogenSupplyByFertilizers", () => {
                 {
                     p_id_catalogue: "mineral1",
                     p_n_rt: 20,
+                    p_no3_rt: 0,
+                    p_nh4_rt: 0,
+                    p_s_rt: 0,
+                    p_ef_nh3: 0,
                     p_type: "mineral",
                 },
             ],

@@ -6,7 +6,6 @@ import type {
     NitrogenSupply,
     SoilAnalysisPicked,
 } from "../types"
-import { calculateNitrogenSupplyByDeposition } from "./deposition"
 import { calculateNitrogenSupplyByFertilizers } from "./fertilizers"
 import { calculateNitrogenFixation } from "./fixation"
 import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
@@ -21,22 +20,21 @@ import { calculateNitrogenSupplyBySoilMineralization } from "./mineralization"
  * @param soilAnalysis - Combined soil analysis data for the field.
  * @param cultivationDetailsMap - A map containing details for each cultivation, including its nitrogen fixation value.
  * @param fertilizerDetailsMap - A map containing details for each fertilizer, including its type and nitrogen content.
+ * @param depositionSupply - The pre-calculated nitrogen supply from atmospheric deposition.
  * @param timeFrame - The time frame for which to calculate the nitrogen supply.
- * @param fdmPublicDataUrl - The base URL for accessing FDM public data, including the deposition raster dataset.
  *
- * @returns A promise that resolves with an object containing the total nitrogen supply for the field,
+ * @returns An object containing the total nitrogen supply for the field,
  *  as well as a breakdown by source (fertilizers, fixation, deposition, and mineralization).
  */
-export async function calculateNitrogenSupply(
-    field: FieldInput["field"],
+export function calculateNitrogenSupply(
     cultivations: FieldInput["cultivations"],
     fertilizerApplications: FieldInput["fertilizerApplications"],
     soilAnalysis: SoilAnalysisPicked,
     cultivationDetailsMap: Map<string, CultivationDetail>,
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
+    depositionSupply: NitrogenSupply["deposition"],
     timeFrame: NitrogenBalanceInput["timeFrame"],
-    fdmPublicDataUrl: string,
-): Promise<NitrogenSupply> {
+): NitrogenSupply {
     try {
         // Calculate the amount of Nitrogen supplied by fertilizers
         const fertilizersSupply = calculateNitrogenSupplyByFertilizers(
@@ -48,13 +46,6 @@ export async function calculateNitrogenSupply(
         const fixationSupply = calculateNitrogenFixation(
             cultivations,
             cultivationDetailsMap,
-        )
-
-        // Calculate the amount of Nitrogen supplied by deposition
-        const depositionSupply = await calculateNitrogenSupplyByDeposition(
-            field,
-            timeFrame,
-            fdmPublicDataUrl,
         )
 
         // Calculate the amount of Nitrogen supplied by mineralization from the soil
@@ -72,15 +63,13 @@ export async function calculateNitrogenSupply(
             .add(depositionSupply.total)
             .add(mineralisationSupply.total)
 
-        const supply = {
+        return {
             total: totalSupply,
             fertilizers: fertilizersSupply,
             fixation: fixationSupply,
             deposition: depositionSupply,
             mineralisation: mineralisationSupply,
         }
-
-        return supply
     } catch (error) {
         console.error("Error calculating nitrogen supply:", error)
         throw new Error(
