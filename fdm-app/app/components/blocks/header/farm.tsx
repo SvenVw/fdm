@@ -25,11 +25,11 @@ export function HeaderFarm({
     const setStoredFarmOptions = useFarmFieldOptionsStore(
         (s) => s.setFarmOptions,
     )
-    useEffect(() => {
-        if (farmOptions && farmOptions.length > 0) {
-            setStoredFarmOptions(farmOptions)
-        }
-    }, [farmOptions, setStoredFarmOptions])
+    // useEffect(() => {
+    //     if (farmOptions && farmOptions.length > 0) {
+    //         setStoredFarmOptions(farmOptions)
+    //     }
+    // }, [farmOptions, setStoredFarmOptions])
 
     const currentPath = String(location.pathname)
 

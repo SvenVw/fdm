@@ -19,6 +19,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
+import HeaderAutomatic from "~/components/blocks/header/automatic"
 
 export const meta: MetaFunction = () => {
     return [
@@ -132,6 +133,7 @@ export default function App() {
                 />
             </Sidebar>
             <SidebarInset>
+                <HeaderAutomatic />
                 <Outlet />
             </SidebarInset>
         </SidebarProvider>

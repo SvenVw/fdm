@@ -30,11 +30,11 @@ export function HeaderField({
     const setStoredFieldOptions = useFarmFieldOptionsStore(
         (s) => s.setFieldOptions,
     )
-    useEffect(() => {
-        if (fieldOptions && fieldOptions.length > 0) {
-            setStoredFieldOptions(fieldOptions)
-        }
-    }, [fieldOptions, setStoredFieldOptions])
+    // useEffect(() => {
+    //     if (fieldOptions && fieldOptions.length > 0) {
+    //         setStoredFieldOptions(fieldOptions)
+    //     }
+    // }, [fieldOptions, setStoredFieldOptions])
 
     return (
         <>

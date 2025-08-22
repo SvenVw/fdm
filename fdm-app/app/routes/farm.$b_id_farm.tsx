@@ -1,3 +1,4 @@
+import { getFarms, getFields } from "@svenvw/fdm-core"
 import { data, type LoaderFunctionArgs, type MetaFunction } from "react-router"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
@@ -6,8 +7,11 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 import type { Route } from "../+types/root"
+import type { HeaderFieldOption } from "~/components/blocks/header/field"
+import { getTimeframe } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -45,9 +49,48 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Get a list of possible farms of the user
+        const farms = await getFarms(fdm, session.principal_id)
+        if (!farms || farms.length === 0) {
+            throw data("not found: farms", {
+                status: 404,
+                statusText: "not found: farms",
+            })
+        }
+        const farmOptions = farms.map((farm) => {
+            return {
+                b_id_farm: farm.b_id_farm,
+                b_name_farm: farm.b_name_farm,
+            }
+        })
+
+        // Get the fields to be selected if available
+        const timeframe = getTimeframe(params)
+        let fieldOptions: HeaderFieldOption[] = []
+        if (timeframe) {
+            const fields = await getFields(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
+            fieldOptions = fields.map((field) => {
+                if (!field?.b_id || !field?.b_name) {
+                    throw new Error("Invalid field data structure")
+                }
+                return {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                }
+            })
+        }
+
         // Return the farm ID and session info
         return {
             farmId: b_id_farm,
+            farmOptions,
+            fieldOptions,
             session,
         }
     } catch (error) {
