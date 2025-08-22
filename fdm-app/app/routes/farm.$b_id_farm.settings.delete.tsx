@@ -71,11 +71,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         }
 
         // Check if user is allowed to delete farm
-        const canDeleteFarm = await isAllowedToDeleteFarm(
+        let canDeleteFarm = await isAllowedToDeleteFarm(
             fdm,
             session.principal_id,
             b_id_farm,
         )
+        // Add temporary workaround (until implemented in fdm-core) so that advisors are not able to delete a farm
+        if (canDeleteFarm && farm.roles.includes("advisor")) {
+            canDeleteFarm = false
+        }
 
         // Return farm information from loader
         return {
