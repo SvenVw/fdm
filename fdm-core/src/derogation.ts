@@ -29,7 +29,7 @@ export async function addDerogation(
         throw new Error("Derogation year must be between 2006 and 2025.")
     }
     try {
-        return await fdm.transaction(async (tx) => {
+        return await fdm.transaction(async (tx: FdmType) => {
             await checkPermission(
                 tx,
                 "farm",
@@ -104,7 +104,7 @@ export async function removeDerogation(
     b_id_derogation: schema.derogationsTypeInsert["b_id_derogation"],
 ): Promise<void> {
     try {
-        await fdm.transaction(async (tx) => {
+        await fdm.transaction(async (tx: FdmType) => {
             const application = await tx
                 .select()
                 .from(schema.derogationApplying)
@@ -165,7 +165,7 @@ export async function listDerogations(
     b_id_farm: schema.farmsTypeInsert["b_id_farm"],
 ): Promise<schema.derogationsTypeSelect[]> {
     try {
-        return await fdm.transaction(async (tx) => {
+        return await fdm.transaction(async (tx: FdmType) => {
             await checkPermission(
                 tx,
                 "farm",
@@ -186,7 +186,9 @@ export async function listDerogations(
                 return []
             }
 
-            const derogationIds = applications.map((app) => app.b_id_derogation)
+            const derogationIds = applications.map(
+                (app: { b_id_derogation: string }) => app.b_id_derogation,
+            )
 
             return await tx
                 .select()
@@ -219,7 +221,7 @@ export async function isDerogationGrantedForYear(
     year: number,
 ): Promise<boolean> {
     try {
-        return await fdm.transaction(async (tx) => {
+        return await fdm.transaction(async (tx: FdmType) => {
             await checkPermission(
                 tx,
                 "farm",
