@@ -33,9 +33,12 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { AccessFormSchema } from "~/lib/schemas/access.schema"
-import { SidebarInset } from "../components/ui/sidebar"
-import { Header } from "../components/blocks/header/base"
-import { HeaderFarmCreate } from "../components/blocks/header/create-farm"
+import { Route } from "../+types/root"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -228,4 +231,37 @@ export async function action({ request, params }: ActionFunctionArgs) {
         return dataWithError(null, "Er is iets misgegaan")
         // throw handleActionError(error)
     }
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const { params } = props
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const cachedFarmName = farmFieldOptionsStore.getFarmById(
+        params.b_id_farm,
+    )?.b_name_farm
+
+    return (
+        <>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={cachedFarmName} />
+            </Header>
+            <main>
+                <div className="space-y-6 p-10 pb-0">
+                    <div className="flex items-center">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-bold tracking-tight mt-2">
+                                Toegang instellen (Optioneel)
+                            </h2>
+                            <p className="text-muted-foreground">
+                                Nodig nu alvast gebruikers of organisaties uit,
+                                of voltooi de wizard.
+                            </p>
+                        </div>
+                    </div>
+                    <Separator className="my-6" />
+                </div>
+                <InlineErrorBoundary {...props} />
+            </main>
+        </>
+    )
 }

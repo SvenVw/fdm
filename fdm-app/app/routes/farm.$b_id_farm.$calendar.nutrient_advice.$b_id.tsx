@@ -28,6 +28,8 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import type { Route } from "../+types/root"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -259,4 +261,8 @@ function FieldNutrientAdvice({
             }
         />
     )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    return <InlineErrorBoundary {...props} />
 }

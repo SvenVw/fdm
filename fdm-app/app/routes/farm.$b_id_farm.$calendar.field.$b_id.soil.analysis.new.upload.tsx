@@ -210,6 +210,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             )
         }
 
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

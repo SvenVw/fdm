@@ -171,3 +171,16 @@
     /* text-transform: uppercase; */
     /* outline: none; */
 }
+
+@keyframes tractor-drive {
+    100% {
+        transform: translateX(calc(-100% - 5rem));
+    }
+    0% {
+        transform: translateX(calc(100% + 20rem)); /* Adjusted to move beyond the card width */
+    }
+}
+
+.animate-tractor-drive {
+    animation: tractor-drive 5s linear infinite;
+}

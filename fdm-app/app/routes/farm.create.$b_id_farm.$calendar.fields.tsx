@@ -20,6 +20,9 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
+import type { Route } from "../+types/root"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -166,6 +169,39 @@ export default function Index() {
                         </div>
                     </div>
                 </div>
+            </main>
+        </SidebarInset>
+    )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const { params } = props
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const cachedFarmName = farmFieldOptionsStore.getFarmById(
+        params.b_id_farm,
+    )?.b_name_farm
+
+    return (
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarmCreate b_name_farm={cachedFarmName} />
+            </Header>
+            <main>
+                <div className="space-y-6 p-10 pb-0">
+                    <div className="flex items-center">
+                        <div className="space-y-0.5">
+                            <h2 className="text-2xl font-bold tracking-tight">
+                                Percelen
+                            </h2>
+                            <p className="text-muted-foreground">
+                                Pas de naam aan, controleer het gewas en
+                                bodemgegevens
+                            </p>
+                        </div>
+                    </div>
+                    <Separator className="my-6" />
+                </div>
+                <InlineErrorBoundary {...props} />
             </main>
         </SidebarInset>
     )

@@ -16,6 +16,9 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import type { Route } from "../+types/root"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -150,6 +153,31 @@ export default function FarmBalanceNitrogenBlock() {
                         <div className="flex-1">{<Outlet />}</div>
                     </div>
                 </div>
+            </main>
+        </SidebarInset>
+    )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const { params } = props
+
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+
+    return (
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={farmFieldOptionsStore.farmOptions}
+                />
+                <HeaderBalance
+                    b_id_farm={params.b_id_farm}
+                    b_id={params.b_id}
+                    fieldOptions={farmFieldOptionsStore.fieldOptions}
+                />
+            </Header>
+            <main>
+                <InlineErrorBoundary {...props} />
             </main>
         </SidebarInset>
     )

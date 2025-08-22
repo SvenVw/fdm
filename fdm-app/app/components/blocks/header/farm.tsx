@@ -1,5 +1,7 @@
 import { ChevronDown } from "lucide-react"
+import { useEffect } from "react"
 import { NavLink, useLocation } from "react-router"
+import { useFarmFieldOptionsStore } from "@/app/store/farm-field-options"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -20,6 +22,15 @@ export function HeaderFarm({
     farmOptions: HeaderFarmOption[]
 }) {
     const location = useLocation()
+    const setStoredFarmOptions = useFarmFieldOptionsStore(
+        (s) => s.setFarmOptions,
+    )
+    // useEffect(() => {
+    //     if (farmOptions && farmOptions.length > 0) {
+    //         setStoredFarmOptions(farmOptions)
+    //     }
+    // }, [farmOptions, setStoredFarmOptions])
+
     const currentPath = String(location.pathname)
 
     return (
@@ -75,7 +86,7 @@ export function HeaderFarm({
     )
 }
 
-type HeaderFarmOption = {
+export type HeaderFarmOption = {
     b_id_farm: string
     b_name_farm: string | undefined | null
 }

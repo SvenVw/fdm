@@ -239,6 +239,6 @@ export async function action({ request }: ActionFunctionArgs) {
         }
         throw new Error("invalid intent")
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

@@ -199,6 +199,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             message: "Bodemanalyse is toegevoegd! 🎉",
         })
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

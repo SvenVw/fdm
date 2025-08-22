@@ -70,6 +70,6 @@ export async function extractFormValuesFromRequest<T extends ZodSchema>(
 
         return parsedData.data as z.infer<T>
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

@@ -25,7 +25,10 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { getCalendarSelection } from "../lib/calendar"
+import { getCalendarSelection } from "~/lib/calendar"
+import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { Route } from "../+types/root"
+import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -406,6 +409,23 @@ export default function AppIndex() {
                     </>
                 )}
             </main>
+        </SidebarInset>
+    )
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const farmFieldOptionsStore = useFarmFieldOptionsStore()
+    const { params } = props
+
+    return (
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={farmFieldOptionsStore.farmOptions}
+                />
+            </Header>
+            <InlineErrorBoundary {...props} />
         </SidebarInset>
     )
 }
