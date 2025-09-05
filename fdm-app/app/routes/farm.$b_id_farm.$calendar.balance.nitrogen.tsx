@@ -1,24 +1,17 @@
-import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
+import { getFields } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { HeaderBalance } from "~/components/blocks/header/balance"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
+import { clientConfig } from "~/lib/config"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import type { Route } from "../+types/root"
-import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
-import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -56,39 +49,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the field id
-        const b_id = params.b_id
-
         // Get the session
         const session = await getSession(request)
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
-
-        // Get details of farm
-        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-        if (!farm) {
-            throw data("not found: b_id_farm", {
-                status: 404,
-                statusText: "not found: b_id_farm",
-            })
-        }
-
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
 
         // Get the fields to be selected
         const fields = await getFields(
@@ -110,10 +75,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
-            b_id_farm: b_id_farm,
-            b_id: b_id,
-            farmOptions: farmOptions,
             fieldOptions: fieldOptions,
         }
     } catch (error) {
@@ -128,21 +89,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmBalanceNitrogenBlock() {
-    const loaderData = useLoaderData<typeof loader>()
-
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderBalance
-                    b_id_farm={loaderData.b_id_farm}
-                    b_id={loaderData.b_id}
-                    fieldOptions={loaderData.fieldOptions}
-                />
-            </Header>
             <main>
                 <FarmTitle
                     title={"Stikstof"}
@@ -153,31 +101,6 @@ export default function FarmBalanceNitrogenBlock() {
                         <div className="flex-1">{<Outlet />}</div>
                     </div>
                 </div>
-            </main>
-        </SidebarInset>
-    )
-}
-
-export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
-    const { params } = props
-
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
-
-    return (
-        <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={params.b_id_farm}
-                    farmOptions={farmFieldOptionsStore.farmOptions}
-                />
-                <HeaderBalance
-                    b_id_farm={params.b_id_farm}
-                    b_id={params.b_id}
-                    fieldOptions={farmFieldOptionsStore.fieldOptions}
-                />
-            </Header>
-            <main>
-                <InlineErrorBoundary {...props} />
             </main>
         </SidebarInset>
     )

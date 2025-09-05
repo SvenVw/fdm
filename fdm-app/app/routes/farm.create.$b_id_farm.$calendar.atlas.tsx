@@ -55,7 +55,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import FieldDetailsInfoPopup from "../components/blocks/field/popup"
+import FieldDetailsInfoPopup from "~/components/blocks/field/popup"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -162,7 +162,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return {
             b_id_farm: farm.b_id_farm,
-            b_name_farm: farm.b_name_farm,
             fieldsSaved: fieldsSaved,
             timeframe: timeframe,
             calendar: calendar,
@@ -219,9 +218,6 @@ export default function Index() {
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
-            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex items-center">

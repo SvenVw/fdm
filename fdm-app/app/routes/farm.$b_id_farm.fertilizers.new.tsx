@@ -4,12 +4,8 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -58,20 +54,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "not found: farms",
             })
         }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm || "",
-            }
-        })
-
-        // Return user information from loader
-        return {
-            farm: farm,
-            b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
-        }
     } catch (error) {
         throw handleLoaderError(error)
     }
@@ -84,27 +66,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmFertilizerBlock() {
-    const loaderData = useLoaderData<typeof loader>()
-
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: "../fertilizers",
-                    label: "Terug naar overzicht",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderFertilizer
-                    b_id_farm={loaderData.b_id_farm}
-                    p_id={undefined}
-                    fertilizerOptions={[]}
-                />
-            </Header>
             <main className="mx-auto max-w-4xl">
                 <FarmTitle
                     title={"Meststof toevoegen"}

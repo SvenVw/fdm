@@ -1,10 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
     getFarm,
-    getFarms,
     getFertilizer,
     getFertilizerParametersDescription,
-    getFertilizers,
     updateFertilizerFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
@@ -20,9 +18,6 @@ import type { z } from "zod"
 import { FertilizerForm } from "@/app/components/blocks/fertilizer/form"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
@@ -72,38 +67,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
-
         // Get selected fertilizer
         const fertilizer = await getFertilizer(fdm, p_id)
         const fertilizerParameters = getFertilizerParametersDescription()
-
-        // Get the available fertilizers
-        const fertilizers = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        const fertilizerOptions = fertilizers.map((fertilizer) => {
-            return {
-                p_id: fertilizer.p_id,
-                p_name_nl: fertilizer.p_name_nl || "",
-            }
-        })
 
         // Set editable status
         let editable = false
@@ -113,11 +79,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
-            p_id: p_id,
-            b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
-            fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
             editable: editable,
             fertilizerParameters: fertilizerParameters,
@@ -191,23 +152,6 @@ export default function FarmFertilizerBlock() {
 
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: "../fertilizers",
-                    label: "Terug naar overzicht",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderFertilizer
-                    b_id_farm={loaderData.b_id_farm}
-                    p_id={loaderData.p_id}
-                    fertilizerOptions={loaderData.fertilizerOptions}
-                />
-            </Header>
             <main>
                 <FarmTitle
                     title={loaderData.fertilizer.p_name_nl}

@@ -15,8 +15,6 @@ import {
     useLocation,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { FarmNorms } from "~/components/blocks/norms/farm-norms"
 import { FieldNorms } from "~/components/blocks/norms/field-norms"
 import { NormsFallback } from "~/components/blocks/norms/skeletons"
@@ -26,14 +24,10 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import type { Route } from "../+types/root"
-import { HeaderNorms } from "~/components/blocks/header/norms"
-import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
 import { Alert, AlertDescription } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
-import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -84,13 +78,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 statusText: "not found: farms",
             })
         }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
 
         // Get the fields to be selected
         const fields = await getFields(
@@ -183,7 +170,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm: b_id_farm,
             b_id: b_id,
             calendar: calendar,
-            farmOptions: farmOptions,
             fieldOptions: fieldOptions,
             asyncData,
         }
@@ -197,13 +183,6 @@ export default function FarmNormsBlock() {
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderNorms b_id_farm={loaderData.b_id_farm} />
-            </Header>
             <main>
                 <FarmTitle
                     title={"Gebruiksnormen"}
@@ -314,26 +293,5 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
                 </NavLink>
             </div>
         </div>
-    )
-}
-
-export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
-    const { params } = props
-
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
-
-    return (
-        <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={params.b_id_farm}
-                    farmOptions={farmFieldOptionsStore.farmOptions}
-                />
-                <HeaderNorms b_id_farm={params.b_id_farm} />
-            </Header>
-            <main>
-                <InlineErrorBoundary {...props} />
-            </main>
-        </SidebarInset>
     )
 }

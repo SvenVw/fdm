@@ -20,6 +20,8 @@ import { handleLoaderError } from "~/lib/error"
 import { useCalendarStore } from "~/store/calendar"
 import { useFarmStore } from "~/store/farm"
 import HeaderAutomatic from "~/components/blocks/header/automatic"
+import { getFarms } from "@svenvw/fdm-core"
+import { fdm } from "~/lib/fdm.server"
 
 export const meta: MetaFunction = () => {
     return [
@@ -53,12 +55,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
             return sessionCheckResponse
         }
 
-        // Return user information from loader
-        return {
+        const data = {
             user: session.user,
             userName: session.userName,
             initials: session.initials,
+            farmOptions: [],
         }
+
+        try {
+            // Get a list of possible farms of the user
+            const farms = await getFarms(fdm, session.principal_id)
+            const farmOptions = farms.map((farm) => {
+                return {
+                    b_id_farm: farm.b_id_farm,
+                    b_name_farm: farm.b_name_farm,
+                }
+            })
+
+            data.farmOptions = farmOptions
+        } catch (_) {}
+
+        // Return user information from loader
+        return data
     } catch (error) {
         // If getSession throws (e.g., invalid token), it might result in a 401
         // We need to handle that case here as well, similar to the ErrorBoundary

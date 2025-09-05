@@ -18,8 +18,6 @@ import { data, useLoaderData } from "react-router"
 import { dataWithWarning, redirectWithSuccess } from "remix-toast"
 import { combine, parseDbf, parseShp } from "shpjs"
 import { MijnPercelenUploadForm } from "@/app/components/blocks/mijnpercelen/form-upload"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getNmiApiKey, getSoilParameterEstimates } from "~/integrations/nmi"
 import { getSession } from "~/lib/auth.server"
@@ -64,17 +62,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const calendar = getCalendar(params)
 
-    return { b_id_farm, b_name_farm: farm.b_name_farm, calendar }
+    return { b_id_farm, calendar }
 }
 
 export default function UploadMijnPercelenPage() {
-    const { b_id_farm, calendar, b_name_farm } = useLoaderData<typeof loader>()
+    const { b_id_farm, calendar } = useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={b_name_farm} />
-            </Header>
             <main>
                 <div className="flex h-screen items-center justify-center">
                     <MijnPercelenUploadForm

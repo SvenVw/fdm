@@ -72,22 +72,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         (x: { parameter: string }) => x.parameter === "p_app_method_options",
     )
     if (!applicationMethods) throw new Error("Parameter metadata missing")
-    // Map fertilizers to options for the combobox
-    const fertilizerOptions = fertilizers.map((fertilizer) => {
-        const applicationMethodOptions = fertilizer.p_app_method_options
-            .map((opt: string) => {
-                const meta = applicationMethods.options.find(
-                    (x: { value: string }) => x.value === opt,
-                )
-                return meta ? { value: opt, label: meta.label } : undefined
-            })
-            .filter(Boolean)
-        return {
-            value: fertilizer.p_id,
-            label: fertilizer.p_name_nl,
-            applicationMethodOptions: applicationMethodOptions,
-        }
-    })
 
     // Fetch the cultivation plan for the farm
     const cultivationPlan = await getCultivationPlan(
@@ -143,7 +127,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     return {
         b_lu_catalogue: b_lu_catalogue,
         b_id_farm: b_id_farm,
-        fertilizerOptions: fertilizerOptions,
         fertilizerApplications: fertilizerApplications,
         dose: dose.dose,
         applicationMethodOptions: applicationMethods.options,

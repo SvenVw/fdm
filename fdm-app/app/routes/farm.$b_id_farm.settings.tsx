@@ -1,4 +1,4 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -8,15 +8,12 @@ import {
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Toaster } from "~/components/ui/sonner"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -66,22 +63,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
-
         // Create the items for sidebar page
         const sidebarPageItems = [
             {
@@ -104,9 +85,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
-            b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
             sidebarPageItems: sidebarPageItems,
         }
     } catch (error) {
@@ -123,22 +101,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmContentBlock() {
     const loaderData = useLoaderData<typeof loader>()
 
-    const calendar = useCalendarStore((state) => state.calendar)
-
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field`,
-                    label: "Naar percelen",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-            </Header>
             <main>
                 <FarmTitle
                     title={"Instellingen"}

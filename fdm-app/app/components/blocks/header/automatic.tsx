@@ -1,7 +1,8 @@
-import { ReactNode } from "react"
-import { useLocation, useMatches, useParams } from "react-router"
+import type { ReactNode } from "react"
+import { type UIMatch, useLocation, useMatches, useParams } from "react-router"
 import { useCalendarStore } from "@/app/store/calendar"
 import { useFarmFieldOptionsStore } from "@/app/store/farm-field-options"
+import type { FertilizerOption } from "../farm/farm"
 import { HeaderAtlas } from "./atlas"
 import { HeaderBalance } from "./balance"
 import { Header } from "./base"
@@ -13,7 +14,13 @@ import { HeaderNorms } from "./norms"
 import { HeaderNutrientAdvice } from "./nutrient-advice"
 
 export default function HeaderAutomatic() {
-    const matches = useMatches()
+    interface LoaderDataCandidate {
+        b_name_farm?: string
+        farmOptions?: HeaderFarmOption[]
+        fieldOptions?: HeaderFieldOption[]
+        fertilizerOptions?: FertilizerOption[]
+    }
+    const matches = useMatches() as UIMatch<LoaderDataCandidate, unknown>[]
     const params = useParams()
     const location = useLocation()
     const farmFieldOptionsStore = useFarmFieldOptionsStore()
@@ -27,26 +34,22 @@ export default function HeaderAutomatic() {
 
     for (const match of matches) {
         if (match.loaderData) {
-            farmOptions ??= (
-                match.loaderData as { farmOptions?: HeaderFarmOption[] }
-            ).farmOptions
-            fieldOptions ??= (
-                match.loaderData as { fieldOptions?: HeaderFieldOption[] }
-            ).fieldOptions
-            fertilizerOptions ??= (
-                match.loaderData as { fertilizerOptions?: unknown[] }
-            ).fertilizerOptions
+            b_name_farm ??= match.loaderData.b_name_farm
+            farmOptions ??= match.loaderData.farmOptions
+            fieldOptions ??= match.loaderData.fieldOptions
+            fertilizerOptions ??= match.loaderData.fertilizerOptions
         }
     }
 
     farmOptions ??= farmFieldOptionsStore.farmOptions
     fieldOptions ??= farmFieldOptionsStore.fieldOptions
-    b_name_farm ??= farmFieldOptionsStore.getFarmById(
-        params.b_id_farm,
-    )?.b_name_farm
+    b_name_farm ??=
+        farmFieldOptionsStore.getFarmById(params.b_id_farm)?.b_name_farm ??
+        undefined
+
     const calendar = params.calendar ?? storedCalendar
 
-    if (/create/.test(location.pathname)) {
+    if (/\/create\//.test(location.pathname)) {
         return (
             <Header action={undefined}>
                 <HeaderFarmCreate b_name_farm={b_name_farm} />
@@ -57,10 +60,13 @@ export default function HeaderAutomatic() {
     const variants: Record<string, () => ReactNode> = {
         "routes/farm._index": () => (
             <Header action={undefined}>
-                <HeaderFarm b_id_farm={undefined} farmOptions={farmOptions} />
+                <HeaderFarm
+                    b_id_farm={params.b_id_farm}
+                    farmOptions={farmOptions}
+                />
             </Header>
         ),
-        "routes/farm.$b_id_farm.settings.properties": () => (
+        "routes/farm.$b_id_farm.settings": () => (
             <Header
                 action={{
                     to: `/farm/${params.b_id_farm}/${calendar}/field`,
@@ -99,9 +105,7 @@ export default function HeaderAutomatic() {
                 />
             </Header>
         ),
-        "routes/farm.$b_id_farm.fertilizers.$p_id": () =>
-            variants["routes/farm.$b_id_farm.fertilizers._index"](),
-        "routes/farm.$b_id_farm.fertilizers._index": () => (
+        "routes/farm.$b_id_farm.fertilizers": () => (
             <Header action={undefined}>
                 <HeaderFarm
                     b_id_farm={params.b_id_farm}
@@ -110,7 +114,11 @@ export default function HeaderAutomatic() {
                 <HeaderFertilizer
                     b_id_farm={params.b_id_farm}
                     p_id={params.p_id}
-                    fertilizerOptions={fertilizerOptions}
+                    fertilizerOptions={
+                        /\/new(\/|$)/.test(location.pathname)
+                            ? []
+                            : fertilizerOptions
+                    }
                 />
             </Header>
         ),

@@ -2,8 +2,6 @@ import { getFarm } from "@svenvw/fdm-core"
 import { Map as MapIcon, UploadCloud } from "lucide-react"
 import type { LoaderFunctionArgs, MetaFunction } from "react-router"
 import { data, NavLink, useLoaderData } from "react-router"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import {
     Accordion,
     AccordionContent,
@@ -20,8 +18,7 @@ import {
 } from "~/components/ui/card"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { clientConfig } from "~/lib/config"
-import { getSession } from "../lib/auth.server"
-import { fdm } from "../lib/fdm.server"
+import { getSession } from "~/lib/auth.server"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -43,27 +40,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 
     // Get the session
-    const session = await getSession(request)
-
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-    if (!farm) {
-        throw data("Farm not found", {
-            status: 404,
-            statusText: "Farm not found",
-        })
-    }
-
-    return { farm }
+    await getSession(request)
 }
 
 export default function ChooseFieldImportMethod() {
-    const { farm } = useLoaderData<typeof loader>()
-
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={farm.b_name_farm} />
-            </Header>
             <main className="flex-1 flex flex-col items-center justify-center p-4">
                 <div className="w-full max-w-4xl">
                     <h1 className="text-2xl font-bold text-center mb-2">

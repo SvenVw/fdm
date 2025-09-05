@@ -8,8 +8,6 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarPage } from "~/components/custom/sidebar-page"
 import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
@@ -22,7 +20,6 @@ import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
 import type { Route } from "../+types/root"
 import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
-import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -111,9 +108,6 @@ export default function Index() {
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
-            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-16">
                     <div className="flex items-center">
@@ -175,17 +169,8 @@ export default function Index() {
 }
 
 export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
-    const { params } = props
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
-    const cachedFarmName = farmFieldOptionsStore.getFarmById(
-        params.b_id_farm,
-    )?.b_name_farm
-
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={cachedFarmName} />
-            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex items-center">

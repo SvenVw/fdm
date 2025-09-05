@@ -3,10 +3,8 @@ import {
     addFertilizer,
     addFertilizerToCatalogue,
     getFarm,
-    getFarms,
     getFertilizer,
     getFertilizerParametersDescription,
-    getFertilizers,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -68,46 +66,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
-
         // Get selected fertilizer
         const fertilizer = await getFertilizer(fdm, p_id)
         const fertilizerParameters = getFertilizerParametersDescription()
-
-        // Get the available fertilizers
-        const fertilizers = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        const fertilizerOptions = fertilizers.map((fertilizer) => {
-            return {
-                p_id: fertilizer.p_id,
-                p_name_nl: fertilizer.p_name_nl,
-            }
-        })
 
         // Return user information from loader
         return {
             farm: farm,
             p_id: p_id,
             b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
-            fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
             editable: true,
             fertilizerParameters: fertilizerParameters,

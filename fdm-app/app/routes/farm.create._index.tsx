@@ -16,8 +16,6 @@ import { Form, useLoaderData } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import { redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import {
@@ -122,9 +120,6 @@ export default function AddFarmPage() {
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={undefined} />
-            </Header>
             <main>
                 <div className="flex h-screen items-center justify-center">
                     <Card className="w-[350px]">

@@ -62,7 +62,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         if (!b_id_farm) {
             throw data("Farm ID is required", { status: 400 })
         }
-        const calendar = getCalendar(params) // Get calendar year
 
         const session = await getSession(request)
 
@@ -86,10 +85,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         return {
             b_id_farm: b_id_farm,
-            b_name_farm: farm.b_name_farm,
             principals: principals,
             hasSharePermission: hasSharePermission,
-            calendar: calendar,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -100,14 +97,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // TODO: Add wizard-specific layout/header/breadcrumbs
 // TODO: Add "Voltooien" button with correct navigation
 export default function CreateFarmAccessStep() {
-    const { b_id_farm, b_name_farm, principals, hasSharePermission, calendar } =
+    const { b_id_farm, principals, hasSharePermission } =
         useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={b_name_farm} />
-            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex items-center">
@@ -234,17 +228,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
-    const { params } = props
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
-    const cachedFarmName = farmFieldOptionsStore.getFarmById(
-        params.b_id_farm,
-    )?.b_name_farm
-
     return (
-        <>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={cachedFarmName} />
-            </Header>
             <main>
                 <div className="space-y-6 p-10 pb-0">
                     <div className="flex items-center">
@@ -262,6 +246,5 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
                 </div>
                 <InlineErrorBoundary {...props} />
             </main>
-        </>
     )
 }

@@ -8,8 +8,6 @@ import {
 } from "react-router"
 import { CultivationListPlan } from "~/components/blocks/cultivation/list-plan"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
@@ -17,7 +15,6 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import type { Route } from "../+types/root"
 import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
-import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -104,64 +101,50 @@ export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
-            </Header>
-            <main>
-                <FarmTitle
-                    title={"Gewassen in bouwplan"}
-                    description={
-                        "Werk de eigenschappen per gewas in je bouwplan bij."
-                    }
-                    action={{
-                        to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
-                        label: "Doorgaan",
-                    }}
-                />
-                <div className="space-y-6 px-8">
-                    <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6">
-                        <CultivationListPlan
-                            cultivationPlan={loaderData.cultivationPlan}
-                            b_id_farm={loaderData.b_id_farm}
-                            calendar={loaderData.calendar}
-                            basePath="cultivations"
-                        />
-                        <div className="xl:col-span-2">
-                            <Outlet />
-                        </div>
+        <main>
+            <FarmTitle
+                title={"Gewassen in bouwplan"}
+                description={
+                    "Werk de eigenschappen per gewas in je bouwplan bij."
+                }
+                action={{
+                    to: `/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/fertilizers`,
+                    label: "Doorgaan",
+                }}
+            />
+            <div className="space-y-6 px-8">
+                <div className="grid xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6">
+                    <CultivationListPlan
+                        cultivationPlan={loaderData.cultivationPlan}
+                        b_id_farm={loaderData.b_id_farm}
+                        calendar={loaderData.calendar}
+                        basePath="cultivations"
+                    />
+                    <div className="xl:col-span-2">
+                        <Outlet />
                     </div>
                 </div>
-            </main>
-        </>
+            </div>
+        </main>
     )
 }
 
 export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
     const { params } = props
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
-    const cachedFarmName = farmFieldOptionsStore.getFarmById(
-        params.b_id_farm,
-    )?.b_name_farm
 
     return (
-        <>
-            <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={cachedFarmName} />
-            </Header>
-            <main>
-                <FarmTitle
-                    title={"Gewassen in bouwplan"}
-                    description={
-                        "Werk de eigenschappen per gewas in je bouwplan bij."
-                    }
-                    action={{
-                        to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers`,
-                        label: "Doorgaan",
-                    }}
-                />
-                <InlineErrorBoundary {...props} />
-            </main>
-        </>
+        <main>
+            <FarmTitle
+                title={"Gewassen in bouwplan"}
+                description={
+                    "Werk de eigenschappen per gewas in je bouwplan bij."
+                }
+                action={{
+                    to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers`,
+                    label: "Doorgaan",
+                }}
+            />
+            <InlineErrorBoundary {...props} />
+        </main>
     )
 }

@@ -1,5 +1,4 @@
 import { ChevronDown } from "lucide-react"
-import { useEffect } from "react"
 import { NavLink, useLocation } from "react-router"
 import { useFarmFieldOptionsStore } from "@/app/store/farm-field-options"
 import {
@@ -22,14 +21,6 @@ export function HeaderFarm({
     farmOptions: HeaderFarmOption[]
 }) {
     const location = useLocation()
-    const setStoredFarmOptions = useFarmFieldOptionsStore(
-        (s) => s.setFarmOptions,
-    )
-    // useEffect(() => {
-    //     if (farmOptions && farmOptions.length > 0) {
-    //         setStoredFarmOptions(farmOptions)
-    //     }
-    // }, [farmOptions, setStoredFarmOptions])
 
     const currentPath = String(location.pathname)
 

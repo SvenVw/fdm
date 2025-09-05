@@ -7,8 +7,6 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import {
@@ -28,7 +26,6 @@ import { getTimeBasedGreeting } from "~/lib/greetings"
 import { getCalendarSelection } from "~/lib/calendar"
 import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
 import { Route } from "../+types/root"
-import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -53,7 +50,7 @@ export const meta: MetaFunction = () => {
  *
  * @throws {Error} If retrieving the session or fetching the farm data fails.
  */
-export async function loader({ request, params }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
     try {
         // Get the session
         const session = await getSession(request)
@@ -63,17 +60,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
 
         // Return user information from loader
         return {
             farms: farms,
-            farmOptions: farmOptions,
             calendar: calendar,
             username: session.userName,
         }
@@ -95,12 +85,6 @@ export default function AppIndex() {
 
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={undefined}
-                    farmOptions={loaderData.farmOptions}
-                />
-            </Header>
             <main>
                 {loaderData.farms.length === 0 ? (
                     <div className="flex h-[calc(100vh-8rem)] flex-col">
@@ -414,17 +398,8 @@ export default function AppIndex() {
 }
 
 export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
-    const farmFieldOptionsStore = useFarmFieldOptionsStore()
-    const { params } = props
-
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={params.b_id_farm}
-                    farmOptions={farmFieldOptionsStore.farmOptions}
-                />
-            </Header>
             <InlineErrorBoundary {...props} />
         </SidebarInset>
     )

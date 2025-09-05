@@ -4,7 +4,6 @@ import {
     addSoilAnalysis,
     getCultivationsFromCatalogue,
     getFarm,
-    getFarms,
     getFields,
 } from "@svenvw/fdm-core"
 import type { Feature, FeatureCollection, Polygon } from "geojson"
@@ -37,9 +36,6 @@ import { getFieldsStyle } from "~/components/blocks/atlas/atlas-styles"
 import { getViewState } from "~/components/blocks/atlas/atlas-viewstate"
 import FieldDetailsDialog from "~/components/blocks/field/form"
 import { FormSchema } from "~/components/blocks/field/schema"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
@@ -51,7 +47,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { useCalendarStore } from "~/store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -90,18 +85,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Get timeframe from calendar store
         const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
-
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        const farmOptions = farms.map((farm) => {
-            if (!farm?.b_id_farm || !farm?.b_name_farm) {
-                throw new Error("Invalid farm data structure")
-            }
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
 
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
 
@@ -170,7 +153,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const mapboxStyle = getMapboxStyle()
 
         return {
-            farmOptions: farmOptions,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
             calendar: calendar,
@@ -188,7 +170,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const calendar = useCalendarStore((state) => state.calendar)
 
     const fieldsSavedId = "fieldsSaved"
     const fieldsSaved = loaderData.featureCollection
@@ -226,23 +207,6 @@ export default function Index() {
 
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
-                    label: "Terug naar percelen",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderField
-                    b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={[]}
-                    b_id={undefined}
-                />
-            </Header>
             {/* <FarmHeader
                 farmOptions={loaderData.farmOptions}
                 b_id_farm={loaderData.b_id_farm}

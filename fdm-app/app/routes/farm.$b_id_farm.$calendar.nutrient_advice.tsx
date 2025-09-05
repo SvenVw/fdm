@@ -7,15 +7,12 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderNutrientAdvice } from "~/components/blocks/header/nutrient-advice"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
-import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { getTimeframe } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -53,39 +50,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the field id
-        const b_id = params.b_id
-
         // Get the session
         const session = await getSession(request)
 
         // Get timeframe from calendar store
         const timeframe = getTimeframe(params)
-
-        // Get details of farm
-        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-        if (!farm) {
-            throw data("not found: b_id_farm", {
-                status: 404,
-                statusText: "not found: b_id_farm",
-            })
-        }
-
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
 
         // Get the fields to be selected
         const fields = await getFields(
@@ -107,10 +76,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
-            b_id_farm: b_id_farm,
-            b_id: b_id,
-            farmOptions: farmOptions,
             fieldOptions: fieldOptions,
         }
     } catch (error) {
@@ -125,21 +90,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmBalanceNitrogenBlock() {
-    const loaderData = useLoaderData<typeof loader>()
-
     return (
         <SidebarInset>
-            <Header action={undefined}>
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderNutrientAdvice
-                    b_id_farm={loaderData.b_id_farm}
-                    b_id={loaderData.b_id}
-                    fieldOptions={loaderData.fieldOptions}
-                />
-            </Header>
             <main>
                 <FarmTitle
                     title={"Bemestingsadvies"}

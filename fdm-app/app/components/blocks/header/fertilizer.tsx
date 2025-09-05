@@ -1,5 +1,4 @@
 import { ChevronDown } from "lucide-react"
-import { useEffect } from "react"
 import { NavLink, useLocation } from "react-router"
 import { create } from "zustand"
 import {
@@ -27,30 +26,13 @@ const useFertilizerOptionsStore = create<{
 export function HeaderFertilizer({
     b_id_farm,
     p_id,
-    fertilizerOptions: pFertilizerOptions,
+    fertilizerOptions,
 }: {
     b_id_farm: string
     p_id: string | undefined
     fertilizerOptions: HeaderFertilizerOption[] | undefined
 }) {
     const location = useLocation()
-    const fertilizerOptionsStore = useFertilizerOptionsStore()
-
-    useEffect(() => {
-        if (
-            pFertilizerOptions &&
-            pFertilizerOptions !== fertilizerOptionsStore.fertilizerOptions
-        ) {
-            fertilizerOptionsStore.setFertilizerOptions(pFertilizerOptions)
-        }
-    }, [
-        pFertilizerOptions,
-        fertilizerOptionsStore.fertilizerOptions,
-        fertilizerOptionsStore.setFertilizerOptions,
-    ])
-
-    const fertilizerOptions =
-        pFertilizerOptions ?? fertilizerOptionsStore.fertilizerOptions
 
     const currentPath = String(location.pathname)
 
@@ -58,7 +40,7 @@ export function HeaderFertilizer({
         <>
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={`/farm/${b_id_farm}/fertilizer`}>
+                <BreadcrumbLink href={`/farm/${b_id_farm}/fertilizers`}>
                     Meststof
                 </BreadcrumbLink>
             </BreadcrumbItem>

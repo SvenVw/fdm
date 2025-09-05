@@ -8,9 +8,6 @@ import {
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 import { Button } from "~/components/ui/button"
 import {
     Card,
@@ -81,17 +78,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             return redirect("./farm")
         }
 
-        // Get farms to be selected
-        const farmOptions = farms.map((farm) => {
-            if (!farm?.b_id_farm || !farm?.b_name_farm) {
-                throw new Error("Invalid farm data structure")
-            }
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
-
         // Get the fields to be selected
         const fields = await getFields(
             fdm,
@@ -116,7 +102,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
             fieldOptions: fieldOptions,
             userName: session.userName,
         }
@@ -142,23 +127,6 @@ export default function FarmFieldIndex() {
 
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}`,
-                    label: "Terug naar bedrijf",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderField
-                    b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={loaderData.fieldOptions}
-                    b_id={undefined}
-                />
-            </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
                     <>

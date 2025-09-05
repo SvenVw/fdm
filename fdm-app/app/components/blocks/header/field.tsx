@@ -27,14 +27,6 @@ export function HeaderField({
     const location = useLocation()
     const currentPath = String(location.pathname)
     const calendar = useCalendarStore((state) => state.calendar)
-    const setStoredFieldOptions = useFarmFieldOptionsStore(
-        (s) => s.setFieldOptions,
-    )
-    // useEffect(() => {
-    //     if (fieldOptions && fieldOptions.length > 0) {
-    //         setStoredFieldOptions(fieldOptions)
-    //     }
-    // }, [fieldOptions, setStoredFieldOptions])
 
     return (
         <>

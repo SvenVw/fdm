@@ -3,7 +3,6 @@ import {
     addFertilizer,
     addFertilizerToCatalogue,
     getFertilizerParametersDescription,
-    getFertilizers,
 } from "@svenvw/fdm-core"
 import { useEffect } from "react"
 import {
@@ -102,22 +101,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             p_app_method_options: [],
         }
 
-        // Get the available fertilizers
-        const fertilizers = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
-        const fertilizerOptions = fertilizers.map((fertilizer) => {
-            return {
-                p_id: fertilizer.p_id,
-                p_name_nl: fertilizer.p_name_nl,
-            }
-        })
-
         // Return user information from loader
         return {
-            fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
             fertilizerParameters: fertilizerParameters,
         }

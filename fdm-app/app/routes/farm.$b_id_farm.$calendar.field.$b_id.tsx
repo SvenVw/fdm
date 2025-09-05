@@ -4,14 +4,10 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
-    redirect,
     useLoaderData,
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
@@ -19,7 +15,6 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { useCalendarStore } from "~/store/calendar"
 import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
 import type { Route } from "../+types/root"
 
@@ -122,25 +117,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const calendar = getCalendar(params)
         const timeframe = getTimeframe(params)
 
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-
-        // Redirect to farms overview if user has no farm
-        if (farms.length === 0) {
-            return redirect("farm")
-        }
-
-        // Get farms to be selected
-        const farmOptions = farms.map((farm) => {
-            if (!farm?.b_id_farm || !farm?.b_name_farm) {
-                throw new Error("Invalid farm data structure")
-            }
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
-
         // Get the fields to be selected
         const fields = await getFields(
             fdm,
@@ -177,7 +153,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
             fieldOptions: fieldOptions,
             field: field,
             b_id: b_id,
@@ -200,27 +175,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
-    const calendar = useCalendarStore((state) => state.calendar)
 
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: `/farm/${loaderData.b_id_farm}/${calendar}/field/`,
-                    label: "Terug naar percelen",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderField
-                    b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={loaderData.fieldOptions}
-                    b_id={loaderData.b_id}
-                />
-            </Header>
             <main>
                 <FarmTitle
                     title={loaderData.field?.b_name}
@@ -245,24 +202,6 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
 
     return (
         <SidebarInset>
-            <Header
-                action={{
-                    to: `/farm/${params.b_id_farm}/${params.calendar}/field/`,
-                    label: "Terug naar percelen",
-                    disabled: false,
-                }}
-            >
-                <HeaderFarm
-                    b_id_farm={params.b_id_farm}
-                    farmOptions={farmFieldOptionsStore.farmOptions}
-                />
-                <HeaderField
-                    b_id_farm={params.b_id_farm}
-                    fieldOptions={farmFieldOptionsStore.fieldOptions}
-                    b_id={params.b_id}
-                />
-            </Header>
-
             {params.b_id_farm && params.calendar && params.b_id ? (
                 <main>
                     <FarmTitle

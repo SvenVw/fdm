@@ -8,9 +8,6 @@ import {
     useLocation,
 } from "react-router"
 import { ClientOnly } from "remix-utils/client-only"
-import { HeaderAtlas } from "~/components/blocks/header/atlas"
-import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { Skeleton } from "~/components/ui/skeleton"
 import { getSession } from "~/lib/auth.server"
@@ -111,13 +108,6 @@ export default function FarmContentBlock() {
 
     return (
         <SidebarInset>
-            <Header action={headerAction}>
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderAtlas b_id_farm={loaderData.b_id_farm} />
-            </Header>
             <main>
                 <ClientOnly
                     fallback={<Skeleton className="h-full w-full rounded-xl" />}
