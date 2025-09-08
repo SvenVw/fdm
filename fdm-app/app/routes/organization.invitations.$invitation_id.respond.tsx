@@ -3,12 +3,16 @@ import {
     getPendingInvitation,
     rejectInvitation,
 } from "@svenvw/fdm-core"
+import { useEffect } from "react"
 import {
     type ActionFunctionArgs,
     data,
+    isRouteErrorResponse,
     type LoaderFunctionArgs,
     redirect,
     useLoaderData,
+    useSearchParams,
+    useSubmit,
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import z from "zod"
@@ -20,62 +24,34 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import type { Route } from "../+types/root"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    const session = await getSession(request)
+    await getSession(request)
 
     // Check for valid invitation id
     if (!params.invitation_id) {
         throw failBadRequest("Bad Request: invitation id missing")
     }
 
-    // Check for valid intent
-    if (request.url.indexOf("?") === -1) {
-        throw failBadRequest("Bad Request: intent missing")
-    }
+    // Check for valid invitation
+    try {
+        const invitation = await getPendingInvitation(fdm, params.invitation_id)
 
-    const searchParams = new URLSearchParams(
-        request.url.substring(request.url.indexOf("?") + 1),
-    )
-
-    if (!searchParams.has("intent")) {
-        throw failBadRequest("Bad Request: intent missing")
-    }
-
-    let accepted: boolean
-    if (searchParams.get("intent")?.toLowerCase() === "accept") {
-        accepted = true
-    } else if (searchParams.get("intent")?.toLowerCase() === "reject") {
-        accepted = false
-    } else {
-        throw failBadRequest(
-            `Bad Request: bad intent: ${searchParams.get("intent")}`,
-        )
-    }
-
-    const invitation = await getPendingInvitation(fdm, params.invitation_id)
-    if (!invitation) {
-        throw failNotFound("Uitnodiging niet gevonden of is verloopt.")
-    }
-
-    // If accepted process the request and redirect to the organizations page
-    if (accepted) {
-        await acceptInvitation(fdm, params.invitation_id, session.user.id)
-        return redirectWithSuccess("/organization", {
-            message: "Uitnodiging geaccepteerd! 🎉",
-        })
-    }
-
-    // Collect loader data and show the rejection confirmation page
-    return {
-        invitationId: invitation.invitation_id,
-        inviterFirstName: invitation.inviter_firstname,
-        inviterSurname: invitation.inviter_surname,
-        organizationName: invitation.organization_name,
-        role: invitation.role,
+        return {
+            invitationId: invitation.invitation_id,
+            inviterFirstName: invitation.inviter_firstname,
+            inviterSurname: invitation.inviter_surname,
+            organizationSlug: invitation.organization_slug,
+            organizationName: invitation.organization_name,
+            role: invitation.role,
+        }
+    } catch (e) {
+        throw data("Invitation not found", 404)
     }
 }
 
@@ -84,9 +60,42 @@ export default function Respond() {
         invitationId,
         inviterFirstName,
         inviterSurname,
+        organizationSlug,
         organizationName,
         role,
     } = useLoaderData()
+
+    const [searchParams] = useSearchParams()
+    const intentRaw = searchParams.get("intent")
+    const intent = intentRaw != null ? intentRaw.toLowerCase() : null
+
+    const submit = useSubmit()
+
+    useEffect(() => {
+        if (intent && intent === "accept") {
+            submit(
+                {
+                    invitation_id: invitationId,
+                    intent: "accept",
+                    organization_slug: organizationSlug,
+                },
+                { method: "POST" },
+            )
+        }
+    }, [intent, submit, invitationId, organizationSlug])
+
+    if (intent !== "accept" && intent !== "reject") {
+        throw failBadRequest(`Invalid intent: ${intent}`)
+    }
+
+    if (intent === "accept") {
+        return (
+            <h1 className="font-semibold mt-[200px] text-3xl text-center text-primary">
+                Aan het accepteren...
+            </h1>
+        )
+    }
+
     return (
         <div className="max-w-3xl mx-auto my-4 px-4">
             <Card>
@@ -94,6 +103,7 @@ export default function Respond() {
                     <CardTitle>Uitnodiging Afwijzen</CardTitle>
                 </CardHeader>
                 <CardContent>
+                    <Separator />
                     <p className="my-1">
                         {`${inviterFirstName} ${inviterSurname} heeft je uitgenodigd om lid te worden van de organisatie `}
                         <span className="font-semibold">{`${organizationName}.`}</span>
@@ -137,6 +147,7 @@ export default function Respond() {
 const FormSchema = z.object({
     invitation_id: z.string(),
     intent: z.enum(["accept", "reject", "do_nothing"]),
+    organization_slug: z.string().optional(),
 })
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -144,25 +155,90 @@ export async function action({ request }: ActionFunctionArgs) {
 
     const session = await getSession(request)
 
+    if (formValues.intent === "accept") {
+        try {
+            await acceptInvitation(
+                fdm,
+                formValues.invitation_id,
+                session.user.id,
+            )
+        } catch (_) {
+            throw data("Invitation not found", 404)
+        }
+        return redirectWithSuccess(
+            `/organization/${formValues.organization_slug}`,
+            {
+                message: "Uitnodiging geaccepteerd! 🎉",
+            },
+        )
+    }
+
     if (formValues.intent === "reject") {
-        await rejectInvitation(fdm, formValues.invitation_id, session.user.id)
+        try {
+            await rejectInvitation(
+                fdm,
+                formValues.invitation_id,
+                session.user.id,
+            )
+        } catch (_) {
+            throw data("Invitation not found", 404)
+        }
         return redirectWithSuccess("/organization", {
             message: "Uitnodiging afgewezen",
         })
     }
+
     if (formValues.intent === "do_nothing") {
         return redirect("/organization/invitations")
     }
+
     throw new Error("invalid intent")
+}
+
+export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
+    const error = props.error
+    if (isRouteErrorResponse(error)) {
+        if (error.status === 404) {
+            return (
+                <div className="max-w-3xl mx-auto my-4 px-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Uitnodiging Niet Beschikbaar</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Separator />
+                            <p className="my-1">
+                                Uitnodiging niet gevonden of is verlopen.
+                            </p>
+                        </CardContent>
+                        <CardFooter>
+                            <form method="post" className="flex flex-row gap-2">
+                                <input
+                                    type="hidden"
+                                    name="invitation_id"
+                                    value={props.params.invitation_id}
+                                />
+                                <Button
+                                    variant="secondary"
+                                    name="intent"
+                                    value="do_nothing"
+                                >
+                                    Terug naar mijn uitnodigingen
+                                </Button>
+                            </form>
+                        </CardFooter>
+                    </Card>
+                </div>
+            )
+        }
+    }
+
+    throw error
 }
 
 function failBadRequest(message: string) {
     // Not 400 because 400 currently hits the Not Found error page
     return fail(message, 500)
-}
-
-function failNotFound(message: string) {
-    return fail(message, 404)
 }
 
 function fail(message: string, status: number) {
