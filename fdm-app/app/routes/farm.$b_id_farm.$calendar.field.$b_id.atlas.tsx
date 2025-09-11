@@ -1,7 +1,7 @@
 import { getField } from "@svenvw/fdm-core"
 import type { FeatureCollection } from "geojson"
 import { useEffect, useRef } from "react"
-import { Layer, Map as MapGL } from "react-map-gl/mapbox"
+import { Layer, Map as MapGL, type MapRef } from "react-map-gl/mapbox"
 import type { MetaFunction } from "react-router"
 import {
     type ActionFunctionArgs,
@@ -109,7 +109,7 @@ export default function FarmFieldAtlasBlock() {
     const fieldsSavedStyle = getFieldsStyle(id)
     const fieldsSavedOutlineStyle = getFieldsStyle("fieldsSavedOutline")
 
-    const mapRef = useRef<mapboxgl.Map>(null)
+    const mapRef = useRef<MapRef>(null)
 
     useEffect(() => {
         mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
