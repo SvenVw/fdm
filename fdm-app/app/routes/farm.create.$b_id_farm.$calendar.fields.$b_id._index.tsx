@@ -247,6 +247,13 @@ export default function Index() {
         })
     }, [loaderData, form.reset])
 
+    //ref to refit the map when the selected field changes
+    const mapRef = useRef<mapboxgl.Map>(null)
+
+    useEffect(() => {
+        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
+    }, [viewState])
+
     //ref to check if map is rendered
     const mapContainerRef = useRef<HTMLDivElement>(null)
     const [mapIsLoaded, setMapIsLoaded] = useState(false)
@@ -379,6 +386,7 @@ export default function Index() {
                                 mapStyle={loaderData.mapboxStyle}
                                 mapboxAccessToken={loaderData.mapboxToken}
                                 interactiveLayerIds={[id]}
+                                ref={mapRef}
                             >
                                 <FieldsSourceNotClickable
                                     id={id}
