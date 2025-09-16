@@ -91,7 +91,7 @@ export default function Respond() {
     if (intent === "accept") {
         return (
             <h1 className="font-semibold mt-[200px] text-3xl text-center text-primary">
-                Aan het accepteren...
+                Uitnodiging wordt geaccepteerd...
             </h1>
         )
     }
@@ -100,7 +100,7 @@ export default function Respond() {
         <div className="max-w-3xl mx-auto my-4 px-4">
             <Card>
                 <CardHeader>
-                    <CardTitle>Uitnodiging Afwijzen</CardTitle>
+                    <CardTitle>Uitnodiging afwijzen</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Separator />
@@ -135,7 +135,7 @@ export default function Respond() {
                             name="intent"
                             value="do_nothing"
                         >
-                            Nee, terug naar mijn uitnodigingen
+                            Nee, terug naar Mijn Uitnodigingen
                         </Button>
                     </form>
                 </CardFooter>
@@ -203,12 +203,15 @@ export function ErrorBoundary(props: Route.ErrorBoundaryProps) {
                 <div className="max-w-3xl mx-auto my-4 px-4">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Uitnodiging Niet Beschikbaar</CardTitle>
+                            <CardTitle>Uitnodiging niet beschikbaar</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <Separator />
                             <p className="my-1">
-                                Uitnodiging niet gevonden of is verlopen.
+                                Helaas, deze uitnodiging is niet langer geldig
+                                of bestaat niet. Neem eventueel contact op met
+                                degene die je heeft uitgenodigd voor een nieuwe
+                                uitnodiging.
                             </p>
                         </CardContent>
                         <CardFooter>
