@@ -57,6 +57,7 @@ export {
 } from "./derogation"
 export {
     addFarm,
+    getCalendarYears,
     getFarm,
     getFarms,
     grantRoleToFarm,

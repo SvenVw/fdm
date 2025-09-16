@@ -1,4 +1,4 @@
-import { getFarm, getFields } from "@svenvw/fdm-core"
+import { getCalendarYears, getFarm, getFields } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
 import {
     data,
@@ -16,7 +16,7 @@ import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
-import { getCalendar, getCalendarSelection, getTimeframe } from "~/lib/calendar"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -27,8 +27,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "../components/ui/select"
-import { useCalendarStore } from "../store/calendar"
+} from "~/components/ui/select"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -100,11 +99,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        const calendarYears = await getCalendarYears(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+
         return {
             sidebarPageItems: sidebarPageItems,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
             calendar: calendar,
+            calendarYears: calendarYears,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -114,7 +120,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
-    const calendarStore = useCalendarStore()
     const navigate = useNavigate()
 
     const handleCalendarSelect = (year: string) => {
@@ -161,38 +166,40 @@ export default function Index() {
                     <div className="space-y-6 pb-0">
                         <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
                             <aside className="lg:w-1/5">
-                                <p className="flex flex-row items-baseline mb-4">
-                                    <label
-                                        htmlFor="calendar-select"
-                                        className="mr-2"
-                                    >
-                                        Kies een jaar:
-                                    </label>
-                                    <Select
-                                        defaultValue={loaderData.calendar}
-                                        name="role"
-                                        onValueChange={handleCalendarSelect}
-                                    >
-                                        <SelectTrigger
-                                            id="calendar-select"
-                                            className="flex-1"
+                                {loaderData.calendarYears.length > 1 && (
+                                    <p className="flex flex-row items-baseline mb-4">
+                                        <label
+                                            htmlFor="calendar-select"
+                                            className="mr-2"
                                         >
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {getCalendarSelection().map(
-                                                (year) => (
-                                                    <SelectItem
-                                                        key={year}
-                                                        value={year}
-                                                    >
-                                                        {year}
-                                                    </SelectItem>
-                                                ),
-                                            )}
-                                        </SelectContent>
-                                    </Select>
-                                </p>
+                                            Kies een jaar:
+                                        </label>
+                                        <Select
+                                            defaultValue={loaderData.calendar}
+                                            name="role"
+                                            onValueChange={handleCalendarSelect}
+                                        >
+                                            <SelectTrigger
+                                                id="calendar-select"
+                                                className="flex-1"
+                                            >
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {loaderData.calendarYears.map(
+                                                    (year) => (
+                                                        <SelectItem
+                                                            key={year}
+                                                            value={year}
+                                                        >
+                                                            {year}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </p>
+                                )}
                                 <SidebarPage
                                     items={loaderData.sidebarPageItems}
                                 >

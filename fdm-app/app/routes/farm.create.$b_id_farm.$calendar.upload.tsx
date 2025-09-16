@@ -15,7 +15,11 @@ import type {
     MetaFunction,
 } from "react-router"
 import { data, useLoaderData } from "react-router"
-import { dataWithWarning, redirectWithSuccess } from "remix-toast"
+import {
+    dataWithWarning,
+    redirectWithError,
+    redirectWithSuccess,
+} from "remix-toast"
 import { combine, parseDbf, parseShp } from "shpjs"
 import { MijnPercelenUploadForm } from "@/app/components/blocks/mijnpercelen/form-upload"
 import { Header } from "~/components/blocks/header/base"
@@ -176,6 +180,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
+        const calendarYears = new Set()
+        let minCalendarYear = Number.POSITIVE_INFINITY
+        let maxCalendarYear = 0
+
         for (const feature of features) {
             const { properties, geometry } = feature
             const {
@@ -256,6 +264,35 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     estimates,
                 )
             }
+
+            calendarYears.add(b_start.getFullYear().toString())
+            minCalendarYear = Math.min(minCalendarYear, b_start.getFullYear())
+            maxCalendarYear = Math.max(maxCalendarYear, b_start.getFullYear())
+        }
+
+        if (calendarYears.size === 0) {
+            return redirectWithError(
+                `/farm/create/${b_id_farm}/${calendar}/fields`,
+                {
+                    message: "Geen percelen zijn geïmporteerd.",
+                },
+            )
+        }
+
+        if (!calendarYears.has(calendar)) {
+            try {
+                const redirectCalendar = Math.max(
+                    minCalendarYear,
+                    Math.min(maxCalendarYear, Number.parseInt(calendar)),
+                )
+
+                return redirectWithSuccess(
+                    `/farm/create/${b_id_farm}/${redirectCalendar}/fields`,
+                    {
+                        message: `Geen percelen in ${calendar} zijn geïmporteerd. Je bekijkt nu de percelen in ${redirectCalendar}.`,
+                    },
+                )
+            } catch (_) {}
         }
 
         return redirectWithSuccess(

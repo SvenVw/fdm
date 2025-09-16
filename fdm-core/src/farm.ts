@@ -73,6 +73,49 @@ export async function addFarm(
 }
 
 /**
+ * Retrieves the calendar years during which the farm has fields, after verifying that the requesting principal has read access.
+ *
+ * This function checks the principal's permissions before querying the database for the farm identified by the provided ID.
+ *
+ * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
+ * @param principal_id - The identifier of the principal making the request.
+ * @param b_id_farm - The unique identifier of the farm to retrieve.
+ * @returns A Promise that resolves with a string array of calendar years.
+ * @throws {Error} If permission checks fail or if an error occurs while retrieving the calendar years.
+ * @alpha
+ */
+export async function getCalendarYears(
+    fdm: FdmType,
+    principal_id: string,
+    b_id_farm: string,
+): Promise<string[]> {
+    try {
+        return await fdm.transaction(async (tx: FdmType) => {
+            await checkPermission(
+                tx,
+                "farm",
+                "read",
+                b_id_farm,
+                principal_id,
+                "getCalendarYears",
+            )
+
+            const results = await tx
+                .selectDistinct({ b_start: schema.fieldAcquiring.b_start })
+                .from(schema.fieldAcquiring)
+                .where(eq(schema.fieldAcquiring.b_id_farm, b_id_farm))
+                .orderBy(asc(schema.fieldAcquiring.b_start))
+
+            return results.map(({ b_start }) =>
+                b_start.getFullYear().toString(),
+            )
+        })
+    } catch (err) {
+        throw handleError(err, "Exception for getCalendarYears")
+    }
+}
+
+/**
  * Retrieves a farm's details after verifying that the requesting principal has read access.
  *
  * This function checks the principal's permissions before querying the database for the farm identified by the provided ID.
