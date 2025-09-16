@@ -7,6 +7,7 @@ import {
     NavLink,
     Outlet,
     useLoaderData,
+    useNavigate,
 } from "react-router"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
@@ -15,11 +16,19 @@ import { Button } from "~/components/ui/button"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { getCalendar, getCalendarSelection, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../components/ui/select"
+import { useCalendarStore } from "../store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -105,7 +114,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
+    const calendarStore = useCalendarStore()
+    const navigate = useNavigate()
 
+    const handleCalendarSelect = (year: string) => {
+        navigate(`/farm/create/${loaderData.b_id_farm}/${year}/fields`)
+    }
     return (
         <SidebarInset>
             <Header action={undefined}>
@@ -147,6 +161,38 @@ export default function Index() {
                     <div className="space-y-6 pb-0">
                         <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
                             <aside className="lg:w-1/5">
+                                <p className="flex flex-row items-baseline mb-4">
+                                    <label
+                                        htmlFor="calendar-select"
+                                        className="mr-2"
+                                    >
+                                        Kies een jaar:
+                                    </label>
+                                    <Select
+                                        defaultValue={loaderData.calendar}
+                                        name="role"
+                                        onValueChange={handleCalendarSelect}
+                                    >
+                                        <SelectTrigger
+                                            id="calendar-select"
+                                            className="flex-1"
+                                        >
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {getCalendarSelection().map(
+                                                (year) => (
+                                                    <SelectItem
+                                                        key={year}
+                                                        value={year}
+                                                    >
+                                                        {year}
+                                                    </SelectItem>
+                                                ),
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                </p>
                                 <SidebarPage
                                     items={loaderData.sidebarPageItems}
                                 >
