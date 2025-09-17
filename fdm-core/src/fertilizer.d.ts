@@ -50,7 +50,7 @@ export interface FertilizerApplication {
     p_name_nl: string | null
     p_app_amount: number | null
     p_app_method: ApplicationMethods | null
-    p_app_date: Date | null
+    p_app_date: Date
     p_app_id: string
 }
 
