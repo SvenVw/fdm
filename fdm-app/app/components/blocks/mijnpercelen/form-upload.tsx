@@ -146,7 +146,9 @@ export function MijnPercelenUploadForm({
         checkRequiredFiles(validFiles)
         setUploadState("idle")
 
-        const dbfFile = validFiles.find((file) => file.name.endsWith(".dbf"))
+        const dbfFile = validFiles.find(
+            (file) => getFileExtension(file.name) === ".dbf",
+        )
         if (dbfFile) {
             try {
                 const dbfBuffer = await dbfFile.arrayBuffer()
@@ -229,7 +231,7 @@ export function MijnPercelenUploadForm({
             )
 
             form.setValue("shapefile", updatedFiles, { shouldValidate: true })
-            handleFilesSet(updatedFiles)
+            await handleFilesSet(updatedFiles)
             e.dataTransfer.clearData()
         }
     }

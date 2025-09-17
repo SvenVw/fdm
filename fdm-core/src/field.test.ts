@@ -338,7 +338,7 @@ describe("Farm Data Model", () => {
                     expect.arrayContaining([field1Name, field2Name]),
                 )
 
-                // Test with a timeframe that includes field 2 and field 4
+                // Test with a timeframe that includes field 2 and field 3
                 const timeframe3 = {
                     start: new Date("2023-05-01"),
                     end: new Date("2023-09-01"),
@@ -359,7 +359,7 @@ describe("Farm Data Model", () => {
                     start: new Date("2023-03-01"),
                     end: undefined,
                 })
-                console.log(fields4)
+                
                 expect(fields4.length).toBe(3)
                 expect(fields4.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([

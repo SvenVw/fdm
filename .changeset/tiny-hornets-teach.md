@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": patch
 ---
 
-Fixes that files are removed for upload box when another (new) shapefile is selected to be uploaded
+Fixes to keep files in the upload box when selecting another (new) shapefile to upload
