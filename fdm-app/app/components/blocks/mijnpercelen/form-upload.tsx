@@ -189,8 +189,42 @@ export function MijnPercelenUploadForm({
 
             if (validNewFiles.length === 0) return
 
-            onChange(validNewFiles)
-            await handleFilesSet(validNewFiles)
+            const currentFiles = form.getValues("shapefile") || []
+
+            const currentExtensions = currentFiles.map((file) =>
+                getFileExtension(file.name),
+            )
+            const hasAllFiles = requiredExtensions.every((ext) =>
+                currentExtensions.includes(ext),
+            )
+
+            let updatedFiles: File[]
+            if (hasAllFiles) {
+                updatedFiles = [...validNewFiles]
+            } else {
+                updatedFiles = [...currentFiles]
+                validNewFiles.forEach((newFile) => {
+                    const newFileExt = getFileExtension(newFile.name)
+                    const existingFileIndex = updatedFiles.findIndex(
+                        (file) => getFileExtension(file.name) === newFileExt,
+                    )
+                    if (existingFileIndex !== -1) {
+                        updatedFiles[existingFileIndex] = newFile
+                    } else {
+                        updatedFiles.push(newFile)
+                    }
+                })
+            }
+
+            const uniqueFiles = updatedFiles.reduce((acc, current) => {
+                if (!acc.find((item) => item.name === current.name)) {
+                    acc.push(current)
+                }
+                return acc
+            }, [] as File[])
+
+            onChange(uniqueFiles)
+            await handleFilesSet(uniqueFiles)
         }
     }
 
@@ -214,10 +248,41 @@ export function MijnPercelenUploadForm({
 
             if (validNewFiles.length === 0) return
 
-            form.setValue("shapefile", validNewFiles, {
-                shouldValidate: true,
-            })
-            handleFilesSet(validNewFiles)
+            const currentFiles = form.getValues("shapefile") || []
+            const currentExtensions = currentFiles.map((file) =>
+                getFileExtension(file.name),
+            )
+            const hasAllFiles = requiredExtensions.every((ext) =>
+                currentExtensions.includes(ext),
+            )
+
+            let updatedFiles: File[]
+            if (hasAllFiles) {
+                updatedFiles = [...validNewFiles]
+            } else {
+                updatedFiles = [...currentFiles]
+                validNewFiles.forEach((newFile) => {
+                    const newFileExt = getFileExtension(newFile.name)
+                    const existingFileIndex = updatedFiles.findIndex(
+                        (file) => getFileExtension(file.name) === newFileExt,
+                    )
+                    if (existingFileIndex !== -1) {
+                        updatedFiles[existingFileIndex] = newFile
+                    } else {
+                        updatedFiles.push(newFile)
+                    }
+                })
+            }
+
+            const uniqueFiles = updatedFiles.reduce((acc, current) => {
+                if (!acc.find((item) => item.name === current.name)) {
+                    acc.push(current)
+                }
+                return acc
+            }, [] as File[])
+
+            form.setValue("shapefile", uniqueFiles, { shouldValidate: true })
+            handleFilesSet(uniqueFiles)
             e.dataTransfer.clearData()
         }
     }
