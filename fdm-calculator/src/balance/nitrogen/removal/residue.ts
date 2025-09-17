@@ -75,7 +75,9 @@ export function calculateNitrogenRemovalByResidue(
 
             // Fallback to default yield from cultivation_catalogue
             if (yieldForThisHarvest === null) {
-                yieldForThisHarvest = new Decimal(cultivationDetail.b_lu_yield ?? 0)
+                yieldForThisHarvest = new Decimal(
+                    cultivationDetail.b_lu_yield ?? 0,
+                )
             }
 
             if (yieldForThisHarvest !== null) {
@@ -123,7 +125,7 @@ export function calculateNitrogenRemovalByResidue(
         }
     })
 
-    // Aggregate the total maount of Nitrogen removed by crop residues
+    // Aggregate the total amount of Nitrogen removed by crop residues
     const totalValue = removalsResidue.reduce((acc, residue) => {
         return acc.add(residue.value)
     }, new Decimal(0))

@@ -307,9 +307,9 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
         )
 
         //Check for approximation due to floating point
-        expect(result.total.toNumber()).toBeCloseTo(0, 2)
+        expect(result.total.equals(new Decimal(0))).toBe(true)
         expect(result.cultivations).toEqual([
-            { id: "cultivation1", value: expect.any(Decimal) },
+            { id: "cultivation1", value: new Decimal(0) },
         ])
     })
 })

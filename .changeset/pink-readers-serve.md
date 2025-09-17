@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Fix dividing by 0 error at nitrogen balance calculation when b_lu_hi is undefined or 0
+Fix divide-by-zero in nitrogen balance when b_lu_hi is undefined or 0

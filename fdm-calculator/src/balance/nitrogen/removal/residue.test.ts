@@ -20,7 +20,7 @@ describe("calculateNitrogenRemovalByResidue", () => {
         [
             "catalogue2",
             {
-                b_lu_catalogue: "catalogue1",
+                b_lu_catalogue: "catalogue2",
                 b_lu_croprotation: "quinoa",
                 b_lu_yield: 1000,
                 b_lu_n_harvestable: 20,
