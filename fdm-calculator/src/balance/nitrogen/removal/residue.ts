@@ -75,7 +75,7 @@ export function calculateNitrogenRemovalByResidue(
 
             // Fallback to default yield from cultivation_catalogue
             if (yieldForThisHarvest === null) {
-                yieldForThisHarvest = cultivationDetail.b_lu_yield
+                yieldForThisHarvest = new Decimal(cultivationDetail.b_lu_yield ?? 0)
             }
 
             if (yieldForThisHarvest !== null) {
