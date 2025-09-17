@@ -17,6 +17,18 @@ describe("calculateNitrogenRemovalByResidue", () => {
                 b_n_fixation: 0,
             },
         ],
+        [
+            "catalogue2",
+            {
+                b_lu_catalogue: "catalogue1",
+                b_lu_croprotation: "quinoa",
+                b_lu_yield: 1000,
+                b_lu_n_harvestable: 20,
+                b_lu_hi: 0,
+                b_lu_n_residue: 2,
+                b_n_fixation: 0,
+            },
+        ],
     ])
 
     it("should return 0 if no crop residues are left", () => {
@@ -215,5 +227,29 @@ describe("calculateNitrogenRemovalByResidue", () => {
 
         expect(result.total.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
         expect(result.cultivations[0].value.toNumber()).toBeCloseTo(-3) //Approximation due to floating point
+    })
+
+    it("should return 0 if b_lu_hi is 0", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "cultivation1",
+                b_lu_catalogue: "catalogue2",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
+                m_cropresidue: true,
+            },
+        ]
+        const harvests: FieldInput["harvests"] = []
+
+        const result = calculateNitrogenRemovalByResidue(
+            cultivations,
+            harvests,
+            cultivationDetailsMap,
+        )
+
+        expect(result).toEqual({
+            total: new Decimal(0),
+            cultivations: [{ id: "cultivation1", value: new Decimal(0) }],
+        })
     })
 })

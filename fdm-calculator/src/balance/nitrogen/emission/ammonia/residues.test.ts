@@ -258,4 +258,58 @@ describe("calculateNitrogenEmissionViaAmmoniaByResidues", () => {
             { id: "cultivation1", value: expect.any(Decimal) },
         ])
     })
+
+    it("should return 0 when b_lu_hi is 0", () => {
+        const cultivations: FieldInput["cultivations"] = [
+            {
+                b_lu: "cultivation1",
+                b_lu_catalogue: "catalogue1",
+                b_lu_start: new Date("2022-01-01"),
+                b_lu_end: new Date("2022-12-31"),
+                m_cropresidue: true,
+            },
+        ]
+        const harvests: FieldInput["harvests"] = [
+            {
+                b_id_harvesting: "harvest1",
+                b_lu: "cultivation1",
+                b_lu_harvest_date: new Date(),
+                harvestable: {
+                    b_id_harvestable: "harvestable1",
+                    harvestable_analyses: [
+                        {
+                            b_lu_yield: 1000,
+                            b_lu_n_harvestable: 20,
+                        },
+                    ],
+                },
+            },
+        ]
+        const cultivationDetailsMap = new Map<string, CultivationDetail>([
+            [
+                "catalogue1",
+                {
+                    b_lu_catalogue: "catalogue1",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 1000,
+                    b_lu_n_harvestable: 20,
+                    b_lu_hi: 0,
+                    b_lu_n_residue: 14,
+                    b_n_fixation: 0,
+                },
+            ],
+        ])
+
+        const result = calculateNitrogenEmissionViaAmmoniaByResidues(
+            cultivations,
+            harvests,
+            cultivationDetailsMap,
+        )
+
+        //Check for approximation due to floating point
+        expect(result.total.toNumber()).toBeCloseTo(0, 2)
+        expect(result.cultivations).toEqual([
+            { id: "cultivation1", value: expect.any(Decimal) },
+        ])
+    })
 })

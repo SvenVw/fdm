@@ -101,6 +101,14 @@ export function calculateNitrogenRemovalByResidue(
             cultivationDetail.b_lu_n_residue ?? 0,
         )
 
+        // If cultivation has no residues possible return 0
+        if (b_lu_hi.isZero()) {
+            return {
+                id: cultivation.b_lu,
+                value: new Decimal(0),
+            }
+        }
+
         // Calculate the amount of Nitrogen removed by crop residues of this cultivation
         const removal = b_lu_yield
             .dividedBy(b_lu_hi)
