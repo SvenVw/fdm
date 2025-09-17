@@ -1,6 +1,5 @@
 import {
     and,
-    asc,
     desc,
     eq,
     gte,
@@ -428,7 +427,7 @@ export async function updateField(
 
             return field
         } catch (err) {
-            handleError(err, "Exception for updateField", {
+            throw handleError(err, "Exception for updateField", {
                 b_id,
                 b_name,
                 b_id_source,
