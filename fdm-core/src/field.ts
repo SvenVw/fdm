@@ -231,27 +231,27 @@ export async function getFields(
                 eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
                 and(
                     // Check if the acquiring date is within the timeframe
-                    gte(schema.fieldAcquiring.b_start, timeframe.start),
                     lte(schema.fieldAcquiring.b_start, timeframe.end),
                 ),
                 // Check if there is a discarding date and if it is within the timeframe
                 or(
+                    isNull(schema.fieldDiscarding.b_end),
                     and(
                         isNotNull(schema.fieldDiscarding.b_end),
                         gte(schema.fieldDiscarding.b_end, timeframe.start),
-                        lte(schema.fieldDiscarding.b_end, timeframe.end),
-                    ),
-                    // Check if there is no discarding date or if the discarding date is after the timeframe
-                    or(
-                        isNull(schema.fieldDiscarding.b_end),
-                        gte(schema.fieldDiscarding.b_end, timeframe.end),
                     ),
                 ),
             )
         } else if (timeframe?.start) {
             whereClause = and(
                 eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
-                gte(schema.fieldAcquiring.b_start, timeframe.start),
+                or(
+                    isNull(schema.fieldDiscarding.b_end),
+                    and(
+                        isNotNull(schema.fieldDiscarding.b_end),
+                        gte(schema.fieldDiscarding.b_end, timeframe.start),
+                    ),
+                ),
             )
         } else if (timeframe?.end) {
             whereClause = and(
