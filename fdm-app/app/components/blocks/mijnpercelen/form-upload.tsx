@@ -189,17 +189,8 @@ export function MijnPercelenUploadForm({
 
             if (validNewFiles.length === 0) return
 
-            const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = [...currentFiles, ...validNewFiles]
-            const uniqueFiles = updatedFiles.reduce((acc, current) => {
-                if (!acc.find((item) => item.name === current.name)) {
-                    acc.push(current)
-                }
-                return acc
-            }, [] as File[])
-
-            onChange(uniqueFiles)
-            await handleFilesSet(uniqueFiles)
+            onChange(validNewFiles)
+            await handleFilesSet(validNewFiles)
         }
     }
 
@@ -223,17 +214,10 @@ export function MijnPercelenUploadForm({
 
             if (validNewFiles.length === 0) return
 
-            const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = [...currentFiles, ...validNewFiles]
-            const uniqueFiles = updatedFiles.reduce((acc, current) => {
-                if (!acc.find((item) => item.name === current.name)) {
-                    acc.push(current)
-                }
-                return acc
-            }, [] as File[])
-
-            form.setValue("shapefile", uniqueFiles, { shouldValidate: true })
-            handleFilesSet(uniqueFiles)
+            form.setValue("shapefile", validNewFiles, {
+                shouldValidate: true,
+            })
+            handleFilesSet(validNewFiles)
             e.dataTransfer.clearData()
         }
     }
