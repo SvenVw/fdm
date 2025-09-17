@@ -1,6 +1,7 @@
 import {
     and,
     asc,
+    desc,
     eq,
     gte,
     inArray,
@@ -287,7 +288,7 @@ export async function getFields(
                 eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
             )
             .where(whereClause)
-            .orderBy(asc(schema.fields.b_name))
+            .orderBy(desc(sql<number>`ST_Area(b_geometry::geography)`))
 
         // Process the centroids into  a tuple
         for (const field of fields) {
