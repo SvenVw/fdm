@@ -145,7 +145,7 @@ export default function FarmDashboardIndex() {
                             </CardHeader>
                             <CardContent className="grid lg:grid-cols-2 gap-4">
                                 <NavLink to="#">
-                                    <Card>
+                                    <Card className="transition-all hover:shadow-md">
                                         <CardHeader className="flex items-start">
                                             <div className="flex items-center gap-4">
                                                 <div className="rounded-lg bg-muted p-2">
@@ -166,7 +166,7 @@ export default function FarmDashboardIndex() {
                                     </Card>
                                 </NavLink>
                                 <NavLink to="#">
-                                    <Card>
+                                    <Card className="transition-all hover:shadow-md">
                                         <CardHeader className="flex items-start">
                                             <div className="flex items-center gap-4">
                                                 <div className="rounded-lg bg-muted p-2">
@@ -197,7 +197,7 @@ export default function FarmDashboardIndex() {
                                 </CardHeader>
                                 <CardContent className="grid lg:grid-cols-2 gap-4">
                                     <NavLink to={`${calendar}/balance`}>
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -218,7 +218,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to={`${calendar}/nutrient_advice`}>
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -241,7 +241,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to={`${calendar}/norms`}>
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -262,7 +262,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to={`${calendar}/atlas`}>
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -294,7 +294,7 @@ export default function FarmDashboardIndex() {
                                 </CardHeader>
                                 <CardContent className="grid lg:grid-cols-2 gap-4">
                                     <NavLink to={`${calendar}/field`}>
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -319,7 +319,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to="fertilizers">
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -340,7 +340,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to="settings/access">
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -371,7 +371,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to="settings">
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
@@ -392,7 +392,7 @@ export default function FarmDashboardIndex() {
                                         </Card>
                                     </NavLink>
                                     <NavLink to="settings/derogation">
-                                        <Card>
+                                        <Card className="transition-all hover:shadow-md">
                                             <CardHeader className="flex items-start">
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-muted p-2">
