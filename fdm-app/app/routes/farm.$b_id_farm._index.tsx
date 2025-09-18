@@ -27,19 +27,29 @@ import {
 } from "../components/ui/card"
 import { Button } from "../components/ui/button"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../components/ui/select"
+import {
     ArrowRightLeft,
     BookOpenText,
     ChevronsUp,
     ChevronUp,
+    Home,
     Landmark,
     MapIcon,
     Plus,
     Settings,
     Shapes,
     Square,
+    Trash2,
     UserRoundCheck,
     Zap,
 } from "lucide-react"
+import { getCalendarSelection } from "../lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -113,6 +123,8 @@ export default function FarmDashboardIndex() {
     const loaderData = useLoaderData<typeof loader>()
 
     const calendar = useCalendarStore((state) => state.calendar)
+    const setCalendar = useCalendarStore((state) => state.setCalendar)
+    const years = getCalendarSelection()
 
     return (
         <SidebarInset>
@@ -131,86 +143,79 @@ export default function FarmDashboardIndex() {
             <main>
                 <FarmTitle title={loaderData.b_name_farm} description={""} />
                 <FarmContent>
-                    <div className="grid  gap-4">
-                        <Card className="w-full">
-                            <CardHeader>
-                                <div className="flex items-center gap-4">
-                                    <div className="rounded-lg bg-muted p-2">
-                                        <Zap className="h-8 w-8 text-primary" />
-                                    </div>
-                                    <div>
-                                        <CardTitle>Snelle acties</CardTitle>
-                                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Left Column */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Quick Actions */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold tracking-tight">
+                                    Snelle acties
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <NavLink to="#">
+                                        <Card className="transition-all hover:shadow-md">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-primary text-primary-foreground p-3">
+                                                        <Plus className="h-6 w-6" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Bemesting toevoegen
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Voor één of meerdere
+                                                            percelen.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
+                                    <NavLink to="#">
+                                        <Card className="transition-all hover:shadow-md">
+                                            <CardHeader>
+                                                <div className="flex items-center gap-4">
+                                                    <div className="rounded-lg bg-primary text-primary-foreground p-3">
+                                                        <Plus className="h-6 w-6" />
+                                                    </div>
+                                                    <div>
+                                                        <CardTitle>
+                                                            Oogst toevoegen
+                                                        </CardTitle>
+                                                        <CardDescription>
+                                                            Voor één of meerdere
+                                                            percelen.
+                                                        </CardDescription>
+                                                    </div>
+                                                </div>
+                                            </CardHeader>
+                                        </Card>
+                                    </NavLink>
                                 </div>
-                            </CardHeader>
-                            <CardContent className="grid lg:grid-cols-2 gap-4">
-                                <NavLink to="#">
-                                    <Card className="transition-all hover:shadow-md">
-                                        <CardHeader className="flex items-start">
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-lg bg-muted p-2">
-                                                    <Plus className="h-8 w-8 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <CardTitle>
-                                                        Bemesting
-                                                    </CardTitle>
-                                                    <CardDescription>
-                                                        Voeg een bemesting toe
-                                                        voor één of meerdere
-                                                        percelen.
-                                                    </CardDescription>
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                    </Card>
-                                </NavLink>
-                                <NavLink to="#">
-                                    <Card className="transition-all hover:shadow-md">
-                                        <CardHeader className="flex items-start">
-                                            <div className="flex items-center gap-4">
-                                                <div className="rounded-lg bg-muted p-2">
-                                                    <Plus className="h-8 w-8 text-primary" />
-                                                </div>
-                                                <div>
-                                                    <CardTitle>Oogst</CardTitle>
-                                                    <CardDescription className="">
-                                                        Voeg een oogst toe voor
-                                                        één of meerdere
-                                                        percelen.
-                                                    </CardDescription>
-                                                </div>
-                                            </div>
-                                        </CardHeader>
-                                    </Card>
-                                </NavLink>
-                            </CardContent>
-                        </Card>
-                        <div className="grid lg:grid-cols-2 gap-4">
-                            <Card className="w-full">
-                                <CardHeader>
-                                    <CardTitle>Apps</CardTitle>
-                                    <CardDescription>
-                                        Bekijk welke apps er beschikbaar zijn
-                                        voor dit bedrijf.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="grid lg:grid-cols-2 gap-4">
+                            </div>
+
+                            {/* Apps */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold tracking-tight">
+                                    Apps
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <NavLink to={`${calendar}/balance`}>
                                         <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
+                                            <CardHeader>
                                                 <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <ArrowRightLeft className="h-8 w-8 text-primary" />
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <ArrowRightLeft className="h-6 w-6 text-primary" />
                                                     </div>
                                                     <div>
                                                         <CardTitle>
                                                             Nutriententenbalans
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Inzicht in aanvoer,
-                                                            afvoer en emissie
-                                                            van stikstof
+                                                            Aanvoer, afvoer en
+                                                            emissie van
+                                                            stikstof.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
@@ -219,21 +224,20 @@ export default function FarmDashboardIndex() {
                                     </NavLink>
                                     <NavLink to={`${calendar}/nutrient_advice`}>
                                         <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
+                                            <CardHeader>
                                                 <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <BookOpenText className="h-8 w-8 text-primary" />
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <BookOpenText className="h-6 w-6 text-primary" />
                                                     </div>
                                                     <div>
                                                         <CardTitle>
                                                             Bemestingsadvies
                                                         </CardTitle>
-                                                        <CardDescription className="">
-                                                            Advies volgens
-                                                            Handboek Bodem en
-                                                            Bemesting (CBAV) en
-                                                            Adviesbasis
-                                                            Bemesting (CBGV).
+                                                        <CardDescription>
+                                                            Volgens Handboek
+                                                            Bodem en Bemesting
+                                                            en Adviesbasis
+                                                            Bemesting.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
@@ -242,19 +246,18 @@ export default function FarmDashboardIndex() {
                                     </NavLink>
                                     <NavLink to={`${calendar}/norms`}>
                                         <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
+                                            <CardHeader>
                                                 <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <Landmark className="h-8 w-8 text-primary" />
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <Landmark className="h-6 w-6 text-primary" />
                                                     </div>
                                                     <div>
                                                         <CardTitle>
                                                             Gebruiksnormen
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Gebruiksnormen op
-                                                            bedrijdfs- en
-                                                            perceelsniveau
+                                                            Normen op bedrijfs-
+                                                            en perceelsniveau.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
@@ -263,156 +266,180 @@ export default function FarmDashboardIndex() {
                                     </NavLink>
                                     <NavLink to={`${calendar}/atlas`}>
                                         <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
+                                            <CardHeader>
                                                 <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <MapIcon className="h-8 w-8 text-primary" />
+                                                    <div className="rounded-lg bg-muted p-3">
+                                                        <MapIcon className="h-6 w-6 text-primary" />
                                                     </div>
                                                     <div>
                                                         <CardTitle>
                                                             Atlas
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Bekijk gewaspercelen
-                                                            op de kaart
+                                                            Gewaspercelen op de
+                                                            kaart.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
                                             </CardHeader>
                                         </Card>
                                     </NavLink>
-                                </CardContent>
-                            </Card>
+                                </div>
+                            </div>
+                        </div>
 
-                            <Card className="w-full">
-                                <CardHeader>
-                                    <CardTitle>Gegevens</CardTitle>
-                                    <CardDescription>
-                                        Bekijk welke gegevens er zijn over dit
-                                        bedrijf.
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="grid lg:grid-cols-2 gap-4">
-                                    <NavLink to={`${calendar}/field`}>
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <Square className="h-8 w-8 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Percelen
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            {loaderData.fieldsNumber ===
-                                                            0
-                                                                ? `Dit bedrijf heeft geen percelen ${calendar}`
-                                                                : loaderData.fieldsNumber ===
-                                                                    1
-                                                                  ? `Dit bedrijf heeft 1 perceel in ${calendar}`
-                                                                  : `Dit bedrijf heeft ${loaderData.fieldsNumber} percelen en ${loaderData.farmArea} ha in ${calendar}.`}
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
-                                    <NavLink to="fertilizers">
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <Shapes className="h-8 w-8 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Meststoffen
-                                                        </CardTitle>
-                                                        <CardDescription className="">
-                                                            Bekijk en beheer de
-                                                            meststoffen voor dit
-                                                            bedrijf
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
-                                    <NavLink to="settings/access">
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <UserRoundCheck className="h-8 w-8 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Toegang
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            {loaderData
-                                                                .roles[0] ===
-                                                            "owner"
-                                                                ? "Je hebt de rol Eigenaar voor dit bedrijf."
-                                                                : loaderData
-                                                                        .roles[0] ===
-                                                                    "advisor"
-                                                                  ? "Je hebt de rol Adviseur voor dit bedrijf."
-                                                                  : loaderData
-                                                                          .roles[0] ===
-                                                                      "researcher"
-                                                                    ? "Je hebt de rol Onderzoeker voor dit bedrijf."
-                                                                    : `Je hebt de rol ${loaderData.roles[0]} voor dit bedrijf.`}
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
-                                    <NavLink to="settings">
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <Settings className="h-8 w-8 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Instellingen
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            Pas de instellingen
-                                                            voor dit bedrijf
-                                                            aan.
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
-                                    <NavLink to="settings/derogation">
-                                        <Card className="transition-all hover:shadow-md">
-                                            <CardHeader className="flex items-start">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="rounded-lg bg-muted p-2">
-                                                        <ChevronUp className="h-8 w-8 text-primary" />
-                                                    </div>
-                                                    <div>
-                                                        <CardTitle>
-                                                            Derogatie
-                                                        </CardTitle>
-                                                        <CardDescription>
-                                                            Beheer derogatie
-                                                            voor dit bedrijf.
-                                                        </CardDescription>
-                                                    </div>
-                                                </div>
-                                            </CardHeader>
-                                        </Card>
-                                    </NavLink>
-                                </CardContent>
-                            </Card>
+                        {/* Right Column */}
+                        <div className="space-y-8">
+                            {/* Overview */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold tracking-tight">
+                                    Overzicht
+                                </h2>
+                                <Card>
+                                    <CardContent className="pt-6">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-muted-foreground">
+                                                    Aantal percelen
+                                                </span>
+                                                <span className="font-semibold">
+                                                    {loaderData.fieldsNumber}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-muted-foreground">
+                                                    Totale oppervlakte
+                                                </span>
+                                                <span className="font-semibold">
+                                                    {loaderData.farmArea} ha
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-muted-foreground">
+                                                    Rol
+                                                </span>
+                                                <span className="font-semibold">
+                                                    {loaderData.roles.includes(
+                                                        "owner",
+                                                    )
+                                                        ? "Eigenaar"
+                                                        : loaderData.roles.includes(
+                                                                "advisor",
+                                                            )
+                                                          ? "Adviseur"
+                                                          : loaderData.roles.includes(
+                                                                  "researcher",
+                                                              )
+                                                            ? "Onderzoeker"
+                                                            : loaderData
+                                                                  .roles[0]}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-muted-foreground">
+                                                    Jaar
+                                                </span>
+                                                <Select
+                                                    value={calendar}
+                                                    onValueChange={(value) =>
+                                                        setCalendar(value)
+                                                    }
+                                                >
+                                                    <SelectTrigger className="w-[180px]">
+                                                        <SelectValue placeholder="Select a year" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {years.map((year) => (
+                                                            <SelectItem
+                                                                key={year}
+                                                                value={year}
+                                                            >
+                                                                {year}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
+                            {/* Settings */}
+                            <div className="space-y-4">
+                                <h2 className="text-2xl font-semibold tracking-tight">
+                                    Gegevens
+                                </h2>
+                                <Card>
+                                    <CardContent className="pt-6">
+                                        <div className="space-y-1">
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink
+                                                    to={`${calendar}/field`}
+                                                >
+                                                    <Square className="mr-2 h-4 w-4" />
+                                                    Percelen
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="fertilizers">
+                                                    <Shapes className="mr-2 h-4 w-4" />
+                                                    Meststoffen
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings">
+                                                    <Home className="mr-2 h-4 w-4" />
+                                                    Bedrijf
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/derogation">
+                                                    <ChevronUp className="mr-2 h-4 w-4" />
+                                                    Derogatie
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/access">
+                                                    <UserRoundCheck className="mr-2 h-4 w-4" />
+                                                    Toegang
+                                                </NavLink>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                className="w-full justify-start"
+                                                asChild
+                                            >
+                                                <NavLink to="settings/delete">
+                                                    <Trash2 className="mr-2 h-4 w-4" />
+                                                    Verwijderen
+                                                </NavLink>
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </div>
                     </div>
                 </FarmContent>
