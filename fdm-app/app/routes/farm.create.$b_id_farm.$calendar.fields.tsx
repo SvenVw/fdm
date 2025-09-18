@@ -80,9 +80,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
 
-        // Sort by name
-        fields.sort((a, b) => a.b_name.localeCompare(b.b_name))
-
         // Create the sidenav
         const sidebarPageItems = fields.map((field) => {
             return {

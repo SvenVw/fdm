@@ -146,7 +146,9 @@ export function MijnPercelenUploadForm({
         checkRequiredFiles(validFiles)
         setUploadState("idle")
 
-        const dbfFile = validFiles.find((file) => file.name.endsWith(".dbf"))
+        const dbfFile = validFiles.find(
+            (file) => getFileExtension(file.name) === ".dbf",
+        )
         if (dbfFile) {
             try {
                 const dbfBuffer = await dbfFile.arrayBuffer()
@@ -190,16 +192,14 @@ export function MijnPercelenUploadForm({
             if (validNewFiles.length === 0) return
 
             const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = [...currentFiles, ...validNewFiles]
-            const uniqueFiles = updatedFiles.reduce((acc, current) => {
-                if (!acc.find((item) => item.name === current.name)) {
-                    acc.push(current)
-                }
-                return acc
-            }, [] as File[])
+            const updatedFiles = mergeShapefileParts(
+                currentFiles,
+                validNewFiles,
+                requiredExtensions,
+            )
 
-            onChange(uniqueFiles)
-            await handleFilesSet(uniqueFiles)
+            onChange(updatedFiles)
+            await handleFilesSet(updatedFiles)
         }
     }
 
@@ -224,16 +224,14 @@ export function MijnPercelenUploadForm({
             if (validNewFiles.length === 0) return
 
             const currentFiles = form.getValues("shapefile") || []
-            const updatedFiles = [...currentFiles, ...validNewFiles]
-            const uniqueFiles = updatedFiles.reduce((acc, current) => {
-                if (!acc.find((item) => item.name === current.name)) {
-                    acc.push(current)
-                }
-                return acc
-            }, [] as File[])
+            const updatedFiles = mergeShapefileParts(
+                currentFiles,
+                validNewFiles,
+                requiredExtensions,
+            )
 
-            form.setValue("shapefile", uniqueFiles, { shouldValidate: true })
-            handleFilesSet(uniqueFiles)
+            form.setValue("shapefile", updatedFiles, { shouldValidate: true })
+            await handleFilesSet(updatedFiles)
             e.dataTransfer.clearData()
         }
     }
@@ -641,4 +639,41 @@ export const FormSchema = z.object({
 
 const getFileExtension = (filename: string): string => {
     return filename.slice(filename.lastIndexOf(".")).toLowerCase()
+}
+
+function mergeShapefileParts(
+    currentFiles: File[],
+    newFiles: File[],
+    requiredExtensions: string[],
+) {
+    const newExtensions = new Set(
+        newFiles.map((file) => getFileExtension(file.name)),
+    )
+    const hasAllRequired = requiredExtensions.every((ext) =>
+        newExtensions.has(ext),
+    )
+
+    if (hasAllRequired) {
+        return [...newFiles]
+    }
+
+    const updatedFiles = [...currentFiles]
+    newFiles.forEach((newFile) => {
+        const newFileExt = getFileExtension(newFile.name)
+        const existingFileIndex = updatedFiles.findIndex(
+            (file) => getFileExtension(file.name) === newFileExt,
+        )
+        if (existingFileIndex !== -1) {
+            updatedFiles[existingFileIndex] = newFile
+        } else {
+            updatedFiles.push(newFile)
+        }
+    })
+
+    return updatedFiles.reduce((acc, current) => {
+        if (!acc.find((item) => item.name === current.name)) {
+            acc.push(current)
+        }
+        return acc
+    }, [] as File[])
 }
