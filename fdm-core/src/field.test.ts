@@ -210,7 +210,8 @@ describe("Farm Data Model", () => {
                         ],
                     ],
                 }
-                const field1Start = new Date("2023-01-01")
+                const field1Start = new Date("2022-01-01")
+                const field1End = new Date("2022-05-01")
                 const field1AcquiringMethod = "nl_01"
                 await addField(
                     fdm,
@@ -221,6 +222,7 @@ describe("Farm Data Model", () => {
                     field1Geometry,
                     field1Start,
                     field1AcquiringMethod,
+                    field1End,
                 )
 
                 const field2Name = "Field 2"
@@ -237,7 +239,7 @@ describe("Farm Data Model", () => {
                         ],
                     ],
                 }
-                const field2Start = new Date("2023-04-01")
+                const field2Start = new Date("2023-02-01")
                 const field2AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
@@ -291,8 +293,8 @@ describe("Farm Data Model", () => {
                         ],
                     ],
                 }
-                const field4Start = new Date("2023-07-01")
-                const field4End = new Date("2023-09-01")
+                const field4Start = new Date("2024-07-01")
+                const field4End = new Date("2024-09-01")
                 const field4AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
@@ -306,7 +308,7 @@ describe("Farm Data Model", () => {
                     field4End,
                 )
 
-                // Test with a timeframe that includes only Field 2
+                // Test with a timeframe that includes Field 2
                 const timeframe1 = {
                     start: new Date("2023-03-01"),
                     end: new Date("2023-05-01"),
@@ -322,7 +324,7 @@ describe("Farm Data Model", () => {
 
                 // Test with a timeframe that includes both Field 1 and Field 2
                 const timeframe2 = {
-                    start: new Date("2022-12-01"),
+                    start: new Date("2022-01-01"),
                     end: new Date("2023-05-01"),
                 }
                 const fields2 = await getFields(
@@ -336,7 +338,7 @@ describe("Farm Data Model", () => {
                     expect.arrayContaining([field1Name, field2Name]),
                 )
 
-                // Test with a timeframe that includes field 3 and field 4
+                // Test with a timeframe that includes field 2 and field 3
                 const timeframe3 = {
                     start: new Date("2023-05-01"),
                     end: new Date("2023-09-01"),
@@ -348,16 +350,16 @@ describe("Farm Data Model", () => {
                     b_id_farm,
                     timeframe3,
                 )
-
                 expect(fields3.length).toBe(2)
                 expect(fields3.map((f) => f.b_name)).toEqual(
-                    expect.arrayContaining([field3Name, field4Name]),
+                    expect.arrayContaining([field2Name, field3Name]),
                 )
                 //Test with only start date
                 const fields4 = await getFields(fdm, principal_id, b_id_farm, {
                     start: new Date("2023-03-01"),
                     end: undefined,
                 })
+                
                 expect(fields4.length).toBe(3)
                 expect(fields4.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([

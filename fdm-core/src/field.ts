@@ -1,6 +1,6 @@
 import {
     and,
-    asc,
+    desc,
     eq,
     gte,
     inArray,
@@ -231,27 +231,27 @@ export async function getFields(
                 eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
                 and(
                     // Check if the acquiring date is within the timeframe
-                    gte(schema.fieldAcquiring.b_start, timeframe.start),
                     lte(schema.fieldAcquiring.b_start, timeframe.end),
                 ),
                 // Check if there is a discarding date and if it is within the timeframe
                 or(
+                    isNull(schema.fieldDiscarding.b_end),
                     and(
                         isNotNull(schema.fieldDiscarding.b_end),
                         gte(schema.fieldDiscarding.b_end, timeframe.start),
-                        lte(schema.fieldDiscarding.b_end, timeframe.end),
-                    ),
-                    // Check if there is no discarding date or if the discarding date is after the timeframe
-                    or(
-                        isNull(schema.fieldDiscarding.b_end),
-                        gte(schema.fieldDiscarding.b_end, timeframe.end),
                     ),
                 ),
             )
         } else if (timeframe?.start) {
             whereClause = and(
                 eq(schema.fieldAcquiring.b_id_farm, b_id_farm),
-                gte(schema.fieldAcquiring.b_start, timeframe.start),
+                or(
+                    isNull(schema.fieldDiscarding.b_end),
+                    and(
+                        isNotNull(schema.fieldDiscarding.b_end),
+                        gte(schema.fieldDiscarding.b_end, timeframe.start),
+                    ),
+                ),
             )
         } else if (timeframe?.end) {
             whereClause = and(
@@ -287,7 +287,7 @@ export async function getFields(
                 eq(schema.fields.b_id, schema.fieldDiscarding.b_id),
             )
             .where(whereClause)
-            .orderBy(asc(schema.fields.b_name))
+            .orderBy(desc(sql<number>`ST_Area(b_geometry::geography)`))
 
         // Process the centroids into  a tuple
         for (const field of fields) {
@@ -427,7 +427,7 @@ export async function updateField(
 
             return field
         } catch (err) {
-            handleError(err, "Exception for updateField", {
+            throw handleError(err, "Exception for updateField", {
                 b_id,
                 b_name,
                 b_id_source,

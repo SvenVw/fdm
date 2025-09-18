@@ -1,5 +1,12 @@
 # Changelog fdm-core
 
+## 0.24.2
+
+### Patch Changes
+
+- 787fa53: Fix `getFields` filtering: include fields acquired before the timeframe start if they overlap the timeframe (end is within the timeframe or undefined).
+- cd4cc8a: Fields are sorted by descending area instead of alphabetical name.
+
 ## 0.24.1
 
 ### Patch Changes
