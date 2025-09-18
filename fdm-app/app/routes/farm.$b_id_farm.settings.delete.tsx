@@ -159,6 +159,21 @@ export async function action({ request, params }: ActionFunctionArgs) {
         // Get the session
         const session = await getSession(request)
 
+        // Server-side permission check (mirror loader logic)
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        let canDeleteFarm = await isAllowedToDeleteFarm(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
+        // Temporary workaround: advisors may not delete farms
+        if (canDeleteFarm && farm.roles.includes("advisor")) {
+            canDeleteFarm = false
+        }
+        if (!canDeleteFarm) {
+            throw data("Forbidden", { status: 403, statusText: "Forbidden" })
+        }
+
         // Remove the farm
         await removeFarm(fdm, session.principal_id, b_id_farm)
 
