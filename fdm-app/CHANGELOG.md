@@ -1,5 +1,17 @@
 # Changelog fdm-app
 
+## 0.22.4
+
+### Patch Changes
+
+- 5848723: Remove uploaded shapefile after uploading
+- 65d2a3d: Fixes to keep files in the upload box when selecting another (new) shapefile to upload
+- cd4cc8a: Fields are sorted by descending area instead of alphabetical name.
+- Updated dependencies [787fa53]
+- Updated dependencies [cd4cc8a]
+  - @svenvw/fdm-core@0.24.2
+  - @svenvw/fdm-calculator@0.6.1
+
 ## 0.22.3
 
 ### Patch Changes
