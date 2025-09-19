@@ -97,6 +97,14 @@ export function calculateNitrogenEmissionViaAmmoniaByResidues(
         const b_lu_hi = new Decimal(cultivationDetail.b_lu_hi ?? 0)
         const b_lu_hi_res = new Decimal(1).minus(b_lu_hi)
 
+        // If cultivation has no residues possible return 0
+        if (b_lu_hi.isZero()) {
+            return {
+                id: cultivation.b_lu,
+                value: new Decimal(0),
+            }
+        }
+
         // Get the Nitrogen content of the crop residues
         const b_lu_n_residue = new Decimal(
             cultivationDetail.b_lu_n_residue ?? 0,

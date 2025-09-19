@@ -1,5 +1,5 @@
-import { LocalFileStorage } from "@mjackson/file-storage/local"
-import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
+import { LocalFileStorage } from "@remix-run/file-storage/local"
+import { type FileUpload, parseFormData } from "@remix-run/form-data-parser"
 import {
     addCultivation,
     addField,
@@ -102,6 +102,9 @@ interface RvoProperties {
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
+    const fileStorage = new LocalFileStorage("./uploads/shapefiles")
+    const storageKeys: string[] = []
+
     try {
         // Get the Id and name of the farm
         const b_id_farm = params.b_id_farm
@@ -115,10 +118,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const session = await getSession(request)
         const calendar = await getCalendar(params)
         const nmiApiKey = getNmiApiKey()
-        const fileStorage = new LocalFileStorage("./uploads/shapefiles")
 
         const uploadHandler = async (fileUpload: FileUpload) => {
             const storageKey = crypto.randomUUID()
+            storageKeys.push(storageKey)
             await fileStorage.set(storageKey, fileUpload)
             return fileStorage.get(storageKey)
         }
@@ -266,5 +269,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
     } catch (error) {
         throw handleActionError(error)
+    } finally {
+        for (const key of storageKeys) {
+            await fileStorage.remove(key)
+        }
     }
 }

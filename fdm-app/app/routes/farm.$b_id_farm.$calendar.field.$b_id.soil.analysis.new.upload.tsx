@@ -1,5 +1,5 @@
-import { LocalFileStorage } from "@mjackson/file-storage/local"
-import { type FileUpload, parseFormData } from "@mjackson/form-data-parser"
+import { LocalFileStorage } from "@remix-run/file-storage/local"
+import { type FileUpload, parseFormData } from "@remix-run/form-data-parser"
 import {
     addSoilAnalysis,
     getField,

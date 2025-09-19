@@ -110,9 +110,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        // Sort fields by name alphabetically
-        fieldOptions.sort((a, b) => a.b_name.localeCompare(b.b_name))
-
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
@@ -211,16 +208,13 @@ export default function FarmFieldIndex() {
                                                             <p className="text-sm font-medium leading-none">
                                                                 {option.b_name}
                                                             </p>
-                                                            {option.b_area &&
-                                                            option.b_area >
-                                                                0.1 ? (
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {
-                                                                        option.b_area
-                                                                    }{" "}
-                                                                    ha
-                                                                </p>
-                                                            ) : null}
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {option.b_area &&
+                                                                option.b_area >
+                                                                    0.1
+                                                                    ? `${option.b_area} ha`
+                                                                    : "< 0.1 ha"}
+                                                            </p>
                                                         </div>
 
                                                         <div className="">
