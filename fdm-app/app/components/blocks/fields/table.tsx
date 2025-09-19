@@ -11,7 +11,7 @@ import {
     VisibilityState,
 } from "@tanstack/react-table"
 import { ChevronDown, Plus } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router"
 import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
@@ -54,9 +54,51 @@ export function DataTable<TData extends FieldExtended, TValue>({
         {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+    const lastSelectedRowIndex = useRef<number | null>(null)
 
     const params = useParams()
     const b_id_farm = params.b_id_farm
+
+    const handleRowClick = (
+        row: any,
+        event: React.MouseEvent<HTMLTableRowElement>,
+    ) => {
+        // Check if the clicked element or any of its parents is an anchor tag
+        const isLinkClick = (target: EventTarget | null): boolean => {
+            if (!target || !(target instanceof HTMLElement)) {
+                return false
+            }
+            if (target.tagName === "A") {
+                return true
+            }
+            return isLinkClick(target.parentElement)
+        }
+
+        if (isLinkClick(event.target)) {
+            // If a link was clicked, let the default navigation happen
+            return
+        }
+
+        if (event.shiftKey && lastSelectedRowIndex.current !== null) {
+            const currentIndex = row.index
+            const start = Math.min(currentIndex, lastSelectedRowIndex.current)
+            const end = Math.max(currentIndex, lastSelectedRowIndex.current)
+
+            const rowsToSelect = table
+                .getRowModel()
+                .rows.slice(start, end + 1)
+                .map((r) => r.id)
+
+            const newRowSelection = { ...rowSelection }
+            rowsToSelect.forEach((id) => {
+                newRowSelection[id] = true
+            })
+            setRowSelection(newRowSelection)
+        } else {
+            row.toggleSelected()
+        }
+        lastSelectedRowIndex.current = row.index
+    }
 
     const fuzzyFilter = (row: any, columnId: string, filterValue: string) => {
         const cultivationNames = row.original.cultivations
@@ -93,7 +135,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
 
     const selectedFields = useMemo(() => {
         return table.getFilteredSelectedRowModel().rows.map((row) => row.original)
-    }, [table.getFilteredSelectedRowModel().rows])
+    }, [table])
 
     const canAddHarvest = useMemo(() => {
         if (selectedFields.length === 0) return false
@@ -243,6 +285,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                     data-state={
                                         row.getIsSelected() && "selected"
                                     }
+                                    onClick={(event) => handleRowClick(row, event)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
