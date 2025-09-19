@@ -74,7 +74,11 @@ export function FertilizerApplicationForm({
             )
             if (savedFormValues) {
                 for (const [k, v] of Object.entries(savedFormValues)) {
-                    form.setValue(k as any, v)
+                    const hydrated =
+                        k === "p_app_date" && v
+                            ? new Date(v as any)
+                            : (v as any)
+                    form.setValue(k as any, hydrated)
                 }
             }
         }
