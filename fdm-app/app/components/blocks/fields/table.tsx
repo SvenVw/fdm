@@ -12,6 +12,7 @@ import {
 import { ChevronDown, Plus } from "lucide-react"
 import { useState } from "react"
 import { NavLink } from "react-router"
+import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import {
@@ -40,9 +41,16 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const [globalFilter, setGlobalFilter] = useState("")
 
     const [columnVisibility, setColumnVisibility] =
         useState<VisibilityState>({})
+
+    const fuzzyFilter = (row: any, columnId: string, filterValue: string) => {
+        const target = `${row.getValue("b_name")} ${row.getValue("b_lu_name")}`
+        const result = fuzzysort.go(filterValue, [target])
+        return result.length > 0
+    }
 
     const table = useReactTable({
         data,
@@ -53,10 +61,13 @@ export function DataTable<TData, TValue>({
         onColumnFiltersChange: setColumnFilters,
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: fuzzyFilter,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
+            globalFilter,
         },
     })
 
@@ -64,17 +75,9 @@ export function DataTable<TData, TValue>({
         <div>
             <div className="flex items-center py-4 space-x-2">
                 <Input
-                    placeholder="Filter percelen..."
-                    value={
-                        (table
-                            .getColumn("b_name")
-                            ?.getFilterValue() as string) ?? ""
-                    }
-                    onChange={(event) =>
-                        table
-                            .getColumn("b_name")
-                            ?.setFilterValue(event.target.value)
-                    }
+                    placeholder="Filter percelen of gewassen..."
+                    value={globalFilter ?? ""}
+                    onChange={(event) => setGlobalFilter(event.target.value)}
                     className="max-w-sm"
                 />
                 <DropdownMenu>
