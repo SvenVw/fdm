@@ -6,11 +6,12 @@ import {
     useLoaderData,
 } from "react-router"
 import type { Fertilizer } from "~/components/blocks/fertilizer/columns"
+import { FarmFertilizersIndexBlock } from "~/components/blocks/fertilizer/index-page"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmFertilizersIndexBlock } from "../components/blocks/fertilizer/index-page"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.fertilizer.manage._index"
 
 export const meta: MetaFunction = () => {
     return [
@@ -80,8 +81,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export default function FarmFertilizersIndexPage() {
+export default function FarmFertilizersIndexPage({
+    params,
+}: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
-    return <FarmFertilizersIndexBlock loaderData={loaderData} />
+    return (
+        <FarmFertilizersIndexBlock
+            loaderData={loaderData}
+            action={{
+                label: "Terug naar bemesting toevoegen",
+                to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer`,
+                disabled: false,
+            }}
+        />
+    )
 }

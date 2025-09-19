@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import type { FormEvent, MouseEvent } from "react"
 import { useEffect } from "react"
 import type { Navigation } from "react-router"
-import { Form } from "react-router"
+import { Form, useNavigate, useParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
@@ -31,11 +33,18 @@ export function FertilizerApplicationForm({
     options,
     action,
     navigation,
+    b_id_farm,
+    b_id,
 }: {
     options: FertilizerOption[]
     action: string
     navigation: Navigation
+    b_id_farm: string
+    b_id: string
 }) {
+    const params = useParams()
+    const navigate = useNavigate()
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -56,28 +65,72 @@ export function FertilizerApplicationForm({
         }
     }, [p_id, form.setValue])
 
+    const fieldFertilizerFormStore = useFieldFertilizerFormStore()
+
+    useEffect(() => {
+        if (b_id_farm && b_id) {
+            const savedFormValues = fieldFertilizerFormStore.load(
+                b_id_farm,
+                b_id,
+            )
+            if (savedFormValues) {
+                for (const [k, v] of Object.entries(savedFormValues)) {
+                    form.setValue(k as any, v)
+                }
+            }
+        }
+    }, [b_id_farm, b_id, form.setValue, fieldFertilizerFormStore.load])
+
+    function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
+        e.preventDefault()
+        if (params.b_id_farm && params.b_id) {
+            fieldFertilizerFormStore.save(
+                params.b_id_farm,
+                params.b_id,
+                form.getValues(),
+            )
+        }
+        navigate("./manage")
+    }
+
+    function handleSubmit(e: FormEvent<HTMLFormElement>) {
+        fieldFertilizerFormStore.delete(b_id_farm, b_id)
+        form.handleSubmit(e)
+    }
+
     return (
         <RemixFormProvider {...form}>
             <Form
                 id="formAddFertilizerApplication"
                 action={action}
-                onSubmit={form.handleSubmit}
+                onSubmit={handleSubmit}
                 method="post"
             >
                 <fieldset disabled={isSubmitting}>
                     <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
                         {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
-                        <Combobox
-                            options={options}
-                            form={form}
-                            name="p_id"
-                            label={
-                                <span>
-                                    Meststof
-                                    <span className="text-red-500">*</span>
-                                </span>
-                            }
-                        />
+                        <div className="flex flex-row items-end [&>*]:grow-1">
+                            <Combobox
+                                options={options}
+                                form={form}
+                                name="p_id"
+                                label={
+                                    <span>
+                                        Meststof
+                                        <span className="text-red-500">*</span>
+                                    </span>
+                                }
+                            />
+                            <div className="py-2 [&.py-2]:grow-0">
+                                <Button
+                                    variant="secondary"
+                                    className="ml-2"
+                                    onClick={handleManageFertilizers}
+                                >
+                                    Beheren
+                                </Button>
+                            </div>
+                        </div>
                         <FormField
                             control={form.control}
                             name="p_app_method"

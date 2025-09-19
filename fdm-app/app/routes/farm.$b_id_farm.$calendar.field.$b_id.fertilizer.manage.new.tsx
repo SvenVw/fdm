@@ -1,23 +1,25 @@
-import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
+import { getFarm, getFarms } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
+    Outlet,
     useLoaderData,
 } from "react-router"
-import type { Fertilizer } from "~/components/blocks/fertilizer/columns"
+import { FarmNewFertilizerLayout } from "~/components/blocks/fertilizer/new-layout"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmFertilizersIndexBlock } from "../components/blocks/fertilizer/index-page"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.fertilizer.manage._index"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Meststoffen | ${clientConfig.name}` },
+        { title: `Meststof toevoegen | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekij de lijst van meststoffen beschikbaar.",
+            content:
+                "Voeg een meststof toe om deze te gebruiken op dit bedrijf.",
         },
     ]
 }
@@ -57,31 +59,41 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const farmOptions = farms.map((farm) => {
             return {
                 b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
+                b_name_farm: farm.b_name_farm || "",
             }
         })
-
-        // Get the available fertilizers
-        const fertilizers: Fertilizer[] = await getFertilizers(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-        )
 
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
-            fertilizers: fertilizers,
         }
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
-export default function FarmFertilizersIndexPage() {
+/**
+ * Renders the layout for managing farm settings.
+ *
+ * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
+ * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ */
+export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
-    return <FarmFertilizersIndexBlock loaderData={loaderData} />
+    return (
+        <FarmNewFertilizerLayout
+            loaderData={loaderData}
+            action={{
+                label: "Terug naar bemesting toevoegen",
+                to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer`,
+                disabled: false,
+            }}
+            backlink={`/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer/manage`}
+        >
+            <Outlet />
+        </FarmNewFertilizerLayout>
+    )
 }

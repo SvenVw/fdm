@@ -3,7 +3,9 @@ import type { ApplicationMethods } from "@svenvw/fdm-data"
 import { format } from "date-fns"
 import { Lightbulb, Scale } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { useFetcher, useLocation, useNavigation } from "react-router"
+import { useFetcher, useLocation, useNavigation, useParams } from "react-router"
+import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
@@ -21,7 +23,6 @@ import {
     TooltipTrigger,
 } from "~/components/ui/tooltip"
 import { cn } from "~/lib/utils"
-import { LoadingSpinner } from "../../custom/loadingspinner"
 import { FertilizerApplicationForm } from "./form"
 import type {
     FertilizerApplication,
@@ -151,6 +152,7 @@ export function FertilizerApplicationCard({
 }) {
     const fetcher = useFetcher()
     const location = useLocation()
+    const params = useParams()
     const navigation = useNavigation()
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const previousNavigationState = useRef(navigation.state)
@@ -172,6 +174,17 @@ export function FertilizerApplicationCard({
         previousNavigationState.current = navigation.state
     }, [navigation.state])
 
+    const fieldFertilizerFormStore = useFieldFertilizerFormStore()
+    const savedFormValues =
+        params.b_id_farm &&
+        params.b_id &&
+        fieldFertilizerFormStore.load(params.b_id_farm, params.b_id)
+    useEffect(() => {
+        if (!isDialogOpen && savedFormValues) {
+            setIsDialogOpen(true)
+        }
+    }, [isDialogOpen, savedFormValues])
+
     const detailCards = constructCards(dose)
 
     return (
@@ -190,7 +203,9 @@ export function FertilizerApplicationCard({
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[800px]">
                         <DialogHeader>
-                            <DialogTitle>Bemesting toevoegen</DialogTitle>
+                            <DialogTitle className="flex flex-row items-center justify-between mr-4">
+                                Bemesting toevoegen
+                            </DialogTitle>
                             <DialogDescription>
                                 Voeg een nieuwe bemestingstoepassing toe aan het
                                 perceel.
@@ -200,6 +215,8 @@ export function FertilizerApplicationCard({
                             options={fertilizerOptions}
                             action={location.pathname}
                             navigation={navigation}
+                            b_id_farm={params.b_id_farm || ""}
+                            b_id={params.b_id || ""}
                         />
                     </DialogContent>
                 </Dialog>
