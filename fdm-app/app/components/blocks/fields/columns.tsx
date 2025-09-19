@@ -44,7 +44,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
         },
     },
     {
-        accessorKey: "cultivationNames",
+        accessorKey: "b_lu_name",
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Gewassen" />
         },
