@@ -47,7 +47,10 @@ export function DataTable<TData, TValue>({
         useState<VisibilityState>({})
 
     const fuzzyFilter = (row: any, columnId: string, filterValue: string) => {
-        const target = `${row.getValue("b_name")} ${row.getValue("b_lu_name")}`
+        const cultivationNames = row.original.cultivations
+            .map((c: { b_lu_name: string }) => c.b_lu_name)
+            .join(" ")
+        const target = `${row.getValue("b_name")} ${cultivationNames}`
         const result = fuzzysort.go(filterValue, [target])
         return result.length > 0
     }

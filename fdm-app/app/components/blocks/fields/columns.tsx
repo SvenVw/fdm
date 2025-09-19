@@ -12,11 +12,15 @@ import {
     DropdownMenuTrigger,
 } from "../../ui/dropdown-menu"
 import { Button } from "../../ui/button"
+import { getCultivationColor } from "../../custom/cultivation-colors"
 
 export type FieldExtended = {
     b_id: string
     b_name: string
-    b_lu_name: string[]
+    cultivations: {
+        b_lu_name: string
+        b_lu_croprotation: string
+    }[]
     b_area: number
 }
 
@@ -44,18 +48,23 @@ export const columns: ColumnDef<FieldExtended>[] = [
         },
     },
     {
-        accessorKey: "b_lu_name",
+        accessorKey: "cultivations",
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Gewassen" />
         },
         cell: ({ row }) => {
-            const field = row.original
+            const field = row.original           
 
             return (
                 <div className="flex items-start flex-col space-x-2">
-                    {field.b_lu_name.map((name) => (
-                        <Badge key={name} className="" variant="default">
-                            {name}
+                    {field.cultivations.map((cultivation) => (
+                        <Badge 
+                            key={cultivation.b_lu_name} 
+                            style={{ backgroundColor: getCultivationColor(cultivation.b_lu_croprotation) }}
+                            className="text-white" 
+                            variant="default"
+                        >
+                            {cultivation.b_lu_name}
                         </Badge>
                     ))}
                 </div>

@@ -121,15 +121,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     field.b_id,
                     timeframe,
                 )
-                const cultivationNames = cultivations.reduce(
-                    (x, currentValue) => [...x, currentValue.b_lu_name],
-                    [],
-                )
 
                 return {
                     b_id: field.b_id,
                     b_name: field.b_name,
-                    b_lu_name: cultivationNames,
+                    cultivations: cultivations,
                     b_area: Math.round(field.b_area * 10) / 10,
                 }
             }),
