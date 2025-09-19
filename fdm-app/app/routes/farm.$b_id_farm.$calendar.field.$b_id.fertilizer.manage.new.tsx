@@ -6,12 +6,12 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
+import { FarmNewFertilizerLayout } from "~/components/blocks/fertilizer/new-layout"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmNewFertilizerLayout } from "../components/blocks/fertilizer/new-layout"
-import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.fertilizer.manage.new"
 
 export const meta: MetaFunction = () => {
     return [
@@ -75,7 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the new fertilizer wizard when coming from the main sidebar.
+ * Renders the new fertilizer wizard when coming from the field fertilizer application form.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
@@ -83,7 +83,12 @@ export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     return (
         <FarmNewFertilizerLayout
             loaderData={loaderData}
-            backlink={`/farm/${params.b_id_farm}/fertilizers`}
+            action={{
+                label: "Terug naar bemesting toevoegen",
+                to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer`,
+                disabled: false,
+            }}
+            backlink={`/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer/manage`}
         >
             <Outlet />
         </FarmNewFertilizerLayout>

@@ -1,11 +1,10 @@
 import {
-    addFertilizer,
-    addFertilizerToCatalogue,
     getFarm,
     getFarms,
     getFertilizer,
     getFertilizerParametersDescription,
     getFertilizers,
+    updateFertilizerFromCatalogue,
 } from "@svenvw/fdm-core"
 import {
     type ActionFunctionArgs,
@@ -14,14 +13,14 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import { redirectWithSuccess } from "remix-toast"
+import { dataWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
-import { FarmNewFertilizerBlock } from "../components/blocks/fertilizer/new-fertilizer-page"
+import { FarmFertilizerBlock } from "../components/blocks/fertilizer/fertilizer-page"
 
 export const meta: MetaFunction = () => {
     return [
@@ -94,9 +93,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const fertilizerOptions = fertilizers.map((fertilizer) => {
             return {
                 p_id: fertilizer.p_id,
-                p_name_nl: fertilizer.p_name_nl,
+                p_name_nl: fertilizer.p_name_nl || "",
             }
         })
+
+        // Set editable status
+        let editable = false
+        if (fertilizer.p_source === b_id_farm) {
+            editable = true
+        }
 
         // Return user information from loader
         return {
@@ -106,7 +111,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             farmOptions: farmOptions,
             fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
-            editable: true,
+            editable: editable,
             fertilizerParameters: fertilizerParameters,
         }
     } catch (error) {
@@ -114,16 +119,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-/**
- * Renders the layout for managing farm settings.
- *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
- */
 export default function FarmFertilizerPage() {
-    const loaderData = useLoaderData<typeof loader>()
+    const loaderData = useLoaderData()
 
-    return <FarmNewFertilizerBlock loaderData={loaderData} />
+    return (
+        <FarmFertilizerBlock
+            loaderData={loaderData}
+            backlink={"../fertilizer/manage"}
+        />
+    )
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -144,74 +148,24 @@ export async function action({ request, params }: ActionFunctionArgs) {
             FormSchema,
         )
 
-        const p_id_catalogue = await addFertilizerToCatalogue(
+        const fertilizer = await getFertilizer(fdm, p_id)
+        if (fertilizer.p_source !== b_id_farm) {
+            throw new Error("Forbidden")
+        }
+        const p_id_catalogue = fertilizer.p_id_catalogue
+
+        await updateFertilizerFromCatalogue(
             fdm,
             session.principal_id,
             b_id_farm,
-            {
-                p_name_nl: formValues.p_name_nl,
-                p_name_en: formValues.p_name_en,
-                p_description: formValues.p_description,
-                p_type: formValues.p_type,
-                p_dm: formValues.p_dm,
-                p_density: formValues.p_density,
-                p_om: formValues.p_om,
-                p_a: formValues.p_a,
-                p_hc: formValues.p_hc,
-                p_eom: formValues.p_eom,
-                p_eoc: formValues.p_eoc,
-                p_c_rt: formValues.p_c_rt,
-                p_c_of: formValues.p_c_of,
-                p_c_if: formValues.p_c_if,
-                p_c_fr: formValues.p_c_fr,
-                p_cn_of: formValues.p_cn_of,
-                p_n_rt: formValues.p_n_rt,
-                p_n_if: formValues.p_n_if,
-                p_n_of: formValues.p_n_of,
-                p_n_wc: formValues.p_n_wc,
-                p_no3_rt: formValues.p_no3_rt,
-                p_nh4_rt: formValues.p_nh4_rt,
-                p_p_rt: formValues.p_p_rt,
-                p_k_rt: formValues.p_k_rt,
-                p_mg_rt: formValues.p_mg_rt,
-                p_ca_rt: formValues.p_ca_rt,
-                p_ne: formValues.p_ne,
-                p_s_rt: formValues.p_s_rt,
-                p_s_wc: formValues.p_s_wc,
-                p_cu_rt: formValues.p_cu_rt,
-                p_zn_rt: formValues.p_zn_rt,
-                p_na_rt: formValues.p_na_rt,
-                p_si_rt: formValues.p_si_rt,
-                p_b_rt: formValues.p_b_rt,
-                p_mn_rt: formValues.p_mn_rt,
-                p_ni_rt: formValues.p_ni_rt,
-                p_fe_rt: formValues.p_fe_rt,
-                p_mo_rt: formValues.p_mo_rt,
-                p_co_rt: formValues.p_co_rt,
-                p_as_rt: formValues.p_as_rt,
-                p_cd_rt: formValues.p_cd_rt,
-                p_cr_rt: formValues.p_cr_rt,
-                p_cr_vi: formValues.p_cr_vi,
-                p_pb_rt: formValues.p_pb_rt,
-                p_hg_rt: formValues.p_hg_rt,
-                p_cl_rt: formValues.p_cl_rt,
-                p_ef_nh3: undefined,
-                p_app_method_options: formValues.p_app_method_options,
-            },
-        )
-
-        await addFertilizer(
-            fdm,
-            session.principal_id,
             p_id_catalogue,
-            b_id_farm,
-            undefined,
-            undefined,
+            formValues,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
+        return dataWithSuccess(
+            { result: "Data saved successfully" },
+            { message: "Meststof is bijgewerkt! 🎉" },
+        )
     } catch (error) {
         throw handleActionError(error)
     }

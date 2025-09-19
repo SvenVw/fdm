@@ -1,25 +1,24 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
-    Outlet,
     useLoaderData,
 } from "react-router"
+import type { Fertilizer } from "~/components/blocks/fertilizer/columns"
+import { FarmFertilizersIndexBlock } from "~/components/blocks/fertilizer/index-page"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmNewFertilizerLayout } from "../components/blocks/fertilizer/new-layout"
-import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.fertilizer.manage._index"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Meststof toevoegen | ${clientConfig.name}` },
+        { title: `Meststoffen | ${clientConfig.name}` },
         {
             name: "description",
-            content:
-                "Voeg een meststof toe om deze te gebruiken op dit bedrijf.",
+            content: "Bekij de lijst van meststoffen beschikbaar.",
         },
     ]
 }
@@ -59,33 +58,42 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         const farmOptions = farms.map((farm) => {
             return {
                 b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm || "",
+                b_name_farm: farm.b_name_farm,
             }
         })
+
+        // Get the available fertilizers
+        const fertilizers: Fertilizer[] = await getFertilizers(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+        )
 
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
+            fertilizers: fertilizers,
         }
     } catch (error) {
         throw handleLoaderError(error)
     }
 }
 
-/**
- * Renders the new fertilizer wizard when coming from the main sidebar.
- */
-export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
+export default function FarmFertilizersIndexPage({
+    params,
+}: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <FarmNewFertilizerLayout
+        <FarmFertilizersIndexBlock
             loaderData={loaderData}
-            backlink={`/farm/${params.b_id_farm}/fertilizers`}
-        >
-            <Outlet />
-        </FarmNewFertilizerLayout>
+            action={{
+                label: "Terug naar bemesting toevoegen",
+                to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer`,
+                disabled: false,
+            }}
+        />
     )
 }

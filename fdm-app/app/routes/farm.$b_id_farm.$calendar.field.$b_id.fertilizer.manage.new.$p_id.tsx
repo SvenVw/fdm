@@ -22,6 +22,7 @@ import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 import { FarmNewFertilizerBlock } from "../components/blocks/fertilizer/new-fertilizer-page"
+import { getCalendar } from "../lib/calendar"
 
 export const meta: MetaFunction = () => {
     return [
@@ -129,14 +130,22 @@ export default function FarmFertilizerPage() {
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm
+        const b_id = params.b_id
         const p_id = params.p_id
 
         if (!b_id_farm) {
             throw new Error("missing: b_id_farm")
         }
+
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+
         if (!p_id) {
             throw new Error("missing: p_id")
         }
+
+        const calendar = getCalendar(params)
 
         const session = await getSession(request)
         const formValues = await extractFormValuesFromRequest(
@@ -209,9 +218,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer/manage`,
+            {
+                message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }
