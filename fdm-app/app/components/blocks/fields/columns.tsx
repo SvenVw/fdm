@@ -2,12 +2,6 @@ import type { ColumnDef } from "@tanstack/react-table"
 import { ArrowRight, MoreHorizontal } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
 import { DataTableColumnHeader } from "./column-header"
 import {
     DropdownMenu,
@@ -22,6 +16,7 @@ import { Button } from "../../ui/button"
 export type FieldExtended = {
     b_id: string
     b_name: string
+    b_lu_name: string[]
     b_area: number
 }
 
@@ -34,6 +29,37 @@ export const columns: ColumnDef<FieldExtended>[] = [
         accessorKey: "b_name",
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Naam" />
+        },
+        cell: ({ row }) => {
+            const field = row.original
+
+            return (
+                <NavLink
+                    to={`./${field.b_id}`}
+                    className="flex items-center hover:underline"
+                >
+                    {field.b_name}
+                </NavLink>
+            )
+        },
+    },
+    {
+        accessorKey: "cultivationNames",
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="Gewassen" />
+        },
+        cell: ({ row }) => {
+            const field = row.original
+
+            return (
+                <div className="flex items-start flex-col space-x-2">
+                    {field.b_lu_name.map((name) => (
+                        <Badge key={name} className="" variant="default">
+                            {name}
+                        </Badge>
+                    ))}
+                </div>
+            )
         },
     },
     {

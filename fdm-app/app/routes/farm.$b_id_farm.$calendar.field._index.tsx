@@ -1,4 +1,4 @@
-import { getFarms, getFields } from "@svenvw/fdm-core"
+import { getCultivations, getFarms, getFields } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -113,11 +113,34 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        const fieldsExtended = await Promise.all(
+            fields.map(async (field) => {
+                const cultivations = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+                const cultivationNames = cultivations.reduce(
+                    (x, currentValue) => [...x, currentValue.b_lu_name],
+                    [],
+                )
+
+                return {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    b_lu_name: cultivationNames,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                }
+            }),
+        )
+
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
+            fieldsExtended: fieldsExtended,
             userName: session.userName,
         }
     } catch (error) {
@@ -191,11 +214,11 @@ export default function FarmFieldIndex() {
                             }
                         />
                         <FarmContent>
-                            <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">                            
+                            <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable
                                     columns={columns}
-                                    data={loaderData.fieldOptions}
-                                />                 
+                                    data={loaderData.fieldsExtended}
+                                />
                             </div>
                         </FarmContent>
                     </>
