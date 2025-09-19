@@ -6,15 +6,23 @@ import {
     getFilteredRowModel,
     getSortedRowModel,
     type SortingState,
+    type RowSelectionState,
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
 import { ChevronDown, Plus } from "lucide-react"
-import { useState } from "react"
-import { NavLink } from "react-router"
+import { useMemo, useState } from "react"
+import { NavLink, useParams } from "react-router"
 import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
+import { type FieldExtended } from "./columns"
 import {
     Table,
     TableBody,
@@ -35,17 +43,20 @@ interface DataTableProps<TData, TValue> {
     data: TData[]
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends FieldExtended, TValue>({
     columns,
     data,
 }: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState("")
-
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         {},
     )
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+    const params = useParams()
+    const b_id_farm = params.b_id_farm
 
     const fuzzyFilter = (row: any, columnId: string, filterValue: string) => {
         const cultivationNames = row.original.cultivations
@@ -69,14 +80,42 @@ export function DataTable<TData, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onGlobalFilterChange: setGlobalFilter,
+        onRowSelectionChange: setRowSelection,
         globalFilterFn: fuzzyFilter,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             globalFilter,
+            rowSelection,
         },
     })
+
+    const selectedFields = useMemo(() => {
+        return table.getFilteredSelectedRowModel().rows.map((row) => row.original)
+    }, [table.getFilteredSelectedRowModel().rows])
+
+    const canAddHarvest = useMemo(() => {
+        if (selectedFields.length === 0) return false
+        const firstCultivation = selectedFields[0]?.cultivations[0]?.b_lu_name
+        return selectedFields.every(
+            (field) =>
+                field.cultivations.length > 0 &&
+                field.cultivations[0]?.b_lu_name === firstCultivation,
+        )
+    }, [selectedFields])
+
+    const selectedFieldIds = selectedFields.map((field) => field.b_id)
+
+    const isFertilizerButtonDisabled = selectedFields.length === 0
+    const fertilizerTooltipContent = isFertilizerButtonDisabled
+        ? "Selecteer één of meerdere percelen om bemesting toe te voegen"
+        : "Bemesting toevoegen aan geselecteerde percelen"
+
+    const isHarvestButtonDisabled = !canAddHarvest
+    const harvestTooltipContent = isHarvestButtonDisabled
+        ? "Selecteer één of meerdere percelen met hetzelfde gewas om oogst toe te voegen"
+        : "Oogst toevoegen aan geselecteerde percelen"
 
     return (
         <div className="w-full">
@@ -114,6 +153,58 @@ export function DataTable<TData, TValue>({
                             })}
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div>
+                                {isFertilizerButtonDisabled ? (
+                                    <Button disabled={isFertilizerButtonDisabled}>
+                                        <Plus />
+                                        Bemesting toevoegen
+                                    </Button>
+                                ) : (
+                                    <NavLink
+                                        to={`/farm/${b_id_farm}/add/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
+                                    >
+                                        <Button>
+                                            <Plus />
+                                            Bemesting toevoegen
+                                        </Button>
+                                    </NavLink>
+                                )}
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{fertilizerTooltipContent}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div>
+                                {isHarvestButtonDisabled ? (
+                                    <Button disabled={isHarvestButtonDisabled}>
+                                        <Plus />
+                                        Oogst toevoegen
+                                    </Button>
+                                ) : (
+                                    <NavLink
+                                        to={`/farm/${b_id_farm}/add/harvest?fieldIds=${selectedFieldIds.join(",")}`}
+                                    >
+                                        <Button>
+                                            <Plus />
+                                            Oogst toevoegen
+                                        </Button>
+                                    </NavLink>
+                                )}
+                            </div>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{harvestTooltipContent}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
                 <div className="ml-auto">
                     <NavLink to={"./new"}>
                         <Button>
