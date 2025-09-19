@@ -75,10 +75,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the layout for managing farm settings.
- *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ * Renders the new fertilizer wizard when coming from the main sidebar.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()

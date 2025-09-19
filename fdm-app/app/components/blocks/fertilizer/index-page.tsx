@@ -18,10 +18,9 @@ interface FertilizersIndexLoaderData {
 }
 
 /**
- * Renders the layout for managing farm settings.
+ * Renders the the farm fertilizers page.
  *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ * It also renders a main section containing an interactive table of fertilizers, including a button to add a new fertilizer.
  */
 export function FarmFertilizersIndexBlock({
     loaderData,

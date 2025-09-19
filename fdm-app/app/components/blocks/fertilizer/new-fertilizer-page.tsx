@@ -15,10 +15,9 @@ interface FarmNewFertilizerBlockLoaderData {
 }
 
 /**
- * Renders the layout for managing farm settings.
+ * Renders the new fertilizer form based off of an existing farm.
  *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ * Users on the add field fertilizer form can now directly navigate to the fertilizer management page, then come back when they are done.
  */
 export function FarmNewFertilizerBlock({
     loaderData,

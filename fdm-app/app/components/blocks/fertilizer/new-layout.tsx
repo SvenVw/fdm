@@ -12,10 +12,12 @@ interface FarmNewFertilizerLayoutLoaderData {
 }
 
 /**
- * Renders the layout for managing farm settings.
+ * Renders the layout for adding a new fertilizer.
  *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ * This component includes the page header and a centered section containing another header and the new fertilizer wizard.
+ *
+ * @param action when specified it shows an action button in the page header
+ * @param backlink path to navigate to when the user tries to go back to the fertilizer list
  */
 export function FarmNewFertilizerLayout({
     loaderData,

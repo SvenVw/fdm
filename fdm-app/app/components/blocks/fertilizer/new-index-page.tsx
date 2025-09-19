@@ -6,6 +6,12 @@ interface NewFertilizerIndexLoaderData {
     fertilizers: Fertilizer[]
 }
 
+/**
+ * Renders the new fertilizer wizard start page
+ *
+ * This component includes a button that can be used to fill everything from scratch.
+ * Below that it includes a button for each existing fertilizer which the user can click to fill in the new fertilizer form values on the next page based on the corresponding fertilizer.
+ */
 export function NewFertilizerIndex({
     loaderData,
 }: {

@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import type { FormEvent, MouseEvent } from "react"
 import { useEffect } from "react"
 import type { Navigation } from "react-router"
-import { Form, useNavigate, useParams } from "react-router"
+import { Form, useNavigate } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
@@ -42,7 +42,6 @@ export function FertilizerApplicationForm({
     b_id_farm: string
     b_id: string
 }) {
-    const params = useParams()
     const navigate = useNavigate()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
@@ -83,12 +82,8 @@ export function FertilizerApplicationForm({
 
     function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
         e.preventDefault()
-        if (params.b_id_farm && params.b_id) {
-            fieldFertilizerFormStore.save(
-                params.b_id_farm,
-                params.b_id,
-                form.getValues(),
-            )
+        if (b_id_farm && b_id) {
+            fieldFertilizerFormStore.save(b_id_farm, b_id, form.getValues())
         }
         navigate("./manage")
     }

@@ -11,13 +11,12 @@ import { FertilizerForm } from "./form"
 
 interface FarmNewCustomFertilizerBlockLoaderData {
     fertilizer: Fertilizer
-    fertilizerParameters: FertilizerParameterDescriptionItem
+    fertilizerParameters: FertilizerParameterDescriptionItem[]
 }
 /**
- * Renders the layout for managing farm settings.
+ * Renders the new custom fertilizer page.
  *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ * This component displays a form where the user can fill in the name and each attribute of their custom fertilizer and submit it.
  */
 export function FarmNewCustomFertilizerBlock({
     loaderData,
