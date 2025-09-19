@@ -43,14 +43,18 @@ export function DataTable<TData, TValue>({
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState("")
 
-    const [columnVisibility, setColumnVisibility] =
-        useState<VisibilityState>({})
+    const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+        {},
+    )
 
     const fuzzyFilter = (row: any, columnId: string, filterValue: string) => {
         const cultivationNames = row.original.cultivations
             .map((c: { b_lu_name: string }) => c.b_lu_name)
             .join(" ")
-        const target = `${row.getValue("b_name")} ${cultivationNames}`
+        const fertilizerNames = row.original.fertilizerApplications
+            .map((f: { p_name_nl: string }) => f.p_name_nl)
+            .join(" ")
+        const target = `${row.getValue("b_name")} ${cultivationNames} ${fertilizerNames}`
         const result = fuzzysort.go(filterValue, [target])
         return result.length > 0
     }
@@ -86,7 +90,7 @@ export function DataTable<TData, TValue>({
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
-                            Kolommen 
+                            Kolommen
                             <ChevronDown />
                         </Button>
                     </DropdownMenuTrigger>

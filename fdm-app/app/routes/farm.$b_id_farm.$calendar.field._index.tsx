@@ -1,4 +1,10 @@
-import { getCultivations, getFarms, getFields } from "@svenvw/fdm-core"
+import {
+    getCultivations,
+    getFarms,
+    getFertilizerApplication,
+    getFertilizerApplications,
+    getFields,
+} from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -122,10 +128,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     timeframe,
                 )
 
+                const fertilizerApplications = await getFertilizerApplications(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+
                 return {
                     b_id: field.b_id,
                     b_name: field.b_name,
                     cultivations: cultivations,
+                    fertilizerApplications: fertilizerApplications,
                     b_area: Math.round(field.b_area * 10) / 10,
                 }
             }),

@@ -22,6 +22,9 @@ export type FieldExtended = {
         b_lu_croprotation: string
         b_lu_start: Date
     }[]
+    fertilizerApplications: {
+        p_name_nl: string
+    }[]
     b_area: number
 }
 
@@ -87,46 +90,36 @@ export const columns: ColumnDef<FieldExtended>[] = [
         },
     },
     {
+        accessorKey: "fertilizerApplications",
+        header: ({ column }) => {
+            return (
+                <DataTableColumnHeader column={column} title="Bemesting met:" />
+            )
+        },
+        cell: ({ row }) => {
+            const field = row.original
+
+            const uniqueFertilizerNames = field.fertilizerApplications
+                .map((app) => app.p_name_nl)
+                .filter((name, index, self) => self.indexOf(name) === index)
+
+            return (
+                <div className="flex items-start flex-col space-y-2">
+                    {uniqueFertilizerNames.map((fertilizer) => (
+                        <Badge key={fertilizer} variant="outline">
+                            {fertilizer}
+                        </Badge>
+                    ))}
+                </div>
+            )
+        },
+    },
+    {
         accessorKey: "b_area",
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Oppervlakte" />
         },
     },
-    // {
-    //     accessorKey: "Type",
-    //     cell: ({ row }) => {
-    //         const fertilizer = row.original
-
-    //         return (
-    //             <span className="flex items-center gap-2">
-    //                 {fertilizer.p_type_manure ? (
-    //                     <Badge
-    //                         className="bg-amber-600 text-white hover:bg-amber-700"
-    //                         variant="default"
-    //                     >
-    //                         Mest
-    //                     </Badge>
-    //                 ) : null}
-    //                 {fertilizer.p_type_compost ? (
-    //                     <Badge
-    //                         className="bg-green-600 text-white hover:bg-green-700"
-    //                         variant="default"
-    //                     >
-    //                         Compost
-    //                     </Badge>
-    //                 ) : null}
-    //                 {fertilizer.p_type_mineral ? (
-    //                     <Badge
-    //                         className="bg-blue-600 text-white hover:bg-blue-700"
-    //                         variant="default"
-    //                     >
-    //                         Kunstmest
-    //                     </Badge>
-    //                 ) : null}
-    //             </span>
-    //         )
-    //     },
-    // },
     {
         id: "actions",
         enableHiding: false,
