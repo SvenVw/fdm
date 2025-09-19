@@ -20,6 +20,7 @@ export type FieldExtended = {
     cultivations: {
         b_lu_name: string
         b_lu_croprotation: string
+        b_lu_start: Date
     }[]
     b_area: number
 }
@@ -53,15 +54,29 @@ export const columns: ColumnDef<FieldExtended>[] = [
             return <DataTableColumnHeader column={column} title="Gewassen" />
         },
         cell: ({ row }) => {
-            const field = row.original           
+            const field = row.original
+
+            const cultivationsSorted = field.cultivations.sort((a, b) => {
+                if (a.b_lu_start.getTime() < b.b_lu_start.getTime()) {
+                    return -1
+                }
+                if (a.b_lu_start.getTime() > b.b_lu_start.getTime()) {
+                    return 1
+                }
+                return 0
+            })
 
             return (
-                <div className="flex items-start flex-col space-x-2">
-                    {field.cultivations.map((cultivation) => (
-                        <Badge 
-                            key={cultivation.b_lu_name} 
-                            style={{ backgroundColor: getCultivationColor(cultivation.b_lu_croprotation) }}
-                            className="text-white" 
+                <div className="flex items-start flex-col space-y-2">
+                    {cultivationsSorted.map((cultivation) => (
+                        <Badge
+                            key={cultivation.b_lu_name}
+                            style={{
+                                backgroundColor: getCultivationColor(
+                                    cultivation.b_lu_croprotation,
+                                ),
+                            }}
+                            className="text-white"
                             variant="default"
                         >
                             {cultivation.b_lu_name}
@@ -141,7 +156,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
                             <NavLink to={`./${field.b_id}`}>Overzicht</NavLink>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
-                            <NavLink to={`./${field.b_id}/cultivations`}>
+                            <NavLink to={`./${field.b_id}/cultivation`}>
                                 Gewassen
                             </NavLink>
                         </DropdownMenuItem>
