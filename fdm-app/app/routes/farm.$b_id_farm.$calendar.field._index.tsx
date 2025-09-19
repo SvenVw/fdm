@@ -1,5 +1,6 @@
 import {
     getCultivations,
+    getCurrentSoilData,
     getFarms,
     getFertilizerApplication,
     getFertilizerApplications,
@@ -135,11 +136,32 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     timeframe,
                 )
 
+                const currentSoilData = await getCurrentSoilData(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+                const a_som_loi = currentSoilData.find((x) => {
+                    if (x.parameter === "a_som_loi") {
+                        return true
+                    }
+                    return false
+                }).value
+                const b_soiltype_agr = currentSoilData.find((x) => {
+                    if (x.parameter === "b_soiltype_agr") {
+                        return true
+                    }
+                    return false
+                }).value
+
                 return {
                     b_id: field.b_id,
                     b_name: field.b_name,
                     cultivations: cultivations,
                     fertilizerApplications: fertilizerApplications,
+                    a_som_loi: a_som_loi,
+                    b_soiltype_agr: b_soiltype_agr,            
                     b_area: Math.round(field.b_area * 10) / 10,
                 }
             }),

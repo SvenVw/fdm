@@ -24,6 +24,8 @@ export type FieldExtended = {
     fertilizerApplications: {
         p_name_nl: string
     }[]
+    a_som_loi: number
+    b_soiltype_agr: string
     b_area: number
 }
 
@@ -93,8 +95,10 @@ export const columns: ColumnDef<FieldExtended>[] = [
         accessorKey: "fertilizerApplications",
         enableSorting: true,
         sortingFn: (rowA, rowB, columnId) => {
-            const fertilizerA = rowA.original.fertilizerApplications[0]?.p_name_nl || ""
-            const fertilizerB = rowB.original.fertilizerApplications[0]?.p_name_nl || ""
+            const fertilizerA =
+                rowA.original.fertilizerApplications[0]?.p_name_nl || ""
+            const fertilizerB =
+                rowB.original.fertilizerApplications[0]?.p_name_nl || ""
             return fertilizerA.localeCompare(fertilizerB)
         },
         header: ({ column }) => {
@@ -122,11 +126,32 @@ export const columns: ColumnDef<FieldExtended>[] = [
         },
     },
     {
+        accessorKey: "a_som_loi",
+        enableSorting: true,
+        sortingFn: "alphanumeric",
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="OS (%)" />
+        },
+    },
+     {
+        accessorKey: "b_soiltype_agr",
+        enableSorting: true,
+        sortingFn: "alphanumeric",
+        header: ({ column }) => {
+            return <DataTableColumnHeader column={column} title="Bodemtype" />
+        },
+    },
+    {
         accessorKey: "b_area",
         enableSorting: true,
         sortingFn: "alphanumeric",
         header: ({ column }) => {
-            return <DataTableColumnHeader column={column} title="Oppervlakte" />
+            return (
+                <DataTableColumnHeader
+                    column={column}
+                    title="Oppervlakte (ha)"
+                />
+            )
         },
     },
     {

@@ -54,7 +54,7 @@ export function DataTable<TData, TValue>({
         const fertilizerNames = row.original.fertilizerApplications
             .map((f: { p_name_nl: string }) => f.p_name_nl)
             .join(" ")
-        const target = `${row.getValue("b_name")} ${cultivationNames} ${fertilizerNames}`
+        const target = `${row.getValue("b_name")} ${cultivationNames} ${fertilizerNames} ${row.getValue("b_soiltype_agr")}`
         const result = fuzzysort.go(filterValue, [target])
         return result.length > 0
     }
@@ -79,10 +79,10 @@ export function DataTable<TData, TValue>({
     })
 
     return (
-        <div>
-            <div className="flex items-center py-4 space-x-2">
+        <div className="w-full">
+            <div className="flex py-4 space-x-2">
                 <Input
-                    placeholder="Filter percelen of gewassen..."
+                    placeholder="Zoek op naam, gewas of meststof"
                     value={globalFilter ?? ""}
                     onChange={(event) => setGlobalFilter(event.target.value)}
                     className="max-w-sm"
