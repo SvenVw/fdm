@@ -5,12 +5,21 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
-import type { Fertilizer } from "~/components/blocks/fertilizer/columns"
+import {
+    columns,
+    type Fertilizer,
+} from "~/components/blocks/fertilizer/columns"
+import { Header } from "~/components/blocks/header/base"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmFertilizersIndexBlock } from "../components/blocks/fertilizer/index-page"
+import { FarmTitle } from "../components/blocks/farm/farm-title"
+import { DataTable } from "../components/blocks/fertilizer/table"
+import { HeaderFarm } from "../components/blocks/header/farm"
+import { HeaderFertilizer } from "../components/blocks/header/fertilizer"
+import { SidebarInset } from "../components/ui/sidebar"
+import type { Route } from "./+types/farm.$b_id_farm.fertilizers._index"
 
 export const meta: MetaFunction = () => {
     return [
@@ -80,8 +89,40 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export default function FarmFertilizersIndexPage() {
+export default function FarmFertilizersIndexPage({
+    params,
+}: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
-    return <FarmFertilizersIndexBlock loaderData={loaderData} />
+    return (
+        <SidebarInset>
+            <Header action={undefined}>
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderFertilizer
+                    b_id_farm={loaderData.b_id_farm}
+                    p_id={undefined}
+                    fertilizerOptions={loaderData.fertilizers}
+                />
+            </Header>
+            <main>
+                <FarmTitle
+                    title={"Meststoffen"}
+                    description={"Beheer de meststoffen van dit bedrijf"}
+                />
+                <div className="space-y-6 p-10 pb-0">
+                    <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
+                        <div className="flex-1">
+                            <DataTable
+                                columns={columns}
+                                data={loaderData.fertilizers}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </SidebarInset>
+    )
 }
