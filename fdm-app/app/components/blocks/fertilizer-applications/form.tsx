@@ -34,13 +34,13 @@ export function FertilizerApplicationForm({
     action,
     navigation,
     b_id_farm,
-    b_id,
+    b_id_or_b_lu_catalogue,
 }: {
     options: FertilizerOption[]
     action: string
     navigation: Navigation
     b_id_farm: string
-    b_id: string
+    b_id_or_b_lu_catalogue: string
 }) {
     const navigate = useNavigate()
 
@@ -67,10 +67,10 @@ export function FertilizerApplicationForm({
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
 
     useEffect(() => {
-        if (b_id_farm && b_id) {
+        if (b_id_farm && b_id_or_b_lu_catalogue) {
             const savedFormValues = fieldFertilizerFormStore.load(
                 b_id_farm,
-                b_id,
+                b_id_or_b_lu_catalogue,
             )
             if (savedFormValues) {
                 for (const [k, v] of Object.entries(savedFormValues)) {
@@ -82,12 +82,21 @@ export function FertilizerApplicationForm({
                 }
             }
         }
-    }, [b_id_farm, b_id, form.setValue, fieldFertilizerFormStore.load])
+    }, [
+        b_id_farm,
+        b_id_or_b_lu_catalogue,
+        form.setValue,
+        fieldFertilizerFormStore.load,
+    ])
 
     function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
         e.preventDefault()
-        if (b_id_farm && b_id) {
-            fieldFertilizerFormStore.save(b_id_farm, b_id, form.getValues())
+        if (b_id_farm && b_id_or_b_lu_catalogue) {
+            fieldFertilizerFormStore.save(
+                b_id_farm,
+                b_id_or_b_lu_catalogue,
+                form.getValues(),
+            )
         }
         navigate("./manage")
     }

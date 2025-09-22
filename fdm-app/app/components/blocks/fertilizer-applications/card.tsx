@@ -157,6 +157,8 @@ export function FertilizerApplicationCard({
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const previousNavigationState = useRef(navigation.state)
 
+    const b_id_or_b_lu_catalogue = params.b_lu_catalogue || params.b_id
+
     const handleDelete = (p_app_id: string | string[]) => {
         if (fetcher.state === "submitting") return
 
@@ -177,8 +179,8 @@ export function FertilizerApplicationCard({
     const fieldFertilizerFormStore = useFieldFertilizerFormStore()
     const savedFormValues =
         params.b_id_farm &&
-        params.b_id &&
-        fieldFertilizerFormStore.load(params.b_id_farm, params.b_id)
+        b_id_or_b_lu_catalogue &&
+        fieldFertilizerFormStore.load(params.b_id_farm, b_id_or_b_lu_catalogue)
     useEffect(() => {
         if (!isDialogOpen && savedFormValues) {
             setIsDialogOpen(true)
@@ -188,8 +190,11 @@ export function FertilizerApplicationCard({
     const detailCards = constructCards(dose)
 
     function handleDialogOpenChange(state: boolean) {
-        if (!state && params.b_id_farm && params.b_id) {
-            fieldFertilizerFormStore.delete(params.b_id_farm, params.b_id)
+        if (!state && params.b_id_farm && b_id_or_b_lu_catalogue) {
+            fieldFertilizerFormStore.delete(
+                params.b_id_farm,
+                b_id_or_b_lu_catalogue,
+            )
         }
 
         setIsDialogOpen(state)
@@ -227,7 +232,9 @@ export function FertilizerApplicationCard({
                             action={location.pathname}
                             navigation={navigation}
                             b_id_farm={params.b_id_farm || ""}
-                            b_id={params.b_id || ""}
+                            b_id_or_b_lu_catalogue={
+                                b_id_or_b_lu_catalogue || ""
+                            }
                         />
                     </DialogContent>
                 </Dialog>
