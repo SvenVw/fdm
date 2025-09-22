@@ -1,5 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, ChevronRight, ChevronDown, ArrowUpRightFromSquare } from "lucide-react"
+import {
+    MoreHorizontal,
+    ChevronRight,
+    ChevronDown,
+    ArrowUpRightFromSquare,
+} from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import { DataTableColumnHeader } from "./column-header"
@@ -165,9 +170,17 @@ export const columns: ColumnDef<FieldExtended>[] = [
         enableSorting: true,
         sortingFn: "alphanumeric",
         header: ({ column }) => {
-            return <DataTableColumnHeader column={column} title="OS (%)" />
+            return <DataTableColumnHeader column={column} title="OS" />
         },
         enableHiding: true, // Enable hiding for mobile
+        cell: ({ row }) => {
+            const field = row.original
+            return (
+                <p className="text-muted-foreground">
+                    {`${field.a_som_loi.toFixed(2)} %`}
+                </p>
+            )
+        },
     },
     {
         accessorKey: "b_soiltype_agr",
@@ -177,20 +190,31 @@ export const columns: ColumnDef<FieldExtended>[] = [
             return <DataTableColumnHeader column={column} title="Bodemtype" />
         },
         enableHiding: true, // Enable hiding for mobile
+        cell: ({ row }) => {
+            const field = row.original
+            return (
+                <p className="text-muted-foreground">{field.b_soiltype_agr}</p>
+            )
+        },
     },
     {
         accessorKey: "b_area",
         enableSorting: true,
         sortingFn: "alphanumeric",
         header: ({ column }) => {
-            return (
-                <DataTableColumnHeader
-                    column={column}
-                    title="Oppervlakte (ha)"
-                />
-            )
+            return <DataTableColumnHeader column={column} title="Oppervlakte" />
         },
         enableHiding: true, // Enable hiding for mobile
+        cell: ({ row }) => {
+            const field = row.original
+            return (
+                <p className="text-muted-foreground">
+                    {field.b_area < 0.1
+                        ? "< 0.1 ha"
+                        : `${field.b_area.toFixed(1)} ha`}
+                </p>
+            )
+        },
     },
     {
         id: "actions",
