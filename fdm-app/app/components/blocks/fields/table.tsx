@@ -11,8 +11,8 @@ import {
     VisibilityState,
 } from "@tanstack/react-table"
 import { ChevronDown, Plus } from "lucide-react"
-import { useMemo, useRef, useState } from "react"
-import { NavLink, useParams } from "react-router"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { NavLink, useParams } from "react-router-dom"
 import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -31,6 +31,7 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
+import { cn } from "@/app/lib/utils"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -38,9 +39,6 @@ import {
     DropdownMenuTrigger,
 } from "../../ui/dropdown-menu"
 import { useIsMobile } from "~/hooks/use-mobile"
-import { Collapsible, CollapsibleContent } from "~/components/ui/collapsible"
-import { Badge } from "~/components/ui/badge"
-import { getCultivationColor } from "../../custom/cultivation-colors"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -54,18 +52,25 @@ export function DataTable<TData extends FieldExtended, TValue>({
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [globalFilter, setGlobalFilter] = useState("")
+    const isMobile = useIsMobile()
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-        {},
+        isMobile
+            ? { a_som_loi: false, b_soiltype_agr: false, b_area: false }
+            : {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-    const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>(
-        {},
-    )
     const lastSelectedRowIndex = useRef<number | null>(null)
+
+    useEffect(() => {
+        setColumnVisibility(
+            isMobile
+                ? { a_som_loi: false, b_soiltype_agr: false, b_area: false }
+                : {},
+        )
+    }, [isMobile])
 
     const params = useParams()
     const b_id_farm = params.b_id_farm
-    const isMobile = useIsMobile()
 
     const handleRowClick = (
         row: any,
@@ -84,14 +89,6 @@ export function DataTable<TData extends FieldExtended, TValue>({
 
         if (isLinkClick(event.target)) {
             // If a link was clicked, let the default navigation happen
-            return
-        }
-
-        if (isMobile) {
-            setExpandedRows((prev) => ({
-                ...prev,
-                [row.id]: !prev[row.id],
-            }))
             return
         }
 
@@ -143,18 +140,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
         state: {
             sorting,
             columnFilters,
-            columnVisibility: isMobile
-                ? {
-                      b_name: true,
-                      select: true,
-                      actions: true,
-                      cultivations: false,
-                      fertilizerApplications: false,
-                      a_som_loi: false,
-                      b_soiltype_agr: false,
-                      b_area: false,
-                  }
-                : columnVisibility,
+            columnVisibility,
             globalFilter,
             rowSelection,
         },
@@ -164,7 +150,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
         return table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)
-    }, [table])
+    }, [table, rowSelection])
 
     const canAddHarvest = useMemo(() => {
         if (selectedFields.length === 0) return false
@@ -190,19 +176,19 @@ export function DataTable<TData extends FieldExtended, TValue>({
 
     return (
         <div className="w-full flex flex-col h-full">
-            <div className="sticky top-0 z-10 bg-background py-4 flex space-x-2">
+            <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
                 <Input
                     placeholder="Zoek op naam, gewas of meststof"
                     value={globalFilter ?? ""}
                     onChange={(event) => setGlobalFilter(event.target.value)}
-                    className="max-w-sm"
+                    className="w-full sm:w-auto sm:flex-grow"
                 />
-                {!isMobile && (
+                <div className="flex w-full items-center justify-start sm:justify-end gap-2 sm:w-auto flex-wrap">
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="ml-auto">
-                                Kolommen
-                                <ChevronDown />
+                            <Button variant="outline">
+                                Bekijk
+                                <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
@@ -225,82 +211,60 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                 })}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                )}
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div>
-                                {isFertilizerButtonDisabled ? (
-                                    <Button
-                                        disabled={isFertilizerButtonDisabled}
-                                        className="rounded-3xl"
-                                    >
-                                        <Plus />
-                                        Bemesting toevoegen
-                                    </Button>
-                                ) : (
-                                    <NavLink
-                                        to={`/farm/${b_id_farm}/add/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
-                                    >
-                                        <Button className="rounded-3xl">
-                                            <Plus />
-                                            Bemesting toevoegen
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <div>
+                                    {isFertilizerButtonDisabled ? (
+                                        <Button
+                                            disabled={
+                                                isFertilizerButtonDisabled
+                                            }
+                                        >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Bemesting
                                         </Button>
-                                    </NavLink>
-                                )}
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{fertilizerTooltipContent}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <div>
-                                {isHarvestButtonDisabled ? (
-                                    <Button
-                                        disabled={isHarvestButtonDisabled}
-                                        className="rounded-3xl"
-                                    >
-                                        <Plus />
-                                        Oogst toevoegen
-                                    </Button>
-                                ) : (
-                                    <NavLink
-                                        to={`/farm/${b_id_farm}/add/harvest?fieldIds=${selectedFieldIds.join(",")}`}
-                                    >
-                                        <Button className="rounded-3xl">
-                                            <Plus />
-                                            Oogst toevoegen
-                                        </Button>
-                                    </NavLink>
-                                )}
-                            </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{harvestTooltipContent}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                <div className="ml-auto">
+                                    ) : (
+                                        <NavLink
+                                            to={`/farm/${b_id_farm}/add/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
+                                        >
+                                            <Button>
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Bemesting
+                                            </Button>
+                                        </NavLink>
+                                    )}
+                                </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{fertilizerTooltipContent}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                     <NavLink to={"./new"}>
                         <Button>
-                            <Plus />
-                            Perceel toevoegen
+                            <Plus className="mr-2 h-4 w-4" />
+                            Perceel
                         </Button>
                     </NavLink>
                 </div>
             </div>
-            <div className="rounded-md border flex-grow overflow-y-auto">
+            <div className="rounded-md border flex-grow relative overflow-x-auto">
                 <Table>
                     <TableHeader className="sticky top-0 z-10 bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead
+                                            key={header.id}
+                                            className={cn({
+                                                "sticky left-0 bg-background":
+                                                    header.column.id === "select",
+                                                "sticky right-0 bg-background":
+                                                    header.column.id === "actions",
+                                            })}
+                                        >
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -317,130 +281,32 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <>
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={
-                                            row.getIsSelected() && "selected"
-                                        }
-                                        onClick={(event) =>
-                                            handleRowClick(row, event)
-                                        }
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext(),
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                    {isMobile && expandedRows[row.id] && (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={
-                                                    row.getVisibleCells().length
-                                                }
-                                                className="p-0"
-                                            >
-                                                <Collapsible
-                                                    open={expandedRows[row.id]}
-                                                >
-                                                    <CollapsibleContent className="space-y-2 p-4">
-                                                        <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">
-                                                                Gewassen:
-                                                            </p>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {row.original.cultivations.map(
-                                                                    (
-                                                                        cultivation: any,
-                                                                    ) => (
-                                                                        <Badge
-                                                                            key={
-                                                                                cultivation.b_lu_name
-                                                                            }
-                                                                            style={{
-                                                                                backgroundColor:
-                                                                                    getCultivationColor(
-                                                                                        cultivation.b_lu_croprotation,
-                                                                                    ),
-                                                                            }}
-                                                                            className="text-white"
-                                                                            variant="default"
-                                                                        >
-                                                                            {
-                                                                                cultivation.b_lu_name
-                                                                            }
-                                                                        </Badge>
-                                                                    ),
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">
-                                                                Bemesting met:
-                                                            </p>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {row.original.fertilizerApplications.map(
-                                                                    (
-                                                                        fertilizer: any,
-                                                                    ) => (
-                                                                        <Badge
-                                                                            key={
-                                                                                fertilizer.p_name_nl
-                                                                            }
-                                                                            variant="outline"
-                                                                        >
-                                                                            {
-                                                                                fertilizer.p_name_nl
-                                                                            }
-                                                                        </Badge>
-                                                                    ),
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">
-                                                                OS (%):
-                                                            </p>
-                                                            <p className="text-sm">
-                                                                {
-                                                                    row.original
-                                                                        .a_som_loi
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">
-                                                                Bodemtype:
-                                                            </p>
-                                                            <p className="text-sm">
-                                                                {
-                                                                    row.original
-                                                                        .b_soiltype_agr
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                        <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">
-                                                                Oppervlakte
-                                                                (ha):
-                                                            </p>
-                                                            <p className="text-sm">
-                                                                {
-                                                                    row.original
-                                                                        .b_area
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                    </CollapsibleContent>
-                                                </Collapsible>
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </>
+                                <TableRow
+                                    key={row.id}
+                                    data-state={
+                                        row.getIsSelected() && "selected"
+                                    }
+                                    onClick={(event) =>
+                                        handleRowClick(row, event)
+                                    }
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell
+                                            key={cell.id}
+                                            className={cn({
+                                                "sticky left-0 bg-background":
+                                                    cell.column.id === "select",
+                                                "sticky right-0 bg-background":
+                                                    cell.column.id === "actions",
+                                            })}
+                                        >
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
                             ))
                         ) : (
                             <TableRow>

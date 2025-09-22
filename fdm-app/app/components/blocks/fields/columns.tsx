@@ -36,17 +36,7 @@ export type FieldExtended = {
     b_area: number
 }
 
-export const columns: ColumnDef<FieldExtended>[] = [
-    {
-        id: "expander",
-        header: () => null,
-        cell: ({ row }) => {
-            const isMobile = useIsMobile()
-            if (!isMobile) return null
-            return row.getIsExpanded() ? <ChevronDown /> : <ChevronRight />
-        },
-        enableHiding: true,
-    },
+export const columns: ColumnDef<FieldExtended>[] = [  
     {
         id: "select",
         header: ({ table }) => (

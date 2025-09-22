@@ -37,6 +37,7 @@ import { getTimeBasedGreeting } from "~/lib/greetings"
 import { DataTable } from "../components/blocks/fields/table"
 import { columns } from "../components/blocks/fields/columns"
 import { FarmContent } from "../components/blocks/farm/farm-content"
+import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "../components/ui/breadcrumb"
 
 export const meta: MetaFunction = () => {
     return [
@@ -208,11 +209,11 @@ export default function FarmFieldIndex() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderField
-                    b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={loaderData.fieldOptions}
-                    b_id={undefined}
-                />
+               
+            <BreadcrumbSeparator />
+            <BreadcrumbItem className="hidden md:block">
+                    Percelen
+            </BreadcrumbItem>
             </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
@@ -242,7 +243,7 @@ export default function FarmFieldIndex() {
                         <FarmTitle
                             title={`${greeting}, ${loaderData.userName}! 👋`}
                             description={
-                                "Kies een perceel uit de lijst om verder te gaan of maak een nieuw perceel aan"
+                                "Kies een perceel uit de table om verder te gaan of maak een nieuw perceel aan"
                             }
                         />
                         <FarmContent>
