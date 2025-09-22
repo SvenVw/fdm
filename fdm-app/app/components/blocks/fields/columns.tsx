@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, ChevronRight, ChevronDown } from "lucide-react"
+import { MoreHorizontal, ChevronRight, ChevronDown, ArrowUpRightFromSquare } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import { DataTableColumnHeader } from "./column-header"
@@ -78,9 +78,10 @@ export const columns: ColumnDef<FieldExtended>[] = [
             return (
                 <NavLink
                     to={`./${field.b_id}`}
-                    className="flex items-center hover:underline"
+                    className="group flex items-center hover:underline w-fit"
                 >
                     {field.b_name}
+                    <ArrowUpRightFromSquare className="ml-2 h-4 w-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </NavLink>
             )
         },
@@ -168,7 +169,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
         },
         enableHiding: true, // Enable hiding for mobile
     },
-     {
+    {
         accessorKey: "b_soiltype_agr",
         enableSorting: true,
         sortingFn: "alphanumeric",

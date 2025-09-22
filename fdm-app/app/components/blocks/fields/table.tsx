@@ -10,7 +10,7 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
-import { ChevronDown, Plus, ChevronRight } from "lucide-react"
+import { ChevronDown, Plus } from "lucide-react"
 import { useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router"
 import fuzzysort from "fuzzysort"
@@ -22,7 +22,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { type FieldExtended } from "./columns"
+import type { FieldExtended } from "./columns"
 import {
     Table,
     TableBody,
@@ -38,7 +38,7 @@ import {
     DropdownMenuTrigger,
 } from "../../ui/dropdown-menu"
 import { useIsMobile } from "~/hooks/use-mobile"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
+import { Collapsible, CollapsibleContent } from "~/components/ui/collapsible"
 import { Badge } from "~/components/ui/badge"
 import { getCultivationColor } from "../../custom/cultivation-colors"
 
@@ -58,7 +58,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
         {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
-    const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
+    const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>(
+        {},
+    )
     const lastSelectedRowIndex = useRef<number | null>(null)
 
     const params = useParams()
@@ -142,7 +144,16 @@ export function DataTable<TData extends FieldExtended, TValue>({
             sorting,
             columnFilters,
             columnVisibility: isMobile
-                ? { b_name: true, select: true, actions: true, cultivations: false, fertilizerApplications: false, a_som_loi: false, b_soiltype_agr: false, b_area: false }
+                ? {
+                      b_name: true,
+                      select: true,
+                      actions: true,
+                      cultivations: false,
+                      fertilizerApplications: false,
+                      a_som_loi: false,
+                      b_soiltype_agr: false,
+                      b_area: false,
+                  }
                 : columnVisibility,
             globalFilter,
             rowSelection,
@@ -150,7 +161,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
     })
 
     const selectedFields = useMemo(() => {
-        return table.getFilteredSelectedRowModel().rows.map((row) => row.original)
+        return table
+            .getFilteredSelectedRowModel()
+            .rows.map((row) => row.original)
     }, [table])
 
     const canAddHarvest = useMemo(() => {
@@ -218,7 +231,10 @@ export function DataTable<TData extends FieldExtended, TValue>({
                         <TooltipTrigger asChild>
                             <div>
                                 {isFertilizerButtonDisabled ? (
-                                    <Button disabled={isFertilizerButtonDisabled}>
+                                    <Button
+                                        disabled={isFertilizerButtonDisabled}
+                                        className="rounded-3xl"
+                                    >
                                         <Plus />
                                         Bemesting toevoegen
                                     </Button>
@@ -226,7 +242,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                     <NavLink
                                         to={`/farm/${b_id_farm}/add/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
                                     >
-                                        <Button>
+                                        <Button className="rounded-3xl">
                                             <Plus />
                                             Bemesting toevoegen
                                         </Button>
@@ -244,7 +260,10 @@ export function DataTable<TData extends FieldExtended, TValue>({
                         <TooltipTrigger asChild>
                             <div>
                                 {isHarvestButtonDisabled ? (
-                                    <Button disabled={isHarvestButtonDisabled}>
+                                    <Button
+                                        disabled={isHarvestButtonDisabled}
+                                        className="rounded-3xl"
+                                    >
                                         <Plus />
                                         Oogst toevoegen
                                     </Button>
@@ -252,7 +271,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                     <NavLink
                                         to={`/farm/${b_id_farm}/add/harvest?fieldIds=${selectedFieldIds.join(",")}`}
                                     >
-                                        <Button>
+                                        <Button className="rounded-3xl">
                                             <Plus />
                                             Oogst toevoegen
                                         </Button>
@@ -304,7 +323,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                         data-state={
                                             row.getIsSelected() && "selected"
                                         }
-                                        onClick={(event) => handleRowClick(row, event)}
+                                        onClick={(event) =>
+                                            handleRowClick(row, event)
+                                        }
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id}>
@@ -317,49 +338,102 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                     </TableRow>
                                     {isMobile && expandedRows[row.id] && (
                                         <TableRow>
-                                            <TableCell colSpan={row.getVisibleCells().length} className="p-0">
-                                                <Collapsible open={expandedRows[row.id]}>
+                                            <TableCell
+                                                colSpan={
+                                                    row.getVisibleCells().length
+                                                }
+                                                className="p-0"
+                                            >
+                                                <Collapsible
+                                                    open={expandedRows[row.id]}
+                                                >
                                                     <CollapsibleContent className="space-y-2 p-4">
                                                         <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">Gewassen:</p>
+                                                            <p className="text-sm font-medium">
+                                                                Gewassen:
+                                                            </p>
                                                             <div className="flex flex-wrap gap-2">
-                                                                {row.original.cultivations.map((cultivation: any) => (
-                                                                    <Badge
-                                                                        key={cultivation.b_lu_name}
-                                                                        style={{
-                                                                            backgroundColor: getCultivationColor(
-                                                                                cultivation.b_lu_croprotation,
-                                                                            ),
-                                                                        }}
-                                                                        className="text-white"
-                                                                        variant="default"
-                                                                    >
-                                                                        {cultivation.b_lu_name}
-                                                                    </Badge>
-                                                                ))}
+                                                                {row.original.cultivations.map(
+                                                                    (
+                                                                        cultivation: any,
+                                                                    ) => (
+                                                                        <Badge
+                                                                            key={
+                                                                                cultivation.b_lu_name
+                                                                            }
+                                                                            style={{
+                                                                                backgroundColor:
+                                                                                    getCultivationColor(
+                                                                                        cultivation.b_lu_croprotation,
+                                                                                    ),
+                                                                            }}
+                                                                            className="text-white"
+                                                                            variant="default"
+                                                                        >
+                                                                            {
+                                                                                cultivation.b_lu_name
+                                                                            }
+                                                                        </Badge>
+                                                                    ),
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">Bemesting met:</p>
+                                                            <p className="text-sm font-medium">
+                                                                Bemesting met:
+                                                            </p>
                                                             <div className="flex flex-wrap gap-2">
-                                                                {row.original.fertilizerApplications.map((fertilizer: any) => (
-                                                                    <Badge key={fertilizer.p_name_nl} variant="outline">
-                                                                        {fertilizer.p_name_nl}
-                                                                    </Badge>
-                                                                ))}
+                                                                {row.original.fertilizerApplications.map(
+                                                                    (
+                                                                        fertilizer: any,
+                                                                    ) => (
+                                                                        <Badge
+                                                                            key={
+                                                                                fertilizer.p_name_nl
+                                                                            }
+                                                                            variant="outline"
+                                                                        >
+                                                                            {
+                                                                                fertilizer.p_name_nl
+                                                                            }
+                                                                        </Badge>
+                                                                    ),
+                                                                )}
                                                             </div>
                                                         </div>
                                                         <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">OS (%):</p>
-                                                            <p className="text-sm">{row.original.a_som_loi}</p>
+                                                            <p className="text-sm font-medium">
+                                                                OS (%):
+                                                            </p>
+                                                            <p className="text-sm">
+                                                                {
+                                                                    row.original
+                                                                        .a_som_loi
+                                                                }
+                                                            </p>
                                                         </div>
                                                         <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">Bodemtype:</p>
-                                                            <p className="text-sm">{row.original.b_soiltype_agr}</p>
+                                                            <p className="text-sm font-medium">
+                                                                Bodemtype:
+                                                            </p>
+                                                            <p className="text-sm">
+                                                                {
+                                                                    row.original
+                                                                        .b_soiltype_agr
+                                                                }
+                                                            </p>
                                                         </div>
                                                         <div className="flex flex-col space-y-2">
-                                                            <p className="text-sm font-medium">Oppervlakte (ha):</p>
-                                                            <p className="text-sm">{row.original.b_area}</p>
+                                                            <p className="text-sm font-medium">
+                                                                Oppervlakte
+                                                                (ha):
+                                                            </p>
+                                                            <p className="text-sm">
+                                                                {
+                                                                    row.original
+                                                                        .b_area
+                                                                }
+                                                            </p>
                                                         </div>
                                                     </CollapsibleContent>
                                                 </Collapsible>
