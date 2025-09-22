@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, ChevronRight, ChevronDown } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import { DataTableColumnHeader } from "./column-header"
@@ -13,6 +13,7 @@ import {
 import { Button } from "../../ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
 import { getCultivationColor } from "../../custom/cultivation-colors"
+import { useIsMobile } from "~/hooks/use-mobile"
 
 export type FieldExtended = {
     b_id: string
@@ -31,6 +32,16 @@ export type FieldExtended = {
 }
 
 export const columns: ColumnDef<FieldExtended>[] = [
+    {
+        id: "expander",
+        header: () => null,
+        cell: ({ row }) => {
+            const isMobile = useIsMobile()
+            if (!isMobile) return null
+            return row.getIsExpanded() ? <ChevronDown /> : <ChevronRight />
+        },
+        enableHiding: true,
+    },
     {
         id: "select",
         header: ({ table }) => (
@@ -111,6 +122,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
                 </div>
             )
         },
+        enableHiding: true, // Enable hiding for mobile
     },
     {
         accessorKey: "fertilizerApplications",
@@ -145,6 +157,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
                 </div>
             )
         },
+        enableHiding: true, // Enable hiding for mobile
     },
     {
         accessorKey: "a_som_loi",
@@ -153,6 +166,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="OS (%)" />
         },
+        enableHiding: true, // Enable hiding for mobile
     },
      {
         accessorKey: "b_soiltype_agr",
@@ -161,6 +175,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
         header: ({ column }) => {
             return <DataTableColumnHeader column={column} title="Bodemtype" />
         },
+        enableHiding: true, // Enable hiding for mobile
     },
     {
         accessorKey: "b_area",
@@ -174,6 +189,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
                 />
             )
         },
+        enableHiding: true, // Enable hiding for mobile
     },
     {
         id: "actions",

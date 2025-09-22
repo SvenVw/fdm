@@ -10,7 +10,7 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
-import { ChevronDown, Plus } from "lucide-react"
+import { ChevronDown, Plus, ChevronRight } from "lucide-react"
 import { useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router"
 import fuzzysort from "fuzzysort"
@@ -37,6 +37,10 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "../../ui/dropdown-menu"
+import { useIsMobile } from "~/hooks/use-mobile"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "~/components/ui/collapsible"
+import { Badge } from "~/components/ui/badge"
+import { getCultivationColor } from "../../custom/cultivation-colors"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -54,10 +58,12 @@ export function DataTable<TData extends FieldExtended, TValue>({
         {},
     )
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+    const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
     const lastSelectedRowIndex = useRef<number | null>(null)
 
     const params = useParams()
     const b_id_farm = params.b_id_farm
+    const isMobile = useIsMobile()
 
     const handleRowClick = (
         row: any,
@@ -76,6 +82,14 @@ export function DataTable<TData extends FieldExtended, TValue>({
 
         if (isLinkClick(event.target)) {
             // If a link was clicked, let the default navigation happen
+            return
+        }
+
+        if (isMobile) {
+            setExpandedRows((prev) => ({
+                ...prev,
+                [row.id]: !prev[row.id],
+            }))
             return
         }
 
@@ -127,7 +141,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
         state: {
             sorting,
             columnFilters,
-            columnVisibility,
+            columnVisibility: isMobile
+                ? { b_name: true, select: true, actions: true, cultivations: false, fertilizerApplications: false, a_som_loi: false, b_soiltype_agr: false, b_area: false }
+                : columnVisibility,
             globalFilter,
             rowSelection,
         },
@@ -168,33 +184,35 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     onChange={(event) => setGlobalFilter(event.target.value)}
                     className="max-w-sm"
                 />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Kolommen
-                            <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) =>
-                                            column.toggleVisibility(!!value)
-                                        }
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                )
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                {!isMobile && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="ml-auto">
+                                Kolommen
+                                <ChevronDown />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {table
+                                .getAllColumns()
+                                .filter((column) => column.getCanHide())
+                                .map((column) => {
+                                    return (
+                                        <DropdownMenuCheckboxItem
+                                            key={column.id}
+                                            className="capitalize"
+                                            checked={column.getIsVisible()}
+                                            onCheckedChange={(value) =>
+                                                column.toggleVisibility(!!value)
+                                            }
+                                        >
+                                            {column.id}
+                                        </DropdownMenuCheckboxItem>
+                                    )
+                                })}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
                 <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -280,22 +298,75 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={
-                                        row.getIsSelected() && "selected"
-                                    }
-                                    onClick={(event) => handleRowClick(row, event)}
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext(),
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
+                                <>
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={
+                                            row.getIsSelected() && "selected"
+                                        }
+                                        onClick={(event) => handleRowClick(row, event)}
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext(),
+                                                )}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                    {isMobile && expandedRows[row.id] && (
+                                        <TableRow>
+                                            <TableCell colSpan={row.getVisibleCells().length} className="p-0">
+                                                <Collapsible open={expandedRows[row.id]}>
+                                                    <CollapsibleContent className="space-y-2 p-4">
+                                                        <div className="flex flex-col space-y-2">
+                                                            <p className="text-sm font-medium">Gewassen:</p>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {row.original.cultivations.map((cultivation: any) => (
+                                                                    <Badge
+                                                                        key={cultivation.b_lu_name}
+                                                                        style={{
+                                                                            backgroundColor: getCultivationColor(
+                                                                                cultivation.b_lu_croprotation,
+                                                                            ),
+                                                                        }}
+                                                                        className="text-white"
+                                                                        variant="default"
+                                                                    >
+                                                                        {cultivation.b_lu_name}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-2">
+                                                            <p className="text-sm font-medium">Bemesting met:</p>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {row.original.fertilizerApplications.map((fertilizer: any) => (
+                                                                    <Badge key={fertilizer.p_name_nl} variant="outline">
+                                                                        {fertilizer.p_name_nl}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-2">
+                                                            <p className="text-sm font-medium">OS (%):</p>
+                                                            <p className="text-sm">{row.original.a_som_loi}</p>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-2">
+                                                            <p className="text-sm font-medium">Bodemtype:</p>
+                                                            <p className="text-sm">{row.original.b_soiltype_agr}</p>
+                                                        </div>
+                                                        <div className="flex flex-col space-y-2">
+                                                            <p className="text-sm font-medium">Oppervlakte (ha):</p>
+                                                            <p className="text-sm">{row.original.b_area}</p>
+                                                        </div>
+                                                    </CollapsibleContent>
+                                                </Collapsible>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </>
                             ))
                         ) : (
                             <TableRow>
