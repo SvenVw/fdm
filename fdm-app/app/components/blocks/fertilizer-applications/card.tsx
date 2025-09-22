@@ -187,6 +187,14 @@ export function FertilizerApplicationCard({
 
     const detailCards = constructCards(dose)
 
+    function handleDialogOpenChange(state: boolean) {
+        if (!state && params.b_id_farm && params.b_id) {
+            fieldFertilizerFormStore.delete(params.b_id_farm, params.b_id)
+        }
+
+        setIsDialogOpen(state)
+    }
+
     return (
         <Card className="col-span-2 space-y-4">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -197,7 +205,10 @@ export function FertilizerApplicationCard({
                         gift per hectare voor verschillende nutriënten
                     </p>
                 </CardTitle>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog
+                    open={isDialogOpen}
+                    onOpenChange={handleDialogOpenChange}
+                >
                     <DialogTrigger asChild>
                         <Button>Bemesting toevoegen</Button>
                     </DialogTrigger>
