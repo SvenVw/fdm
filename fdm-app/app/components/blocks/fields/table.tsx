@@ -189,8 +189,8 @@ export function DataTable<TData extends FieldExtended, TValue>({
         : "Oogst toevoegen aan geselecteerde percelen"
 
     return (
-        <div className="w-full">
-            <div className="flex py-4 space-x-2">
+        <div className="w-full flex flex-col h-full">
+            <div className="sticky top-0 z-10 bg-background py-4 flex space-x-2">
                 <Input
                     placeholder="Zoek op naam, gewas of meststof"
                     value={globalFilter ?? ""}
@@ -293,9 +293,9 @@ export function DataTable<TData extends FieldExtended, TValue>({
                     </NavLink>
                 </div>
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-md border flex-grow overflow-y-auto">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="sticky top-0 z-10 bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
