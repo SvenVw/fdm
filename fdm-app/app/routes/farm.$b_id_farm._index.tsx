@@ -157,7 +157,9 @@ export default function FarmDashboardIndex() {
                                     Snelle acties
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <NavLink to="#">
+                                    <NavLink
+                                        to={`${calendar}/field/fertilizer`}
+                                    >
                                         <Card className="transition-all hover:shadow-md">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
@@ -177,20 +179,21 @@ export default function FarmDashboardIndex() {
                                             </CardHeader>
                                         </Card>
                                     </NavLink>
-                                    <NavLink to="#">
+                                    <NavLink
+                                        to={`${calendar}/field`}
+                                    >
                                         <Card className="transition-all hover:shadow-md">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
                                                     <div className="rounded-lg bg-primary text-primary-foreground p-3">
-                                                        <Plus className="h-6 w-6" />
+                                                        <Square className="h-6 w-6" />
                                                     </div>
                                                     <div>
                                                         <CardTitle>
-                                                            Oogst toevoegen
+                                                            Perceelsoverzicht
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Voor één of meerdere
-                                                            percelen.
+                                                            Uitgebreide tabel met o.a. gewassen en meststoffen per perceel.
                                                         </CardDescription>
                                                     </div>
                                                 </div>
@@ -215,7 +218,7 @@ export default function FarmDashboardIndex() {
                                                     </div>
                                                     <div>
                                                         <CardTitle>
-                                                            Nutriententenbalans
+                                                            Nutriëntenbalans
                                                         </CardTitle>
                                                         <CardDescription>
                                                             Aanvoer, afvoer en
