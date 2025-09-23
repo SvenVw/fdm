@@ -2,7 +2,6 @@ import {
     getCultivations,
     getCurrentSoilData,
     getFarms,
-    getFertilizerApplication,
     getFertilizerApplications,
     getFields,
 } from "@svenvw/fdm-core"
@@ -17,27 +16,17 @@ import {
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 import { Button } from "~/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-} from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getTimeBasedGreeting } from "~/lib/greetings"
 import { DataTable } from "../components/blocks/fields/table"
 import { columns } from "../components/blocks/fields/columns"
 import { FarmContent } from "../components/blocks/farm/farm-content"
-import { BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator } from "../components/ui/breadcrumb"
+import { BreadcrumbItem, BreadcrumbSeparator } from "../components/ui/breadcrumb"
 
 export const meta: MetaFunction = () => {
     return [

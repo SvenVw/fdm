@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { NavLink, useParams } from "react-router-dom"
+import { Link, NavLink, useParams } from "react-router-dom"
 import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -71,6 +71,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
 
     const params = useParams()
     const b_id_farm = params.b_id_farm
+    const calendar = params.calendar
 
     const handleRowClick = (
         row: any,
@@ -146,21 +147,12 @@ export function DataTable<TData extends FieldExtended, TValue>({
         },
     })
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is needed for Bemesting button activation
     const selectedFields = useMemo(() => {
         return table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)
     }, [table, rowSelection])
-
-    const canAddHarvest = useMemo(() => {
-        if (selectedFields.length === 0) return false
-        const firstCultivation = selectedFields[0]?.cultivations[0]?.b_lu_name
-        return selectedFields.every(
-            (field) =>
-                field.cultivations.length > 0 &&
-                field.cultivations[0]?.b_lu_name === firstCultivation,
-        )
-    }, [selectedFields])
 
     const selectedFieldIds = selectedFields.map((field) => field.b_id)
 
@@ -191,14 +183,16 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                 .getAllColumns()
                                 .filter((column) => column.getCanHide())
                                 .map((column) => {
-                                    const columnNames: Record<string, string> = {
-                                        b_name: "Naam",
-                                        cultivations: "Gewassen",
-                                        fertilizerApplications: "Bemesting met:",
-                                        a_som_loi: "OS",
-                                        b_soiltype_agr: "Bodemtype",
-                                        b_area: "Oppervlakte",
-                                    }
+                                    const columnNames: Record<string, string> =
+                                        {
+                                            b_name: "Naam",
+                                            cultivations: "Gewassen",
+                                            fertilizerApplications:
+                                                "Bemesting met:",
+                                            a_som_loi: "OS",
+                                            b_soiltype_agr: "Bodemtype",
+                                            b_area: "Oppervlakte",
+                                        }
                                     return (
                                         <DropdownMenuCheckboxItem
                                             key={column.id}
@@ -208,7 +202,8 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                                 column.toggleVisibility(!!value)
                                             }
                                         >
-                                            {columnNames[column.id] ?? column.id}
+                                            {columnNames[column.id] ??
+                                                column.id}
                                         </DropdownMenuCheckboxItem>
                                     )
                                 })}
@@ -229,7 +224,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/add/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />
