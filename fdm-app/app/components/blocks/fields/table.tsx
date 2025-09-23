@@ -191,6 +191,14 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                 .getAllColumns()
                                 .filter((column) => column.getCanHide())
                                 .map((column) => {
+                                    const columnNames: Record<string, string> = {
+                                        b_name: "Naam",
+                                        cultivations: "Gewassen",
+                                        fertilizerApplications: "Bemesting met:",
+                                        a_som_loi: "OS",
+                                        b_soiltype_agr: "Bodemtype",
+                                        b_area: "Oppervlakte",
+                                    }
                                     return (
                                         <DropdownMenuCheckboxItem
                                             key={column.id}
@@ -200,7 +208,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                                 column.toggleVisibility(!!value)
                                             }
                                         >
-                                            {column.id}
+                                            {columnNames[column.id] ?? column.id}
                                         </DropdownMenuCheckboxItem>
                                     )
                                 })}
