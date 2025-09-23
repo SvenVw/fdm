@@ -25,11 +25,7 @@ export function BasedOffFertilizerButton({
     fertilizer: Fertilizer
 }) {
     return (
-        <NavLink
-            key={fertilizer.p_id}
-            to={`${fertilizer.p_id}`}
-            className="block"
-        >
+        <NavLink to={`${fertilizer.p_id}`} className="block">
             <Card>
                 <CardContent className="p-4">
                     <h3 className="text-lg font-semibold">

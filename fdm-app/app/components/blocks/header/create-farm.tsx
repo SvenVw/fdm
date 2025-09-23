@@ -67,13 +67,11 @@ export function HeaderFarmCreate({
                     <BreadcrumbSeparator />
                     {currentPath.match(/manage/) ? (
                         <>
-                            <Link to="..">
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="..">
-                                        Bemesting
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                            </Link>
+                            <BreadcrumbItem className="hidden md:block">
+                                <BreadcrumbLink href="..">
+                                    Bemesting
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
                             <BreadcrumbSeparator />
                             <BreadcrumbItem className="hidden md:block">
                                 <BreadcrumbLink>Meststoffen</BreadcrumbLink>
