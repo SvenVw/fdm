@@ -74,6 +74,7 @@ export function FertilizerApplicationForm({
             )
             if (savedFormValues) {
                 for (const [k, v] of Object.entries(savedFormValues)) {
+                    if (typeof v === "undefined" || v === null) continue
                     const hydrated =
                         k === "p_app_date" && v
                             ? new Date(v as any)
@@ -102,7 +103,7 @@ export function FertilizerApplicationForm({
     }
 
     function handleSubmit(e: FormEvent<HTMLFormElement>) {
-        fieldFertilizerFormStore.delete(b_id_farm, b_id)
+        fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
         form.handleSubmit(e)
     }
 
