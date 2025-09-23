@@ -9,6 +9,8 @@ import {
     type RowSelectionState,
     useReactTable,
     VisibilityState,
+    type Row,
+    type FilterFn,
 } from "@tanstack/react-table"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -31,13 +33,13 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
-import { cn } from "@/app/lib/utils"
+import { cn } from "~/lib/utils"
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from "../../ui/dropdown-menu"
+} from "~/components/ui/dropdown-menu"
 import { useIsMobile } from "~/hooks/use-mobile"
 
 interface DataTableProps<TData, TValue> {
@@ -74,7 +76,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
     const calendar = params.calendar
 
     const handleRowClick = (
-        row: any,
+        row: Row<TData>,
         event: React.MouseEvent<HTMLTableRowElement>,
     ) => {
         // Check if the clicked element or any of its parents is an anchor tag
@@ -114,7 +116,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
         lastSelectedRowIndex.current = row.index
     }
 
-    const fuzzyFilter = (row: any, columnId: string, filterValue: string) => {
+    const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
         const cultivationNames = row.original.cultivations
             .map((c: { b_lu_name: string }) => c.b_lu_name)
             .join(" ")
@@ -224,7 +226,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                         </Button>
                                     ) : (
                                         <NavLink
-                                            to={`/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${selectedFieldIds.join(",")}`}
+                                            to={`/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${selectedFieldIds.map(encodeURIComponent).join(",")}`}
                                         >
                                             <Button>
                                                 <Plus className="mr-2 h-4 w-4" />

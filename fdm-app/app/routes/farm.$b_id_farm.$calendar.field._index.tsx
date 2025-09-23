@@ -174,6 +174,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
 
+    const currentFarmName =
+        loaderData.farmOptions.find(
+            (farm) => farm.b_id_farm === loaderData.b_id_farm,
+        )?.b_name_farm ?? ""
+
     return (
         <SidebarInset>
             <Header
@@ -197,7 +202,7 @@ export default function FarmFieldIndex() {
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Percelen van ${loaderData.farmOptions.find((farm) => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
+                            title={`Percelen van ${currentFarmName}`}
                             description="Dit bedrijf heeft nog geen percelen"
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
@@ -219,7 +224,7 @@ export default function FarmFieldIndex() {
                 ) : (
                     <>
                         <FarmTitle
-                            title={`Percelen van ${loaderData.farmOptions.find((farm) => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
+                            title={`Percelen van ${currentFarmName}`}
                             description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
                         />
                         <FarmContent>

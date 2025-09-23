@@ -120,8 +120,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             timeframe,
         )
-        const selectedFields = fields.filter((field) =>
-            fieldIds.includes(field.b_id!),
+        const selectedFields = fields.filter(
+            (field) => field.b_id && fieldIds.includes(field.b_id),
         )
 
         const fieldOptions = fields.map((field) => {
@@ -156,7 +156,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     )
                     return meta ? { value: opt, label: meta.label } : undefined
                 })
-                .filter(Boolean)
+                .filter(
+                    (option): option is { value: string; label: string } =>
+                        option !== undefined,
+                )
             return {
                 value: fertilizer.p_id,
                 label: fertilizer.p_name_nl,

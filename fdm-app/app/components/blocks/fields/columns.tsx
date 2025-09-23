@@ -1,8 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import {
-    MoreHorizontal,
-    ArrowUpRightFromSquare,
-} from "lucide-react"
+import { MoreHorizontal, ArrowUpRightFromSquare } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import { DataTableColumnHeader } from "./column-header"
@@ -33,7 +30,7 @@ export type FieldExtended = {
     b_area: number
 }
 
-export const columns: ColumnDef<FieldExtended>[] = [  
+export const columns: ColumnDef<FieldExtended>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -98,9 +95,9 @@ export const columns: ColumnDef<FieldExtended>[] = [
 
             return (
                 <div className="flex items-start flex-col space-y-2">
-                    {cultivationsSorted.map((cultivation) => (
+                    {cultivationsSorted.map((cultivation, idx) => (
                         <Badge
-                            key={cultivation.b_lu_name}
+                            key={`${cultivation.b_lu_name}-${idx}`}
                             style={{
                                 backgroundColor: getCultivationColor(
                                     cultivation.b_lu_croprotation,

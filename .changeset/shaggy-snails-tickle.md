@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Add new page to add fertilizer application to multiple fields at once
+Add a new page to apply a fertilizer application to multiple fields at once.
