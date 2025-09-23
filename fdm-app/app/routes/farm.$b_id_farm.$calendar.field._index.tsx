@@ -132,18 +132,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     field.b_id,
                     timeframe,
                 )
-                const a_som_loi = currentSoilData.find((x) => {
-                    if (x.parameter === "a_som_loi") {
-                        return true
-                    }
-                    return false
-                }).value
-                const b_soiltype_agr = currentSoilData.find((x) => {
-                    if (x.parameter === "b_soiltype_agr") {
-                        return true
-                    }
-                    return false
-                }).value
+                const a_som_loi = currentSoilData.find(x => x.parameter === "a_som_loi")?.value ?? null
+                const b_soiltype_agr = currentSoilData.find(x => x.parameter === "b_soiltype_agr")?.value ?? null
 
                 return {
                     b_id: field.b_id,
