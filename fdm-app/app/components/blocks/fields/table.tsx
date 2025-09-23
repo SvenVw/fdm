@@ -169,11 +169,6 @@ export function DataTable<TData extends FieldExtended, TValue>({
         ? "Selecteer één of meerdere percelen om bemesting toe te voegen"
         : "Bemesting toevoegen aan geselecteerde percelen"
 
-    const isHarvestButtonDisabled = !canAddHarvest
-    const harvestTooltipContent = isHarvestButtonDisabled
-        ? "Selecteer één of meerdere percelen met hetzelfde gewas om oogst toe te voegen"
-        : "Oogst toevoegen aan geselecteerde percelen"
-
     return (
         <div className="w-full flex flex-col h-full">
             <div className="sticky top-0 z-10 bg-background py-4 flex flex-col sm:flex-row gap-2 items-center">
@@ -241,12 +236,21 @@ export function DataTable<TData extends FieldExtended, TValue>({
                             </TooltipContent>
                         </Tooltip>
                     </TooltipProvider>
-                    <NavLink to={"./new"}>
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Perceel
-                        </Button>
-                    </NavLink>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <NavLink to={"./new"}>
+                                    <Button>
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Nieuw perceel
+                                    </Button>
+                                </NavLink>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Voeg een nieuw perceel toe</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </div>
             <div className="rounded-md border flex-grow relative overflow-x-auto">
@@ -260,9 +264,11 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                             key={header.id}
                                             className={cn({
                                                 "sticky left-0 bg-background":
-                                                    header.column.id === "select",
+                                                    header.column.id ===
+                                                    "select",
                                                 "sticky right-0 bg-background":
-                                                    header.column.id === "actions",
+                                                    header.column.id ===
+                                                    "actions",
                                             })}
                                         >
                                             {header.isPlaceholder
@@ -297,7 +303,8 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                                 "sticky left-0 bg-background":
                                                     cell.column.id === "select",
                                                 "sticky right-0 bg-background":
-                                                    cell.column.id === "actions",
+                                                    cell.column.id ===
+                                                    "actions",
                                             })}
                                         >
                                             {flexRender(
