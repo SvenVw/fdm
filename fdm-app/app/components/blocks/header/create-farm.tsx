@@ -1,4 +1,4 @@
-import { useLocation } from "react-router"
+import { Link, useLocation } from "react-router"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -65,9 +65,25 @@ export function HeaderFarmCreate({
                         <BreadcrumbLink>Bouwplan</BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbSeparator />
-                    <BreadcrumbItem className="hidden md:block">
-                        <BreadcrumbLink>Bemesting</BreadcrumbLink>
-                    </BreadcrumbItem>
+                    {currentPath.match(/manage/) ? (
+                        <>
+                            <Link to="..">
+                                <BreadcrumbItem className="hidden md:block">
+                                    <BreadcrumbLink href="..">
+                                        Bemesting
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                            </Link>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem className="hidden md:block">
+                                <BreadcrumbLink>Meststoffen</BreadcrumbLink>
+                            </BreadcrumbItem>
+                        </>
+                    ) : (
+                        <BreadcrumbItem className="hidden md:block">
+                            <BreadcrumbLink>Bemesting</BreadcrumbLink>
+                        </BreadcrumbItem>
+                    )}
                 </>
             ) : null}
             {currentPath.match(/access/) ? (
