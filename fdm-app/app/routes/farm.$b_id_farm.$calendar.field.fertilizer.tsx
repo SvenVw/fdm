@@ -249,8 +249,8 @@ export default function FarmFieldFertilizerAddIndex() {
                         </div>
                     )}
                     <FarmContent>
-                        <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
-                            <Card className="lg:w-1/3">
+                        <div className="flex flex-col space-y-8 pb-10 md:flex-row md:space-x-12 md:space-y-0">
+                            <Card className="md:w-1/3">
                                 <CardHeader>
                                     <CardTitle>
                                         Geselecteerde percelen
@@ -262,7 +262,7 @@ export default function FarmFieldFertilizerAddIndex() {
                                 </CardHeader>
                                 <CardContent>
                                     {loaderData.selectedFields.length > 0 ? (
-                                        <div className="h-96 space-y-2 overflow-y-auto">
+                                        <div className="max-h-[60vh] space-y-2 overflow-y-auto">
                                             {loaderData.selectedFields.map(
                                                 (field) => (
                                                     <div
@@ -280,7 +280,7 @@ export default function FarmFieldFertilizerAddIndex() {
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="flex h-96 flex-col items-center justify-center rounded-md border border-dashed text-center">
+                                        <div className="flex h-full min-h-[24rem] flex-col items-center justify-center rounded-md border border-dashed text-center">
                                             <Info className="h-10 w-10 text-muted-foreground/50" />
                                             <h3 className="mt-4 text-lg font-semibold">
                                                 Geen percelen geselecteerd
@@ -325,7 +325,7 @@ export default function FarmFieldFertilizerAddIndex() {
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <div className="grid gap-4 py-4">
-                                                <div className="h-96 space-y-2 overflow-y-auto rounded-md border p-2">
+                                                <div className="max-h-[60vh] space-y-2 overflow-y-auto rounded-md border p-2">
                                                     {loaderData.fieldOptions.map(
                                                         (field) => (
                                                             <div
