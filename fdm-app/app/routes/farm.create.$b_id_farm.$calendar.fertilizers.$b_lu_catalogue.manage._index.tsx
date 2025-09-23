@@ -25,7 +25,7 @@ export const meta: MetaFunction = () => {
         { title: `Meststoffen | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekij de lijst van meststoffen beschikbaar.",
+            content: "Bekijk de lijst van meststoffen beschikbaar.",
         },
     ]
 }
