@@ -12,7 +12,7 @@ import {
 import type { FeatureCollection } from "geojson"
 import { Plus } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-import { Layer, Map as MapGL } from "react-map-gl/mapbox"
+import { Layer, Map as MapGL, type MapRef } from "react-map-gl/mapbox"
 import {
     type ActionFunctionArgs,
     data,
@@ -247,6 +247,13 @@ export default function Index() {
         })
     }, [loaderData, form.reset])
 
+    //ref to refit the map when the selected field changes
+    const mapRef = useRef<MapRef>(null)
+
+    useEffect(() => {
+        mapRef.current?.fitBounds(viewState.bounds, viewState.fitBoundsOptions)
+    }, [viewState])
+
     //ref to check if map is rendered
     const mapContainerRef = useRef<HTMLDivElement>(null)
     const [mapIsLoaded, setMapIsLoaded] = useState(false)
@@ -379,6 +386,7 @@ export default function Index() {
                                 mapStyle={loaderData.mapboxStyle}
                                 mapboxAccessToken={loaderData.mapboxToken}
                                 interactiveLayerIds={[id]}
+                                ref={mapRef}
                             >
                                 <FieldsSourceNotClickable
                                     id={id}
