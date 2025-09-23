@@ -21,6 +21,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
+import type { Route } from "./+types/farm.create.$b_id_farm.$calendar.fertilizers.$b_lu_catalogue.manage.$p_id"
 
 export const meta: MetaFunction = () => {
     return [
@@ -119,13 +120,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
-export default function FarmFertilizerPage() {
+export default function FarmFertilizerPage({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData()
 
     return (
         <FarmFertilizerBlock
             loaderData={loaderData}
-            backlink={"../fertilizer/manage"}
+            backlink={`../${params.b_lu_catalogue}/manage`}
         />
     )
 }
