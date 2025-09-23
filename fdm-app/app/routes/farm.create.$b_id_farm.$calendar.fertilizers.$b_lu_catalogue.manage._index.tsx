@@ -16,10 +16,9 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { FarmTitle } from "../components/blocks/farm/farm-title"
 import { DataTable } from "../components/blocks/fertilizer/table"
-import { HeaderFarm } from "../components/blocks/header/farm"
-import { HeaderFertilizer } from "../components/blocks/header/fertilizer"
 import { SidebarInset } from "../components/ui/sidebar"
 import type { Route } from "./+types/farm.create.$b_id_farm.$calendar.fertilizers.$b_lu_catalogue.manage._index"
+import { HeaderFarmCreate } from "../components/blocks/header/create-farm"
 
 export const meta: MetaFunction = () => {
     return [
@@ -54,6 +53,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        const b_name_farm = farm.b_name_farm
+
         // Get a list of possible farms of the user
         const farms = await getFarms(fdm, session.principal_id)
         if (!farms || farms.length === 0) {
@@ -81,6 +82,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             farm: farm,
             b_id_farm: b_id_farm,
+            b_name_farm: b_name_farm,
             farmOptions: farmOptions,
             fertilizers: fertilizers,
         }
@@ -103,15 +105,7 @@ export default function FarmFertilizersIndexPage({
                     disabled: false,
                 }}
             >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderFertilizer
-                    b_id_farm={loaderData.b_id_farm}
-                    p_id={undefined}
-                    fertilizerOptions={loaderData.fertilizers}
-                />
+                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
             </Header>
             <main>
                 <FarmTitle
