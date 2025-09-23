@@ -1,8 +1,6 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import {
     MoreHorizontal,
-    ChevronRight,
-    ChevronDown,
     ArrowUpRightFromSquare,
 } from "lucide-react"
 import { NavLink } from "react-router-dom"
@@ -18,7 +16,6 @@ import {
 import { Button } from "../../ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
 import { getCultivationColor } from "../../custom/cultivation-colors"
-import { useIsMobile } from "~/hooks/use-mobile"
 
 export type FieldExtended = {
     b_id: string
