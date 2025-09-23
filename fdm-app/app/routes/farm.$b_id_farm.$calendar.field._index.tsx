@@ -194,7 +194,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
-    const greeting = getTimeBasedGreeting()
 
     return (
         <SidebarInset>
@@ -219,8 +218,8 @@ export default function FarmFieldIndex() {
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Welkom, ${loaderData.userName}! 👋`}
-                            description={""}
+                            title={`Percelen van ${loaderData.farmOptions.find(farm => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
+                            description="Dit bedrijf heeft nog geen percelen"
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                             <div className="flex flex-col space-y-2 text-center">
@@ -241,10 +240,8 @@ export default function FarmFieldIndex() {
                 ) : (
                     <>
                         <FarmTitle
-                            title={`${greeting}, ${loaderData.userName}! 👋`}
-                            description={
-                                "Kies een perceel uit de table om verder te gaan of maak een nieuw perceel aan"
-                            }
+                            title={`Percelen van ${loaderData.farmOptions.find(farm => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
+                            description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
                         />
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">

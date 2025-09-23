@@ -141,7 +141,12 @@ export default function FarmDashboardIndex() {
                 />
             </Header>
             <main>
-                <FarmTitle title={loaderData.b_name_farm} description={""} />
+                <FarmTitle
+                    title={`${loaderData.b_name_farm}`}
+                    description={
+                        "Een overzicht van de bedrijfsgegevens, snelle acties en applicaties."
+                    }
+                />
                 <FarmContent>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Left Column */}
