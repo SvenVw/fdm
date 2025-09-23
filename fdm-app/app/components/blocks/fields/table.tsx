@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Link, NavLink, useParams } from "react-router-dom"
+import { NavLink, useParams } from "react-router-dom"
 import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"

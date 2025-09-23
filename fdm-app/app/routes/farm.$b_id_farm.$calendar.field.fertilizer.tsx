@@ -27,12 +27,12 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmContent } from "../components/blocks/farm/farm-content"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
 import {
     BreadcrumbItem,
     BreadcrumbSeparator,
 } from "../components/ui/breadcrumb"
-import { FertilizerApplicationForm } from "../components/blocks/fertilizer-applications/form"
+import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
 import {
     Card,
     CardContent,
@@ -40,7 +40,7 @@ import {
     CardFooter,
     CardHeader,
     CardTitle,
-} from "../components/ui/card"
+} from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
 import { useState } from "react"
 import {
@@ -54,12 +54,12 @@ import {
 } from "~/components/ui/dialog"
 import { Checkbox } from "~/components/ui/checkbox"
 import { Label } from "~/components/ui/label"
-import { FormSchema } from "../components/blocks/fertilizer-applications/formschema.tsx"
+import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { dataWithError, redirectWithSuccess } from "remix-toast"
 import { z } from "zod"
 import { Info } from "lucide-react"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
-import { extractFormValuesFromRequest } from "../lib/form"
+import { extractFormValuesFromRequest } from "~/lib/form"
 
 export const meta: MetaFunction = () => {
     return [

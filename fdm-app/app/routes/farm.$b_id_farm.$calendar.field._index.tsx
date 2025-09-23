@@ -23,10 +23,10 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { DataTable } from "../components/blocks/fields/table"
-import { columns } from "../components/blocks/fields/columns"
-import { FarmContent } from "../components/blocks/farm/farm-content"
-import { BreadcrumbItem, BreadcrumbSeparator } from "../components/ui/breadcrumb"
+import { DataTable } from "~/components/blocks/fields/table"
+import { columns } from "~/components/blocks/fields/columns"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 
 export const meta: MetaFunction = () => {
     return [
@@ -151,7 +151,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     cultivations: cultivations,
                     fertilizerApplications: fertilizerApplications,
                     a_som_loi: a_som_loi,
-                    b_soiltype_agr: b_soiltype_agr,            
+                    b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
                 }
             }),
@@ -197,17 +197,17 @@ export default function FarmFieldIndex() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-               
-            <BreadcrumbSeparator />
-            <BreadcrumbItem className="hidden md:block">
+
+                <BreadcrumbSeparator />
+                <BreadcrumbItem className="hidden md:block">
                     Percelen
-            </BreadcrumbItem>
+                </BreadcrumbItem>
             </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Percelen van ${loaderData.farmOptions.find(farm => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
+                            title={`Percelen van ${loaderData.farmOptions.find((farm) => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
                             description="Dit bedrijf heeft nog geen percelen"
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
@@ -229,7 +229,7 @@ export default function FarmFieldIndex() {
                 ) : (
                     <>
                         <FarmTitle
-                            title={`Percelen van ${loaderData.farmOptions.find(farm => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
+                            title={`Percelen van ${loaderData.farmOptions.find((farm) => farm.b_id_farm === loaderData.b_id_farm)?.b_name_farm}`}
                             description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
                         />
                         <FarmContent>

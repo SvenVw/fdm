@@ -12,10 +12,10 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger,
-} from "../../ui/dropdown-menu"
-import { Button } from "../../ui/button"
+} from "~/components/ui/dropdown-menu"
+import { Button } from "~/components/ui/button"
 import { Checkbox } from "~/components/ui/checkbox"
-import { getCultivationColor } from "../../custom/cultivation-colors"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
 
 export type FieldExtended = {
     b_id: string
