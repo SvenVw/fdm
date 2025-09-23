@@ -6,7 +6,11 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
-import { FarmNewFertilizerLayout } from "~/components/blocks/fertilizer/new-layout"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
@@ -75,22 +79,48 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the new fertilizer wizard when coming from the field fertilizer application form.
+ * Renders the layout for managing farm settings.
+ *
+ * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
+ * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <FarmNewFertilizerLayout
-            loaderData={loaderData}
-            action={{
-                label: "Terug naar bemesting toevoegen",
-                to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer`,
-                disabled: false,
-            }}
-            backlink={`/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer/manage`}
-        >
-            <Outlet />
-        </FarmNewFertilizerLayout>
+        <SidebarInset>
+            <Header
+                action={{
+                    label: "Terug naar bemesting toevoegen",
+                    to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer`,
+                    disabled: false,
+                }}
+            >
+                <HeaderFarm
+                    b_id_farm={loaderData.b_id_farm}
+                    farmOptions={loaderData.farmOptions}
+                />
+                <HeaderFertilizer
+                    b_id_farm={loaderData.b_id_farm}
+                    p_id={undefined}
+                    fertilizerOptions={[]}
+                />
+            </Header>
+            <main className="mx-auto max-w-4xl">
+                <FarmTitle
+                    title={"Meststof toevoegen"}
+                    description={
+                        "Voeg een meststof toe om deze te gebruiken op dit bedrijf."
+                    }
+                    action={{
+                        to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer/manage`,
+                        label: "Terug naar overzicht",
+                    }}
+                />
+                <div className="space-y-6 p-10 pb-0">
+                    <Outlet />
+                </div>
+            </main>
+        </SidebarInset>
     )
 }

@@ -1,4 +1,4 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -6,11 +6,14 @@ import {
     Outlet,
     useLoaderData,
 } from "react-router"
-import { FarmNewFertilizerLayout } from "~/components/blocks/fertilizer/new-layout"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { Header } from "~/components/blocks/header/base"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { HeaderFarmCreate } from "../components/blocks/header/create-farm"
 import type { Route } from "./+types/farm.create.$b_id_farm.$calendar.fertilizers.$b_lu_catalogue.manage.new"
 
 export const meta: MetaFunction = () => {
@@ -47,27 +50,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm || "",
-            }
-        })
+        const b_name_farm = farm.b_name_farm
 
         // Return user information from loader
         return {
-            farm: farm,
-            b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
+            b_name_farm: b_name_farm,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -75,22 +62,40 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the new fertilizer wizard when coming from the field fertilizer application form.
+ * Renders the layout for managing farm settings.
+ *
+ * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
+ * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
-        <FarmNewFertilizerLayout
-            loaderData={loaderData}
-            action={{
-                label: "Terug naar bemesting toevoegen",
-                to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers/${params.b_lu_catalogue}`,
-                disabled: false,
-            }}
-            backlink={`/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers/${params.b_lu_catalogue}/manage`}
-        >
-            <Outlet />
-        </FarmNewFertilizerLayout>
+        <SidebarInset>
+            <Header
+                action={{
+                    label: "Terug naar bemesting toevoegen",
+                    to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers/${params.b_lu_catalogue}`,
+                    disabled: false,
+                }}
+            >
+                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
+            </Header>
+            <main className="mx-auto max-w-4xl">
+                <FarmTitle
+                    title={"Meststof toevoegen"}
+                    description={
+                        "Voeg een meststof toe om deze te gebruiken op dit bedrijf."
+                    }
+                    action={{
+                        to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers/${params.b_lu_catalogue}/manage`,
+                        label: "Terug naar overzicht",
+                    }}
+                />
+                <div className="space-y-6 p-10 pb-0">
+                    <Outlet />
+                </div>
+            </main>
+        </SidebarInset>
     )
 }
