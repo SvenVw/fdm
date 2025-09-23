@@ -26,6 +26,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
@@ -131,13 +136,21 @@ export function FertilizerApplicationForm({
                                 }
                             />
                             <div className="py-2 [&.py-2]:grow-0">
-                                <Button
-                                    variant="secondary"
-                                    className="ml-2"
-                                    onClick={handleManageFertilizers}
-                                >
-                                    Beheren
-                                </Button>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <Button
+                                            variant="secondary"
+                                            className="ml-2"
+                                            onClick={handleManageFertilizers}
+                                        >
+                                            Beheren
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Bekijk meststoffen van dit bedrijf of
+                                        voeg nieuwe toe
+                                    </TooltipContent>
+                                </Tooltip>
                             </div>
                         </div>
                         <FormField
