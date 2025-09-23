@@ -1,9 +1,8 @@
-import { getFertilizers } from "@svenvw/fdm-core"
+import { type Fertilizer, getFertilizers } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { useLoaderData } from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { fdm } from "~/lib/fdm.server"
-import type { Fertilizer } from "~/components/blocks/fertilizer/columns"
 import {
     BasedOffFertilizerButton,
     CustomFertilizerButton,

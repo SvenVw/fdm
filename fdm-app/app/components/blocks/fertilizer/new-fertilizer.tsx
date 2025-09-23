@@ -1,6 +1,6 @@
+import type { Fertilizer } from "@svenvw/fdm-core"
 import { Link, NavLink } from "react-router"
-import { Card, CardContent } from "../../ui/card"
-import { Fertilizer } from "./columns"
+import { Card, CardContent } from "~/components/ui/card"
 
 export function CustomFertilizerButton() {
     return (
