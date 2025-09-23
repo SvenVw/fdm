@@ -95,6 +95,17 @@ export function FertilizerApplicationForm({
         fieldFertilizerFormStore.load,
     ])
 
+    useEffect(() => {
+        if (form.formState.isSubmitSuccessful) {
+            fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
+        }
+    }, [
+        form.formState.isSubmitSuccessful,
+        b_id_farm,
+        b_id_or_b_lu_catalogue,
+        fieldFertilizerFormStore.delete,
+    ])
+
     function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
         e.preventDefault()
         if (b_id_farm && b_id_or_b_lu_catalogue) {
@@ -107,17 +118,12 @@ export function FertilizerApplicationForm({
         navigate("./manage")
     }
 
-    function handleSubmit(e: FormEvent<HTMLFormElement>) {
-        fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
-        form.handleSubmit(e)
-    }
-
     return (
         <RemixFormProvider {...form}>
             <Form
                 id="formAddFertilizerApplication"
                 action={action}
-                onSubmit={handleSubmit}
+                onSubmit={form.handleSubmit}
                 method="post"
             >
                 <fieldset disabled={isSubmitting}>
