@@ -116,20 +116,21 @@ export function DataTable<TData extends FieldExtended, TValue>({
         lastSelectedRowIndex.current = row.index
     }
 
+
+    const memoizedData = useMemo(() => {
+        return data.map(item => ({
+            ...item,
+            searchTarget: `${item.b_name} ${item.cultivations.map(c => c.b_lu_name).join(' ')} ${item.fertilizerApplications.map(f => f.p_name_nl).join(' ')} ${item.b_soiltype_agr}`
+        }))
+    }, [data])
+
     const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
-        const cultivationNames = row.original.cultivations
-            .map((c: { b_lu_name: string }) => c.b_lu_name)
-            .join(" ")
-        const fertilizerNames = row.original.fertilizerApplications
-            .map((f: { p_name_nl: string }) => f.p_name_nl)
-            .join(" ")
-        const target = `${row.getValue("b_name")} ${cultivationNames} ${fertilizerNames} ${row.getValue("b_soiltype_agr")}`
-        const result = fuzzysort.go(filterValue, [target])
+        const result = fuzzysort.go(filterValue, [(row.original as any).searchTarget])
         return result.length > 0
     }
 
     const table = useReactTable({
-        data,
+        data: memoizedData,
         columns,
         getCoreRowModel: getCoreRowModel(),
         onSortingChange: setSorting,
