@@ -112,10 +112,6 @@ export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
                     description={
                         "Voeg een meststof toe om deze te gebruiken op dit bedrijf."
                     }
-                    action={{
-                        to: `/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer/manage`,
-                        label: "Terug naar overzicht",
-                    }}
                 />
                 <div className="space-y-6 p-10 pb-0">
                     <Outlet />

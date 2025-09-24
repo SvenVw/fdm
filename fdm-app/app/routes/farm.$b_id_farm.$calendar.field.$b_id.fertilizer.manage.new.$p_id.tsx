@@ -219,7 +219,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         return redirectWithSuccess(
-            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer/manage`,
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer`,
             {
                 message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
             },

@@ -115,7 +115,7 @@ export function FertilizerApplicationForm({
                 form.getValues(),
             )
         }
-        navigate("./manage")
+        navigate("./manage/new")
     }
 
     return (
@@ -149,7 +149,7 @@ export function FertilizerApplicationForm({
                                             className="ml-2"
                                             onClick={handleManageFertilizers}
                                         >
-                                            Beheren
+                                            Voeg nieuwe toe
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
