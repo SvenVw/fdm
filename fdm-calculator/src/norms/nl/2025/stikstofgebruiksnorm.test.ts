@@ -77,7 +77,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(140)
-        expect(result.normSource).toEqual("Akkerbouwgewas, pootaardappelen.")
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewas, pootaardappelen (hoge norm).",
+        )
     })
 
     it("should apply 0 korting if winterteelt is present in zand_nwc region (hoofdteelt 2025)", async () => {

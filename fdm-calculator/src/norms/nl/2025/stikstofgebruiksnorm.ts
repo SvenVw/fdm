@@ -110,6 +110,9 @@ export async function getRegion(
         if (feature) {
             return feature.region as RegionKey
         }
+        throw new Error(
+            `Field coordinates do not fall within any known region.`,
+        ) // Throw error if no feature found
     } catch (err) {
         if ((err as any)?.name === "AbortError") {
             throw new Error(
@@ -169,15 +172,25 @@ export async function getRegion(
  */
 function getNormsForCultivation(
     selectedStandard: NitrogenStandard,
-    b_lu_variety: string | undefined,
-    is_derogatie_bedrijf: boolean | undefined,
     b_lu_end: Date,
+    subTypeOmschrijving?: string, // New parameter
 ): NormsByRegion | undefined {
-    // Handle sub-types, typically used for temporary grasslands where norms depend on the period.
     if (selectedStandard.sub_types) {
+        let matchingSubType
+
+        // 1. Check for a direct match on omschrijving
+        if (subTypeOmschrijving) {
+            matchingSubType = selectedStandard.sub_types.find(
+                (sub) => sub.omschrijving === subTypeOmschrijving,
+            )
+            if (matchingSubType) {
+                return matchingSubType.norms
+            }
+        }
+
+        // 2. Fallback to time-based logic for temporary grasslands if no omschrijving match
         const endDate = new Date(b_lu_end)
-        const matchingSubType = selectedStandard.sub_types.find((sub) => {
-            // Check if the cultivation end date falls within the sub-type's defined period.
+        matchingSubType = selectedStandard.sub_types.find((sub) => {
             if (sub.period_start_month && sub.period_end_month) {
                 const startPeriod = new Date(
                     endDate.getFullYear(),
@@ -189,7 +202,6 @@ function getNormsForCultivation(
                     sub.period_end_month - 1,
                     sub.period_end_day || 1,
                 )
-                // Adjust endYear if the period spans across a year boundary (e.g., starts in Oct, ends in Jan).
                 if (sub.period_start_month > sub.period_end_month) {
                     endPeriod.setFullYear(endDate.getFullYear() + 1)
                 }
@@ -197,45 +209,92 @@ function getNormsForCultivation(
             }
             return false
         })
-        return matchingSubType?.norms // Return norms from the matching sub-type.
+
+        return matchingSubType?.norms
     }
-    // Handle specific potato varieties which have 'high' or 'low' norms.
-    if (selectedStandard.type === "aardappel" && b_lu_variety) {
-        const varietyLower = b_lu_variety.toLowerCase()
-        if (
-            selectedStandard.varieties_hoge_norm?.some(
-                (v) => v.toLowerCase() === varietyLower,
-            )
-        ) {
-            return selectedStandard.norms_hoge_norm
-        }
-        if (
-            selectedStandard.varieties_lage_norm?.some(
-                (v) => v.toLowerCase() === varietyLower,
-            )
-        ) {
-            return selectedStandard.norms_lage_norm
-        }
-        if (selectedStandard.norms_overig) {
-            return selectedStandard.norms_overig // Fallback to 'overig' if variety not in specific lists.
-        }
-        return selectedStandard.norms // Fallback to general norms if specific potato norms are missing.
-    }
-    // Handle specific norms for maize based on derogation status.
-    if (
-        selectedStandard.type === "akkerbouw" &&
-        selectedStandard.cultivation_rvo_table2 === "Akkerbouwgewassen, mais"
-    ) {
-        if (is_derogatie_bedrijf && selectedStandard.derogatie_norms) {
-            return selectedStandard.derogatie_norms
-        }
-        if (!is_derogatie_bedrijf && selectedStandard.non_derogatie_norms) {
-            return selectedStandard.non_derogatie_norms
-        }
-        return selectedStandard.norms // Fallback if derogation status doesn't match specific norms.
-    }
-    // Default case: return the primary norms defined for the standard.
+
+    // Default case if no sub_types are defined
     return selectedStandard.norms
+}
+
+/**
+ * Determines the specific sub-type 'omschrijving' for a cultivation that is part of a larger group.
+ * This is necessary for standards that use sub_types to differentiate norms, e.g., for winter vs. summer varieties.
+ *
+ * @param cultivation - The specific cultivation for which to determine the sub-type.
+ * @param standard - The matched NitrogenStandard which may contain sub_types.
+ * @param is_derogatie_bedrijf - Optional. A boolean indicating if the farm operates under derogation.
+ * @param cultivations - An array of cultivation objects for the current and previous year.
+ * @returns The 'omschrijving' of the matching sub-type as a string, or undefined if no specific sub-type applies.
+ */
+function determineSubTypeOmschrijving(
+    cultivation: NL2025NormsInputForCultivation,
+    standard: NitrogenStandard,
+    is_derogatie_bedrijf: boolean | undefined,
+    cultivations: NL2025NormsInputForCultivation[],
+): string | undefined {
+    // Potato logic based on variety
+    if (standard.type === "aardappel" && cultivation.b_lu_variety) {
+        const varietyLower = cultivation.b_lu_variety.toLowerCase()
+        const subType = standard.sub_types?.find((sub) =>
+            sub.varieties?.some((v) => v.toLowerCase() === varietyLower),
+        )
+        if (subType) {
+            return subType.omschrijving
+        }
+        // Fallback for potatoes is 'overig' if a variety is present but not in a specific list
+        return standard.sub_types?.find((s) => s.omschrijving === "overig")
+            ?.omschrijving
+    }
+
+    // Maize logic based on derogation status
+    if (standard.cultivation_rvo_table2 === "Akkerbouwgewassen, mais") {
+        return is_derogatie_bedrijf ? "derogatie" : "non-derogatie"
+    }
+
+    // Luzerne logic based on cultivation history
+    if (standard.cultivation_rvo_table2 === "Akkerbouwgewassen, Luzerne") {
+        const lucerneCultivationCodes = standard.b_lu_catalogue_match
+        const hasLucernceCultivationInPreviousYear = cultivations.some(
+            (c) =>
+                lucerneCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start.getFullYear() < new Date().getFullYear(), // Check for cultivation in any previous year
+        )
+        return hasLucernceCultivationInPreviousYear
+            ? "volgende jaren"
+            : "eerste jaar"
+    }
+
+    // Koolzaad logic based on specific BRP code
+    if (standard.cultivation_rvo_table2 === "Akkerbouwgewassen, koolzaad") {
+        if (cultivation.b_lu_catalogue === "nl_1922") return "winter"
+        if (cultivation.b_lu_catalogue === "nl_1923") return "zomer"
+    }
+
+    /*
+     * The following cultivations have sub_types defined in stikstofgebruiksnorm-data.ts
+     * but are not yet covered by the logic in this function.
+     *
+     * --- Cultivations Requiring Cultivation History Logic (e.g., "1e jaars" vs. "overjarig"): ---
+     * - Akkerbouwgewassen, Gras voor industriële verwerking
+     * - Akkerbouwgewassen, Graszaad, Engels raaigras
+     * - Akkerbouwgewassen, Roodzwenkgras
+     * - Akkerbouwgewassen, Roodzwenkgras, volgteelt
+     *
+     * --- Cultivations Requiring Cultivation Calendar Logic (e.g., "1e teelt" vs. "volgteelt"): ---
+     * - Bladgewassen, Spinazie
+     * - Bladgewassen, Slasoorten
+     * - Bladgewassen, Andijvie eerste teelt volgteelt
+     *
+     * --- Cultivations with Unclear Differentiation Logic (may require matching on b_lu string or external context): ---
+     * - Bladgewassen, Bladgewassen overig (e.g., "eenmalige oogst" vs. "meermalige oogst")
+     * - Kruiden (differentiating between bladgewas, wortelgewassen, zaadgewassen)
+     * - Bloembollengewassen, Iris (e.g., "grofbollig" vs. "fijnbollig")
+     * - Bloembollengewassen, Krokus (e.g., "grote gele" vs. "overig")
+     * - Bloembollengewassen, Gladiool (e.g., "pitten" vs. "kralen")
+     */
+
+    return undefined
 }
 
 /**
@@ -465,7 +524,7 @@ export async function getNL2025StikstofGebruiksNorm(
     const region = await getRegion(field.b_centroid)
 
     // Find matching nitrogen standard data based on b_lu_catalogue_match
-    let matchingStandards: NitrogenStandard[] = nitrogenStandardsData.filter(
+    const matchingStandards: NitrogenStandard[] = nitrogenStandardsData.filter(
         (ns: NitrogenStandard) =>
             ns.b_lu_catalogue_match.includes(b_lu_catalogue),
     )
@@ -476,31 +535,6 @@ export async function getNL2025StikstofGebruiksNorm(
         )
     }
 
-    // Handle specific cases for potatoes based on variety
-    // This logic assumes that the b_lu_catalogue for potatoes will match one of the potato entries
-    // and then the variety_type will further refine it.
-    if (cultivation.b_lu_variety) {
-        const varietyLower = cultivation.b_lu_variety.toLowerCase()
-        const filteredByVariety = matchingStandards.filter(
-            (ns: NitrogenStandard) =>
-                ns.varieties?.some((v) => v.toLowerCase() === varietyLower),
-        )
-
-        if (filteredByVariety.length > 0) {
-            matchingStandards = filteredByVariety
-        } else {
-            // Fallback to 'overig' if variety not found in high/low lists for potatoes
-            const overigPotato = matchingStandards.find(
-                (ns: NitrogenStandard) =>
-                    ns.type === "aardappel" &&
-                    ns.variety_type?.includes("overig"),
-            )
-            if (overigPotato) {
-                matchingStandards = [overigPotato]
-            }
-        }
-    }
-
     // Prioritize exact matches if multiple exist (e.g., for specific potato types)
     let selectedStandard: NitrogenStandard | undefined
 
@@ -508,38 +542,11 @@ export async function getNL2025StikstofGebruiksNorm(
         selectedStandard = matchingStandards[0]
     } else if (matchingStandards.length > 1) {
         // If multiple standards match b_lu_catalogue, try to find a more specific one
-        // This could be based on variety_type for potatoes, or other criteria if added later
-        if (cultivation.b_lu_variety) {
-            const varietyLower = cultivation.b_lu_variety.toLowerCase() // Define varietyLower here
-            const varietySpecific = matchingStandards.find(
-                (ns) =>
-                    ns.varieties_hoge_norm?.some(
-                        (v) => v.toLowerCase() === varietyLower,
-                    ) ||
-                    ns.varieties_lage_norm?.some(
-                        (v) => v.toLowerCase() === varietyLower,
-                    ) ||
-                    ns.varieties?.some((v) => v.toLowerCase() === varietyLower),
-            )
-            if (varietySpecific) {
-                selectedStandard = varietySpecific
-            } else {
-                // If variety doesn't match a specific list, check for an "overig" type for potatoes
-                const overigPotato = matchingStandards.find(
-                    (ns) =>
-                        ns.type === "aardappel" &&
-                        ns.variety_type?.includes("overig"),
-                )
-                if (overigPotato) selectedStandard = overigPotato
-            }
-        }
-        if (!selectedStandard) {
-            // If still no specific match, take the first one (or implement more sophisticated disambiguation)
-            selectedStandard =
-                matchingStandards.find(
-                    (ns) => !ns.variety_type && !ns.sub_types,
-                ) || matchingStandards[0]
-        }
+        // This could be based on sub_types with specific omschrijving or varieties
+        selectedStandard =
+            matchingStandards.find((ns) =>
+                ns.sub_types?.some((sub) => sub.omschrijving || sub.varieties),
+            ) || matchingStandards[0] // Fallback to the first if no specific sub_type is found
     }
 
     if (!selectedStandard) {
@@ -550,11 +557,18 @@ export async function getNL2025StikstofGebruiksNorm(
         )
     }
 
+    // Determine the sub-type omschrijving
+    const subTypeOmschrijving = determineSubTypeOmschrijving(
+        cultivation,
+        selectedStandard,
+        is_derogatie_bedrijf,
+        cultivations,
+    )
+
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
-        cultivation.b_lu_variety,
-        is_derogatie_bedrijf,
         cultivation.b_lu_end,
+        subTypeOmschrijving, // Pass the determined subTypeOmschrijving
     )
 
     if (!applicableNorms) {
@@ -581,8 +595,9 @@ export async function getNL2025StikstofGebruiksNorm(
         calculateKorting(cultivations, region)
     normValue = new Decimal(normValue).minus(kortingAmount).toNumber()
 
+    const subTypeText = subTypeOmschrijving ? ` (${subTypeOmschrijving})` : ""
     return {
         normValue: normValue,
-        normSource: `${selectedStandard.cultivation_rvo_table2}${kortingDescription}`,
+        normSource: `${selectedStandard.cultivation_rvo_table2}${subTypeText}${kortingDescription}`,
     }
 }
