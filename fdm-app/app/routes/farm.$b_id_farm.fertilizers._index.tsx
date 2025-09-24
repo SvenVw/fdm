@@ -5,20 +5,20 @@ import {
     type MetaFunction,
     useLoaderData,
 } from "react-router"
+import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import {
     columns,
     type Fertilizer,
 } from "~/components/blocks/fertilizer/columns"
+import { DataTable } from "~/components/blocks/fertilizer/table"
 import { Header } from "~/components/blocks/header/base"
+import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
+import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { FarmTitle } from "../components/blocks/farm/farm-title"
-import { DataTable } from "../components/blocks/fertilizer/table"
-import { HeaderFarm } from "../components/blocks/header/farm"
-import { HeaderFertilizer } from "../components/blocks/header/fertilizer"
-import { SidebarInset } from "../components/ui/sidebar"
 import type { Route } from "./+types/farm.$b_id_farm.fertilizers._index"
 
 export const meta: MetaFunction = () => {

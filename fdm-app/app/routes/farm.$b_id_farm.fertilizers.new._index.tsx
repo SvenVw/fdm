@@ -1,12 +1,12 @@
 import { type Fertilizer, getFertilizers } from "@svenvw/fdm-core"
 import type { LoaderFunctionArgs } from "react-router"
 import { useLoaderData } from "react-router"
-import { getSession } from "~/lib/auth.server"
-import { fdm } from "~/lib/fdm.server"
 import {
     BasedOffFertilizerButton,
     CustomFertilizerButton,
-} from "../components/blocks/fertilizer/new-fertilizer"
+} from "~/components/blocks/fertilizer/new-fertilizer"
+import { getSession } from "~/lib/auth.server"
+import { fdm } from "~/lib/fdm.server"
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
     const { b_id_farm } = params

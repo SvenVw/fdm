@@ -8,12 +8,12 @@ import {
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { HeaderFarmCreate } from "../components/blocks/header/create-farm"
 import type { Route } from "./+types/farm.create.$b_id_farm.$calendar.fertilizers.$b_lu_catalogue.manage.new"
 
 export const meta: MetaFunction = () => {
