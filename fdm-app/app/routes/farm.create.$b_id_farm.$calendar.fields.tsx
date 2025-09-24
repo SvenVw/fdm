@@ -1,5 +1,5 @@
 import { getFarm, getFields } from "@svenvw/fdm-core"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Car } from "lucide-react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -20,6 +20,14 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
+import { FieldFilterToggle } from "../components/custom/field-filter-toggle"
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "../components/ui/card"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -143,19 +151,31 @@ export default function Index() {
                     <Separator className="my-6" />
                     <div className="space-y-6 pb-0">
                         <div className="flex flex-col space-y-0 lg:flex-row lg:space-x-4 lg:space-y-0">
-                            <aside className="lg:w-1/5">
-                                <SidebarPage
-                                    items={loaderData.sidebarPageItems}
-                                >
-                                    <Button variant={"link"} asChild>
-                                        <NavLink
-                                            to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/atlas`}
-                                        >
-                                            <ArrowLeft />
-                                            Terug naar kaart
-                                        </NavLink>
-                                    </Button>
-                                </SidebarPage>
+                            <aside className="lg:w-1/5 gap-0">
+                                <Card>
+                                    <CardHeader>
+                                        <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                            <p>Percelen</p>
+                                            <FieldFilterToggle />
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <SidebarPage
+                                            items={loaderData.sidebarPageItems}
+                                        />
+                                    </CardContent>
+                                    <CardFooter className="flex flex-col items-center space-y-2 relative">
+                                        {/* <Separator /> */}
+                                        <Button variant={"link"} asChild>
+                                            <NavLink
+                                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/atlas`}
+                                            >
+                                                <ArrowLeft />
+                                                Terug naar kaart
+                                            </NavLink>
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
                             </aside>
                             <div className="flex-1">
                                 <Outlet />

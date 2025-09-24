@@ -18,6 +18,7 @@ import {
     CardDescription,
     CardFooter,
     CardHeader,
+    CardTitle,
 } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
@@ -27,6 +28,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
+import { FieldFilterToggle } from "../components/custom/field-filter-toggle"
 
 export const meta: MetaFunction = () => {
     return [
@@ -190,10 +192,10 @@ export default function FarmFieldIndex() {
                         <div className="flex h-full items-center justify-center">
                             <Card className="w-[350px]">
                                 <CardHeader>
-                                    {/* <CardTitle>Bedrijven</CardTitle> */}
-                                    <CardDescription className="text-center">
-                                        Kies een perceel om verder te gaan
-                                    </CardDescription>
+                                    <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                        <p>Percelen</p>
+                                        <FieldFilterToggle />
+                                    </CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="grid w-full items-center gap-4">

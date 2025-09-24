@@ -2,6 +2,7 @@ import { NavLink } from "react-router"
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
+import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 
 interface CultivationField {
     b_id: string
@@ -32,7 +33,10 @@ export function CultivationListPlan({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Gewassen in bouwplan</CardTitle>
+                <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <p>Gewassen in bouwplan</p>
+                    <FieldFilterToggle />
+                </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-2">
