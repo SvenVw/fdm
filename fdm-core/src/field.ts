@@ -20,6 +20,8 @@ import type { Field } from "./field.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
+const BUFFERSTROKEN_CONSTANT = 0.38 // Sven found that a ratio for a field with Perimeter (m^2) / Area (m) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 0.38
+
 /**
  * Adds a new field to a farm.
  *
@@ -166,6 +168,7 @@ export async function getField(
                 b_centroid_x: sql<number>`ST_X(ST_Centroid(b_geometry))`,
                 b_centroid_y: sql<number>`ST_Y(ST_Centroid(b_geometry))`,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                b_perimeter: sql<number>`ROUND((ST_Perimeter(b_geometry::geography))::NUMERIC, 2)::FLOAT`,
                 b_start: schema.fieldAcquiring.b_start,
                 b_end: schema.fieldDiscarding.b_end,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
@@ -186,6 +189,9 @@ export async function getField(
         field[0].b_centroid = [field[0].b_centroid_x, field[0].b_centroid_y]
         field[0].b_centroid_x = undefined
         field[0].b_centroid_y = undefined
+        field[0].b_isproductive =
+            (field[0].b_perimeter * 100000) / field[0].b_area >
+            BUFFERSTROKEN_CONSTANT
 
         return field[0]
     } catch (err) {
@@ -273,6 +279,7 @@ export async function getFields(
                 b_centroid_x: sql<number>`ST_X(ST_Centroid(b_geometry))`,
                 b_centroid_y: sql<number>`ST_Y(ST_Centroid(b_geometry))`,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                b_perimeter: sql<number>`ROUND((ST_Perimeter(b_geometry::geography))::NUMERIC, 2)::FLOAT`,
                 b_start: schema.fieldAcquiring.b_start,
                 b_acquiring_method: schema.fieldAcquiring.b_acquiring_method,
                 b_end: schema.fieldDiscarding.b_end,
@@ -289,11 +296,14 @@ export async function getFields(
             .where(whereClause)
             .orderBy(desc(sql<number>`ST_Area(b_geometry::geography)`))
 
-        // Process the centroids into  a tuple
+        // Process the centroids into a tuple
         for (const field of fields) {
             field.b_centroid = [field.b_centroid_x, field.b_centroid_y]
             field.b_centroid_x = undefined
             field.b_centroid_y = undefined
+            field.b_isproductive =
+                (field.b_perimeter * 100000) / field.b_area >
+                BUFFERSTROKEN_CONSTANT
         }
 
         return fields
