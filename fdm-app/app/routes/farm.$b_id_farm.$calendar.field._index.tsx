@@ -134,8 +134,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     field.b_id,
                     timeframe,
                 )
-                const a_som_loi = currentSoilData.find(x => x.parameter === "a_som_loi")?.value ?? null
-                const b_soiltype_agr = currentSoilData.find(x => x.parameter === "b_soiltype_agr")?.value ?? null
+                const a_som_loi =
+                    currentSoilData.find((x) => x.parameter === "a_som_loi")
+                        ?.value ?? null
+                const b_soiltype_agr =
+                    currentSoilData.find(
+                        (x) => x.parameter === "b_soiltype_agr",
+                    )?.value ?? null
 
                 return {
                     b_id: field.b_id,
@@ -178,7 +183,7 @@ export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const { showProductiveOnly } = useFieldFilterStore()
 
-    const filteredFields = loaderData.fieldsExtended.filter(field => {
+    const filteredFields = loaderData.fieldsExtended.filter((field) => {
         if (!showProductiveOnly) {
             return true
         }
@@ -239,7 +244,6 @@ export default function FarmFieldIndex() {
                                 title={`Percelen van ${currentFarmName}`}
                                 description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
                             />
-                            <FieldFilterToggle />
                         </div>
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
