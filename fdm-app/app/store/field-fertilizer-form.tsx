@@ -1,4 +1,4 @@
-import type z from "zod"
+import type { z } from "zod"
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import type { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
