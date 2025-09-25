@@ -108,7 +108,6 @@ export function FertilizerApplicationForm({
     ])
 
     function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
-        e.preventDefault()
         if (b_id_farm && b_id_or_b_lu_catalogue) {
             fieldFertilizerFormStore.save(
                 b_id_farm,
@@ -150,6 +149,7 @@ export function FertilizerApplicationForm({
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
+                                            type="button"
                                             variant="secondary"
                                             className="ml-2"
                                             onClick={handleManageFertilizers}
