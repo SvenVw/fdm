@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import type { FormEvent, MouseEvent } from "react"
+import type { MouseEvent } from "react"
 import { useEffect } from "react"
 import type { Navigation } from "react-router"
-import { Form, useNavigate } from "react-router"
+import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
 import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
@@ -48,6 +48,7 @@ export function FertilizerApplicationForm({
     b_id_or_b_lu_catalogue: string
 }) {
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
@@ -115,7 +116,11 @@ export function FertilizerApplicationForm({
                 form.getValues(),
             )
         }
-        navigate("./manage/new")
+        navigate(
+            searchParams.has("fieldIds")
+                ? `./manage/new?fieldIds=${searchParams.get("fieldIds")}`
+                : "./manage/new",
+        )
     }
 
     return (

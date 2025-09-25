@@ -1,10 +1,18 @@
 import type { Fertilizer } from "@svenvw/fdm-core"
-import { Link, NavLink } from "react-router"
+import { Link, NavLink, useSearchParams } from "react-router"
 import { Card, CardContent } from "~/components/ui/card"
 
 export function CustomFertilizerButton() {
+    const [searchParams] = useSearchParams()
     return (
-        <Link to="custom" className="block">
+        <Link
+            to={
+                searchParams.has("fieldIds")
+                    ? `custom?fieldIds=${searchParams.get("fieldIds")}`
+                    : "custom"
+            }
+            className="block"
+        >
             <Card>
                 <CardContent className="p-4">
                     <h2 className="text-xl font-semibold">
@@ -24,8 +32,16 @@ export function BasedOffFertilizerButton({
 }: {
     fertilizer: Fertilizer
 }) {
+    const [searchParams] = useSearchParams()
     return (
-        <NavLink to={`${fertilizer.p_id}`} className="block">
+        <NavLink
+            to={
+                searchParams.has("fieldIds")
+                    ? `${fertilizer.p_id}?fieldIds=${searchParams.get("fieldIds")}`
+                    : `${fertilizer.p_id}`
+            }
+            className="block"
+        >
             <Card>
                 <CardContent className="p-4">
                     <h3 className="text-lg font-semibold">
