@@ -1,4 +1,4 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm, getFarms, getField, getFields } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -9,9 +9,11 @@ import {
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
+import { HeaderField } from "~/components/blocks/header/field"
+import { BreadcrumbLink } from "~/components/ui/breadcrumb"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
+import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -39,8 +41,20 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        // Get the field id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("invalid: b_id", {
+                status: 400,
+                statusText: "invalid: b_id",
+            })
+        }
+
         // Get the session
         const session = await getSession(request)
+
+        // Get the calendar
+        const timeframe = getTimeframe(params)
 
         // Get details of farm
         const farm = await getFarm(fdm, session.principal_id, b_id_farm)
@@ -48,6 +62,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("not found: b_id_farm", {
                 status: 404,
                 statusText: "not found: b_id_farm",
+            })
+        }
+
+        const field = await getField(fdm, session.principal_id, b_id)
+        if (!field) {
+            throw data("not found: b_id", {
+                status: 404,
+                statusText: "not found: b_id",
             })
         }
 
@@ -67,11 +89,31 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
+        // Get the fields to be selected
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+        const fieldOptions = fields.map((field) => {
+            if (!field?.b_id || !field?.b_name) {
+                throw new Error("Invalid field data structure")
+            }
+            return {
+                b_id: field.b_id,
+                b_name: field.b_name,
+                b_area: Math.round(field.b_area * 10) / 10,
+            }
+        })
+
         // Return user information from loader
         return {
             farm: farm,
             b_id_farm: b_id_farm,
+            b_id: b_id,
             farmOptions: farmOptions,
+            fieldOptions: fieldOptions,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -100,11 +142,16 @@ export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderFertilizer
+                <HeaderField
                     b_id_farm={loaderData.b_id_farm}
-                    p_id={undefined}
-                    fertilizerOptions={[]}
+                    fieldOptions={loaderData.fieldOptions}
+                    b_id={loaderData.b_id}
                 />
+                <BreadcrumbLink
+                    href={`/farm/${params.b_id_farm}/${params.calendar}/field/${params.b_id}/fertilizer/manage/new`}
+                >
+                    Nieuwe meststof
+                </BreadcrumbLink>
             </Header>
             <main className="mx-auto max-w-4xl">
                 <FarmTitle
