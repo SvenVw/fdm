@@ -28,10 +28,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
-import {
-    BreadcrumbItem,
-    BreadcrumbSeparator,
-} from "../components/ui/breadcrumb"
+import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
 import {
     Card,
