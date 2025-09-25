@@ -34,28 +34,30 @@ export function CultivationListPlan({
 }: CultivationListPlanProps) {
     const { showProductiveOnly } = useFieldFilterStore()
 
-    const filteredCultivationPlan = cultivationPlan
-        .map((cultivation) => {
-            const filteredFields = cultivation.fields.filter(
-                (field) => !showProductiveOnly || field.b_isproductive,
-            )
+    const filteredCultivationPlan = (
+        cultivationPlan
+            .map((cultivation) => {
+                const filteredFields = cultivation.fields.filter(
+                    (field) => !showProductiveOnly || field.b_isproductive,
+                )
 
-            if (filteredFields.length === 0) {
-                return null
-            }
+                if (filteredFields.length === 0) {
+                    return null
+                }
 
-            const totalArea = filteredFields.reduce(
-                (sum, field) => sum + field.b_area,
-                0,
-            )
+                const totalArea = filteredFields.reduce(
+                    (sum, field) => sum + field.b_area,
+                    0,
+                )
 
-            return {
-                ...cultivation,
-                fields: filteredFields,
-                b_area: totalArea,
-            }
-        })
-        .filter(Boolean) as CultivationPlanItem[]
+                return {
+                    ...cultivation,
+                    fields: filteredFields,
+                    b_area: totalArea,
+                }
+            })
+            .filter(Boolean) as CultivationPlanItem[]
+    ).sort((a, b) => b.b_area - a.b_area)
 
     return (
         <Card>
