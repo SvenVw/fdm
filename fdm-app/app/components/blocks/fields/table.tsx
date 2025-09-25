@@ -79,18 +79,15 @@ export function DataTable<TData extends FieldExtended, TValue>({
         row: Row<TData>,
         event: React.MouseEvent<HTMLTableRowElement>,
     ) => {
-        // Check if the clicked element or any of its parents is an anchor tag
-        const isLinkClick = (target: EventTarget | null): boolean => {
-            if (!target || !(target instanceof HTMLElement)) {
-                return false
-            }
-            if (target.tagName === "A") {
-                return true
-            }
-            return isLinkClick(target.parentElement)
+        // Ignore clicks on interactive elements inside the row
+        const isInteractive = (target: EventTarget | null): boolean => {
+            if (!(target instanceof Element)) return false
+            return !!target.closest(
+                'a,button,input,label,select,textarea,[role="button"],[role="link"],[role="checkbox"],[data-prevent-row-click="true"]',
+            )
         }
 
-        if (isLinkClick(event.target)) {
+        if (isInteractive(event.target)) {
             // If a link was clicked, let the default navigation happen
             return
         }
@@ -116,16 +113,17 @@ export function DataTable<TData extends FieldExtended, TValue>({
         lastSelectedRowIndex.current = row.index
     }
 
-
     const memoizedData = useMemo(() => {
-        return data.map(item => ({
+        return data.map((item) => ({
             ...item,
-            searchTarget: `${item.b_name} ${item.cultivations.map(c => c.b_lu_name).join(' ')} ${item.fertilizerApplications.map(f => f.p_name_nl).join(' ')} ${item.b_soiltype_agr}`
+            searchTarget: `${item.b_name} ${item.cultivations.map((c) => c.b_lu_name).join(" ")} ${item.fertilizerApplications.map((f) => f.p_name_nl).join(" ")} ${item.b_soiltype_agr}`,
         }))
     }, [data])
 
     const fuzzyFilter: FilterFn<TData> = (row, _columnId, filterValue) => {
-        const result = fuzzysort.go(filterValue, [(row.original as any).searchTarget])
+        const result = fuzzysort.go(filterValue, [
+            (row.original as any).searchTarget,
+        ])
         return result.length > 0
     }
 
