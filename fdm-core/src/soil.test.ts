@@ -16,6 +16,7 @@ import {
     updateSoilAnalysis,
 } from "./soil"
 import type { CurrentSoilData } from "./soil.d"
+type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
 describe("Soil Analysis Functions", () => {
     let fdm: FdmServerType
@@ -48,7 +49,7 @@ describe("Soil Analysis Functions", () => {
 
         const fieldName = "Test Field"
         const fieldIDSource = "test-field-id"
-        const fieldGeometry = {
+        const fieldGeometry: Polygon = {
             type: "Polygon",
             coordinates: [
                 [
@@ -143,7 +144,7 @@ describe("Soil Analysis Functions", () => {
         const b_soiltype_agr = "rivierklei"
         const b_gwl_class = "II"
 
-        expect(async () => {
+        await expect(async () => {
             await addSoilAnalysis(
                 fdm,
                 principal_id,
@@ -406,7 +407,7 @@ describe("Soil Analysis Functions", () => {
             b_id,
             timeframe1,
         )
-        analyses1.map((analysis) => {
+        analyses1.forEach((analysis) => {
             expect(analysis.b_sampling_date).toBeInstanceOf(Date)
             expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
                 timeframe1.start.getTime(),
@@ -427,7 +428,7 @@ describe("Soil Analysis Functions", () => {
             b_id,
             timeframe2,
         )
-        analyses2.map((analysis) => {
+        analyses2.forEach((analysis) => {
             expect(analysis.b_sampling_date).toBeInstanceOf(Date)
             expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
                 timeframe2.start.getTime(),
@@ -448,7 +449,7 @@ describe("Soil Analysis Functions", () => {
             b_id,
             timeframe3,
         )
-        analyses3.map((analysis) => {
+        analyses3.forEach((analysis) => {
             expect(analysis.b_sampling_date).toBeInstanceOf(Date)
             expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
                 timeframe3.start.getTime(),
@@ -469,7 +470,7 @@ describe("Soil Analysis Functions", () => {
             b_id,
             timeframe4,
         )
-        analyses4.map((analysis) => {
+        analyses4.forEach((analysis) => {
             expect(analysis.b_sampling_date).toBeInstanceOf(Date)
             expect(analysis.b_sampling_date?.getTime()).toBeGreaterThanOrEqual(
                 timeframe4.start.getTime(),
@@ -487,7 +488,7 @@ describe("Soil Analysis Functions", () => {
             b_id,
             timeframe5,
         )
-        analyses5.map((analysis) => {
+        analyses5.forEach((analysis) => {
             expect(analysis.b_sampling_date).toBeInstanceOf(Date)
             expect(analysis.b_sampling_date?.getTime()).toBeLessThanOrEqual(
                 timeframe5.end.getTime(),
