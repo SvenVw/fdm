@@ -33,6 +33,7 @@ import {
 } from "~/components/ui/tooltip"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
+import { Plus } from "lucide-react"
 
 export function FertilizerApplicationForm({
     options,
@@ -133,7 +134,7 @@ export function FertilizerApplicationForm({
                 <fieldset disabled={isSubmitting}>
                     <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
                         {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
-                        <div className="flex flex-row items-end [&>*]:grow-1">
+                        <div className="flex flex-row items-baseline [&>*]:grow">
                             <Combobox
                                 options={options}
                                 form={form}
@@ -146,6 +147,7 @@ export function FertilizerApplicationForm({
                                 }
                             />
                             <div className="py-2 [&.py-2]:grow-0">
+                                <p className="invisible">&nbsp;</p>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Button
@@ -154,12 +156,12 @@ export function FertilizerApplicationForm({
                                             className="ml-2"
                                             onClick={handleManageFertilizers}
                                         >
-                                            Voeg nieuwe toe
+                                            <Plus />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        Bekijk meststoffen van dit bedrijf of
-                                        voeg nieuwe toe
+                                        Voeg een nieuwe meststof toe aan de
+                                        keuzelijst
                                     </TooltipContent>
                                 </Tooltip>
                             </div>
