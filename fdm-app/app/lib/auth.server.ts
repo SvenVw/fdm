@@ -19,7 +19,7 @@ export const auth: FdmAuth = createFdmAuth(
     fdm,
     serverConfig.auth.google,
     serverConfig.auth.microsoft,
-    { sendMagicLinkEmail: sendMagicLinkEmailToUser, expiresIn: 60 * 15 },
+    sendMagicLinkEmailToUser,
 )
 
 // Extend database hooks with sending a welcome email after sign up

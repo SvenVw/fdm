@@ -1,10 +1,6 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import {
-    magicLink as magicLinkPlugin,
-    organization,
-    username,
-} from "better-auth/plugins"
+import { magicLink, organization, username } from "better-auth/plugins"
 import { eq } from "drizzle-orm"
 import { generateFromEmail } from "unique-username-generator"
 import type { FdmAuth } from "./authentication.d"
@@ -24,7 +20,7 @@ import type { FdmType } from "./fdm"
  * @param fdm The FDM instance providing the connection to the database. The instance can be created with {@link createFdmServer}.
  * @param google Optional configuration for Google authentication. If provided, users can sign up and sign in with their Google accounts.
  * @param microsoft Optional configuration for Microsoft authentication. If provided, users can sign up and sign in with their Microsoft accounts.
- * @param magicLink Optional function to send magic link emails, or an object of the function and an optional expiresIn field in seconds. If provided, the magic link plugin will use the function to send emails that expire in the specified time, or 5 minutes by default.
+ * @param sendMagicLinkEmail Optional function to send magic link emails. If provided, the magic link plugin will use this function to send emails.
  * @param emailAndPassword Optional boolean indicating whether to enable email and password authentication. Defaults to false.
  * @returns The configured authentication instance.
  * @throws {Error} If required environment variables are missing or if role assignment fails.
@@ -33,12 +29,7 @@ export function createFdmAuth(
     fdm: FdmType,
     google?: { clientSecret: string; clientId: string },
     microsoft?: { clientSecret: string; clientId: string },
-    magicLink?:
-        | ((email: string, url: string) => Promise<void>)
-        | {
-              sendMagicLinkEmail: (email: string, url: string) => Promise<void>
-              expiresIn?: number
-          },
+    sendMagicLinkEmail?: (email: string, url: string) => Promise<void>,
     emailAndPassword?: boolean,
 ): FdmAuth {
     // Setup social auth providers
@@ -92,26 +83,6 @@ export function createFdmAuth(
                     displayUsername: createDisplayUsername(firstname, surname),
                 }
             },
-        }
-    }
-
-    let sendMagicLinkEmail:
-        | ((email: string, url: string) => Promise<void>)
-        | undefined
-    let magicLinkExpiresIn: number = 60 * 5
-
-    if (magicLink) {
-        if (
-            typeof magicLink === "object" &&
-            "sendMagicLinkEmail" in magicLink
-        ) {
-            sendMagicLinkEmail = magicLink.sendMagicLinkEmail
-            if (magicLink.expiresIn && magicLink.expiresIn > 0)
-                magicLinkExpiresIn = magicLink.expiresIn
-        } else if (typeof magicLink === "function") {
-            sendMagicLinkEmail = magicLink
-        } else {
-            throw new Error("Illegal magicLink argument")
         }
     }
 
@@ -179,8 +150,8 @@ export function createFdmAuth(
                     },
                 },
             }),
-            magicLinkPlugin({
-                expiresIn: magicLinkExpiresIn,
+            magicLink({
+                expiresIn: 60 * 15,
                 sendMagicLink: async (
                     { email, url },
                     _request,
