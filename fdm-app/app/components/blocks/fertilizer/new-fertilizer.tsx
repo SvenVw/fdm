@@ -44,7 +44,7 @@ export function BasedOffFertilizerButton({
         >
             <Card>
                 <CardContent className="p-4">
-                    <h3 className="text-lg font-semibold">
+                    <h3 className="text-lg font-semibold break-all">
                         {fertilizer.p_name_nl || "Onbekend"}
                     </h3>
                     {/* <p className="text-muted-foreground">
