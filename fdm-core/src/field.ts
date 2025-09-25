@@ -190,8 +190,10 @@ export async function getField(
         field[0].b_centroid_x = undefined
         field[0].b_centroid_y = undefined
         field[0].b_isproductive =
-            (field[0].b_perimeter * 100000) / field[0].b_area >
-            BUFFERSTROKEN_CONSTANT
+            field[0].b_area && field[0].b_perimeter
+                ? field[0].b_perimeter / (field[0].b_area * 100000) <
+                  BUFFERSTROKEN_CONSTANT
+                : true
 
         return field[0]
     } catch (err) {
@@ -302,8 +304,10 @@ export async function getFields(
             field.b_centroid_x = undefined
             field.b_centroid_y = undefined
             field.b_isproductive =
-                (field.b_perimeter * 100000) / field.b_area >
-                BUFFERSTROKEN_CONSTANT
+                field.b_area && field.b_perimeter
+                    ? field.b_perimeter / (field.b_area * 10000) <
+                      BUFFERSTROKEN_CONSTANT
+                    : true
         }
 
         return fields
