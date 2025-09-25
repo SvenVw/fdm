@@ -16,7 +16,7 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.$b_id.fertilizer.manage.new"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.fertilizer.manage.new"
 
 export const meta: MetaFunction = () => {
     return [

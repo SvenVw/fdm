@@ -148,7 +148,7 @@ export function FertilizerApplicationForm({
                             />
                             <div className="py-2 [&.py-2]:grow-0">
                                 <Tooltip>
-                                    <TooltipTrigger>
+                                    <TooltipTrigger asChild>
                                         <Button
                                             variant="secondary"
                                             className="ml-2"
