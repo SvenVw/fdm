@@ -32,27 +32,22 @@ export function CultivationListPlan({
     calendar,
     basePath,
 }: CultivationListPlanProps) {
-    const { showProductiveOnly } = useFieldFilterStore()
-
-    const filteredCultivationPlan = (
+    const fieldsCultivationPlan = (
         cultivationPlan
             .map((cultivation) => {
-                const filteredFields = cultivation.fields.filter(
-                    (field) => !showProductiveOnly || field.b_isproductive,
-                )
-
-                if (filteredFields.length === 0) {
+                const fields = cultivation.fields
+                if (fields.length === 0) {
                     return null
                 }
 
-                const totalArea = filteredFields.reduce(
+                const totalArea = fields.reduce(
                     (sum, field) => sum + field.b_area,
                     0,
                 )
 
                 return {
                     ...cultivation,
-                    fields: filteredFields,
+                    fields: fields,
                     b_area: totalArea,
                 }
             })
@@ -64,12 +59,11 @@ export function CultivationListPlan({
             <CardHeader>
                 <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <p>Gewassen in bouwplan</p>
-                    <FieldFilterToggle />
                 </CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-2">
-                    {filteredCultivationPlan.map((cultivation) => {
+                    {fieldsCultivationPlan.map((cultivation) => {
                         const numberOfFields = cultivation.fields.length
                         const totalArea = cultivation.b_area
                         const nameOfFields = cultivation.fields
@@ -103,7 +97,9 @@ export function CultivationListPlan({
                                             : `${numberOfFields} percelen`}
                                     </Badge>
                                     <Badge variant="outline">
-                                        {Math.round(totalArea * 10) / 10} ha
+                                        {totalArea < 0.1
+                                            ? "< 0.1 ha"
+                                            : `${Math.round(totalArea * 10) / 10} ha`}
                                     </Badge>
                                 </div>
                             </NavLink>
