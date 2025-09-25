@@ -20,7 +20,7 @@ import type { Field } from "./field.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
-const BUFFERSTROKEN_CONSTANT = 0.38 // Sven found that a ratio for a field with Perimeter (m^2) / Area (m) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 0.38
+export const BUFFERSTROKEN_CONSTANT = 0.38 // Sven found that a ratio for a field with Perimeter (m^2) / Area (m) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 0.38
 
 /**
  * Adds a new field to a farm.
@@ -191,7 +191,7 @@ export async function getField(
         field[0].b_centroid_y = undefined
         field[0].b_isproductive =
             field[0].b_area && field[0].b_perimeter
-                ? field[0].b_perimeter / (field[0].b_area * 100000) <
+                ? field[0].b_perimeter / (field[0].b_area * 10000) <
                   BUFFERSTROKEN_CONSTANT
                 : true
 
