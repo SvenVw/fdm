@@ -1,13 +1,15 @@
-import { NavLink } from "react-router"
+import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
+import { useFieldFilterStore } from "~/store/field-filter"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 
 interface CultivationField {
     b_id: string
     b_name: string
     b_area: number
+    b_isproductive: boolean
 }
 
 interface CultivationPlanItem {
@@ -30,6 +32,31 @@ export function CultivationListPlan({
     calendar,
     basePath,
 }: CultivationListPlanProps) {
+    const { showProductiveOnly } = useFieldFilterStore()
+
+    const filteredCultivationPlan = cultivationPlan
+        .map((cultivation) => {
+            const filteredFields = cultivation.fields.filter(
+                (field) => !showProductiveOnly || field.b_isproductive,
+            )
+
+            if (filteredFields.length === 0) {
+                return null
+            }
+
+            const totalArea = filteredFields.reduce(
+                (sum, field) => sum + field.b_area,
+                0,
+            )
+
+            return {
+                ...cultivation,
+                fields: filteredFields,
+                b_area: totalArea,
+            }
+        })
+        .filter(Boolean) as CultivationPlanItem[]
+
     return (
         <Card>
             <CardHeader>
@@ -40,7 +67,7 @@ export function CultivationListPlan({
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-2">
-                    {cultivationPlan.map((cultivation) => {
+                    {filteredCultivationPlan.map((cultivation) => {
                         const numberOfFields = cultivation.fields.length
                         const totalArea = cultivation.b_area
                         const nameOfFields = cultivation.fields
