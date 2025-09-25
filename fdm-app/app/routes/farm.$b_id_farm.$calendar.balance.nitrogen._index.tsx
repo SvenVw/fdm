@@ -213,11 +213,13 @@ function FarmBalanceNitrogenOverview({
     }
 
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
-    const filteredFields = showProductiveOnly
-        ? resolvedNitrogenBalanceResult.fields.filter(
-              (field) => fieldsMap.get(field.b_id)?.b_isproductive,
-          )
-        : resolvedNitrogenBalanceResult.fields
+    const filteredFields = resolvedNitrogenBalanceResult.fields.filter(
+        (field) => {
+            if (!showProductiveOnly) return true
+            const fieldData = fieldsMap.get(field.b_id)
+            return fieldData ? fieldData.b_isproductive === true : false
+        },
+    )
 
     return (
         <>

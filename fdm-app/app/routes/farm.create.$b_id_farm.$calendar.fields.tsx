@@ -20,6 +20,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
+import { useFieldFilterStore } from "~/store/field-filter"
 import { FieldFilterToggle } from "../components/custom/field-filter-toggle"
 import {
     Card,
@@ -88,16 +89,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             timeframe,
         )
 
-        // Create the sidenav
-        const sidebarPageItems = fields.map((field) => {
-            return {
-                title: field.b_name,
-                to: `/farm/create/${b_id_farm}/${calendar}/fields/${field.b_id}`,
-            }
-        })
-
         return {
-            sidebarPageItems: sidebarPageItems,
+            fields: fields,
             b_id_farm: b_id_farm,
             b_name_farm: farm.b_name_farm,
             calendar: calendar,
@@ -110,11 +103,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
+    const { fields, b_id_farm, b_name_farm, calendar } = loaderData
+    const { showProductiveOnly } = useFieldFilterStore()
+
+    // Create the sidenav
+    const sidebarPageItems = fields
+        .filter((field) => (showProductiveOnly ? field.b_isproductive : true))
+        .map((field) => {
+            return {
+                title: field.b_name,
+                to: `/farm/create/${b_id_farm}/${calendar}/fields/${field.b_id}`,
+            }
+        })
 
     return (
         <SidebarInset>
             <Header action={undefined}>
-                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
+                <HeaderFarmCreate b_name_farm={b_name_farm} />
             </Header>
             <main>
                 <div className="space-y-6 p-10 pb-16">
@@ -131,17 +136,14 @@ export default function Index() {
 
                         <div className="ml-auto">
                             <NavLink
-                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/cultivations`}
+                                to={`/farm/create/${b_id_farm}/${calendar}/cultivations`}
                                 className={cn("ml-auto", {
                                     "pointer-events-none":
-                                        loaderData.sidebarPageItems.length ===
-                                        0,
+                                        sidebarPageItems.length === 0,
                                 })}
                             >
                                 <Button
-                                    disabled={
-                                        loaderData.sidebarPageItems.length === 0
-                                    }
+                                    disabled={sidebarPageItems.length === 0}
                                 >
                                     Doorgaan
                                 </Button>
@@ -160,15 +162,13 @@ export default function Index() {
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                        <SidebarPage
-                                            items={loaderData.sidebarPageItems}
-                                        />
+                                        <SidebarPage items={sidebarPageItems} />
                                     </CardContent>
                                     <CardFooter className="flex flex-col items-center space-y-2 relative">
                                         {/* <Separator /> */}
                                         <Button variant={"link"} asChild>
                                             <NavLink
-                                                to={`/farm/create/${loaderData.b_id_farm}/${loaderData.calendar}/atlas`}
+                                                to={`/farm/create/${b_id_farm}/${calendar}/atlas`}
                                             >
                                                 <ArrowLeft />
                                                 Terug naar kaart
