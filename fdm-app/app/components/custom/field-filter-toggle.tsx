@@ -13,8 +13,8 @@ export function FieldFilterToggle() {
         useFieldFilterStore()
 
     const tooltipContent = showProductiveOnly
-        ? "Alle percelen (incl. bufferstroken) zijn weergegeven"
-        : "Bufferstroken zijn verborgen"
+        ? "Bufferstroken zijn verborgen"
+        : "Alle percelen (incl. bufferstroken) zijn weergegeven"
 
     return (
         <div className="">
