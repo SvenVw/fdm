@@ -25,7 +25,7 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { getTimeBasedGreeting } from "~/lib/greetings"
-import { getCalendarSelection } from "../lib/calendar"
+import { getCalendarSelection } from "~/lib/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
