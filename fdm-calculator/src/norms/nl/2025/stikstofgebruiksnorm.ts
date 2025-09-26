@@ -13,56 +13,38 @@ import type {
 import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 import { getGeoTiffValue } from "../../../shared/geotiff"
 
-const FETCH_TIMEOUT_MS = 8000
-
 /**
  * Determines if a field is located within a met nutriënten verontreinigde gebied (NV-gebied) in the Netherlands.
- * This is achieved by performing a spatial query against a vector file containing
- * the boundaries of all NV-gebieden.
+ * This is achieved by querying a GeoTIFF file that delineates NV-gebieden.
+ * The function checks the value at the field's centroid coordinates.
  *
  * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the geographical data.
- * @returns A promise that resolves to `true` if the field's centroid is found within an NV-gebied,
- *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ *   This point is used to query the GeoTIFF data.
+ * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within an NV-gebied),
+ *   and `false` if the value is 0.
+ * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
  */
 export async function isFieldInNVGebied(
     b_centroid: Field["b_centroid"],
 ): Promise<boolean> {
-    const url =
-        "https://api.ellipsis-drive.com/v3/path/992a7db3-01ea-4c8f-a172-268333e22706/vector/timestamp/1bc2cc57-e0dd-4f49-a290-f600780dd3fe/location"
-
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2025/nv.tiff`
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+    const NVGebiedCode = await getGeoTiffValue(url, longitude, latitude)
 
-    const params = new URLSearchParams()
-    params.append("locations", `[[${longitude}, ${latitude}]]`)
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
-    try {
-        const response = await fetch(`${url}?${params.toString()}`, {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-        })
-        if (!response.ok) {
+    switch (NVGebiedCode) {
+        case 1: {
+            return true
+        }
+        case 0: {
+            return false
+        }
+        default: {
             throw new Error(
-                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                `Unknown NVGebied code: ${NVGebiedCode} for coordinates , `,
             )
         }
-        const json = await response.json()
-        const feature = json?.[0]?.[0]
-        return Boolean(feature)
-    } catch (err) {
-        if ((err as any)?.name === "AbortError") {
-            throw new Error(
-                `Timeout querying NV-Gebied after ${FETCH_TIMEOUT_MS}ms`,
-            )
-        }
-        throw new Error(`Error querying NV-Gebied : ${String(err)}`)
-    } finally {
-        clearTimeout(timeout)
     }
 }
 
