@@ -35,6 +35,7 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { cn } from "~/lib/utils"
 import { extractFormValuesFromRequest } from "../lib/form"
+import { useEffect } from "react"
 
 export const meta: MetaFunction = () => {
     return [
@@ -47,6 +48,7 @@ export const meta: MetaFunction = () => {
 }
 
 const FormSchema = z.object({
+    timeZone: z.string().optional(),
     email: z.coerce
         .string({
             required_error:
@@ -109,7 +111,7 @@ export default function SignIn() {
         console.error("Social sign-in failed:", error)
     }
     const openCookieSettings = () => {
-        if (typeof window !== "undefined" && window.openCookieSettings) {
+        if (window?.openCookieSettings) {
             window.openCookieSettings()
         }
     }
@@ -122,8 +124,14 @@ export default function SignIn() {
         resolver: zodResolver(FormSchema),
         defaultValues: {
             email: "",
+            timeZone: undefined,
         },
     })
+
+    useEffect(() => {
+        const timeZone = Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone
+        form.setValue("timeZone", timeZone)
+    }, [form.setValue])
 
     return (
         <div>
@@ -355,6 +363,20 @@ export default function SignIn() {
                                                 <div className="flex flex-col space-y-1.5">
                                                     <FormField
                                                         control={form.control}
+                                                        name="timeZone"
+                                                        render={({ field }) => (
+                                                            <FormItem>
+                                                                <FormControl>
+                                                                    <Input
+                                                                        type="hidden"
+                                                                        {...field}
+                                                                    />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    <FormField
+                                                        control={form.control}
                                                         name="email"
                                                         render={({ field }) => (
                                                             <FormItem>
@@ -448,11 +470,29 @@ export async function action({ request }: ActionFunctionArgs) {
     // Validate redirectTo to prevent open redirect
     const isValidRedirect =
         redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-    const safeRedirectTo = isValidRedirect ? redirectTo : "/farm"
+    let safeRedirectTo = isValidRedirect ? redirectTo : "/farm"
 
     // Get form values
     const formValues = await extractFormValuesFromRequest(request, FormSchema)
     const { email } = formValues
+
+    // Validate timezone and use undefined if invalid
+    let timeZone: string | undefined
+    if (formValues.timeZone) {
+        try {
+            Intl.DateTimeFormat(undefined, { timeZone: formValues.timeZone })
+            timeZone = formValues.timeZone
+        } catch (_) {}
+    }
+
+    if (timeZone) {
+        const safeRedirectToUrl = new URL(
+            safeRedirectTo,
+            "http://localhost:9999",
+        )
+        safeRedirectToUrl.searchParams.set("timeZone", timeZone)
+        safeRedirectTo = `${safeRedirectToUrl.pathname}${safeRedirectToUrl.search}${safeRedirectToUrl.hash}`
+    }
 
     try {
         // This will trigger the sendMagicLink hook in fdm-core, which sends the email

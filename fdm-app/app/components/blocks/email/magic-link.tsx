@@ -72,7 +72,7 @@ export const MagicLinkEmail = ({
                             Aanmelden bij {appName}
                         </Button>
                         <Text className="text-[#666666] text-[12px] leading-[24px] mt-[5px] block text-center">
-                            Deze link is éénmalig en voor 5 minuten geldig.
+                            Deze link is éénmalig en voor 15 minuten geldig.
                         </Text>
                     </Section>
                     <Text className="text-black text-[14px] leading-[24px]">
