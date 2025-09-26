@@ -1,3 +1,4 @@
+import { TZDate } from "@date-fns/tz"
 import { render } from "@react-email/components"
 import type { User } from "better-auth"
 import { format } from "date-fns"
@@ -71,7 +72,44 @@ export async function renderMagicLinkEmail(
     emailAddress: string,
     magicLinkUrl: string,
 ): Promise<Email> {
-    const emailTimestamp = format(new Date(), "Pp", { locale: nl })
+    // Validate timezone and use undefined if invalid
+    let timeZone: string | undefined
+    const parsedMagicLinkUrl = new URL(magicLinkUrl)
+    if (parsedMagicLinkUrl.searchParams.has("callbackURL")) {
+        const callbackUrlCandidate =
+            parsedMagicLinkUrl.searchParams.get("callbackURL") || ""
+        // Fake origin url just to be able to parse the search params
+        const parsedCallbackUrl = new URL(
+            callbackUrlCandidate,
+            callbackUrlCandidate.startsWith("http")
+                ? undefined
+                : "http://localhost:9999",
+        )
+        try {
+            const timeZoneCandidate =
+                parsedCallbackUrl.searchParams.get("timeZone")
+            if (
+                timeZoneCandidate &&
+                Intl.DateTimeFormat(undefined, {
+                    timeZone: timeZoneCandidate,
+                })
+            ) {
+                timeZone = timeZoneCandidate
+            }
+        } catch (_) {}
+    }
+
+    // Show the local time only if available, otherwise show server time
+    let emailTimestamp: string
+    if (timeZone) {
+        const emailTimestampLocal = format(TZDate.tz(timeZone), "Pp", {
+            locale: nl,
+        })
+        emailTimestamp = `${emailTimestampLocal} ${timeZone}`
+    } else {
+        emailTimestamp = format(new Date(), "Pp zzzz", { locale: nl })
+    }
+
     const emailHtml = await render(
         MagicLinkEmail({
             url: magicLinkUrl,
