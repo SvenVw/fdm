@@ -669,23 +669,8 @@ describe("Farm Data Model", () => {
 
             const field = await getField(fdm, principal_id, b_id)
             expect(field.b_name).toBe(fieldName)
-            // The perimeter of a 10x10 square is 40. The perimeter of a 6x6 square is 24.
-            // ST_Perimeter on a geography type should calculate the outer perimeter.
-            // The coordinates are in degrees, so the actual perimeter will be much larger.
-            // We expect it to be greater than the perimeter of the inner hole.
             expect(field.b_perimeter).toBeGreaterThan(0)
-            // For a simple square, the perimeter is 4 * side.
-            // The outer square has side length 10 units.
-            // The inner square has side length 6 units.
-            // The perimeter should be approximately 4 * 10 = 40 units in degrees, converted to meters.
-            // Since the coordinates are small, we can approximate the perimeter of the outer square.
-            // The difference between 0 and 10 degrees latitude/longitude is roughly 1113km.
-            // So, 4 * 10 * 111.3km = 4452km = 4452000m.
-            // The actual value will depend on the exact projection and datum used by PostGIS.
-            // The previous test had a perimeter of 443770.92 for a 1x1 degree square.
-            // For a 10x10 degree square, it should be roughly 10 times that.
-            // Let's just assert it's greater than a reasonable lower bound.
-            expect(field.b_perimeter).toBeGreaterThan(4000000) // Roughly 4000km in meters
+            expect(field.b_perimeter).toBeGreaterThan(4000000) 
             expect(field.b_isproductive).toBe(true)
         })
     })

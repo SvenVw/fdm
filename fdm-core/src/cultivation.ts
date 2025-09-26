@@ -618,7 +618,7 @@ export async function getCultivationPlan(
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
-                b_perimeter: sql<number>`ROUND((ST_Perimeter(b_geometry::geography))::NUMERIC, 2)::FLOAT`,
+                b_perimeter: sql<number>`ROUND((ST_Length(ST_ExteriorRing(b_geometry)::geography))::NUMERIC, 2)::FLOAT`,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
