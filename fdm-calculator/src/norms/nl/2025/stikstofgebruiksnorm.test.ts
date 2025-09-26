@@ -494,4 +494,76 @@ describe("getNL2025StikstofGebruiksNorm", () => {
             "Akkerbouwgewassen, Ui overig, zaaiui of winterui. (2e jaars).",
         )
     })
+
+    it("should return the correct norm for Bladgewassen, Spinazie (1e teelt)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2773", // Bladgewassen, Spinazie
+                    b_lu_start: new Date(2025, 4, 15), // May 15th, 2025 (hoofdteelt)
+                    b_lu_end: new Date(2025, 6, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(260)
+        expect(result.normSource).toEqual(
+            "Bladgewassen, Spinazie (1e teelt).",
+        )
+    })
+
+    it("should return the correct norm for Bladgewassen, Slasoorten (1e teelt)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2767", // Bladgewassen, Slasoorten
+                    b_lu_start: new Date(2025, 4, 15), // May 15th, 2025 (hoofdteelt)
+                    b_lu_end: new Date(2025, 6, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(180)
+        expect(result.normSource).toEqual(
+            "Bladgewassen, Slasoorten (1e teelt).",
+        )
+    })
+
+    it("should return the correct norm for Bladgewassen, Andijvie eerste teelt volgteelt (1e teelt)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2708", // Bladgewassen, Andijvie eerste teelt volgteelt
+                    b_lu_start: new Date(2025, 4, 15), // May 15th, 2025 (hoofdteelt)
+                    b_lu_end: new Date(2025, 6, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(180)
+        expect(result.normSource).toEqual(
+            "Bladgewassen, Andijvie eerste teelt volgteelt (1e teelt).",
+        )
+    })
 })

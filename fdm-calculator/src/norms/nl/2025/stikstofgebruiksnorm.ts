@@ -302,12 +302,22 @@ function determineSubTypeOmschrijving(
         if (cultivation.b_lu_catalogue === "nl_1933") return "2e jaars"
     }
 
+    // Bladgewassen logic based on hoofdteelt
+    const bladgewasRvoTable2s = [
+        "Bladgewassen, Spinazie",
+        "Bladgewassen, Slasoorten",
+        "Bladgewassen, Andijvie eerste teelt volgteelt",
+    ]
+
+    if (bladgewasRvoTable2s.includes(standard.cultivation_rvo_table2)) {
+        const hoofdteeltCatalogue = determineNL2025Hoofdteelt(cultivations)
+        if (cultivation.b_lu_catalogue === hoofdteeltCatalogue) {
+            return "1e teelt"
+        }
+        // TODO: Implement volgteelt logic here later
+    }
+
     /*
-     * --- Cultivations Requiring Cultivation Calendar Logic (e.g., "1e teelt" vs. "volgteelt"): ---
-     * - Bladgewassen, Spinazie
-     * - Bladgewassen, Slasoorten
-     * - Bladgewassen, Andijvie eerste teelt volgteelt
-     *
      * --- Cultivations with Unclear Differentiation Logic (may require matching on b_lu string or external context): ---
      * - Bladgewassen, Bladgewassen overig (e.g., "eenmalige oogst" vs. "meermalige oogst")
      * - Kruiden (differentiating between bladgewas, wortelgewassen, zaadgewassen)
