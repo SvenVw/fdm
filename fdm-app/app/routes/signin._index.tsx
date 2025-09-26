@@ -486,11 +486,12 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     if (timeZone) {
-        if (redirectTo.includes("?")) {
-            safeRedirectTo += `&timeZone=${encodeURIComponent(timeZone)}`
-        } else {
-            safeRedirectTo += `?timeZone=${encodeURIComponent(timeZone)}`
-        }
+        const safeRedirectToUrl = new URL(
+            safeRedirectTo,
+            "http://localhost:9999",
+        )
+        safeRedirectToUrl.searchParams.set("timeZone", timeZone)
+        safeRedirectTo = `${safeRedirectToUrl.pathname}${safeRedirectToUrl.search}${safeRedirectToUrl.hash}`
     }
 
     try {
