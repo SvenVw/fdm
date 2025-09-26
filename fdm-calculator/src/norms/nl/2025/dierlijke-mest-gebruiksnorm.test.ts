@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { getNL2025DierlijkeMestGebruiksNorm } from "./dierlijke-mest-gebruiksnorm"
+import {
+    getNL2025DierlijkeMestGebruiksNorm,
+    isFieldInDerogatieVrijeZone,
+} from "./dierlijke-mest-gebruiksnorm"
 import type { NL2025NormsInput } from "./types"
 
 describe("getNL2025DierlijkeMestGebruiksNorm", () => {
@@ -108,5 +111,25 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
         const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(170)
         expect(result.normSource).toBe("Derogatie - Natura2000 Gebied")
+    })
+
+    describe("isFieldInDerogatieVrijeZone", () => {
+        it("should return true for a location inside the derogatie-vrije zone", async () => {
+            const locationInside: [number, number] = [
+                5.698110435483986, 51.967321021267445,
+            ]
+            await expect(
+                isFieldInDerogatieVrijeZone(locationInside),
+            ).resolves.toBe(true)
+        })
+
+        it("should return false for a location outside the derogatie-vrije zone", async () => {
+            const locationOutside: [number, number] = [
+                5.642031564776303, 51.9733216807388,
+            ]
+            await expect(
+                isFieldInDerogatieVrijeZone(locationOutside),
+            ).resolves.toBe(false)
+        })
     })
 })

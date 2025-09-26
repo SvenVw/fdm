@@ -76,6 +76,45 @@ export async function isFieldInNatura2000Gebied(
 }
 
 /**
+ * Determines if a field is located within a "derogatie-vrije zone" (derogation-free zone) in the Netherlands.
+ * This is achieved by querying a GeoTIFF file that delineates these zones.
+ * The function checks the value at the field's centroid coordinates.
+ *
+ * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
+ *   This point is used to query the GeoTIFF data.
+ * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a derogatie-vrije zone),
+ *   and `false` if the value is 0.
+ * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
+ */
+export async function isFieldInDerogatieVrijeZone(
+    b_centroid: Field["b_centroid"],
+): Promise<boolean> {
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2025/derogatievrije_zones.tiff`
+    const longitude = b_centroid[0]
+    const latitude = b_centroid[1]
+    const derogatieVrijeZoneCode = await getGeoTiffValue(
+        url,
+        longitude,
+        latitude,
+    )
+
+    switch (derogatieVrijeZoneCode) {
+        case 1: {
+            return true
+        }
+        case 0: {
+            return false
+        }
+        default: {
+            throw new Error(
+                `Unknown  derogatieVrijeZoneCodes code: ${derogatieVrijeZoneCode} for coordinates , `,
+            )
+        }
+    }
+}
+
+/**
  * Determines the 'gebruiksnorm' (usage standard) for nitrogen from animal manure
  * for a given farm and parcel in the Netherlands for the year 2025.
  *
@@ -111,12 +150,17 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
     const field = input.field
 
-    const [is_nv_gebied, is_gwbg_gebied, is_natura2000_gebied] =
-        await Promise.all([
-            isFieldInNVGebied(field.b_centroid),
-            isFieldInGWGBGebied(field.b_centroid),
-            isFieldInNatura2000Gebied(field.b_centroid),
-        ])
+    const [
+        is_nv_gebied,
+        is_gwbg_gebied,
+        is_natura2000_gebied,
+        is_derogatie_vrije_zone,
+    ] = await Promise.all([
+        isFieldInNVGebied(field.b_centroid),
+        isFieldInGWGBGebied(field.b_centroid),
+        isFieldInNatura2000Gebied(field.b_centroid),
+        isFieldInDerogatieVrijeZone(field.b_centroid),
+    ])
 
     let normValue: number
     let normSource: string
@@ -128,6 +172,9 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
         } else if (is_gwbg_gebied) {
             normValue = 170
             normSource = "Derogatie - Grondwaterbeschermingsgebied"
+        } else if (is_derogatie_vrije_zone) {
+            normValue = 170
+            normSource = "Derogatie - Derogatie-vrije zone"
         } else if (is_nv_gebied) {
             normValue = 190
             normSource = "Derogatie - NV Gebied"
