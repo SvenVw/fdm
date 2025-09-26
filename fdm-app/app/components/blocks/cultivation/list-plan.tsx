@@ -2,8 +2,6 @@ import { NavLink } from "react-router-dom"
 import { Badge } from "~/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { cn } from "~/lib/utils"
-import { useFieldFilterStore } from "~/store/field-filter"
-import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 
 interface CultivationField {
     b_id: string
