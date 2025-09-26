@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Plus } from "lucide-react"
 import type { MouseEvent } from "react"
 import { useEffect } from "react"
 import type { Navigation } from "react-router"
@@ -33,7 +34,6 @@ import {
 } from "~/components/ui/tooltip"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
-import { Plus } from "lucide-react"
 
 export function FertilizerApplicationForm({
     options,
@@ -96,6 +96,14 @@ export function FertilizerApplicationForm({
         form.setValue,
         fieldFertilizerFormStore.load,
     ])
+
+    // Change fertilizer selection if the user has added a new fertilizer
+    const new_p_id = searchParams.get("p_id")
+    useEffect(() => {
+        if (new_p_id) {
+            form.setValue("p_id", new_p_id)
+        }
+    }, [new_p_id, form.setValue])
 
     useEffect(() => {
         if (form.formState.isSubmitSuccessful) {

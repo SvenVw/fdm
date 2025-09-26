@@ -213,7 +213,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
-        await addFertilizer(
+        const new_p_id = await addFertilizer(
             fdm,
             session.principal_id,
             p_id_catalogue,
@@ -223,7 +223,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         )
 
         return redirectWithSuccess(
-            `/farm/create/${b_id_farm}/${calendar}/fertilizers/${b_lu_catalogue}`,
+            `/farm/create/${b_id_farm}/${calendar}/fertilizers/${b_lu_catalogue}?p_id=${new_p_id}`,
             {
                 message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
             },
