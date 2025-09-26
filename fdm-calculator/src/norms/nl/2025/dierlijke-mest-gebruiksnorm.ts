@@ -7,56 +7,38 @@ import type {
 import { getGeoTiffValue } from "../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 
-const FETCH_TIMEOUT_MS = 8000
-
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
- * This is achieved by performing a spatial query against a vector file containing
- * the boundaries of all GWBG-gebieden.
+ * This is achieved by querying a GeoTIFF file that delineates GWBG areas.
+ * The function checks the value at the field's centroid coordinates.
  *
  * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the geographical data.
- * @returns A promise that resolves to `true` if the field's centroid is found within an GWBG-gebied,
- *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ *   This point is used to query the GeoTIFF data.
+ * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a GWBG area),
+ *   and `false` if the value is 0.
+ * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
  */
 export async function isFieldInGWGBGebied(
     b_centroid: Field["b_centroid"],
 ): Promise<boolean> {
-    const url =
-        "https://api.ellipsis-drive.com/v3/path/6e87a86a-4548-4bed-b47e-06a47e4b59fa/vector/timestamp/8780e629-668c-40fd-bbc0-4fa15e5557f7/location"
-
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2024/gwgb.tiff`
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+    const gwgbCode = await getGeoTiffValue(url, longitude, latitude)
 
-    const params = new URLSearchParams()
-    params.append("locations", `[[${longitude}, ${latitude}]]`)
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
-    try {
-        const response = await fetch(`${url}?${params.toString()}`, {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-        })
-        if (!response.ok) {
+    switch (gwgbCode) {
+        case 1: {
+            return true
+        }
+        case 0: {
+            return false
+        }
+        default: {
             throw new Error(
-                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                `Unknown Natura2000 code: ${gwgbCode} for coordinates , `,
             )
         }
-        const json = await response.json()
-        const feature = json?.[0]?.[0]
-        return Boolean(feature)
-    } catch (err) {
-        if ((err as any)?.name === "AbortError") {
-            throw new Error(
-                `Timeout querying GWGB-Gebied after ${FETCH_TIMEOUT_MS}ms`,
-            )
-        }
-        throw new Error(`Error querying GWGB-Gebied : ${String(err)}`)
-    } finally {
-        clearTimeout(timeout)
     }
 }
 
