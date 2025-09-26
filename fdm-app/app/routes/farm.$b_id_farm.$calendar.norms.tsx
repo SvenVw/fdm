@@ -264,16 +264,10 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
     }
 
     if (farmNorms && fieldNorms) {
-        const fieldOptions = loaderData.fields.map((field) => {
-            if (!field?.b_id || !field?.b_name) {
-                throw new Error("Invalid field data structure")
-            }
-            return {
-                b_id: field.b_id,
-                b_name: field.b_name,
-            }
-        })
-
+        const fieldOptions = loaderData.fields
+            .filter((f) => f?.b_id && f?.b_name)
+            .map((f) => ({ b_id: f.b_id, b_name: f.b_name }))
+            
         const fieldsMap = new Map(loaderData.fields.map((f) => [f.b_id, f]))
         const filteredFieldNorms = fieldNorms.filter((fieldNorm) => {
             if (!showProductiveOnly) return true
