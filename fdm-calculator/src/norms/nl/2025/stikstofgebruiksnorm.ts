@@ -84,18 +84,18 @@ function getGrondsoortUrl(year: number): string {
 /**
  * Determines the soil region for a given field based on its geographical coordinates.
  *
- * This function queries a GeoTIFF file representing the official "grondsoortenkaart" 
- * from the Dutch Meststoffenwet (Manure Law). It identifies whether the field's centroid 
+ * This function queries a GeoTIFF file representing the official "grondsoortenkaart"
+ * from the Dutch Meststoffenwet (Manure Law). It identifies whether the field's centroid
  * falls within one of the predefined soil regions: "klei", "loess", "veen", "zand_nwc", or "zand_zuid".
  *
- * The soil region is a critical factor in determining the applicable nitrogen usage norms, 
+ * The soil region is a critical factor in determining the applicable nitrogen usage norms,
  * as these standards vary significantly between different soil types.
  *
- * @param b_centroid - A tuple containing the longitude and latitude of the field's centroid. 
+ * @param b_centroid - A tuple containing the longitude and latitude of the field's centroid.
  *   This coordinate is used to look up the corresponding value in the GeoTIFF file.
- * @returns A promise that resolves to a `RegionKey`, which is a string literal representing the soil region 
+ * @returns A promise that resolves to a `RegionKey`, which is a string literal representing the soil region
  *   (e.g., "zand_nwc", "klei").
- * @throws {Error} If the GeoTIFF file cannot be fetched, if the coordinates fall outside the bounds of the map, 
+ * @throws {Error} If the GeoTIFF file cannot be fetched, if the coordinates fall outside the bounds of the map,
  *   or if the returned region code is unknown.
  *
  */
@@ -241,14 +241,17 @@ function determineSubTypeOmschrijving(
     cultivations: NL2025NormsInputForCultivation[],
 ): string | undefined {
     // Potato logic based on variety
-    if (standard.type === "aardappel" && cultivation.b_lu_variety) {
-        const varietyLower = cultivation.b_lu_variety.toLowerCase()
-        const subType = standard.sub_types?.find((sub) =>
-            sub.varieties?.some((v) => v.toLowerCase() === varietyLower),
-        )
-        if (subType) {
-            return subType.omschrijving
+    if (standard.type === "aardappel") {
+        if (cultivation.b_lu_variety) {
+            const varietyLower = cultivation.b_lu_variety.toLowerCase()
+            const subType = standard.sub_types?.find((sub) =>
+                sub.varieties?.some((v) => v.toLowerCase() === varietyLower),
+            )
+            if (subType) {
+                return subType.omschrijving
+            }
         }
+
         // Fallback for potatoes is 'overig' if a variety is present but not in a specific list
         return standard.sub_types?.find((s) => s.omschrijving === "overig")
             ?.omschrijving
