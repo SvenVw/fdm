@@ -111,7 +111,7 @@ export default function SignIn() {
         console.error("Social sign-in failed:", error)
     }
     const openCookieSettings = () => {
-        if (typeof window !== "undefined" && window.openCookieSettings) {
+        if (window?.openCookieSettings) {
             window.openCookieSettings()
         }
     }
