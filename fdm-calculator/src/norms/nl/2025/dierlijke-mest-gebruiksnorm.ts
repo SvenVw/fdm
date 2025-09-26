@@ -22,12 +22,12 @@ export async function isFieldInGWGBGebied(
     b_centroid: Field["b_centroid"],
 ): Promise<boolean> {
     const fdmPublicDataUrl = getFdmPublicDataUrl()
-    const url = `${fdmPublicDataUrl}norms/nl/2024/gwgb.tiff`
+    const url = `${fdmPublicDataUrl}norms/nl/2024/gwbg.tiff`
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
-    const gwgbCode = await getGeoTiffValue(url, longitude, latitude)
+    const gwbgCode = await getGeoTiffValue(url, longitude, latitude)
 
-    switch (gwgbCode) {
+    switch (gwbgCode) {
         case 1: {
             return true
         }
@@ -35,9 +35,7 @@ export async function isFieldInGWGBGebied(
             return false
         }
         default: {
-            throw new Error(
-                `Unknown Natura2000 code: ${gwgbCode} for coordinates , `,
-            )
+            throw new Error(`Unknown GWBG code: ${gwbgCode} for coordinates , `)
         }
     }
 }
