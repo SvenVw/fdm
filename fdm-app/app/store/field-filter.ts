@@ -1,5 +1,6 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
+import { ssrSafeJSONStorage } from "./storage"
 
 interface FieldFilterState {
     showProductiveOnly: boolean
@@ -17,7 +18,7 @@ export const useFieldFilterStore = create<FieldFilterState>()(
         }),
         {
             name: "field-filter-storage", // unique name
-            storage: createJSONStorage(() => localStorage), // Use localStorage
+            storage: createJSONStorage(() => ssrSafeJSONStorage), // Use SSR-safe storage
         },
     ),
 )
