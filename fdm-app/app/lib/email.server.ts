@@ -45,11 +45,13 @@ export async function renderInvitationEmail(
     inviteeEmail: string,
     inviter: ExtendedUser,
     organizationName: string,
+    invitationId: string,
 ): Promise<Email> {
     const emailHtml = await render(
         InvitationEmail({
             inviteeEmail: inviteeEmail,
             inviterName: `${inviter.firstname} ${inviter.surname}`,
+            invitationId: invitationId,
             organizationName: organizationName,
             appName: serverConfig.name,
             appBaseUrl: serverConfig.url,

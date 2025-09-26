@@ -27,6 +27,7 @@ import { DataTable } from "~/components/blocks/fields/table"
 import { columns } from "~/components/blocks/fields/columns"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
+import { useFieldFilterStore } from "~/store/field-filter"
 
 export const meta: MetaFunction = () => {
     return [
@@ -132,8 +133,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     field.b_id,
                     timeframe,
                 )
-                const a_som_loi = currentSoilData.find(x => x.parameter === "a_som_loi")?.value ?? null
-                const b_soiltype_agr = currentSoilData.find(x => x.parameter === "b_soiltype_agr")?.value ?? null
+                const a_som_loi =
+                    currentSoilData.find((x) => x.parameter === "a_som_loi")
+                        ?.value ?? null
+                const b_soiltype_agr =
+                    currentSoilData.find(
+                        (x) => x.parameter === "b_soiltype_agr",
+                    )?.value ?? null
 
                 return {
                     b_id: field.b_id,
@@ -143,6 +149,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
+                    b_isproductive: field.b_isproductive ?? true,
                 }
             }),
         )
@@ -173,6 +180,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
+    const { showProductiveOnly } = useFieldFilterStore()
+
+    const filteredFields = loaderData.fieldsExtended.filter((field) => {
+        if (!showProductiveOnly) {
+            return true
+        }
+        return field.b_isproductive === true
+    })
 
     const currentFarmName =
         loaderData.farmOptions.find(
@@ -223,15 +238,17 @@ export default function FarmFieldIndex() {
                     </>
                 ) : (
                     <>
-                        <FarmTitle
-                            title={`Percelen van ${currentFarmName}`}
-                            description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
-                        />
+                        <div className="flex items-center justify-between">
+                            <FarmTitle
+                                title={`Percelen van ${currentFarmName}`}
+                                description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
+                            />
+                        </div>
                         <FarmContent>
                             <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
                                 <DataTable
                                     columns={columns}
-                                    data={loaderData.fieldsExtended}
+                                    data={filteredFields}
                                 />
                             </div>
                         </FarmContent>
