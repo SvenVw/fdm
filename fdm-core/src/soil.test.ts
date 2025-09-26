@@ -144,8 +144,8 @@ describe("Soil Analysis Functions", () => {
         const b_soiltype_agr = "rivierklei"
         const b_gwl_class = "II"
 
-        await expect(async () => {
-            await addSoilAnalysis(
+        await expect(
+            addSoilAnalysis(
                 fdm,
                 principal_id,
                 a_date,
@@ -160,8 +160,8 @@ describe("Soil Analysis Functions", () => {
                     b_gwl_class: b_gwl_class,
                 },
                 a_depth_upper,
-            )
-        }).rejects.toThrowError("Exception for addSoilAnalysis")
+            ),
+        ).rejects.toThrowError("Exception for addSoilAnalysis")
     })
 
     it("should add a new soil analysis with upper and lower depth", async () => {
