@@ -248,16 +248,61 @@ function determineSubTypeOmschrijving(
         if (cultivation.b_lu_catalogue === "nl_1923") return "zomer"
     }
 
+    // Gras voor industriële verwerking logic based on cultivation history
+    if (
+        standard.cultivation_rvo_table2 ===
+        "Akkerbouwgewassen, Gras voor industriële verwerking"
+    ) {
+        const grasCultivationCodes = standard.b_lu_catalogue_match
+        const hasGrasCultivationInPreviousYear = cultivations.some(
+            (c) =>
+                grasCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start.getFullYear() <= 2024,
+        )
+        return hasGrasCultivationInPreviousYear
+            ? "inzaai voor 15 mei en volgende jaren"
+            : "inzaai in september en eerste jaar"
+    }
+
+    // Graszaad, Engels raaigras logic based on cultivation history
+    if (
+        standard.cultivation_rvo_table2 ===
+        "Akkerbouwgewassen, Graszaad, Engels raaigras"
+    ) {
+        const graszaadCultivationCodes = standard.b_lu_catalogue_match
+        const hasGraszaadCultivationInPreviousYear = cultivations.some(
+            (c) =>
+                graszaadCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start.getFullYear() <= 2024,
+        )
+        return hasGraszaadCultivationInPreviousYear ? "overjarig" : "1e jaars"
+    }
+
+    // Roodzwenkgras logic based on cultivation history
+    if (
+        standard.cultivation_rvo_table2 === "Akkerbouwgewassen, Roodzwenkgras"
+    ) {
+        const roodzwenkgrasCultivationCodes = standard.b_lu_catalogue_match
+        const hasRoodzwenkgrasCultivationInPreviousYear = cultivations.some(
+            (c) =>
+                roodzwenkgrasCultivationCodes.includes(c.b_lu_catalogue) &&
+                c.b_lu_start.getFullYear() <= 2024,
+        )
+        return hasRoodzwenkgrasCultivationInPreviousYear
+            ? "overjarig"
+            : "1e jaars"
+    }
+
+    // Winterui (Onion) logic based on specific BRP codes
+    if (
+        standard.cultivation_rvo_table2 ===
+        "Akkerbouwgewassen, Ui overig, zaaiui of winterui."
+    ) {
+        if (cultivation.b_lu_catalogue === "nl_1932") return "1e jaars"
+        if (cultivation.b_lu_catalogue === "nl_1933") return "2e jaars"
+    }
+
     /*
-     * The following cultivations have sub_types defined in stikstofgebruiksnorm-data.ts
-     * but are not yet covered by the logic in this function.
-     *
-     * --- Cultivations Requiring Cultivation History Logic (e.g., "1e jaars" vs. "overjarig"): ---
-     * - Akkerbouwgewassen, Gras voor industriële verwerking
-     * - Akkerbouwgewassen, Graszaad, Engels raaigras
-     * - Akkerbouwgewassen, Roodzwenkgras
-     * - Akkerbouwgewassen, Roodzwenkgras, volgteelt
-     *
      * --- Cultivations Requiring Cultivation Calendar Logic (e.g., "1e teelt" vs. "volgteelt"): ---
      * - Bladgewassen, Spinazie
      * - Bladgewassen, Slasoorten
