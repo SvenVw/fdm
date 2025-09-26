@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { createJSONStorage, persist } from "zustand/middleware"
 import { changelogEntries } from "~/routes/about.whats-new._index"
+import { ssrSafeJSONStorage } from "./storage"
 
 interface ChangelogState {
     lastSeenVersion: string | null
@@ -45,7 +46,7 @@ export const useChangelogStore = create<ChangelogState>()(
         }),
         {
             name: "changelog-storage", // name of the item in localStorage
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(() => ssrSafeJSONStorage),
             partialize: (state) => ({ lastSeenVersion: state.lastSeenVersion }),
         },
     ),
