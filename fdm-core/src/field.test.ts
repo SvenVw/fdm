@@ -89,7 +89,6 @@ describe("Farm Data Model", () => {
             expect(field.b_centroid[0]).toBeTypeOf("number")
             expect(field.b_centroid[1]).toBeTypeOf("number")
             expect(field.b_area).toBeGreaterThan(0)
-            console.log(field)
             expect(field.b_perimeter).toBeGreaterThan(0)
             expect(field.b_isproductive).toBe(true)
             expect(field.b_start).toEqual(AcquireDate)

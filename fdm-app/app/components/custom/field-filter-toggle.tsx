@@ -17,30 +17,28 @@ export function FieldFilterToggle() {
         : "Alle percelen (incl. bufferstroken) zijn weergegeven"
 
     return (
-        <div className="">
-            <TooltipProvider>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={toggleShowProductiveOnly}
-                            className="border hover:bg-accent hover:text-accent-foreground"
-                            aria-label={tooltipContent}
-                            aria-pressed={showProductiveOnly}
-                        >
-                            {showProductiveOnly ? (
-                                <Square className="h-4 w-4 text-primary" />
-                            ) : (
-                                <PanelsRightBottom className="h-4 w-4" />
-                            )}
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                        <p>{tooltipContent}</p>
-                    </TooltipContent>
-                </Tooltip>
-            </TooltipProvider>
-        </div>
+        <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={toggleShowProductiveOnly}
+                        className="border hover:bg-accent hover:text-accent-foreground"
+                        aria-label={tooltipContent}
+                        aria-pressed={showProductiveOnly}
+                    >
+                        {showProductiveOnly ? (
+                            <Square className="h-4 w-4 text-primary" />
+                        ) : (
+                            <PanelsRightBottom className="h-4 w-4" />
+                        )}
+                    </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{tooltipContent}</p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
     )
 }

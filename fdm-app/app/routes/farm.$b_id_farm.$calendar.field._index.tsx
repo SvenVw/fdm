@@ -28,7 +28,6 @@ import { columns } from "~/components/blocks/fields/columns"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { useFieldFilterStore } from "~/store/field-filter"
-import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
 
 export const meta: MetaFunction = () => {
     return [
@@ -150,7 +149,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     a_som_loi: a_som_loi,
                     b_soiltype_agr: b_soiltype_agr,
                     b_area: Math.round(field.b_area * 10) / 10,
-                    b_isproductive: field.b_isproductive,
+                    b_isproductive: field.b_isproductive ?? true,
                 }
             }),
         )

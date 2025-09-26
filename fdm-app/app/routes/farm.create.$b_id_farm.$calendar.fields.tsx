@@ -1,5 +1,5 @@
 import { getFarm, getFields } from "@svenvw/fdm-core"
-import { ArrowLeft, Car } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -21,14 +21,15 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
 import { useFieldFilterStore } from "~/store/field-filter"
-import { FieldFilterToggle } from "../components/custom/field-filter-toggle"
+import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
 import {
     Card,
     CardContent,
     CardFooter,
     CardHeader,
     CardTitle,
-} from "../components/ui/card"
+} from "~/components/ui/card"
+import { useMemo } from "react"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -49,12 +50,10 @@ export const meta: MetaFunction = () => {
  *
  * This loader retrieves the details of a farm and its associated fields using the provided farm ID from the URL parameters.
  * It also fetches available cultivation options from the catalogue and the Mapbox access token from the environment.
- * The fields are sorted alphabetically by name and converted into sidebar navigation items for use in the UI.
+ * The fields are returned for client-side filtering/sorting into sidebar navigation items.
  *
  * @returns An object containing:
- * - sidebarPageItems: Navigation items for each field.
- * - cultivationOptions: A list of available cultivation options.
- * - mapboxToken: The Mapbox access token.
+ * - fields: Array of fields for the farm (respects timeframe).
  * - b_id_farm: The farm ID.
  * - b_name_farm: The name of the farm.
  * - action: The URL for field update submissions.
@@ -107,14 +106,20 @@ export default function Index() {
     const { showProductiveOnly } = useFieldFilterStore()
 
     // Create the sidenav
-    const sidebarPageItems = fields
-        .filter((field) => (showProductiveOnly ? field.b_isproductive : true))
-        .map((field) => {
-            return {
-                title: field.b_name,
-                to: `/farm/create/${b_id_farm}/${calendar}/fields/${field.b_id}`,
-            }
-        })
+    const sidebarPageItems = useMemo(
+        () =>
+            fields
+                .filter((field) =>
+                    showProductiveOnly ? field.b_isproductive : true,
+                )
+                .slice()
+                .sort((a, b) => b.b_area - a.b_area) // Sort by area in descending order
+                .map((field) => ({
+                    title: field.b_name,
+                    to: `/farm/create/${b_id_farm}/${calendar}/fields/${field.b_id}`,
+                })),
+        [fields, showProductiveOnly, b_id_farm, calendar],
+    )
 
     return (
         <SidebarInset>

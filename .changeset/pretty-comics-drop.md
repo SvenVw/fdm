@@ -2,4 +2,4 @@
 "@svenvw/fdm-core": minor
 ---
 
-Adds `b_perimeter` and `b_area` to output of `getField` and `getFields`
+Expose `b_perimeter` and `b_isproductive` in the output of `getField` and `getFields`
