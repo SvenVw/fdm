@@ -10,6 +10,8 @@ import type {
     NormsByRegion,
     RegionKey,
 } from "./types"
+import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
+import { getGeoTiffValue } from "../../../shared/geotiff"
 
 const FETCH_TIMEOUT_MS = 8000
 
@@ -65,63 +67,68 @@ export async function isFieldInNVGebied(
 }
 
 /**
- * Determines the specific soil region (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") for a given field
- * based on its geographical coordinates. This is achieved by performing a spatial query
- * against a vector file containing the boundaries of grondsoortenkaart in de Meststoffenwet in the Netherlands.
+ * Returns the URL for the GeoTIFF file of the specified year's "grondsoortenkaart".
  *
- * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the geographical data.
- * @returns A promise that resolves to a `RegionKey` (e.g., "zand_nwc", "zand_zuid", "klei", "veen", "loess") if the
- *   field's centroid is found within a defined soil region.
- * @throws {Error} If there are issues fetching the file, processing its stream,
- *   or if the field's coordinates do not fall within any known region.
+ * @param year The year for which to retrieve the map. Currently, only 2024 is supported.
+ * @returns The URL to the GeoTIFF file.
+ * @throws {Error} If the year is not supported.
+ */
+function getGrondsoortUrl(year: number): string {
+    if (year !== 2024) {
+        throw new Error(`Year ${year} for grondsoortenkaart is not supported.`)
+    }
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    return `${fdmPublicDataUrl}/norms/nl/${year}/grondsoorten.tiff`
+}
+
+/**
+ * Determines the soil region for a given field based on its geographical coordinates.
  *
- * @remarks
- * This function is critical for applying region-specific nitrogen norms, as these norms
- * vary based on soil type.
+ * This function queries a GeoTIFF file representing the official "grondsoortenkaart" 
+ * from the Dutch Meststoffenwet (Manure Law). It identifies whether the field's centroid 
+ * falls within one of the predefined soil regions: "klei", "loess", "veen", "zand_nwc", or "zand_zuid".
+ *
+ * The soil region is a critical factor in determining the applicable nitrogen usage norms, 
+ * as these standards vary significantly between different soil types.
+ *
+ * @param b_centroid - A tuple containing the longitude and latitude of the field's centroid. 
+ *   This coordinate is used to look up the corresponding value in the GeoTIFF file.
+ * @returns A promise that resolves to a `RegionKey`, which is a string literal representing the soil region 
+ *   (e.g., "zand_nwc", "klei").
+ * @throws {Error} If the GeoTIFF file cannot be fetched, if the coordinates fall outside the bounds of the map, 
+ *   or if the returned region code is unknown.
+ *
  */
 export async function getRegion(
     b_centroid: Field["b_centroid"],
 ): Promise<RegionKey> {
-    const url =
-        "https://api.ellipsis-drive.com/v3/path/9d3c44e3-d737-492b-9358-4b26f6c2aeb3/vector/timestamp/89db219b-9d9d-42a6-b4a1-50728ab1d7cf/location"
-
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2024/grondsoorten.tiff`
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+    const grondoortCode = await getGeoTiffValue(url, longitude, latitude)
 
-    const params = new URLSearchParams()
-    params.append("locations", `[[${longitude}, ${latitude}]]`)
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
-    try {
-        const response = await fetch(`${url}?${params.toString()}`, {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-        })
-        if (!response.ok) {
+    switch (grondoortCode) {
+        case 1: {
+            return "klei"
+        }
+        case 2: {
+            return "loess"
+        }
+        case 3: {
+            return "veen"
+        }
+        case 4: {
+            return "zand_nwc"
+        }
+        case 5: {
+            return "zand_zuid"
+        }
+        default: {
             throw new Error(
-                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                `Unknown region code: ${grondoortCode} for coordinates , `,
             )
         }
-        const json = await response.json()
-        const feature = json?.[0]?.[0]
-        if (feature) {
-            return feature.region as RegionKey
-        }
-        throw new Error(
-            `Field coordinates do not fall within any known region.`,
-        ) // Throw error if no feature found
-    } catch (err) {
-        if ((err as any)?.name === "AbortError") {
-            throw new Error(
-                `Timeout querying Table2 Region after ${FETCH_TIMEOUT_MS}ms`,
-            )
-        }
-        throw new Error(`Error querying Table2 Region : ${String(err)}`)
-    } finally {
-        clearTimeout(timeout)
     }
 }
 
