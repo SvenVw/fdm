@@ -20,8 +20,6 @@ import type { Field } from "./field.d"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
 
-export const BUFFERSTROKEN_CONSTANT = 0.38 // Sven found that a ratio for a field with Perimeter (m^2) / Area (m) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 0.38
-
 /**
  * Adds a new field to a farm.
  *
@@ -189,11 +187,10 @@ export async function getField(
         field[0].b_centroid = [field[0].b_centroid_x, field[0].b_centroid_y]
         field[0].b_centroid_x = undefined
         field[0].b_centroid_y = undefined
-        field[0].b_isproductive =
-            field[0].b_area && field[0].b_perimeter
-                ? field[0].b_perimeter / (field[0].b_area * 10000) <
-                  BUFFERSTROKEN_CONSTANT
-                : true
+        field[0].b_isproductive = determineIfFieldIsProductiveByShape(
+            field[0].b_area,
+            field[0].b_perimeter,
+        )
 
         return field[0]
     } catch (err) {
@@ -303,11 +300,10 @@ export async function getFields(
             field.b_centroid = [field.b_centroid_x, field.b_centroid_y]
             field.b_centroid_x = undefined
             field.b_centroid_y = undefined
-            field.b_isproductive =
-                field.b_area && field.b_perimeter
-                    ? field.b_perimeter / (field.b_area * 10000) <
-                      BUFFERSTROKEN_CONSTANT
-                    : true
+            field.b_isproductive = determineIfFieldIsProductiveByShape(
+                field.b_area,
+                field.b_perimeter,
+            )
         }
 
         return fields
@@ -641,4 +637,29 @@ export function listAvailableAcquiringMethods(): {
     label: string
 }[] {
     return schema.acquiringMethodOptions
+}
+
+/**
+ * Determines if a field is considered productive based on its area and perimeter.
+ *
+ * This function uses a heuristic to differentiate between productive fields and non-productive areas like buffer strips.
+ * A field is classified as non-productive if its area is less than 2.5 hectares and the ratio of its perimeter
+ * to the square root of its area (in square meters) is greater than or equal to a predefined constant (20).
+ *
+ * @param b_area The area of the field in hectares.
+ * @param b_perimeter The perimeter of the field in meters.
+ * @returns `true` if the field is determined to be productive, `false` otherwise.
+ * @alpha
+ */
+export function determineIfFieldIsProductiveByShape(
+    b_area: number,
+    b_perimeter: number,
+) {
+    // Sven found that a ratio for a field with Perimeter (m) / SQRT(Area (m^2)) usually differentiates buffferstrips from "normal"  fields when the ratio is larger than 20 and area smaller than 2.5 ha
+    const BUFFERSTROKEN_CONSTANT = 20
+
+    return (
+        b_perimeter / Math.sqrt(b_area * 10000) < BUFFERSTROKEN_CONSTANT ||
+        b_area >= 2.5
+    )
 }
