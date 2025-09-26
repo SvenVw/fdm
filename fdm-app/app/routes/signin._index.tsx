@@ -48,7 +48,7 @@ export const meta: MetaFunction = () => {
 }
 
 const FormSchema = z.object({
-    timeZone: z.string(),
+    timeZone: z.string().optional(),
     email: z.coerce
         .string({
             required_error:
