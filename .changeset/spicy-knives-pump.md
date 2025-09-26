@@ -2,4 +2,4 @@
 "@svenvw/fdm-app": minor
 ---
 
-Users on the add field fertilizer form can now directly navigate to the fertilizer management page, then come back when they are done.
+While at the fertilizer application form users can navigate to the page to add a new custom fertilizer. After successful submission the user is directed back to the fertilizer application form.
