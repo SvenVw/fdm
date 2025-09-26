@@ -1,4 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
+import { AlertTriangle } from "lucide-react"
 
 interface FarmNormsProps {
     farmNorms: {
@@ -6,13 +13,38 @@ interface FarmNormsProps {
         phosphate: number
         nitrogen: number
     }
+    hasFieldNormErrors: boolean
+    fieldErrorMessages: string[]
 }
 
-export function FarmNorms({ farmNorms }: FarmNormsProps) {
+export function FarmNorms({
+    farmNorms,
+    hasFieldNormErrors,
+    fieldErrorMessages,
+}: FarmNormsProps) {
     return (
         <div className="mb-0">
             <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-                {/* <Info className="h-5 w-5 text-blue-600" /> */}
+                {hasFieldNormErrors && (
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-md">
+                                <p className="font-medium">
+                                    Voor sommige percelen zijn de
+                                    gebruiksnormen niet volledig berekend:
+                                </p>
+                                <ul className="list-disc pl-5 mt-2 text-sm">
+                                    {fieldErrorMessages.map((msg, index) => (
+                                        <li key={index}>{msg}</li>
+                                    ))}
+                                </ul>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                )}
                 Bedrijfsniveau
             </h2>
             <div className="grid gap-4 xl:grid-cols-3">
