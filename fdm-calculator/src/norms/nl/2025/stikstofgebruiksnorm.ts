@@ -67,21 +67,6 @@ export async function isFieldInNVGebied(
 }
 
 /**
- * Returns the URL for the GeoTIFF file of the specified year's "grondsoortenkaart".
- *
- * @param year The year for which to retrieve the map. Currently, only 2024 is supported.
- * @returns The URL to the GeoTIFF file.
- * @throws {Error} If the year is not supported.
- */
-function getGrondsoortUrl(year: number): string {
-    if (year !== 2024) {
-        throw new Error(`Year ${year} for grondsoortenkaart is not supported.`)
-    }
-    const fdmPublicDataUrl = getFdmPublicDataUrl()
-    return `${fdmPublicDataUrl}/norms/nl/${year}/grondsoorten.tiff`
-}
-
-/**
  * Determines the soil region for a given field based on its geographical coordinates.
  *
  * This function queries a GeoTIFF file representing the official "grondsoortenkaart"
