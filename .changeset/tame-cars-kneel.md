@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": minor
 ---
 
-Add support for cultivation with different stikstofgebruiksnormen for 1st and later years
+Add support for cultivations with different stikstofgebruiksnormen for first and subsequent years.

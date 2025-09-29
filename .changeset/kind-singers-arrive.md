@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-At norms replace vector lookup of remote datasets with raster query to improve performance and reliability
+In norms, replace vector lookups of remote datasets with raster queries to improve performance and reliability.

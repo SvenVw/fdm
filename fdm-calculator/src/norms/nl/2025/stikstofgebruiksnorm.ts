@@ -42,7 +42,7 @@ export async function isFieldInNVGebied(
         }
         default: {
             throw new Error(
-                `Unknown NVGebied code: ${NVGebiedCode} for coordinates , `,
+                `Unknown NV-gebied code: ${NVGebiedCode} for coordinates ${longitude}, ${latitude}`,
             )
         }
     }
@@ -93,7 +93,7 @@ export async function getRegion(
         }
         default: {
             throw new Error(
-                `Unknown region code: ${grondoortCode} for coordinates , `,
+                `Unknown region code: ${grondoortCode} for coordinates ${longitude}, ${latitude}`,
             )
         }
     }

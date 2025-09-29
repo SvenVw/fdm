@@ -2,4 +2,4 @@
 "@svenvw/fdm-calculator": patch
 ---
 
-Fixes exception at calculation of stikstofgebruiksnorm for cultivations with sub_types
+Fix exception when calculating stikstofgebruiksnorm for cultivations with sub_types.
