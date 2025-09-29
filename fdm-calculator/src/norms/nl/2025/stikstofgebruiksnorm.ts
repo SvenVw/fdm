@@ -150,7 +150,8 @@ function getNormsForCultivation(
     subTypeOmschrijving?: string, // New parameter
 ): NormsByRegion | undefined {
     if (selectedStandard.sub_types) {
-        let matchingSubType
+        type SubType = NonNullable<NitrogenStandard["sub_types"]>[number]
+        let matchingSubType: SubType | undefined
 
         // 1. Check for a direct match on omschrijving
         if (subTypeOmschrijving) {
