@@ -151,6 +151,7 @@ export function createFdmAuth(
                 },
             }),
             magicLink({
+                expiresIn: 60 * 15,
                 sendMagicLink: async (
                     { email, url },
                     _request,
