@@ -15,6 +15,7 @@ import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
 
 export const meta: MetaFunction = () => {
     return [
@@ -83,14 +84,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
  * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
  */
-export default function FarmFertilizerBlock() {
+export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
 
     return (
         <SidebarInset>
             <Header
                 action={{
-                    to: "../fertilizers",
+                    to: `/farm/${params.b_id_farm}/fertilizers`,
                     label: "Terug naar overzicht",
                     disabled: false,
                 }}

@@ -1,5 +1,11 @@
 # fdm-calculator
 
+## 0.6.1
+
+### Patch Changes
+
+- a9acf19: Fix divide-by-zero in nitrogen balance when b_lu_hi is undefined or 0
+
 ## 0.6.0
 
 ### Minor Changes

@@ -406,7 +406,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             if (!formValues.role) {
                 return handleActionError("missing: role")
             }
-            await inviteUserToOrganization(
+            const invitationId = await inviteUserToOrganization(
                 fdm,
                 session.user.id,
                 formValues.email,
@@ -420,6 +420,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
                     surname: session.user.surname,
                 },
                 organization.name,
+                invitationId,
             )
             await sendEmail(invitationEmail)
 

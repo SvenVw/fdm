@@ -1,4 +1,10 @@
-import { getFarms, getFields } from "@svenvw/fdm-core"
+import {
+    getCultivations,
+    getCurrentSoilData,
+    getFarms,
+    getFertilizerApplications,
+    getFields,
+} from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -10,23 +16,18 @@ import {
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderField } from "~/components/blocks/header/field"
 import { Button } from "~/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-} from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { getTimeBasedGreeting } from "~/lib/greetings"
+import { DataTable } from "~/components/blocks/fields/table"
+import { columns } from "~/components/blocks/fields/columns"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
+import { useFieldFilterStore } from "~/store/field-filter"
 
 export const meta: MetaFunction = () => {
     return [
@@ -110,14 +111,55 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        // Sort fields by name alphabetically
-        fieldOptions.sort((a, b) => a.b_name.localeCompare(b.b_name))
+        const fieldsExtended = await Promise.all(
+            fields.map(async (field) => {
+                const cultivations = await getCultivations(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+
+                const fertilizerApplications = await getFertilizerApplications(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+
+                const currentSoilData = await getCurrentSoilData(
+                    fdm,
+                    session.principal_id,
+                    field.b_id,
+                    timeframe,
+                )
+                const a_som_loi =
+                    currentSoilData.find((x) => x.parameter === "a_som_loi")
+                        ?.value ?? null
+                const b_soiltype_agr =
+                    currentSoilData.find(
+                        (x) => x.parameter === "b_soiltype_agr",
+                    )?.value ?? null
+
+                return {
+                    b_id: field.b_id,
+                    b_name: field.b_name,
+                    cultivations: cultivations,
+                    fertilizerApplications: fertilizerApplications,
+                    a_som_loi: a_som_loi,
+                    b_soiltype_agr: b_soiltype_agr,
+                    b_area: Math.round(field.b_area * 10) / 10,
+                    b_isproductive: field.b_isproductive ?? true,
+                }
+            }),
+        )
 
         // Return user information from loader
         return {
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
             fieldOptions: fieldOptions,
+            fieldsExtended: fieldsExtended,
             userName: session.userName,
         }
     } catch (error) {
@@ -138,7 +180,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
-    const greeting = getTimeBasedGreeting()
+    const { showProductiveOnly } = useFieldFilterStore()
+
+    const filteredFields = loaderData.fieldsExtended.filter((field) => {
+        if (!showProductiveOnly) {
+            return true
+        }
+        return field.b_isproductive === true
+    })
+
+    const currentFarmName =
+        loaderData.farmOptions.find(
+            (farm) => farm.b_id_farm === loaderData.b_id_farm,
+        )?.b_name_farm ?? ""
 
     return (
         <SidebarInset>
@@ -153,18 +207,18 @@ export default function FarmFieldIndex() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderField
-                    b_id_farm={loaderData.b_id_farm}
-                    fieldOptions={loaderData.fieldOptions}
-                    b_id={undefined}
-                />
+
+                <BreadcrumbSeparator />
+                <BreadcrumbItem className="hidden md:block">
+                    Percelen
+                </BreadcrumbItem>
             </Header>
             <main>
                 {loaderData.fieldOptions.length === 0 ? (
                     <>
                         <FarmTitle
-                            title={`Welkom, ${loaderData.userName}! 👋`}
-                            description={""}
+                            title={`Percelen van ${currentFarmName}`}
+                            description="Dit bedrijf heeft nog geen percelen"
                         />
                         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6 sm:w-[350px]">
                             <div className="flex flex-col space-y-2 text-center">
@@ -184,76 +238,20 @@ export default function FarmFieldIndex() {
                     </>
                 ) : (
                     <>
-                        <FarmTitle
-                            title={`${greeting}, ${loaderData.userName}! 👋`}
-                            description={
-                                "Kies een perceel uit de lijst om verder te gaan of maak een nieuw perceel aan"
-                            }
-                        />
-                        <div className="flex h-full items-center justify-center">
-                            <Card className="w-[350px]">
-                                <CardHeader>
-                                    {/* <CardTitle>Bedrijven</CardTitle> */}
-                                    <CardDescription className="text-center">
-                                        Kies een perceel om verder te gaan
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid w-full items-center gap-4">
-                                        <div className="flex flex-col space-y-4">
-                                            {loaderData.fieldOptions.map(
-                                                (option) => (
-                                                    <div
-                                                        className="grid grid-cols-3 gap-x-3 items-center"
-                                                        key={option.b_id}
-                                                    >
-                                                        <div className="col-span-2">
-                                                            <p className="text-sm font-medium leading-none">
-                                                                {option.b_name}
-                                                            </p>
-                                                            {option.b_area &&
-                                                            option.b_area >
-                                                                0.1 ? (
-                                                                <p className="text-sm text-muted-foreground">
-                                                                    {
-                                                                        option.b_area
-                                                                    }{" "}
-                                                                    ha
-                                                                </p>
-                                                            ) : null}
-                                                        </div>
-
-                                                        <div className="">
-                                                            <Button
-                                                                asChild
-                                                                aria-label={`Selecteer ${option.b_name}`}
-                                                            >
-                                                                <NavLink
-                                                                    to={`./${option.b_id}`}
-                                                                >
-                                                                    Selecteer
-                                                                </NavLink>
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                ),
-                                            )}
-                                        </div>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="flex flex-col items-center space-y-2 relative">
-                                    <Separator />
-                                    <p className="text-muted-foreground text-sm">
-                                        Of maak een nieuw perceel aan:
-                                    </p>
-                                    <div className="flex flex-col items-center relative">
-                                        <NavLink to="./new">
-                                            <Button>Maak een perceel</Button>
-                                        </NavLink>
-                                    </div>
-                                </CardFooter>
-                            </Card>
+                        <div className="flex items-center justify-between">
+                            <FarmTitle
+                                title={`Percelen van ${currentFarmName}`}
+                                description="Selecteer een perceel voor details of voeg een nieuw perceel toe."
+                            />
                         </div>
+                        <FarmContent>
+                            <div className="flex flex-col space-y-8 pb-10 lg:flex-row lg:space-x-12 lg:space-y-0">
+                                <DataTable
+                                    columns={columns}
+                                    data={filteredFields}
+                                />
+                            </div>
+                        </FarmContent>
                     </>
                 )}
             </main>

@@ -6,6 +6,7 @@ import {
     Outlet,
     redirect,
     useLoaderData,
+    useLocation,
 } from "react-router"
 import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
@@ -201,7 +202,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFieldIndex() {
     const loaderData = useLoaderData<typeof loader>()
     const calendar = useCalendarStore((state) => state.calendar)
+    const location = useLocation()
 
+    if (location.pathname.includes("fertilizer/manage")) return <Outlet />
     return (
         <SidebarInset>
             <Header

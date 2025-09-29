@@ -29,6 +29,7 @@ import { fdm } from "~/lib/fdm.server"
 import type { Route } from "../+types/root"
 import { HeaderNorms } from "~/components/blocks/header/norms"
 import { InlineErrorBoundary } from "~/components/custom/inline-error-boundary"
+import { useFieldFilterStore } from "~/store/field-filter"
 import { Alert, AlertDescription } from "~/components/ui/alert"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -99,16 +100,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             timeframe,
         )
-        const fieldOptions = fields.map((field) => {
-            if (!field?.b_id || !field?.b_name) {
-                throw new Error("Invalid field data structure")
-            }
-            return {
-                b_id: field.b_id,
-                b_name: field.b_name,
-                b_area: Math.round(field.b_area * 10) / 10,
-            }
-        })
 
         const asyncData = (async () => {
             // Currently only 2025 is supported
@@ -184,7 +175,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id: b_id,
             calendar: calendar,
             farmOptions: farmOptions,
-            fieldOptions: fieldOptions,
+            fields: fields,
             asyncData,
         }
     } catch (error) {
@@ -233,6 +224,7 @@ export default function FarmNormsBlock() {
  */
 function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
     const { farmNorms, fieldNorms, errorMessage } = use(loaderData.asyncData)
+    const { showProductiveOnly } = useFieldFilterStore()
 
     const location = useLocation()
     const page = location.pathname
@@ -275,6 +267,17 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
     }
 
     if (farmNorms && fieldNorms) {
+        const fieldOptions = loaderData.fields
+            .filter((f) => f?.b_id && f?.b_name)
+            .map((f) => ({ b_id: f.b_id, b_name: f.b_name }))
+            
+        const fieldsMap = new Map(loaderData.fields.map((f) => [f.b_id, f]))
+        const filteredFieldNorms = fieldNorms.filter((fieldNorm) => {
+            if (!showProductiveOnly) return true
+            const fieldData = fieldsMap.get(fieldNorm.b_id)
+            return fieldData ? fieldData.b_isproductive === true : false
+        })
+
         return (
             <div className="space-y-6 px-10 pb-16">
                 <Alert className="mb-8  border-amber-200 bg-amber-50">
@@ -291,8 +294,8 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
                 <FarmNorms farmNorms={farmNorms} />
                 <Separator className="my-8" />
                 <FieldNorms
-                    fieldNorms={fieldNorms}
-                    fieldOptions={loaderData.fieldOptions}
+                    fieldNorms={filteredFieldNorms}
+                    fieldOptions={fieldOptions}
                 />
             </div>
         )

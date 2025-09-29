@@ -56,11 +56,11 @@ describe("Farm Data Model", () => {
                 type: "Polygon",
                 coordinates: [
                     [
-                        [30, 10],
-                        [40, 40],
-                        [20, 40],
-                        [10, 20],
-                        [30, 10],
+                        [0, 0],
+                        [0, 1],
+                        [1, 1],
+                        [1, 0],
+                        [0, 0],
                     ],
                 ],
             }
@@ -89,6 +89,8 @@ describe("Farm Data Model", () => {
             expect(field.b_centroid[0]).toBeTypeOf("number")
             expect(field.b_centroid[1]).toBeTypeOf("number")
             expect(field.b_area).toBeGreaterThan(0)
+            expect(field.b_perimeter).toBeGreaterThan(0)
+            expect(field.b_isproductive).toBe(true)
             expect(field.b_start).toEqual(AcquireDate)
             expect(field.b_end).toEqual(discardingDate)
             expect(field.b_acquiring_method).toBe(AcquiringMethod)
@@ -183,6 +185,10 @@ describe("Farm Data Model", () => {
                 expect(fields.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([field1Name, field2Name]),
                 )
+                for (const field of fields) {
+                    expect(field.b_perimeter).toBeGreaterThan(0)
+                    expect(field.b_isproductive).toBe(true)
+                }
             })
 
             it("should throw an error when permission check fails", async () => {
@@ -210,7 +216,8 @@ describe("Farm Data Model", () => {
                         ],
                     ],
                 }
-                const field1Start = new Date("2023-01-01")
+                const field1Start = new Date("2022-01-01")
+                const field1End = new Date("2022-05-01")
                 const field1AcquiringMethod = "nl_01"
                 await addField(
                     fdm,
@@ -221,6 +228,7 @@ describe("Farm Data Model", () => {
                     field1Geometry,
                     field1Start,
                     field1AcquiringMethod,
+                    field1End,
                 )
 
                 const field2Name = "Field 2"
@@ -237,7 +245,7 @@ describe("Farm Data Model", () => {
                         ],
                     ],
                 }
-                const field2Start = new Date("2023-04-01")
+                const field2Start = new Date("2023-02-01")
                 const field2AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
@@ -291,8 +299,8 @@ describe("Farm Data Model", () => {
                         ],
                     ],
                 }
-                const field4Start = new Date("2023-07-01")
-                const field4End = new Date("2023-09-01")
+                const field4Start = new Date("2024-07-01")
+                const field4End = new Date("2024-09-01")
                 const field4AcquiringMethod = "nl_02"
                 await addField(
                     fdm,
@@ -306,7 +314,7 @@ describe("Farm Data Model", () => {
                     field4End,
                 )
 
-                // Test with a timeframe that includes only Field 2
+                // Test with a timeframe that includes Field 2
                 const timeframe1 = {
                     start: new Date("2023-03-01"),
                     end: new Date("2023-05-01"),
@@ -319,10 +327,12 @@ describe("Farm Data Model", () => {
                 )
                 expect(fields1.length).toBe(1)
                 expect(fields1[0].b_name).toBe(field2Name)
+                expect(fields1[0].b_perimeter).toBeGreaterThan(0)
+                expect(fields1[0].b_isproductive).toBe(true)
 
                 // Test with a timeframe that includes both Field 1 and Field 2
                 const timeframe2 = {
-                    start: new Date("2022-12-01"),
+                    start: new Date("2022-01-01"),
                     end: new Date("2023-05-01"),
                 }
                 const fields2 = await getFields(
@@ -335,8 +345,12 @@ describe("Farm Data Model", () => {
                 expect(fields2.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([field1Name, field2Name]),
                 )
+                for (const field of fields2) {
+                    expect(field.b_perimeter).toBeGreaterThan(0)
+                    expect(field.b_isproductive).toBe(true)
+                }
 
-                // Test with a timeframe that includes field 3 and field 4
+                // Test with a timeframe that includes field 2 and field 3
                 const timeframe3 = {
                     start: new Date("2023-05-01"),
                     end: new Date("2023-09-01"),
@@ -348,16 +362,20 @@ describe("Farm Data Model", () => {
                     b_id_farm,
                     timeframe3,
                 )
-
                 expect(fields3.length).toBe(2)
                 expect(fields3.map((f) => f.b_name)).toEqual(
-                    expect.arrayContaining([field3Name, field4Name]),
+                    expect.arrayContaining([field2Name, field3Name]),
                 )
+                for (const field of fields3) {
+                    expect(field.b_perimeter).toBeGreaterThan(0)
+                    expect(field.b_isproductive).toBe(true)
+                }
                 //Test with only start date
                 const fields4 = await getFields(fdm, principal_id, b_id_farm, {
                     start: new Date("2023-03-01"),
                     end: undefined,
                 })
+                
                 expect(fields4.length).toBe(3)
                 expect(fields4.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([
@@ -366,6 +384,10 @@ describe("Farm Data Model", () => {
                         field4Name,
                     ]),
                 )
+                for (const field of fields4) {
+                    expect(field.b_perimeter).toBeGreaterThan(0)
+                    expect(field.b_isproductive).toBe(true)
+                }
                 //Test with only end date
                 const fields5 = await getFields(fdm, principal_id, b_id_farm, {
                     start: undefined,
@@ -375,6 +397,10 @@ describe("Farm Data Model", () => {
                 expect(fields5.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([field1Name, field2Name]),
                 )
+                for (const field of fields5) {
+                    expect(field.b_perimeter).toBeGreaterThan(0)
+                    expect(field.b_isproductive).toBe(true)
+                }
             })
         })
         it("should update a field", async () => {
@@ -397,11 +423,11 @@ describe("Farm Data Model", () => {
                 type: "Polygon",
                 coordinates: [
                     [
-                        [30, 10],
-                        [40, 40],
-                        [20, 40],
-                        [10, 20],
-                        [30, 10],
+                        [0, 0],
+                        [0, 1],
+                        [1, 1],
+                        [1, 0],
+                        [0, 0],
                     ],
                 ],
             }
@@ -476,11 +502,11 @@ describe("Farm Data Model", () => {
                 type: "Polygon",
                 coordinates: [
                     [
-                        [30, 10],
-                        [40, 40],
-                        [20, 40],
-                        [10, 20],
-                        [30, 10],
+                        [0, 0],
+                        [0, 1],
+                        [1, 1],
+                        [1, 0],
+                        [0, 0],
                     ],
                 ],
             }
@@ -586,6 +612,66 @@ describe("Farm Data Model", () => {
                 updatedAcquiringMethod,
             ) // Should remain the same
         })
+
+        it("should calculate perimeter correctly for a polygon with a hole", async () => {
+            const farmName = "Test Farm with Hole"
+            const farmBusinessId = "789012"
+            const farmAddress = "456 Hole Lane"
+            const farmPostalCode = "67890"
+            const b_id_farm = await addFarm(
+                fdm,
+                principal_id,
+                farmName,
+                farmBusinessId,
+                farmAddress,
+                farmPostalCode,
+            )
+
+            const fieldName = "Field with Hole"
+            const fieldIDSource = "test-field-id-hole"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    // Outer ring
+                    [
+                        [0, 0],
+                        [0, 10],
+                        [10, 10],
+                        [10, 0],
+                        [0, 0],
+                    ],
+                    // Inner ring (hole)
+                    [
+                        [2, 2],
+                        [2, 8],
+                        [8, 8],
+                        [8, 2],
+                        [2, 2],
+                    ],
+                ],
+            }
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "nl_01"
+            const b_id = await addField(
+                fdm,
+                principal_id,
+                b_id_farm,
+                fieldName,
+                fieldIDSource,
+                fieldGeometry,
+                AcquireDate,
+                AcquiringMethod,
+                discardingDate,
+            )
+            expect(b_id).toBeDefined()
+
+            const field = await getField(fdm, principal_id, b_id)
+            expect(field.b_name).toBe(fieldName)
+            expect(field.b_perimeter).toBeGreaterThan(0)
+            expect(field.b_perimeter).toBeGreaterThan(4000000) 
+            expect(field.b_isproductive).toBe(true)
+        })
     })
 
     describe("removeField", () => {
@@ -626,6 +712,8 @@ describe("Farm Data Model", () => {
                 b_lu_n_harvestable: 4,
                 b_lu_n_residue: 2,
                 b_n_fixation: 0,
+                b_lu_rest_oravib: false, // Changed to boolean
+                b_lu_variety_options: [], // Added missing property
             })
         })
 

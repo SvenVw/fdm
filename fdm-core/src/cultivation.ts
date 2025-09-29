@@ -29,6 +29,7 @@ import {
 } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
+import { determineIfFieldIsProductiveByShape } from "./field"
 
 /**
  * Retrieves cultivations available in the enabled catalogues for a farm.
@@ -617,6 +618,7 @@ export async function getCultivationPlan(
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                b_perimeter: sql<number>`ROUND((ST_Length(ST_ExteriorRing(b_geometry)::geography))::NUMERIC, 2)::FLOAT`,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -770,6 +772,10 @@ export async function getCultivationPlan(
                         b_id: curr.b_id,
                         b_area: curr.b_area,
                         b_name: curr.b_name,
+                        b_isproductive: determineIfFieldIsProductiveByShape(
+                            curr.b_area,
+                            curr.b_perimeter,
+                        ),
                         fertilizer_applications: [],
                         harvests: [],
                     }

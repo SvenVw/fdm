@@ -5,6 +5,7 @@ import {
     type MetaFunction,
     Outlet,
     useLoaderData,
+    useLocation,
 } from "react-router"
 import { CultivationListPlan } from "~/components/blocks/cultivation/list-plan"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
@@ -81,6 +82,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 // Main
 export default function Index() {
     const loaderData = useLoaderData<typeof loader>()
+    const location = useLocation()
+
+    if (location.pathname.includes("/manage")) {
+        return <Outlet />
+    }
 
     return (
         <>
