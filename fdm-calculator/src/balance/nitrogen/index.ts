@@ -21,6 +21,7 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
+import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.
@@ -428,8 +429,4 @@ export function combineSoilAnalyses(
     }
 
     return soilAnalysis
-}
-
-export function getFdmPublicDataUrl(): string {
-    return "https://storage.googleapis.com/fdm-public-data/"
 }

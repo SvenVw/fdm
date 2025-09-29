@@ -99,24 +99,8 @@ export interface NitrogenStandard {
      * Optional. A more specific classification for varieties, particularly for potatoes.
      * @example "consumptie_overig", "poot_overig"
      */
-    variety_type?: string
-    /**
-     * Optional. A list of specific varieties that fall under this standard.
-     * Used for filtering when a `b_lu_variety` is provided.
-     */
-    varieties?: string[]
-    /**
-     * Indicates if the cultivation is considered a "winterteelt" (winter crop).
-     */
     is_winterteelt: boolean
-    /**
-     * Indicates if the cultivation is considered a "vanggewas" (catch crop).
-     */
     is_vanggewas: boolean
-    /**
-     * Optional. The default nitrogen norms (standard and NV-area) per region.
-     * This is the most common structure for norms.
-     */
     norms?: {
         klei: { standard: number; nv_area: number }
         zand_nwc: { standard: number; nv_area: number }
@@ -124,70 +108,6 @@ export interface NitrogenStandard {
         loess: { standard: number; nv_area: number }
         veen: { standard: number; nv_area: number }
     }
-    /**
-     * Optional. A list of varieties that qualify for a 'high norm' for certain crops (e.g., potatoes).
-     */
-    varieties_hoge_norm?: string[]
-    /**
-     * Optional. A list of varieties that qualify for a 'low norm' for certain crops (e.g., potatoes).
-     */
-    varieties_lage_norm?: string[]
-    /**
-     * Optional. Nitrogen norms specifically for 'high norm' varieties, per region.
-     */
-    norms_hoge_norm?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loess: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms specifically for 'low norm' varieties, per region.
-     */
-    norms_lage_norm?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loess: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms for 'other' varieties when specific high/low norms don't apply.
-     */
-    norms_overig?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loess: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms specifically for farms with derogation status, per region.
-     * Applicable for certain crops like maize.
-     */
-    derogatie_norms?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loess: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. Nitrogen norms specifically for farms without derogation status, per region.
-     * Applicable for certain crops like maize.
-     */
-    non_derogatie_norms?: {
-        klei: { standard: number; nv_area: number }
-        zand_nwc: { standard: number; nv_area: number }
-        zand_zuid: { standard: number; nv_area: number }
-        loess: { standard: number; nv_area: number }
-        veen: { standard: number; nv_area: number }
-    }
-    /**
-     * Optional. An array of sub-types for a cultivation, each with its own norms and period descriptions.
-     * Used for crops like temporary grassland where norms vary based on the period of cultivation.
-     */
     sub_types?: Array<{
         omschrijving?: string
         period_description?: string
@@ -195,6 +115,7 @@ export interface NitrogenStandard {
         period_start_day?: number
         period_end_month?: number
         period_end_day?: number
+        varieties?: string[] // Added for potato varieties
         norms: {
             klei: { standard: number; nv_area: number }
             zand_nwc: { standard: number; nv_area: number }
@@ -202,8 +123,6 @@ export interface NitrogenStandard {
             loess: { standard: number; nv_area: number }
             veen: { standard: number; nv_area: number }
         }
-        // Note: winterteelt properties are removed from the top-level NitrogenStandard
-        // but are kept here within sub_types if specific sub-periods have them.
         winterteelt_voor_31_12?: {
             klei: { standard: number; nv_area: number }
             zand_nwc: { standard: number; nv_area: number }

@@ -10,13 +10,6 @@ import type {
     SoilAnalysisPicked,
 } from "./types"
 
-describe("getFdmPublicDataUrl", () => {
-    it("should return the correct FDM public data URL", () => {
-        const expectedUrl = "https://storage.googleapis.com/fdm-public-data/"
-        expect(getFdmPublicDataUrl()).toBe(expectedUrl)
-    })
-})
-
 describe("calculateNitrogenBalance", () => {
     it("should calculate nitrogen balance correctly with mock input", async () => {
         const mockNitrogenBalanceInput: NitrogenBalanceInput = {
