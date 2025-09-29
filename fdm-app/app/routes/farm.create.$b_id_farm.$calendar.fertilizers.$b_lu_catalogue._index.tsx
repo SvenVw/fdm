@@ -252,6 +252,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
         }
         throw new Error(`${request.method} is not supported`)
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

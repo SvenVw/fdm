@@ -89,7 +89,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             mapboxStyle: mapboxStyle,
         }
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }
 
@@ -177,6 +177,6 @@ export async function action({ request, params }: ActionFunctionArgs) {
             throw new Error("Missing field ID.")
         }
     } catch (error) {
-        throw handleActionError(error)
+        return handleActionError(error)
     }
 }

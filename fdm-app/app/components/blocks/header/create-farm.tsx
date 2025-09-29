@@ -1,4 +1,6 @@
-import { useLocation } from "react-router"
+import { useEffect } from "react"
+import { useLocation, useParams } from "react-router"
+import { useFarmFieldOptionsStore } from "@/app/store/farm-field-options"
 import {
     BreadcrumbItem,
     BreadcrumbLink,
@@ -11,6 +13,16 @@ export function HeaderFarmCreate({
     b_name_farm: string | undefined | null
 }) {
     const location = useLocation()
+    const params = useParams()
+    const addFarmOptionToTheStore = useFarmFieldOptionsStore(
+        (s) => s.addFarmOption,
+    )
+    useEffect(() => {
+        if (params.b_id_farm && b_name_farm) {
+            addFarmOptionToTheStore(params.b_id_farm, b_name_farm)
+        }
+    }, [params.b_id_farm, b_name_farm, addFarmOptionToTheStore])
+
     const currentPath = String(location.pathname)
 
     return (
