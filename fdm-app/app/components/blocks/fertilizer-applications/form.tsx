@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { Plus } from "lucide-react"
+import type { MouseEvent } from "react"
 import { useEffect } from "react"
 import type { Navigation } from "react-router"
-import { Form } from "react-router"
+import { Form, useNavigate, useSearchParams } from "react-router"
 import { RemixFormProvider, useRemixForm } from "remix-hook-form"
 import type { z } from "zod"
+import { useFieldFertilizerFormStore } from "@/app/store/field-fertilizer-form"
 import { Combobox } from "~/components/custom/combobox"
 import { DatePicker } from "~/components/custom/date-picker"
 import { LoadingSpinner } from "~/components/custom/loadingspinner"
@@ -24,6 +27,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { FormSchema } from "./formschema"
 import type { FertilizerOption } from "./types.d"
 
@@ -31,11 +39,18 @@ export function FertilizerApplicationForm({
     options,
     action,
     navigation,
+    b_id_farm,
+    b_id_or_b_lu_catalogue,
 }: {
     options: FertilizerOption[]
     action: string
     navigation: Navigation
+    b_id_farm: string
+    b_id_or_b_lu_catalogue: string
 }) {
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",
         resolver: zodResolver(FormSchema),
@@ -56,6 +71,66 @@ export function FertilizerApplicationForm({
         }
     }, [p_id, form.setValue])
 
+    const fieldFertilizerFormStore = useFieldFertilizerFormStore()
+
+    useEffect(() => {
+        if (b_id_farm && b_id_or_b_lu_catalogue) {
+            const savedFormValues = fieldFertilizerFormStore.load(
+                b_id_farm,
+                b_id_or_b_lu_catalogue,
+            )
+            if (savedFormValues) {
+                for (const [k, v] of Object.entries(savedFormValues)) {
+                    if (typeof v === "undefined" || v === null) continue
+                    const hydrated =
+                        k === "p_app_date" && v
+                            ? new Date(v as any)
+                            : (v as any)
+                    form.setValue(k as any, hydrated)
+                }
+            }
+        }
+    }, [
+        b_id_farm,
+        b_id_or_b_lu_catalogue,
+        form.setValue,
+        fieldFertilizerFormStore.load,
+    ])
+
+    // Change fertilizer selection if the user has added a new fertilizer
+    const new_p_id = searchParams.get("p_id")
+    useEffect(() => {
+        if (new_p_id) {
+            form.setValue("p_id", new_p_id)
+        }
+    }, [new_p_id, form.setValue])
+
+    useEffect(() => {
+        if (form.formState.isSubmitSuccessful) {
+            fieldFertilizerFormStore.delete(b_id_farm, b_id_or_b_lu_catalogue)
+        }
+    }, [
+        form.formState.isSubmitSuccessful,
+        b_id_farm,
+        b_id_or_b_lu_catalogue,
+        fieldFertilizerFormStore.delete,
+    ])
+
+    function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
+        if (b_id_farm && b_id_or_b_lu_catalogue) {
+            fieldFertilizerFormStore.save(
+                b_id_farm,
+                b_id_or_b_lu_catalogue,
+                form.getValues(),
+            )
+        }
+        navigate(
+            searchParams.has("fieldIds")
+                ? `./manage/new?fieldIds=${searchParams.get("fieldIds")}`
+                : "./manage/new",
+        )
+    }
+
     return (
         <RemixFormProvider {...form}>
             <Form
@@ -67,17 +142,38 @@ export function FertilizerApplicationForm({
                 <fieldset disabled={isSubmitting}>
                     <div className="grid md:grid-cols-2 items-end gap-x-8 gap-y-4 justify-between">
                         {/* <Label htmlFor="b_name_farm">Meststof</Label> */}
-                        <Combobox
-                            options={options}
-                            form={form}
-                            name="p_id"
-                            label={
-                                <span>
-                                    Meststof
-                                    <span className="text-red-500">*</span>
-                                </span>
-                            }
-                        />
+                        <div className="flex flex-row items-baseline [&>*]:grow">
+                            <Combobox
+                                options={options}
+                                form={form}
+                                name="p_id"
+                                label={
+                                    <span>
+                                        Meststof
+                                        <span className="text-red-500">*</span>
+                                    </span>
+                                }
+                            />
+                            <div className="py-2 [&.py-2]:grow-0">
+                                <p className="invisible">&nbsp;</p>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            className="ml-2"
+                                            onClick={handleManageFertilizers}
+                                        >
+                                            <Plus />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Voeg een nieuwe meststof toe aan de
+                                        keuzelijst
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </div>
                         <FormField
                             control={form.control}
                             name="p_app_method"

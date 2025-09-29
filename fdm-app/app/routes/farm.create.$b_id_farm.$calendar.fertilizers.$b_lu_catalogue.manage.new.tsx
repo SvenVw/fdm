@@ -1,4 +1,4 @@
-import { getFarm, getFarms } from "@svenvw/fdm-core"
+import { getFarm } from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -8,14 +8,13 @@ import {
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
-import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
+import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
+import type { Route } from "./+types/farm.create.$b_id_farm.$calendar.fertilizers.$b_lu_catalogue.manage.new"
 
 export const meta: MetaFunction = () => {
     return [
@@ -51,27 +50,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm || "",
-            }
-        })
+        const b_name_farm = farm.b_name_farm
 
         // Return user information from loader
         return {
-            farm: farm,
-            b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
+            b_name_farm: b_name_farm,
         }
     } catch (error) {
         throw handleLoaderError(error)
@@ -91,20 +74,12 @@ export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
         <SidebarInset>
             <Header
                 action={{
-                    to: `/farm/${params.b_id_farm}/fertilizers`,
-                    label: "Terug naar overzicht",
+                    label: "Terug naar bemesting toevoegen",
+                    to: `/farm/create/${params.b_id_farm}/${params.calendar}/fertilizers/${params.b_lu_catalogue}`,
                     disabled: false,
                 }}
             >
-                <HeaderFarm
-                    b_id_farm={loaderData.b_id_farm}
-                    farmOptions={loaderData.farmOptions}
-                />
-                <HeaderFertilizer
-                    b_id_farm={loaderData.b_id_farm}
-                    p_id={undefined}
-                    fertilizerOptions={[]}
-                />
+                <HeaderFarmCreate b_name_farm={loaderData.b_name_farm} />
             </Header>
             <main className="mx-auto max-w-4xl">
                 <FarmTitle

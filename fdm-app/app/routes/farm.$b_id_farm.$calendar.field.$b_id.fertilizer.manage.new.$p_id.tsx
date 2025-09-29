@@ -18,6 +18,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
 import { FarmNewFertilizerBlock } from "~/components/blocks/fertilizer/new-fertilizer-page"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -28,7 +29,7 @@ export const meta: MetaFunction = () => {
         { title: `Meststof | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekij de details van deze meststof",
+            content: "Bekijk de details van deze meststof",
         },
     ]
 }
@@ -129,14 +130,22 @@ export default function FarmFertilizerPage() {
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
         const b_id_farm = params.b_id_farm
+        const b_id = params.b_id
         const p_id = params.p_id
 
         if (!b_id_farm) {
             throw new Error("missing: b_id_farm")
         }
+
+        if (!b_id) {
+            throw new Error("missing: b_id")
+        }
+
         if (!p_id) {
             throw new Error("missing: p_id")
         }
+
+        const calendar = getCalendar(params)
 
         const session = await getSession(request)
         const formValues = await extractFormValuesFromRequest(
@@ -200,7 +209,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
-        await addFertilizer(
+        const new_p_id = await addFertilizer(
             fdm,
             session.principal_id,
             p_id_catalogue,
@@ -209,9 +218,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/${calendar}/field/${b_id}/fertilizer?p_id=${new_p_id}`,
+            {
+                message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }

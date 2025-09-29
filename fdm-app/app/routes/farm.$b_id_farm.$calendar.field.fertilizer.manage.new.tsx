@@ -5,17 +5,18 @@ import {
     type MetaFunction,
     Outlet,
     useLoaderData,
+    useSearchParams,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { HeaderFertilizer } from "~/components/blocks/header/fertilizer"
+import { BreadcrumbLink, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import type { Route } from "./+types/farm.$b_id_farm.fertilizers.new"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.field.fertilizer.manage.new"
 
 export const meta: MetaFunction = () => {
     return [
@@ -36,6 +37,15 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("invalid: b_id_farm", {
                 status: 400,
                 statusText: "invalid: b_id_farm",
+            })
+        }
+
+        // Get the field ids
+        const searchParams = new URL(request.url).searchParams
+        if (!searchParams.has("fieldIds")) {
+            throw data("missing: fieldIds", {
+                status: 400,
+                statusText: "missing: fieldIds",
             })
         }
 
@@ -69,7 +79,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
             b_id_farm: b_id_farm,
             farmOptions: farmOptions,
         }
@@ -86,13 +95,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
  */
 export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
     const loaderData = useLoaderData<typeof loader>()
+    const [urlSearchParams] = useSearchParams()
 
     return (
         <SidebarInset>
             <Header
                 action={{
-                    to: `/farm/${params.b_id_farm}/fertilizers`,
-                    label: "Terug naar overzicht",
+                    label: "Terug naar bemesting toevoegen",
+                    to: `/farm/${params.b_id_farm}/${params.calendar}/field/fertilizer?fieldIds=${urlSearchParams.get("fieldIds")}`,
                     disabled: false,
                 }}
             >
@@ -100,11 +110,20 @@ export default function FarmFertilizerBlock({ params }: Route.ComponentProps) {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderFertilizer
-                    b_id_farm={loaderData.b_id_farm}
-                    p_id={undefined}
-                    fertilizerOptions={[]}
-                />
+                <BreadcrumbSeparator />
+                Percelen
+                <BreadcrumbSeparator />
+                <BreadcrumbLink
+                    href={`/farm/${params.b_id_farm}/${params.calendar}/field/fertilizer?fieldIds=${urlSearchParams.get("fieldIds")}`}
+                >
+                    Bemesting toevoegen
+                </BreadcrumbLink>
+                <BreadcrumbSeparator />
+                <BreadcrumbLink
+                    href={`/farm/${params.b_id_farm}/${params.calendar}/field/fertilizer/manage/new?fieldIds=${urlSearchParams.get("fieldIds")}`}
+                >
+                    Nieuwe meststof
+                </BreadcrumbLink>
             </Header>
             <main className="mx-auto max-w-4xl">
                 <FarmTitle
