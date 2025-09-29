@@ -180,7 +180,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     hasFieldNormErrors = true
                     const fallbackFieldId = "unknown"
                     const fallbackFieldName =
-                        fieldOptions.find((opt) => opt.b_id === fallbackFieldId)
+                        fields.find((f) => f.b_id === fallbackFieldId)
                             ?.b_name || `Perceel ${fallbackFieldId}`
                     fieldErrorMessages.push(
                         `${fallbackFieldName}: ${String(result.reason).replace(
@@ -335,7 +335,7 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
         const fieldOptions = loaderData.fields
             .filter((f) => f?.b_id && f?.b_name)
             .map((f) => ({ b_id: f.b_id, b_name: f.b_name }))
-            
+
         const fieldsMap = new Map(loaderData.fields.map((f) => [f.b_id, f]))
         const filteredFieldNorms = fieldNorms.filter((fieldNorm) => {
             if (!showProductiveOnly) return true
