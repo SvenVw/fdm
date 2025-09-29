@@ -236,7 +236,7 @@ function determineSubTypeOmschrijving(
         const hasLucernceCultivationInPreviousYear = cultivations.some(
             (c) =>
                 lucerneCultivationCodes.includes(c.b_lu_catalogue) &&
-                c.b_lu_start.getFullYear() < new Date().getFullYear(), // Check for cultivation in any previous year
+                c.b_lu_start.getFullYear() <= 2024,
         )
         return hasLucernceCultivationInPreviousYear
             ? "volgende jaren"
