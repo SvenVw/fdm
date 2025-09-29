@@ -46,9 +46,9 @@ export function FarmNorms({
                                     niet volledig berekend:
                                 </p>
                                 <ul className="list-disc pl-5 mt-2 text-sm">
-                                    {fieldErrorMessages.map(
-                                        (msg) => +(<li key={msg}>{msg}</li>),
-                                    )}
+                                    {fieldErrorMessages.map((msg) => (
+                                        <li key={msg}>{msg}</li>
+                                    ))}
                                 </ul>
                             </TooltipContent>
                         </Tooltip>
