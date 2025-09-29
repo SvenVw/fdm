@@ -29,12 +29,21 @@ export function FarmNorms({
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                                <button
+                                    type="button"
+                                    aria-label="Gebruiksnorm fouten op percelen"
+                                    className="inline-flex"
+                                >
+                                    <AlertTriangle
+                                        className="h-5 w-5 text-amber-600"
+                                        aria-hidden="true"
+                                    />
+                                </button>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-md">
                                 <p className="font-medium">
-                                    Voor sommige percelen zijn de
-                                    gebruiksnormen niet volledig berekend:
+                                    Voor sommige percelen zijn de gebruiksnormen
+                                    niet volledig berekend:
                                 </p>
                                 <ul className="list-disc pl-5 mt-2 text-sm">
                                     {fieldErrorMessages.map((msg, index) => (
