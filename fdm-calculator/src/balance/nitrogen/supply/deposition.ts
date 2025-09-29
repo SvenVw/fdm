@@ -1,4 +1,4 @@
-import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
+import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
 import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 import { getGeoTiffValue } from "../../../shared/geotiff"
