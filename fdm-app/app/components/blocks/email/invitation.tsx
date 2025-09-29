@@ -6,6 +6,7 @@ import {
     Heading,
     Html,
     Img,
+    Link,
     Preview,
     Section,
     Text,
@@ -16,6 +17,7 @@ interface InvitationEmailProps {
     organizationName: string
     inviterName: string
     inviteeEmail: string
+    invitationId: string
     appName: string
     appBaseUrl?: string // Optional base URL for logo path
     logoFileName?: string // Optional logo file name
@@ -25,6 +27,7 @@ export const InvitationEmail = ({
     organizationName,
     inviterName,
     inviteeEmail,
+    invitationId,
     appName,
     appBaseUrl = "",
     logoFileName = "/fdm-high-resolution-logo-transparent.png",
@@ -78,13 +81,26 @@ export const InvitationEmail = ({
                             er geschikt zijn voor een perceel. Je kunt bedrijven
                             aanmaken en met andere gebruikers samenwerken.
                         </Text>
-                        <Section className="mt-[32px] mb-[32px]">
+                        <Section className="mt-[32px] mb-[8px] text-center">
                             <Button
-                                href={`${appBaseUrl}/organization/invitations`}
-                                className="bg-[#0070f3] text-white rounded px-[12px] py-[12px] text-[14px] font-semibold no-underline"
+                                href={`${appBaseUrl}/organization/invitations/${invitationId}/respond?intent=accept`}
+                                className="bg-[#0070f3] text-white border-solid border-[#0070f3] border-2 rounded mx-[24px] px-[12px] py-[12px] text-[14px] font-semibold no-underline"
                             >
-                                Uitnodiging bekijken
+                                Accepteren
                             </Button>
+                            <Button
+                                href={`${appBaseUrl}/organization/invitations/${invitationId}/respond?intent=reject`}
+                                className="bg-[#f5f5f5] text-[#171717] border-solid border-[#171717] border-2 rounded mx-[24px] px-[12px] py-[12px] text-[14px] font-semibold no-underline"
+                            >
+                                Afwijzen
+                            </Button>
+                        </Section>
+                        <Section className="mt-[32px] mb-[32px] text-center">
+                            <Link
+                                href={`${appBaseUrl}/organization/invitations`}
+                            >
+                                of bekijk je uitnodigingen
+                            </Link>
                         </Section>
                         <Text className="text-black text-[14px] leading-[24px]">
                             Als je deze uitnodiging niet wilt accepteren, kun je

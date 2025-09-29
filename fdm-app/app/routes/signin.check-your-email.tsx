@@ -106,7 +106,7 @@ export default function SignIn() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-muted-foreground">
-                                    De aanmeldlink is 5 minuten geldig en kan
+                                    De aanmeldlink is 15 minuten geldig en kan
                                     maar één keer worden gebruikt.
                                 </p>
                             </CardContent>

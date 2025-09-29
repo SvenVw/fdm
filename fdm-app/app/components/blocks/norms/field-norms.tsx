@@ -5,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 
 interface Norm {
     normValue: number
@@ -39,7 +40,11 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
 
     return (
         <div>
-            <h2 className="text-2xl font-semibold mb-6">Perceelsniveau</h2>
+            <div className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <h2 className="text-2xl font-semibold mb-6">Perceelsniveau</h2>
+                <FieldFilterToggle />
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {fieldNorms.map((field) => (
                     <Card

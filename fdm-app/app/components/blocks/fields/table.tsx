@@ -41,6 +41,7 @@ import {
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
 import { useIsMobile } from "~/hooks/use-mobile"
+import { FieldFilterToggle } from "../../custom/field-filter-toggle"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -210,6 +211,7 @@ export function DataTable<TData extends FieldExtended, TValue>({
                                 })}
                         </DropdownMenuContent>
                     </DropdownMenu>
+                    <FieldFilterToggle />
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
