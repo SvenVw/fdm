@@ -22,6 +22,7 @@ import type {
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import { determineIfFieldIsProductiveByShape } from "./field"
 import {
     addHarvest,
     getHarvestableTypeOfCultivation,
@@ -29,7 +30,6 @@ import {
 } from "./harvest"
 import { createId } from "./id"
 import type { Timeframe } from "./timeframe"
-import { determineIfFieldIsProductiveByShape } from "./field"
 
 /**
  * Retrieves cultivations available in the enabled catalogues for a farm.

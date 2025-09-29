@@ -1,29 +1,29 @@
+import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
 import { createFdmAuth } from "./authentication"
 import type { FdmAuth } from "./authentication.d"
 import { listPrincipalsForResource } from "./authorization"
+import * as schema from "./db/schema"
 import {
     addFarm,
     getFarm,
     getFarms,
     grantRoleToFarm,
+    isAllowedToDeleteFarm,
     isAllowedToShareFarm,
     listPrincipalsForFarm,
+    removeFarm,
     revokePrincipalFromFarm,
     updateFarm,
     updateRoleOfPrincipalAtFarm,
-    removeFarm,
-    isAllowedToDeleteFarm,
 } from "./farm"
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
+import { addFertilizer, addFertilizerToCatalogue } from "./fertilizer"
+import { addField, getFields } from "./field"
 import { createId } from "./id"
 import { getPrincipal } from "./principal"
-import { addField, getFields } from "./field"
-import { addFertilizerToCatalogue, addFertilizer } from "./fertilizer"
-import * as schema from "./db/schema"
-import { eq } from "drizzle-orm"
 
 describe("Farm Functions", () => {
     let fdm: FdmServerType
@@ -586,8 +586,8 @@ describe("Farm Functions", () => {
     describe("removeFarm", () => {
         let testFarmId: string
         let testPrincipalId: string
-        let testFieldId: string
-        let testFertilizerId: string
+        let _testFieldId: string
+        let _testFertilizerId: string
         let testFertilizerCatalogueId: string
 
         beforeAll(async () => {
@@ -614,7 +614,7 @@ describe("Farm Functions", () => {
             )
 
             // Add a field to the farm
-            testFieldId = await addField(
+            _testFieldId = await addField(
                 fdm,
                 testPrincipalId,
                 testFarmId,
@@ -649,7 +649,7 @@ describe("Farm Functions", () => {
             )
 
             // Add an acquired fertilizer to the farm
-            testFertilizerId = await addFertilizer(
+            _testFertilizerId = await addFertilizer(
                 fdm,
                 testPrincipalId,
                 testFertilizerCatalogueId,

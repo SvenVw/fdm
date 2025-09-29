@@ -1,4 +1,4 @@
-import { type fdmSchema } from "@svenvw/fdm-core"
+import type { fdmSchema } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import {
     calculateBulkDensity,
@@ -6,6 +6,7 @@ import {
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
+import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenSupply } from "./supply"
@@ -21,7 +22,6 @@ import type {
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
 } from "./types"
-import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 
 /**
  * Calculates the nitrogen balance for a set of fields, considering nitrogen supply, removal, and emission.

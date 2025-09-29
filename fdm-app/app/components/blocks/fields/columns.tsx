@@ -1,8 +1,10 @@
 import type { ColumnDef } from "@tanstack/react-table"
-import { MoreHorizontal, ArrowUpRightFromSquare } from "lucide-react"
+import { ArrowUpRightFromSquare, MoreHorizontal } from "lucide-react"
 import { NavLink } from "react-router-dom"
+import { getCultivationColor } from "~/components/custom/cultivation-colors"
 import { Badge } from "~/components/ui/badge"
-import { DataTableColumnHeader } from "./column-header"
+import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,9 +12,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { Button } from "~/components/ui/button"
-import { Checkbox } from "~/components/ui/checkbox"
-import { getCultivationColor } from "~/components/custom/cultivation-colors"
+import { DataTableColumnHeader } from "./column-header"
 
 export type FieldExtended = {
     b_id: string
@@ -78,7 +78,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
     {
         accessorKey: "cultivations",
         enableSorting: true,
-        sortingFn: (rowA, rowB, columnId) => {
+        sortingFn: (rowA, rowB, _columnId) => {
             const cultivationA = rowA.original.cultivations[0]?.b_lu_name || ""
             const cultivationB = rowB.original.cultivations[0]?.b_lu_name || ""
             return cultivationA.localeCompare(cultivationB)
@@ -117,7 +117,7 @@ export const columns: ColumnDef<FieldExtended>[] = [
     {
         accessorKey: "fertilizerApplications",
         enableSorting: true,
-        sortingFn: (rowA, rowB, columnId) => {
+        sortingFn: (rowA, rowB, _columnId) => {
             const fertilizerA =
                 rowA.original.fertilizerApplications[0]?.p_name_nl || ""
             const fertilizerB =

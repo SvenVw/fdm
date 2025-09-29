@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import {
     Tooltip,
@@ -5,7 +6,6 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
-import { AlertTriangle } from "lucide-react"
 
 interface FarmNormsProps {
     farmNorms: {

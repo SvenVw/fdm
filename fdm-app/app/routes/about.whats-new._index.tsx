@@ -154,8 +154,9 @@ export const changelogEntries: ChangelogEntry[] = [
     {
         version: "v0.17.0",
         date: "14 Maart 2025",
-        title: `Lancering 🎉`,
-        description: `Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen.`,
+        title: "Lancering 🎉",
+        description:
+            "Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen.",
         items: [
             "Account aanmaken",
             "Bedrijven aanmaken",
@@ -209,7 +210,7 @@ export default function WhatsNew() {
             </Header>
             <main className="mx-auto">
                 <Changelog1
-                    title={"Wat is er nieuw in " + clientConfig.name + "? 🚀"}
+                    title={`Wat is er nieuw in ${clientConfig.name}? 🚀`}
                     description={
                         "Benieuwd naar de laatste updates en nieuwe features van " +
                         clientConfig.name +

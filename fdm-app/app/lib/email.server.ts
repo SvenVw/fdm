@@ -77,7 +77,11 @@ export async function renderMagicLinkEmail(
     const timeZone = getTimeZoneFromUrl(magicLinkUrl)
 
     // Show the local time only if available, otherwise show server time
-    const emailTimestamp: string = format(timeZone ? TZDate.tz(timeZone) : new Date(), "Pp", { locale: nl })
+    const emailTimestamp: string = format(
+        timeZone ? TZDate.tz(timeZone) : new Date(),
+        "Pp",
+        { locale: nl },
+    )
 
     const emailHtml = await render(
         MagicLinkEmail({

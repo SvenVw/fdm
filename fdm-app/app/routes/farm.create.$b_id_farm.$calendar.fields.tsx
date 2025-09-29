@@ -1,5 +1,6 @@
 import { getFarm, getFields } from "@svenvw/fdm-core"
 import { ArrowLeft } from "lucide-react"
+import { useMemo } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -10,8 +11,16 @@ import {
 } from "react-router"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarmCreate } from "~/components/blocks/header/create-farm"
+import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
 import { SidebarPage } from "~/components/custom/sidebar-page"
 import { Button } from "~/components/ui/button"
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
@@ -21,15 +30,6 @@ import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { cn } from "~/lib/utils"
 import { useFieldFilterStore } from "~/store/field-filter"
-import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "~/components/ui/card"
-import { useMemo } from "react"
 
 // Meta
 export const meta: MetaFunction = () => {

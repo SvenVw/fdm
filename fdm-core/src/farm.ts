@@ -2,20 +2,20 @@ import { asc, eq, inArray } from "drizzle-orm"
 import {
     checkPermission,
     getRolesOfPrincipalForResource,
+    grantRole,
     listPrincipalsForResource,
     listResources,
     revokePrincipal,
-    grantRole,
     updateRole,
 } from "./authorization"
 import type { PrincipalId, Role } from "./authorization.d"
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import { removeField } from "./field"
 import { createId } from "./id"
 import { getPrincipal, identifyPrincipal } from "./principal"
 import type { Principal } from "./principal.d"
-import { removeField } from "./field"
 
 /**
  * Creates a new farm record and assigns the "owner" role to the specified principal.

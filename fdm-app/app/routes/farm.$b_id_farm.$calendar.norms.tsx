@@ -4,7 +4,6 @@ import {
     type GebruiksnormResult,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
-import { AlertTriangle, CircleAlert } from "lucide-react"
 import { Suspense, use } from "react"
 import {
     data,
@@ -17,9 +16,14 @@ import {
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
+import { HeaderNorms } from "~/components/blocks/header/norms"
 import { FarmNorms } from "~/components/blocks/norms/farm-norms"
 import { FieldNorms } from "~/components/blocks/norms/field-norms"
 import { NormsFallback } from "~/components/blocks/norms/skeletons"
+import { Alert, AlertDescription } from "~/components/ui/alert"
+import { Button } from "~/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
@@ -27,11 +31,6 @@ import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
-import { HeaderNorms } from "~/components/blocks/header/norms"
-import { Alert, AlertDescription } from "~/components/ui/alert"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
 
 interface FieldNorm {
     b_id: string

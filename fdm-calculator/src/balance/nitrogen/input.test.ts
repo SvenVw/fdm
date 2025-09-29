@@ -154,7 +154,7 @@ describe("collectInputForNitrogenBalance", () => {
             {
                 p_app_id: "fa-1",
                 p_id_catalogue: "fert-1",
-                p_name_nl: 'test-product',
+                p_name_nl: "test-product",
                 p_app_amount: 100,
                 p_app_method: "broadcasting", // match one of ApplicationMethods
                 p_app_date: new Date(),

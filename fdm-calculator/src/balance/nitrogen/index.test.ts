@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest"
-import {
-    calculateNitrogenBalance,
-    combineSoilAnalyses,
-    getFdmPublicDataUrl,
-} from "."
+import { calculateNitrogenBalance, combineSoilAnalyses } from "."
 import type {
     FieldInput,
     NitrogenBalanceInput,

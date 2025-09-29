@@ -50,7 +50,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             organizationName: invitation.organization_name,
             role: invitation.role,
         }
-    } catch (e) {
+    } catch (_e) {
         throw data("Invitation not found", 404)
     }
 }

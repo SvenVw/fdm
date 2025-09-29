@@ -33,9 +33,9 @@ export function FarmDeleteDialog({
                     <AlertDialogTitle>Weet je het zeker?</AlertDialogTitle>
                     <AlertDialogDescription>
                         Deze actie kan niet ongedaan worden gemaakt. Dit
-                        verwijdert het bedrijf "{farmName}" en alle
-                        bijbehorende gegevens, inclusief percelen, gewassen,
-                        bemestingen, bodemanalyses en oogsten.
+                        verwijdert het bedrijf "{farmName}" en alle bijbehorende
+                        gegevens, inclusief percelen, gewassen, bemestingen,
+                        bodemanalyses en oogsten.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

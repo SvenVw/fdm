@@ -514,9 +514,7 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(260)
-        expect(result.normSource).toEqual(
-            "Bladgewassen, Spinazie (1e teelt).",
-        )
+        expect(result.normSource).toEqual("Bladgewassen, Spinazie (1e teelt).")
     })
 
     it("should return the correct norm for Bladgewassen, Slasoorten (1e teelt)", async () => {

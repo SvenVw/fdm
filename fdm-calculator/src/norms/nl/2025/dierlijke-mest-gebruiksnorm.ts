@@ -1,11 +1,11 @@
 import type { Field } from "@svenvw/fdm-core"
+import { getGeoTiffValue } from "../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
     NL2025NormsInput,
 } from "./types.d"
-import { getGeoTiffValue } from "../../../shared/geotiff"
-import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
