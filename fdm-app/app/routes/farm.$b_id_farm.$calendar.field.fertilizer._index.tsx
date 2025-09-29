@@ -399,6 +399,11 @@ export default function FarmFieldFertilizerAddIndex() {
                                             }
                                             action={`${location.pathname}${location.search}`}
                                             navigation={navigation}
+                                            b_id_farm={loaderData.b_id_farm}
+                                            b_id_or_b_lu_catalogue={
+                                                searchParams.get("fieldIds") ||
+                                                ""
+                                            }
                                         />
                                     ) : (
                                         <div className="flex h-full min-h-60 items-center justify-center rounded-md border border-dashed">

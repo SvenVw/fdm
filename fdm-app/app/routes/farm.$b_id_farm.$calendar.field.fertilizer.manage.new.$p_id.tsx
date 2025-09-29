@@ -18,6 +18,7 @@ import { redirectWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
 import { FarmNewFertilizerBlock } from "~/components/blocks/fertilizer/new-fertilizer-page"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -28,7 +29,7 @@ export const meta: MetaFunction = () => {
         { title: `Meststof | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekij de details van deze meststof",
+            content: "Bekijk de details van deze meststof",
         },
     ]
 }
@@ -50,6 +51,14 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             throw data("invalid: p_id", {
                 status: 400,
                 statusText: "invalid: p_id",
+            })
+        }
+
+        const searchParams = new URL(request.url).searchParams
+        if (!searchParams.has("fieldIds")) {
+            throw data("missing: fieldIds", {
+                status: 400,
+                statusText: "missing: fieldIds",
             })
         }
 
@@ -134,9 +143,20 @@ export async function action({ request, params }: ActionFunctionArgs) {
         if (!b_id_farm) {
             throw new Error("missing: b_id_farm")
         }
+
         if (!p_id) {
             throw new Error("missing: p_id")
         }
+
+        const searchParams = new URL(request.url).searchParams
+        if (!searchParams.has("fieldIds")) {
+            throw data("missing: fieldIds", {
+                status: 400,
+                statusText: "missing: fieldIds",
+            })
+        }
+
+        const calendar = getCalendar(params)
 
         const session = await getSession(request)
         const formValues = await extractFormValuesFromRequest(
@@ -200,7 +220,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
-        await addFertilizer(
+        const new_p_id = await addFertilizer(
             fdm,
             session.principal_id,
             p_id_catalogue,
@@ -209,9 +229,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${searchParams.get("fieldIds")}&p_id=${new_p_id}`,
+            {
+                message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }

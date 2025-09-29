@@ -1,9 +1,6 @@
 import {
     addFertilizer,
     addFertilizerToCatalogue,
-    getFarm,
-    getFarms,
-    getFertilizer,
     getFertilizerParametersDescription,
     getFertilizers,
 } from "@svenvw/fdm-core"
@@ -16,8 +13,9 @@ import {
 } from "react-router"
 import { redirectWithSuccess } from "remix-toast"
 import { FormSchema } from "~/components/blocks/fertilizer/formschema"
-import { FarmNewFertilizerBlock } from "~/components/blocks/fertilizer/new-fertilizer-page"
+import { FarmNewCustomFertilizerBlock } from "~/components/blocks/fertilizer/new-custom-fertilizer-page"
 import { getSession } from "~/lib/auth.server"
+import { getCalendar } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
@@ -25,10 +23,11 @@ import { extractFormValuesFromRequest } from "~/lib/form"
 
 export const meta: MetaFunction = () => {
     return [
-        { title: `Meststof | ${clientConfig.name}` },
+        { title: `Meststof toevoegen | ${clientConfig.name}` },
         {
             name: "description",
-            content: "Bekij de details van deze meststof",
+            content:
+                "Voeg een meststof toe om deze te gebruiken op dit bedrijf.",
         },
     ]
 }
@@ -44,46 +43,69 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the fertilizer id
-        const p_id = params.p_id
-        if (!p_id) {
-            throw data("invalid: p_id", {
+        const searchParams = new URL(request.url).searchParams
+        if (!searchParams.has("fieldIds")) {
+            throw data("missing: fieldIds", {
                 status: 400,
-                statusText: "invalid: p_id",
+                statusText: "missing: fieldIds",
             })
         }
 
         // Get the session
         const session = await getSession(request)
 
-        // Get details of farm
-        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-        if (!farm) {
-            throw data("not found: b_id_farm", {
-                status: 404,
-                statusText: "not found: b_id_farm",
-            })
-        }
-
-        // Get a list of possible farms of the user
-        const farms = await getFarms(fdm, session.principal_id)
-        if (!farms || farms.length === 0) {
-            throw data("not found: farms", {
-                status: 404,
-                statusText: "not found: farms",
-            })
-        }
-
-        const farmOptions = farms.map((farm) => {
-            return {
-                b_id_farm: farm.b_id_farm,
-                b_name_farm: farm.b_name_farm,
-            }
-        })
-
         // Get selected fertilizer
-        const fertilizer = await getFertilizer(fdm, p_id)
         const fertilizerParameters = getFertilizerParametersDescription()
+
+        const fertilizer = {
+            p_id: undefined, // Added p_id
+            p_source: b_id_farm,
+            p_name_nl: "",
+            p_type: undefined,
+            p_dm: undefined,
+            p_density: undefined,
+            p_om: undefined,
+            p_a: undefined,
+            p_hc: undefined,
+            p_eom: undefined,
+            p_eoc: undefined,
+            p_c_rt: undefined,
+            p_c_of: undefined,
+            p_c_if: undefined,
+            p_c_fr: undefined,
+            p_cn_of: undefined,
+            p_n_rt: undefined,
+            p_n_if: undefined,
+            p_n_of: undefined,
+            p_n_wc: undefined,
+            p_no3_rt: undefined,
+            p_nh4_rt: undefined,
+            p_p_rt: undefined,
+            p_k_rt: undefined,
+            p_mg_rt: undefined,
+            p_ca_rt: undefined,
+            p_ne: undefined,
+            p_s_rt: undefined,
+            p_s_wc: undefined,
+            p_cu_rt: undefined,
+            p_zn_rt: undefined,
+            p_na_rt: undefined,
+            p_si_rt: undefined,
+            p_b_rt: undefined,
+            p_mn_rt: undefined,
+            p_ni_rt: undefined,
+            p_fe_rt: undefined,
+            p_mo_rt: undefined,
+            p_co_rt: undefined,
+            p_as_rt: undefined,
+            p_cd_rt: undefined,
+            p_cr_rt: undefined,
+            p_cr_vi: undefined,
+            p_pb_rt: undefined,
+            p_hg_rt: undefined,
+            p_cl_rt: undefined,
+            p_app_method_options: [],
+        }
 
         // Get the available fertilizers
         const fertilizers = await getFertilizers(
@@ -100,13 +122,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         // Return user information from loader
         return {
-            farm: farm,
-            p_id: p_id,
-            b_id_farm: b_id_farm,
-            farmOptions: farmOptions,
             fertilizerOptions: fertilizerOptions,
             fertilizer: fertilizer,
-            editable: true,
             fertilizerParameters: fertilizerParameters,
         }
     } catch (error) {
@@ -123,22 +140,21 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function FarmFertilizerPage() {
     const loaderData = useLoaderData<typeof loader>()
 
-    return <FarmNewFertilizerBlock loaderData={loaderData} />
+    return <FarmNewCustomFertilizerBlock loaderData={loaderData} />
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
     try {
+        const searchParams = new URL(request.url).searchParams
         const b_id_farm = params.b_id_farm
-        const p_id = params.p_id
 
         if (!b_id_farm) {
             throw new Error("missing: b_id_farm")
         }
-        if (!p_id) {
-            throw new Error("missing: p_id")
-        }
 
         const session = await getSession(request)
+        const calendar = getCalendar(params)
+
         const formValues = await extractFormValuesFromRequest(
             request,
             FormSchema,
@@ -200,7 +216,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
             },
         )
 
-        await addFertilizer(
+        const new_p_id = await addFertilizer(
             fdm,
             session.principal_id,
             p_id_catalogue,
@@ -209,9 +225,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
             undefined,
         )
 
-        return redirectWithSuccess(`/farm/${b_id_farm}/fertilizers`, {
-            message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
-        })
+        return redirectWithSuccess(
+            `/farm/${b_id_farm}/${calendar}/field/fertilizer?fieldIds=${searchParams.get("fieldIds")}&p_id=${new_p_id}`,
+            {
+                message: `${formValues.p_name_nl} is toegevoegd! 🎉`,
+            },
+        )
     } catch (error) {
         throw handleActionError(error)
     }
