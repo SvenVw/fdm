@@ -4,7 +4,7 @@ import {
     type GebruiksnormResult,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, CircleAlert } from "lucide-react"
 import { Suspense, use } from "react"
 import {
     data,
@@ -35,6 +35,17 @@ import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Separator } from "~/components/ui/separator"
 import { useFarmFieldOptionsStore } from "~/store/farm-field-options"
+
+interface FieldNorm {
+    b_id: string
+    b_area: number
+    norms?: {
+        manure: GebruiksnormResult
+        phosphate: GebruiksnormResult
+        nitrogen: GebruiksnormResult
+    }
+    errorMessage?: string
+}
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -107,25 +118,17 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 return {}
             }
 
-            let fieldNorms = undefined as
-                | {
-                      b_id: string
-                      b_area: number
-                      norms: {
-                          manure: GebruiksnormResult
-                          phosphate: GebruiksnormResult
-                          nitrogen: GebruiksnormResult
-                      }
-                  }[]
-                | undefined
+            let fieldNorms = undefined as FieldNorm[] | undefined
             let farmNorms = undefined as AggregatedNormsToFarmLevel | undefined
             let errorMessage = null as string | null
+            let hasFieldNormErrors = false
+            const fieldErrorMessages: string[] = []
             try {
                 // Calculate norms per field
                 const functionsForms = createFunctionsForNorms("NL", calendar)
 
-                fieldNorms = await Promise.all(
-                    fields.map(async (field) => {
+                const fieldNormPromises = fields.map(async (field) => {
+                    try {
                         // Collect the input
                         const input = await functionsForms.collectInputForNorms(
                             fdm,
@@ -140,7 +143,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 functionsForms.calculateNormForPhosphate(input),
                                 functionsForms.calculateNormForNitrogen(input),
                             ])
-                        // const normNitrogen = { normValue: 230, normSource: "test" }
 
                         return {
                             b_id: field.b_id,
@@ -151,12 +153,70 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                                 nitrogen: normNitrogen,
                             },
                         }
-                    }),
-                )
+                    } catch (error) {
+                        hasFieldNormErrors = true
+                        const fieldName =
+                            fields.find((f) => f.b_id === field.b_id)?.b_name ||
+                            `Perceel ${field.b_id}`
+                        fieldErrorMessages.push(
+                            `${fieldName}: ${String(error).replace(
+                                "Error: ",
+                                "",
+                            )}`,
+                        )
+                        return {
+                            b_id: field.b_id,
+                            b_area: field.b_area,
+                            errorMessage: String(error).replace("Error: ", ""),
+                        }
+                    }
+                })
+
+                const results = await Promise.allSettled(fieldNormPromises)
+
+                fieldNorms = results.map((result) => {
+                    if (result.status === "fulfilled") {
+                        return result.value
+                    }
+                    // This case should ideally not be hit if individual promises catch their errors,
+                    // but it's a safeguard for unexpected rejections.
+                    hasFieldNormErrors = true
+                    const fallbackFieldId = "unknown"
+                    const fallbackFieldName =
+                        fields.find((f) => f.b_id === fallbackFieldId)
+                            ?.b_name || `Perceel ${fallbackFieldId}`
+                    fieldErrorMessages.push(
+                        `${fallbackFieldName}: ${String(result.reason).replace(
+                            "Error: ",
+                            "",
+                        )}`,
+                    )
+                    return {
+                        b_id: fallbackFieldId, // Fallback ID
+                        b_area: 0, // Fallback area
+                        errorMessage: String(result.reason).replace(
+                            "Error: ",
+                            "",
+                        ),
+                    }
+                })
 
                 // Aggregate the norms to farm level
+                const validFieldNorms = (fieldNorms || []).filter(
+                    (field) => field.norms !== undefined,
+                ) as {
+                    b_id: string
+                    b_area: number
+                    norms: {
+                        manure: GebruiksnormResult
+                        phosphate: GebruiksnormResult
+                        nitrogen: GebruiksnormResult
+                    }
+                }[]
                 farmNorms =
-                    await functionsForms.aggregateNormsToFarmLevel(fieldNorms)
+                    await functionsForms.aggregateNormsToFarmLevel(
+                        validFieldNorms,
+                    )
             } catch (error) {
                 errorMessage = String(error).replace("Error: ", "")
             }
@@ -166,6 +226,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 errorMessage: errorMessage,
                 fieldNorms: fieldNorms,
                 farmNorms: farmNorms,
+                hasFieldNormErrors: hasFieldNormErrors,
+                fieldErrorMessages: fieldErrorMessages,
             }
         })()
 
@@ -223,7 +285,13 @@ export default function FarmNormsBlock() {
  * would not render until `asyncData` resolves and the fallback would never be shown.
  */
 function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
-    const { farmNorms, fieldNorms, errorMessage } = use(loaderData.asyncData)
+    const {
+        farmNorms,
+        fieldNorms,
+        errorMessage,
+        hasFieldNormErrors,
+        fieldErrorMessages,
+    } = use(loaderData.asyncData)
     const { showProductiveOnly } = useFieldFilterStore()
 
     const location = useLocation()
@@ -270,7 +338,7 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
         const fieldOptions = loaderData.fields
             .filter((f) => f?.b_id && f?.b_name)
             .map((f) => ({ b_id: f.b_id, b_name: f.b_name }))
-            
+
         const fieldsMap = new Map(loaderData.fields.map((f) => [f.b_id, f]))
         const filteredFieldNorms = fieldNorms.filter((fieldNorm) => {
             if (!showProductiveOnly) return true
@@ -281,7 +349,6 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
         return (
             <div className="space-y-6 px-10 pb-16">
                 <Alert className="mb-8  border-amber-200 bg-amber-50">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
                     <AlertDescription className="text-amber-800">
                         <strong>Disclaimer:</strong> Deze getallen zijn
                         uitsluitend bedoeld voor informatieve doeleinden. De
@@ -291,7 +358,11 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
                         definitieve normen.
                     </AlertDescription>
                 </Alert>
-                <FarmNorms farmNorms={farmNorms} />
+                <FarmNorms
+                    farmNorms={farmNorms}
+                    hasFieldNormErrors={hasFieldNormErrors}
+                    fieldErrorMessages={fieldErrorMessages}
+                />
                 <Separator className="my-8" />
                 <FieldNorms
                     fieldNorms={filteredFieldNorms}
@@ -300,7 +371,7 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
             </div>
         )
     }
-
+    // This block is now an independent return, not an else clause
     return (
         <div className="mx-auto flex h-full w-full items-center flex-col justify-center space-y-6">
             <div className="flex flex-col space-y-2 text-center">
