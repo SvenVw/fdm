@@ -51,7 +51,7 @@ export async function calculateAllFieldsNitrogenSupplyByDeposition(
         const value = await getGeoTiffValue(url, longitude, latitude)
 
         let depositionValue = new Decimal(0)
-        if (value !== null) {
+        if (value !== null && Number.isFinite(value)) {
             depositionValue = new Decimal(value).times(fraction)
         }
 
