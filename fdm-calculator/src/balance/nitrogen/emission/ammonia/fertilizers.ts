@@ -260,6 +260,9 @@ function determineManureAmmoniaEmissionFactor(
         if (p_app_method === "shallow injection") {
             return new Decimal(0.24)
         }
+        if (p_app_method === "injection") {
+            return new Decimal(0.02)
+        }
         if (p_app_method === "incorporation") {
             return new Decimal(0.22)
         }
@@ -283,6 +286,9 @@ function determineManureAmmoniaEmissionFactor(
     }
     if (p_app_method === "shallow injection") {
         return new Decimal(0.25)
+    }
+    if (p_app_method === "injection") {
+        return new Decimal(0.02)
     }
     if (p_app_method === "incorporation") {
         return new Decimal(0.22)
