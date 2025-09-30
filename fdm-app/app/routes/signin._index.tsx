@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Check, Cookie, Info } from "lucide-react"
+import { useEffect } from "react"
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
@@ -35,7 +36,6 @@ import { clientConfig } from "~/lib/config"
 import { handleActionError, handleLoaderError } from "~/lib/error"
 import { cn } from "~/lib/utils"
 import { extractFormValuesFromRequest } from "../lib/form"
-import { useEffect } from "react"
 
 export const meta: MetaFunction = () => {
     return [

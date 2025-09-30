@@ -116,7 +116,7 @@ export function SidebarPlatform() {
 }
 
 const openCookieSettings = () => {
-    if (typeof window !== "undefined" && window.openCookieSettings) {
+    if (window?.openCookieSettings) {
         window.openCookieSettings()
     }
 }

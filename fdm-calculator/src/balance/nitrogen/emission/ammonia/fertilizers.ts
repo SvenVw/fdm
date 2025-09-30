@@ -1,3 +1,4 @@
+import type { FertilizerApplication } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import type {
     CultivationDetail,
@@ -5,7 +6,6 @@ import type {
     FieldInput,
     NitrogenEmissionAmmoniaFertilizers,
 } from "../../types"
-import type { FertilizerApplication } from "@svenvw/fdm-core"
 
 /**
  * Calculates the total ammonia emission from all fertilizer sources (mineral, manure, compost and other fertilizers).
@@ -243,7 +243,8 @@ function determineManureAmmoniaEmissionFactor(
             `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) on grassland`,
         )
         return new Decimal(0)
-    } else if (landType === "cropland") {
+    }
+    if (landType === "cropland") {
         if (p_app_method === "broadcasting") {
             return new Decimal(0.69)
         }
@@ -266,29 +267,28 @@ function determineManureAmmoniaEmissionFactor(
             `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for cropland`,
         )
         return new Decimal(0)
-    } else {
-        // Bare soil
-        if (p_app_method === "broadcasting") {
-            return new Decimal(0.69)
-        }
-        if (p_app_method === "incorporation 2 tracks") {
-            return new Decimal(0.46)
-        }
-        if (p_app_method === "narrowband") {
-            return new Decimal(0.36)
-        }
-        if (p_app_method === "slotted coulter") {
-            return new Decimal(0.3)
-        }
-        if (p_app_method === "shallow injection") {
-            return new Decimal(0.25)
-        }
-        if (p_app_method === "incorporation") {
-            return new Decimal(0.22)
-        }
-        console.warn(
-            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
-        )
-        return new Decimal(0)
     }
+    // Bare soil
+    if (p_app_method === "broadcasting") {
+        return new Decimal(0.69)
+    }
+    if (p_app_method === "incorporation 2 tracks") {
+        return new Decimal(0.46)
+    }
+    if (p_app_method === "narrowband") {
+        return new Decimal(0.36)
+    }
+    if (p_app_method === "slotted coulter") {
+        return new Decimal(0.3)
+    }
+    if (p_app_method === "shallow injection") {
+        return new Decimal(0.25)
+    }
+    if (p_app_method === "incorporation") {
+        return new Decimal(0.22)
+    }
+    console.warn(
+        `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
+    )
+    return new Decimal(0)
 }

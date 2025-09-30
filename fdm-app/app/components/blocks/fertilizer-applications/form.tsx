@@ -116,7 +116,7 @@ export function FertilizerApplicationForm({
         fieldFertilizerFormStore.delete,
     ])
 
-    function handleManageFertilizers(e: MouseEvent<HTMLButtonElement>) {
+    function handleManageFertilizers(_e: MouseEvent<HTMLButtonElement>) {
         if (b_id_farm && b_id_or_b_lu_catalogue) {
             fieldFertilizerFormStore.save(
                 b_id_farm,

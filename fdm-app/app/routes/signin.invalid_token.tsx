@@ -66,7 +66,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
  */
 export default function SignIn() {
     const openCookieSettings = () => {
-        if (typeof window !== "undefined" && window.openCookieSettings) {
+        if (window?.openCookieSettings) {
             window.openCookieSettings()
         }
     }

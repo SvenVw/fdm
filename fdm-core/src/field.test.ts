@@ -375,7 +375,7 @@ describe("Farm Data Model", () => {
                     start: new Date("2023-03-01"),
                     end: undefined,
                 })
-                
+
                 expect(fields4.length).toBe(3)
                 expect(fields4.map((f) => f.b_name)).toEqual(
                     expect.arrayContaining([
@@ -669,7 +669,7 @@ describe("Farm Data Model", () => {
             const field = await getField(fdm, principal_id, b_id)
             expect(field.b_name).toBe(fieldName)
             expect(field.b_perimeter).toBeGreaterThan(0)
-            expect(field.b_perimeter).toBeGreaterThan(4000000) 
+            expect(field.b_perimeter).toBeGreaterThan(4000000)
             expect(field.b_isproductive).toBe(true)
         })
     })

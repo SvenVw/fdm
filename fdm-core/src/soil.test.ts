@@ -16,6 +16,7 @@ import {
     updateSoilAnalysis,
 } from "./soil"
 import type { CurrentSoilData } from "./soil.d"
+
 type Polygon = schema.fieldsTypeInsert["b_geometry"]
 
 describe("Soil Analysis Functions", () => {

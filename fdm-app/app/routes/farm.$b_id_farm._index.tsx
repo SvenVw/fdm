@@ -1,31 +1,39 @@
+import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
+import {
+    ArrowRightLeft,
+    BookOpenText,
+    ChevronUp,
+    Home,
+    Landmark,
+    MapIcon,
+    Plus,
+    Shapes,
+    Square,
+    Trash2,
+    UserRoundCheck,
+} from "lucide-react"
 import {
     data,
-    NavLink,
-    Outlet,
-    useLoaderData,
     type LoaderFunctionArgs,
     type MetaFunction,
+    NavLink,
+    useLoaderData,
 } from "react-router"
 import { getSession } from "~/lib/auth.server"
 import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { useCalendarStore } from "../store/calendar"
-import { SidebarInset } from "../components/ui/sidebar"
+import { handleLoaderError } from "~/lib/error"
+import { FarmContent } from "../components/blocks/farm/farm-content"
+import { FarmTitle } from "../components/blocks/farm/farm-title"
 import { Header } from "../components/blocks/header/base"
 import { HeaderFarm } from "../components/blocks/header/farm"
-import { FarmTitle } from "../components/blocks/farm/farm-title"
-import { FarmContent } from "../components/blocks/farm/farm-content"
-import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
-import { fdm } from "../lib/fdm.server"
+import { Button } from "../components/ui/button"
 import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from "../components/ui/card"
-import { Button } from "../components/ui/button"
 import {
     Select,
     SelectContent,
@@ -33,23 +41,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "../components/ui/select"
-import {
-    ArrowRightLeft,
-    BookOpenText,
-    ChevronsUp,
-    ChevronUp,
-    Home,
-    Landmark,
-    MapIcon,
-    Plus,
-    Settings,
-    Shapes,
-    Square,
-    Trash2,
-    UserRoundCheck,
-    Zap,
-} from "lucide-react"
+import { SidebarInset } from "../components/ui/sidebar"
 import { getCalendarSelection } from "../lib/calendar"
+import { fdm } from "../lib/fdm.server"
+import { useCalendarStore } from "../store/calendar"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -179,9 +174,7 @@ export default function FarmDashboardIndex() {
                                             </CardHeader>
                                         </Card>
                                     </NavLink>
-                                    <NavLink
-                                        to={`${calendar}/field`}
-                                    >
+                                    <NavLink to={`${calendar}/field`}>
                                         <Card className="transition-all hover:shadow-md">
                                             <CardHeader>
                                                 <div className="flex items-center gap-4">
@@ -193,7 +186,10 @@ export default function FarmDashboardIndex() {
                                                             Perceelsoverzicht
                                                         </CardTitle>
                                                         <CardDescription>
-                                                            Uitgebreide tabel met o.a. gewassen en meststoffen per perceel.
+                                                            Uitgebreide tabel
+                                                            met o.a. gewassen en
+                                                            meststoffen per
+                                                            perceel.
                                                         </CardDescription>
                                                     </div>
                                                 </div>

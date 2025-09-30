@@ -134,18 +134,12 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                                                 Stikstof uit dierlijke mest
                                             </p>
                                             <p className="text-sm text-gray-600">
-                                                {
-                                                    field.norms?.manure
-                                                        .normSource
-                                                }
+                                                {field.norms?.manure.normSource}
                                             </p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xl font-bold text-gray-800">
-                                                {
-                                                    field.norms?.manure
-                                                        .normValue
-                                                }{" "}
+                                                {field.norms?.manure.normValue}{" "}
                                                 <span className="text-sm font-normal text-gray-600">
                                                     kg N / ha
                                                 </span>

@@ -78,7 +78,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get details of fields
     const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
-       const asyncData = (async () => {
+    const asyncData = (async () => {
         // Collect input data for nutrient balance calculation
         const nitrogenBalanceInput = await collectInputForNitrogenBalance(
             fdm,

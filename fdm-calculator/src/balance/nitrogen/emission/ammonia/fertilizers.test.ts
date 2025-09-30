@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest"
-import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 import type {
     CultivationDetail,
     FertilizerDetail,
     FieldInput,
 } from "../../types"
+import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 
 describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()

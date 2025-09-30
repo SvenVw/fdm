@@ -5,9 +5,11 @@ import {
     getFertilizers,
     getFields,
 } from "@svenvw/fdm-core"
+import { Info } from "lucide-react"
+import { useState } from "react"
 import {
-    data,
     type ActionFunctionArgs,
+    data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
@@ -17,19 +19,18 @@ import {
     useNavigation,
     useSearchParams,
 } from "react-router"
+import { dataWithError, redirectWithSuccess } from "remix-toast"
+import { z } from "zod"
+import { FarmContent } from "~/components/blocks/farm/farm-content"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
+import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
+import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
 import { Header } from "~/components/blocks/header/base"
 import { HeaderFarm } from "~/components/blocks/header/farm"
-import { Button } from "~/components/ui/button"
-import { SidebarInset } from "~/components/ui/sidebar"
-import { getSession } from "~/lib/auth.server"
-import { getCalendar, getTimeframe } from "~/lib/calendar"
-import { clientConfig } from "~/lib/config"
-import { handleActionError, handleLoaderError } from "~/lib/error"
-import { fdm } from "~/lib/fdm.server"
-import { FarmContent } from "~/components/blocks/farm/farm-content"
+import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { Badge } from "~/components/ui/badge"
 import { BreadcrumbItem, BreadcrumbSeparator } from "~/components/ui/breadcrumb"
-import { FertilizerApplicationForm } from "~/components/blocks/fertilizer-applications/form"
+import { Button } from "~/components/ui/button"
 import {
     Card,
     CardContent,
@@ -38,8 +39,7 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
-import { Badge } from "~/components/ui/badge"
-import { useState } from "react"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
     Dialog,
     DialogContent,
@@ -49,13 +49,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "~/components/ui/dialog"
-import { Checkbox } from "~/components/ui/checkbox"
 import { Label } from "~/components/ui/label"
-import { FormSchema } from "~/components/blocks/fertilizer-applications/formschema"
-import { dataWithError, redirectWithSuccess } from "remix-toast"
-import { z } from "zod"
-import { Info } from "lucide-react"
-import { LoadingSpinner } from "~/components/custom/loadingspinner"
+import { SidebarInset } from "~/components/ui/sidebar"
+import { getSession } from "~/lib/auth.server"
+import { getCalendar, getTimeframe } from "~/lib/calendar"
+import { clientConfig } from "~/lib/config"
+import { handleActionError, handleLoaderError } from "~/lib/error"
+import { fdm } from "~/lib/fdm.server"
 import { extractFormValuesFromRequest } from "~/lib/form"
 
 export const meta: MetaFunction = () => {

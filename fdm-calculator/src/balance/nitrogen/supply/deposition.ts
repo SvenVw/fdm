@@ -1,7 +1,7 @@
 import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
-import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 import { getGeoTiffValue } from "../../../shared/geotiff"
+import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 
 /**
  * Calculates the nitrogen deposition for a batch of fields from a GeoTIFF file.

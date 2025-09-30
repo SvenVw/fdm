@@ -1,30 +1,29 @@
 import {
     type ColumnDef,
     type ColumnFiltersState,
+    type FilterFn,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getSortedRowModel,
-    type SortingState,
-    type RowSelectionState,
-    useReactTable,
-    VisibilityState,
     type Row,
-    type FilterFn,
+    type RowSelectionState,
+    type SortingState,
+    useReactTable,
+    type VisibilityState,
 } from "@tanstack/react-table"
+import fuzzysort from "fuzzysort"
 import { ChevronDown, Plus } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { NavLink, useParams } from "react-router-dom"
-import fuzzysort from "fuzzysort"
 import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
-import type { FieldExtended } from "./columns"
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu"
+import { Input } from "~/components/ui/input"
 import {
     Table,
     TableBody,
@@ -33,15 +32,16 @@ import {
     TableHeader,
     TableRow,
 } from "~/components/ui/table"
-import { cn } from "~/lib/utils"
 import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { useIsMobile } from "~/hooks/use-mobile"
+import { cn } from "~/lib/utils"
 import { FieldFilterToggle } from "../../custom/field-filter-toggle"
+import type { FieldExtended } from "./columns"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

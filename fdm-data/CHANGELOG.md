@@ -1,5 +1,15 @@
 # fdm-data
 
+## 0.17.0
+
+### Minor Changes
+
+- 16270d6: Add `p_ef_nh3` to synced values for `baat` catalogue
+
+### Patch Changes
+
+- e844f9d: Fixes unit of `p_ef_nh3` to be a fraction instead of percentage
+
 ## 0.16.0
 
 ### Minor Changes

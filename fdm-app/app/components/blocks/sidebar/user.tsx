@@ -169,7 +169,7 @@ export function SidebarUser({
 }
 
 const openCookieSettings = () => {
-    if (typeof window !== "undefined" && window.openCookieSettings) {
+    if (window?.openCookieSettings) {
         window.openCookieSettings()
     }
 }
