@@ -29,6 +29,7 @@ export interface CultivationPlan {
         b_id: schema.fieldsTypeSelect["b_id"]
         b_area: number
         b_name: schema.fieldsTypeSelect["b_name"]
+        b_isproductive: boolean
         fertilizer_applications: Array<{
             p_id_catalogue: schema.fertilizersCatalogueTypeSelect["p_id_catalogue"]
             p_name_nl: schema.fertilizersCatalogueTypeSelect["p_name_nl"]
@@ -38,10 +39,10 @@ export interface CultivationPlan {
             p_app_id: schema.fertilizerApplicationTypeSelect["p_app_id"]
         }>
         harvests: Array<{
-            b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_"]
+            b_id_harvesting: schema.cultivationHarvestingTypeSelect["b_id_harvesting"]
             b_lu_harvest_date: schema.cultivationHarvestingTypeSelect["b_lu_harvest_date"]
             harvestable: {
-                b_id_harvestable: schema.harvestableAnalysesTypeSelect["b_id_harvestable"]
+                b_id_harvestable: schema.harvestablesTypeSelect["b_id_harvestable"]
                 harvestable_analyses: Array<{
                     b_lu_yield: schema.harvestableAnalysesTypeSelect["b_lu_yield"]
                     b_lu_n_harvestable: schema.harvestableAnalysesTypeSelect["b_lu_n_harvestable"]

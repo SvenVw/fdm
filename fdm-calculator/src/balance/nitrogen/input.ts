@@ -27,7 +27,6 @@ import type { NitrogenBalanceInput } from "./types"
  * @param principal_id - The ID of the principal (user or service) initiating the data collection.
  * @param b_id_farm - The ID of the farm for which to collect the nitrogen balance input.
  * @param timeframe - The timeframe for which to collect the data.
- * @param fdmPublicDataUrl - The base URL for accessing FDM public data.
  * @returns A promise that resolves with a `NitrogenBalanceInput` object containing all the necessary data.
  * @throws {Error} - Throws an error if data collection or processing fails.
  *
@@ -38,7 +37,6 @@ export async function collectInputForNitrogenBalance(
     principal_id: PrincipalId,
     b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"],
     timeframe: Timeframe,
-    fdmPublicDataUrl: string,
 ): Promise<NitrogenBalanceInput> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
@@ -127,7 +125,6 @@ export async function collectInputForNitrogenBalance(
                 fertilizerDetails: fertilizerDetails,
                 cultivationDetails: cultivationDetails,
                 timeFrame: timeframe,
-                fdmPublicDataUrl: fdmPublicDataUrl,
             }
         })
     } catch (error) {

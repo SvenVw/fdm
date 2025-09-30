@@ -1,14 +1,16 @@
 import type { fdmSchema } from "@svenvw/fdm-core"
-import { Decimal } from "decimal.js"
+import Decimal from "decimal.js"
 import {
     calculateBulkDensity,
     calculateCarbonNitrogenRatio,
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
+import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
 import { calculateNitrogenSupply } from "./supply"
+import { calculateAllFieldsNitrogenSupplyByDeposition } from "./supply/deposition"
 import { calculateTargetForNitrogenBalance } from "./target"
 import type {
     CultivationDetail,
@@ -52,10 +54,34 @@ export async function calculateNitrogenBalance(
             cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
         )
 
-        // Calculate for each field the nitrogen balance
-        const fieldsWithBalance = await Promise.all(
-            fields.map(async (field: FieldInput) => {
-                return await calculateNitrogenBalanceField(
+        // Fetch all deposition data in a single, batched request to avoid requesting the GeoTIIF for every field
+        const depositionByField =
+            await calculateAllFieldsNitrogenSupplyByDeposition(
+                fields,
+                timeFrame,
+                fdmPublicDataUrl,
+            )
+
+        //
+        // Process fields in batches to control concurrency.
+        // Instead of running all fields in parallel with Promise.all, which can
+        // overwhelm the server for farms with many fields, we process them in
+        // smaller, manageable chunks. This provides more stable performance.
+        const batchSize = 50 // A sensible default, can be tuned based on profiling.
+        const fieldsWithBalance: NitrogenBalanceField[] = []
+
+        for (let i = 0; i < fields.length; i += batchSize) {
+            const batch = fields.slice(i, i + batchSize)
+            const batchResults = batch.map((field: FieldInput) => {
+                const depositionSupply = depositionByField.get(field.field.b_id)
+                if (!depositionSupply) {
+                    // This should not happen if the deposition calculation is correct
+                    throw new Error(
+                        `Deposition data not found for field ${field.field.b_id}`,
+                    )
+                }
+
+                return calculateNitrogenBalanceField(
                     field.field,
                     field.cultivations,
                     field.harvests,
@@ -64,13 +90,14 @@ export async function calculateNitrogenBalance(
                     fertilizerDetailsMap,
                     cultivationDetailsMap,
                     timeFrame,
-                    fdmPublicDataUrl,
+                    depositionSupply,
                 )
-            }),
-        )
+            })
+
+            fieldsWithBalance.push(...batchResults)
+        }
 
         // Aggregate the field balances to farm level
-        // calculateNitrogenBalancesFieldToFarm returns NitrogenBalance (with Decimals)
         const farmWithBalanceDecimal = calculateNitrogenBalancesFieldToFarm(
             fieldsWithBalance,
             fields,
@@ -105,11 +132,11 @@ export async function calculateNitrogenBalance(
  * @param fertilizerDetailsMap - A map containing details for each fertilizer.
  * @param cultivationDetailsMap - A map containing details for each cultivation.
  * @param timeFrame - The time frame for the calculation.
- * @param fdmPublicDataUrl - The URL for accessing public FDM data.
- * @returns A promise that resolves with the calculated nitrogen balance for the field.
+ * @param depositionSupply - The pre-calculated nitrogen supply from deposition.
+ * @returns The calculated nitrogen balance for the field.
  * @throws Throws an error if any of the calculations fail.
  */
-export async function calculateNitrogenBalanceField(
+export function calculateNitrogenBalanceField(
     field: FieldInput["field"],
     cultivations: FieldInput["cultivations"],
     harvests: FieldInput["harvests"],
@@ -118,32 +145,40 @@ export async function calculateNitrogenBalanceField(
     fertilizerDetailsMap: Map<string, FertilizerDetail>,
     cultivationDetailsMap: Map<string, CultivationDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
-    fdmPublicDataUrl: string,
-): Promise<NitrogenBalanceField> {
+    depositionSupply: NitrogenBalanceField["supply"]["deposition"],
+): NitrogenBalanceField {
     // Get the details of the field
     const fieldDetails = field
 
     // Combine soil analyses
     const soilAnalysis = combineSoilAnalyses(soilAnalyses)
 
-    // If timeframe is broader than field existence, shorten it
-    if (field.b_start?.getTime() > timeFrame.start.getTime()) {
-        timeFrame.start = field.b_start
+    // Use a field-local timeframe (intersection with input timeframe)
+    const timeFrameField = {
+        start:
+            field.b_start && field.b_start.getTime() > timeFrame.start.getTime()
+                ? field.b_start
+                : timeFrame.start,
+        end:
+            field.b_end && field.b_end.getTime() < timeFrame.end.getTime()
+                ? field.b_end
+                : timeFrame.end,
     }
-    if (field.b_end?.getTime() < timeFrame.end.getTime()) {
-        timeFrame.end = field.b_end
+    // Normalize: ensure start <= end
+    if (timeFrameField.end.getTime() < timeFrameField.start.getTime()) {
+        // Clamp to an empty interval at the boundary to signal “no overlap”
+        timeFrameField.end = timeFrameField.start
     }
 
     // Calculate the amount of Nitrogen supplied
-    const supply = await calculateNitrogenSupply(
-        field,
+    const supply = calculateNitrogenSupply(
         cultivations,
         fertilizerApplications,
         soilAnalysis,
         cultivationDetailsMap,
         fertilizerDetailsMap,
-        timeFrame,
-        fdmPublicDataUrl,
+        depositionSupply,
+        timeFrameField,
     )
 
     // Calculate the amount of Nitrogen removed
@@ -167,7 +202,7 @@ export async function calculateNitrogenBalanceField(
         cultivations,
         soilAnalysis,
         cultivationDetailsMap,
-        timeFrame,
+        timeFrameField,
     )
 
     return {
@@ -204,10 +239,10 @@ export function calculateNitrogenBalancesFieldToFarm(
     )
 
     // Calculate total weighted supply, removal, and emission across the farm
-    let totalFarmSupply = Decimal(0)
-    let totalFarmRemoval = Decimal(0)
-    let totalFarmEmission = Decimal(0)
-    let totalFarmTarget = Decimal(0)
+    let totalFarmSupply = new Decimal(0)
+    let totalFarmRemoval = new Decimal(0)
+    let totalFarmEmission = new Decimal(0)
+    let totalFarmTarget = new Decimal(0)
 
     for (const fieldBalance of fieldsWithBalance) {
         const fieldInput = fields.find(
@@ -230,7 +265,7 @@ export function calculateNitrogenBalancesFieldToFarm(
             fieldBalance.removal.total.times(fieldArea),
         )
         totalFarmEmission = totalFarmEmission.add(
-            fieldBalance.emission.total.times(fieldArea),
+            fieldBalance.emission.ammonia.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
             fieldBalance.target.times(fieldArea),
@@ -239,16 +274,16 @@ export function calculateNitrogenBalancesFieldToFarm(
 
     // Calculate average values per hectare for the farm
     const avgFarmSupply = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmSupply.dividedBy(totalFarmArea)
     const avgFarmRemoval = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmRemoval.dividedBy(totalFarmArea)
     const avgFarmEmission = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmEmission.dividedBy(totalFarmArea)
     const avgFarmTarget = totalFarmArea.isZero()
-        ? Decimal(0)
+        ? new Decimal(0)
         : totalFarmTarget.dividedBy(totalFarmArea)
 
     // Calculate the average balance at farm level (Supply + Removal + Emission)
@@ -351,23 +386,23 @@ export function combineSoilAnalyses(
             )?.[prop] || null
     }
 
-    // When values for soil parameters are not available try to estimate them with convertsion functions
-    if (!soilAnalysis.a_c_of) {
+    // When values for soil parameters are not available try to estimate them with conversion functions
+    if (soilAnalysis.a_c_of == null) {
         soilAnalysis.a_c_of = calculateOrganicCarbon(soilAnalysis.a_som_loi)
     }
 
-    if (!soilAnalysis.a_som_loi) {
+    if (soilAnalysis.a_som_loi == null) {
         soilAnalysis.a_som_loi = calculateOrganicMatter(soilAnalysis.a_c_of)
     }
 
-    if (!soilAnalysis.a_cn_fr) {
+    if (soilAnalysis.a_cn_fr == null) {
         soilAnalysis.a_cn_fr = calculateCarbonNitrogenRatio(
             soilAnalysis.a_c_of,
             soilAnalysis.a_n_rt,
         )
     }
 
-    if (!soilAnalysis.a_density_sa) {
+    if (soilAnalysis.a_density_sa == null) {
         soilAnalysis.a_density_sa = calculateBulkDensity(
             soilAnalysis.a_som_loi,
             soilAnalysis.b_soiltype_agr,
@@ -394,8 +429,4 @@ export function combineSoilAnalyses(
     }
 
     return soilAnalysis
-}
-
-export function getFdmPublicDataUrl(): string {
-    return "https://storage.googleapis.com/fdm-public-data/"
 }

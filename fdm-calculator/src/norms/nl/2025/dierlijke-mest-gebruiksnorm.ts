@@ -1,111 +1,118 @@
 import type { Field } from "@svenvw/fdm-core"
+import { getGeoTiffValue } from "../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,
     NL2025NormsInput,
 } from "./types.d"
 
-const FETCH_TIMEOUT_MS = 8000
-
 /**
  * Determines if a field is located within a grondwaterbeschermingsgebied (GWBG) in the Netherlands.
- * This is achieved by performing a spatial query against a vector file containing
- * the boundaries of all GWBG-gebieden.
+ * This is achieved by querying a GeoTIFF file that delineates GWBG areas.
+ * The function checks the value at the field's centroid coordinates.
  *
  * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the geographical data.
- * @returns A promise that resolves to `true` if the field's centroid is found within an GWBG-gebied,
- *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ *   This point is used to query the GeoTIFF data.
+ * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a GWBG area),
+ *   and `false` if the value is 0.
+ * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
  */
 export async function isFieldInGWGBGebied(
     b_centroid: Field["b_centroid"],
 ): Promise<boolean> {
-    const url =
-        "https://api.ellipsis-drive.com/v3/path/6e87a86a-4548-4bed-b47e-06a47e4b59fa/vector/timestamp/8780e629-668c-40fd-bbc0-4fa15e5557f7/location"
-
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2024/gwbg.tiff`
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+    const gwbgCode = await getGeoTiffValue(url, longitude, latitude)
 
-    const params = new URLSearchParams()
-    params.append("locations", `[[${longitude}, ${latitude}]]`)
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
-    try {
-        const response = await fetch(`${url}?${params.toString()}`, {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-        })
-        if (!response.ok) {
+    switch (gwbgCode) {
+        case 1: {
+            return true
+        }
+        case 0: {
+            return false
+        }
+        default: {
             throw new Error(
-                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                `Unknown GWBG code: ${gwbgCode} for coordinates ${longitude}, ${latitude}`,
             )
         }
-        const json = await response.json()
-        const feature = json?.[0]?.[0]
-        return Boolean(feature)
-    } catch (err) {
-        if ((err as any)?.name === "AbortError") {
-            throw new Error(
-                `Timeout querying GWGB-Gebied after ${FETCH_TIMEOUT_MS}ms`,
-            )
-        }
-        throw new Error(`Error querying GWGB-Gebied : ${String(err)}`)
-    } finally {
-        clearTimeout(timeout)
     }
 }
 
 /**
- * Determines if a field is located within a Natura 2000 in the Netherlands.
- * This is achieved by performing a spatial query against a vector file containing
- * the boundaries of all natura200-gebieden, including the 100m buffer.
+ * Determines if a field is located within a Natura 2000 area in the Netherlands.
+ * This is achieved by querying a GeoTIFF file that delineates Natura 2000 areas.
+ * The function checks the value at the field's centroid coordinates.
  *
  * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
- *   This point is used to query the geographical data.
- * @returns A promise that resolves to `true` if the field's centroid is found within an natura2000-gebied or within 100m buffer,
- *   `false` otherwise.
- * @throws {Error} If there are issues fetching the file or processing its stream.
+ *   This point is used to query the GeoTIFF data.
+ * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a Natura 2000 area),
+ *   and `false` if the value is 0.
+ * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
  */
 export async function isFieldInNatura2000Gebied(
     b_centroid: Field["b_centroid"],
 ): Promise<boolean> {
-    const url =
-        "https://api.ellipsis-drive.com/v3/path/153b4c2f-d250-4edd-ab19-9320245de431/vector/timestamp/ce0e4ac3-42aa-4e85-a321-9561ffa1183e/location"
-
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2024/natura2000.tiff`
     const longitude = b_centroid[0]
     const latitude = b_centroid[1]
+    const natura2000Code = await getGeoTiffValue(url, longitude, latitude)
 
-    const params = new URLSearchParams()
-    params.append("locations", `[[${longitude}, ${latitude}]]`)
-
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
-
-    try {
-        const response = await fetch(`${url}?${params.toString()}`, {
-            headers: { Accept: "application/json" },
-            signal: controller.signal,
-        })
-        if (!response.ok) {
+    switch (natura2000Code) {
+        case 1: {
+            return true
+        }
+        case 0: {
+            return false
+        }
+        default: {
             throw new Error(
-                `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+                `Unknown Natura2000 code: ${natura2000Code} for coordinates ${longitude}, ${latitude}`,
             )
         }
-        const json = await response.json()
-        const feature = json?.[0]?.[0]
-        return Boolean(feature)
-    } catch (err) {
-        if ((err as any)?.name === "AbortError") {
+    }
+}
+
+/**
+ * Determines if a field is located within a "derogatie-vrije zone" (derogation-free zone) in the Netherlands.
+ * This is achieved by querying a GeoTIFF file that delineates these zones.
+ * The function checks the value at the field's centroid coordinates.
+ *
+ * @param b_centroid - An array containing the `longitude` and `latitude` of the field's centroid.
+ *   This point is used to query the GeoTIFF data.
+ * @returns A promise that resolves to `true` if the GeoTIFF value at the centroid is 1 (indicating it is within a derogatie-vrije zone),
+ *   and `false` if the value is 0.
+ * @throws {Error} If the GeoTIFF returns an unexpected value, or if there are issues fetching or processing the file.
+ */
+export async function isFieldInDerogatieVrijeZone(
+    b_centroid: Field["b_centroid"],
+): Promise<boolean> {
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
+    const url = `${fdmPublicDataUrl}norms/nl/2025/derogatievrije_zones.tiff`
+    const longitude = b_centroid[0]
+    const latitude = b_centroid[1]
+    const derogatieVrijeZoneCode = await getGeoTiffValue(
+        url,
+        longitude,
+        latitude,
+    )
+
+    switch (derogatieVrijeZoneCode) {
+        case 1: {
+            return true
+        }
+        case 0: {
+            return false
+        }
+        default: {
             throw new Error(
-                `Timeout querying Natura2000-Gebied after ${FETCH_TIMEOUT_MS}ms`,
+                `Unknown  derogatieVrijeZoneCodes code: ${derogatieVrijeZoneCode} for coordinates ${longitude}, ${latitude}`,
             )
         }
-        throw new Error(`Error querying Natura2000-Gebied : ${String(err)}`)
-    } finally {
-        clearTimeout(timeout)
     }
 }
 
@@ -145,12 +152,17 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
     const field = input.field
 
-    const [is_nv_gebied, is_gwbg_gebied, is_natura2000_gebied] =
-        await Promise.all([
-            isFieldInNVGebied(field.b_centroid),
-            isFieldInGWGBGebied(field.b_centroid),
-            isFieldInNatura2000Gebied(field.b_centroid),
-        ])
+    const [
+        is_nv_gebied,
+        is_gwbg_gebied,
+        is_natura2000_gebied,
+        is_derogatie_vrije_zone,
+    ] = await Promise.all([
+        isFieldInNVGebied(field.b_centroid),
+        isFieldInGWGBGebied(field.b_centroid),
+        isFieldInNatura2000Gebied(field.b_centroid),
+        isFieldInDerogatieVrijeZone(field.b_centroid),
+    ])
 
     let normValue: number
     let normSource: string
@@ -162,6 +174,9 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
         } else if (is_gwbg_gebied) {
             normValue = 170
             normSource = "Derogatie - Grondwaterbeschermingsgebied"
+        } else if (is_derogatie_vrije_zone) {
+            normValue = 170
+            normSource = "Derogatie - Derogatie-vrije zone"
         } else if (is_nv_gebied) {
             normValue = 190
             normSource = "Derogatie - NV Gebied"

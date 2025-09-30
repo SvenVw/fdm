@@ -103,7 +103,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Welcome() {
     const loaderData = useLoaderData<typeof loader>()
     const openCookieSettings = () => {
-        if (typeof window !== "undefined" && window.openCookieSettings) {
+        if (window?.openCookieSettings) {
             window.openCookieSettings()
         }
     }

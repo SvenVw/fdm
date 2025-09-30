@@ -1,5 +1,22 @@
 # Changelog fdm-core
 
+## 0.25.0
+
+### Minor Changes
+
+- af57dd1: Add `removeFarm` to delete a farm and all of the related data to it
+- 29b0937: Adds `b_isproductive` to output of `getCultivationPlan`
+- aa7a1b1: Expose `b_perimeter` and `b_isproductive` in the output of `getField` and `getFields`
+- 8cc6e4a: Add function `isAllowedToDeleteFarm` to check if principal has the right to delete a farm
+- 5cf76d4: Made the magic link email timeout 15 minutes.
+
+### Patch Changes
+
+- 86e16c2: Removed `null` for `p_app_date` at FertilizerApplication
+- Updated dependencies [16270d6]
+- Updated dependencies [e844f9d]
+  - @svenvw/fdm-data@0.17.0
+
 ## 0.24.2
 
 ### Patch Changes

@@ -24,6 +24,28 @@ export const meta: MetaFunction = () => {
 
 export const changelogEntries: ChangelogEntry[] = [
     {
+        version: "v0.23.0",
+        date: "29 September 2025",
+        title: "Nieuw perceelsoverzicht, bedrijf verwijderen en meer",
+        description:
+            "Deze update introduceert een geavanceerde perceelstabel met zoek- en selectiemogelijkheden, maakt het mogelijk om een bedrijf te verwijderen, en diverse verbeteringen voor een efficiënter beheer van uw percelen en bemesting.",
+        items: [
+            "Geavanceerde Perceelstabel: Er is een nieuwe pagina toegevoegd met een geavanceerde tabel voor de percelen van uw bedrijf. Deze tabel biedt uitgebreide zoekmogelijkheden (op perceelnaam, teelten en meststoffen) en de mogelijkheid om meerdere percelen te selecteren voor het toedienen van een mestgift.",
+            "Bedrijf Verwijderen: U kunt nu een bedrijf direct verwijderen vanaf de instellingenpagina van het bedrijf. Dit kan alleen als u de rol Eigenaar hebt voor het bedrijf.",
+            "Nieuw Dashboard: Er is een nieuw dashboard voor uw bedrijf toegevoegd. Hier vindt u een overzicht van uw bedrijf met snelle links naar apps, pagina's en belangrijke acties.",
+            "Bemesting Toepassen op Meerdere Percelen: Een nieuwe, speciale pagina maakt het mogelijk om een mestgift op meerdere percelen tegelijk toe te passen.",
+            "Eenvoudig Toevoegen van Eigen Meststof bij Bemesting Invullen: Vanaf het formulier voor het toedienen van een mestgift kunt u nu eenvoudig navigeren naar een nieuwe pagina om een eigen meststof toe te voegen. Na succesvolle toevoegen wordt u automatisch teruggestuurd naar het bemestingsformulier.",
+            "Filter op Bufferstroken: Een nieuwe schakelaar stelt u in staat om op verschillende pagina's alle percelen of alleen de percelen zonder bufferstrokente tonen, voor een meer gericht overzicht.",
+            "Sortering van Percelen: Percelen worden nu gesorteerd op aflopende oppervlakte in plaats van op alfabetische naam.",
+            "Verbeterde Sortering in Bouwplan: In de wizard voor het aanmaken van een bedrijf worden de teelten in het bouwplan nu gesorteerd op aflopende totale oppervlakte.",
+            "Kaart Centreert op Geselecteerd Perceel: Bij het beoordelen van nieuw aangemaakte percelen of het bekijken van individuele percelen op de kaart, centreert de kaart nu automatisch op het geselecteerde perceel.",
+            "Verbeterde Uitnodigingen voor Organisaties: E-mails met uitnodigingen voor organisaties bevatten nu directe knoppen voor accepteren en weigeren.",
+            "Tijdzone in Magic Links: De tijdstempel in e-mails met een magic link toont nu, indien mogelijk, de eigen tijdzone van de gebruiker voor meer duidelijkheid.",
+            "Verbeterde Foutafhandeling bij Gebruiksnormen: Bij de berekening van de gebruiksnormen tonen percelen met fouten nu specifieke foutmeldingen op hun respectievelijke kaarten, naast een algemene foutmelding voor de hele pagina. Succesvol berekende percelen worden nog steeds weergegeven.",
+            "Gebruiksvriendelijker Uploaden van Shapefiles: Het proces voor het uploaden van shapefiles is gebruiksvriendelijker gemaakt. Wanneer u een nieuw bestand selecteert, blijven de reeds gekozen bestanden behouden, wat het corrigeren van uw selectie vergemakkelijkt.",
+        ],
+    },
+    {
         version: "v0.22.0",
         date: "15 Augustus 2025",
         title: "Atlas is vernieuwd, BRP 2025 en meer",
@@ -132,8 +154,9 @@ export const changelogEntries: ChangelogEntry[] = [
     {
         version: "v0.17.0",
         date: "14 Maart 2025",
-        title: `Lancering 🎉`,
-        description: `Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen.`,
+        title: "Lancering 🎉",
+        description:
+            "Vanaf nu kun je bedrijven aanmaken, percelen toevoegen en bemestingen invullen.",
         items: [
             "Account aanmaken",
             "Bedrijven aanmaken",
@@ -188,7 +211,11 @@ export default function WhatsNew() {
             <main className="mx-auto">
                 <Changelog1
                     title={`Wat is er nieuw in ${clientConfig.name}? 🚀`}
-                    description={`Benieuwd naar de laatste updates en nieuwe features van ${clientConfig.name}? Hier vind je een overzicht van alle recente updates en verbeteringen.`}
+                    description={
+                        "Benieuwd naar de laatste updates en nieuwe features van " +
+                        clientConfig.name +
+                        "? Hier vind je een overzicht van alle recente updates en verbeteringen."
+                    }
                     entries={changelogEntries}
                 />
             </main>

@@ -1,7 +1,7 @@
 {
     "name": "@svenvw/fdm-core",
     "private": false,
-    "version": "0.24.2",
+    "version": "0.25.0",
     "description": "Interface for the Farm Data Model",
     "license": "MIT",
     "homepage": "https://svenvw.github.io/fdm/",
@@ -50,12 +50,12 @@
         "@rollup/plugin-node-resolve": "catalog:",
         "@rollup/plugin-terser": "catalog:",
         "@rollup/plugin-typescript": "catalog:",
-        "@svenvw/fdm-data": "workspace:^0.16.0",
-        "@types/node": "^24.2.1",
+        "@svenvw/fdm-data": "workspace:^0.17.0",
+        "@types/node": "^24.5.2",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
-        "fs-extra": "^11.3.1",
-        "globals": "^16.3.0",
+        "fs-extra": "^11.3.2",
+        "globals": "^16.4.0",
         "rollup": "catalog:",
         "rollup-plugin-polyfill-node": "catalog:",
         "typedoc": "catalog:",
@@ -64,16 +64,16 @@
         "vitest": "catalog:"
     },
     "dependencies": {
-        "@electric-sql/pglite": "^0.3.7",
+        "@electric-sql/pglite": "^0.3.8",
         "@svenvw/fdm-data": "workspace:*",
         "@types/geojson": "^7946.0.16",
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.5",
         "postgres": "^3.4.7",
-        "unique-username-generator": "^1.4.0"
+        "unique-username-generator": "^1.5.1"
     },
-    "packageManager": "pnpm@10.14.0",
+    "packageManager": "pnpm@10.17.0",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }

@@ -1,13 +1,18 @@
+import { eq } from "drizzle-orm"
 import { beforeAll, describe, expect, inject, it } from "vitest"
-import { type BetterAuth, createFdmAuth } from "./authentication"
+import { createFdmAuth } from "./authentication"
+import type { FdmAuth } from "./authentication.d"
 import { listPrincipalsForResource } from "./authorization"
+import * as schema from "./db/schema"
 import {
     addFarm,
     getFarm,
     getFarms,
     grantRoleToFarm,
+    isAllowedToDeleteFarm,
     isAllowedToShareFarm,
     listPrincipalsForFarm,
+    removeFarm,
     revokePrincipalFromFarm,
     updateFarm,
     updateRoleOfPrincipalAtFarm,
@@ -15,6 +20,8 @@ import {
 import type { FdmType } from "./fdm"
 import { createFdmServer } from "./fdm-server"
 import type { FdmServerType } from "./fdm-server.d"
+import { addFertilizer, addFertilizerToCatalogue } from "./fertilizer"
+import { addField, getFields } from "./field"
 import { createId } from "./id"
 import { getPrincipal } from "./principal"
 
@@ -28,7 +35,7 @@ describe("Farm Functions", () => {
     let farmBusinessId: string
     let farmAddress: string
     let farmPostalCode: string
-    let fdmAuth: BetterAuth
+    let fdmAuth: FdmAuth
 
     beforeAll(async () => {
         const host = inject("host")
@@ -55,8 +62,6 @@ describe("Farm Functions", () => {
             body: {
                 email: "user10@example.com",
                 name: "user10",
-                firstname: "user10",
-                surname: "user10",
                 username: "user10",
                 password: "password",
             },
@@ -70,8 +75,6 @@ describe("Farm Functions", () => {
             body: {
                 email: "user15@example.com",
                 name: "user15",
-                firstname: "user15",
-                surname: "user15",
                 username: target_username,
                 password: "password",
             },
@@ -554,6 +557,209 @@ describe("Farm Functions", () => {
             )
 
             expect(isAllowed).toBe(false)
+        })
+    })
+
+    describe("isAllowedToDeleteFarm", () => {
+        it("should return true if principal is allowed to delete the farm", async () => {
+            const isAllowed = await isAllowedToDeleteFarm(
+                fdm,
+                principal_id,
+                b_id_farm,
+            )
+            expect(isAllowed).toBe(true)
+        })
+
+        it("should return false if principal is not allowed to delete the farm", async () => {
+            const other_principal_id = createId()
+
+            const isAllowed = await isAllowedToDeleteFarm(
+                fdm,
+                other_principal_id,
+                b_id_farm,
+            )
+
+            expect(isAllowed).toBe(false)
+        })
+    })
+
+    describe("removeFarm", () => {
+        let testFarmId: string
+        let testPrincipalId: string
+        let _testFieldId: string
+        let _testFertilizerId: string
+        let testFertilizerCatalogueId: string
+
+        beforeAll(async () => {
+            // Create a new principal for this test suite
+            const user = await fdmAuth.api.signUpEmail({
+                headers: undefined,
+                body: {
+                    email: "testuser_removefarm@example.com",
+                    name: "testuser_removefarm",
+                    username: "testuser_removefarm",
+                    password: "password",
+                },
+            })
+            testPrincipalId = user.user.id
+
+            // Create a new farm for testing removal
+            testFarmId = await addFarm(
+                fdm,
+                testPrincipalId,
+                "Farm to Remove",
+                "999999",
+                "Delete Lane",
+                "99999",
+            )
+
+            // Add a field to the farm
+            _testFieldId = await addField(
+                fdm,
+                testPrincipalId,
+                testFarmId,
+                "Field to Delete",
+                "source-field-id",
+                {
+                    type: "Polygon",
+                    coordinates: [
+                        [
+                            [0, 0],
+                            [0, 1],
+                            [1, 1],
+                            [1, 0],
+                            [0, 0],
+                        ],
+                    ],
+                },
+                new Date(),
+                "unknown",
+            )
+
+            // Add a custom fertilizer to the farm's catalogue
+            testFertilizerCatalogueId = await addFertilizerToCatalogue(
+                fdm,
+                testPrincipalId,
+                testFarmId,
+                {
+                    p_name_nl: "Custom Fertilizer",
+                    p_source: testFarmId,
+                    p_type: "mineral",
+                } as any, // Cast to any to simplify properties for test
+            )
+
+            // Add an acquired fertilizer to the farm
+            _testFertilizerId = await addFertilizer(
+                fdm,
+                testPrincipalId,
+                testFertilizerCatalogueId,
+                testFarmId,
+                100,
+                new Date(),
+            )
+
+            // Grant another principal a role on this farm
+            await grantRoleToFarm(
+                fdm,
+                testPrincipalId,
+                target_username, // Using an existing target_username from outer scope
+                testFarmId,
+                "advisor",
+            )
+        })
+
+        it("should successfully remove a farm and all its associated data", async () => {
+            await removeFarm(fdm, testPrincipalId, testFarmId)
+
+            // Verify farm is deleted
+            await expect(
+                getFarm(fdm, testPrincipalId, testFarmId),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action", // Permission denied because farm is deleted
+            )
+
+            // Verify fields are deleted (expect permission denied as farm is gone)
+            await expect(
+                getFields(fdm, testPrincipalId, testFarmId),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+
+            // Verify fertilizer acquiring records are deleted
+            const fertilizerAcquiringRecords = await fdm
+                .select()
+                .from(schema.fertilizerAcquiring)
+                .where(eq(schema.fertilizerAcquiring.b_id_farm, testFarmId))
+            expect(fertilizerAcquiringRecords).toEqual([])
+
+            // Verify custom fertilizer from catalogue is deleted
+            const customFertilizerCatalogue = await fdm
+                .select()
+                .from(schema.fertilizersCatalogue)
+                .where(
+                    eq(
+                        schema.fertilizersCatalogue.p_id_catalogue,
+                        testFertilizerCatalogueId,
+                    ),
+                )
+            expect(customFertilizerCatalogue).toEqual([])
+
+            // Verify principals are revoked
+            const principals = await listPrincipalsForResource(
+                fdm,
+                "farm",
+                testFarmId,
+            )
+            expect(principals).toEqual([])
+        })
+
+        it("should throw an error if the principal does not have write access", async () => {
+            const other_principal_id = createId()
+            const newFarmId = await addFarm(
+                fdm,
+                principal_id, // Farm owned by principal_id
+                "Another Farm",
+                "111111",
+                "Other Lane",
+                "11111",
+            )
+            await expect(
+                removeFarm(fdm, other_principal_id, newFarmId),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
+        })
+
+        it("should handle errors during farm removal", async () => {
+            const newFarmId = await addFarm(
+                fdm,
+                principal_id,
+                "Farm for Error Test",
+                "222222",
+                "Error Lane",
+                "22222",
+            )
+            // Mock the delete function to throw an error
+            const mockDelete = async () => {
+                throw new Error("Database delete failed")
+            }
+            const fdmMock = {
+                ...fdm,
+                delete: mockDelete,
+            } as unknown as FdmType // Cast to FdmType to satisfy type checking
+
+            await expect(
+                removeFarm(fdmMock, principal_id, newFarmId),
+            ).rejects.toThrowError("Exception for removeFarm")
+        })
+
+        it("should throw an error if the farm does not exist", async () => {
+            const nonExistentFarmId = createId()
+            await expect(
+                removeFarm(fdm, principal_id, nonExistentFarmId),
+            ).rejects.toThrowError(
+                "Principal does not have permission to perform this action",
+            )
         })
     })
 })

@@ -1,106 +1,74 @@
-import { differenceInCalendarDays } from "date-fns/differenceInCalendarDays"
+import { differenceInCalendarDays } from "date-fns"
 import Decimal from "decimal.js"
-import { fromUrl } from "geotiff"
+import { getGeoTiffValue } from "../../../shared/geotiff"
 import type { FieldInput, NitrogenBalanceInput, NitrogenSupply } from "../types"
 
 /**
- * Calculates the amount of nitrogen supplied through atmospheric deposition for a given field and time frame.
+ * Calculates the nitrogen deposition for a batch of fields from a GeoTIFF file.
+ * This function is the core of the performance optimization. It fetches the GeoTIFF
+ * object once (using a cache) and then concurrently calculates the deposition for each field.
+ * This avoids re-downloading the main file for every field.
  *
- * This function uses the geotiff.js library to identify the nitrogen deposition value at the field's centroid
- * from a raster dataset (TIFF file) provided by RIVM (Netherlands National Institute for Public Health and the Environment).
- * It adjusts the total deposition based on the number of days in the specified time frame.
- *
- * @param field - The field for which to calculate nitrogen deposition.
- *                  The field object must include the `b_centroid` property, which represents the field's centroid coordinates as [longitude, latitude].
- * @param timeFrame - The time frame for which to calculate nitrogen deposition.
- *                      The timeFrame object must include `start` and `end` properties, which are Date objects representing the start and end dates of the period.
- * @param fdmPublicDataUrl - The base URL for accessing FDM public data, including the deposition raster dataset.
- * @returns A promise that resolves with an object containing the total nitrogen deposition for the field in kg N / ha.
- *          If the location is outside the RIVM dataset, or if an error occurs, it returns 0.
+ * @param fields - An array of FieldInput objects for which to calculate deposition.
+ * @param timeFrame - The time frame for the calculation.
+ * @param fdmPublicDataUrl - The base URL for FDM public data.
+ * @returns A promise that resolves to a Map where keys are field IDs and values are
+ *          the calculated nitrogen deposition supply for that field.
  */
-export async function calculateNitrogenSupplyByDeposition(
-    field: FieldInput["field"],
+export async function calculateAllFieldsNitrogenSupplyByDeposition(
+    fields: FieldInput[],
     timeFrame: NitrogenBalanceInput["timeFrame"],
     fdmPublicDataUrl: string,
-): Promise<NitrogenSupply["deposition"]> {
-    // Settings
-    // Using the year 2022 as this is currrently only available.
-    // TO DO: Expand the options of other years
+): Promise<Map<string, NitrogenSupply["deposition"]>> {
+    if (fields.length === 0) {
+        return new Map()
+    }
+
+    // Settings for the GeoTIFF file.
+    // Currently, only the year 2022 is available.
+    // TODO: Add support for multiple years when data becomes available.
     const year = "2022"
     const region = "nl"
     const url = `${fdmPublicDataUrl}deposition/${region}/ntot_${year}.tiff`
 
-    // Get centroid coordinates
-    const b_centroid = field.b_centroid
-    const [longitude, latitude] = b_centroid
-
-    // Source: https://medium.com/data-science/geotiff-coordinate-querying-with-javascript-5e6caaaf88cf
-    try {
-        const tiff = await fromUrl(url)
-        const image = await tiff.getImage()
-
-        const bbox = image.getBoundingBox()
-        const pixelWidth = image.getWidth()
-        const pixelHeight = image.getHeight()
-        const bboxWidth = bbox[2] - bbox[0]
-        const bboxHeight = bbox[3] - bbox[1]
-
-        const widthPct = (longitude - bbox[0]) / bboxWidth
-        const heightPct = (latitude - bbox[1]) / bboxHeight
-        const xPx = Math.floor(pixelWidth * widthPct)
-        const yPx = Math.floor(pixelHeight * (1 - heightPct))
-
-        const window = [xPx, yPx, xPx + 1, yPx + 1]
-        const rasterData = await image.readRasters({ window })
-
-        // rasterData should be an array of TypedArrays, one for each band requested.
-        // For one point, one band: e.g., [ Float32Array(1) [value] ]
-        const firstBandData = rasterData[0]
-
-        // Check if the first band data exists and has at least one element
-        if (
-            !firstBandData ||
-            typeof firstBandData === "number" ||
-            firstBandData.length === 0
-        ) {
-            console.warn(
-                "Invalid raster data received for deposition calculation (expected TypedArray with length > 0).",
-            )
-            return { total: new Decimal(0) }
-        }
-
-        // Access the first value from the TypedArray
-        const depositionValue = firstBandData[0]
-
-        // Check for NoData value
-        const noDataValue = image.getGDALNoData()
-        if (noDataValue !== null && depositionValue === noDataValue) {
-            console.warn("Pixel value is NoData.")
-            return { total: new Decimal(0) }
-        }
-
-        if (depositionValue === undefined) {
-            console.warn(
-                "Pixel value is undefined (possibly out of bounds or issue with readRasters).",
-            )
-            return { total: new Decimal(0) }
-        }
-
-        // Adjust for the number of days
-        const timeFrameDays = new Decimal(
-            differenceInCalendarDays(timeFrame.end, timeFrame.start),
+    // Step 1: Create an array of promises to calculate deposition for each field concurrently.
+    const depositionPromises = fields.map(async (field) => {
+        // Compute per-field effective timeframe (intersection with field existence)
+        const fStart = field.field.b_start ?? timeFrame.start
+        const fEnd = field.field.b_end ?? timeFrame.end
+        const effectiveStart = new Date(
+            Math.max(fStart.getTime(), timeFrame.start.getTime()),
         )
-        // Ensure timeFrameDays is positive
-        if (timeFrameDays.lessThanOrEqualTo(0)) {
-            return { total: new Decimal(0) }
-        }
-        const timeFrameFraction = timeFrameDays.add(1).dividedBy(365)
-        const deposition = new Decimal(depositionValue).times(timeFrameFraction)
-
-        return { total: deposition }
-    } catch (error) {
-        throw new Error(
-            `Error processing GeoTIFF for deposition calculation: ${String(error)}`,
+        const effectiveEnd = new Date(
+            Math.min(fEnd.getTime(), timeFrame.end.getTime()),
         )
+        const days = differenceInCalendarDays(effectiveEnd, effectiveStart)
+        const fraction =
+            days >= 0 ? new Decimal(days).add(1).dividedBy(365) : new Decimal(0)
+
+        // Get the deposition value from the GeoTIFF using the new getTiffValue function.
+        const [longitude, latitude] = field.field.b_centroid
+        const value = await getGeoTiffValue(url, longitude, latitude)
+
+        let depositionValue = new Decimal(0)
+        if (value !== null && Number.isFinite(value)) {
+            depositionValue = new Decimal(value).times(fraction)
+        }
+
+        return {
+            fieldId: field.field.b_id,
+            deposition: { total: depositionValue },
+        }
+    })
+
+    // Step 3: Execute all promises concurrently.
+    const depositionResults = await Promise.all(depositionPromises)
+
+    // Step 4: Convert the array of results into a Map for easy lookup.
+    const depositionMap = new Map<string, NitrogenSupply["deposition"]>()
+    for (const result of depositionResults) {
+        depositionMap.set(result.fieldId, result.deposition)
     }
+
+    return depositionMap
 }

@@ -1,5 +1,44 @@
 # Changelog fdm-app
 
+## 0.23.0
+
+### Minor Changes
+
+- 57b4fe8: Add a toggle to show all or only productive fields at various pages that show a list of fields
+- c3e5388: In the farm create wizard, show the cultivations in the bouwplan sorted by descending total area (instead of a random order)
+- 638ac47: Organization invitation emails now come with accept and reject buttons which will make accepting or rejecting the invitation easier for the invitee.
+- 92e7b30: Adds a new farm dashboard page with an overview of the farm and links to apps, data pages, and quick actions.
+- 47acfac: Add a new page to apply a fertilizer application to multiple fields at once.
+- 4174369: While at the fertilizer application form users can navigate to the page to add a new custom fertilizer. After successful submission the user is directed back to the fertilizer application form.
+- 26d4f93: The timestamp in the magic link email now shows the user's own timezone when it is able to be determined.
+- f72e93b: Add feature to delete a farm at the farm settings
+- 47acfac: Add a new page showing an advanced table for the fields of the farm, including searching on field name, cultivations, and fertilizers. It also includes multi‑selection of fields to add a new fertilizer application.
+
+### Patch Changes
+
+- 77eb67f: In norms, when a field has an error during calculation, show an error message on that field’s card; also show a general error for the whole page; still render the fields that were calculated successfully.
+- 86470a9: While reviewing newly created fields or viewing individual fields on the map, the map now centers on the field when a new field is selected.
+- Updated dependencies [7cfc412]
+- Updated dependencies [85b964d]
+- Updated dependencies [af57dd1]
+- Updated dependencies [82bb999]
+- Updated dependencies [29b0937]
+- Updated dependencies [8333884]
+- Updated dependencies [16270d6]
+- Updated dependencies [e844f9d]
+- Updated dependencies [aa7a1b1]
+- Updated dependencies [fa5aab5]
+- Updated dependencies [d25b70e]
+- Updated dependencies [14c8a06]
+- Updated dependencies [be7d733]
+- Updated dependencies [a1ef995]
+- Updated dependencies [8cc6e4a]
+- Updated dependencies [5cf76d4]
+- Updated dependencies [86e16c2]
+  - @svenvw/fdm-calculator@0.7.0
+  - @svenvw/fdm-core@0.25.0
+  - @svenvw/fdm-data@0.17.0
+
 ## 0.22.4
 
 ### Patch Changes

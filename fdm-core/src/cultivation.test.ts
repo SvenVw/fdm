@@ -7,7 +7,6 @@ import {
 import {
     addCultivation,
     addCultivationToCatalogue,
-    buildCultivationTimeframeCondition,
     getCultivation,
     getCultivationPlan,
     getCultivations,
@@ -28,7 +27,6 @@ import {
 import { addField } from "./field"
 import { addHarvest } from "./harvest"
 import { createId } from "./id"
-import type { Timeframe } from "./timeframe"
 
 describe("Cultivation Data Model", () => {
     let fdm: FdmServerType

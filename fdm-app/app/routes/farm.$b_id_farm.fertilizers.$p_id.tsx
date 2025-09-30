@@ -128,10 +128,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 }
 
 /**
- * Renders the layout for managing farm settings.
+ * Renders the form to edit an existing fertilizer.
  *
- * This component displays a sidebar that includes the farm header, navigation options, and a link to farm fields.
- * It also renders a main section containing the farm title, description, nested routes via an Outlet, and a notification toaster.
+ * This component displays the fertilizer header and a form to edit the properties of the fertilizer.
+ * The form will not be editable if the displayed fertilizer is a builtin.
  */
 export default function FarmFertilizerBlock() {
     const loaderData = useLoaderData<typeof loader>()
