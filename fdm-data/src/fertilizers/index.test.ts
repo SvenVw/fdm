@@ -173,6 +173,7 @@ describe("getCatalogueBaat", async () => {
             expect(item).toHaveProperty("p_type_manure")
             expect(item).toHaveProperty("p_type_mineral")
             expect(item).toHaveProperty("p_type_compost")
+            expect(item).toHaveProperty("p_type_rvo")
             expect(item).toHaveProperty("hash")
         }
     })
