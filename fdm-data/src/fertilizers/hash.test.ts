@@ -56,13 +56,14 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const hash = await hashFertilizer(fertilizer)
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("08585267")
+        expect(hash).toBe("dfb35759")
     })
 
     it("should generate different hashes for different fertilizer items", async () => {
@@ -117,6 +118,7 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const fertilizer2: CatalogueFertilizerItem = {
@@ -170,6 +172,7 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const hash1 = await hashFertilizer(fertilizer1)
@@ -230,6 +233,7 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const fertilizer2: CatalogueFertilizerItem = {
@@ -294,6 +298,7 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const fertilizer2: CatalogueFertilizerItem = {
@@ -358,6 +363,7 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const fertilizer2: CatalogueFertilizerItem = {
@@ -422,6 +428,7 @@ describe("hashFertilizer", () => {
             p_type_manure: true,
             p_type_mineral: false,
             p_type_compost: false,
+            p_type_rvo: "42",
         }
 
         const fertilizer2: CatalogueFertilizerItem = {

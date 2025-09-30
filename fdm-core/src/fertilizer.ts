@@ -137,6 +137,7 @@ export async function addFertilizerToCatalogue(
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
         p_ef_nh3: schema.fertilizersCatalogueTypeInsert["p_ef_nh3"]
         p_type: "manure" | "mineral" | "compost" | null
+        p_type_rvo: schema.fertilizersCatalogueTypeInsert["p_type_rvo"]
     },
 ): Promise<schema.fertilizersCatalogueTypeSelect["p_id_catalogue"]> {
     try {
@@ -326,6 +327,7 @@ export async function getFertilizer(
                 p_type_manure: schema.fertilizersCatalogue.p_type_manure,
                 p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
                 p_type_compost: schema.fertilizersCatalogue.p_type_compost,
+                p_type_rvo: schema.fertilizersCatalogue.p_type_rvo,
             })
             .from(schema.fertilizers)
             .leftJoin(
@@ -437,6 +439,7 @@ export async function updateFertilizerFromCatalogue(
         p_cl_rt: schema.fertilizersCatalogueTypeInsert["p_cl_rt"]
         p_ef_nh3: schema.fertilizersCatalogueTypeInsert["p_ef_nh3"]
         p_type: "manure" | "mineral" | "compost" | null
+        p_type_rvo: schema.fertilizersCatalogueTypeInsert["p_type_rvo"]
     }>,
 ): Promise<void> {
     try {
@@ -597,6 +600,7 @@ export async function getFertilizers(
                 p_type_manure: schema.fertilizersCatalogue.p_type_manure,
                 p_type_mineral: schema.fertilizersCatalogue.p_type_mineral,
                 p_type_compost: schema.fertilizersCatalogue.p_type_compost,
+                p_type_rvo: schema.fertilizersCatalogue.p_type_rvo,
             })
             .from(schema.fertilizers)
             .leftJoin(
@@ -1046,6 +1050,15 @@ export function getFertilizerParametersDescription(
                 { value: "mineral", label: "Kunstmest" },
                 { value: "compost", label: "Compost" },
             ],
+        },
+        {
+            parameter: "p_type_rvo",
+            unit: "",
+            name: "Mestcode (RVO)",
+            type: "enum",
+            category: "general",
+            description: "Mestcode volgens RVO",
+            options: schema.typeRvoOptions,
         },
         {
             parameter: "p_app_method_options",

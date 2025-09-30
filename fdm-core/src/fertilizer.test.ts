@@ -131,6 +131,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -210,6 +211,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -287,6 +289,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -377,6 +380,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -476,6 +480,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
         })
@@ -692,6 +697,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
             const updatedProperties = {
@@ -807,6 +813,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: 0.8,
                     p_type: "mineral",
+                    p_type_rvo: "115",
                 },
             )
 
@@ -992,7 +999,7 @@ describe("Fertilizer Data Model", () => {
                 b_id,
                 timeframe,
             )
-            fertilizerApplications.map((application) => {
+            fertilizerApplications.forEach((application) => {
                 expect(
                     application.p_app_date?.getTime(),
                 ).toBeGreaterThanOrEqual(timeframe.start.getTime())
