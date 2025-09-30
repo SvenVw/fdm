@@ -791,6 +791,51 @@ export type derogationApplyingTypeSelect =
 export type derogationApplyingTypeInsert =
     typeof derogationApplying.$inferInsert
 
+// Define organics table
+export const organicCertifications = fdmSchema.table("organic_certifications", {
+    b_id_organic: text().primaryKey(),
+    b_organic_traces: text(),
+    b_organic_skal: text(),
+    b_organic_issued: timestamp({ withTimezone: true }),
+    b_organic_expires: timestamp({ withTimezone: true }),
+    created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+    updated: timestamp({ withTimezone: true }),
+})
+
+export type organicCertificationsTypeSelect =
+    typeof organicCertifications.$inferSelect
+export type organicCertificationsTypeInsert =
+    typeof organicCertifications.$inferInsert
+
+// Define organic_certifications_holding table
+export const organicCertificationsHolding = fdmSchema.table(
+    "organic_certifications_holding",
+    {
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        b_id_organic: text()
+            .notNull()
+            .references(() => organicCertifications.b_id_organic),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => {
+        return [
+            {
+                pk: primaryKey({
+                    columns: [table.b_id_farm, table.b_id_organic],
+                }),
+            },
+        ]
+    },
+)
+
+export type organicCertificationsHoldingTypeSelect =
+    typeof organicCertificationsHolding.$inferSelect
+export type organicCertificationsHoldingTypeInsert =
+    typeof organicCertificationsHolding.$inferInsert
+
 // Define fertilizer_catalogue_enabling table
 export const fertilizerCatalogueEnabling = fdmSchema.table(
     "fertilizer_catalogue_enabling",
