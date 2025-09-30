@@ -4,12 +4,14 @@ import {
     type GebruiksnormResult,
 } from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
-import { Suspense, use } from "react"
+import hash from "object-hash"
+import { Suspense, use, useEffect } from "react"
 import {
     data,
     type LoaderFunctionArgs,
     type MetaFunction,
     NavLink,
+    redirect,
     useLoaderData,
     useLocation,
 } from "react-router"
@@ -30,7 +32,9 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { useFarmNormsCache } from "~/store/calculation-cache"
 import { useFieldFilterStore } from "~/store/field-filter"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.norms"
 
 interface FieldNorm {
     b_id: string
@@ -119,19 +123,45 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             let errorMessage = null as string | null
             let hasFieldNormErrors = false
             const fieldErrorMessages: string[] = []
+
+            const url = new URL(request.url)
+            const cacheHash = url.searchParams.get("cacheHash")
+
+            let inputHash: string | undefined
             try {
                 // Calculate norms per field
                 const functionsForms = createFunctionsForNorms("NL", calendar)
 
-                const fieldNormPromises = fields.map(async (field) => {
+                const inputPromises = fields.map(async (field) => {
                     try {
                         // Collect the input
-                        const input = await functionsForms.collectInputForNorms(
+                        return await functionsForms.collectInputForNorms(
                             fdm,
                             session.principal_id,
                             field.b_id,
                         )
+                    } catch (error) {
+                        return {
+                            b_id: field.b_id,
+                            b_area: field.b_area,
+                            errorMessage: String(error).replace("Error: ", ""),
+                        }
+                    }
+                })
 
+                const inputs = await Promise.all(inputPromises)
+                inputHash = hash(inputs)
+                if (inputHash === cacheHash) {
+                    return { useCache: true }
+                }
+
+                const fieldNormPromises = inputs.map(async (input) => {
+                    const { field } = input
+                    if (input.errorMessage) {
+                        return input
+                    }
+
+                    try {
                         // Calculate the norms
                         const [normManure, normPhosphate, normNitrogen] =
                             await Promise.all([
@@ -219,6 +249,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
             // Return user information from loader
             return {
+                inputHash: inputHash,
                 errorMessage: errorMessage,
                 fieldNorms: fieldNorms,
                 farmNorms: farmNorms,
@@ -240,6 +271,39 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         throw handleLoaderError(error)
     }
 }
+
+const clientCacheMiddleware: Route.ClientMiddlewareFunction = async (
+    { params, request },
+    next,
+) => {
+    if (typeof window === "undefined") return next()
+    const requestUrl = new URL(request.url)
+
+    const previousCacheHash = requestUrl.searchParams.get("cacheHash")
+    let newCacheHash: string | null = previousCacheHash
+
+    // Get cache hash for the cache we (possibly) have
+    const cachedData = useFarmNormsCache.getState().get(params.b_id_farm)
+    if (cachedData?.inputHash) {
+        newCacheHash = cachedData.inputHash
+    } else {
+        newCacheHash = null
+    }
+
+    // Redirect if the `cacheHash` search param was wrong
+    if (previousCacheHash !== newCacheHash) {
+        newCacheHash
+            ? requestUrl.searchParams.set("cacheHash", newCacheHash)
+            : requestUrl.searchParams.delete("cacheHash")
+        throw redirect(requestUrl.toString())
+    }
+
+    return next()
+}
+
+export const clientMiddleware: Route.ClientMiddlewareFunction[] = [
+    clientCacheMiddleware,
+]
 
 export default function FarmNormsBlock() {
     const loaderData = useLoaderData<typeof loader>()
@@ -281,13 +345,33 @@ export default function FarmNormsBlock() {
  * would not render until `asyncData` resolves and the fallback would never be shown.
  */
 function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
+    const data = use(loaderData.asyncData)
+
+    const farmNormsCache = useFarmNormsCache()
+
+    const cachedData = farmNormsCache.get(loaderData.b_id_farm)
+
+    useEffect(() => {
+        if (
+            (!data.useCache || !cachedData?.inputHash) &&
+            !data.errorMessage &&
+            data.inputHash
+        ) {
+            farmNormsCache.set(loaderData.b_id_farm, data)
+        }
+    }, [loaderData.b_id_farm, data, cachedData?.inputHash, farmNormsCache.set])
+
     const {
         farmNorms,
         fieldNorms,
         errorMessage,
         hasFieldNormErrors,
         fieldErrorMessages,
-    } = use(loaderData.asyncData)
+    } =
+        data.useCache && cachedData
+            ? farmNormsCache.get(loaderData.b_id_farm)
+            : data
+
     const { showProductiveOnly } = useFieldFilterStore()
 
     const location = useLocation()
