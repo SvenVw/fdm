@@ -814,4 +814,268 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // Emission = 1000 * 20 * 0.69 / 1000 * -1 = -13.8 kg N
         expect(result.manure.total.toFixed(1)).toBe("-13.8")
     })
+
+    it("should calculate manure ammonia emission factor correctly for grassland - injection", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-27",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_method: "injection",
+                p_name_nl: "Manure Injection Grassland",
+                p_id: "man-inj-grass",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.17 / 1000 * -1 = -3.40 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-3.40")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for cropland - injection", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-28",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-05-01"), // Cropland active
+                p_app_method: "injection",
+                p_name_nl: "Manure Injection Cropland",
+                p_id: "man-inj-crop",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.24 / 1000 * -1 = -4.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-4.80")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for bare soil - injection", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-29",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2025-01-01"), // Bare soil
+                p_app_method: "injection",
+                p_name_nl: "Manure Injection Bare Soil",
+                p_id: "man-inj-bare",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.02 / 1000 * -1 = -0.40 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-0.40")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for grassland - spraying", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-30",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_method: "spraying",
+                p_name_nl: "Manure Spraying Grassland",
+                p_id: "man-spray-grass",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.68 / 1000 * -1 = -13.60 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-13.60")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for cropland - spraying", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-31",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-05-01"), // Cropland active
+                p_app_method: "spraying",
+                p_name_nl: "Manure Spraying Cropland",
+                p_id: "man-spray-crop",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.69 / 1000 * -1 = -13.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-13.80")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for bare soil - spraying", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-32",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2025-01-01"), // Bare soil
+                p_app_method: "spraying",
+                p_name_nl: "Manure Spraying Bare Soil",
+                p_id: "man-spray-bare",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.69 / 1000 * -1 = -13.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-13.80")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for grassland - spoke wheel", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-33",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_method: "spoke wheel",
+                p_name_nl: "Manure Spoke Wheel Grassland",
+                p_id: "man-spoke-grass",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.17 / 1000 * -1 = -3.40 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-3.40")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for cropland - spoke wheel", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-34",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-05-01"), // Cropland active
+                p_app_method: "spoke wheel",
+                p_name_nl: "Manure Spoke Wheel Cropland",
+                p_id: "man-spoke-crop",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.24 / 1000 * -1 = -4.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-4.80")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for bare soil - spoke wheel", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-35",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2025-01-01"), // Bare soil
+                p_app_method: "spoke wheel",
+                p_name_nl: "Manure Spoke Wheel Bare Soil",
+                p_id: "man-spoke-bare",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.24 / 1000 * -1 = -4.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-4.80")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for grassland - pocket placement", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-36",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-02-01"), // Grassland only
+                p_app_method: "pocket placement",
+                p_name_nl: "Manure Pocket Placement Grassland",
+                p_id: "man-pocket-grass",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.68 / 1000 * -1 = -13.60 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-13.60")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for cropland - pocket placement", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-37",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2024-05-01"), // Cropland active
+                p_app_method: "pocket placement",
+                p_name_nl: "Manure Pocket Placement Cropland",
+                p_id: "man-pocket-crop",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.69 / 1000 * -1 = -13.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-13.80")
+    })
+
+    it("should calculate manure ammonia emission factor correctly for bare soil - pocket placement", () => {
+        const fertilizerApplications: FieldInput["fertilizerApplications"] = [
+            {
+                p_app_id: "app-38",
+                p_id_catalogue: "manure-fertilizer",
+                p_app_amount: 1000,
+                p_app_date: new Date("2025-01-01"), // Bare soil
+                p_app_method: "pocket placement",
+                p_name_nl: "Manure Pocket Placement Bare Soil",
+                p_id: "man-pocket-bare",
+            },
+        ]
+        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
+            mockCultivations,
+            fertilizerApplications,
+            mockCultivationDetailsMap,
+            mockFertilizerDetailsMap,
+        )
+        // Emission = 1000 * 20 * 0.69 / 1000 * -1 = -13.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-13.80")
+    })
 })
