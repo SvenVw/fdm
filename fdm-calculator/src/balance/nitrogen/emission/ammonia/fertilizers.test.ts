@@ -8,8 +8,8 @@ import { calculateNitrogenEmissionViaAmmoniaByFertilizers } from "./fertilizers"
 
 describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     const mockCultivationDetailsMap = new Map<string, CultivationDetail>()
-    mockCultivationDetailsMap.set("grassland-cultivation", {
-        b_lu_catalogue: "grassland-cultivation",
+    mockCultivationDetailsMap.set("nl_265", {
+        b_lu_catalogue: "nl_265",
         b_lu_croprotation: "grass",
         b_lu_yield: 0,
         b_lu_hi: 0,
@@ -17,9 +17,9 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         b_lu_n_residue: 0,
         b_n_fixation: 0,
     })
-    mockCultivationDetailsMap.set("cropland-cultivation", {
-        b_lu_catalogue: "cropland-cultivation",
-        b_lu_croprotation: "crop",
+    mockCultivationDetailsMap.set("nl_2014", {
+        b_lu_catalogue: "nl_2014",
+        b_lu_croprotation: "maize",
         b_lu_yield: 0,
         b_lu_hi: 0,
         b_lu_n_harvestable: 0,
@@ -51,7 +51,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     mockFertilizerDetailsMap.set("manure-fertilizer", {
         p_id_catalogue: "manure-fertilizer",
         p_type: "manure",
-        p_n_rt: 0,
+        p_n_rt: 20,
         p_no3_rt: 0,
         p_nh4_rt: 20,
         p_s_rt: 0,
@@ -61,7 +61,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     mockFertilizerDetailsMap.set("compost-fertilizer", {
         p_id_catalogue: "compost-fertilizer",
         p_type: "compost",
-        p_n_rt: 0,
+        p_n_rt: 15,
         p_no3_rt: 0,
         p_nh4_rt: 15,
         p_s_rt: 0,
@@ -71,7 +71,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     mockFertilizerDetailsMap.set("other-fertilizer", {
         p_id_catalogue: "other-fertilizer",
         p_type: "other",
-        p_n_rt: 0,
+        p_n_rt: 10,
         p_no3_rt: 0,
         p_nh4_rt: 10,
         p_s_rt: 0,
@@ -82,14 +82,14 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
     const mockCultivations: FieldInput["cultivations"] = [
         {
             b_lu: "cult-1",
-            b_lu_catalogue: "grassland-cultivation",
+            b_lu_catalogue: "nl_265", // Referencing "grassland-cultivation"
             b_lu_start: new Date("2024-01-01"),
             b_lu_end: new Date("2024-02-29"), // Ends before cropland starts
             m_cropresidue: undefined,
         },
         {
             b_lu: "cult-2",
-            b_lu_catalogue: "cropland-cultivation",
+            b_lu_catalogue: "nl_2014", // Referencing "cropland-cultivation"
             b_lu_start: new Date("2024-03-01"),
             b_lu_end: new Date("2024-10-31"),
             m_cropresidue: undefined,
@@ -197,13 +197,13 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         ]
 
         const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
-            mockCultivations,
+            [mockCultivations[1]],
             fertilizerApplications,
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
 
-        // Compost EF for incorporation on cropland = 0.22
+        // Compost EF for incorporation on cropland = 0.22 (same as manure)
         // Emission = 1500 * 15 * 0.22 / 1000 * -1 = -4.95 kg N
         expect(result.compost.total.toFixed(2)).toBe("-4.95")
         expect(result.total.toFixed(2)).toBe("-4.95")
@@ -278,7 +278,7 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
         // Mineral: -60.296
         // Manure (broadcasting on cropland): 2000 * 20 / 1000 * 0.69 * -1 = -27.6 kg N
         // Compost: -4.95
-        // Total = -60.296 - 27.6 - 4.95 = -33.15296
+        // Total = -60.296 - 27.6 - 4.95 = -92.84600
         expect(result.total.toFixed(5)).toBe("-92.84600")
         expect(result.mineral.total.toFixed(5)).toBe("-60.29600")
         expect(result.manure.total.toFixed(1)).toBe("-27.6")
