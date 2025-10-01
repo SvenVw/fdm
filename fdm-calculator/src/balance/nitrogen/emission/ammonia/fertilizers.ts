@@ -225,76 +225,151 @@ function determineManureAmmoniaEmissionFactor(
         landType = "bare soil"
     }
 
-    // Determine the Emission factor based on active cultivation type
-    if (landType === "grassland") {
-        if (p_app_method === "broadcasting") {
-            return new Decimal(0.68)
-        }
-        if (p_app_method === "narrowband") {
-            return new Decimal(0.264)
-        }
-        if (p_app_method === "slotted coulter") {
-            return new Decimal(0.217)
-        }
-        if (p_app_method === "shallow injection") {
-            return new Decimal(0.17)
-        }
-        console.warn(
-            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) on grassland`,
-        )
-        return new Decimal(0)
+    // According to table B18.3 (column: 2019-2022) in "Bruggen, C. van, A. Bannink, A. Bleeker, D.W. Bussink, H.J.C. van Dooren, C.M. Groenestein, J.F.M. Huijsmans, J. Kros, K. Oltmer, M.B.H. Ros, M.W. van Schijndel, L. Schulte-Uebbing, G.L. Velthof en T.C. van der Zee (2024). Emissies naar lucht uit de landbouw berekend met NEMA voor 1990-2022. Wageningen, WOT Natuur & Milieu, WOT-technical report 264"
+    switch (p_app_method) {
+        case "slotted coulter":
+            // Set to "sod injection"
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    // Not specified in table, assuming similiar to "shallow injection" at cropland
+                    return new Decimal(0.24)
+                case "bare soil":
+                    return new Decimal(0.24)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "incorporation":
+            switch (landType) {
+                // Not specified in table, assuming similiar to "shallow injection" at grassland
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    return new Decimal(0.22)
+                case "bare soil":
+                    // Not specified in table, assuming similiar to "incorporation in 2 tracks"
+                    return new Decimal(0.46)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "incorporation 2 tracks":
+            // Not specified in table, assuming similiar to "shallow injection" at grassland
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    return new Decimal(0.46)
+                case "bare soil":
+                    return new Decimal(0.46)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "injection":
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    // Not specified in table, assuming similiar to "shallow injection" at cropland
+                    return new Decimal(0.24)
+                case "bare soil":
+                    return new Decimal(0.02)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "shallow injection":
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    return new Decimal(0.24)
+                case "bare soil":
+                    return new Decimal(0.24)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+
+        case "spraying":
+            // Not specified in table, assuming similiar to "broadcasting"
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.68)
+                case "cropland":
+                    return new Decimal(0.69)
+                case "bare soil":
+                    return new Decimal(0.69)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "broadcasting":
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.68)
+                case "cropland":
+                    return new Decimal(0.69)
+                case "bare soil":
+                    return new Decimal(0.69)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "spoke wheel":
+            // Not specified in table, assuming similiar to "shallow injection"
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    return new Decimal(0.24)
+                case "bare soil":
+                    return new Decimal(0.24)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "pocket placement":
+            // Not specified in table, assuming similiar to "broadcasting"
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.68)
+                case "cropland":
+                    return new Decimal(0.69)
+                case "bare soil":
+                    return new Decimal(0.69)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        case "narrowband":
+            switch (landType) {
+                case "grassland":
+                    return new Decimal(0.17)
+                case "cropland":
+                    return new Decimal(0.36)
+                case "bare soil":
+                    return new Decimal(0.36)
+                default:
+                    throw new Error(
+                        `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
+                    )
+            }
+        default:
+            throw new Error(
+                `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id})`,
+            )
     }
-    if (landType === "cropland") {
-        if (p_app_method === "broadcasting") {
-            return new Decimal(0.69)
-        }
-        if (p_app_method === "incorporation 2 tracks") {
-            return new Decimal(0.46)
-        }
-        if (p_app_method === "narrowband") {
-            return new Decimal(0.36)
-        }
-        if (p_app_method === "slotted coulter") {
-            return new Decimal(0.3)
-        }
-        if (p_app_method === "shallow injection") {
-            return new Decimal(0.24)
-        }
-        if (p_app_method === "injection") {
-            return new Decimal(0.02)
-        }
-        if (p_app_method === "incorporation") {
-            return new Decimal(0.22)
-        }
-        console.warn(
-            `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for cropland`,
-        )
-        return new Decimal(0)
-    }
-    // Bare soil
-    if (p_app_method === "broadcasting") {
-        return new Decimal(0.69)
-    }
-    if (p_app_method === "incorporation 2 tracks") {
-        return new Decimal(0.46)
-    }
-    if (p_app_method === "narrowband") {
-        return new Decimal(0.36)
-    }
-    if (p_app_method === "slotted coulter") {
-        return new Decimal(0.3)
-    }
-    if (p_app_method === "shallow injection") {
-        return new Decimal(0.25)
-    }
-    if (p_app_method === "injection") {
-        return new Decimal(0.02)
-    }
-    if (p_app_method === "incorporation") {
-        return new Decimal(0.22)
-    }
-    console.warn(
-        `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id}) for bare soil`,
-    )
-    return new Decimal(0)
 }

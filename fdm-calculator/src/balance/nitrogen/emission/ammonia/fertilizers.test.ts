@@ -230,11 +230,11 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockFertilizerDetailsMap,
         )
 
-        // Other EF for slotted coulter on bare soil = 0.3
-        // Emission = 1000 * 10 * 0.3 / 1000 * -1 = -3 kg N
-        expect(result.other.total.toFixed(0)).toBe("-3")
-        expect(result.total.toFixed(0)).toBe("-3")
-        expect(result.other.applications[0].value.toFixed(0)).toBe("-3")
+        // Other EF for slotted coulter on bare soil = 0.24 (from manure slotted coulter bare soil)
+        // Emission = 1000 * 10 * 0.24 / 1000 * -1 = -2.4 kg N
+        expect(result.other.total.toFixed(1)).toBe("-2.4")
+        expect(result.total.toFixed(1)).toBe("-2.4")
+        expect(result.other.applications[0].value.toFixed(1)).toBe("-2.4")
     })
 
     it("should aggregate emissions from multiple fertilizer types", () => {
@@ -406,8 +406,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
-        // Emission = 1000 * 20 * 0.264 / 1000 * -1 = -5.28 kg N
-        expect(result.manure.total.toFixed(2)).toBe("-5.28")
+        // Emission = 1000 * 20 * 0.17 / 1000 * -1 = -3.40 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-3.40")
     })
 
     it("should calculate manure ammonia emission factor correctly for grassland - slotted coulter", () => {
@@ -428,8 +428,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
-        // Emission = 1000 * 20 * 0.217 / 1000 * -1 = -4.34 kg N
-        expect(result.manure.total.toFixed(2)).toBe("-4.34")
+        // Emission = 1000 * 20 * 0.17 / 1000 * -1 = -3.40 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-3.40")
     })
 
     it("should calculate manure ammonia emission factor correctly for grassland - shallow injection", () => {
@@ -516,8 +516,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
-        // Emission = 1000 * 20 * 0.30 / 1000 * -1 = -6.00 kg N
-        expect(result.manure.total.toFixed(2)).toBe("-6.00")
+        // Emission = 1000 * 20 * 0.24 / 1000 * -1 = -4.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-4.80")
     })
 
     it("should calculate manure ammonia emission factor correctly for cropland - shallow injection", () => {
@@ -626,8 +626,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
-        // Emission = 1000 * 20 * 0.30 / 1000 * -1 = -6.00 kg N
-        expect(result.manure.total.toFixed(2)).toBe("-6.00")
+        // Emission = 1000 * 20 * 0.24 / 1000 * -1 = -4.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-4.80")
     })
 
     it("should calculate manure ammonia emission factor correctly for bare soil - shallow injection", () => {
@@ -648,8 +648,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
-        // Emission = 1000 * 20 * 0.25 / 1000 * -1 = -5.00 kg N
-        expect(result.manure.total.toFixed(2)).toBe("-5.00")
+        // Emission = 1000 * 20 * 0.24 / 1000 * -1 = -4.80 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-4.80")
     })
 
     it("should calculate manure ammonia emission factor correctly for bare soil - incorporation", () => {
@@ -670,8 +670,8 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
             mockCultivationDetailsMap,
             mockFertilizerDetailsMap,
         )
-        // Emission = 1000 * 20 * 0.22 / 1000 * -1 = -4.40 kg N
-        expect(result.manure.total.toFixed(2)).toBe("-4.40")
+        // Emission = 1000 * 20 * 0.46 / 1000 * -1 = -9.20 kg N
+        expect(result.manure.total.toFixed(2)).toBe("-9.20")
     })
 
     it("should handle unsupported application method for grassland", () => {
@@ -686,20 +686,16 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id: "man-unsupported",
             },
         ]
-        const consoleWarnSpy = vi
-            .spyOn(console, "warn")
-            .mockImplementation(() => {})
-        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
-            mockCultivations,
-            fertilizerApplications,
-            mockCultivationDetailsMap,
-            mockFertilizerDetailsMap,
+        expect(() =>
+            calculateNitrogenEmissionViaAmmoniaByFertilizers(
+                mockCultivations,
+                fertilizerApplications,
+                mockCultivationDetailsMap,
+                mockFertilizerDetailsMap,
+            ),
+        ).toThrow(
+            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported)",
         )
-        expect(result.manure.total.toFixed(0)).toBe("0")
-        expect(consoleWarnSpy).toHaveBeenCalledWith(
-            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported) on grassland",
-        )
-        consoleWarnSpy.mockRestore()
     })
 
     it("should handle unsupported application method for cropland", () => {
@@ -714,20 +710,16 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id: "man-unsupported-crop",
             },
         ]
-        const consoleWarnSpy = vi
-            .spyOn(console, "warn")
-            .mockImplementation(() => {})
-        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
-            mockCultivations,
-            fertilizerApplications,
-            mockCultivationDetailsMap,
-            mockFertilizerDetailsMap,
+        expect(() =>
+            calculateNitrogenEmissionViaAmmoniaByFertilizers(
+                mockCultivations,
+                fertilizerApplications,
+                mockCultivationDetailsMap,
+                mockFertilizerDetailsMap,
+            ),
+        ).toThrow(
+            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported-crop)",
         )
-        expect(result.manure.total.toFixed(0)).toBe("0")
-        expect(consoleWarnSpy).toHaveBeenCalledWith(
-            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported-crop) for cropland",
-        )
-        consoleWarnSpy.mockRestore()
     })
 
     it("should handle unsupported application method for bare soil", () => {
@@ -742,20 +734,16 @@ describe("calculateNitrogenEmissionViaAmmoniaByFertilizers", () => {
                 p_id: "man-unsupported-bare",
             },
         ]
-        const consoleWarnSpy = vi
-            .spyOn(console, "warn")
-            .mockImplementation(() => {})
-        const result = calculateNitrogenEmissionViaAmmoniaByFertilizers(
-            mockCultivations,
-            fertilizerApplications,
-            mockCultivationDetailsMap,
-            mockFertilizerDetailsMap,
+        expect(() =>
+            calculateNitrogenEmissionViaAmmoniaByFertilizers(
+                mockCultivations,
+                fertilizerApplications,
+                mockCultivationDetailsMap,
+                mockFertilizerDetailsMap,
+            ),
+        ).toThrow(
+            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported-bare)",
         )
-        expect(result.manure.total.toFixed(0)).toBe("0")
-        expect(consoleWarnSpy).toHaveBeenCalledWith(
-            "Unsupported application method unsupported-method for Manure Unsupported (man-unsupported-bare) for bare soil",
-        )
-        consoleWarnSpy.mockRestore()
     })
 
     it("should correctly identify grassland cultivation based on date range", () => {
