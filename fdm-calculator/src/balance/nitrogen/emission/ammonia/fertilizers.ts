@@ -210,17 +210,19 @@ function determineManureAmmoniaEmissionFactor(
 
     for (const cultivation of activeCultivations) {
         const type = cultivationDetails.get(cultivation.b_lu_catalogue)
-        if (type?.b_lu_croprotation === "crop") {
-            hasCropland = true
-        } else if (type?.b_lu_croprotation === "grass") {
+        if (
+            type?.b_lu_croprotation === "grass" ||
+            type?.b_lu_croprotation === "clover"
+        ) {
             hasGrassland = true
         }
+        hasCropland = true
     }
 
-    if (hasCropland) {
-        landType = "cropland"
-    } else if (hasGrassland) {
+    if (hasGrassland) {
         landType = "grassland"
+    } else if (hasCropland) {
+        landType = "cropland"
     } else {
         landType = "bare soil"
     }
