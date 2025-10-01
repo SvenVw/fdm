@@ -277,7 +277,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "incorporation":
             switch (landType) {
                 // Not specified in table, assuming similiar to "shallow injection" at grassland
@@ -293,7 +292,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "incorporation 2 tracks":
             // Not specified in table, assuming similiar to "shallow injection" at grassland
             switch (landType) {
@@ -308,7 +306,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "injection":
             switch (landType) {
                 case "grassland":
@@ -323,7 +320,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "shallow injection":
             switch (landType) {
                 case "grassland":
@@ -337,7 +333,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "spraying":
             // Not specified in table, assuming similiar to "broadcasting"
             switch (landType) {
@@ -352,7 +347,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "broadcasting":
             switch (landType) {
                 case "grassland":
@@ -366,7 +360,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "spoke wheel":
             // Not specified in table, assuming similiar to "shallow injection"
             switch (landType) {
@@ -381,7 +374,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "pocket placement":
             // Not specified in table, assuming similiar to "broadcasting"
             switch (landType) {
@@ -396,7 +388,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         case "narrowband":
             switch (landType) {
                 case "grassland":
@@ -410,7 +401,6 @@ function determineManureAmmoniaEmissionFactor(
                         `Unsupported land type ${landType} for ${p_app_name} (${p_id}) with ${p_app_method}`,
                     )
             }
-            break
         default:
             throw new Error(
                 `Unsupported application method ${p_app_method} for ${p_app_name} (${p_id})`,
