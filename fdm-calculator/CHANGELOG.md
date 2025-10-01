@@ -1,5 +1,15 @@
 # fdm-calculator
 
+## 0.7.1
+
+### Patch Changes
+
+- ba3d4d3: Fixes to include missing `injection` value for `p_app_method`
+- dcf0577: Add check for bare soil crop codes at `determineManureAmmoniaEmissionFactor`
+- e715493: Fix determining cropland at `determineManureAmmoniaEmissionFactor`
+- 12565b2: Improved `determineManureAmmoniaEmissionFactor` so that it in all cases will return a value
+  - @svenvw/fdm-core@0.25.1
+
 ## 0.7.0
 
 ### Minor Changes
