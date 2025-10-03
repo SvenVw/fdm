@@ -19,7 +19,10 @@ function createCache<T extends DataWithInputHash>(name: string) {
                 get: (id) => _get().db[id],
                 set: (id, val) => _set({ db: { ..._get().db, [id]: val } }),
             }),
-            { name },
+            {
+                name,
+                version: `fdm-calculator:${PUBLIC_FDM_CALCULATOR_VERSION}`,
+            },
         ),
     )
 }
