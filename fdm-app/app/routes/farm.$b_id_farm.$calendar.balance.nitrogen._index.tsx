@@ -38,7 +38,6 @@ import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
 import { useFarmNitrogenBalanceCache } from "../store/calculation-cache"
-import type { Route } from "./+types/farm.$b_id_farm.$calendar.balance.nitrogen._index"
 
 // Meta
 export const meta: MetaFunction = () => {
