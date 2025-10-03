@@ -172,7 +172,7 @@ function NitrogenBalance({
 
     const fieldNitrogenBalanceCache = useFieldNitrogenBalanceCache()
 
-    const cachedData = fieldNitrogenBalanceCache.get(farm.b_id_farm)
+    const cachedData = fieldNitrogenBalanceCache.get(field.b_id)
 
     useEffect(() => {
         if (
