@@ -1,3 +1,5 @@
+import fs from "node:fs/promises"
+
 import { reactRouter } from "@react-router/dev/vite"
 import {
     type SentryReactRouterBuildOptions,
@@ -7,7 +9,16 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
 
-export default defineConfig((config) => {
+export default defineConfig(async (config) => {
+    // We need to go one directory up since package.json is not inside the dist folder
+    const fdmCalculatorPackageJsonPath = new URL(
+        "../package.json",
+        import.meta.resolve("@svenvw/fdm-calculator"),
+    )
+    const fdmCalculatorPackage = JSON.parse(
+        await fs.readFile(fdmCalculatorPackageJsonPath, { encoding: "utf-8" }),
+    )
+
     return {
         plugins: [
             reactRouter(),
@@ -35,6 +46,9 @@ export default defineConfig((config) => {
         envPrefix: "PUBLIC_",
         define: {
             global: {},
+            PUBLIC_FDM_CALCULATOR_VERSION: JSON.stringify(
+                fdmCalculatorPackage.version || "0.7.0",
+            ),
         },
         ssr: {
             noExternal: ["posthog-js", "posthog-js/react"],
