@@ -11,7 +11,8 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
-import { Suspense, use } from "react"
+import hash from "object-hash"
+import { Suspense, use, useEffect } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -38,6 +39,7 @@ import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
 import { serverConfig } from "../lib/config.server"
+import { useFieldNitrogenBalanceCache } from "../store/calculation-cache"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -91,6 +93,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get details of field
     const field = await getField(fdm, session.principal_id, b_id)
 
+    const url = new URL(request.url)
+    const cacheHash = url.searchParams.get("cacheHash")
+
     // Return promise directly for React Router v7 Suspense pattern
     const nitrogenBalancePromise = collectInputForNitrogenBalance(
         fdm,
@@ -100,6 +105,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         datasetsUrl,
     )
         .then(async (input) => {
+            const inputHash = hash(input)
+            if (inputHash === cacheHash) {
+                return { useCache: true }
+            }
             const result = await calculateNitrogenBalance(input)
             return {
                 input: input.fields.find(
@@ -110,6 +119,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     (field: { b_id: string }) => field.b_id === b_id,
                 ),
                 errorMessage: null,
+                inputHash: inputHash,
             }
         })
         .catch((error) => ({
@@ -154,11 +164,28 @@ function NitrogenBalance({
     field,
     nitrogenBalanceResult,
 }: Awaited<ReturnType<typeof loader>>) {
-    const { input, result, errorMessage } = use(nitrogenBalanceResult)
+    const data = use(nitrogenBalanceResult)
 
     const location = useLocation()
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
+
+    const fieldNitrogenBalanceCache = useFieldNitrogenBalanceCache()
+
+    const cachedData = fieldNitrogenBalanceCache.get(farm.b_id_farm)
+
+    useEffect(() => {
+        if (
+            (!data.useCache || !cachedData?.inputHash) &&
+            !data.errorMessage &&
+            data.inputHash
+        ) {
+            fieldNitrogenBalanceCache.set(field.b_id, data)
+        }
+    }, [field.b_id, data, cachedData?.inputHash, fieldNitrogenBalanceCache.set])
+
+    const { input, result, errorMessage } =
+        data.useCache && cachedData ? cachedData : data
 
     if (!input) {
         return (

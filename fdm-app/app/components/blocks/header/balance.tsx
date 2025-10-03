@@ -30,8 +30,10 @@ export function HeaderBalance({
         <>
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href={`/farm/${b_id_farm}/${calendar}/balance`}>
-                    Nutriëntenbalans
+                <BreadcrumbLink asChild>
+                    <NavLink to={`/farm/${b_id_farm}/${calendar}/balance`}>
+                        Nutriëntenbalans
+                    </NavLink>
                 </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

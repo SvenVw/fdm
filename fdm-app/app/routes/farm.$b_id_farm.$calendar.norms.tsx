@@ -272,6 +272,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     }
 }
 
+/**
+ * Client middleware that redirects with the most recent cacheHash search parameter as needed
+ */
 const clientCacheMiddleware: Route.ClientMiddlewareFunction = async (
     { params, request },
     next,

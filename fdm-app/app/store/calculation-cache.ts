@@ -1,13 +1,17 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface CacheStore<T> {
+export interface DataWithInputHash {
+    inputHash?: string | undefined
+}
+
+export interface CacheStore<T extends DataWithInputHash> {
     db: Record<string, T>
     get: (id: string) => T | undefined
     set: (id: string, val: T) => void
 }
 
-function createCache<T>(name: string) {
+function createCache<T extends DataWithInputHash>(name: string) {
     return create(
         persist<CacheStore<T>>(
             (_set, _get) => ({
@@ -21,3 +25,9 @@ function createCache<T>(name: string) {
 }
 
 export const useFarmNormsCache = createCache("farm-norms-cache")
+export const useFarmNitrogenBalanceCache = createCache(
+    "farm-nitrogen-balance-cache",
+)
+export const useFieldNitrogenBalanceCache = createCache(
+    "field-nitrogen-balance-cache",
+)
