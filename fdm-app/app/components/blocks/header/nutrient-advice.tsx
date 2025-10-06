@@ -30,10 +30,12 @@ export function HeaderNutrientAdvice({
         <>
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink
-                    href={`/farm/${b_id_farm}/${calendar}/nutrient_advice`}
-                >
-                    Bemestingsadvies
+                <BreadcrumbLink asChild>
+                    <NavLink
+                        to={`/farm/${b_id_farm}/${calendar}/nutrient_advice`}
+                    >
+                        Bemestingsadvies
+                    </NavLink>
                 </BreadcrumbLink>
             </BreadcrumbItem>
             {b_id ? (
