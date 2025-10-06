@@ -157,10 +157,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 }
 
                 const fieldNormPromises = inputs.map(async (input) => {
-                    const { field } = input
                     if (input.errorMessage) {
                         return input
                     }
+                    const { field } = input
 
                     try {
                         // Calculate the norms
