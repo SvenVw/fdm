@@ -4,6 +4,7 @@ import {
     type LoaderFunctionArgs,
     type MetaFunction,
     Outlet,
+    redirect,
     useLoaderData,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
@@ -16,6 +17,9 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { splatCacheMiddleware } from "../lib/middleware"
+import { useFieldNutrientAdviceCache } from "../store/calculation-cache"
+import type { Route } from "./+types/farm.$b_id_farm.$calendar.nutrient_advice"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -117,6 +121,43 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         throw handleLoaderError(error)
     }
 }
+
+// In case the user navigated within the application
+const redirectMiddleware: Route.ClientMiddlewareFunction = (
+    { request, params },
+    next,
+) => {
+    const url = new URL(request.url)
+
+    if (/\/nutrient_advice\/?$/.test(url.pathname)) {
+        const nutrientAdviceCache = useFieldNutrientAdviceCache.getState()
+
+        const cachedFieldId = Object.keys(nutrientAdviceCache.db)[0]
+
+        if (cachedFieldId) {
+            const cachedData = nutrientAdviceCache.get(cachedFieldId)
+
+            if (cachedData?.inputHash) {
+                throw redirect(
+                    `/farm/${params.b_id_farm}/${params.calendar}/nutrient_advice/${cachedFieldId}?cacheHash=${cachedData.inputHash}`,
+                )
+            }
+        }
+    }
+
+    return next()
+}
+
+export const clientMiddleware = [
+    // Redirect to nitrogen balance if what kind of balance analysis needed is not known yet
+    redirectMiddleware,
+    // Farm nitrogen
+    splatCacheMiddleware(
+        () => /\/nutrient_advice\/.+\/?$/,
+        () => useFieldNutrientAdviceCache.getState(),
+        ({ params }) => params.b_id || "",
+    ),
+]
 
 /**
  * Renders the layout for managing farm settings.

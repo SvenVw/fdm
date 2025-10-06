@@ -34,3 +34,4 @@ export const useFarmNitrogenBalanceCache = createCache(
 export const useFieldNitrogenBalanceCache = createCache(
     "field-nitrogen-balance-cache",
 )
+export const useFieldNutrientAdviceCache = createCache("field-norms-cache")

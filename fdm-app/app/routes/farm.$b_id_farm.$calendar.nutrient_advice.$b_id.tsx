@@ -6,7 +6,8 @@ import {
     getFertilizers,
     getField,
 } from "@svenvw/fdm-core"
-import { Suspense, use } from "react"
+import hash from "object-hash"
+import { Suspense, use, useEffect } from "react"
 import {
     type LoaderFunctionArgs,
     type MetaFunction,
@@ -28,6 +29,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { useFieldNutrientAdviceCache } from "../store/calculation-cache"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -75,6 +77,8 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
         const field = await getField(fdm, session.principal_id, b_id)
 
+        const url = new URL(request.url)
+        const cacheHash = url.searchParams.get("cacheHash")
         const asyncData = (async () => {
             try {
                 const currentSoilData = getCurrentSoilData(
@@ -120,6 +124,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 // For now take the first cultivation
                 const b_lu_catalogue = cultivations[0].b_lu_catalogue
 
+                const inputHash = hash([
+                    resolvedCurrentSoilData,
+                    resolvedFertilizerApplications,
+                    resolvedFertilizers,
+                    b_lu_catalogue,
+                ])
+                if (inputHash === cacheHash) {
+                    return { useCache: true }
+                }
+
                 const doses = calculateDose({
                     applications: resolvedFertilizerApplications,
                     fertilizers: resolvedFertilizers,
@@ -138,6 +152,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     fertilizerApplications: resolvedFertilizerApplications,
                     fertilizers: resolvedFertilizers,
                     errorMessage: undefined,
+                    inputHash: inputHash,
                 }
             } catch (error) {
                 return { errorMessage: String(error).replace("Error: ", "") }
@@ -211,8 +226,29 @@ function FieldNutrientAdvice({
     traceNutrients: NutrientDescription[]
 }) {
     const { field, calendar, nutrientsDescription } = loaderData
-    const asyncData = use(loaderData.asyncData)
+    const serverAsyncData = use(loaderData.asyncData)
     const location = useLocation()
+
+    const fieldNutrientAdviceCache = useFieldNutrientAdviceCache()
+    const cachedData = fieldNutrientAdviceCache.get(field.b_id)
+    useEffect(() => {
+        if (
+            (!serverAsyncData.useCache || !cachedData?.inputHash) &&
+            !serverAsyncData.errorMessage &&
+            serverAsyncData.inputHash
+        ) {
+            fieldNutrientAdviceCache.set(field.b_id, asyncData)
+        }
+    }, [
+        field.b_id,
+        serverAsyncData,
+        cachedData?.inputHash,
+        fieldNutrientAdviceCache.set,
+    ])
+
+    const asyncData = (
+        serverAsyncData.useCache ? cachedData : serverAsyncData
+    ) as typeof serverAsyncData
 
     if (typeof asyncData.errorMessage === "string") {
         return (
