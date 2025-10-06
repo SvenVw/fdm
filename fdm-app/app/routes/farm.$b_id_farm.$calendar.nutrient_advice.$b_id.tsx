@@ -239,7 +239,7 @@ function FieldNutrientAdvice({
             !serverAsyncData.errorMessage &&
             serverAsyncData.inputHash
         ) {
-            fieldNutrientAdviceCache.set(field.b_id, asyncData)
+            fieldNutrientAdviceCache.set(field.b_id, serverAsyncData)
         }
     }, [
         field.b_id,
