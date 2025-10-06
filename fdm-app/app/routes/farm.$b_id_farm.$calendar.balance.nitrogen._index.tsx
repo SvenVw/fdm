@@ -12,7 +12,8 @@ import {
     CircleAlert,
     CircleCheck,
 } from "lucide-react"
-import { Suspense, use } from "react"
+import hash from "object-hash"
+import { Suspense, use, useEffect } from "react"
 import {
     data,
     type LoaderFunctionArgs,
@@ -20,6 +21,7 @@ import {
     NavLink,
     useLoaderData,
     useLocation,
+    useSearchParams,
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
@@ -36,6 +38,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
+import { useFarmNitrogenBalanceCache } from "../store/calculation-cache"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -78,6 +81,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     // Get details of fields
     const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
+    const url = new URL(request.url)
+    const cacheHash = url.searchParams.get("cacheHash")
+
     const asyncData = (async () => {
         // Collect input data for nutrient balance calculation
         const nitrogenBalanceInput = await collectInputForNitrogenBalance(
@@ -86,6 +92,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id_farm,
             timeframe,
         )
+
+        const inputHash = hash(nitrogenBalanceInput)
+        if (inputHash === cacheHash) {
+            return { useCache: true }
+        }
 
         let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null
         let errorMessage = null as string | null
@@ -99,6 +110,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         return {
             nitrogenBalanceResult: nitrogenBalanceResult,
             errorMessage: errorMessage,
+            inputHash: inputHash,
         }
     })()
 
@@ -140,10 +152,42 @@ function FarmBalanceNitrogenOverview({
 }: Awaited<ReturnType<typeof loader>>) {
     const location = useLocation()
     const page = location.pathname
-    const { nitrogenBalanceResult, errorMessage } = use(asyncData)
+    const [searchParams, setSearchParams] = useSearchParams()
+    const data = use(asyncData)
     const { showProductiveOnly } = useFieldFilterStore()
 
-    const resolvedNitrogenBalanceResult = nitrogenBalanceResult
+    const farmNitrogenBalanceCache = useFarmNitrogenBalanceCache()
+
+    const cachedData = farmNitrogenBalanceCache.get(farm.b_id_farm)
+
+    useEffect(() => {
+        if (
+            (!data.useCache || !cachedData?.inputHash) &&
+            !data.errorMessage &&
+            data.inputHash
+        ) {
+            farmNitrogenBalanceCache.set(farm.b_id_farm, data)
+        }
+    }, [
+        farm.b_id_farm,
+        data,
+        cachedData?.inputHash,
+        farmNitrogenBalanceCache.set,
+    ])
+
+    if (data.useCache && !cachedData && searchParams.get("cacheHash")) {
+        setSearchParams((searchParams) => {
+            searchParams.delete("cacheHash")
+            return searchParams
+        })
+        return null
+    }
+
+    const {
+        nitrogenBalanceResult: resolvedNitrogenBalanceResult,
+        errorMessage,
+    } = data.useCache && cachedData ? cachedData : data
+
     if (errorMessage) {
         return (
             <div className="flex items-center justify-center">
