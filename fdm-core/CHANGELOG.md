@@ -1,5 +1,43 @@
 # Changelog fdm-core
 
+## 0.25.1
+
+### Patch Changes
+
+- Updated dependencies [e4ce36a]
+  - @svenvw/fdm-data@0.17.1
+
+## 0.25.0
+
+### Minor Changes
+
+- af57dd1: Add `removeFarm` to delete a farm and all of the related data to it
+- 29b0937: Adds `b_isproductive` to output of `getCultivationPlan`
+- aa7a1b1: Expose `b_perimeter` and `b_isproductive` in the output of `getField` and `getFields`
+- 8cc6e4a: Add function `isAllowedToDeleteFarm` to check if principal has the right to delete a farm
+- 5cf76d4: Made the magic link email timeout 15 minutes.
+
+### Patch Changes
+
+- 86e16c2: Removed `null` for `p_app_date` at FertilizerApplication
+- Updated dependencies [16270d6]
+- Updated dependencies [e844f9d]
+  - @svenvw/fdm-data@0.17.0
+
+## 0.24.2
+
+### Patch Changes
+
+- 787fa53: Fix `getFields` filtering: include fields acquired before the timeframe start if they overlap the timeframe (end is within the timeframe or undefined).
+- cd4cc8a: Fields are sorted by descending area instead of alphabetical name.
+
+## 0.24.1
+
+### Patch Changes
+
+- e964a18: Fix to return cultivations at `getCultivationPlan` and `getCultivation` when cultivation starts before `timeFrame.start` and has no `ending date
+- 0c29661: Fixes validation check that harvest or end date of cultivation cannot happen on start date of cultivation
+
 ## 0.24.0
 
 ### Minor Changes

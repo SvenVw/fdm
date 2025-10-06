@@ -1,3 +1,4 @@
+import { TZDate } from "@date-fns/tz"
 import { render } from "@react-email/components"
 import type { User } from "better-auth"
 import { format } from "date-fns"
@@ -50,11 +51,13 @@ export async function renderInvitationEmail(
     inviteeEmail: string,
     inviter: ExtendedUser,
     organizationName: string,
+    invitationId: string,
 ): Promise<Email> {
     const emailHtml = await render(
         InvitationEmail({
             inviteeEmail: inviteeEmail,
             inviterName: `${inviter.firstname} ${inviter.surname}`,
+            invitationId: invitationId,
             organizationName: organizationName,
             appName: serverConfig.name,
             appBaseUrl: serverConfig.url,
@@ -77,7 +80,15 @@ export async function renderMagicLinkEmail(
     emailAddress: string,
     magicLinkUrl: string,
 ): Promise<Email> {
-    const emailTimestamp = format(new Date(), "Pp", { locale: nl })
+    const timeZone = getTimeZoneFromUrl(magicLinkUrl)
+
+    // Show the local time only if available, otherwise show server time
+    const emailTimestamp: string = format(
+        timeZone ? TZDate.tz(timeZone) : new Date(),
+        "Pp",
+        { locale: nl },
+    )
+
     const emailHtml = await render(
         MagicLinkEmail({
             url: magicLinkUrl,
@@ -98,6 +109,41 @@ export async function renderMagicLinkEmail(
     }
 
     return email
+}
+
+/**
+ * Extracts and validates a timezone from a given URL's callbackURL parameter.
+ * @param url The URL to parse.
+ * @returns The validated timezone string or undefined if not found or invalid.
+ */
+function getTimeZoneFromUrl(url: string): string | undefined {
+    try {
+        const parsedMagicLinkUrl = new URL(url)
+        const callbackUrlCandidate =
+            parsedMagicLinkUrl.searchParams.get("callbackURL")
+
+        if (!callbackUrlCandidate) {
+            return undefined
+        }
+
+        // Use a dummy base URL for parsing if callbackUrlCandidate is relative
+        const parsedCallbackUrl = new URL(
+            callbackUrlCandidate,
+            callbackUrlCandidate.startsWith("http")
+                ? undefined
+                : "http://example.com",
+        )
+        const timeZoneCandidate = parsedCallbackUrl.searchParams.get("timeZone")
+
+        if (timeZoneCandidate) {
+            // Validate the timezone
+            Intl.DateTimeFormat(undefined, { timeZone: timeZoneCandidate })
+            return timeZoneCandidate
+        }
+    } catch (error) {
+        console.warn("Invalid timezone in callbackURL:", error)
+    }
+    return undefined
 }
 
 export async function sendEmail(email: Email): Promise<void> {

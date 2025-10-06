@@ -77,7 +77,9 @@ describe("getNL2025StikstofGebruiksNorm", () => {
 
         const result = await getNL2025StikstofGebruiksNorm(mockInput)
         expect(result.normValue).toBe(140)
-        expect(result.normSource).toEqual("Akkerbouwgewas, pootaardappelen.")
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewas, pootaardappelen (hoge norm).",
+        )
     })
 
     it("should apply 0 korting if winterteelt is present in zand_nwc region (hoofdteelt 2025)", async () => {
@@ -283,6 +285,283 @@ describe("getNL2025StikstofGebruiksNorm", () => {
         expect(result.normValue).toBe(135)
         expect(result.normSource).toEqual(
             "Vruchtgewassen, Landbouwstambonen, rijp zaad.",
+        )
+    })
+
+    it("should return the correct norm for Gras voor industriële verwerking (eerste jaar)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_3805", // Gras voor industriële verwerking
+                    b_lu_start: new Date(2025, 0, 1), // Current year cultivation
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(30)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Gras voor industriële verwerking (inzaai in september en eerste jaar).",
+        )
+    })
+
+    it("should return the correct norm for Gras voor industriële verwerking (volgende jaren)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_3805", // Gras voor industriële verwerking (current year)
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+                {
+                    b_lu_catalogue: "nl_3805", // Gras voor industriële verwerking (previous year)
+                    b_lu_start: new Date(2024, 0, 1),
+                    b_lu_end: new Date(2024, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(310)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Gras voor industriële verwerking (inzaai voor 15 mei en volgende jaren).",
+        )
+    })
+
+    it("should return the correct norm for Graszaad, Engels raaigras (1e jaars)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_6750", // Graszaad, Engels raaigras
+                    b_lu_start: new Date(2025, 0, 1), // Current year cultivation
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(165)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Graszaad, Engels raaigras (1e jaars).",
+        )
+    })
+
+    it("should return the correct norm for Graszaad, Engels raaigras (overjarig)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_6750", // Graszaad, Engels raaigras (current year)
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+                {
+                    b_lu_catalogue: "nl_6750", // Graszaad, Engels raaigras (previous year)
+                    b_lu_start: new Date(2024, 0, 1),
+                    b_lu_end: new Date(2024, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(200)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Graszaad, Engels raaigras (overjarig).",
+        )
+    })
+
+    it("should return the correct norm for Akkerbouwgewassen, Roodzwenkgras (1e jaars)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_6784", // Akkerbouwgewassen, Roodzwenkgras
+                    b_lu_start: new Date(2025, 0, 1), // Current year cultivation
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(85)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Roodzwenkgras (1e jaars).",
+        )
+    })
+
+    it("should return the correct norm for Akkerbouwgewassen, Roodzwenkgras (overjarig)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_6784", // Akkerbouwgewassen, Roodzwenkgras (current year)
+                    b_lu_start: new Date(2025, 0, 1),
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+                {
+                    b_lu_catalogue: "nl_6784", // Akkerbouwgewassen, Roodzwenkgras (previous year)
+                    b_lu_start: new Date(2024, 0, 1),
+                    b_lu_end: new Date(2024, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(115)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Roodzwenkgras (overjarig).",
+        )
+    })
+
+    it("should return the correct norm for Winterui (1e jaars)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_1932", // Winterui, 1e jaars
+                    b_lu_start: new Date(2025, 0, 1), // Current year cultivation
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(170)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Ui overig, zaaiui of winterui. (1e jaars).",
+        )
+    })
+
+    it("should return the correct norm for Winterui (2e jaars)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_1933", // Winterui, 2e jaars
+                    b_lu_start: new Date(2025, 0, 1), // Current year cultivation
+                    b_lu_end: new Date(2025, 5, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(170)
+        expect(result.normSource).toEqual(
+            "Akkerbouwgewassen, Ui overig, zaaiui of winterui. (2e jaars).",
+        )
+    })
+
+    it("should return the correct norm for Bladgewassen, Spinazie (1e teelt)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2773", // Bladgewassen, Spinazie
+                    b_lu_start: new Date(2025, 4, 15), // May 15th, 2025 (hoofdteelt)
+                    b_lu_end: new Date(2025, 6, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(260)
+        expect(result.normSource).toEqual("Bladgewassen, Spinazie (1e teelt).")
+    })
+
+    it("should return the correct norm for Bladgewassen, Slasoorten (1e teelt)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2767", // Bladgewassen, Slasoorten
+                    b_lu_start: new Date(2025, 4, 15), // May 15th, 2025 (hoofdteelt)
+                    b_lu_end: new Date(2025, 6, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(180)
+        expect(result.normSource).toEqual(
+            "Bladgewassen, Slasoorten (1e teelt).",
+        )
+    })
+
+    it("should return the correct norm for Bladgewassen, Andijvie eerste teelt volgteelt (1e teelt)", async () => {
+        const mockInput: NL2025NormsInput = {
+            farm: { is_derogatie_bedrijf: false },
+            field: {
+                b_id: "1",
+                b_centroid: [5.6279889, 51.975571], // Klei region
+            } as Field,
+            cultivations: [
+                {
+                    b_lu_catalogue: "nl_2708", // Bladgewassen, Andijvie eerste teelt volgteelt
+                    b_lu_start: new Date(2025, 4, 15), // May 15th, 2025 (hoofdteelt)
+                    b_lu_end: new Date(2025, 6, 1),
+                } as Partial<NL2025NormsInputForCultivation>,
+            ] as NL2025NormsInputForCultivation[],
+            soilAnalysis: { a_p_al: 20, a_p_cc: 0.9 },
+        }
+
+        const result = await getNL2025StikstofGebruiksNorm(mockInput)
+        expect(result.normValue).toBe(180)
+        expect(result.normSource).toEqual(
+            "Bladgewassen, Andijvie eerste teelt volgteelt (1e teelt).",
         )
     })
 })

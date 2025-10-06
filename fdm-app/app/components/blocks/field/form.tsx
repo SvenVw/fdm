@@ -41,7 +41,7 @@ export default function FieldDetailsDialog({
     cultivationOptions,
     fieldNameDefault,
 }: FieldDetailsDialogProps) {
-    const b_lu_catalogue = `nl_${field.properties?.b_lu_catalogue ?? ""}`
+    const b_lu_catalogue = field.properties?.b_lu_catalogue ?? ""
 
     const form = useRemixForm<z.infer<typeof FormSchema>>({
         mode: "onTouched",

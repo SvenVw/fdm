@@ -25,11 +25,11 @@
         "format-and-lint:fix-unsafe": "biome check . --write --unsafe"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.1.4",
-        "@changesets/cli": "^2.29.5",
-        "turbo": "^2.5.5"
+        "@biomejs/biome": "^2.2.4",
+        "@changesets/cli": "^2.29.7",
+        "turbo": "^2.5.6"
     },
-    "packageManager": "pnpm@10.14.0",
+    "packageManager": "pnpm@10.17.0",
     "pnpm": {
         "packageExtensions": {
             "vite-plugin-dts": {

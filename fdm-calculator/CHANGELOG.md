@@ -1,5 +1,45 @@
 # fdm-calculator
 
+## 0.7.1
+
+### Patch Changes
+
+- ba3d4d3: Fixes to include missing `injection` value for `p_app_method`
+- dcf0577: Add check for bare soil crop codes at `determineManureAmmoniaEmissionFactor`
+- e715493: Fix determining cropland at `determineManureAmmoniaEmissionFactor`
+- 12565b2: Improved `determineManureAmmoniaEmissionFactor` so that it in all cases will return a value
+  - @svenvw/fdm-core@0.25.1
+
+## 0.7.0
+
+### Minor Changes
+
+- fa5aab5: Adds support for derogatievrije zones at dierlijke mest gebruiksnorm calculation
+- be7d733: Add support for cultivations with different stikstofgebruiksnormen for first and subsequent years.
+
+### Patch Changes
+
+- 7cfc412: Prevent overwhelming the nitrogen balance calculation with many fields by organizing calculations into batches.
+- 85b964d: Fix exception when calculating stikstofgebruiksnorm for cultivations with sub_types.
+- 82bb999: In norms, replace vector lookups of remote datasets with raster queries to improve performance and reliability.
+- 8333884: Fixes exception at calculating stikstofgebruiksnorm when potato crop has no variety provided
+- d25b70e: Improve nitrogen balance calculation performance for fertilizer supply by iterating over each fertilizer application only once.
+- 14c8a06: Improve nitrogen balance performance by retrieving deposition values more efficiently from the remote GeoTIFF (batched requests + caching)
+- a1ef995: Improve nitrogen balance calculation performance for ammonia emissions from fertilizer applications by iterating over each application only once.
+- Updated dependencies [af57dd1]
+- Updated dependencies [29b0937]
+- Updated dependencies [aa7a1b1]
+- Updated dependencies [8cc6e4a]
+- Updated dependencies [5cf76d4]
+- Updated dependencies [86e16c2]
+  - @svenvw/fdm-core@0.25.0
+
+## 0.6.1
+
+### Patch Changes
+
+- a9acf19: Fix divide-by-zero in nitrogen balance when b_lu_hi is undefined or 0
+
 ## 0.6.0
 
 ### Minor Changes

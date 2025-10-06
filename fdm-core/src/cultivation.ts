@@ -6,6 +6,7 @@ import {
     gte,
     inArray,
     isNotNull,
+    isNull,
     lte,
     or,
     type SQL,
@@ -21,6 +22,7 @@ import type {
 import * as schema from "./db/schema"
 import { handleError } from "./error"
 import type { FdmType } from "./fdm"
+import { determineIfFieldIsProductiveByShape } from "./field"
 import {
     addHarvest,
     getHarvestableTypeOfCultivation,
@@ -202,7 +204,7 @@ export async function addCultivation(
                 }
 
                 // Validate if terminate date is after sowing date
-                if (b_lu_end <= b_lu_start) {
+                if (b_lu_end.getTime() <= b_lu_start.getTime()) {
                     throw new Error("Terminate date must be after sowing date")
                 }
             }
@@ -457,15 +459,7 @@ export async function getCultivations(
             "getCultivations",
         )
 
-        const startingDateCondition = buildDateRangeCondition(
-            timeframe?.start,
-            timeframe?.end,
-        )
-        const endingDateCondition = buildDateRangeConditionEnding(
-            timeframe?.start,
-            timeframe?.end,
-        )
-        const timeframeClause = or(startingDateCondition, endingDateCondition)
+        const timeframeCondition = buildCultivationTimeframeCondition(timeframe)
 
         const cultivations = await fdm
             .select({
@@ -501,7 +495,12 @@ export async function getCultivations(
                 ),
             )
             .where(
-                and(eq(schema.cultivationStarting.b_id, b_id), timeframeClause),
+                timeframeCondition
+                    ? and(
+                          eq(schema.cultivationStarting.b_id, b_id),
+                          timeframeCondition,
+                      )
+                    : eq(schema.cultivationStarting.b_id, b_id),
             )
             .orderBy(
                 desc(schema.cultivationStarting.b_lu_start),
@@ -608,15 +607,7 @@ export async function getCultivationPlan(
             "getCultivationPlan",
         )
 
-        const startingDateCondition = buildDateRangeCondition(
-            timeframe?.start,
-            timeframe?.end,
-        )
-        const endingDateCondition = buildDateRangeConditionEnding(
-            timeframe?.start,
-            timeframe?.end,
-        )
-        const timeframeClause = or(startingDateCondition, endingDateCondition)
+        const timeframeCondition = buildCultivationTimeframeCondition(timeframe)
 
         const cultivations = await fdm
             .select({
@@ -627,6 +618,7 @@ export async function getCultivationPlan(
                 b_id: schema.fields.b_id,
                 b_name: schema.fields.b_name,
                 b_area: sql<number>`ROUND((ST_Area(b_geometry::geography)/10000)::NUMERIC, 2)::FLOAT`,
+                b_perimeter: sql<number>`ROUND((ST_Length(ST_ExteriorRing(b_geometry)::geography))::NUMERIC, 2)::FLOAT`,
                 b_lu_start: schema.cultivationStarting.b_lu_start,
                 b_lu_end: schema.cultivationEnding.b_lu_end,
                 m_cropresidue: schema.cultivationEnding.m_cropresidue,
@@ -726,12 +718,22 @@ export async function getCultivationPlan(
                 ),
             )
             .where(
-                and(
-                    eq(schema.farms.b_id_farm, b_id_farm),
-                    isNotNull(schema.cultivationsCatalogue.b_lu_catalogue),
-                    isNotNull(schema.cultivationStarting.b_id),
-                    timeframeClause,
-                ),
+                timeframeCondition
+                    ? and(
+                          eq(schema.farms.b_id_farm, b_id_farm),
+                          isNotNull(
+                              schema.cultivationsCatalogue.b_lu_catalogue,
+                          ),
+                          isNotNull(schema.cultivationStarting.b_id),
+                          timeframeCondition,
+                      )
+                    : and(
+                          eq(schema.farms.b_id_farm, b_id_farm),
+                          isNotNull(
+                              schema.cultivationsCatalogue.b_lu_catalogue,
+                          ),
+                          isNotNull(schema.cultivationStarting.b_id),
+                      ),
             )
 
         const cultivationPlan = cultivations.reduce(
@@ -747,17 +749,6 @@ export async function getCultivationPlan(
                 )
 
                 if (!existingCultivation) {
-                    if (timeframe) {
-                        if (
-                            !isCultivationWithinTimeframe(
-                                curr.b_lu_start,
-                                curr.b_lu_end,
-                                timeframe,
-                            )
-                        ) {
-                            return acc
-                        }
-                    }
                     existingCultivation = {
                         b_lu_catalogue: curr.b_lu_catalogue,
                         b_lu_name: curr.b_lu_name,
@@ -781,6 +772,10 @@ export async function getCultivationPlan(
                         b_id: curr.b_id,
                         b_area: curr.b_area,
                         b_name: curr.b_name,
+                        b_isproductive: determineIfFieldIsProductiveByShape(
+                            curr.b_area,
+                            curr.b_perimeter,
+                        ),
                         fertilizer_applications: [],
                         harvests: [],
                     }
@@ -833,23 +828,6 @@ export async function getCultivationPlan(
             b_id_farm,
         })
     }
-}
-
-export function isCultivationWithinTimeframe(
-    b_lu_start: Date | null,
-    b_lu_end: Date | null,
-    timeframe: Timeframe,
-): boolean {
-    if (!b_lu_start || !timeframe.start || !timeframe.end) return false
-
-    if (b_lu_end) {
-        return (
-            (b_lu_start >= timeframe.start && b_lu_start <= timeframe.end) ||
-            (b_lu_end >= timeframe.start && b_lu_end <= timeframe.end) ||
-            (b_lu_start <= timeframe.start && b_lu_end >= timeframe.end)
-        )
-    }
-    return b_lu_start >= timeframe.start && b_lu_start <= timeframe.end
 }
 
 /**
@@ -1171,62 +1149,50 @@ export async function updateCultivation(
     }
 }
 
-// Helper function to build date range conditions
-export const buildDateRangeCondition = (
-    dateStart: Date | null | undefined,
-    dateEnd: Date | null | undefined,
+// Helper function to build a robust date range condition for cultivations.
+// This function constructs a SQL clause to filter cultivations that overlap
+// with a given timeframe.
+// An overlap occurs if the cultivation's start is before the timeframe's end,
+// AND the cultivation's end is after the timeframe's start.
+// A cultivation with no end date is considered to extend indefinitely into the future,
+// which correctly includes it in the timeframe if it started before the timeframe ended.
+export const buildCultivationTimeframeCondition = (
+    timeframe: Timeframe | undefined,
 ): SQL | undefined => {
-    if (!dateStart && !dateEnd) {
+    if (!timeframe?.start || !timeframe?.end) {
         return undefined
     }
-    const startCondition = dateStart
-        ? gte(schema.cultivationStarting.b_lu_start, dateStart)
-        : undefined
-    const endCondition = dateEnd
-        ? lte(schema.cultivationStarting.b_lu_start, dateEnd)
-        : undefined
 
-    if (startCondition && endCondition) {
-        return and(startCondition, endCondition)
-    }
-    if (startCondition) {
-        return startCondition
-    }
-    return endCondition
-}
-
-// Helper function to build date range conditions for ending
-export const buildDateRangeConditionEnding = (
-    dateStart: Date | null | undefined,
-    dateEnd: Date | null | undefined,
-): SQL | undefined => {
-    if (!dateStart && !dateEnd) {
-        return undefined
-    }
-    const startCondition = dateStart
-        ? or(
-              gte(schema.cultivationEnding.b_lu_end, dateStart),
-              and(
-                  isNotNull(schema.cultivationEnding.b_lu_end),
-                  gte(schema.cultivationStarting.b_lu_start, dateStart),
-              ),
-          )
-        : undefined
-    const endCondition = dateEnd
-        ? or(
-              lte(schema.cultivationEnding.b_lu_end, dateEnd),
-              and(
-                  isNotNull(schema.cultivationEnding.b_lu_end),
-                  lte(schema.cultivationStarting.b_lu_start, dateEnd),
-              ),
-          )
-        : undefined
-
-    if (startCondition && endCondition) {
-        return and(startCondition, endCondition)
-    }
-    if (startCondition) {
-        return startCondition
-    }
-    return endCondition
+    // A cultivation is within the timeframe if:
+    // 1. It has an end date AND (it starts within, ends within, or spans the timeframe)
+    // OR
+    // 2. It does NOT have an end date AND its start date is on or before the timeframe's end.
+    return or(
+        // Case 1: Cultivation has an end date and overlaps with the timeframe
+        and(
+            isNotNull(schema.cultivationEnding.b_lu_end),
+            or(
+                // Cultivation starts within the timeframe
+                and(
+                    gte(schema.cultivationStarting.b_lu_start, timeframe.start),
+                    lte(schema.cultivationStarting.b_lu_start, timeframe.end),
+                ),
+                // Cultivation ends within the timeframe
+                and(
+                    gte(schema.cultivationEnding.b_lu_end, timeframe.start),
+                    lte(schema.cultivationEnding.b_lu_end, timeframe.end),
+                ),
+                // Cultivation spans the entire timeframe
+                and(
+                    lte(schema.cultivationStarting.b_lu_start, timeframe.start),
+                    gte(schema.cultivationEnding.b_lu_end, timeframe.end),
+                ),
+            ),
+        ),
+        // Case 2: Cultivation has no end date and its start is on or before the timeframe's end
+        and(
+            isNull(schema.cultivationEnding.b_lu_end),
+            lte(schema.cultivationStarting.b_lu_start, timeframe.end),
+        ),
+    )
 }

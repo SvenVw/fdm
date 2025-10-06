@@ -20,10 +20,10 @@ import {
     NavLink,
     useLoaderData,
     useLocation,
-    useNavigation,
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
+import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
 import {
     Card,
     CardContent,
@@ -34,8 +34,8 @@ import {
 import { getSession } from "~/lib/auth.server"
 import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
-import { serverConfig } from "~/lib/config.server"
 import { fdm } from "~/lib/fdm.server"
+import { useFieldFilterStore } from "~/store/field-filter"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -80,13 +80,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
     const asyncData = (async () => {
         // Collect input data for nutrient balance calculation
-        const datasetsUrl = serverConfig.datasets_url
         const nitrogenBalanceInput = await collectInputForNitrogenBalance(
             fdm,
             session.principal_id,
             b_id_farm,
             timeframe,
-            datasetsUrl,
         )
 
         let nitrogenBalanceResult = null as NitrogenBalanceNumeric | null
@@ -113,7 +111,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 
 export default function FarmBalanceNitrogenOverviewBlock() {
     const loaderData = useLoaderData<typeof loader>()
-    const _navigation = useNavigation()
 
     return (
         <div className="space-y-4">
@@ -144,6 +141,8 @@ function FarmBalanceNitrogenOverview({
     const location = useLocation()
     const page = location.pathname
     const { nitrogenBalanceResult, errorMessage } = use(asyncData)
+    const { showProductiveOnly } = useFieldFilterStore()
+
     const resolvedNitrogenBalanceResult = nitrogenBalanceResult
     if (errorMessage) {
         return (
@@ -214,6 +213,14 @@ function FarmBalanceNitrogenOverview({
     }
 
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
+    const filteredFields = resolvedNitrogenBalanceResult.fields.filter(
+        (field) => {
+            if (!showProductiveOnly) return true
+            const fieldData = fieldsMap.get(field.b_id)
+            return fieldData ? fieldData.b_isproductive === true : false
+        },
+    )
+
     return (
         <>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -315,12 +322,15 @@ function FarmBalanceNitrogenOverview({
                 </Card>
                 <Card className="col-span-3">
                     <CardHeader>
-                        <CardTitle>Percelen</CardTitle>
+                        <CardTitle className="flex flex-row items-center justify-between space-y-0 pb-2">
+                            <p>Percelen</p>
+                            <FieldFilterToggle />
+                        </CardTitle>
                         <CardDescription />
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-8">
-                            {resolvedNitrogenBalanceResult.fields.map(
+                            {filteredFields.map(
                                 (
                                     field: NitrogenBalanceNumeric["fields"][number],
                                 ) => {

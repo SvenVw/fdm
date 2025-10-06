@@ -67,7 +67,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function SignIn() {
     // Function to open cookie settings if available in the window object
     const openCookieSettings = () => {
-        if (typeof window !== "undefined" && window.openCookieSettings) {
+        if (window?.openCookieSettings) {
             window.openCookieSettings()
         }
     }
@@ -106,7 +106,7 @@ export default function SignIn() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <p className="text-sm text-muted-foreground">
-                                    De aanmeldlink is 5 minuten geldig en kan
+                                    De aanmeldlink is 15 minuten geldig en kan
                                     maar één keer worden gebruikt.
                                 </p>
                             </CardContent>
