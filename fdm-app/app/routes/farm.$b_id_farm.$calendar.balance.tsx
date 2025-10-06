@@ -1,11 +1,10 @@
 import { redirect } from "react-router"
-import type { CacheStore, DataWithInputHash } from "../store/calculation-cache"
+import { splatCacheMiddleware } from "~/lib/middleware"
 import {
     useFarmNitrogenBalanceCache,
     useFieldNitrogenBalanceCache,
-} from "../store/calculation-cache"
+} from "~/store/calculation-cache"
 import type { Route } from "./+types/farm.$b_id_farm.$calendar.balance"
-import { splatCacheMiddleware } from "../lib/middleware"
 
 // In case the user navigated directly by URL
 export function loader({ params, request }: Route.LoaderArgs) {

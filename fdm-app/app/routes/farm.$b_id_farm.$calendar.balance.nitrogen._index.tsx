@@ -21,6 +21,7 @@ import {
     NavLink,
     useLoaderData,
     useLocation,
+    useSearchParams,
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import { NitrogenBalanceFallback } from "~/components/blocks/balance/skeletons"
@@ -151,6 +152,7 @@ function FarmBalanceNitrogenOverview({
 }: Awaited<ReturnType<typeof loader>>) {
     const location = useLocation()
     const page = location.pathname
+    const [searchParams, setSearchParams] = useSearchParams()
     const data = use(asyncData)
     const { showProductiveOnly } = useFieldFilterStore()
 
@@ -172,6 +174,14 @@ function FarmBalanceNitrogenOverview({
         cachedData?.inputHash,
         farmNitrogenBalanceCache.set,
     ])
+
+    if (data.useCache && !cachedData && searchParams.get("cacheHash")) {
+        setSearchParams((searchParams) => {
+            searchParams.delete("cacheHash")
+            return searchParams
+        })
+        return null
+    }
 
     const {
         nitrogenBalanceResult: resolvedNitrogenBalanceResult,

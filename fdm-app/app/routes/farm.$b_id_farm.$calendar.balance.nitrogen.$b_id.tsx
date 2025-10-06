@@ -20,6 +20,7 @@ import {
     NavLink,
     useLoaderData,
     useLocation,
+    useSearchParams,
 } from "react-router"
 import { NitrogenBalanceChart } from "~/components/blocks/balance/nitrogen-chart"
 import NitrogenBalanceDetails from "~/components/blocks/balance/nitrogen-details"
@@ -167,6 +168,7 @@ function NitrogenBalance({
     const data = use(nitrogenBalanceResult)
 
     const location = useLocation()
+    const [searchParams, setSearchParams] = useSearchParams()
     const page = location.pathname
     const calendar = useCalendarStore((state) => state.calendar)
 
@@ -183,6 +185,14 @@ function NitrogenBalance({
             fieldNitrogenBalanceCache.set(field.b_id, data)
         }
     }, [field.b_id, data, cachedData?.inputHash, fieldNitrogenBalanceCache.set])
+
+    if (data.useCache && !cachedData && searchParams.get("cacheHash")) {
+        setSearchParams((searchParams) => {
+            searchParams.delete("cacheHash")
+            return searchParams
+        })
+        return null
+    }
 
     const { input, result, errorMessage } =
         data.useCache && cachedData ? cachedData : data

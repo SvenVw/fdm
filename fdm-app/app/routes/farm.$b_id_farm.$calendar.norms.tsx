@@ -14,6 +14,7 @@ import {
     redirect,
     useLoaderData,
     useLocation,
+    useSearchParams,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
@@ -348,6 +349,7 @@ export default function FarmNormsBlock() {
  * would not render until `asyncData` resolves and the fallback would never be shown.
  */
 function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
+    const [searchParams, setSearchParams] = useSearchParams()
     const data = use(loaderData.asyncData)
 
     const farmNormsCache = useFarmNormsCache()
@@ -363,6 +365,14 @@ function Norms(loaderData: Awaited<ReturnType<typeof loader>>) {
             farmNormsCache.set(loaderData.b_id_farm, data)
         }
     }, [loaderData.b_id_farm, data, cachedData?.inputHash, farmNormsCache.set])
+
+    if (data.useCache && !cachedData && searchParams.get("cacheHash")) {
+        setSearchParams((searchParams) => {
+            searchParams.delete("cacheHash")
+            return searchParams
+        })
+        return null
+    }
 
     const {
         farmNorms,

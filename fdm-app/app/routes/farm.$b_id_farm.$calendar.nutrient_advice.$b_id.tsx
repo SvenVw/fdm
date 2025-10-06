@@ -13,6 +13,7 @@ import {
     type MetaFunction,
     useLoaderData,
     useLocation,
+    useSearchParams,
 } from "react-router"
 import { FieldNutrientAdviceLayout } from "~/components/blocks/nutrient-advice/layout"
 import { getNutrientsDescription } from "~/components/blocks/nutrient-advice/nutrients"
@@ -228,6 +229,7 @@ function FieldNutrientAdvice({
     const { field, calendar, nutrientsDescription } = loaderData
     const serverAsyncData = use(loaderData.asyncData)
     const location = useLocation()
+    const [searchParams, setSearchParams] = useSearchParams()
 
     const fieldNutrientAdviceCache = useFieldNutrientAdviceCache()
     const cachedData = fieldNutrientAdviceCache.get(field.b_id)
@@ -245,6 +247,18 @@ function FieldNutrientAdvice({
         cachedData?.inputHash,
         fieldNutrientAdviceCache.set,
     ])
+
+    if (
+        serverAsyncData.useCache &&
+        !cachedData &&
+        searchParams.get("cacheHash")
+    ) {
+        setSearchParams((searchParams) => {
+            searchParams.delete("cacheHash")
+            return searchParams
+        })
+        return null
+    }
 
     const asyncData = (
         serverAsyncData.useCache ? cachedData : serverAsyncData
