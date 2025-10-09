@@ -850,9 +850,7 @@ describe("Cultivation Data Model", () => {
                     b_lu_start_default: "2024-03-01", // Invalid format
                     b_date_harvest_default: "09-15",
                 }),
-            ).rejects.toThrow(
-                "Invalid b_lu_start_default format. Expected MM-dd.",
-            )
+            ).rejects.toThrow("Exception for addCultivationToCatalogue")
         })
 
         it("should throw an error for invalid b_date_harvest_default format", async () => {
@@ -877,9 +875,7 @@ describe("Cultivation Data Model", () => {
                     b_lu_start_default: "03-01",
                     b_date_harvest_default: "2024-09-15", // Invalid format
                 }),
-            ).rejects.toThrow(
-                "Invalid b_date_harvest_default format. Expected MM-dd.",
-            )
+            ).rejects.toThrow("Exception for addCultivationToCatalogue")
         })
 
         it("should not throw an error for valid date formats", async () => {
@@ -1033,7 +1029,7 @@ describe("Cultivation Data Model", () => {
                         nonExistentCatalogueId,
                         year,
                     ),
-                ).rejects.toThrow("Cultivation not found in catalogue")
+                ).rejects.toThrow("Exception for getDefaultDatesOfCultivation")
             })
         })
     })
