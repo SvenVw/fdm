@@ -17,6 +17,7 @@ import type { PrincipalId } from "./authorization.d"
 import type {
     Cultivation,
     CultivationCatalogue,
+    CultivationDefaultDates,
     CultivationPlan,
 } from "./cultivation.d"
 import * as schema from "./db/schema"
@@ -166,6 +167,123 @@ export async function addCultivationToCatalogue(
     } catch (err) {
         throw handleError(err, "Exception for addCultivationToCatalogue", {
             properties,
+        })
+    }
+}
+
+/**
+ * Retrieves the default start and end dates for a given cultivation in a specific year.
+ *
+ * This function checks for read permissions on the farm, then queries the cultivation catalogue
+ * to find the default sowing and harvest dates for the specified cultivation. It constructs
+ * Date objects for the given year. For single-harvest crops, it calculates the default end
+ * date and adjusts the year if the harvest date falls into the next calendar year.
+ *
+ * @param fdm The FDM instance providing the connection to the database.
+ * @param principal_id The ID of the principal making the request.
+ * @param b_id_farm The ID of the farm.
+ * @param b_lu_catalogue The catalogue ID of the cultivation.
+ * @param year The year for which to determine the default dates.
+ * @returns A Promise that resolves with an object containing the default start and end dates.
+ * @throws {Error} If the cultivation is not found in the enabled catalogues for the farm.
+ * @alpha
+ */
+export async function getDefaultDatesOfCultivation(
+    fdm: FdmType,
+    principal_id: PrincipalId,
+    b_id_farm: schema.farmsTypeSelect["b_id_farm"],
+    b_lu_catalogue: schema.cultivationsCatalogueTypeSelect["b_lu_catalogue"],
+    year: number,
+): Promise<CultivationDefaultDates> {
+    try {
+        await checkPermission(
+            fdm,
+            "farm",
+            "read",
+            b_id_farm,
+            principal_id,
+            "getDefaultDatesOfCultivation",
+        )
+
+        // Retrieve the enabled cultivation catalogues for the specified farm.
+        const enabledCatalogues = await fdm
+            .select({
+                b_lu_source: schema.cultivationCatalogueSelecting.b_lu_source,
+            })
+            .from(schema.cultivationCatalogueSelecting)
+            .where(
+                eq(schema.cultivationCatalogueSelecting.b_id_farm, b_id_farm),
+            )
+
+        // Fetch the specified cultivation's default date information from the enabled catalogues.
+        const cultivationsCatalogue = await fdm
+            .select({
+                b_lu_catalogue: schema.cultivationsCatalogue.b_lu_catalogue,
+                b_lu_harvestable: schema.cultivationsCatalogue.b_lu_harvestable,
+                b_lu_start_default:
+                    schema.cultivationsCatalogue.b_lu_start_default,
+                b_date_harvest_default:
+                    schema.cultivationsCatalogue.b_date_harvest_default,
+            })
+            .from(schema.cultivationsCatalogue)
+            .where(
+                and(
+                    inArray(
+                        schema.cultivationsCatalogue.b_lu_source,
+                        enabledCatalogues.map(
+                            (c: { b_lu_source: string }) => c.b_lu_source,
+                        ),
+                    ),
+                    eq(
+                        schema.cultivationsCatalogue.b_lu_catalogue,
+                        b_lu_catalogue,
+                    ),
+                ),
+            )
+            .limit(1)
+
+        if (cultivationsCatalogue.length === 0) {
+            throw new Error("Cultivation not found in catalogue")
+        }
+
+        // Construct the default start date using the provided year.
+        const cultivationDefaultDates: CultivationDefaultDates = {
+            b_lu_start: new Date(
+                `${year}-${cultivationsCatalogue[0].b_lu_start_default}`,
+            ),
+            b_lu_end: undefined,
+        }
+
+        // For single-harvest crops, set the default end date based on the default harvest date.
+        if (
+            cultivationsCatalogue[0].b_lu_harvestable === "once" &&
+            cultivationsCatalogue[0].b_date_harvest_default
+        ) {
+            cultivationDefaultDates.b_lu_end = new Date(
+                `${year}-${cultivationsCatalogue[0].b_date_harvest_default}`,
+            )
+
+            // If the calculated end date is earlier than the start date, it implies the harvest
+            // occurs in the following year, so we increment the year for the end date.
+            if (
+                cultivationDefaultDates.b_lu_end.getTime() <=
+                cultivationDefaultDates.b_lu_start.getTime()
+            ) {
+                cultivationDefaultDates.b_lu_end = new Date(
+                    `${year + 1}-${
+                        cultivationsCatalogue[0].b_date_harvest_default
+                    }`,
+                )
+            }
+        }
+
+        return cultivationDefaultDates
+    } catch (err) {
+        throw handleError(err, "Exception for getDefaultDatesOfCultivation", {
+            principal_id,
+            b_id_farm,
+            b_lu_catalogue,
+            year,
         })
     }
 }

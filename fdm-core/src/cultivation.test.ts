@@ -11,6 +11,7 @@ import {
     getCultivationPlan,
     getCultivations,
     getCultivationsFromCatalogue,
+    getDefaultDatesOfCultivation,
     removeCultivation,
     updateCultivation,
 } from "./cultivation"
@@ -931,6 +932,109 @@ describe("Cultivation Data Model", () => {
                     b_date_harvest_default: null,
                 }),
             ).resolves.not.toThrow()
+        })
+        describe("getDefaultDatesOfCultivation", () => {
+            it("should return default start and end dates for a single-harvest cultivation", async () => {
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    b_lu_catalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-03-01"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2024-09-15"))
+            })
+
+            it("should handle harvest in the next year", async () => {
+                const winterCropCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: winterCropCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "winter-wheat",
+                    b_lu_name_en: "Winter Wheat",
+                    b_lu_harvestable: "once",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 7000,
+                    b_lu_hi: 0.5,
+                    b_lu_n_harvestable: 5,
+                    b_lu_n_residue: 3,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: "10-15", // October 15th
+                    b_date_harvest_default: "07-20", // July 20th
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    winterCropCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-10-15"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2025-07-20"))
+            })
+
+            it("should return only start date for multi-harvest cultivations", async () => {
+                const multiHarvestCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: multiHarvestCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "grass",
+                    b_lu_name_en: "Grass",
+                    b_lu_harvestable: "multiple",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "grass",
+                    b_lu_yield: 10000,
+                    b_lu_hi: 0.8,
+                    b_lu_n_harvestable: 6,
+                    b_lu_n_residue: 4,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: "04-01",
+                    b_date_harvest_default: null,
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    multiHarvestCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-04-01"))
+                expect(defaultDates.b_lu_end).toBeUndefined()
+            })
+
+            it("should throw an error if cultivation is not found", async () => {
+                const nonExistentCatalogueId = createId()
+                const year = 2024
+
+                await expect(
+                    getDefaultDatesOfCultivation(
+                        fdm,
+                        principal_id,
+                        b_id_farm,
+                        nonExistentCatalogueId,
+                        year,
+                    ),
+                ).rejects.toThrow("Cultivation not found in catalogue")
+            })
         })
     })
 

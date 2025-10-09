@@ -58,3 +58,8 @@ export interface CultivationPlan {
 }
 
 export type CultivationCatalogue = schema.cultivationsCatalogueTypeSelect
+
+export type CultivationDefaultDates = {
+    b_lu_start: Date
+    b_lu_end: Date | undefine
+}
