@@ -371,6 +371,8 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_n_fixation: numericCasted(),
         b_lu_rest_oravib: boolean(),
         b_lu_variety_options: text().array(),
+        b_lu_start_default: text(), // MM-dd
+        b_date_harvest_default: text(), // MM-dd
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),

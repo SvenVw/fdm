@@ -119,6 +119,8 @@ export async function addCultivationToCatalogue(
         b_n_fixation: schema.cultivationsCatalogueTypeInsert["b_n_fixation"]
         b_lu_rest_oravib: schema.cultivationsCatalogueTypeInsert["b_lu_rest_oravib"]
         b_lu_variety_options: schema.cultivationsCatalogueTypeInsert["b_lu_variety_options"]
+        b_lu_start_default: schema.cultivationsCatalogueTypeInsert["b_lu_start_default"]
+        b_date_harvest_default: schema.cultivationsCatalogueTypeInsert["b_date_harvest_default"]
     },
 ): Promise<void> {
     try {
@@ -137,6 +139,25 @@ export async function addCultivationToCatalogue(
 
             if (existing.length > 0) {
                 throw new Error("Cultivation already exists in catalogue")
+            }
+
+            // Validate if b_lu_start_default and b_date_harvest_default follows format MM-dd
+            const dateRegex = /^(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/
+            if (
+                properties.b_lu_start_default &&
+                !dateRegex.test(properties.b_lu_start_default)
+            ) {
+                throw new Error(
+                    "Invalid b_lu_start_default format. Expected MM-dd.",
+                )
+            }
+            if (
+                properties.b_date_harvest_default &&
+                !dateRegex.test(properties.b_date_harvest_default)
+            ) {
+                throw new Error(
+                    "Invalid b_date_harvest_default format. Expected MM-dd.",
+                )
             }
 
             // Insert the cultivation in the db
