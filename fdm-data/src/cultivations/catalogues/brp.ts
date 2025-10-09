@@ -69,6 +69,8 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
                           .map((s) => s.trim())
                           .filter((s) => s.length > 0)
                     : null,
+            b_lu_start_default: cultivation.b_lu_start_default,
+            b_date_harvest_default: cultivation.b_date_harvest_default,
             hash: null,
         }
 
