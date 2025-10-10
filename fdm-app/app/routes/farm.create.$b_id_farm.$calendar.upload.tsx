@@ -4,6 +4,7 @@ import {
     addCultivation,
     addField,
     addSoilAnalysis,
+    getDefaultDatesOfCultivation,
     getFarm,
 } from "@svenvw/fdm-core"
 import * as turf from "@turf/turf"
@@ -233,13 +234,22 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 b_end,
             )
 
+            const cultivationDefaultDates = await getDefaultDatesOfCultivation(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                b_lu_catalogue,
+                Number(calendar),
+            )
+            const b_lu_start = cultivationDefaultDates.b_lu_start
+            const b_lu_end = cultivationDefaultDates.b_lu_end
             await addCultivation(
                 fdm,
                 session.principal_id,
                 b_lu_catalogue,
                 fieldId,
-                new Date(`${calendar}-01-01`),
-                undefined,
+                b_lu_start,
+                b_lu_end,
             )
 
             if (nmiApiKey) {

@@ -992,7 +992,7 @@ describe("Fertilizer Data Model", () => {
                 b_id,
                 timeframe,
             )
-            fertilizerApplications.map((application) => {
+            fertilizerApplications.forEach((application) => {
                 expect(
                     application.p_app_date?.getTime(),
                 ).toBeGreaterThanOrEqual(timeframe.start.getTime())
