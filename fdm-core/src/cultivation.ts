@@ -206,7 +206,7 @@ export async function getDefaultDatesOfCultivation(
         )
 
         // Validate year
-        if (!year || Number.isInteger(year) === false || year < 1970 || year >= 2100) {
+        if (!year || !Number.isInteger(year) || year < 1970 || year >= 2100) {
             throw new Error("Invalid year")
         }
 
@@ -271,7 +271,7 @@ export async function getDefaultDatesOfCultivation(
             cultivationDefaultDates.b_lu_end = new Date(`${year}-${defaultEnd}`)
 
             // If the calculated end date is earlier than the start date, it implies the sowing
-            // occured in the previous year, so we use the previous year for the start date.
+            // occurred in the previous year, so we use the previous year for the start date.
             if (
                 cultivationDefaultDates.b_lu_end.getTime() <=
                 cultivationDefaultDates.b_lu_start.getTime()

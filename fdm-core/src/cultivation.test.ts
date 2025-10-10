@@ -800,7 +800,7 @@ describe("Cultivation Data Model", () => {
                 b_lu_harvestable: "once",
                 b_lu_hcat3: "test-hcat3",
                 b_lu_hcat3_name: "Test HCAT3 Name",
-                b_lu_croprotation: "cereal", // This is the problematic line
+                b_lu_croprotation: "cereal",
                 b_lu_yield: 6000,
                 b_lu_hi: 0.4,
                 b_lu_n_harvestable: 4,
@@ -1015,6 +1015,78 @@ describe("Cultivation Data Model", () => {
                 expect(defaultDates).toBeDefined()
                 expect(defaultDates.b_lu_start).toEqual(new Date("2024-04-01"))
                 expect(defaultDates.b_lu_end).toBeUndefined()
+            })
+
+            it("should return only start date when harvestable is 'none'", async () => {
+                const noneHarvestableCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: noneHarvestableCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "cover-crop",
+                    b_lu_name_en: "Cover Crop",
+                    b_lu_harvestable: "none",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "other",
+                    b_lu_yield: 0,
+                    b_lu_hi: 0,
+                    b_lu_n_harvestable: 0,
+                    b_lu_n_residue: 0,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: "04-01",
+                    b_date_harvest_default: null,
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    noneHarvestableCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-04-01"))
+                expect(defaultDates.b_lu_end).toBeUndefined()
+            })
+
+            it("should return default start date of '03-15' when b_lu_start_default is null", async () => {
+                const nullStartDefaultCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: nullStartDefaultCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "null-start-default",
+                    b_lu_name_en: "Null Start Default",
+                    b_lu_harvestable: "once",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: null,
+                    b_date_harvest_default: "09-15",
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    nullStartDefaultCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-03-15"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2024-09-15"))
             })
 
             it("should throw an error if cultivation is not found", async () => {
