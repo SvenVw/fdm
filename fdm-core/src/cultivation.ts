@@ -246,22 +246,24 @@ export async function getDefaultDatesOfCultivation(
             throw new Error("Cultivation not found in catalogue")
         }
 
+        // Set default dates of March 15th to September 15th if not provided
+        const defaultStart =
+            cultivationsCatalogue[0].b_lu_start_default ?? "03-15"
+        const defaultEnd =
+            cultivationsCatalogue[0].b_date_harvest_default ?? "09-15"
+
         // Construct the default start date using the provided year.
         const cultivationDefaultDates: CultivationDefaultDates = {
-            b_lu_start: new Date(
-                `${year}-${cultivationsCatalogue[0].b_lu_start_default}`,
-            ),
+            b_lu_start: new Date(`${year}-${defaultStart}`),
             b_lu_end: undefined,
         }
 
         // For single-harvest crops, set the default end date based on the default harvest date.
         if (
             cultivationsCatalogue[0].b_lu_harvestable === "once" &&
-            cultivationsCatalogue[0].b_date_harvest_default
+            defaultEnd
         ) {
-            cultivationDefaultDates.b_lu_end = new Date(
-                `${year}-${cultivationsCatalogue[0].b_date_harvest_default}`,
-            )
+            cultivationDefaultDates.b_lu_end = new Date(`${year}-${defaultEnd}`)
 
             // If the calculated end date is earlier than the start date, it implies the sowing
             // occured in the previous year, so we use the previous year for the start date.
@@ -270,9 +272,7 @@ export async function getDefaultDatesOfCultivation(
                 cultivationDefaultDates.b_lu_start.getTime()
             ) {
                 cultivationDefaultDates.b_lu_start = new Date(
-                    `${year - 1}-${
-                        cultivationsCatalogue[0].b_lu_start_default
-                    }`,
+                    `${year - 1}-${defaultStart}`,
                 )
             }
         }
