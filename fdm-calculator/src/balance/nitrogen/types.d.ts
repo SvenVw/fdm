@@ -348,6 +348,16 @@ export type NitrogenBalanceField = {
 }
 
 /**
+ * Represents the result of a nitrogen balance calculation for a single field, which may include an error message.
+ */
+export type NitrogenBalanceFieldResult = {
+    b_id: string
+    b_area: number
+    balance?: NitrogenBalanceField
+    errorMessage?: string
+}
+
+/**
  * Represents the total nitrogen balance across all fields.
  * All values are in kilograms of nitrogen per hectare (kg N / ha).
  */
@@ -375,7 +385,15 @@ export type NitrogenBalance = {
     /**
      * A detailed breakdown of the nitrogen balance for each individual field.
      */
-    fields: NitrogenBalanceField[]
+    fields: NitrogenBalanceFieldResult[]
+    /**
+     * Indicates if any field calculations failed.
+     */
+    hasErrors: boolean
+    /**
+     * A list of error messages for fields that failed to calculate.
+     */
+    fieldErrorMessages: string[]
 }
 
 export type SoilAnalysisPicked = Pick<
@@ -571,6 +589,16 @@ export type NitrogenBalanceFieldNumeric = {
     emission: NitrogenEmissionNumeric
 }
 
+/**
+ * Represents the numeric version of NitrogenBalanceFieldResult.
+ */
+export type NitrogenBalanceFieldResultNumeric = {
+    b_id: string
+    b_area: number
+    balance?: NitrogenBalanceFieldNumeric
+    errorMessage?: string
+}
+
 // Numeric version of NitrogenBalance
 export type NitrogenBalanceNumeric = {
     balance: number
@@ -578,5 +606,7 @@ export type NitrogenBalanceNumeric = {
     removal: number
     emission: number
     target: number
-    fields: NitrogenBalanceFieldNumeric[]
+    fields: NitrogenBalanceFieldResultNumeric[]
+    hasErrors: boolean
+    fieldErrorMessages: string[]
 }

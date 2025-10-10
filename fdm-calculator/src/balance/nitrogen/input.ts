@@ -9,6 +9,7 @@ import {
     getCultivationsFromCatalogue,
     getFertilizerApplications,
     getFertilizers,
+    getField,
     getFields,
     getHarvests,
     getSoilAnalyses,
@@ -37,16 +38,14 @@ export async function collectInputForNitrogenBalance(
     principal_id: PrincipalId,
     b_id_farm: fdmSchema.farmsTypeSelect["b_id_farm"],
     timeframe: Timeframe,
+    b_id?: fdmSchema.fieldsTypeSelect["b_id"],
 ): Promise<NitrogenBalanceInput> {
     try {
         return await fdm.transaction(async (tx: FdmType) => {
             // Collect the fields for the farm
-            const farmFields = await getFields(
-                tx,
-                principal_id,
-                b_id_farm,
-                timeframe,
-            )
+            const farmFields = b_id
+                ? [await getField(tx, principal_id, b_id)]
+                : await getFields(tx, principal_id, b_id_farm, timeframe)
 
             // Collect the details per field
             const fields = await Promise.all(
