@@ -205,6 +205,11 @@ export async function getDefaultDatesOfCultivation(
             "getDefaultDatesOfCultivation",
         )
 
+        // Validate year
+        if (!year || Number.isInteger(year) === false || year < 1970 || year >= 2100) {
+            throw new Error("Invalid year")
+        }
+
         // Retrieve the enabled cultivation catalogues for the specified farm.
         const enabledCatalogues = await fdm
             .select({
