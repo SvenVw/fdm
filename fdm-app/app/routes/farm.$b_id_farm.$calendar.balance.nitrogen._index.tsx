@@ -309,9 +309,16 @@ function FarmBalanceNitrogenOverview({
                                                 {fieldResult.balance ? (
                                                     `${fieldResult.balance.balance} / ${fieldResult.balance.target}`
                                                 ) : (
-                                                    <p className="text-orange-500">
-                                                        {"? / ?"}
-                                                    </p>
+                                                    <span className="text-end">
+                                                        <p className="text-sm text-orange-500">
+                                                            {"Foutdetails:"}
+                                                        </p>
+                                                        <p className="text-xs text-orange-500">
+                                                            {
+                                                                fieldResult.errorMessage
+                                                            }
+                                                        </p>
+                                                    </span>
                                                 )}
                                             </div>
                                         </div>
