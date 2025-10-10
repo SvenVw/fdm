@@ -1,5 +1,5 @@
 {
-  "id": "d1171b57-f922-421c-b386-3518178537c8",
+  "id": "5ba4f7c3-7e93-40b0-b184-e837bcbc41cc",
   "prevId": "c953a71f-8431-4aea-94b9-e49a5a96cf0c",
   "version": "7",
   "dialect": "postgresql",
@@ -504,7 +504,16 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
-      "checkConstraints": {},
+      "checkConstraints": {
+        "b_lu_start_default_format": {
+          "name": "b_lu_start_default_format",
+          "value": "b_lu_start_default IS NULL OR b_lu_start_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'"
+        },
+        "b_date_harvest_default_format": {
+          "name": "b_date_harvest_default_format",
+          "value": "b_date_harvest_default IS NULL OR b_date_harvest_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'"
+        }
+      },
       "isRLSEnabled": false
     },
     "fdm.derogation_applying": {
