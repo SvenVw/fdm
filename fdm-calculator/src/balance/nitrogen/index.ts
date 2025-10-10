@@ -154,8 +154,6 @@ export function calculateNitrogenBalanceField(
     depositionSupply: NitrogenBalanceField["supply"]["deposition"],
 ): NitrogenBalanceFieldResult {
     try {
-    const fieldDetails = field
-
         // Get the details of the field
         const fieldDetails = field
 
