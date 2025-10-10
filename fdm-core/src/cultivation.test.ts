@@ -977,8 +977,8 @@ describe("Cultivation Data Model", () => {
                 )
 
                 expect(defaultDates).toBeDefined()
-                expect(defaultDates.b_lu_start).toEqual(new Date("2024-10-15"))
-                expect(defaultDates.b_lu_end).toEqual(new Date("2025-07-20"))
+                expect(defaultDates.b_lu_start).toEqual(new Date("2023-10-15"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2024-07-20"))
             })
 
             it("should return only start date for multi-harvest cultivations", async () => {

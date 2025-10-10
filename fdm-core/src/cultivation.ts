@@ -177,7 +177,7 @@ export async function addCultivationToCatalogue(
  * This function checks for read permissions on the farm, then queries the cultivation catalogue
  * to find the default sowing and harvest dates for the specified cultivation. It constructs
  * Date objects for the given year. For single-harvest crops, it calculates the default end
- * date and adjusts the year if the harvest date falls into the next calendar year.
+ * date and adjusts the year if the sowing date felt into the previous calendar year.
  *
  * @param fdm The FDM instance providing the connection to the database.
  * @param principal_id The ID of the principal making the request.
@@ -263,15 +263,15 @@ export async function getDefaultDatesOfCultivation(
                 `${year}-${cultivationsCatalogue[0].b_date_harvest_default}`,
             )
 
-            // If the calculated end date is earlier than the start date, it implies the harvest
-            // occurs in the following year, so we increment the year for the end date.
+            // If the calculated end date is earlier than the start date, it implies the sowing
+            // occured in the previous year, so we use the previous year for the start date.
             if (
                 cultivationDefaultDates.b_lu_end.getTime() <=
                 cultivationDefaultDates.b_lu_start.getTime()
             ) {
-                cultivationDefaultDates.b_lu_end = new Date(
-                    `${year + 1}-${
-                        cultivationsCatalogue[0].b_date_harvest_default
+                cultivationDefaultDates.b_lu_start = new Date(
+                    `${year - 1}-${
+                        cultivationsCatalogue[0].b_lu_start_default
                     }`,
                 )
             }
