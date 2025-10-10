@@ -4,6 +4,8 @@ export type {
     FieldInput,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
+    NitrogenBalanceFieldNumeric, 
+    NitrogenBalanceFieldResultNumeric,
     NitrogenEmissionAmmoniaFertilizersNumeric,
     NitrogenEmissionAmmoniaNumeric,
     NitrogenEmissionAmmoniaResiduesNumeric,
@@ -14,7 +16,6 @@ export type {
     NitrogenSupplyFixationNumeric,
     NitrogenSupplyMineralizationNumeric,
     NitrogenSupplyNumeric,
-    NitrogenVolatilizationNumeric,
 } from "./balance/nitrogen/types"
 export { calculateDose } from "./doses/calculate-dose"
 export type { Dose } from "./doses/d"
