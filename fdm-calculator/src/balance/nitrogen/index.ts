@@ -102,6 +102,12 @@ export async function calculateNitrogenBalance(
         })
 
         const batchResults = await Promise.all(batchPromises)
+        for (const r of batchResults) {
+            if (r.errorMessage) {
+                hasErrors = true
+                fieldErrorMessages.push(`[${r.b_id}] ${r.errorMessage}`)
+            }
+        }
         fieldsWithBalanceResults.push(...batchResults)
     }
 
@@ -168,8 +174,7 @@ export function calculateNitrogenBalanceField(
                     ? field.b_start
                     : timeFrame.start,
             end:
-                field.b_end &&
-                field.b_end.getTime() < timeFrame.end.getTime()
+                field.b_end && field.b_end.getTime() < timeFrame.end.getTime()
                     ? field.b_end
                     : timeFrame.end,
         }
@@ -271,9 +276,7 @@ export function calculateNitrogenBalancesFieldToFarm(
     let totalFarmArea = new Decimal(0)
 
     for (const fieldResult of successfulFieldBalances) {
-        const fieldInput = fields.find(
-            (f) => f.field.b_id === fieldResult.b_id,
-        )
+        const fieldInput = fields.find((f) => f.field.b_id === fieldResult.b_id)
 
         if (!fieldInput) {
             console.warn(
@@ -282,7 +285,7 @@ export function calculateNitrogenBalancesFieldToFarm(
             continue
         }
         const fieldArea = new Decimal(fieldInput.field.b_area ?? 0)
-        totalFarmArea  = totalFarmArea .add(fieldArea);
+        totalFarmArea = totalFarmArea.add(fieldArea)
 
         totalFarmSupply = totalFarmSupply.add(
             fieldResult.balance.supply.total.times(fieldArea),
@@ -299,18 +302,18 @@ export function calculateNitrogenBalancesFieldToFarm(
     }
 
     // Calculate average values per hectare for the farm, only considering the area of successfully calculated fields
-    const avgFarmSupply = totalFarmArea .isZero()
+    const avgFarmSupply = totalFarmArea.isZero()
         ? new Decimal(0)
-        : totalFarmSupply.dividedBy(totalFarmArea )
-    const avgFarmRemoval = totalFarmArea .isZero()
+        : totalFarmSupply.dividedBy(totalFarmArea)
+    const avgFarmRemoval = totalFarmArea.isZero()
         ? new Decimal(0)
-        : totalFarmRemoval.dividedBy(totalFarmArea )
-    const avgFarmEmission = totalFarmArea .isZero()
+        : totalFarmRemoval.dividedBy(totalFarmArea)
+    const avgFarmEmission = totalFarmArea.isZero()
         ? new Decimal(0)
-        : totalFarmEmission.dividedBy(totalFarmArea )
-    const avgFarmTarget = totalFarmArea .isZero()
+        : totalFarmEmission.dividedBy(totalFarmArea)
+    const avgFarmTarget = totalFarmArea.isZero()
         ? new Decimal(0)
-        : totalFarmTarget.dividedBy(totalFarmArea )
+        : totalFarmTarget.dividedBy(totalFarmArea)
 
     // Calculate the average balance at farm level (Supply + Removal + Emission)
     const avgFarmBalance = avgFarmSupply
@@ -325,7 +328,9 @@ export function calculateNitrogenBalancesFieldToFarm(
         emission: avgFarmEmission,
         target: avgFarmTarget,
         fields: fieldsWithBalanceResults,
-        hasErrors: hasErrors || (fieldsWithBalanceResults.length !== successfulFieldBalances.length),
+        hasErrors:
+            hasErrors ||
+            fieldsWithBalanceResults.length !== successfulFieldBalances.length,
         fieldErrorMessages: fieldErrorMessages,
     }
 
@@ -359,25 +364,29 @@ export function convertNitrogenBalanceToNumeric(
     balance: NitrogenBalance, // Input is the original Decimal-based type
 ): NitrogenBalanceNumeric {
     // Output is the new number-based type
-    const numericBalance = convertDecimalToNumberRecursive(balance) as NitrogenBalanceNumeric;
+    const numericBalance = convertDecimalToNumberRecursive(
+        balance,
+    ) as NitrogenBalanceNumeric
 
     // Ensure fields are correctly converted, especially handling errorMessage
-    numericBalance.fields = balance.fields.map(fieldResult => {
+    numericBalance.fields = balance.fields.map((fieldResult) => {
         if (fieldResult.balance) {
             return {
                 b_id: fieldResult.b_id,
                 b_area: fieldResult.b_area,
-                balance: convertDecimalToNumberRecursive(fieldResult.balance) as NitrogenBalanceFieldNumeric,
-            };
+                balance: convertDecimalToNumberRecursive(
+                    fieldResult.balance,
+                ) as NitrogenBalanceFieldNumeric,
+            }
         }
         return {
             b_id: fieldResult.b_id,
             b_area: fieldResult.b_area,
             errorMessage: fieldResult.errorMessage,
-        };
-    });
+        }
+    })
 
-    return numericBalance;
+    return numericBalance
 }
 
 /**
