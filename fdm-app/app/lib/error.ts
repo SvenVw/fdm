@@ -1,5 +1,33 @@
 import { data, redirect } from "react-router"
 import { dataWithError, dataWithWarning } from "remix-toast"
+import { customAlphabet } from "nanoid"
+import * as Sentry from "@sentry/react-router"
+import { clientConfig } from "~/lib/config"
+
+const customErrorAlphabet = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ" // No lookalikes (0, 1, I, O, S, Z)
+const errorIdSize = 8 // Number of characters in ID
+
+export const createErrorId = customAlphabet(customErrorAlphabet, errorIdSize)
+
+export function reportError(error: unknown, tags: Record<string, string> = {}, context?: Record<string, unknown>): string {
+    const errorId = createErrorId().match(/.{1,4}/g)?.join("-") || createErrorId() // Format as XXXX-XXXX
+
+    if (clientConfig.analytics.sentry?.dsn) {
+        Sentry.captureException(error, {
+            tags: {
+                ...tags,
+            },
+            extra: {
+                ...context,
+                errorId: errorId,
+            },
+        })
+    } else {
+        console.error(`Error (code: ${errorId}):`, error, context)
+    }
+
+    return errorId
+}
 
 export function handleLoaderError(error: unknown) {
     // Handle 'data' thrown errors

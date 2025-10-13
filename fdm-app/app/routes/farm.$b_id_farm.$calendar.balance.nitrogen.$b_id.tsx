@@ -37,6 +37,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useCalendarStore } from "~/store/calendar"
+import { handleLoaderError, reportError } from "~/lib/error"
 
 // Meta
 export const meta: MetaFunction = () => {
@@ -52,78 +53,97 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("invalid: b_id_farm", {
-            status: 400,
-            statusText: "invalid: b_id_farm",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("invalid: b_id_farm", {
+                status: 400,
+                statusText: "invalid: b_id_farm",
+            })
+        }
 
-    // Get the farm id
-    const b_id = params.b_id
-    if (!b_id) {
-        throw data("invalid: b_id", {
-            status: 400,
-            statusText: "invalid: b_id",
-        })
-    }
+        // Get the farm id
+        const b_id = params.b_id
+        if (!b_id) {
+            throw data("invalid: b_id", {
+                status: 400,
+                statusText: "invalid: b_id",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get timeframe from calendar store
-    const timeframe = getTimeframe(params)
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
 
-    // Get details of farm
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-    if (!farm) {
-        throw data("not found: b_id_farm", {
-            status: 404,
-            statusText: "not found: b_id_farm",
-        })
-    }
+        // Get details of farm
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("not found: b_id_farm", {
+                status: 404,
+                statusText: "not found: b_id_farm",
+            })
+        }
 
-    // Get details of field
-    const field = await getField(fdm, session.principal_id, b_id)
+        // Get details of field
+        const field = await getField(fdm, session.principal_id, b_id)
 
-    // Return promise directly for React Router v7 Suspense pattern
-    const nitrogenBalancePromise = collectInputForNitrogenBalance(
-        fdm,
-        session.principal_id,
-        b_id_farm,
-        timeframe,
-        b_id,
-    )
-        .then(async (input) => {
-            const nitrogenBalanceResult =
-                await calculateNitrogenBalance(input)
-            const fieldResult = nitrogenBalanceResult.fields.find(
+        // Return promise directly for React Router v7 Suspense pattern
+        const nitrogenBalancePromise = collectInputForNitrogenBalance(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+            b_id,
+        ).then(async (input) => {
+            const nitrogenBalanceResult = await calculateNitrogenBalance(input)
+            let fieldResult = nitrogenBalanceResult.fields.find(
                 (field: { b_id: string }) => field.b_id === b_id,
             )
 
-            // If fieldResult is not found, it means the field was not processed
             if (!fieldResult) {
-                throw new Error(`Nitrogen balance data not found for field ${b_id}`);
+                throw new Error(
+                    `Nitrogen balance data not found for field ${b_id}`,
+                )
+            }
+
+            if (fieldResult.errorMessage) {
+                const errorId = reportError(
+                    fieldResult.errorMessage,
+                    {
+                        page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/{b_id}",
+                    },
+                    {
+                        b_id,
+                        b_id_farm,
+                        timeframe,
+                        fieldArea: field?.b_area,
+                        userId: session.principal_id,
+                    },
+                )
+
+                fieldResult = {
+                    b_id: b_id,
+                    b_area: field?.b_area ?? 0,
+                    errorMessage: fieldResult.errorMessage,
+                    errorId: errorId,
+                }
             }
 
             return {
                 fieldResult: fieldResult,
             }
         })
-        .catch((error) => ({
-            fieldResult: {
-                b_id: b_id,
-                b_area: field?.b_area ?? 0,
-                errorMessage: String(error).replace("Error: ", ""),
-            },
-        }))
 
-    return {
-        nitrogenBalanceResult: nitrogenBalancePromise,
-        field: field,
-        farm: farm,
+        return {
+            nitrogenBalanceResult: nitrogenBalancePromise,
+            field: field,
+            farm: farm,
+        }
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -183,7 +203,9 @@ function NitrogenBalance({
                                 </p>
                                 <br />
                                 <ul className="list-disc list-inside">
-                                    {fieldResult.errorMessage.match(/a_n_rt/) ? (
+                                    {fieldResult.errorMessage.match(
+                                        /a_n_rt/,
+                                    ) ? (
                                         <li>Totaal stikstofgehalte</li>
                                     ) : null}
                                     {fieldResult.errorMessage.match(
@@ -209,8 +231,9 @@ function NitrogenBalance({
                                     <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
                                         {JSON.stringify(
                                             {
-                                                message:
-                                                    fieldResult.errorMessage,
+                                                // message:
+                                                //     fieldResult.errorMessage,
+                                                errorId: fieldResult.errorId,
                                                 page: page,
                                                 timestamp: new Date(),
                                             },
@@ -257,7 +280,7 @@ function NitrogenBalance({
         )
     }
 
-    const result = fieldResult.balance; // Use the actual balance data
+    const result = fieldResult.balance // Use the actual balance data
 
     return (
         <>

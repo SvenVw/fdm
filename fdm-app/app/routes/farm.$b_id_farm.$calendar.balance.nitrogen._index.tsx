@@ -36,6 +36,7 @@ import { getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { fdm } from "~/lib/fdm.server"
 import { useFieldFilterStore } from "~/store/field-filter"
+import { handleLoaderError, reportError } from "~/lib/error"
 import {
     Tooltip,
     TooltipContent,
@@ -56,54 +57,84 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-    // Get the farm id
-    const b_id_farm = params.b_id_farm
-    if (!b_id_farm) {
-        throw data("invalid: b_id_farm", {
-            status: 400,
-            statusText: "invalid: b_id_farm",
-        })
-    }
+    try {
+        // Get the farm id
+        const b_id_farm = params.b_id_farm
+        if (!b_id_farm) {
+            throw data("invalid: b_id_farm", {
+                status: 400,
+                statusText: "invalid: b_id_farm",
+            })
+        }
 
-    // Get the session
-    const session = await getSession(request)
+        // Get the session
+        const session = await getSession(request)
 
-    // Get timeframe from calendar store
-    const timeframe = getTimeframe(params)
+        // Get timeframe from calendar store
+        const timeframe = getTimeframe(params)
 
-    // Get details of farm
-    const farm = await getFarm(fdm, session.principal_id, b_id_farm)
-    if (!farm) {
-        throw data("not found: b_id_farm", {
-            status: 404,
-            statusText: "not found: b_id_farm",
-        })
-    }
+        // Get details of farm
+        const farm = await getFarm(fdm, session.principal_id, b_id_farm)
+        if (!farm) {
+            throw data("not found: b_id_farm", {
+                status: 404,
+                statusText: "not found: b_id_farm",
+            })
+        }
 
-    // Get details of fields
-    const fields = await getFields(fdm, session.principal_id, b_id_farm)
+        // Get details of fields
+        const fields = await getFields(fdm, session.principal_id, b_id_farm)
 
-    const asyncData = (async () => {
-        // Collect input data for nutrient balance calculation
-        const nitrogenBalanceInput = await collectInputForNitrogenBalance(
-            fdm,
-            session.principal_id,
-            b_id_farm,
-            timeframe,
-        )
+        const asyncData = (async () => {
+            // Collect input data for nutrient balance calculation
+            const nitrogenBalanceInput = await collectInputForNitrogenBalance(
+                fdm,
+                session.principal_id,
+                b_id_farm,
+                timeframe,
+            )
 
-        const nitrogenBalanceResult =
-            await calculateNitrogenBalance(nitrogenBalanceInput)
+            let nitrogenBalanceResult =
+                await calculateNitrogenBalance(nitrogenBalanceInput)
+
+            if (nitrogenBalanceResult.errorMessage) {
+                const errorId = reportError(
+                    nitrogenBalanceResult.errorMessage,
+                    {
+                        page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/_index",
+                    },
+                    {
+                        b_id_farm,
+                        timeframe,
+                        userId: session.principal_id,
+                    },
+                )
+
+                nitrogenBalanceResult = {
+                    balance: 0,
+                    target: 0,
+                    supply: 0,
+                    removal: 0,
+                    emission: 0,
+                    hasErrors: true,
+                    fields: [],
+                    errorMessage: nitrogenBalanceResult.errorMessage,
+                    errorId: errorId,
+                }
+            }
+
+            return {
+                nitrogenBalanceResult: nitrogenBalanceResult,
+            }
+        })()
 
         return {
-            nitrogenBalanceResult: nitrogenBalanceResult,
+            farm: farm,
+            fields: fields,
+            asyncData: asyncData,
         }
-    })()
-
-    return {
-        farm: farm,
-        fields: fields,
-        asyncData: asyncData,
+    } catch (error) {
+        throw handleLoaderError(error)
     }
 }
 
@@ -140,11 +171,49 @@ function FarmBalanceNitrogenOverview({
     const { showProductiveOnly } = useFieldFilterStore()
 
     const resolvedNitrogenBalanceResult = nitrogenBalanceResult
+
+    if (resolvedNitrogenBalanceResult.errorMessage) {
+        return (
+            <div className="flex items-center justify-center">
+                <Card className="w-[350px]">
+                    <CardHeader>
+                        <CardTitle>
+                            Helaas is het niet mogelijk om je balans uit te
+                            rekenen
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-muted-foreground">
+                            <p>
+                                Er is helaas wat misgegaan. Probeer opnieuw of
+                                neem contact op met Ondersteuning en deel de
+                                volgende foutmelding:
+                            </p>
+                            <div className="mt-8 w-full max-w-2xl">
+                                <pre className="bg-gray-200 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-sm text-gray-800 dark:text-gray-200">
+                                    {JSON.stringify(
+                                        {
+                                            message:
+                                                resolvedNitrogenBalanceResult.errorMessage,
+                                            timestamp: new Date(),
+                                        },
+                                        null,
+                                        2,
+                                    )}
+                                </pre>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        )
+    }
+
     const { hasErrors } = resolvedNitrogenBalanceResult
 
     const fieldsMap = new Map(fields.map((f) => [f.b_id, f]))
     const filteredFields = resolvedNitrogenBalanceResult.fields.filter(
-        (fieldResult) => {
+        (fieldResult: NitrogenBalanceFieldResultNumeric) => {
             if (!showProductiveOnly) return true
             const fieldData = fieldsMap.get(fieldResult.b_id)
             return fieldData ? fieldData.b_isproductive === true : false
@@ -309,16 +378,15 @@ function FarmBalanceNitrogenOverview({
                                                 {fieldResult.balance ? (
                                                     `${fieldResult.balance.balance} / ${fieldResult.balance.target}`
                                                 ) : (
-                                                    <span className="text-end">
-                                                        <p className="text-sm text-orange-500">
-                                                            {"Foutdetails:"}
-                                                        </p>
-                                                        <p className="text-xs text-orange-500">
+                                                    <NavLink
+                                                        to={`./${fieldResult.b_id}`}
+                                                    >
+                                                        <p className="text-sm text-end text-orange-500 hover:underline">
                                                             {
-                                                                fieldResult.errorMessage
+                                                                "Bekijk foutmelding"
                                                             }
                                                         </p>
-                                                    </span>
+                                                    </NavLink>
                                                 )}
                                             </div>
                                         </div>
