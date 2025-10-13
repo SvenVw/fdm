@@ -102,6 +102,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     nitrogenBalanceResult.errorMessage,
                     {
                         page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/_index",
+                        scope: "loader",
                     },
                     {
                         b_id_farm,

@@ -114,6 +114,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                     fieldResult.errorMessage,
                     {
                         page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/{b_id}",
+                        scope: "loader",
                     },
                     {
                         b_id,
