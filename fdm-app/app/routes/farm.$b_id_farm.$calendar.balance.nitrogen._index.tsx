@@ -97,9 +97,9 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             let nitrogenBalanceResult =
                 await calculateNitrogenBalance(nitrogenBalanceInput)
 
-            if (nitrogenBalanceResult.errorMessage) {
+            if (nitrogenBalanceResult.hasErrors) {
                 const errorId = reportError(
-                    nitrogenBalanceResult.errorMessage,
+                    nitrogenBalanceResult.fieldErrorMessages.join(",\n"),
                     {
                         page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/_index",
                         scope: "loader",
