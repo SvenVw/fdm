@@ -545,10 +545,6 @@ export type NitrogenEmissionAmmoniaFertilizersNumeric = {
         total: number
         applications: { id: string; value: number }[]
     }
-    mineral: {
-        total: number
-        applications: { id: string; value: number }[]
-    }
     compost: {
         total: number
         applications: { id: string; value: number }[]
@@ -577,6 +573,7 @@ export type NitrogenEmissionAmmoniaNumeric = {
 export type NitrogenEmissionNumeric = {
     total: number
     ammonia: NitrogenEmissionAmmoniaNumeric
+    nitrate: { total: number }
 }
 
 // Numeric version of NitrogenBalanceField
