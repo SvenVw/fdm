@@ -129,9 +129,10 @@ describe("calculateNitrogenBalance", () => {
             },
         }
 
-        await expect(
-            calculateNitrogenBalance(mockNitrogenBalanceInput),
-        ).rejects.toThrowError()
+        const result = await calculateNitrogenBalance(mockNitrogenBalanceInput)
+
+        expect(result.hasErrors).toBe(true)
+        expect(result.fieldErrorMessages.length).toBeGreaterThan(0)
     })
 })
 
