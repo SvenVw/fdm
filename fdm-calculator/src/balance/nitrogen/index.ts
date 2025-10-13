@@ -76,11 +76,6 @@ export async function calculateNitrogenBalance(
         const batchPromises = batch.map(async (field: FieldInput) => {
             const depositionSupply = depositionByField.get(field.field.b_id)
             if (!depositionSupply) {
-                // This should not happen if the deposition calculation is correct
-                hasErrors = true
-                fieldErrorMessages.push(
-                    `Deposition data not found for field ${field.field.b_id}`,
-                )
                 return {
                     b_id: field.field.b_id,
                     b_area: field.field.b_area ?? 0,
