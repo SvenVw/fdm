@@ -94,11 +94,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 timeframe,
             )
 
-            let nitrogenBalanceResult =
+            const nitrogenBalanceResult =
                 await calculateNitrogenBalance(nitrogenBalanceInput)
 
             if (nitrogenBalanceResult.hasErrors) {
-                const errorId = reportError(
+                reportError(
                     nitrogenBalanceResult.fieldErrorMessages.join(",\n"),
                     {
                         page: "farm/{b_id_farm}/{calendar}/balance/nitrogen/_index",
@@ -110,18 +110,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         userId: session.principal_id,
                     },
                 )
-
-                nitrogenBalanceResult = {
-                    balance: 0,
-                    target: 0,
-                    supply: 0,
-                    removal: 0,
-                    emission: 0,
-                    hasErrors: true,
-                    fields: [],
-                    errorMessage: nitrogenBalanceResult.errorMessage,
-                    errorId: errorId,
-                }
             }
 
             return {
