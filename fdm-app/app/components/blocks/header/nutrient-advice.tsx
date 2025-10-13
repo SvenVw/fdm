@@ -30,8 +30,13 @@ export function HeaderNutrientAdvice({
         <>
             <BreadcrumbSeparator />
             <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink onClick={() => typeof window !== "undefined" && window.location.reload()}>
-                    Bemestingsadvies
+                <BreadcrumbLink asChild>
+                    <NavLink
+                        reloadDocument
+                        to={`/farm/${b_id_farm}/${calendar}/nutrient_advice/${b_id}${location.search}`}
+                    >
+                        Bemestingsadvies
+                    </NavLink>
                 </BreadcrumbLink>
             </BreadcrumbItem>
             {b_id ? (
