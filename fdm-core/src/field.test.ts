@@ -36,12 +36,25 @@ describe("Farm Data Model", () => {
     })
 
     describe("Field CRUD", () => {
-        it("should add a new field", async () => {
+        let fdm: FdmType
+        let principal_id: string
+        let b_id_farm: string
+
+        beforeEach(async () => {
+            const host = inject("host")
+            const port = inject("port")
+            const user = inject("user")
+            const password = inject("password")
+            const database = inject("database")
+            fdm = createFdmServer(host, port, user, password, database)
+            principal_id = "test_principal"
+
+            // Create a test farm
             const farmName = "Test Farm"
             const farmBusinessId = "123456"
             const farmAddress = "123 Farm Lane"
             const farmPostalCode = "12345"
-            const b_id_farm = await addFarm(
+            b_id_farm = await addFarm(
                 fdm,
                 principal_id,
                 farmName,
@@ -49,7 +62,9 @@ describe("Farm Data Model", () => {
                 farmAddress,
                 farmPostalCode,
             )
+        })
 
+        it("should add a new field", async () => {
             const fieldName = "Test Field"
             const fieldIDSource = "test-field-id"
             const fieldGeometry: Polygon = {
@@ -93,6 +108,41 @@ describe("Farm Data Model", () => {
             expect(field.b_isproductive).toBe(true)
             expect(field.b_start).toEqual(AcquireDate)
             expect(field.b_end).toEqual(discardingDate)
+            expect(field.b_acquiring_method).toBe(AcquiringMethod)
+        })
+
+        it("should add a new field with a later added option for b_acquiring_method", async () => {
+            const fieldName = "Test Field"
+            const fieldIDSource = "test-field-id"
+            const fieldGeometry: Polygon = {
+                type: "Polygon",
+                coordinates: [
+                    [
+                        [0, 0],
+                        [0, 1],
+                        [1, 1],
+                        [1, 0],
+                        [0, 0],
+                    ],
+                ],
+            }
+            const AcquireDate = new Date("2023-01-01")
+            const discardingDate = new Date("2023-12-31")
+            const AcquiringMethod = "nl_11"
+            const b_id = await addField(
+                fdm,
+                principal_id,
+                b_id_farm,
+                fieldName,
+                fieldIDSource,
+                fieldGeometry,
+                AcquireDate,
+                AcquiringMethod,
+                discardingDate,
+            )
+            expect(b_id).toBeDefined()
+
+            const field = await getField(fdm, principal_id, b_id)
             expect(field.b_acquiring_method).toBe(AcquiringMethod)
         })
 
