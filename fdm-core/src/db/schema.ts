@@ -37,10 +37,10 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const acquiringMethodOptions = [
     { value: "nl_01", label: "Eigendom" },
     { value: "nl_02", label: "Reguliere pacht" },
-    { value: "nl_03", label: "In gebuik van een terreinbeherende organisatie" },
+    { value: "nl_03", label: "In gebruik van een terreinbeherende organisatie" },
     {
         value: "nl_04",
-        label: "Tijdelijk gebuik in het kader van landinrichting",
+        label: "Tijdelijk gebruik in het kader van landinrichting",
     },
     { value: "nl_07", label: "Overige exploitatievormen" },
     { value: "nl_09", label: "Erfpacht" },
