@@ -73,7 +73,7 @@
         "postgres": "^3.4.7",
         "unique-username-generator": "^1.5.1"
     },
-    "packageManager": "pnpm@10.17.0",
+    "packageManager": "pnpm@10.18.3",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     }
