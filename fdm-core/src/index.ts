@@ -158,3 +158,9 @@ export {
     removeOrganicCertification,
 } from "./organic"
 export type { OrganicCertification } from "./organic.d"
+export {
+    setGrazingIntention,
+    removeGrazingIntention,
+    getGrazingIntention,
+    getGrazingIntentions,
+} from "./grazing_intention"
