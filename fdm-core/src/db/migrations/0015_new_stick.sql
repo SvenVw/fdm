@@ -4,7 +4,8 @@ CREATE TABLE "fdm"."intending_grazing" (
 	"b_grazing_intention" boolean,
 	"b_grazing_intention_year" integer NOT NULL,
 	"created" timestamp with time zone DEFAULT now() NOT NULL,
-	"updated" timestamp with time zone
+	"updated" timestamp with time zone,
+	CONSTRAINT "intending_grazing_b_id_farm_b_grazing_intention_year_pk" PRIMARY KEY("b_id_farm","b_grazing_intention_year")
 );
 --> statement-breakpoint
 CREATE TABLE "fdm"."organic_certifications" (

@@ -1,5 +1,5 @@
 {
-  "id": "ff3e17ab-43af-4427-8582-e5057365e136",
+  "id": "ce358cf4-6c4f-4551-87de-35e01db3ed67",
   "prevId": "45dcb87d-89c8-4cf7-a504-0db74ba68640",
   "version": "7",
   "dialect": "postgresql",
@@ -1880,7 +1880,15 @@
           "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "intending_grazing_b_id_farm_b_grazing_intention_year_pk": {
+          "name": "intending_grazing_b_id_farm_b_grazing_intention_year_pk",
+          "columns": [
+            "b_id_farm",
+            "b_grazing_intention_year"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},

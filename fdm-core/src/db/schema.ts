@@ -851,13 +851,11 @@ export const intendingGrazing = fdmSchema.table(
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
-    (table) => {
-        return [
-            {
-                pk: primaryKey({ columns: [table.b_id_farm, table.b_grazing_intention_year] }),
-            },
-        ]
-    },
+    (table) => ({
+        pk: primaryKey({
+            columns: [table.b_id_farm, table.b_grazing_intention_year],
+        }),
+    }),
 )
 
 export type intendingGrazingTypeSelect = typeof intendingGrazing.$inferSelect
