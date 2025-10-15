@@ -57,7 +57,7 @@
         "typescript": "catalog:",
         "vitest": "catalog:"
     },
-    "packageManager": "pnpm@10.17.0",
+    "packageManager": "pnpm@10.18.3",
     "publishConfig": {
         "registry": "https://npm.pkg.github.com"
     },
