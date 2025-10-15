@@ -1,5 +1,5 @@
 {
-  "id": "e37fbf35-5e1f-447a-ad42-35405b02dbc4",
+  "id": "ff3e17ab-43af-4427-8582-e5057365e136",
   "prevId": "45dcb87d-89c8-4cf7-a504-0db74ba68640",
   "version": "7",
   "dialect": "postgresql",
@@ -1834,14 +1834,14 @@
         "b_id_farm": {
           "name": "b_id_farm",
           "type": "text",
-          "primaryKey": true,
+          "primaryKey": false,
           "notNull": true
         },
         "b_grazing_intention": {
           "name": "b_grazing_intention",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "b_grazing_intention_year": {
           "name": "b_grazing_intention_year",
@@ -1864,7 +1864,22 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "intending_grazing_b_id_farm_farms_b_id_farm_fk": {
+          "name": "intending_grazing_b_id_farm_farms_b_id_farm_fk",
+          "tableFrom": "intending_grazing",
+          "tableTo": "farms",
+          "schemaTo": "fdm",
+          "columnsFrom": [
+            "b_id_farm"
+          ],
+          "columnsTo": [
+            "b_id_farm"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

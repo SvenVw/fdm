@@ -843,8 +843,10 @@ export type organicCertificationsHoldingTypeInsert =
 export const intendingGrazing = fdmSchema.table(
     "intending_grazing",
     {
-        b_id_farm: text().primaryKey(),
-        b_grazing_intention: boolean().notNull(),
+        b_id_farm: text()
+            .notNull()
+            .references(() => farms.b_id_farm),
+        b_grazing_intention: boolean(),
         b_grazing_intention_year: integer().notNull(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
