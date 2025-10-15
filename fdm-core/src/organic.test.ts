@@ -1,8 +1,7 @@
 import { eq } from "drizzle-orm"
-import { afterEach, beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, inject, it } from "vitest"
 import { createFdmServer } from "./fdm-server"
 import * as schema from "./db/schema"
-import * as authNSchema from "./db/schema-authn"
 import { addFarm } from "./farm"
 import {
     addOrganicCertification,
@@ -11,47 +10,37 @@ import {
     listOrganicCertifications,
     removeOrganicCertification,
 } from "./organic"
-
-// Helper function to create a principal for testing purposes
-async function createPrincipal(fdm: Awaited<ReturnType<typeof createFdmServer>>, username: string): Promise<string> {
-    const newPrincipalId = `principal-${Math.random().toString(36).substring(2, 9)}`
-    await fdm.insert(authNSchema.user).values({
-        id: newPrincipalId,
-        name: username,
-        email: `${username}@example.com`,
-        emailVerified: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        username: username,
-        lang: "en-US",
-    })
-    return newPrincipalId
-}
+import type { FdmServerType } from "./fdm-server.d"
+import { createId } from "./id"
 
 describe("Organic Certifications", () => {
-    let fdm: Awaited<ReturnType<typeof createFdmServer>>
-    let principalId: string
+    let fdm: FdmServerType
     let farmId: string
+    let principalId: string
 
     beforeEach(async () => {
-        fdm = createFdmServer(
-            "localhost",
-            5432,
-            "postgres",
-            "postgres",
-            "fdm",
-        )
-        principalId = await createPrincipal(fdm, "test-principal")
-        farmId = await addFarm(fdm, principalId, "Test Farm", undefined, undefined, undefined)
-    })
+        const host = inject("host")
+        const port = inject("port")
+        const user = inject("user")
+        const password = inject("password")
+        const database = inject("database")
+        fdm = createFdmServer(host, port, user, password, database)
 
-    // afterEach(async () => {
-    //     await fdm.delete(schema.farms)
-    //     await fdm.delete(authNSchema.user) // Corrected to authNSchema.user
-    //     await fdm.delete(schema.organicCertifications)
-    //     await fdm.delete(schema.organicCertificationsHolding)
-    //     await fdm.$client.end()
-    // })
+        // Create test field and analyses before each test
+        const farmName = "Test Farm"
+        const farmBusinessId = "123456"
+        const farmAddress = "123 Farm Lane"
+        const farmPostalCode = "12345"
+        principalId = createId()
+        farmId = await addFarm(
+            fdm,
+            principalId,
+            farmName,
+            farmBusinessId,
+            farmAddress,
+            farmPostalCode,
+        )
+    })
 
     it("should add a new organic certification", async () => {
         const traces = "NL-BIO-01.528-0002967.2025.001"
@@ -74,15 +63,25 @@ describe("Organic Certifications", () => {
         const certifications = await fdm
             .select()
             .from(schema.organicCertifications)
-            .where(eq(schema.organicCertifications.b_id_organic, certificationId))
+            .where(
+                eq(schema.organicCertifications.b_id_organic, certificationId),
+            )
 
         expect(certifications.length).toBe(1)
         expect(certifications[0].b_organic_traces).toBe(traces)
         expect(certifications[0].b_organic_skal).toBe(skal)
-        expect(certifications[0].b_organic_issued?.toISOString()).toBe(issued.toISOString())
-        expect(certifications[0].b_organic_expires?.toISOString()).toBe(expires.toISOString())
+        expect(certifications[0].b_organic_issued?.toISOString()).toBe(
+            issued.toISOString(),
+        )
+        expect(certifications[0].b_organic_expires?.toISOString()).toBe(
+            expires.toISOString(),
+        )
 
-        const fetchedCertification = await getOrganicCertification(fdm, principalId, certificationId)
+        const fetchedCertification = await getOrganicCertification(
+            fdm,
+            principalId,
+            certificationId,
+        )
         expect(fetchedCertification).toBeDefined()
         expect(fetchedCertification?.b_id_organic).toBe(certificationId)
         expect(fetchedCertification?.b_organic_traces).toBe(traces)
@@ -206,7 +205,9 @@ describe("Organic Certifications", () => {
         const certifications = await fdm
             .select()
             .from(schema.organicCertifications)
-            .where(eq(schema.organicCertifications.b_id_organic, certificationId))
+            .where(
+                eq(schema.organicCertifications.b_id_organic, certificationId),
+            )
 
         expect(certifications.length).toBe(0)
     })
