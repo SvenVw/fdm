@@ -106,6 +106,13 @@
       "when": 1760450273146,
       "tag": "0014_smart_malice",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1760526983873,
+      "tag": "0015_square_arclight",
+      "breakpoints": true
     }
   ]
 }

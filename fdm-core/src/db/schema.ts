@@ -277,7 +277,7 @@ export const typeRvoOptions = [
     { value: "117", label: "Gescheiden champost" },
     { value: "120", label: "Mineralenconcentraat" },
 ]
-const typeRvoEnum = fdmSchema.enum(
+export const typeRvoEnum = fdmSchema.enum(
     "p_type_rvo",
     typeRvoOptions.map((x) => x.value) as [string, ...string[]],
 )
