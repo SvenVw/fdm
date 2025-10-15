@@ -5,6 +5,8 @@ import {
     getField,
     isDerogationGrantedForYear,
     type Timeframe,
+    getGrazingIntention,
+    type PrincipalId,
 } from "@svenvw/fdm-core"
 import type { NL2025NormsInput } from "./types.d"
 
@@ -46,7 +48,15 @@ export async function collectNL2025InputForNorms(
         2025,
     )
 
-    // 3. Get the details of the cultivations
+    // 3. Get the grazing intention for the farm
+    const has_grazing_intention = await getGrazingIntention(
+        fdm,
+        principal_id as PrincipalId,
+        field.b_id_farm,
+        2025,
+    )
+
+    // 4. Get the details of the cultivations
     const cultivations = await getCultivations(
         fdm,
         principal_id,
@@ -75,6 +85,7 @@ export async function collectNL2025InputForNorms(
     return {
         farm: {
             is_derogatie_bedrijf,
+            has_grazing_intention,
         },
         field: field,
         cultivations: cultivations,

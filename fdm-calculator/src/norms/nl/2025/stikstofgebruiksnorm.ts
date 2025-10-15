@@ -147,7 +147,7 @@ export async function getRegion(
 function getNormsForCultivation(
     selectedStandard: NitrogenStandard,
     b_lu_end: Date,
-    subTypeOmschrijving?: string, // New parameter
+    subTypeOmschrijving?: string,
 ): NormsByRegion | undefined {
     if (selectedStandard.sub_types) {
         type SubType = NonNullable<NitrogenStandard["sub_types"]>[number]
@@ -207,7 +207,13 @@ function determineSubTypeOmschrijving(
     standard: NitrogenStandard,
     is_derogatie_bedrijf: boolean | undefined,
     cultivations: NL2025NormsInputForCultivation[],
+    has_grazing_intention: boolean | undefined,
 ): string | undefined {
+    // Grasland logic based on grazing intention
+    if (standard.type === "grasland") {
+        return has_grazing_intention ? "beweiden" : "volledig maaien"
+    }
+
     // Potato logic based on variety
     if (standard.type === "aardappel") {
         if (cultivation.b_lu_variety) {
@@ -527,6 +533,7 @@ export async function getNL2025StikstofGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<GebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf
+    const has_grazing_intention = input.farm.has_grazing_intention
     const field = input.field
     const cultivations = input.cultivations
 
@@ -596,12 +603,13 @@ export async function getNL2025StikstofGebruiksNorm(
         selectedStandard,
         is_derogatie_bedrijf,
         cultivations,
+        has_grazing_intention,
     )
 
     const applicableNorms = getNormsForCultivation(
         selectedStandard,
         cultivation.b_lu_end,
-        subTypeOmschrijving, // Pass the determined subTypeOmschrijving
+        subTypeOmschrijving,
     )
 
     if (!applicableNorms) {
