@@ -131,6 +131,9 @@ function generateMockData(numberOfFields: number): NitrogenBalanceInput {
                 b_id: fieldId,
                 b_id_farm: "test-farm",
                 p_app_date: new Date(2023, 4, 1),
+                p_app_method: "broadcasting", 
+                p_name_nl: "Mock Fertilizer",
+                p_id: `mock-fert-${i}`,
             },
         ]
 
