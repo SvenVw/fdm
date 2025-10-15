@@ -37,7 +37,10 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const acquiringMethodOptions = [
     { value: "nl_01", label: "Eigendom" },
     { value: "nl_02", label: "Reguliere pacht" },
-    { value: "nl_03", label: "In gebruik van een terreinbeherende organisatie" },
+    {
+        value: "nl_03",
+        label: "In gebruik van een terreinbeherende organisatie",
+    },
     {
         value: "nl_04",
         label: "Tijdelijk gebruik in het kader van landinrichting",
@@ -835,6 +838,28 @@ export type organicCertificationsHoldingTypeSelect =
     typeof organicCertificationsHolding.$inferSelect
 export type organicCertificationsHoldingTypeInsert =
     typeof organicCertificationsHolding.$inferInsert
+
+// Define intending_grazing table
+export const intendingGrazing = fdmSchema.table(
+    "intending_grazing",
+    {
+        b_id_farm: text().primaryKey(),
+        b_grazing_intention: boolean().notNull(),
+        b_grazing_intention_year: integer().notNull(),
+        created: timestamp({ withTimezone: true }).notNull().defaultNow(),
+        updated: timestamp({ withTimezone: true }),
+    },
+    (table) => {
+        return [
+            {
+                pk: primaryKey({ columns: [table.b_id_farm, table.b_grazing_intention_year] }),
+            },
+        ]
+    },
+)
+
+export type intendingGrazingTypeSelect = typeof intendingGrazing.$inferSelect
+export type intendingGrazingTypeInsert = typeof intendingGrazing.$inferInsert
 
 // Define fertilizer_catalogue_enabling table
 export const fertilizerCatalogueEnabling = fdmSchema.table(
