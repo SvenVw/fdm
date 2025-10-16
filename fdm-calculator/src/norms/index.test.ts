@@ -63,8 +63,8 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
         )
         expect(
             functions.calculateFertilizerApplicationFillingForPhosphate,
-        ).toThrowError(
-            "calculateFertilizerApplicationFillingForPhosphate is not implemented yet",
+        ).toBe(
+            calculateFertilizerApplicationFillingForPhosphate,
         )
     })
 

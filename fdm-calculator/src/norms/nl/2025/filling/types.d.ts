@@ -5,6 +5,7 @@ export type NormFilling = {
     applicationFilling: {
         p_app_id: string
         normFilling: number
+        normFillingDetails?: string
     }[]
 }
 
