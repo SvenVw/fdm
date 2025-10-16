@@ -1,4 +1,0 @@
-ALTER TABLE "fdm"."cultivations_catalogue" ADD COLUMN "b_lu_start_default" text;--> statement-breakpoint
-ALTER TABLE "fdm"."cultivations_catalogue" ADD COLUMN "b_date_harvest_default" text;--> statement-breakpoint
-ALTER TABLE "fdm"."cultivations_catalogue" ADD CONSTRAINT "b_lu_start_default_format" CHECK (b_lu_start_default IS NULL OR b_lu_start_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$');--> statement-breakpoint
-ALTER TABLE "fdm"."cultivations_catalogue" ADD CONSTRAINT "b_date_harvest_default_format" CHECK (b_date_harvest_default IS NULL OR b_date_harvest_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$');
