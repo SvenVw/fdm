@@ -11,6 +11,7 @@ import {
     getCultivationPlan,
     getCultivations,
     getCultivationsFromCatalogue,
+    getDefaultDatesOfCultivation,
     removeCultivation,
     updateCultivation,
 } from "./cultivation"
@@ -116,6 +117,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: ["variety1", "variety2"],
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             b_lu_start = new Date("2024-01-01")
@@ -162,6 +165,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: ["variety1", "variety2"],
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             const cultivations = await getCultivationsFromCatalogue(
@@ -217,6 +222,8 @@ describe("Cultivation Data Model", () => {
                     b_n_fixation: 0,
                     b_lu_rest_oravib: false,
                     b_lu_variety_options: null,
+                    b_lu_start_default: "03-01",
+                    b_date_harvest_default: "09-15",
                 }),
             ).rejects.toThrow()
         })
@@ -433,6 +440,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             await updateCultivation(
@@ -505,6 +514,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             const newSowingDate = new Date("2024-02-01")
@@ -549,6 +560,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             await updateCultivation(fdm, principal_id, b_lu, newCatalogueId)
@@ -795,6 +808,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: b_lu_variety_options,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             const cultivations = await getCultivationsFromCatalogue(
@@ -810,6 +825,284 @@ describe("Cultivation Data Model", () => {
             expect(cultivation?.b_lu_variety_options).toEqual(
                 b_lu_variety_options,
             )
+        })
+
+        it("should throw an error for invalid b_lu_start_default format", async () => {
+            const b_lu_catalogue = createId()
+
+            await expect(
+                addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "Test Cultivation",
+                    b_lu_name_en: "Test Cultivation (EN)",
+                    b_lu_harvestable: "once" as const,
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "Test HCAT3 Name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: ["v1", "v2"],
+                    b_lu_start_default: "2024-03-01", // Invalid format
+                    b_date_harvest_default: "09-15",
+                }),
+            ).rejects.toThrow("Exception for addCultivationToCatalogue")
+        })
+
+        it("should throw an error for invalid b_date_harvest_default format", async () => {
+            const b_lu_catalogue = createId()
+            await expect(
+                addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "Test Cultivation",
+                    b_lu_name_en: "Test Cultivation (EN)",
+                    b_lu_harvestable: "once" as const,
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "Test HCAT3 Name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: ["v1", "v2"],
+                    b_lu_start_default: "03-01",
+                    b_date_harvest_default: "2024-09-15", // Invalid format
+                }),
+            ).rejects.toThrow("Exception for addCultivationToCatalogue")
+        })
+
+        it("should not throw an error for valid date formats", async () => {
+            const b_lu_catalogue = createId()
+
+            await expect(
+                addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "Test Cultivation",
+                    b_lu_name_en: "Test Cultivation (EN)",
+                    b_lu_harvestable: "once" as const,
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "Test HCAT3 Name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: ["v1", "v2"],
+                    b_lu_start_default: "03-01",
+                    b_date_harvest_default: "09-15",
+                }),
+            ).resolves.not.toThrow()
+        })
+
+        it("should not throw an error when date fields are null", async () => {
+            const b_lu_catalogue = createId()
+
+            await expect(
+                addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "Test Cultivation",
+                    b_lu_name_en: "Test Cultivation (EN)",
+                    b_lu_harvestable: "once" as const,
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "Test HCAT3 Name",
+                    b_lu_croprotation: "maize",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: ["v1", "v2"],
+                    b_lu_start_default: null,
+                    b_date_harvest_default: null,
+                }),
+            ).resolves.not.toThrow()
+        })
+        describe("getDefaultDatesOfCultivation", () => {
+            it("should return default start and end dates for a single-harvest cultivation", async () => {
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    b_lu_catalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-03-01"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2024-09-15"))
+            })
+
+            it("should handle harvest in the next year", async () => {
+                const winterCropCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: winterCropCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "winter-wheat",
+                    b_lu_name_en: "Winter Wheat",
+                    b_lu_harvestable: "once",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 7000,
+                    b_lu_hi: 0.5,
+                    b_lu_n_harvestable: 5,
+                    b_lu_n_residue: 3,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: "10-15", // October 15th
+                    b_date_harvest_default: "07-20", // July 20th
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    winterCropCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2023-10-15"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2024-07-20"))
+            })
+
+            it("should return only start date for multi-harvest cultivations", async () => {
+                const multiHarvestCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: multiHarvestCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "grass",
+                    b_lu_name_en: "Grass",
+                    b_lu_harvestable: "multiple",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "grass",
+                    b_lu_yield: 10000,
+                    b_lu_hi: 0.8,
+                    b_lu_n_harvestable: 6,
+                    b_lu_n_residue: 4,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: "04-01",
+                    b_date_harvest_default: null,
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    multiHarvestCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-04-01"))
+                expect(defaultDates.b_lu_end).toBeUndefined()
+            })
+
+            it("should return only start date when harvestable is 'none'", async () => {
+                const noneHarvestableCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: noneHarvestableCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "cover-crop",
+                    b_lu_name_en: "Cover Crop",
+                    b_lu_harvestable: "none",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "other",
+                    b_lu_yield: 0,
+                    b_lu_hi: 0,
+                    b_lu_n_harvestable: 0,
+                    b_lu_n_residue: 0,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: "04-01",
+                    b_date_harvest_default: null,
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    noneHarvestableCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-04-01"))
+                expect(defaultDates.b_lu_end).toBeUndefined()
+            })
+
+            it("should return default start date of '03-15' when b_lu_start_default is null", async () => {
+                const nullStartDefaultCatalogue = createId()
+                await addCultivationToCatalogue(fdm, {
+                    b_lu_catalogue: nullStartDefaultCatalogue,
+                    b_lu_source: b_lu_source,
+                    b_lu_name: "null-start-default",
+                    b_lu_name_en: "Null Start Default",
+                    b_lu_harvestable: "once",
+                    b_lu_hcat3: "test-hcat3",
+                    b_lu_hcat3_name: "test-hcat3-name",
+                    b_lu_croprotation: "cereal",
+                    b_lu_yield: 6000,
+                    b_lu_hi: 0.4,
+                    b_lu_n_harvestable: 4,
+                    b_lu_n_residue: 2,
+                    b_n_fixation: 0,
+                    b_lu_rest_oravib: false,
+                    b_lu_variety_options: null,
+                    b_lu_start_default: null,
+                    b_date_harvest_default: "09-15",
+                })
+
+                const year = 2024
+                const defaultDates = await getDefaultDatesOfCultivation(
+                    fdm,
+                    principal_id,
+                    b_id_farm,
+                    nullStartDefaultCatalogue,
+                    year,
+                )
+
+                expect(defaultDates).toBeDefined()
+                expect(defaultDates.b_lu_start).toEqual(new Date("2024-03-15"))
+                expect(defaultDates.b_lu_end).toEqual(new Date("2024-09-15"))
+            })
+
+            it("should throw an error if cultivation is not found", async () => {
+                const nonExistentCatalogueId = createId()
+                const year = 2024
+
+                await expect(
+                    getDefaultDatesOfCultivation(
+                        fdm,
+                        principal_id,
+                        b_id_farm,
+                        nonExistentCatalogueId,
+                        year,
+                    ),
+                ).rejects.toThrow("Exception for getDefaultDatesOfCultivation")
+            })
         })
     })
 
@@ -899,6 +1192,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             await addCultivation(
@@ -1068,6 +1363,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             // Add a second field
@@ -1213,6 +1510,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             // Add a cultivation 'Wheat' within the timeframe
@@ -1277,6 +1576,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             // Add a cultivation 'Wheat'
@@ -1432,6 +1733,8 @@ describe("Cultivation Data Model", () => {
                 b_n_fixation: 0,
                 b_lu_rest_oravib: false,
                 b_lu_variety_options: null,
+                b_lu_start_default: "03-01",
+                b_date_harvest_default: "09-15",
             })
 
             // Add a cultivation 'Wheat' - outside timeframe
@@ -1576,6 +1879,8 @@ describe("buildCultivationTimeframeCondition", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-01",
+            b_date_harvest_default: "09-15",
         })
     })
 
