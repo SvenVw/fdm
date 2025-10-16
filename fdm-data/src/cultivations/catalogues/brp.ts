@@ -69,6 +69,20 @@ export async function getCatalogueBrp(): Promise<CatalogueCultivation> {
                           .map((s) => s.trim())
                           .filter((s) => s.length > 0)
                     : null,
+            b_lu_start_default:
+                typeof cultivation.b_lu_start_default === "string" &&
+                /^(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/.test(
+                    cultivation.b_lu_start_default.trim(),
+                )
+                    ? cultivation.b_lu_start_default.trim()
+                    : null,
+            b_date_harvest_default:
+                typeof cultivation.b_date_harvest_default === "string" &&
+                /^(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/.test(
+                    cultivation.b_date_harvest_default.trim(),
+                )
+                    ? cultivation.b_date_harvest_default.trim()
+                    : null,
             hash: null,
         }
 

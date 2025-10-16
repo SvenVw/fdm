@@ -1,6 +1,7 @@
 import type { ApplicationMethods } from "@svenvw/fdm-data"
 import {
     boolean,
+    check,
     index,
     integer,
     pgSchema,
@@ -10,6 +11,7 @@ import {
     uniqueIndex,
 } from "drizzle-orm/pg-core"
 import { geometry, numericCasted } from "./schema-custom-types"
+import { sql } from "drizzle-orm"
 
 // Define postgres schema
 export const fdmSchema = pgSchema("fdm")
@@ -37,22 +39,22 @@ export type farmsTypeInsert = typeof farms.$inferInsert
 export const acquiringMethodOptions = [
     { value: "nl_01", label: "Eigendom" },
     { value: "nl_02", label: "Reguliere pacht" },
+    { value: "nl_03", label: "In gebruik van een terreinbeherende organisatie" },
+    {
+        value: "nl_04",
+        label: "Tijdelijk gebruik in het kader van landinrichting",
+    },
     { value: "nl_07", label: "Overige exploitatievormen" },
     { value: "nl_09", label: "Erfpacht" },
+    { value: "nl_10", label: "Pacht van geringe oppervlakten" },
+    { value: "nl_11", label: "Natuurpacht" },
     { value: "nl_12", label: "Geliberaliseerde pacht, langer dan 6 jaar" },
     { value: "nl_13", label: "Geliberaliseerde pacht, 6 jaar of korter" },
     { value: "nl_61", label: "Reguliere pacht kortlopend" },
     { value: "nl_63", label: "Teeltpacht" },
-    // { value: "nl_xx", label: "Pacht van geringe oppervlakten" },
-    // { value: "nl_xx", label: "Natuurpacht" },
-    // { value: "nl_xx", label: "In gebuik van een terreinbeherende organisatie" },
-    // {
-    //     value: "nl_xx",
-    //     label: "Tijdelijk gebuik in het kader van landinrichting",
-    // },
     { value: "unknown", label: "Onbekend" },
 ]
-const acquiringMethodEnum = fdmSchema.enum(
+export const acquiringMethodEnum = fdmSchema.enum(
     "b_acquiring_method",
     acquiringMethodOptions.map((x) => x.value) as [string, ...string[]],
 )
@@ -371,11 +373,23 @@ export const cultivationsCatalogue = fdmSchema.table(
         b_n_fixation: numericCasted(),
         b_lu_rest_oravib: boolean(),
         b_lu_variety_options: text().array(),
+        b_lu_start_default: text(), // MM-dd
+        b_date_harvest_default: text(), // MM-dd
         hash: text(),
         created: timestamp({ withTimezone: true }).notNull().defaultNow(),
         updated: timestamp({ withTimezone: true }),
     },
-    (table) => [uniqueIndex("b_lu_catalogue_idx").on(table.b_lu_catalogue)],
+    (table) => [
+        uniqueIndex("b_lu_catalogue_idx").on(table.b_lu_catalogue),
+        check(
+            "b_lu_start_default_format",
+            sql`b_lu_start_default IS NULL OR b_lu_start_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'`,
+        ),
+        check(
+            "b_date_harvest_default_format",
+            sql`b_date_harvest_default IS NULL OR b_date_harvest_default ~ '^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'`,
+        ),
+    ],
 )
 
 export type cultivationsCatalogueTypeSelect =
