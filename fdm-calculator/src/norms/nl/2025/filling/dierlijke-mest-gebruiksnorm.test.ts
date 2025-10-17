@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import type { Fertilizer, FertilizerApplication, Cultivation } from "@svenvw/fdm-core"
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import { calculateFertilizerApplicationFillingForManure } from "./dierlijke-mest-gebruiksnorm"
 import type { NL2025NormsFillingInput } from "./types"
 
