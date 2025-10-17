@@ -63,7 +63,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
-        // Get the farm id
+        // Get the field id
         const b_id = params.b_id
         if (!b_id) {
             throw data("invalid: b_id", {
