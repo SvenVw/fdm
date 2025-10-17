@@ -144,7 +144,6 @@ export function calculateFertilizerApplicationFillingForPhosphate({
         ] = {
             p_app_id: application.p_app_id,
             normFilling: normFilling.toNumber(),
-            normFillingDetails: "Standaard meststof",
         }
     }
 

@@ -297,9 +297,7 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fosfaatgebruiksnorm,
         })
         expect(result.normFilling).toBeCloseTo(30) // 100% counted
-        expect(result.applicationFilling[0].normFillingDetails).toContain(
-            "Standaard meststof",
-        )
+        expect(result.applicationFilling[0].normFillingDetails).toBeUndefined()
     })
 
     it("should use p_p_rt from table11Mestcodes if not on fertilizer object", () => {
@@ -382,13 +380,13 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
         //   Eligible for discount: min(20, 30 - 30) = 0kg. Discounted: 0kg.
         //   Remaining actual P: 20 - 0 = 20kg. This counts 100%.
         //   App3 contribution: 0 + 20 = 20kg.
-        // Total: 10 (app1) + 17.5 (app2) + 20 (app3) = 47.5kg.
-        expect(result.normFilling).toBeCloseTo(47.5)
+        // Total: 10 (app1) + 17.5 (app2) + 15 (app3) = 42.5kg.
+        expect(result.normFilling).toBeCloseTo(42.5)
         expect(result.applicationFilling[0].normFilling).toBeCloseTo(10)
         expect(result.applicationFilling[1].normFilling).toBeCloseTo(17.5)
-        expect(result.applicationFilling[2].normFilling).toBeCloseTo(20)
+        expect(result.applicationFilling[2].normFilling).toBeCloseTo(15)
         expect(result.applicationFilling[2].normFillingDetails).toContain(
-            "OS-rijke meststof (75% korting) draagt 0.00kg bij aan de norm. Plus 20.00kg (100% geteld) boven de kortingslimiet.",
+            "OS-rijke meststof, geen korting toegepast. Plus 15.00kg (100% geteld) boven de kortingslimiet.",
         )
     })
 })
