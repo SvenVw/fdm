@@ -63,11 +63,6 @@ export function calculateFertilizerApplicationFillingForPhosphate({
         })
 
     let totalFilling = new Decimal(0)
-    const applicationsFilling = [] as {
-        p_app_id: string
-        normFilling: number
-        normFillingDetails?: string
-    }[]
     const normLimit = new Decimal(fosfaatgebruiksnorm)
     let remainingDiscountablePhosphate = normLimit // This tracks the remaining P that can be discounted
 
@@ -83,7 +78,7 @@ export function calculateFertilizerApplicationFillingForPhosphate({
         p_app_amount: Decimal
         p_type_rvo: string
         discountFactor: Decimal
-        originalIndex: number 
+        originalIndex: number
     }[] = []
 
     applications.forEach((application, index) => {
@@ -143,7 +138,9 @@ export function calculateFertilizerApplicationFillingForPhosphate({
         const normFilling = p_app_amount.times(p_p_rt).dividedBy(1000)
         totalFilling = totalFilling.plus(normFilling)
         orderedApplicationsFilling[
-            applications.findIndex((app) => app.p_app_id === application.p_app_id)
+            applications.findIndex(
+                (app) => app.p_app_id === application.p_app_id,
+            )
         ] = {
             p_app_id: application.p_app_id,
             normFilling: normFilling.toNumber(),
@@ -226,12 +223,9 @@ export function calculateFertilizerApplicationFillingForPhosphate({
         }
     }
 
-    // Ensure totalFilling does not exceed fosfaatgebruiksnorm
-    const finalTotalFilling = Decimal.min(totalFilling, normLimit)
-
     // Return the total norm filling and the breakdown per application.
     return {
-        normFilling: finalTotalFilling.toNumber(),
+        normFilling: totalFilling.toNumber(),
         applicationFilling: orderedApplicationsFilling,
     }
 }

@@ -352,8 +352,8 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
         // To fill 20kg norm with 25% discounted: need 20 / 0.25 = 80kg actual P.
         // So 80kg of Groencompost is discounted to 20kg.
         // Remaining Groencompost: 200 - 80 = 120kg. This counts 100%.
-        // Total: 10 (standard) + 177.5 (Groencompost) = 187.5. Capped at 30.
-        expect(result.normFilling).toBeCloseTo(30)
+        // Total: 10 (standard) + 177.5 (Groencompost) = 187.5.
+        expect(result.normFilling).toBeCloseTo(187.5)
         expect(result.applicationFilling[1].normFilling).toBeCloseTo(177.5) // 7.5 (discounted) + 170 (100% counted)
         expect(result.applicationFilling[1].normFillingDetails).toContain(
             "OS-rijke meststof (25% korting) draagt 7.50kg bij aan de norm. Plus 170.00kg (100% geteld) boven de kortingslimiet.",
@@ -382,8 +382,8 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
         //   Eligible for discount: min(20, 30 - 30) = 0kg. Discounted: 0kg.
         //   Remaining actual P: 20 - 0 = 20kg. This counts 100%.
         //   App3 contribution: 0 + 20 = 20kg.
-        // Total: 10 (app1) + 17.5 (app2) + 20 (app3) = 47.5kg. Capped at 30.
-        expect(result.normFilling).toBeCloseTo(30)
+        // Total: 10 (app1) + 17.5 (app2) + 20 (app3) = 47.5kg.
+        expect(result.normFilling).toBeCloseTo(47.5)
         expect(result.applicationFilling[0].normFilling).toBeCloseTo(10)
         expect(result.applicationFilling[1].normFilling).toBeCloseTo(17.5)
         expect(result.applicationFilling[2].normFilling).toBeCloseTo(20)
