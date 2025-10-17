@@ -52,6 +52,7 @@
         "@rollup/plugin-typescript": "catalog:",
         "@svenvw/fdm-data": "workspace:^0.17.1",
         "@types/node": "^24.7.2",
+        "@types/object-hash": "^3.0.6",
         "@vitest/coverage-v8": "catalog:",
         "drizzle-kit": "catalog:",
         "fs-extra": "^11.3.2",
@@ -70,6 +71,7 @@
         "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
         "nanoid": "^5.1.6",
+        "object-hash": "^3.0.0",
         "postgres": "^3.4.7",
         "unique-username-generator": "^1.5.1"
     },
