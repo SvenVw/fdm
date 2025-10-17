@@ -2,6 +2,7 @@ import { aggregateNormsToFarmLevel } from "./farm"
 import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/dierlijke-mest-gebruiksnorm"
 import { calculateFertilizerApplicationFillingForManure } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
 import { calculateFertilizerApplicationFillingForPhosphate } from "./nl/2025/filling/fosfaatgebruiksnorm"
+import { calculateFertilizerApplicationFillingForNitrogen } from "./nl/2025/filling/stikstofgebruiksnorm"
 import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/fosfaatgebruiksnorm"
 import { collectNL2025InputForNorms } from "./nl/2025/input"
 import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
@@ -35,11 +36,8 @@ export function createFunctionsForFertilizerApplicationFilling(
                         "collectInputForFertilizerApplicationFilling is not implemented yet",
                     )
                 },
-                calculateFertilizerApplicationFillingForNitrogen: () => {
-                    throw new Error(
-                        "calculateFertilizerApplicationFillingForNitrogen is not implemented yet",
-                    )
-                },
+                calculateFertilizerApplicationFillingForNitrogen:
+                    calculateFertilizerApplicationFillingForNitrogen,
                 calculateFertilizerApplicationFillingForManure:
                     calculateFertilizerApplicationFillingForManure,
                 calculateFertilizerApplicationFillingForPhosphate:

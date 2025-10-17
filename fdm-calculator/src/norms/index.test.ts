@@ -10,6 +10,7 @@ import { collectNL2025InputForNorms } from "./nl/2025/input"
 import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
 import { calculateFertilizerApplicationFillingForPhosphate } from "./nl/2025/filling/fosfaatgebruiksnorm"
 import { calculateFertilizerApplicationFillingForManure } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
+import { calculateFertilizerApplicationFillingForNitrogen } from "./nl/2025/filling/stikstofgebruiksnorm"
 
 describe("createFunctionsForNorms", () => {
     it("should return the correct functions for NL region and year 2025", () => {
@@ -53,19 +54,15 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
         ).toThrowError(
             "collectInputForFertilizerApplicationFilling is not implemented yet",
         )
-        expect(
-            functions.calculateFertilizerApplicationFillingForNitrogen,
-        ).toThrowError(
-            "calculateFertilizerApplicationFillingForNitrogen is not implemented yet",
+        expect(functions.calculateFertilizerApplicationFillingForNitrogen).toBe(
+            calculateFertilizerApplicationFillingForNitrogen,
         )
         expect(functions.calculateFertilizerApplicationFillingForManure).toBe(
             calculateFertilizerApplicationFillingForManure,
         )
         expect(
             functions.calculateFertilizerApplicationFillingForPhosphate,
-        ).toBe(
-            calculateFertilizerApplicationFillingForPhosphate,
-        )
+        ).toBe(calculateFertilizerApplicationFillingForPhosphate)
     })
 
     it("should throw an error for an unsupported year", () => {
