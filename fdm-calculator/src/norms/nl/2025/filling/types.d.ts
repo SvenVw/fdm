@@ -31,3 +31,9 @@ export type Table9 = {
     }[]
     p_n_wcl?: number
 }[]
+
+export type WorkingCoefficientDetails = {
+    p_n_wcl: number
+    description: string
+    subTypeDescription?: string
+}

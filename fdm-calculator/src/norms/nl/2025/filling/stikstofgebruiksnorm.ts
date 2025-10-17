@@ -4,7 +4,7 @@ import type {
     CurrentSoilData,
     Cultivation,
 } from "@svenvw/fdm-core"
-import type { NormFilling } from "./types"
+import type { NormFilling, WorkingCoefficientDetails } from "./types"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import { table9 } from "./table-9"
 import { getRegion } from "../stikstofgebruiksnorm"
@@ -87,7 +87,7 @@ export async function calculateFertilizerApplicationFillingForNitrogen({
         ].includes(fertilizer.p_type_rvo ?? "")
         const fertilizerOnFarmProduced = isDrijfmest // Assume drijfmest is on-farm, vaste mest is not for now.
 
-        const p_n_wcl = getWorkingCoefficient(
+        const workingCoefficientDetails = getWorkingCoefficient(
             fertilizer.p_type_rvo,
             soilType,
             b_grazing_intention,
@@ -100,13 +100,20 @@ export async function calculateFertilizerApplicationFillingForNitrogen({
         const p_app_amount = new Decimal(application.p_app_amount)
         const normFilling = p_app_amount
             .times(p_n_rt)
-            .times(p_n_wcl)
+            .times(workingCoefficientDetails.p_n_wcl)
             .dividedBy(1000)
         totalNormFilling = totalNormFilling.plus(normFilling)
+
+        const descriptionParts = [workingCoefficientDetails.description]
+        if (workingCoefficientDetails.subTypeDescription) {
+            descriptionParts.push(workingCoefficientDetails.subTypeDescription)
+        }
+        const normFillingDetailString = `Werkingscoëfficiënt: ${workingCoefficientDetails.p_n_wcl * 100}% - ${descriptionParts.join(" - ")}`
 
         applicationFillings.push({
             p_app_id: application.p_app_id,
             normFilling: normFilling.toNumber(),
+            normFillingDetails: normFillingDetailString,
         })
     }
 
@@ -161,7 +168,7 @@ export function isBouwland(
  * @param {boolean} isBouwland - True if the land is arable land (bouwland), false otherwise.
  * @param {Date} p_app_date - The date of the fertilizer application.
  * @param {boolean} fertilizerOnFarmProduced - True if the fertilizer is produced on the farm, false otherwise.
- * @returns {number} The working coefficient as a decimal (e.g., 0.45 for 45%). Defaults to 1.0 (100%) if no specific rule applies.
+ * @returns {WorkingCoefficientDetails} An object containing the working coefficient, its main description, and an optional subtype description.
  */
 export function getWorkingCoefficient(
     p_type_rvo: string | null | undefined,
@@ -170,11 +177,14 @@ export function getWorkingCoefficient(
     isBouwland: boolean,
     p_app_date: Date,
     fertilizerOnFarmProduced: boolean, // New parameter
-): number {
-    const p_n_wcl = 1.0 // Default working coefficient is 100% (1.0)
+): WorkingCoefficientDetails {
+    const defaultDetails: WorkingCoefficientDetails = {
+        p_n_wcl: 1.0,
+        description: "Kunstmest of niet gevonden in Tabel 9",
+    }
 
     if (!p_type_rvo) {
-        return p_n_wcl
+        return defaultDetails
     }
 
     for (const entry of table9) {
@@ -234,14 +244,21 @@ export function getWorkingCoefficient(
                 })
 
                 if (matchingSubType) {
-                    return matchingSubType.p_n_wcl
+                    return {
+                        p_n_wcl: matchingSubType.p_n_wcl,
+                        description: entry.description,
+                        subTypeDescription: matchingSubType.description,
+                    }
                 }
             } else if (entry.p_n_wcl !== undefined) {
                 // If no subTypes, use the main entry's p_n_wcl
-                return entry.p_n_wcl
+                return {
+                    p_n_wcl: entry.p_n_wcl,
+                    description: entry.description,
+                }
             }
         }
     }
 
-    return p_n_wcl // If no specific rule is found, return the default 100% (1.0)
+    return defaultDetails // If no specific rule is found, return the default 100% (1.0)
 }
