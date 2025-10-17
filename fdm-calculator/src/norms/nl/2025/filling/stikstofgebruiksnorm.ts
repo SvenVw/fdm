@@ -209,7 +209,7 @@ export function getWorkingCoefficient(
 
                     if (
                         subType.grondsoortCode &&
-                        !subType.grondsoortCode.includes(soilType as any)
+                        !subType.grondsoortCode.includes(soilType as RegionKey)
                     ) {
                         return false
                     }
