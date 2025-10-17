@@ -5,27 +5,28 @@ export const nitrogenStandardsData = [
         type: "grasland",
         is_winterteelt: true,
         is_vanggewas: false,
-        norms: {
-            klei: { standard: 345, nv_area: 276 },
-            zand_nwc: { standard: 250, nv_area: 200 },
-            zand_zuid: { standard: 250, nv_area: 200 },
-            loess: { standard: 250, nv_area: 200 },
-            veen: { standard: 265, nv_area: 212 },
-        },
-    },
-    {
-        cultivation_rvo_table2: "Grasland met volledig maaien",
-        b_lu_catalogue_match: ["nl_265", "nl_331"],
-        type: "grasland",
-        is_winterteelt: true,
-        is_vanggewas: false,
-        norms: {
-            klei: { standard: 385, nv_area: 308 },
-            zand_nwc: { standard: 320, nv_area: 256 },
-            zand_zuid: { standard: 320, nv_area: 256 },
-            loess: { standard: 320, nv_area: 256 },
-            veen: { standard: 300, nv_area: 240 },
-        },
+        sub_types: [
+            {
+                omschrijving: "beweiden",
+                norms: {
+                    klei: { standard: 345, nv_area: 276 },
+                    zand_nwc: { standard: 250, nv_area: 200 },
+                    zand_zuid: { standard: 250, nv_area: 200 },
+                    loess: { standard: 250, nv_area: 200 },
+                    veen: { standard: 265, nv_area: 212 },
+                },
+            },
+            {
+                omschrijving: "volledig maaien",
+                norms: {
+                    klei: { standard: 385, nv_area: 308 },
+                    zand_nwc: { standard: 320, nv_area: 256 },
+                    zand_zuid: { standard: 320, nv_area: 256 },
+                    loess: { standard: 320, nv_area: 256 },
+                    veen: { standard: 300, nv_area: 240 },
+                },
+            },
+        ],
     },
     {
         cultivation_rvo_table2: "Tijdelijk grasland",

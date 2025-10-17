@@ -16,6 +16,7 @@ vi.mock("@svenvw/fdm-core", async () => {
         getCultivations: vi.fn(),
         getCurrentSoilData: vi.fn(),
         isDerogationGrantedForYear: vi.fn(),
+        getGrazingIntention: vi.fn(),
     }
 })
 
@@ -52,6 +53,7 @@ describe("collectNL2025InputForNorms", () => {
             mockSoilAnalysis as unknown as SoilAnalysis[],
         )
         vi.mocked(fdmCore.isDerogationGrantedForYear).mockResolvedValue(false)
+        vi.mocked(fdmCore.getGrazingIntention).mockResolvedValue(false)
 
         const result = await collectNL2025InputForNorms(
             mockFdm,
@@ -60,6 +62,7 @@ describe("collectNL2025InputForNorms", () => {
         )
 
         expect(result.farm.is_derogatie_bedrijf).toBe(false)
+        expect(result.farm.has_grazing_intention).toBe(false)
         expect(result.field).toBe(mockField)
         expect(result.cultivations).toBe(mockCultivations)
         expect(result.soilAnalysis).toEqual({ a_p_cc: 1.0, a_p_al: 20 })
@@ -67,6 +70,18 @@ describe("collectNL2025InputForNorms", () => {
             mockFdm,
             mockPrincipalId,
             mockFieldId,
+        )
+        expect(fdmCore.isDerogationGrantedForYear).toHaveBeenCalledWith(
+            mockFdm,
+            mockPrincipalId,
+            "farm-1",
+            2025,
+        )
+        expect(fdmCore.getGrazingIntention).toHaveBeenCalledWith(
+            mockFdm,
+            mockPrincipalId,
+            "farm-1",
+            2025,
         )
         expect(fdmCore.getCultivations).toHaveBeenCalledWith(
             mockFdm,
@@ -79,12 +94,6 @@ describe("collectNL2025InputForNorms", () => {
             mockPrincipalId,
             mockFieldId,
             timeframe,
-        )
-        expect(fdmCore.isDerogationGrantedForYear).toHaveBeenCalledWith(
-            mockFdm,
-            mockPrincipalId,
-            "farm-1",
-            2025,
         )
     })
 })

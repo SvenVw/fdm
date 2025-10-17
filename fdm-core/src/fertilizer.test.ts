@@ -131,6 +131,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -210,6 +211,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -287,6 +289,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -377,6 +380,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
 
@@ -476,6 +480,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
         })
@@ -692,6 +697,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: null,
                     p_type: "manure",
+                    p_type_rvo: "10",
                 },
             )
             const updatedProperties = {
@@ -807,6 +813,7 @@ describe("Fertilizer Data Model", () => {
                     p_cl_rt: 390,
                     p_ef_nh3: 0.8,
                     p_type: "mineral",
+                    p_type_rvo: "115",
                 },
             )
 
@@ -1059,7 +1066,7 @@ describe("Fertilizer Data Model", () => {
 describe("getFertilizerParametersDescription", () => {
     it("should return the correct fertilizer parameter descriptions for NL-nl locale", () => {
         const descriptions = getFertilizerParametersDescription("NL-nl")
-        expect(descriptions).toHaveLength(24)
+        expect(descriptions).toHaveLength(25)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")
@@ -1084,7 +1091,7 @@ describe("getFertilizerParametersDescription", () => {
 
     it("should return the correct fertilizer parameter descriptions for default locale", () => {
         const descriptions = getFertilizerParametersDescription()
-        expect(descriptions).toHaveLength(24)
+        expect(descriptions).toHaveLength(25)
         for (const description of descriptions) {
             expect(description).toHaveProperty("parameter")
             expect(description).toHaveProperty("unit")

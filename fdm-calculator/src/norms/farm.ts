@@ -1,5 +1,5 @@
 import { Decimal } from "decimal.js"
-import type { GebruiksnormResult } from "./nl/2025/types"
+import type { GebruiksnormResult } from "./nl/2025/value/types"
 
 /**
  * Represents the input structure for the `aggregateNormsToFarmLevel` function.
