@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest"
-import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
+import type { Fertilizer, FertilizerApplication, Cultivation } from "@svenvw/fdm-core"
 import { calculateFertilizerApplicationFillingForManure } from "./dierlijke-mest-gebruiksnorm"
+import type { NL2025NormsFillingInput } from "./types"
 
 describe("calculateFertilizerApplicationFillingForManure", () => {
 	const mockFertilizers: Fertilizer[] = [
@@ -44,7 +45,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 		const result = calculateFertilizerApplicationFillingForManure({
 			applications: [mockApplications[0]],
 			fertilizers: mockFertilizers,
-		})
+            cultivations: [],
+            has_organic_certification: false,
+            has_grazining_intention: false,
+            fosfaatgebruiksnorm: 0,
+            b_centroid: [0, 0],
+		} as NL2025NormsFillingInput)
 
 		expect(result.normFilling).toBe(5)
 		expect(result.applicationFilling).toEqual([
@@ -59,7 +65,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 		const result = calculateFertilizerApplicationFillingForManure({
 			applications: mockApplications,
 			fertilizers: mockFertilizers,
-		})
+            cultivations: [],
+            has_organic_certification: false,
+            has_grazining_intention: false,
+            fosfaatgebruiksnorm: 0,
+            b_centroid: [0, 0],
+		} as NL2025NormsFillingInput)
 
 		expect(result.normFilling).toBe(85) // 5 + 80
 		expect(result.applicationFilling).toEqual([
@@ -84,7 +95,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 				},
 			],
 			fertilizers: mockFertilizers,
-		})
+            cultivations: [],
+            has_organic_certification: false,
+            has_grazining_intention: false,
+            fosfaatgebruiksnorm: 0,
+            b_centroid: [0, 0],
+		} as NL2025NormsFillingInput)
 
 		expect(result.normFilling).toBe(0)
 		expect(result.applicationFilling).toEqual([
@@ -106,7 +122,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 					},
 				],
 				fertilizers: mockFertilizers,
-			}),
+                cultivations: [],
+                has_organic_certification: false,
+                has_grazining_intention: false,
+                fosfaatgebruiksnorm: 0,
+                b_centroid: [0, 0],
+			} as NL2025NormsFillingInput),
 		).toThrow("Fertilizer 999 not found for application app4")
 	})
 
@@ -121,7 +142,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 					},
 				],
 				fertilizers: mockFertilizers,
-			}),
+                cultivations: [],
+                has_organic_certification: false,
+                has_grazining_intention: false,
+                fosfaatgebruiksnorm: 0,
+                b_centroid: [0, 0],
+			} as NL2025NormsFillingInput),
 		).toThrow("Fertilizer 4 has no p_type_rvo")
 	})
 
@@ -136,7 +162,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 					},
 				],
 				fertilizers: mockFertilizers,
-			}),
+                cultivations: [],
+                has_organic_certification: false,
+                has_grazining_intention: false,
+                fosfaatgebruiksnorm: 0,
+                b_centroid: [0, 0],
+			} as NL2025NormsFillingInput),
 		).toThrow("Fertilizer 3 has unknown p_type_rvo 200")
 	})
 
@@ -144,7 +175,12 @@ describe("calculateFertilizerApplicationFillingForManure", () => {
 		const result = calculateFertilizerApplicationFillingForManure({
 			applications: [],
 			fertilizers: mockFertilizers,
-		})
+            cultivations: [],
+            has_organic_certification: false,
+            has_grazining_intention: false,
+            fosfaatgebruiksnorm: 0,
+            b_centroid: [0, 0],
+		} as NL2025NormsFillingInput)
 
 		expect(result.normFilling).toBe(0)
 		expect(result.applicationFilling).toEqual([])

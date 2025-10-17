@@ -1,7 +1,8 @@
-import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
-import type { NormFilling } from "./types"
+import type { NormFilling, NL2025NormsFillingInput } from "./types"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import Decimal from "decimal.js"
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
+
 const rvoMestcodesOrganicRich25Percent = ["111", "112"] // Compost, Zeer schone compost
 const rvoMestcodesOrganicRich75Percent = ["110", "10", "61", "25", "56"] // Champost, Rundvee - Vaste mest, Geiten - Vaste mest, Paarden - Vaste mest, Schapen - Mest, alle systemen
 const rvoMestcodesOrganicRich75PercentOrganic = ["40"] // Varkens - Vaste mest (for organic certification)
@@ -27,24 +28,14 @@ const rvoMestcodesOrganicRich75PercentOrganic = ["40"] // Varkens - Vaste mest (
  *     with a 75% contribution factor (e.g., strorijke vaste mest).
  *     This has been acknowledged by RVO to be possible in personal communication with Sven.
  *
- * @param {object} params - The parameters for the calculation.
- * @param {FertilizerApplication[]} params.applications - An array of fertilizer applications.
- * @param {Fertilizer[]} params.fertilizers - An array of available fertilizers.
- * @param {boolean} params.has_organic_certification - Indicates if the farm has organic certification, which affects certain fertilizer types.
- * @param {number} params.fosfaatgebruiksnorm - The maximum phosphate usage norm in kg/ha.
+ * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total norm filling and a breakdown per application.
  */
-export function calculateFertilizerApplicationFillingForPhosphate({
-    applications,
-    fertilizers,
-    has_organic_certification,
-    fosfaatgebruiksnorm,
-}: {
-    applications: FertilizerApplication[]
-    fertilizers: Fertilizer[]
-    has_organic_certification: boolean
-    fosfaatgebruiksnorm: number
-}): NormFilling {
+export function calculateFertilizerApplicationFillingForPhosphate(
+    input: NL2025NormsFillingInput,
+): NormFilling {
+    const { applications, fertilizers, has_organic_certification, fosfaatgebruiksnorm } = input;
+
     // Create maps for efficient lookups of fertilizers and RVO types.
     // This avoids iterating over the arrays repeatedly in a loop.
     const fertilizersMap = new Map(
@@ -56,11 +47,11 @@ export function calculateFertilizerApplicationFillingForPhosphate({
 
     // Determines if at least 20 kg P2O5 / ha is applied with organic-rich fertilizers
     const condition1 =
-        determineCondition1StimuleringOrganischeStofrijkeMeststoffen({
+        determineCondition1StimuleringOrganischeStofrijkeMeststoffen(
             applications,
             fertilizersMap,
             has_organic_certification,
-        })
+        )
 
     let totalFilling = new Decimal(0)
     const normLimit = new Decimal(fosfaatgebruiksnorm)
@@ -233,21 +224,16 @@ export function calculateFertilizerApplicationFillingForPhosphate({
  * Determines if at least 20 kg P2O5 / ha is applied with organic-rich fertilizers.
  * This is Condition 1 for the "Stimuleren organische stofrijke meststoffen" regulation.
  *
- * @param {object} params - The parameters for the condition check.
- * @param {FertilizerApplication[]} params.applications - An array of fertilizer applications.
- * @param {Map<string, Fertilizer>} params.fertilizersMap - A map of fertilizers for efficient lookup.
- * @param {boolean} params.has_organic_certification - Indicates if the farm has organic certification.
+ * @param {FertilizerApplication[]} applications - An array of fertilizer applications.
+ * @param {Map<string, Fertilizer>} fertilizersMap - A map of fertilizers for efficient lookup.
+ * @param {boolean} has_organic_certification - Indicates if the farm has organic certification.
  * @returns {boolean} True if the 20 kg/ha threshold is met, false otherwise.
  */
-function determineCondition1StimuleringOrganischeStofrijkeMeststoffen({
-    applications,
-    fertilizersMap,
-    has_organic_certification,
-}: {
-    applications: FertilizerApplication[]
-    fertilizersMap: Map<string, Fertilizer>
-    has_organic_certification: boolean
-}): boolean {
+function determineCondition1StimuleringOrganischeStofrijkeMeststoffen(
+    applications: FertilizerApplication[],
+    fertilizersMap: Map<string, Fertilizer>,
+    has_organic_certification: boolean,
+): boolean {
     // Set the RVO mestcodes for organic-rich fertilizers
     const rvoMestcodesOrganicRich = [
         ...rvoMestcodesOrganicRich25Percent,

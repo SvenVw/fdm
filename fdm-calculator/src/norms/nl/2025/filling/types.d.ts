@@ -37,3 +37,13 @@ export type WorkingCoefficientDetails = {
     description: string
     subTypeDescription?: string
 }
+
+export type NL2025NormsFillingInput = {
+    cultivations: cultivations
+    applications: FertilizerApplication[]
+    fertilizers: Fertilizer[]
+    has_organic_certification: boolean
+    has_grazining_intention: boolean
+    fosfaatgebruiksnorm: number
+    b_centroid: Field["b_centroid"]
+}

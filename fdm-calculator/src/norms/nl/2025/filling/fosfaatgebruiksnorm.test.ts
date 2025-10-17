@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest"
-import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
+import type { Fertilizer, FertilizerApplication, Cultivation } from "@svenvw/fdm-core"
 import { calculateFertilizerApplicationFillingForPhosphate } from "./fosfaatgebruiksnorm"
+import type { NL2025NormsFillingInput } from "./types"
 
 // Mock data for fertilizers
 const mockFertilizers: Fertilizer[] = [
@@ -104,7 +105,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
-            })
+                cultivations: [],
+                has_grazining_intention: false,
+                b_centroid: [0, 0],
+            } as NL2025NormsFillingInput)
 
             expect(result.normFilling).toBeCloseTo(60)
             expect(result.applicationFilling).toHaveLength(2)
@@ -124,7 +128,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
-            })
+                cultivations: [],
+                has_grazining_intention: false,
+                b_centroid: [0, 0],
+            } as NL2025NormsFillingInput)
             // console.log(result) // Keep for debugging if needed
 
             expect(result.normFilling).toBeCloseTo(120)
@@ -150,7 +157,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
-            })
+                cultivations: [],
+                has_grazining_intention: false,
+                b_centroid: [0, 0],
+            } as NL2025NormsFillingInput)
             // console.log(result) // Keep for debugging if needed
 
             expect(result.normFilling).toBeCloseTo(120)
@@ -171,7 +181,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
-            })
+                cultivations: [],
+                has_grazining_intention: false,
+                b_centroid: [0, 0],
+            } as NL2025NormsFillingInput)
 
             expect(result.normFilling).toBeCloseTo(86.25) // 60 + (105 * 0.25)
             expect(result.applicationFilling).toHaveLength(2)
@@ -192,7 +205,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
-            })
+                cultivations: [],
+                has_grazining_intention: false,
+                b_centroid: [0, 0],
+            } as NL2025NormsFillingInput)
 
             expect(result.normFilling).toBeCloseTo(59.975) // 40 + (40 * 0.25) + (13.3 * 0.75) = 40 + 10 + 9.975 = 59.975
             expect(result.applicationFilling).toHaveLength(3)
@@ -213,7 +229,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
                 fertilizers: mockFertilizers,
                 has_organic_certification: false,
                 fosfaatgebruiksnorm,
-            })
+                cultivations: [],
+                has_grazining_intention: false,
+                b_centroid: [0, 0],
+            } as NL2025NormsFillingInput)
 
             expect(result.normFilling).toBeCloseTo(70) // (120 * 0.25) + 40 = 30 + 40
             expect(result.applicationFilling).toHaveLength(2)
@@ -230,7 +249,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm: 100,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBe(0)
         expect(result.applicationFilling).toHaveLength(0)
     })
@@ -246,7 +268,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(35)
         expect(result.applicationFilling).toHaveLength(2)
     })
@@ -261,7 +286,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(10) // 100% counted
         expect(result.applicationFilling[0].normFillingDetails).toContain(
             "OS-rijke meststof, minimumdrempel niet gehaald, 100% geteld.",
@@ -278,7 +306,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: true,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(22.5) // 30 * 0.75 = 22.5
         expect(result.applicationFilling[0].normFillingDetails).toContain(
             "75% korting",
@@ -295,7 +326,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(30) // 100% counted
         expect(result.applicationFilling[0].normFillingDetails).toBeUndefined()
     })
@@ -310,7 +344,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBeCloseTo(10 * 3.1) // 31
     })
 
@@ -324,7 +361,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         expect(result.normFilling).toBe(0)
     })
 
@@ -339,7 +379,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         // Standard: 10kg. Remaining norm: 20kg.
         // Groencompost: 200kg actual P. Discounted: 50kg.
         // To fill 20kg norm with 25% discounted: need 20 / 0.25 = 80kg actual P.
@@ -370,7 +413,10 @@ describe("calculateFertilizerApplicationFillingForPhosphate", () => {
             fertilizers: mockFertilizers,
             has_organic_certification: false,
             fosfaatgebruiksnorm,
-        })
+            cultivations: [],
+            has_grazining_intention: false,
+            b_centroid: [0, 0],
+        } as NL2025NormsFillingInput)
         // Standard: 10kg.
         // App2 (Groencompost): 40kg actual P.
         //   Eligible for discount: min(40, 30 - 0) = 30kg. Discounted: 30 * 0.25 = 7.5kg.

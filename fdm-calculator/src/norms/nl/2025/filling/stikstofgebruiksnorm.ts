@@ -1,10 +1,5 @@
-import type {
-    Fertilizer,
-    FertilizerApplication,
-    CurrentSoilData,
-    Cultivation,
-} from "@svenvw/fdm-core"
-import type { NormFilling, WorkingCoefficientDetails } from "./types"
+import type { Cultivation } from "@svenvw/fdm-core"
+import type { NormFilling, WorkingCoefficientDetails, NL2025NormsFillingInput } from "./types"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import { table9 } from "./table-9"
 import { getRegion } from "../stikstofgebruiksnorm"
@@ -17,31 +12,18 @@ import Decimal from "decimal.js"
  * fertilizer type, nitrogen content, working coefficients, soil type, grazing intention,
  * and land use (bouwland/arable land).
  *
- * @param {Object} params - The parameters for the calculation.
- * @param {FertilizerApplication[]} params.applications - An array of fertilizer applications.
- * @param {Fertilizer[]} params.fertilizers - An array of available fertilizers.
- * @param {CurrentSoilData[]} params.soilData - Current soil data for the farm.
- * @param {boolean} params.b_grazing_intention - Indicates if there is a grazing intention for the farm.
- * @param {Cultivation[]} params.cultivations - An array of cultivations for the farm.
+ * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {Promise<NormFilling>} An object containing the total norm filling and details for each application.
  */
-export async function calculateFertilizerApplicationFillingForNitrogen({
-    applications,
-    fertilizers,
-    soilData,
-    b_grazing_intention,
-    cultivations,
-}: {
-    applications: FertilizerApplication[]
-    fertilizers: Fertilizer[]
-    soilData: CurrentSoilData[]
-    b_grazing_intention: boolean
-    cultivations: Cultivation[]
-}): Promise<NormFilling> {
+export async function calculateFertilizerApplicationFillingForNitrogen(
+    input: NL2025NormsFillingInput,
+): Promise<NormFilling> {
+    const { applications, fertilizers, b_centroid, has_grazining_intention, cultivations } = input;
+
     const applicationFillings: NormFilling["applicationFilling"] = []
     let totalNormFilling = new Decimal(0)
 
-    const soilType = await getRegion(soilData)
+    const soilType = await getRegion(b_centroid)
 
     for (const application of applications) {
         const fertilizer = fertilizers.find(
@@ -90,7 +72,7 @@ export async function calculateFertilizerApplicationFillingForNitrogen({
         const workingCoefficientDetails = getWorkingCoefficient(
             fertilizer.p_type_rvo,
             soilType,
-            b_grazing_intention,
+            has_grazining_intention,
             isCurrentBouwland,
             p_app_date,
             fertilizerOnFarmProduced, // Pass the determined onFarmProduced status

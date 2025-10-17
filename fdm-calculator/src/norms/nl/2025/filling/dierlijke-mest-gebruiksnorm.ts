@@ -1,7 +1,7 @@
-import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import { table11Mestcodes } from "./table-11-mestcodes"
-import type { NormFilling } from "./types"
+import type { NormFilling, NL2025NormsFillingInput } from "./types"
+import type { Fertilizer, FertilizerApplication } from "@svenvw/fdm-core"
 
 /**
  * Calculates the nitrogen usage from animal manure for a list of fertilizer applications.
@@ -10,19 +10,15 @@ import type { NormFilling } from "./types"
  * based on the type of manure used. It uses predefined values from `table11Mestcodes` to identify
  * which fertilizers are considered animal manure and to find their nitrogen content.
  *
- * @param {object} params - The parameters for the calculation.
- * @param {FertilizerApplication[]} params.applications - A list of fertilizer applications, each specifying the amount and type of fertilizer used.
- * @param {Fertilizer[]} params.fertilizers - A list of available fertilizers, providing details like nitrogen content.
+ * @param {NL2025NormsFillingInput} input - The standardized input object containing all necessary data.
  * @returns {NormFilling} An object containing the total nitrogen usage (`normFilling`) and a detailed breakdown per application (`applicationFilling`).
  * @throws {Error} Throws an error if a fertilizer or its RVO type is not found, ensuring data integrity.
  */
-export function calculateFertilizerApplicationFillingForManure({
-	applications,
-	fertilizers,
-}: {
-	applications: FertilizerApplication[]
-	fertilizers: Fertilizer[]
-}): NormFilling {
+export function calculateFertilizerApplicationFillingForManure(
+	input: NL2025NormsFillingInput,
+): NormFilling {
+    const { applications, fertilizers } = input;
+
 	// Create maps for efficient lookups of fertilizers and RVO types.
 	// This avoids iterating over the arrays repeatedly in a loop.
 	const fertilizersMap = new Map(

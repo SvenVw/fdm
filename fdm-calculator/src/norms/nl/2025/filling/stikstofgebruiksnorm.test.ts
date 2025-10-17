@@ -8,10 +8,10 @@ import { getRegion } from "../stikstofgebruiksnorm"
 import type {
     Fertilizer,
     FertilizerApplication,
-    CurrentSoilData,
     Cultivation,
 } from "@svenvw/fdm-core"
 import type { RegionKey } from "../types"
+import type { NL2025NormsFillingInput } from "./types"
 
 // Mock getRegion
 vi.mock("../stikstofgebruiksnorm", () => ({
@@ -574,17 +574,19 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
                 p_type_rvo: "115", // Kunstmest (working coefficient 1.0)
             },
         ]
-        const soilData: CurrentSoilData[] = [] // Mocked
-        const b_grazing_intention = false
+        const b_centroid: [number, number] = [0, 0]
+        const has_grazining_intention = false
         const cultivations: Cultivation[] = []
 
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
-            soilData,
-            b_grazing_intention,
+            b_centroid,
+            has_grazining_intention,
             cultivations,
-        })
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // Expected: 1000 kg * 5 kg/ton * 1.0 (100%) / 1000 = 5
         expect(result.normFilling).toBeCloseTo(5)
@@ -623,17 +625,19 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
                 p_type_rvo: "111", // Compost (working coefficient 0.1)
             },
         ]
-        const soilData: CurrentSoilData[] = [] // Mocked
-        const b_grazing_intention = false
+        const b_centroid: [number, number] = [0, 0]
+        const has_grazining_intention = false
         const cultivations: Cultivation[] = []
 
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
-            soilData,
-            b_grazing_intention,
+            b_centroid,
+            has_grazining_intention,
             cultivations,
-        })
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // App1: 1000 * 5 * 1.0 / 1000 = 5
         // App2: 500 * 10 * 0.1 / 1000 = 0.5
@@ -666,17 +670,19 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
                 p_type_rvo: "14", // Drijfmest rundvee (Table 11: 4.0 kg N/ton)
             },
         ]
-        const soilData: CurrentSoilData[] = [] // Mocked
-        const b_grazing_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
+        const b_centroid: [number, number] = [0, 0]
+        const has_grazining_intention = true // Drijfmest graasdieren, met beweiding -> 0.45
         const cultivations: Cultivation[] = []
 
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
-            soilData,
-            b_grazing_intention,
+            b_centroid,
+            has_grazining_intention,
             cultivations,
-        })
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // Expected: 1000 * 4.0 (from Table 11) * 0.45 (from Table 9) / 1000 = 1.8
         expect(result.normFilling).toBeCloseTo(1.8)
@@ -697,18 +703,20 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
             },
         ]
         const fertilizers: Fertilizer[] = [] // Empty fertilizers array
-        const soilData: CurrentSoilData[] = []
-        const b_grazing_intention = false
+        const b_centroid: [number, number] = [0, 0]
+        const has_grazining_intention = false
         const cultivations: Cultivation[] = []
 
         await expect(() =>
             calculateFertilizerApplicationFillingForNitrogen({
                 applications,
                 fertilizers,
-                soilData,
-                b_grazing_intention,
+                b_centroid,
+                has_grazining_intention,
                 cultivations,
-            }),
+                has_organic_certification: false, // Default value for tests
+                fosfaatgebruiksnorm: 0, // Default value for tests
+            } as NL2025NormsFillingInput),
         ).rejects.toThrow(
             "Fertilizer nonExistentFert not found for application app1",
         )
@@ -732,8 +740,8 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
                 p_type_rvo: "10", // Vaste mest rundvee (onFarmProduced: true in table9, but our temp logic makes it false)
             },
         ]
-        const soilData: CurrentSoilData[] = []
-        const b_grazing_intention = false
+        const b_centroid: [number, number] = [0, 0]
+        const has_grazining_intention = false
         const cultivations: Cultivation[] = [
             {
                 b_lu: "cult1",
@@ -746,10 +754,12 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         const result = await calculateFertilizerApplicationFillingForNitrogen({
             applications,
             fertilizers,
-            soilData,
-            b_grazing_intention,
+            b_centroid,
+            has_grazining_intention,
             cultivations,
-        })
+            has_organic_certification: false, // Default value for tests
+            fosfaatgebruiksnorm: 0, // Default value for tests
+        } as NL2025NormsFillingInput)
 
         // For p_type_rvo "10" (Vaste mest rundvee), onFarmProduced: true in table9.
         // Our temporary logic `onFarmProduced = isDrijfmest` makes it `false`.
