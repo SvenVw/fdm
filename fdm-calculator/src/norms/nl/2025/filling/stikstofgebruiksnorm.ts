@@ -1,9 +1,13 @@
 import type { Cultivation } from "@svenvw/fdm-core"
-import type { NormFilling, WorkingCoefficientDetails, NL2025NormsFillingInput } from "./types"
+import type {
+    NormFilling,
+    WorkingCoefficientDetails,
+    NL2025NormsFillingInput,
+} from "./types"
 import { table11Mestcodes } from "./table-11-mestcodes"
 import { table9 } from "./table-9"
-import { getRegion } from "../stikstofgebruiksnorm"
-import type { RegionKey } from "../types"
+import { getRegion } from "../value/stikstofgebruiksnorm"
+import type { RegionKey } from "../value/types"
 import Decimal from "decimal.js"
 
 /**
@@ -18,7 +22,13 @@ import Decimal from "decimal.js"
 export async function calculateFertilizerApplicationFillingForNitrogen(
     input: NL2025NormsFillingInput,
 ): Promise<NormFilling> {
-    const { applications, fertilizers, b_centroid, has_grazining_intention, cultivations } = input;
+    const {
+        applications,
+        fertilizers,
+        b_centroid,
+        has_grazining_intention,
+        cultivations,
+    } = input
 
     const applicationFillings: NormFilling["applicationFilling"] = []
     let totalNormFilling = new Decimal(0)

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { aggregateNormsToFarmLevel } from "./farm"
-import type { GebruiksnormResult } from "./nl/2025/types"
+import type { GebruiksnormResult } from "./nl/2025/value/types"
 
 describe("aggregateNormsToFarmLevel", () => {
     it("should correctly aggregate norms from multiple fields", () => {

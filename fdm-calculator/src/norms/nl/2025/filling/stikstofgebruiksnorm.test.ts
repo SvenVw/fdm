@@ -4,13 +4,13 @@ import {
     isBouwland,
     getWorkingCoefficient,
 } from "./stikstofgebruiksnorm"
-import { getRegion } from "../stikstofgebruiksnorm"
+import { getRegion } from "../value/stikstofgebruiksnorm"
 import type {
     Fertilizer,
     FertilizerApplication,
     Cultivation,
 } from "@svenvw/fdm-core"
-import type { RegionKey } from "../types"
+import type { RegionKey } from "../value/types"
 import type { NL2025NormsFillingInput } from "./types"
 
 // Mock getRegion

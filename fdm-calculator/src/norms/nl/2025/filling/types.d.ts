@@ -1,5 +1,5 @@
 import type { fdmSchema } from "@svenvw/fdm-core"
-import type { RegionKey } from "../types"
+import type { RegionKey } from "../value/types"
 
 export type NormFilling = {
     normFilling: number

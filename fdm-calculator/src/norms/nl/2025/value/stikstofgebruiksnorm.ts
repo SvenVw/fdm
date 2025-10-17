@@ -1,7 +1,7 @@
 import type { Field } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
-import { getGeoTiffValue } from "../../../shared/geotiff"
-import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
+import { getGeoTiffValue } from "../../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import { nitrogenStandardsData } from "./stikstofgebruiksnorm-data"
 import type {

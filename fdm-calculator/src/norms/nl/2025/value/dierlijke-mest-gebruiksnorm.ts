@@ -1,6 +1,6 @@
 import type { Field } from "@svenvw/fdm-core"
-import { getGeoTiffValue } from "../../../shared/geotiff"
-import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
+import { getGeoTiffValue } from "../../../../shared/geotiff"
+import { getFdmPublicDataUrl } from "../../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
 import type {
     DierlijkeMestGebruiksnormResult,

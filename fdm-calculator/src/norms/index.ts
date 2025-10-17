@@ -1,12 +1,12 @@
 import { aggregateNormsToFarmLevel } from "./farm"
-import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/dierlijke-mest-gebruiksnorm"
+import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/value/dierlijke-mest-gebruiksnorm"
 import { calculateFertilizerApplicationFillingForManure } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
 import { calculateFertilizerApplicationFillingForPhosphate } from "./nl/2025/filling/fosfaatgebruiksnorm"
 import { collectInputForFertilizerApplicationFilling } from "./nl/2025/filling/input"
 import { calculateFertilizerApplicationFillingForNitrogen } from "./nl/2025/filling/stikstofgebruiksnorm"
-import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/fosfaatgebruiksnorm"
-import { collectNL2025InputForNorms } from "./nl/2025/input"
-import { getNL2025StikstofGebruiksNorm } from "./nl/2025/stikstofgebruiksnorm"
+import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/value/fosfaatgebruiksnorm"
+import { collectNL2025InputForNorms } from "./nl/2025/value/input"
+import { getNL2025StikstofGebruiksNorm } from "./nl/2025/value/stikstofgebruiksnorm"
 
 export function createFunctionsForNorms(b_region: "NL", year: "2025") {
     if (b_region === "NL") {
