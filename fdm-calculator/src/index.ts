@@ -1,3 +1,5 @@
+import pkg from "./package"
+export const fdmCalculator = pkg
 export {
     calculateNitrogenBalance,
     getNitrogenBalance,
