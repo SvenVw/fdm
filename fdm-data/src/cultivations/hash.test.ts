@@ -20,6 +20,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -27,7 +29,7 @@ describe("hashCultivation", () => {
         expect(hash).toBeDefined()
         expect(typeof hash).toBe("string")
         expect(hash.length).toBeGreaterThan(0)
-        expect(hash).toBe("f6ceb42b")
+        expect(hash).toBe("860c0fe5")
     })
 
     it("should generate different hashes for different cultivation items", async () => {
@@ -47,6 +49,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -66,6 +70,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -92,6 +98,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -122,6 +130,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -152,6 +162,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -183,6 +195,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -214,6 +228,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: ["Agria"],
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -245,6 +261,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 
@@ -283,6 +301,8 @@ describe("hashCultivation", () => {
             b_n_fixation: 0,
             b_lu_rest_oravib: false,
             b_lu_variety_options: null,
+            b_lu_start_default: "03-15",
+            b_date_harvest_default: "09-15",
             hash: null,
         }
 

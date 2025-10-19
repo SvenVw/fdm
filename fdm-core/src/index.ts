@@ -43,6 +43,7 @@ export {
 export {
     addCultivation,
     addCultivationToCatalogue,
+    getDefaultDatesOfCultivation,
     getCultivation,
     getCultivationPlan,
     getCultivations,

@@ -1,6 +1,6 @@
 {
-  "id": "60e262a4-309d-4384-ae3d-130a6e208f05",
-  "prevId": "45dcb87d-89c8-4cf7-a504-0db74ba68640",
+  "id": "69639d86-7dca-424e-bf0b-2bb0edd0f23f",
+  "prevId": "60e262a4-309d-4384-ae3d-130a6e208f05",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2985,6 +2985,112 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
+    },
+    "fdm-calculator.calculation_cache": {
+      "name": "calculation_cache",
+      "schema": "fdm-calculator",
+      "columns": {
+        "calculation_type": {
+          "name": "calculation_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "input_hash": {
+          "name": "input_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calculator_version": {
+          "name": "calculator_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "inputs": {
+          "name": "inputs",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result": {
+          "name": "result",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "fdm-calculator.calculation_errors": {
+      "name": "calculation_errors",
+      "schema": "fdm-calculator",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "calculation_type": {
+          "name": "calculation_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "calculator_version": {
+          "name": "calculator_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "inputs": {
+          "name": "inputs",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stack_trace": {
+          "name": "stack_trace",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -3122,7 +3228,8 @@
   "schemas": {
     "fdm": "fdm",
     "fdm-authn": "fdm-authn",
-    "fdm-authz": "fdm-authz"
+    "fdm-authz": "fdm-authz",
+    "fdm-calculator": "fdm-calculator"
   },
   "sequences": {},
   "roles": {},

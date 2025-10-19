@@ -3,6 +3,7 @@ import {
     addField,
     addSoilAnalysis,
     getCultivationsFromCatalogue,
+    getDefaultDatesOfCultivation,
     getFarm,
     getFarms,
     getFields,
@@ -417,13 +418,18 @@ export async function action({ request, params }: ActionFunctionArgs) {
         const b_geometry = JSON.parse(
             JSON.parse(String(formValues.b_geometry)),
         ) as Polygon
-        const currentYear = new Date().getFullYear()
-        const defaultDate = timeframe.start
-            ? timeframe.start
-            : `${currentYear}-01-01`
-        const b_start = defaultDate
-        const b_lu_start = defaultDate
-        const b_lu_end = undefined
+        const currentYear = Number(calendar)
+
+        const cultivationDefaultDates = await getDefaultDatesOfCultivation(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            b_lu_catalogue,
+            currentYear,
+        )
+        const b_start = new Date(`${currentYear}-01-01`)
+        const b_lu_start = cultivationDefaultDates.b_lu_start
+        const b_lu_end = cultivationDefaultDates.b_lu_end
         const b_end = undefined
         const b_acquiring_method = "unknown"
 

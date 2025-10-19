@@ -18,6 +18,8 @@ import type {
     FieldInput,
     NitrogenBalance,
     NitrogenBalanceField,
+    NitrogenBalanceFieldResult,
+    NitrogenBalanceFieldNumeric,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
@@ -37,77 +39,83 @@ import type {
 export async function calculateNitrogenBalance(
     nitrogenBalanceInput: NitrogenBalanceInput,
 ): Promise<NitrogenBalanceNumeric> {
-    // Changed return type
-    try {
-        // Destructure input directly
-        const { fields, fertilizerDetails, cultivationDetails, timeFrame } =
-            nitrogenBalanceInput
+    // Destructure input directly
+    const { fields, fertilizerDetails, cultivationDetails, timeFrame } =
+        nitrogenBalanceInput
 
-        // Set the link to location of FDM public data
-        const fdmPublicDataUrl = getFdmPublicDataUrl()
+    // Set the link to location of FDM public data
+    const fdmPublicDataUrl = getFdmPublicDataUrl()
 
-        // Pre-process details into Maps for efficient lookups
-        const fertilizerDetailsMap = new Map(
-            fertilizerDetails.map((detail) => [detail.p_id_catalogue, detail]),
-        )
-        const cultivationDetailsMap = new Map(
-            cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
-        )
+    // Pre-process details into Maps for efficient lookups
+    const fertilizerDetailsMap = new Map(
+        fertilizerDetails.map((detail) => [detail.p_id_catalogue, detail]),
+    )
+    const cultivationDetailsMap = new Map(
+        cultivationDetails.map((detail) => [detail.b_lu_catalogue, detail]),
+    )
 
-        // Fetch all deposition data in a single, batched request to avoid requesting the GeoTIIF for every field
-        const depositionByField =
-            await calculateAllFieldsNitrogenSupplyByDeposition(
-                fields,
-                timeFrame,
-                fdmPublicDataUrl,
-            )
-
-        //
-        // Process fields in batches to control concurrency.
-        // Instead of running all fields in parallel with Promise.all, which can
-        // overwhelm the server for farms with many fields, we process them in
-        // smaller, manageable chunks. This provides more stable performance.
-        const batchSize = 50 // A sensible default, can be tuned based on profiling.
-        const fieldsWithBalance: NitrogenBalanceField[] = []
-
-        for (let i = 0; i < fields.length; i += batchSize) {
-            const batch = fields.slice(i, i + batchSize)
-            const batchResults = batch.map((field: FieldInput) => {
-                const depositionSupply = depositionByField.get(field.field.b_id)
-                if (!depositionSupply) {
-                    // This should not happen if the deposition calculation is correct
-                    throw new Error(
-                        `Deposition data not found for field ${field.field.b_id}`,
-                    )
-                }
-
-                return calculateNitrogenBalanceField(
-                    field.field,
-                    field.cultivations,
-                    field.harvests,
-                    field.fertilizerApplications,
-                    field.soilAnalyses,
-                    fertilizerDetailsMap,
-                    cultivationDetailsMap,
-                    timeFrame,
-                    depositionSupply,
-                )
-            })
-
-            fieldsWithBalance.push(...batchResults)
-        }
-
-        // Aggregate the field balances to farm level
-        const farmWithBalanceDecimal = calculateNitrogenBalancesFieldToFarm(
-            fieldsWithBalance,
+    // Fetch all deposition data in a single, batched request to avoid requesting the GeoTIIF for every field
+    const depositionByField =
+        await calculateAllFieldsNitrogenSupplyByDeposition(
             fields,
+            timeFrame,
+            fdmPublicDataUrl,
         )
 
-        // Convert the final result to use numbers instead of Decimals
-        return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
-    } catch (error) {
-        throw new Error(String(error))
+    // Process fields in batches to control concurrency.
+    // Instead of running all fields in parallel with Promise.all, which can
+    // overwhelm the server for farms with many fields, we process them in
+    // smaller, manageable chunks. This provides more stable performance.
+    const batchSize = 50 // A sensible default, can be tuned based on profiling.
+    const fieldsWithBalanceResults: NitrogenBalanceFieldResult[] = []
+    let hasErrors = false
+    const fieldErrorMessages: string[] = []
+
+    for (let i = 0; i < fields.length; i += batchSize) {
+        const batch = fields.slice(i, i + batchSize)
+        const batchPromises = batch.map(async (field: FieldInput) => {
+            const depositionSupply = depositionByField.get(field.field.b_id)
+            if (!depositionSupply) {
+                return {
+                    b_id: field.field.b_id,
+                    b_area: field.field.b_area ?? 0,
+                    errorMessage: `Deposition data not found for field ${field.field.b_id}`,
+                }
+            }
+
+            return calculateNitrogenBalanceField(
+                field.field,
+                field.cultivations,
+                field.harvests,
+                field.fertilizerApplications,
+                field.soilAnalyses,
+                fertilizerDetailsMap,
+                cultivationDetailsMap,
+                timeFrame,
+                depositionSupply,
+            )
+        })
+
+        const batchResults = await Promise.all(batchPromises)
+        for (const r of batchResults) {
+            if (r.errorMessage) {
+                hasErrors = true
+                fieldErrorMessages.push(`[${r.b_id}] ${r.errorMessage}`)
+            }
+        }
+        fieldsWithBalanceResults.push(...batchResults)
     }
+
+    // Aggregate the field balances to farm level
+    const farmWithBalanceDecimal = calculateNitrogenBalancesFieldToFarm(
+        fieldsWithBalanceResults,
+        fields,
+        hasErrors,
+        fieldErrorMessages,
+    )
+
+    // Convert the final result to use numbers instead of Decimals
+    return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
 }
 
 /**
@@ -133,8 +141,7 @@ export async function calculateNitrogenBalance(
  * @param cultivationDetailsMap - A map containing details for each cultivation.
  * @param timeFrame - The time frame for the calculation.
  * @param depositionSupply - The pre-calculated nitrogen supply from deposition.
- * @returns The calculated nitrogen balance for the field.
- * @throws Throws an error if any of the calculations fail.
+ * @returns The calculated nitrogen balance for the field, or an error message if the calculation fails.
  */
 export function calculateNitrogenBalanceField(
     field: FieldInput["field"],
@@ -146,72 +153,87 @@ export function calculateNitrogenBalanceField(
     cultivationDetailsMap: Map<string, CultivationDetail>,
     timeFrame: NitrogenBalanceInput["timeFrame"],
     depositionSupply: NitrogenBalanceField["supply"]["deposition"],
-): NitrogenBalanceField {
-    // Get the details of the field
-    const fieldDetails = field
+): NitrogenBalanceFieldResult {
+    try {
+        // Get the details of the field
+        const fieldDetails = field
 
-    // Combine soil analyses
-    const soilAnalysis = combineSoilAnalyses(soilAnalyses)
+        // Combine soil analyses
+        const soilAnalysis = combineSoilAnalyses(soilAnalyses)
 
-    // Use a field-local timeframe (intersection with input timeframe)
-    const timeFrameField = {
-        start:
-            field.b_start && field.b_start.getTime() > timeFrame.start.getTime()
-                ? field.b_start
-                : timeFrame.start,
-        end:
-            field.b_end && field.b_end.getTime() < timeFrame.end.getTime()
-                ? field.b_end
-                : timeFrame.end,
-    }
-    // Normalize: ensure start <= end
-    if (timeFrameField.end.getTime() < timeFrameField.start.getTime()) {
-        // Clamp to an empty interval at the boundary to signal “no overlap”
-        timeFrameField.end = timeFrameField.start
-    }
+        // Use a field-local timeframe (intersection with input timeframe)
+        const timeFrameField = {
+            start:
+                field.b_start &&
+                field.b_start.getTime() > timeFrame.start.getTime()
+                    ? field.b_start
+                    : timeFrame.start,
+            end:
+                field.b_end && field.b_end.getTime() < timeFrame.end.getTime()
+                    ? field.b_end
+                    : timeFrame.end,
+        }
+        // Normalize: ensure start <= end
+        if (timeFrameField.end.getTime() < timeFrameField.start.getTime()) {
+            // Clamp to an empty interval at the boundary to signal “no overlap”
+            timeFrameField.end = timeFrameField.start
+        }
 
-    // Calculate the amount of Nitrogen supplied
-    const supply = calculateNitrogenSupply(
-        cultivations,
-        fertilizerApplications,
-        soilAnalysis,
-        cultivationDetailsMap,
-        fertilizerDetailsMap,
-        depositionSupply,
-        timeFrameField,
-    )
+        // Calculate the amount of Nitrogen supplied
+        const supply = calculateNitrogenSupply(
+            cultivations,
+            fertilizerApplications,
+            soilAnalysis,
+            cultivationDetailsMap,
+            fertilizerDetailsMap,
+            depositionSupply,
+            timeFrameField,
+        )
 
-    // Calculate the amount of Nitrogen removed
-    const removal = calculateNitrogenRemoval(
-        cultivations,
-        harvests,
-        cultivationDetailsMap,
-    )
+        // Calculate the amount of Nitrogen removed
+        const removal = calculateNitrogenRemoval(
+            cultivations,
+            harvests,
+            cultivationDetailsMap,
+        )
 
-    // Calculate the amount of Nitrogen that is volatilized
-    const emission = calculateNitrogenEmission(
-        cultivations,
-        harvests,
-        fertilizerApplications,
-        cultivationDetailsMap,
-        fertilizerDetailsMap,
-    )
+        // Calculate the amount of Nitrogen that is volatilized
+        const emission = calculateNitrogenEmission(
+            cultivations,
+            harvests,
+            fertilizerApplications,
+            cultivationDetailsMap,
+            fertilizerDetailsMap,
+        )
 
-    // Calculate the target for the Nitrogen balance
-    const target = calculateTargetForNitrogenBalance(
-        cultivations,
-        soilAnalysis,
-        cultivationDetailsMap,
-        timeFrameField,
-    )
+        // Calculate the target for the Nitrogen balance
+        const target = calculateTargetForNitrogenBalance(
+            cultivations,
+            soilAnalysis,
+            cultivationDetailsMap,
+            timeFrameField,
+        )
 
-    return {
-        b_id: fieldDetails.b_id,
-        balance: supply.total.add(removal.total).add(emission.ammonia.total),
-        supply: supply,
-        removal: removal,
-        emission: emission,
-        target: target,
+        return {
+            b_id: fieldDetails.b_id,
+            b_area: fieldDetails.b_area ?? 0,
+            balance: {
+                b_id: fieldDetails.b_id,
+                balance: supply.total
+                    .add(removal.total)
+                    .add(emission.ammonia.total),
+                supply: supply,
+                removal: removal,
+                emission: emission,
+                target: target,
+            },
+        }
+    } catch (error) {
+        return {
+            b_id: field.b_id,
+            b_area: field.b_area ?? 0,
+            errorMessage: String(error).replace("Error: ", ""),
+        }
     }
 }
 
@@ -224,55 +246,57 @@ export function calculateNitrogenBalanceField(
  *
  * The function returns a comprehensive nitrogen balance for the farm, including total supply,
  * removal, emission, and the overall balance.
- * @param fieldsWithBalance - An array of nitrogen balance results for individual fields.
+ * @param fieldsWithBalanceResults - An array of nitrogen balance results for individual fields, potentially including errors.
+ * @param fields - All field inputs, used to get original field data like area.
+ * @param hasErrors - Indicates if any field calculations failed.
+ * @param fieldErrorMessages - A list of error messages for fields that failed to calculate.
  * @returns The aggregated nitrogen balance for the farm.
  */
 export function calculateNitrogenBalancesFieldToFarm(
-    fieldsWithBalance: NitrogenBalanceField[],
+    fieldsWithBalanceResults: NitrogenBalanceFieldResult[],
     fields: FieldInput[],
+    hasErrors: boolean,
+    fieldErrorMessages: string[],
 ): NitrogenBalance {
-    // Explicitly state it returns the Decimal version
-    // Calculate the total farm area
-    const totalFarmArea = fields.reduce(
-        (sum, field) => sum.add(new Decimal(field.field.b_area ?? 0)),
-        Decimal(0),
-    )
+    // Filter out fields that have errors for aggregation
+    const successfulFieldBalances = fieldsWithBalanceResults.filter(
+        (result) => result.balance !== undefined,
+    ) as (NitrogenBalanceFieldResult & { balance: NitrogenBalanceField })[]
 
     // Calculate total weighted supply, removal, and emission across the farm
     let totalFarmSupply = new Decimal(0)
     let totalFarmRemoval = new Decimal(0)
     let totalFarmEmission = new Decimal(0)
     let totalFarmTarget = new Decimal(0)
+    let totalFarmArea = new Decimal(0)
 
-    for (const fieldBalance of fieldsWithBalance) {
-        const fieldInput = fields.find(
-            (f) => f.field.b_id === fieldBalance.b_id,
-        )
+    for (const fieldResult of successfulFieldBalances) {
+        const fieldInput = fields.find((f) => f.field.b_id === fieldResult.b_id)
 
         if (!fieldInput) {
-            // Should not happen if inputs are consistent, but good to handle
             console.warn(
-                `Could not find field input for field balance ${fieldBalance.b_id}`,
+                `Could not find field input for field balance ${fieldResult.b_id}`,
             )
-            continue // Skip this iteration if fieldInput is not found
+            continue
         }
         const fieldArea = new Decimal(fieldInput.field.b_area ?? 0)
+        totalFarmArea = totalFarmArea.add(fieldArea)
 
         totalFarmSupply = totalFarmSupply.add(
-            fieldBalance.supply.total.times(fieldArea),
+            fieldResult.balance.supply.total.times(fieldArea),
         )
         totalFarmRemoval = totalFarmRemoval.add(
-            fieldBalance.removal.total.times(fieldArea),
+            fieldResult.balance.removal.total.times(fieldArea),
         )
         totalFarmEmission = totalFarmEmission.add(
-            fieldBalance.emission.ammonia.total.times(fieldArea),
+            fieldResult.balance.emission.ammonia.total.times(fieldArea),
         )
         totalFarmTarget = totalFarmTarget.add(
-            fieldBalance.target.times(fieldArea),
+            fieldResult.balance.target.times(fieldArea),
         )
     }
 
-    // Calculate average values per hectare for the farm
+    // Calculate average values per hectare for the farm, only considering the area of successfully calculated fields
     const avgFarmSupply = totalFarmArea.isZero()
         ? new Decimal(0)
         : totalFarmSupply.dividedBy(totalFarmArea)
@@ -298,7 +322,11 @@ export function calculateNitrogenBalancesFieldToFarm(
         removal: avgFarmRemoval,
         emission: avgFarmEmission,
         target: avgFarmTarget,
-        fields: fieldsWithBalance,
+        fields: fieldsWithBalanceResults,
+        hasErrors:
+            hasErrors ||
+            fieldsWithBalanceResults.length !== successfulFieldBalances.length,
+        fieldErrorMessages: fieldErrorMessages,
     }
 
     return farmWithBalance
@@ -331,7 +359,29 @@ export function convertNitrogenBalanceToNumeric(
     balance: NitrogenBalance, // Input is the original Decimal-based type
 ): NitrogenBalanceNumeric {
     // Output is the new number-based type
-    return convertDecimalToNumberRecursive(balance) as NitrogenBalanceNumeric
+    const numericBalance = convertDecimalToNumberRecursive(
+        balance,
+    ) as NitrogenBalanceNumeric
+
+    // Ensure fields are correctly converted, especially handling errorMessage
+    numericBalance.fields = balance.fields.map((fieldResult) => {
+        if (fieldResult.balance) {
+            return {
+                b_id: fieldResult.b_id,
+                b_area: fieldResult.b_area,
+                balance: convertDecimalToNumberRecursive(
+                    fieldResult.balance,
+                ) as NitrogenBalanceFieldNumeric,
+            }
+        }
+        return {
+            b_id: fieldResult.b_id,
+            b_area: fieldResult.b_area,
+            errorMessage: fieldResult.errorMessage,
+        }
+    })
+
+    return numericBalance
 }
 
 /**
