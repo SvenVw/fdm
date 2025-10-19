@@ -44,6 +44,7 @@ export async function getCachedCalculation<T_Input, T_Output>(
                 ),
             ),
         )
+        .limit(1)
     return result?.length ? (result[0].result as T_Output) : null
 }
 

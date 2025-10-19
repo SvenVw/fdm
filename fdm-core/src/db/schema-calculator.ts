@@ -8,7 +8,7 @@ import {
 } from "drizzle-orm/pg-core"
 
 export const fdmCalculatorSchema = pgSchema("fdm-calculator")
-export type fdmSchemaAuthNTypeSelect = typeof fdmCalculatorSchema.table
+export type fdmSchemaCalculatorTypeSelect = typeof fdmCalculatorSchema.table
 
 export const calculationCache = fdmCalculatorSchema.table(
     "calculation_cache",
