@@ -1,4 +1,4 @@
-import type { fdmSchema } from "@svenvw/fdm-core"
+import { type fdmSchema, withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
 import {
     calculateBulkDensity,
@@ -6,6 +6,7 @@ import {
     calculateOrganicCarbon,
     calculateOrganicMatter,
 } from "../../conversions/soil"
+import pkg from "../../package"
 import { getFdmPublicDataUrl } from "../../shared/public-data-url"
 import { calculateNitrogenEmission } from "./emission"
 import { calculateNitrogenRemoval } from "./removal"
@@ -18,8 +19,8 @@ import type {
     FieldInput,
     NitrogenBalance,
     NitrogenBalanceField,
-    NitrogenBalanceFieldResult,
     NitrogenBalanceFieldNumeric,
+    NitrogenBalanceFieldResult,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
     SoilAnalysisPicked,
@@ -117,6 +118,12 @@ export async function calculateNitrogenBalance(
     // Convert the final result to use numbers instead of Decimals
     return convertNitrogenBalanceToNumeric(farmWithBalanceDecimal)
 }
+
+export const getNitrogenBalance = withCalculationCache(
+    "calculateNitrogenBalance",
+    pkg.calculatorVersion,
+    calculateNitrogenBalance,
+)
 
 /**
  * Calculates the nitrogen balance for a single field, considering nitrogen supply, removal, and emission.

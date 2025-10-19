@@ -1,4 +1,7 @@
-export { calculateNitrogenBalance } from "./balance/nitrogen/index"
+export {
+    calculateNitrogenBalance,
+    getNitrogenBalance,
+} from "./balance/nitrogen/index"
 export { collectInputForNitrogenBalance } from "./balance/nitrogen/input"
 export type {
     FieldInput,
