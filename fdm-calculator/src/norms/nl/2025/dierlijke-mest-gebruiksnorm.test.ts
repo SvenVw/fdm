@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest"
 import {
-    getNL2025DierlijkeMestGebruiksNorm,
+    calculateNL2025DierlijkeMestGebruiksNorm,
     isFieldInDerogatieVrijeZone,
 } from "./dierlijke-mest-gebruiksnorm"
 import type { NL2025NormsInput } from "./types"
 
-describe("getNL2025DierlijkeMestGebruiksNorm", () => {
+describe("calculateNL2025DierlijkeMestGebruiksNorm", () => {
     it("should return the default norm value", async () => {
         const mockInput: NL2025NormsInput = {
             farm: { is_derogatie_bedrijf: false },
@@ -16,7 +16,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(170)
         expect(result.normSource).toBe("Standaard - geen derogatie")
     })
@@ -31,7 +31,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(200)
         expect(result.normSource).toBe("Derogatie")
     })
@@ -46,7 +46,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(190)
         expect(result.normSource).toBe("Derogatie - NV Gebied")
     })
@@ -61,7 +61,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(170)
         expect(result.normSource).toBe("Standaard - geen derogatie")
     })
@@ -76,7 +76,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(170)
         expect(result.normSource).toBe(
             "Derogatie - Grondwaterbeschermingsgebied",
@@ -93,7 +93,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(190)
         expect(result.normSource).toBe("Derogatie - NV Gebied")
     })
@@ -108,7 +108,7 @@ describe("getNL2025DierlijkeMestGebruiksNorm", () => {
             cultivations: [],
             soilAnalysis: { a_p_cc: 0, a_p_al: 0 },
         }
-        const result = await getNL2025DierlijkeMestGebruiksNorm(mockInput)
+        const result = await calculateNL2025DierlijkeMestGebruiksNorm(mockInput)
         expect(result.normValue).toBe(170)
         expect(result.normSource).toBe("Derogatie - Natura2000 Gebied")
     })

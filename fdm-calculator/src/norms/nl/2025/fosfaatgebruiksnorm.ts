@@ -1,4 +1,6 @@
+import { withCalculationCache } from "@svenvw/fdm-core"
 import Decimal from "decimal.js"
+import pkg from "../../../package"
 import { fosfaatNormsData } from "./fosfaatgebruiksnorm-data"
 import { determineNL2025Hoofdteelt } from "./hoofdteelt"
 import type {
@@ -135,7 +137,7 @@ function getFosfaatKlasse(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond | RVO Fosfaat landbouwgrond (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/gebruiken-en-uitrijden/fosfaat-landbouwgrond/differentiatie | RVO Fosfaatdifferentiatie (official page, including tables for 2025)}
  */
-export async function getNL2025FosfaatGebruiksNorm(
+export async function calculateNL2025FosfaatGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<FosfaatGebruiksnormResult> {
     const cultivations = input.cultivations
@@ -171,3 +173,9 @@ export async function getNL2025FosfaatGebruiksNorm(
 
     return { normValue, normSource }
 }
+
+export const getNL2025FosfaatGebruiksNorm = withCalculationCache(
+    "calculateNL2025FosfaatGebruiksNorm",
+    pkg.calculatorVersion,
+    calculateNL2025FosfaatGebruiksNorm,
+)

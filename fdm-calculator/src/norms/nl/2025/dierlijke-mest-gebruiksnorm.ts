@@ -1,4 +1,5 @@
-import type { Field } from "@svenvw/fdm-core"
+import { type Field, withCalculationCache } from "@svenvw/fdm-core"
+import pkg from "../../../package"
 import { getGeoTiffValue } from "../../../shared/geotiff"
 import { getFdmPublicDataUrl } from "../../../shared/public-data-url"
 import { isFieldInNVGebied } from "./stikstofgebruiksnorm"
@@ -146,7 +147,7 @@ export async function isFieldInDerogatieVrijeZone(
  * @see {@link https://www.rvo.nl/onderwerpen/mest/derogatie | RVO Derogatie (official page)}
  * @see {@link https://www.rvo.nl/onderwerpen/mest/met-nutrienten-verontreinigde-gebieden-nv-gebieden | RVO Met nutriënten verontreinigde gebieden (NV-gebieden) (official page)}
  */
-export async function getNL2025DierlijkeMestGebruiksNorm(
+export async function calculateNL2025DierlijkeMestGebruiksNorm(
     input: NL2025NormsInput,
 ): Promise<DierlijkeMestGebruiksnormResult> {
     const is_derogatie_bedrijf = input.farm.is_derogatie_bedrijf || false
@@ -191,3 +192,9 @@ export async function getNL2025DierlijkeMestGebruiksNorm(
 
     return { normValue, normSource }
 }
+
+export const getNL2025DierlijkeMestGebruiksNorm = withCalculationCache(
+    "calculateNL2025DierlijkeMestGebruiksNorm",
+    pkg.calculatorVersion,
+    calculateNL2025DierlijkeMestGebruiksNorm,
+)

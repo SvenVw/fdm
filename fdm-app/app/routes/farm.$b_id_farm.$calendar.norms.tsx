@@ -135,9 +135,18 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                         // Calculate the norms
                         const [normManure, normPhosphate, normNitrogen] =
                             await Promise.all([
-                                functionsForms.calculateNormForManure(input),
-                                functionsForms.calculateNormForPhosphate(input),
-                                functionsForms.calculateNormForNitrogen(input),
+                                functionsForms.calculateNormForManure(
+                                    fdm,
+                                    input,
+                                ),
+                                functionsForms.calculateNormForPhosphate(
+                                    fdm,
+                                    input,
+                                ),
+                                functionsForms.calculateNormForNitrogen(
+                                    fdm,
+                                    input,
+                                ),
                             ])
 
                         return {

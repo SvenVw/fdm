@@ -3,6 +3,7 @@ import resolve from "@rollup/plugin-node-resolve"
 import terser from "@rollup/plugin-terser"
 import typescript from "@rollup/plugin-typescript"
 import { defineConfig } from "rollup"
+import packageJson from "./package.json" with { type: "json" }
 
 export default defineConfig({
     input: "src/index.ts", // Your entry point
@@ -29,6 +30,16 @@ export default defineConfig({
                       }
                     : false,
         }), // Minifies the output
+        {
+            renderChunk: (code) => {
+                return {
+                    code: code.replace(
+                        "fdm-calculator:{FDM_CALCULATOR_VERSION}",
+                        `fdm-calculator:${packageJson.version}`,
+                    ),
+                }
+            },
+        }, // Modifies bundled package.ts to contain the actual package version
     ],
     external: ["@svenvw/fdm-core", "geotiff"],
 })
