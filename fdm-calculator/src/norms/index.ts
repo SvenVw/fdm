@@ -30,7 +30,6 @@ export function createFunctionsForFertilizerApplicationFilling(
 ) {
     if (b_region === "NL") {
         if (year === "2025") {
-            // TODO: Implement fertilizer application filling functions for NL 2025
             return {
                 collectInputForFertilizerApplicationFilling:
                     collectInputForFertilizerApplicationFilling,
