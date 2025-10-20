@@ -89,10 +89,6 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Gegevens",
             },
             {
-                to: `/farm/${b_id_farm}/settings/access`,
-                title: "Toegang",
-            },
-            {
                 to: `/farm/${b_id_farm}/settings/derogation`,
                 title: "Derogatie",
             },
@@ -103,6 +99,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             {
                 to: `/farm/${b_id_farm}/settings/grazing-intention`,
                 title: "Beweiding",
+            },
+            {
+                to: `/farm/${b_id_farm}/settings/access`,
+                title: "Toegang",
             },
             {
                 to: `/farm/${b_id_farm}/settings/delete`,
