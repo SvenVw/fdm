@@ -157,6 +157,8 @@ export {
     listOrganicCertifications,
     getOrganicCertification,
     removeOrganicCertification,
+    isValidSkalNumber,
+    isValidTracesNumber,
 } from "./organic"
 export type { OrganicCertification } from "./organic.d"
 export {
