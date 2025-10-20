@@ -1047,19 +1047,19 @@ export function getFertilizerParametersDescription(
         //     category: "general",
         //     description: "Beschrijvingen en/of opmerkingen over de meststof",
         // },
-        {
-            parameter: "p_type",
-            unit: "",
-            name: "Type",
-            type: "enum",
-            category: "general",
-            description: "Typering van de meststof",
-            options: [
-                { value: "manure", label: "Dierlijke mest" },
-                { value: "mineral", label: "Kunstmest" },
-                { value: "compost", label: "Compost" },
-            ],
-        },
+        // {
+        //     parameter: "p_type",
+        //     unit: "",
+        //     name: "Type",
+        //     type: "enum",
+        //     category: "general",
+        //     description: "Typering van de meststof",
+        //     options: [
+        //         { value: "manure", label: "Dierlijke mest" },
+        //         { value: "mineral", label: "Kunstmest" },
+        //         { value: "compost", label: "Compost" },
+        //     ],
+        // },
         {
             parameter: "p_type_rvo",
             unit: "",

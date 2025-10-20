@@ -130,7 +130,7 @@ export function FertilizerForm({
                                                     key={option.value}
                                                     value={option.value}
                                                 >
-                                                    {option.label}
+                                                    {`${option.label} (${option.value})`}
                                                 </SelectItem>
                                             )
                                         })}

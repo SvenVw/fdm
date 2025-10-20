@@ -52,7 +52,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             p_id: undefined, // Added p_id
             p_source: b_id_farm,
             p_name_nl: "",
-            p_type: undefined,
+            p_type_rvo: undefined,
             p_dm: undefined,
             p_density: undefined,
             p_om: undefined,
@@ -156,7 +156,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 p_name_nl: formValues.p_name_nl,
                 p_name_en: formValues.p_name_en,
                 p_description: formValues.p_description,
-                p_type: formValues.p_type,
+                p_type: null,
+                p_type_rvo: formValues.p_type_rvo,
                 p_dm: formValues.p_dm,
                 p_density: formValues.p_density,
                 p_om: formValues.p_om,
