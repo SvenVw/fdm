@@ -154,7 +154,7 @@ export async function getGrazingIntention(
     fdm: FdmType,
     principal_id: PrincipalId,
     b_id_farm: schema.farmsTypeSelect["b_id_farm"],
-    b_grazing_intention_year: number,
+    b_grazing_intention_year: schema.intendingGrazingTypeSelect["b_grazing_intention_year"],
 ): Promise<boolean> {
     try {
         await checkPermission(
