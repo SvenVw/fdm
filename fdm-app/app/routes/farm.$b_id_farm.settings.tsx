@@ -97,6 +97,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Derogatie",
             },
             {
+                to: `/farm/${b_id_farm}/settings/organic-certification`,
+                title: "Bio-certificaat",
+            },
+            {
                 to: `/farm/${b_id_farm}/settings/delete`,
                 title: "Verwijderen",
             },
