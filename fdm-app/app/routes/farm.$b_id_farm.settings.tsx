@@ -101,6 +101,10 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
                 title: "Bio-certificaat",
             },
             {
+                to: `/farm/${b_id_farm}/settings/grazing-intention`,
+                title: "Beweiden",
+            },
+            {
                 to: `/farm/${b_id_farm}/settings/delete`,
                 title: "Verwijderen",
             },
