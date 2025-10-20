@@ -4,7 +4,7 @@ export type {
     FieldInput,
     NitrogenBalanceInput,
     NitrogenBalanceNumeric,
-    NitrogenBalanceFieldNumeric, 
+    NitrogenBalanceFieldNumeric,
     NitrogenBalanceFieldResultNumeric,
     NitrogenEmissionAmmoniaFertilizersNumeric,
     NitrogenEmissionAmmoniaNumeric,
@@ -24,7 +24,7 @@ export {
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
 } from "./norms"
-export type { AggregatedNormsToFarmLevel } from "./norms/farm"
+export type { AggregatedNormsToFarmLevel, aggregateNormFillingsToFarmLevel } from "./norms/farm"
 export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
