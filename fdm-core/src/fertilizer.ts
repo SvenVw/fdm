@@ -354,17 +354,21 @@ export async function getFertilizer(
         }
 
         let p_type: "manure" | "mineral" | "compost" | null = null
-        if (result.p_type_manure) {
-            p_type = "manure"
-        } else if (result.p_type_mineral) {
-            p_type = "mineral"
-        } else if (result.p_type_compost) {
-            p_type = "compost"
+        if (result.p_type_rvo) {
+            p_type = convertRvoTypeToFertilizerType(result.p_type_rvo)
+        } else {
+            if (result.p_type_manure) {
+                p_type = "manure"
+            } else if (result.p_type_mineral) {
+                p_type = "mineral"
+            } else if (result.p_type_compost) {
+                p_type = "compost"
+            }
         }
 
         return {
             ...result,
-            p_type,
+            p_type: p_type,
         }
     } catch (err) {
         throw handleError(err, "Exception for getFertilizer", {
@@ -623,16 +627,21 @@ export async function getFertilizers(
 
         return fertilizers.map((f: (typeof fertilizers)[number]) => {
             let p_type: "manure" | "mineral" | "compost" | null = null
-            if (f.p_type_manure) {
-                p_type = "manure"
-            } else if (f.p_type_mineral) {
-                p_type = "mineral"
-            } else if (f.p_type_compost) {
-                p_type = "compost"
+            if (f.p_type_rvo) {
+                p_type = convertRvoTypeToFertilizerType(f.p_type_rvo)
+            } else {
+                if (f.p_type_manure) {
+                    p_type = "manure"
+                } else if (f.p_type_mineral) {
+                    p_type = "mineral"
+                } else if (f.p_type_compost) {
+                    p_type = "compost"
+                }
             }
+
             return {
                 ...f,
-                p_type,
+                p_type: p_type,
             }
         })
     } catch (err) {
@@ -1262,4 +1271,99 @@ export function getFertilizerParametersDescription(
     ]
 
     return fertilizerParameterDescription
+}
+
+/**
+ * Determines the fertilizer type based on the RVO code.
+ *
+ * @param p_type_rvo The RVO code for the fertilizer type.
+ * @returns The fertilizer type ("manure", "mineral", "compost") or null if not classified.
+ * @internal
+ */
+function convertRvoTypeToFertilizerType(
+    p_type_rvo?: schema.fertilizersCatalogueTypeSelect["p_type_rvo"],
+): "manure" | "mineral" | "compost" | null {
+    if (!p_type_rvo) {
+        return null
+    }
+
+    // Manure codes
+    const manureCodes = [
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "17",
+        "18",
+        "19",
+        "23",
+        "30",
+        "31",
+        "32",
+        "33",
+        "35",
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "46",
+        "50",
+        "56",
+        "60",
+        "61",
+        "75",
+        "76",
+        "80",
+        "81",
+        "90",
+        "91",
+        "92",
+        "25",
+        "26",
+        "27",
+        "95",
+        "96",
+        "97",
+        "98",
+        "99",
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "110",
+        "117",
+        "120",
+    ]
+
+    // Compost codes
+    const compostCodes = ["107", "108", "109", "111", "112"]
+
+    // Mineral codes
+    const mineralCodes = ["115"]
+
+    // "Other" codes
+    const otherCodes = ["113", "114", "116"]
+
+    if (manureCodes.includes(p_type_rvo)) {
+        return "manure"
+    }
+
+    if (compostCodes.includes(p_type_rvo)) {
+        return "compost"
+    }
+
+    if (mineralCodes.includes(p_type_rvo)) {
+        return "mineral"
+    }
+
+    if (otherCodes.includes(p_type_rvo)) {
+        return null
+    }
+
+    return null
 }

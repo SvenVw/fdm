@@ -713,6 +713,95 @@ describe("Fertilizer Data Model", () => {
                 ),
             ).rejects.toThrow("Exception for updateFertilizerFromCatalogue")
         })
+
+        it("should correctly derive p_type from p_type_rvo", async () => {
+            // 1. Add a fertilizer with p_type_rvo that maps to "mineral" and p_type as "manure".
+            const p_id_catalogue = await addFertilizerToCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                {
+                    p_name_nl: "RVO-mapped fertilizer",
+                    p_name_en: "RVO-mapped fertilizer (EN)",
+                    p_description: "This is a test fertilizer for RVO mapping",
+                    p_app_method_options: [],
+                    p_dm: 100,
+                    p_density: 1,
+                    p_om: 0,
+                    p_a: 0,
+                    p_hc: 0,
+                    p_eom: 0,
+                    p_eoc: 0,
+                    p_c_rt: 0,
+                    p_c_of: 0,
+                    p_c_if: 0,
+                    p_c_fr: 0,
+                    p_cn_of: 0,
+                    p_n_rt: 10,
+                    p_n_if: 0,
+                    p_n_of: 0,
+                    p_n_wc: 1,
+                    p_no3_rt: 0,
+                    p_nh4_rt: 0,
+                    p_p_rt: 0,
+                    p_k_rt: 0,
+                    p_mg_rt: 0,
+                    p_ca_rt: 0,
+                    p_ne: 0,
+                    p_s_rt: 0,
+                    p_s_wc: 0,
+                    p_cu_rt: 0,
+                    p_zn_rt: 0,
+                    p_na_rt: 0,
+                    p_si_rt: 0,
+                    p_b_rt: 0,
+                    p_mn_rt: 0,
+                    p_ni_rt: 0,
+                    p_fe_rt: 0,
+                    p_mo_rt: 0,
+                    p_co_rt: 0,
+                    p_as_rt: 0,
+                    p_cd_rt: 0,
+                    p_cr_rt: 0,
+                    p_cr_vi: 0,
+                    p_pb_rt: 0,
+                    p_hg_rt: 0,
+                    p_cl_rt: 0,
+                    p_ef_nh3: null,
+                    p_type: "manure", // This should be overridden
+                    p_type_rvo: "115", // Maps to "mineral"
+                },
+            )
+
+            const p_id = await addFertilizer(
+                fdm,
+                principal_id,
+                p_id_catalogue,
+                b_id_farm,
+                100,
+                new Date(),
+            )
+
+            // 2. Get the fertilizer and assert that p_type is "mineral".
+            let fertilizer = await getFertilizer(fdm, p_id)
+            expect(fertilizer.p_type).toBe("mineral")
+
+            // 3. Update the fertilizer with a p_type_rvo that maps to "compost".
+            await updateFertilizerFromCatalogue(
+                fdm,
+                principal_id,
+                b_id_farm,
+                p_id_catalogue,
+                {
+                    p_type_rvo: "111", // Maps to "compost"
+                },
+            )
+
+            // 4. Get the fertilizer and assert that p_type is "compost".
+            fertilizer = await getFertilizer(fdm, p_id)
+            expect(fertilizer.p_type).toBe("compost")
+
+        })
     })
 
     describe("Fertilizer Application", () => {
