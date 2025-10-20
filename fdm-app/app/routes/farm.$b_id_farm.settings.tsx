@@ -102,7 +102,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             },
             {
                 to: `/farm/${b_id_farm}/settings/grazing-intention`,
-                title: "Beweiden",
+                title: "Beweiding",
             },
             {
                 to: `/farm/${b_id_farm}/settings/delete`,
