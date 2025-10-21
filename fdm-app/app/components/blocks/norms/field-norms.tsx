@@ -177,7 +177,7 @@ export function FieldNorms({ fieldNorms, fieldOptions }: FieldNormsProps) {
                                         <NormItem
                                             fieldId={field.b_id}
                                             normName="manure"
-                                            title="Stiktof, dierlijke mest"
+                                            title="Stiktof uit dierlijke mest"
                                             unit="kg N/ha"
                                             norm={field.norms?.manure}
                                             filling={field.normsFilling?.manure}

@@ -32,13 +32,28 @@ import {
     CardHeader,
     CardTitle,
 } from "~/components/ui/card"
+import {
+    Item,
+    ItemContent,
+    ItemDescription,
+    ItemGroup,
+    ItemSeparator,
+    ItemTitle,
+} from "~/components/ui/item"
 import { Separator } from "~/components/ui/separator"
 import { SidebarInset } from "~/components/ui/sidebar"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { getSession } from "~/lib/auth.server"
 import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
+import { NormCard } from "../components/blocks/norms/norm-card"
 
 interface FieldNormData {
     b_id: string
@@ -65,13 +80,12 @@ type FertilizerApplication = Awaited<
 >[number]
 
 // Meta
-export const meta: MetaFunction = ({ params }) => {
-    const fieldId = params.b_id || "Onbekend perceel"
+export const meta: MetaFunction = () => {
     return [
-        { title: `Gebruiksnormen Perceel ${fieldId} ${clientConfig.name}` },
+        { title: `Gebruiksruimte | Perceel } ${clientConfig.name}` },
         {
             name: "description",
-            content: `Bekijk de Gebruiksnormen voor perceel ${fieldId}.`,
+            content: "Bekijk de gebruiksruimte en opvulling voor dit  perceel.",
         },
     ]
 }
@@ -120,7 +134,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        const field = await getField(fdm, session.principal_id, b_id, timeframe)
+        const field = await getField(fdm, session.principal_id, b_id)
         if (!field) {
             throw data("not found: b_id", {
                 status: 404,
@@ -260,60 +274,6 @@ export default function FieldNormsBlock() {
     )
 }
 
-const getProgressColorClass = (percentage: number) => {
-    if (percentage > 100) return "bg-orange-500"
-    return "bg-green-500"
-}
-
-interface ProgressBarProps {
-    value: number
-}
-
-const ProgressBar = ({ value }: ProgressBarProps) => (
-    <div className="h-2 w-full rounded-full bg-muted">
-        <div
-            className={`h-full rounded-full ${getProgressColorClass(value)}`}
-            style={{ width: `${Math.min(value, 100)}%` }}
-        />
-    </div>
-)
-
-interface NormCardProps {
-    title: string
-    norm: GebruiksnormResult | undefined
-    filling: NormFilling | undefined
-}
-
-const NormCard = ({ title, norm, filling }: NormCardProps) => {
-    if (!norm) return null
-
-    const normValue = norm.normValue || 0
-    const normSource = norm.normSource || ""
-    const fillingValue = filling?.normFilling || 0
-    const percentage = normValue > 0 ? (fillingValue / normValue) * 100 : 0
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>{normSource}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-2">
-                    <div className="flex justify-between text-lg font-semibold">
-                        <span>{fillingValue.toFixed(0)}</span>
-                        <span>{normValue.toFixed(0)} kg</span>
-                    </div>
-                    <ProgressBar value={percentage} />
-                    <div className="text-right text-sm text-muted-foreground">
-                        {percentage.toFixed(0)}% gebruikt
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
-    )
-}
-
 interface FertilizerApplicationCardProps {
     application: FertilizerApplication
     normsFilling: {
@@ -327,7 +287,6 @@ const FertilizerApplicationCard = ({
     application,
     normsFilling,
 }: FertilizerApplicationCardProps) => {
-    console.log(normsFilling)
     const applicationFilling = {
         nitrogen: normsFilling.nitrogen.applicationFilling.find(
             (d: { p_app_id: string }) => d.p_app_id === application.p_app_id,
@@ -339,7 +298,41 @@ const FertilizerApplicationCard = ({
             (d: { p_app_id: string }) => d.p_app_id === application.p_app_id,
         ),
     }
-    console.log(applicationFilling)
+
+    const renderApplicationContributionForNorm = (
+        title: string,
+        filling:
+            | { normFilling?: number; normFillingDetails?: string }
+            | undefined,
+    ) => {
+        if (!filling) {
+            return null
+        }
+
+        const details = filling.normFillingDetails
+        const value = filling.normFilling || 0
+
+        return (
+            <Item>
+                <ItemContent>
+                    <ItemTitle>{title}</ItemTitle>
+                    {details && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <ItemDescription className="max-w-xs text-xs">
+                                    {details}
+                                </ItemDescription>
+                            </TooltipTrigger>
+                            <TooltipContent>{details}</TooltipContent>
+                        </Tooltip>
+                    )}
+                </ItemContent>
+                <div className="text-lg font-semibold">
+                    {value.toFixed(0)} kg
+                </div>
+            </Item>
+        )
+    }
 
     return (
         <Card>
@@ -352,47 +345,23 @@ const FertilizerApplicationCard = ({
                     - {application.p_app_amount} kg/ha
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div>
-                    <h4 className="font-medium">Stikstof, werkzaam</h4>
-                    <p className="text-lg font-semibold">
-                        {applicationFilling.nitrogen?.normFilling?.toFixed(0) ||
-                            0}{" "}
-                        kg
-                    </p>
-                    {applicationFilling.nitrogen?.normFillingDetails && (
-                        <p className="text-xs text-muted-foreground">
-                            {applicationFilling.nitrogen.normFillingDetails}
-                        </p>
+            <CardContent>
+                <ItemGroup>
+                    {renderApplicationContributionForNorm(
+                        "Stikstof, werkzaam",
+                        applicationFilling.nitrogen,
                     )}
-                </div>
-                <div>
-                    <h4 className="font-medium">Fosfaat</h4>
-                    <p className="text-lg font-semibold">
-                        {applicationFilling.phosphate?.normFilling?.toFixed(
-                            0,
-                        ) || 0}{" "}
-                        kg
-                    </p>
-                    {applicationFilling.phosphate?.normFillingDetails && (
-                        <p className="text-sm text-muted-foreground">
-                            {applicationFilling.phosphate.normFillingDetails}
-                        </p>
+                    <ItemSeparator />
+                    {renderApplicationContributionForNorm(
+                        "Fosfaat",
+                        applicationFilling.phosphate,
                     )}
-                </div>
-                <div>
-                    <h4 className="font-medium">Stikstof uit dierlijke mest</h4>
-                    <p className="text-lg font-semibold">
-                        {applicationFilling.manure?.normFilling?.toFixed(0) ||
-                            0}{" "}
-                        kg
-                    </p>
-                    {applicationFilling.manure?.normFillingDetails && (
-                        <p className="text-sm text-muted-foreground">
-                            {applicationFilling.manure.normFillingDetails}
-                        </p>
+                    <ItemSeparator />
+                    {renderApplicationContributionForNorm(
+                        "Stikstof uit dierlijke mest",
+                        applicationFilling.manure,
                     )}
-                </div>
+                </ItemGroup>
             </CardContent>
         </Card>
     )
@@ -478,18 +447,24 @@ function FieldNormsContent(loaderData: Awaited<ReturnType<typeof loader>>) {
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                     <NormCard
                         title="Stikstof, werkzaam"
-                        norm={norms?.nitrogen}
-                        filling={normsFilling?.nitrogen}
+                        type="field"
+                        norm={norms?.nitrogen.normValue}
+                        filling={normsFilling?.nitrogen.normFilling}
+                        unit="kg N"
                     />
                     <NormCard
                         title="Fosfaat"
-                        norm={norms?.phosphate}
-                        filling={normsFilling?.phosphate}
+                        type="field"
+                        norm={norms?.phosphate.normValue}
+                        filling={normsFilling?.phosphate.normFilling}
+                        unit="kg P₂O₅"
                     />
                     <NormCard
                         title="Stikstof uit dierlijke mest"
-                        norm={norms?.manure}
-                        filling={normsFilling?.manure}
+                        type="field"
+                        norm={norms?.manure.normValue}
+                        filling={normsFilling?.manure.normFilling}
+                        unit="kg N"
                     />
                 </div>
 
@@ -497,10 +472,10 @@ function FieldNormsContent(loaderData: Awaited<ReturnType<typeof loader>>) {
 
                 <div>
                     <h3 className="text-2xl font-semibold tracking-tight">
-                        Mestgift op dit perceel
+                        Bemesting op dit perceel
                     </h3>
                     <p className="text-muted-foreground">
-                        Hieronder vindt u een overzicht van de mestgiften op dit
+                        Hieronder vindt u een overzicht van de bemesting op dit
                         perceel en hun bijdrage aan de gebruiksnormen.
                     </p>
                 </div>
