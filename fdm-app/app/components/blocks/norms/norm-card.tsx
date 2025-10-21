@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 
 const getProgressColorClass = ({ percentage, type }: ProgressBarProps) => {
     if (percentage > 100 && type === "farm") return "bg-red-500"

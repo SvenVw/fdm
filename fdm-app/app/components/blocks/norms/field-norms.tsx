@@ -2,7 +2,6 @@ import type {
     GebruiksnormResult,
     NormFilling as GebruiksnormFillingResult,
 } from "@svenvw/fdm-calculator"
-import { ChevronRight } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import { FieldFilterToggle } from "~/components/custom/field-filter-toggle"
 import {

@@ -45,7 +45,6 @@ import { SidebarInset } from "~/components/ui/sidebar"
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
 } from "~/components/ui/tooltip"
 import { getSession } from "~/lib/auth.server"
@@ -53,7 +52,7 @@ import { getCalendar, getTimeframe } from "~/lib/calendar"
 import { clientConfig } from "~/lib/config"
 import { handleLoaderError } from "~/lib/error"
 import { fdm } from "~/lib/fdm.server"
-import { NormCard } from "../components/blocks/norms/norm-card"
+import { NormCard } from "~/components/blocks/norms/norm-card"
 
 interface FieldNormData {
     b_id: string
