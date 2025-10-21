@@ -8,6 +8,7 @@ import {
     getFarms,
     getFertilizerApplications,
     getField,
+    getFields,
 } from "@svenvw/fdm-core"
 import { format } from "date-fns"
 import { nl } from "date-fns/locale"
@@ -141,6 +142,23 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             })
         }
 
+        // Get the fields to be selected
+        const fields = await getFields(
+            fdm,
+            session.principal_id,
+            b_id_farm,
+            timeframe,
+        )
+        const fieldOptions = fields.map((field) => {
+            if (!field?.b_id || !field?.b_name) {
+                throw new Error("Invalid field data structure")
+            }
+            return {
+                b_id: field.b_id,
+                b_name: field.b_name,
+            }
+        })
+
         const asyncData = (async () => {
             if (calendar !== "2025") {
                 return {
@@ -238,6 +256,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             b_id,
             calendar,
             farmOptions,
+            fieldOptions,
             asyncData,
         }
     } catch (error) {
@@ -255,7 +274,11 @@ export default function FieldNormsBlock() {
                     b_id_farm={loaderData.b_id_farm}
                     farmOptions={loaderData.farmOptions}
                 />
-                <HeaderNorms b_id_farm={loaderData.b_id_farm} />
+                <HeaderNorms
+                    b_id_farm={loaderData.b_id_farm}
+                    b_id={loaderData.b_id}
+                    fieldOptions={loaderData.fieldOptions}
+                />
             </Header>
             <main>
                 <FarmTitle
