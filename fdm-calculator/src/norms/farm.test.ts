@@ -77,7 +77,7 @@ describe("aggregateNormFillingsToFarmLevel", () => {
             {
                 b_id: "field1",
                 b_area: 10, // hectares
-                normFillings: {
+                normsFilling: {
                     manure: {
                         normFilling: 10,
                         applicationFilling: [
@@ -104,7 +104,7 @@ describe("aggregateNormFillingsToFarmLevel", () => {
             {
                 b_id: "field2",
                 b_area: 5, // hectares
-                normFillings: {
+                normsFilling: {
                     manure: {
                         normFilling: 8,
                         applicationFilling: [
@@ -132,38 +132,18 @@ describe("aggregateNormFillingsToFarmLevel", () => {
 
         const aggregatedFillings = aggregateNormFillingsToFarmLevel(fieldData)
 
-        expect(aggregatedFillings.manure.normFilling).toBe(140) // (10 * 10) + (8 * 5)
-        expect(aggregatedFillings.nitrogen.normFilling).toBe(275) // (20 * 10) + (15 * 5)
-        expect(aggregatedFillings.phosphate.normFilling).toBe(65) // (5 * 10) + (3 * 5)
-
-        // Check application fillings
-        expect(aggregatedFillings.manure.applicationFilling).toEqual([
-            { p_app_id: "app1", normFilling: 50 }, // 5 * 10
-            { p_app_id: "app2", normFilling: 50 }, // 5 * 10
-            { p_app_id: "app3", normFilling: 20 }, // 4 * 5
-            { p_app_id: "app4", normFilling: 20 }, // 4 * 5
-        ])
-        expect(aggregatedFillings.nitrogen.applicationFilling).toEqual([
-            { p_app_id: "app1", normFilling: 100 }, // 10 * 10
-            { p_app_id: "app2", normFilling: 100 }, // 10 * 10
-            { p_app_id: "app3", normFilling: 35 }, // 7 * 5
-            { p_app_id: "app4", normFilling: 40 }, // 8 * 5
-        ])
-        expect(aggregatedFillings.phosphate.applicationFilling).toEqual([
-            { p_app_id: "app1", normFilling: 20 }, // 2 * 10
-            { p_app_id: "app2", normFilling: 30 }, // 3 * 10
-            { p_app_id: "app3", normFilling: 5 }, // 1 * 5
-            { p_app_id: "app4", normFilling: 10 }, // 2 * 5
-        ])
+        expect(aggregatedFillings.manure).toBe(140) // (10 * 10) + (8 * 5)
+        expect(aggregatedFillings.nitrogen).toBe(275) // (20 * 10) + (15 * 5)
+        expect(aggregatedFillings.phosphate).toBe(65) // (5 * 10) + (3 * 5)
     })
 
     it("should handle empty input array for norm fillings", () => {
         const fieldData: InputAggregateNormFillingsToFarmLevel = []
         const aggregatedFillings = aggregateNormFillingsToFarmLevel(fieldData)
         expect(aggregatedFillings).toEqual({
-            manure: { normFilling: 0, applicationFilling: [] },
-            nitrogen: { normFilling: 0, applicationFilling: [] },
-            phosphate: { normFilling: 0, applicationFilling: [] },
+            manure: 0,
+            nitrogen: 0,
+            phosphate: 0,
         })
     })
 
@@ -172,7 +152,7 @@ describe("aggregateNormFillingsToFarmLevel", () => {
             {
                 b_id: "field1",
                 b_area: 0, // hectares
-                normFillings: {
+                normsFilling: {
                     manure: {
                         normFilling: 10,
                         applicationFilling: [
@@ -196,18 +176,9 @@ describe("aggregateNormFillingsToFarmLevel", () => {
         ]
         const aggregatedFillings = aggregateNormFillingsToFarmLevel(fieldData)
         expect(aggregatedFillings).toEqual({
-            manure: {
-                normFilling: 0,
-                applicationFilling: [{ p_app_id: "app1", normFilling: 0 }],
-            },
-            nitrogen: {
-                normFilling: 0,
-                applicationFilling: [{ p_app_id: "app1", normFilling: 0 }],
-            },
-            phosphate: {
-                normFilling: 0,
-                applicationFilling: [{ p_app_id: "app1", normFilling: 0 }],
-            },
+            manure: 0,
+            nitrogen: 0,
+            phosphate: 0,
         })
     })
 })

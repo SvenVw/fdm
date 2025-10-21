@@ -128,7 +128,7 @@ export type InputAggregateNormFillingsToFarmLevel = {
     /**
      * The calculated norm fillings for manure, nitrogen, and phosphate for this field.
      */
-    normFillings: {
+    normsFilling: {
         manure: NormFilling
         nitrogen: NormFilling
         phosphate: NormFilling
@@ -143,15 +143,15 @@ export type AggregatedNormFillingsToFarmLevel = {
     /**
      * Total manure norm filling in kg N for the entire farm.
      */
-    manure: NormFilling
+    manure: number
     /**
      * Total nitrogen norm filling in kg N for the entire farm.
      */
-    nitrogen: NormFilling
+    nitrogen: number
     /**
      * Total phosphate norm filling in kg P2O5 for the entire farm.
      */
-    phosphate: NormFilling
+    phosphate: number
 }
 
 /**
@@ -173,59 +173,28 @@ export function aggregateNormFillingsToFarmLevel(
     let totalNitrogenFilling = new Decimal(0)
     let totalPhosphateFilling = new Decimal(0)
 
-    let allManureApplicationFillings: NormFilling["applicationFilling"] = []
-    let allNitrogenApplicationFillings: NormFilling["applicationFilling"] = []
-    let allPhosphateApplicationFillings: NormFilling["applicationFilling"] = []
-
     for (const field of input) {
         const area = new Decimal(field.b_area)
 
         // Aggregate manure filling
         totalManureFilling = totalManureFilling.plus(
-            new Decimal(field.normFillings.manure.normFilling).times(area),
-        )
-        allManureApplicationFillings = allManureApplicationFillings.concat(
-            field.normFillings.manure.applicationFilling.map((app) => ({
-                ...app,
-                normFilling: new Decimal(app.normFilling).times(area).toNumber(),
-            })),
+            new Decimal(field.normsFilling.manure.normFilling).times(area),
         )
 
         // Aggregate nitrogen filling
         totalNitrogenFilling = totalNitrogenFilling.plus(
-            new Decimal(field.normFillings.nitrogen.normFilling).times(area),
-        )
-        allNitrogenApplicationFillings = allNitrogenApplicationFillings.concat(
-            field.normFillings.nitrogen.applicationFilling.map((app) => ({
-                ...app,
-                normFilling: new Decimal(app.normFilling).times(area).toNumber(),
-            })),
+            new Decimal(field.normsFilling.nitrogen.normFilling).times(area),
         )
 
         // Aggregate phosphate filling
         totalPhosphateFilling = totalPhosphateFilling.plus(
-            new Decimal(field.normFillings.phosphate.normFilling).times(area),
-        )
-        allPhosphateApplicationFillings = allPhosphateApplicationFillings.concat(
-            field.normFillings.phosphate.applicationFilling.map((app) => ({
-                ...app,
-                normFilling: new Decimal(app.normFilling).times(area).toNumber(),
-            })),
+            new Decimal(field.normsFilling.phosphate.normFilling).times(area),
         )
     }
 
     return {
-        manure: {
-            normFilling: totalManureFilling.toDecimalPlaces(0).toNumber(),
-            applicationFilling: allManureApplicationFillings,
-        },
-        nitrogen: {
-            normFilling: totalNitrogenFilling.toDecimalPlaces(0).toNumber(),
-            applicationFilling: allNitrogenApplicationFillings,
-        },
-        phosphate: {
-            normFilling: totalPhosphateFilling.toDecimalPlaces(0).toNumber(),
-            applicationFilling: allPhosphateApplicationFillings,
-        },
+        manure: totalManureFilling.toDecimalPlaces(0).toNumber(),
+        nitrogen: totalNitrogenFilling.toDecimalPlaces(0).toNumber(),
+        phosphate: totalPhosphateFilling.toDecimalPlaces(0).toNumber(),
     }
 }

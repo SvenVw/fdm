@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { aggregateNormsToFarmLevel } from "./farm"
+import {
+    aggregateNormFillingsToFarmLevel,
+    aggregateNormsToFarmLevel,
+} from "./farm"
 import {
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
@@ -62,6 +65,9 @@ describe("createFunctionsForFertilizerApplicationFilling", () => {
         expect(
             functions.calculateFertilizerApplicationFillingForPhosphate,
         ).toBe(calculateFertilizerApplicationFillingForPhosphate)
+        expect(functions.aggregateNormFillingsToFarmLevel).toBe(
+            aggregateNormFillingsToFarmLevel,
+        )
     })
 
     it("should throw an error for an unsupported year", () => {

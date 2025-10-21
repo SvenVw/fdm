@@ -1,4 +1,7 @@
-import { aggregateNormsToFarmLevel } from "./farm"
+import {
+    aggregateNormsToFarmLevel,
+    aggregateNormFillingsToFarmLevel,
+} from "./farm"
 import { getNL2025DierlijkeMestGebruiksNorm } from "./nl/2025/value/dierlijke-mest-gebruiksnorm"
 import { calculateFertilizerApplicationFillingForManure } from "./nl/2025/filling/dierlijke-mest-gebruiksnorm"
 import { calculateFertilizerApplicationFillingForPhosphate } from "./nl/2025/filling/fosfaatgebruiksnorm"
@@ -7,6 +10,7 @@ import { calculateFertilizerApplicationFillingForNitrogen } from "./nl/2025/fill
 import { getNL2025FosfaatGebruiksNorm } from "./nl/2025/value/fosfaatgebruiksnorm"
 import { collectNL2025InputForNorms } from "./nl/2025/value/input"
 import { getNL2025StikstofGebruiksNorm } from "./nl/2025/value/stikstofgebruiksnorm"
+import type { NormFilling } from "./nl/2025/filling/types"
 
 export function createFunctionsForNorms(b_region: "NL", year: "2025") {
     if (b_region === "NL") {
@@ -39,9 +43,12 @@ export function createFunctionsForFertilizerApplicationFilling(
                     calculateFertilizerApplicationFillingForManure,
                 calculateFertilizerApplicationFillingForPhosphate:
                     calculateFertilizerApplicationFillingForPhosphate,
+                aggregateNormFillingsToFarmLevel:
+                    aggregateNormFillingsToFarmLevel,
             }
         }
         throw new Error("Year not supported")
     }
     throw new Error("Region not supported")
 }
+export type { NormFilling }

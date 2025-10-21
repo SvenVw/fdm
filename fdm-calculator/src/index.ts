@@ -24,7 +24,13 @@ export {
     createFunctionsForFertilizerApplicationFilling,
     createFunctionsForNorms,
 } from "./norms"
-export type { AggregatedNormsToFarmLevel, aggregateNormFillingsToFarmLevel } from "./norms/farm"
+export type {
+    InputAggregateNormsToFarmLevel,
+    InputAggregateNormFillingsToFarmLevel,
+    AggregatedNormsToFarmLevel,
+    AggregatedNormFillingsToFarmLevel,
+} from "./norms/farm"
+export type { NormFilling } from "./norms/nl/2025/filling/types"
 export {
     isFieldInGWGBGebied,
     isFieldInNatura2000Gebied,
