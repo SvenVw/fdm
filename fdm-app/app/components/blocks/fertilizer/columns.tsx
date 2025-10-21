@@ -9,7 +9,6 @@ import {
     TooltipTrigger,
 } from "~/components/ui/tooltip"
 import { DataTableColumnHeader } from "./column-header"
-import { getFertilizerParametersDescription } from "@svenvw/fdm-core"
 
 export type Fertilizer = {
     p_id: string
@@ -18,6 +17,7 @@ export type Fertilizer = {
     p_p_rt?: number | null
     p_k_rt?: number | null
     p_type_rvo?: string | null
+    p_type_rvo_label?: string | null
     p_type?: "manure" | "compost" | "mineral" | null
     p_eoc?: number | null
     p_source?: string
@@ -27,8 +27,6 @@ export type Fertilizer = {
     p_ca_rt?: number | null
     p_mg_rt?: number | null
 }
-
-const fertilizerParameterDescription = getFertilizerParametersDescription()
 
 export const columns: ColumnDef<Fertilizer>[] = [
     // {
@@ -66,20 +64,19 @@ export const columns: ColumnDef<Fertilizer>[] = [
     {
         accessorKey: "p_type_rvo",
         header: ({ column }) => {
-            return <DataTableColumnHeader column={column} title="Mestcode (RVO)" />
+            return (
+                <DataTableColumnHeader column={column} title="Mestcode (RVO)" />
+            )
         },
         cell: ({ row }) => {
             const fertilizer = row.original
             if (!fertilizer.p_type_rvo) {
                 return null
             }
-            const p_type_rvo = fertilizer.p_type_rvo
             const p_type = fertilizer.p_type
-            const rvoTypeName = fertilizerParameterDescription
-                .find((x) => x.parameter === "p_type_rvo")
-                ?.options?.find((x) => x.value === p_type_rvo)?.label
-
-            const maxLength = "Rundvee - Drijfmest behalve van vleeskalveren".length
+            const rvoTypeName = fertilizer.p_type_rvo_label
+            const maxLength = "Rundvee - Drijfmest behalve van vleeskalveren"
+                .length
             const isTruncated = rvoTypeName && rvoTypeName.length > maxLength
             const truncatedRvoTypeName = isTruncated
                 ? `${rvoTypeName.substring(0, maxLength)}...`

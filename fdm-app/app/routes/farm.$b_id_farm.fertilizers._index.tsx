@@ -1,4 +1,9 @@
-import { getFarm, getFarms, getFertilizers } from "@svenvw/fdm-core"
+import {
+    getFarm,
+    getFarms,
+    getFertilizerParametersDescription,
+    getFertilizers,
+} from "@svenvw/fdm-core"
 import {
     data,
     type LoaderFunctionArgs,
@@ -70,11 +75,29 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
             }
         })
 
-        // Get the available fertilizers
+        // Get the options for p_type_rvo
+        const fertilizerParameterDescription =
+            await getFertilizerParametersDescription("NL-nl")
+        const p_type_rvo_options = fertilizerParameterDescription.find(
+            (x) => x.parameter === "p_type_rvo",
+        )?.options
+
+        // Get the available fertilizers and the label for p_type_rvo
         const fertilizers: Fertilizer[] = await getFertilizers(
             fdm,
             session.principal_id,
             b_id_farm,
+        ).then((fertilizers) =>
+            fertilizers.map((fertilizer) => {
+                const p_type_rvo = fertilizer.p_type_rvo
+                const rvoTypeName = p_type_rvo_options.find(
+                    (x) => x.value === p_type_rvo,
+                )?.label
+                return {
+                    ...fertilizer,
+                    p_type_rvo_label: rvoTypeName,
+                }
+            }),
         )
 
         // Return user information from loader
