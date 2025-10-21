@@ -14,7 +14,7 @@ import type { RegionKey } from "../value/types"
 import type { NL2025NormsFillingInput } from "./types"
 
 // Mock getRegion
-vi.mock("../stikstofgebruiksnorm", () => ({
+vi.mock("../value/stikstofgebruiksnorm", () => ({
     getRegion: vi.fn(),
 }))
 
