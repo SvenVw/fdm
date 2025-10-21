@@ -1,101 +1,129 @@
+import type {
+    AggregatedNormFillingsToFarmLevel,
+    AggregatedNormsToFarmLevel,
+} from "@svenvw/fdm-calculator"
 import { AlertTriangle } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "~/components/ui/tooltip"
+
+const getProgressColorClass = (percentage: number) => {
+    if (percentage >= 100) return "bg-red-500"
+    return "bg-green-500"
+}
+
+interface ProgressBarProps {
+    value: number
+}
+
+const ProgressBar = ({ value }: ProgressBarProps) => (
+    <div className="h-2 w-full rounded-full bg-muted">
+        <div
+            className={`h-full rounded-full ${getProgressColorClass(value)}`}
+            style={{ width: `${Math.min(value, 100)}%` }}
+        />
+    </div>
+)
+
+interface NormCardProps {
+    title: string
+    norm: number
+    filling: number | undefined
+    unit: string
+}
+
+function NormCard({ title, norm, filling, unit }: NormCardProps) {
+    const fillingValue = filling || 0
+    const percentage = norm > 0 ? (fillingValue / norm) * 100 : 0
+
+    return (
+        <Card>
+            <CardHeader className="pb-4">
+                <CardTitle className="text-base font-medium">{title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-baseline justify-between">
+                    <div>
+                        <div className="text-3xl font-bold">
+                            {norm.toFixed(0)}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{unit}</p>
+                    </div>
+                    {filling !== undefined && (
+                        <div className="text-right">
+                            <div className="text-lg font-semibold">
+                                {fillingValue.toFixed(0)} kg
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                                Gebruikt
+                            </p>
+                        </div>
+                    )}
+                </div>
+                {filling !== undefined && (
+                    <div className="mt-4">
+                        <ProgressBar value={percentage} />
+                        <p className="mt-1 text-right text-sm text-muted-foreground">
+                            {percentage.toFixed(0)}% gebruikt
+                        </p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+}
 
 interface FarmNormsProps {
-    farmNorms: {
-        manure: number
-        phosphate: number
-        nitrogen: number
-    }
+    farmNorms: AggregatedNormsToFarmLevel
+    farmFillings: AggregatedNormFillingsToFarmLevel | undefined
     hasFieldNormErrors: boolean
     fieldErrorMessages: string[]
 }
 
 export function FarmNorms({
     farmNorms,
+    farmFillings,
     hasFieldNormErrors,
     fieldErrorMessages,
 }: FarmNormsProps) {
     return (
-        <div className="mb-0">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-                {hasFieldNormErrors && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <button
-                                    type="button"
-                                    aria-label="Gebruiksnorm fouten op percelen"
-                                    className="inline-flex"
-                                >
-                                    <AlertTriangle
-                                        className="h-5 w-5 text-amber-600"
-                                        aria-hidden="true"
-                                    />
-                                </button>
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-md">
-                                <p className="font-medium">
-                                    Voor sommige percelen zijn de gebruiksnormen
-                                    niet volledig berekend:
-                                </p>
-                                <ul className="list-disc pl-5 mt-2 text-sm">
-                                    {fieldErrorMessages.map((msg) => (
-                                        <li key={msg}>{msg}</li>
-                                    ))}
-                                </ul>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                )}
-                Bedrijfsniveau
-            </h2>
-            <div className="grid gap-4 xl:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Stikstof
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {farmNorms.nitrogen} kg N
-                        </div>
-                        {/* <p className="text-xs text-muted-foreground"></p> */}
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Fosfaat
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {farmNorms.phosphate} kg P2O5
-                        </div>
-                        {/* <p className="text-xs text-muted-foreground"></p> */}
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">
-                            Stikstof uit dierlijke mest
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">
-                            {farmNorms.manure} kg N
-                        </div>
-                        {/* <p className="text-xs text-muted-foreground"></p> */}
-                    </CardContent>
-                </Card>
+        <div>
+            {hasFieldNormErrors && (
+                <Alert variant="destructive" className="mb-6">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Fouten bij perceelsnormen</AlertTitle>
+                    <AlertDescription>
+                        <p>
+                            Voor één of meerdere percelen konden de
+                            gebruiksnormen niet volledig worden berekend. De
+                            totalen op bedrijfsniveau kunnen hierdoor afwijken.
+                        </p>
+                        <ul className="list-disc pl-5 mt-2 text-xs">
+                            {fieldErrorMessages.map((msg) => (
+                                <li key={msg}>{msg}</li>
+                            ))}
+                        </ul>
+                    </AlertDescription>
+                </Alert>
+            )}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <NormCard
+                    title="Stikstof, werkzaam"
+                    norm={farmNorms.nitrogen}
+                    filling={farmFillings?.nitrogen}
+                    unit="kg N"
+                />
+                <NormCard
+                    title="Fosfaat"
+                    norm={farmNorms.phosphate}
+                    filling={farmFillings?.phosphate}
+                    unit="kg P₂O₅"
+                />
+                <NormCard
+                    title="Stikstof uit dierlijke mest"
+                    norm={farmNorms.manure}
+                    filling={farmFillings?.manure}
+                    unit="kg N"
+                />
             </div>
         </div>
     )
