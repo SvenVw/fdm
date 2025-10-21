@@ -1,7 +1,3 @@
-import {
-    createFunctionsForFertilizerApplicationFilling,
-    createFunctionsForNorms,
-} from "@svenvw/fdm-calculator"
 import type {
     AggregatedNormFillingsToFarmLevel,
     AggregatedNormsToFarmLevel,
@@ -10,16 +6,20 @@ import type {
     InputAggregateNormsToFarmLevel,
     NormFilling,
 } from "@svenvw/fdm-calculator"
+import {
+    createFunctionsForFertilizerApplicationFilling,
+    createFunctionsForNorms,
+} from "@svenvw/fdm-calculator"
 import { getFarm, getFarms, getFields } from "@svenvw/fdm-core"
 import { AlertTriangle } from "lucide-react"
 import { Suspense, use } from "react"
 import {
-    NavLink,
     data,
-    useLoaderData,
-    useLocation,
     type LoaderFunctionArgs,
     type MetaFunction,
+    NavLink,
+    useLoaderData,
+    useLocation,
 } from "react-router"
 import { FarmTitle } from "~/components/blocks/farm/farm-title"
 import { Header } from "~/components/blocks/header/base"
