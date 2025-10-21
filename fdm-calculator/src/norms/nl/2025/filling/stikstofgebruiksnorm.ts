@@ -172,7 +172,7 @@ export function getWorkingCoefficient(
 ): WorkingCoefficientDetails {
     const defaultDetails: WorkingCoefficientDetails = {
         p_n_wcl: 1.0,
-        description: "Kunstmest of niet gevonden in Tabel 9",
+        description: "Kunstmest",
     }
 
     if (!p_type_rvo) {

@@ -157,7 +157,7 @@ describe("getWorkingCoefficient", () => {
             false,
         )
         expect(result.p_n_wcl).toBe(1.0)
-        expect(result.description).toBe("Kunstmest of niet gevonden in Tabel 9")
+        expect(result.description).toBe("Kunstmest")
         expect(result.subTypeDescription).toBeUndefined()
     })
 
@@ -171,7 +171,7 @@ describe("getWorkingCoefficient", () => {
             false,
         )
         expect(result.p_n_wcl).toBe(1.0)
-        expect(result.description).toBe("Kunstmest of niet gevonden in Tabel 9")
+        expect(result.description).toBe("Kunstmest")
         expect(result.subTypeDescription).toBeUndefined()
     })
 
@@ -528,7 +528,7 @@ describe("getWorkingCoefficient", () => {
             false,
         )
         expect(result.p_n_wcl).toBe(1.0)
-        expect(result.description).toBe("Kunstmest of niet gevonden in Tabel 9")
+        expect(result.description).toBe("Kunstmest")
         expect(result.subTypeDescription).toBeUndefined()
     })
 
@@ -592,7 +592,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         expect(result.normFilling).toBeCloseTo(5)
         expect(result.applicationFilling[0].normFilling).toBeCloseTo(5)
         expect(result.applicationFilling[0].normFillingDetails).toBe(
-            "Werkingscoëfficiënt: 100% - Kunstmest of niet gevonden in Tabel 9",
+            "Werkingscoëfficiënt: 100% - Kunstmest",
         )
     })
 
@@ -645,7 +645,7 @@ describe("calculateFertilizerApplicationFillingForNitrogen", () => {
         expect(result.normFilling).toBeCloseTo(5.5)
         expect(result.applicationFilling[0].normFilling).toBeCloseTo(5)
         expect(result.applicationFilling[0].normFillingDetails).toBe(
-            "Werkingscoëfficiënt: 100% - Kunstmest of niet gevonden in Tabel 9",
+            "Werkingscoëfficiënt: 100% - Kunstmest",
         )
         expect(result.applicationFilling[1].normFilling).toBeCloseTo(0.5)
         expect(result.applicationFilling[1].normFillingDetails).toBe(
